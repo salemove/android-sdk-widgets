@@ -1,0 +1,3 @@
+include ':widgetssdk'
+include ':app'
+rootProject.name = "Glia android SDK widgets"

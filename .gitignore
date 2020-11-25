@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+/widgetssdk/lint/
+/app/lint/
+lint/

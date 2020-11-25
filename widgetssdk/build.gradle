@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 30
@@ -24,13 +24,36 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    lintOptions {
+        disable "WrongLayoutName"
+        disable "LayoutFileNameMatchesClass"
+        disable "MatchingViewId"
+        disable "RawDimen"
+        disable "WrongAnnotationOrder"
+        disable "ColorCasing"
+        disable "WrongViewIdFormat"
+        disable "HardcodedText"
+    }
+}
+
+
+ext {
+    appCompatVersion = '1.2.0'
+    materialVersion = '1.2.1'
+    constraintLayoutVersion = '2.0.4'
+    junitVersion = '4.13.1'
+    androidXTestVersion = '1.1.2'
+    espressoVersion = '3.3.0'
 }
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "com.google.android.material:material:$materialVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation "com.glia:android-sdk:$gliaSdkVersion"
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }

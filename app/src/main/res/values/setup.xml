@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_token" tools:ignore="ExtraTranslation">xWa2EKJTN35En26o</string>
+    <string name="site_id" tools:ignore="ExtraTranslation">72c76913-ff1b-48a6-b209-bbeb57bd8649</string>
+    <string name="api_token" tools:ignore="ExtraTranslation">aYDwJZ0TemP5ub9rwQBXcg</string>
+</resources>

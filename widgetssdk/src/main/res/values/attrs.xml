@@ -5,6 +5,8 @@
         <attr name="backgroundTint" format="color" />
         <attr name="senderMessageTint" format="color" />
         <attr name="receiverMessageTint" format="color" />
+        <attr name="android:fontFamily" format="reference" />
+        <attr name="primaryTextColor" format="color" />
     </declare-styleable>
 
     <attr name="gliaChatTheme" format="reference" />

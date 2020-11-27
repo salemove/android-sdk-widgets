@@ -3,6 +3,8 @@ package com.glia.widgets;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -13,6 +15,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,13 +24,18 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class ChatView extends LinearLayout {
 
+    private boolean started = false;
+
     private RecyclerView chatRecyclerView;
     private ImageView sendView;
     private EditText chatEditText;
+    private ChatAdapter adapter;
 
     private ColorStateList backgroundTint;
     private ColorStateList colorPrimary;
     private ColorStateList senderMessageTint;
+    private Typeface fontFamily;
+    private ColorStateList primaryTextColor;
 
     public ChatView(Context context) {
         this(context, null);
@@ -69,7 +77,20 @@ public class ChatView extends LinearLayout {
         if (uiTheme.getSenderBackgroundTint() != null) {
             this.senderMessageTint = uiTheme.getSenderBackgroundTint();
         }
+        if (uiTheme.getFontFamily() != null) {
+            this.fontFamily = uiTheme.getFontFamily();
+        }
+        if (uiTheme.getPrimaryTextColor() != null) {
+            this.primaryTextColor = uiTheme.getPrimaryTextColor();
+        }
         setupViews(this.getContext());
+    }
+
+    public void start() {
+        setVisibility(VISIBLE);
+        // TODO Remove when start using real data.
+        adapter.initDefault();
+        started = true;
     }
 
     private void setAttrValues(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -86,11 +107,21 @@ public class ChatView extends LinearLayout {
         if (colorPrimary == null) {
             colorPrimary = ContextCompat.getColorStateList(context, R.color.light_gray_color);
         }
+        int fontFamilyId = typedArray.getResourceId(R.styleable.ChatView_android_fontFamily, 0);
+        if (fontFamilyId != 0) {
+            fontFamily = ResourcesCompat.getFont(context, fontFamilyId);
+        }
+        primaryTextColor = typedArray.getColorStateList(R.styleable.ChatView_primaryTextColor);
+        if (colorPrimary == null) {
+            primaryTextColor = ContextCompat.getColorStateList(context, R.color.color_white);
+        }
         typedArray.recycle();
     }
 
     private void initConfigurations() {
         setOrientation(VERTICAL);
+        // Leaving invisible for now until I can think of a better placeholder in view preview.
+        setVisibility(INVISIBLE);
     }
 
     private void initViews(Context context) {
@@ -101,15 +132,15 @@ public class ChatView extends LinearLayout {
     }
 
     private void setupViews(Context context) {
-        ChatAdapter adapter = new ChatAdapter(senderMessageTint, colorPrimary);
+        adapter = new ChatAdapter(senderMessageTint, colorPrimary, fontFamily, primaryTextColor);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         chatRecyclerView.setAdapter(adapter);
 
         setBackgroundColor(backgroundTint.getDefaultColor());
         sendView.setBackgroundTintList(backgroundTint);
-
-        // TODO Remove when start using real data.
-        adapter.initDefault();
+        if (fontFamily != null) {
+            chatEditText.setTypeface(fontFamily);
+        }
     }
 
     private void setupViewActions() {
@@ -133,5 +164,25 @@ public class ChatView extends LinearLayout {
 
             }
         });
+    }
+
+    @Nullable
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        ChatSaveState saveState = new ChatSaveState(superState);
+        saveState.started = started;
+        return saveState;
+    }
+
+    protected void onRestoreInstanceState(@Nullable Parcelable state) {
+        if (!(state instanceof ChatSaveState)) {
+            super.onRestoreInstanceState(state);
+        } else {
+            ChatSaveState saveState = (ChatSaveState) state;
+            super.onRestoreInstanceState(saveState.getSuperState());
+            if (saveState.started) {
+                this.start();
+            }
+        }
     }
 }

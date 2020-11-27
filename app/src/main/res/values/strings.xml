@@ -4,25 +4,28 @@
     <string name="app_name">Glia SDK Widget Example App</string>
 
     <string name="settings_value_default">Default</string>
+    <string name="settings_color_white">White</string>
+    <string name="settings_color_black">Black</string>
     <string name="settings_color_blue">Blue</string>
     <string name="settings_color_grey">Grey</string>
     <string name="settings_color_red">Red</string>
-    <string name="settings_roman">Times New Roman</string>
-    <string name="settings_roboto">Roboto</string>
-    <string name="settings_playfair">Playfair Display</string>
+    <string name="settings_delius">Delius</string>
+    <string name="settings_expletus">Expletus Sans</string>
+    <string name="settings_tangerine">Tangerine</string>
     <string name="settings_chat_bg_color">Chat screen background color</string>
     <string name="settings_chat_primary_color">Primary color</string>
     <string name="settings_chat_sender_bg_color">Chat message sender background color</string>
     <string name="settings_chat_message_font_family">Chat message font family</string>
     <string name="settings_chat_message_font_color">Chat message font color</string>
     <string name="settings_chat_message_font_size">Chat message font size</string>
+    <string name="settings_chat_text_color">Chat text color</string>
     <string name="settings_chat_message_font_size_small">Small</string>
     <string name="settings_message_font_size_medium">Medium</string>
     <string name="settings_message_font_size_large">Large</string>
 
     <string name="main_open_settings">Open Settings</string>
-    <string name="main_launch_activity">Launch Chat Activity</string>
-    <string name="main_launch_fragment">Launch Chat Fragment</string>
+    <string name="main_launch_activity">Launch Chat in Activity</string>
+    <string name="main_launch_fragment">Launch Chat in Fragment</string>
     <string name="main_embed_in_this_view">Embed Chat in this view</string>
 
 </resources>

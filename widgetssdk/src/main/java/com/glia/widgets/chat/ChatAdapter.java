@@ -1,6 +1,7 @@
 package com.glia.widgets.chat;
 
 import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +22,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int RECEIVE_MESSAGE_VIEW_TYPE = 2;
     private final ColorStateList senderMessageTint;
     private final ColorStateList receiverMessageTint;
+    private final Typeface fontFamily;
+    private final ColorStateList primaryTextColor;
 
     private List<ChatItem> chatItems;
 
     public ChatAdapter(ColorStateList senderMessageTint,
-                       ColorStateList receiverMessageTint) {
+                       ColorStateList receiverMessageTint,
+                       Typeface fontFamily,
+                       ColorStateList primaryTextColor) {
         this.senderMessageTint = senderMessageTint;
         this.receiverMessageTint = receiverMessageTint;
+        this.fontFamily = fontFamily;
+        this.primaryTextColor = primaryTextColor;
     }
 
     public void initDefault() {
@@ -41,46 +48,57 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     private static class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
-        private final View itemView;
+        private final TextView joinedCaptionView;
+        private final TextView connectingOperatorView;
+        private final TextView joinedOperatorNameView;
 
-        public OperatorStatusViewHolder(@NonNull View itemView) {
+        public OperatorStatusViewHolder(@NonNull View itemView, Typeface fontFamily) {
             super(itemView);
-            this.itemView = itemView;
+            this.joinedCaptionView = itemView.findViewById(R.id.joined_operator_caption_view);
+            this.connectingOperatorView = itemView.findViewById(R.id.connecting_operator_view);
+            this.joinedOperatorNameView = itemView.findViewById(R.id.joined_operator_name_view);
+            if (fontFamily != null) {
+                joinedCaptionView.setTypeface(fontFamily);
+                connectingOperatorView.setTypeface(fontFamily);
+                joinedOperatorNameView.setTypeface(fontFamily, Typeface.BOLD);
+            }
         }
 
         public void bind(OperatorStatusItem item) {
-            TextView joinedCaptionView = itemView.findViewById(R.id.joined_operator_caption_view);
         }
     }
 
     private static class SendMessageViewHolder extends RecyclerView.ViewHolder {
-        private final View itemView;
+        private final TextView content;
 
-        public SendMessageViewHolder(@NonNull View itemView) {
+        public SendMessageViewHolder(@NonNull View itemView, ColorStateList backgroundColor, Typeface fontFamily, ColorStateList primaryTextColor) {
             super(itemView);
-            this.itemView = itemView;
+            this.content = itemView.findViewById(R.id.content);
+            content.setBackgroundTintList(backgroundColor);
+            if (fontFamily != null) {
+                content.setTypeface(fontFamily);
+            }
+            content.setTextColor(primaryTextColor);
         }
 
-        public void bind(SendMessageItem item, ColorStateList backgroundColor) {
-            TextView content = itemView.findViewById(R.id.content);
-
-            content.setBackgroundTintList(backgroundColor);
+        public void bind(SendMessageItem item) {
             content.setText(item.getMessage());
         }
     }
 
     private static class ReceiveMessageViewHolder extends RecyclerView.ViewHolder {
-        private final View itemView;
+        private final TextView content;
 
-        public ReceiveMessageViewHolder(@NonNull View itemView) {
+        public ReceiveMessageViewHolder(@NonNull View itemView, ColorStateList backgroundColor, Typeface fontFamily) {
             super(itemView);
-            this.itemView = itemView;
+            this.content = itemView.findViewById(R.id.content);
+            content.setBackgroundTintList(backgroundColor);
+            if (fontFamily != null) {
+                content.setTypeface(fontFamily);
+            }
         }
 
-        public void bind(ReceiveMessageItem item, ColorStateList backgroundColor) {
-            TextView content = itemView.findViewById(R.id.content);
-
-            content.setBackgroundTintList(backgroundColor);
+        public void bind(ReceiveMessageItem item) {
             content.setText(item.getMessage());
         }
     }
@@ -100,11 +118,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == OPERATOR_STATUS_VIEW_TYPE) {
-            return new OperatorStatusViewHolder(inflater.inflate(R.layout.chat_operator_status_item, parent, false));
+            return new OperatorStatusViewHolder(inflater.inflate(R.layout.chat_operator_status_item, parent, false), fontFamily);
         } else if (viewType == SEND_MESSAGE_VIEW_TYPE) {
-            return new SendMessageViewHolder(inflater.inflate(R.layout.chat_send_message_item, parent, false));
+            return new SendMessageViewHolder(inflater.inflate(R.layout.chat_send_message_item, parent, false), senderMessageTint, fontFamily, primaryTextColor);
         } else if (viewType == RECEIVE_MESSAGE_VIEW_TYPE) {
-            return new ReceiveMessageViewHolder(inflater.inflate(R.layout.chat_receive_message_item, parent, false));
+            return new ReceiveMessageViewHolder(inflater.inflate(R.layout.chat_receive_message_item, parent, false), receiverMessageTint, fontFamily);
         } else {
             throw new IllegalArgumentException("Unknown viewtype: " + viewType);
         }
@@ -116,9 +134,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (chatItem instanceof OperatorStatusItem) {
             ((OperatorStatusViewHolder) holder).bind((OperatorStatusItem) chatItem);
         } else if (chatItem instanceof SendMessageItem) {
-            ((SendMessageViewHolder) holder).bind((SendMessageItem) chatItem, senderMessageTint);
+            ((SendMessageViewHolder) holder).bind((SendMessageItem) chatItem);
         } else if (chatItem instanceof ReceiveMessageItem) {
-            ((ReceiveMessageViewHolder) holder).bind((ReceiveMessageItem) chatItem, receiverMessageTint);
+            ((ReceiveMessageViewHolder) holder).bind((ReceiveMessageItem) chatItem);
         }
     }
 

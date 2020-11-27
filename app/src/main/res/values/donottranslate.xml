@@ -3,48 +3,56 @@
     <string name="pref_bg_color">bg_color</string>
     <string name="pref_primary_color">primary_color</string>
     <string name="pref_sender_bg_color">sender_bg_color</string>
+    <string name="pref_text_color">text_color</string>
     <string name="pref_font_family">font_family</string>
     <string name="pref_font_color">font_color</string>
     <string name="pref_font_size">font_size</string>
 
+    <string name="default_value">default</string>
+    <string name="color_white_value">white</string>
+    <string name="color_black_value">black</string>
     <string name="color_blue_value">blue</string>
     <string name="color_grey_value">grey</string>
     <string name="color_red_value">red</string>
-    <string name="font_roman_value">roman</string>
-    <string name="font_roboto_value">roboto</string>
-    <string name="font_playfair_value">playfair</string>
+    <string name="font_delius_value">delius</string>
+    <string name="font_expletus_value">expletus</string>
+    <string name="font_tangerine_value">tangerine</string>
     <string name="font_size_small">small</string>
     <string name="font_size_medium">medium</string>
     <string name="font_size_large">large</string>
     <array name="colors">
+        <item>@string/settings_value_default</item>
         <item>@string/settings_color_blue</item>
         <item>@string/settings_color_grey</item>
         <item>@string/settings_color_red</item>
     </array>
     <array name="color_values">
+        <item>@string/default_value</item>
         <item>@string/color_blue_value</item>
         <item>@string/color_grey_value</item>
         <item>@string/color_red_value</item>
     </array>
     <array name="fonts">
-        <item>@string/settings_roman</item>
-        <item>@string/settings_roboto</item>
-        <item>@string/settings_playfair</item>
+        <item>@string/settings_value_default</item>
+        <item>@string/settings_delius</item>
+        <item>@string/settings_expletus</item>
+        <item>@string/settings_tangerine</item>
     </array>
     <array name="font_values">
-        <item>@string/font_roman_value</item>
-        <item>@string/font_roboto_value</item>
-        <item>@string/font_playfair_value</item>
+        <item>@string/default_value</item>
+        <item>@string/font_delius_value</item>
+        <item>@string/font_expletus_value</item>
+        <item>@string/font_tangerine_value</item>
     </array>
-    <array name="font_sizes">
-        <item>@string/settings_chat_message_font_size_small</item>
-        <item>@string/settings_message_font_size_medium</item>
-        <item>@string/settings_message_font_size_large</item>
+    <array name="text_colors">
+        <item>@string/settings_value_default</item>
+        <item>@string/settings_color_white</item>
+        <item>@string/settings_color_black</item>
     </array>
-    <array name="font_sizes_values">
-        <item>@string/font_size_small</item>
-        <item>@string/font_size_medium</item>
-        <item>@string/font_size_large</item>
+    <array name="text_color_values">
+        <item>@string/default_value</item>
+        <item>@string/color_white_value</item>
+        <item>@string/color_black_value</item>
     </array>
 
 </resources>

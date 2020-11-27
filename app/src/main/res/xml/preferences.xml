@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
-        android:defaultValue="@string/settings_value_default"
+        android:defaultValue="@string/default_value"
         android:entries="@array/colors"
         android:entryValues="@array/color_values"
         android:key="@string/pref_bg_color"
@@ -11,7 +11,7 @@
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-        android:defaultValue="@string/settings_value_default"
+        android:defaultValue="@string/default_value"
         android:entries="@array/colors"
         android:entryValues="@array/color_values"
         android:key="@string/pref_primary_color"
@@ -19,7 +19,7 @@
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-        android:defaultValue="@string/settings_value_default"
+        android:defaultValue="@string/default_value"
         android:entries="@array/colors"
         android:entryValues="@array/color_values"
         android:key="@string/pref_sender_bg_color"
@@ -27,7 +27,7 @@
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-        android:defaultValue="@string/settings_value_default"
+        android:defaultValue="@string/default_value"
         android:entries="@array/fonts"
         android:entryValues="@array/font_values"
         android:key="@string/pref_font_family"
@@ -35,19 +35,11 @@
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
-        android:defaultValue="@string/settings_value_default"
-        android:entries="@array/colors"
-        android:entryValues="@array/color_values"
-        android:key="@string/pref_font_color"
-        android:title="@string/settings_chat_message_font_color"
-        app:useSimpleSummaryProvider="true" />
-
-    <ListPreference
-        android:defaultValue="@string/settings_value_default"
-        android:entries="@array/font_sizes"
-        android:entryValues="@array/font_sizes_values"
-        android:key="@string/pref_font_size"
-        android:title="@string/settings_chat_message_font_size"
+        android:defaultValue="@string/default_value"
+        android:entries="@array/text_colors"
+        android:entryValues="@array/text_color_values"
+        android:key="@string/pref_text_color"
+        android:title="@string/settings_chat_text_color"
         app:useSimpleSummaryProvider="true" />
 
 </PreferenceScreen>

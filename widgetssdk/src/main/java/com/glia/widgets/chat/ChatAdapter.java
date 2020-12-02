@@ -21,18 +21,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int SEND_MESSAGE_VIEW_TYPE = 1;
     public static final int RECEIVE_MESSAGE_VIEW_TYPE = 2;
     private final ColorStateList senderMessageTint;
-    private final ColorStateList receiverMessageTint;
+    private final ColorStateList operatorBackgroundTint;
     private final Typeface fontFamily;
     private final ColorStateList primaryTextColor;
 
     private List<ChatItem> chatItems;
 
     public ChatAdapter(ColorStateList senderMessageTint,
-                       ColorStateList receiverMessageTint,
+                       ColorStateList operatorBackgroundTint,
                        Typeface fontFamily,
                        ColorStateList primaryTextColor) {
         this.senderMessageTint = senderMessageTint;
-        this.receiverMessageTint = receiverMessageTint;
+        this.operatorBackgroundTint = operatorBackgroundTint;
         this.fontFamily = fontFamily;
         this.primaryTextColor = primaryTextColor;
     }
@@ -122,7 +122,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (viewType == SEND_MESSAGE_VIEW_TYPE) {
             return new SendMessageViewHolder(inflater.inflate(R.layout.chat_send_message_item, parent, false), senderMessageTint, fontFamily, primaryTextColor);
         } else if (viewType == RECEIVE_MESSAGE_VIEW_TYPE) {
-            return new ReceiveMessageViewHolder(inflater.inflate(R.layout.chat_receive_message_item, parent, false), receiverMessageTint, fontFamily);
+            return new ReceiveMessageViewHolder(inflater.inflate(R.layout.chat_receive_message_item, parent, false), operatorBackgroundTint, fontFamily);
         } else {
             throw new IllegalArgumentException("Unknown viewtype: " + viewType);
         }

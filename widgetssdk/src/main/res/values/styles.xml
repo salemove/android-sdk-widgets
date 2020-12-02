@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Application.Glia.Chat.Layout" parent="">
-
-    </style>
+    <style name="Application.Glia.Chat.Layout" parent="" />
 
     <style name="Application.Glia.Chat.Edittext" parent="Widget.AppCompat.EditText">
         <item name="android:inputType">textCapSentences|textMultiLine</item>
         <item name="android:backgroundTint">@android:color/transparent</item>
+    </style>
+
+    <style name="Application.Glia.Chat.Toolbar" parent="">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
+        <item name="android:textColor">@color/color_white</item>
     </style>
 
 </resources>

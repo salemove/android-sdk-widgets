@@ -1,9 +1,6 @@
 package com.glia.exampleapp;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavController;
@@ -29,36 +25,55 @@ public class MainFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.main_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Context context = view.getContext();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        FragmentActivity activity = getActivity();
         view.findViewById(R.id.settings_button).setOnClickListener(view1 -> {
-            FragmentActivity activity = getActivity();
             if (activity != null) {
-                NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment);
+                NavController navController =
+                        Navigation.findNavController(activity, R.id.nav_host_fragment);
                 navController.navigate(R.id.settings);
             }
         });
+        ChatView chatView = view.findViewById(R.id.chat_view);
+        chatView.setOnBackClickedListener(view2 -> chatView.stop());
         view.findViewById(R.id.embed_button).setOnClickListener(view1 -> {
-            ChatView chatView = view.findViewById(R.id.chat_view);
-            ColorStateList bgColor = getColorValueFromPrefs(R.string.pref_bg_color, sharedPreferences);
-            ColorStateList receiverBgColor = getColorValueFromPrefs(R.string.pref_primary_color, sharedPreferences);
-            ColorStateList senderBgColor = getColorValueFromPrefs(R.string.pref_sender_bg_color, sharedPreferences);
-            Typeface fontFamily = getTypefaceFromPrefs(getContext(), sharedPreferences);
-            ColorStateList primaryTextColor = getColorValueFromPrefs(R.string.pref_text_color, sharedPreferences);
-            chatView.setupUiConfig(new UiTheme(bgColor, senderBgColor, receiverBgColor, fontFamily, primaryTextColor));
+            UiTheme theme = getUiThemeByPrefs(sharedPreferences);
+            chatView.setTheme(theme);
             chatView.start();
         });
     }
 
-    ColorStateList getColorValueFromPrefs(@StringRes int keyValue, SharedPreferences sharedPreferences) {
+    String getAppbarTitleFromPrefs(SharedPreferences sharedPreferences) {
+        return sharedPreferences.getString(getString(R.string.pref_header_title), null);
+    }
+
+    UiTheme getUiThemeByPrefs(SharedPreferences sharedPreferences) {
+        String title = getAppbarTitleFromPrefs(sharedPreferences);
+        Integer bgColor = getColorValueFromPrefs(R.string.pref_bg_color, sharedPreferences);
+        Integer primaryColor = getColorValueFromPrefs(R.string.pref_primary_color, sharedPreferences);
+        Integer opearatorBgColor = getColorValueFromPrefs(R.string.pref_operator_bg_color, sharedPreferences);
+        Integer fontFamily = getTypefaceFromPrefs(sharedPreferences);
+        Integer primaryTextColor = getColorValueFromPrefs(R.string.pref_text_color, sharedPreferences);
+        UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
+        builder.setTitle(title);
+        builder.setBackgroundColorRes(bgColor);
+        builder.setOperatorMessageBgColorRes(opearatorBgColor);
+        builder.setPrimaryBrandColorRes(primaryColor);
+        builder.setFontRes(fontFamily);
+        builder.setPrimaryTextColorRes(primaryTextColor);
+        return builder.build();
+    }
+
+    Integer getColorValueFromPrefs(@StringRes int keyValue, SharedPreferences sharedPreferences) {
         String colorGrey = getString(R.string.color_grey_value);
         String colorRed = getString(R.string.color_red_value);
         String colorBlue = getString(R.string.color_blue_value);
@@ -70,21 +85,21 @@ public class MainFragment extends Fragment {
 
         if (!colorValue.equals(defaultPrefValue)) {
             if (colorValue.equals(colorGrey)) {
-                return ResourcesCompat.getColorStateList(getResources(), R.color.color_grey, null);
+                return R.color.color_grey;
             } else if (colorValue.equals(colorRed)) {
-                return ResourcesCompat.getColorStateList(getResources(), R.color.color_red, null);
+                return R.color.color_red;
             } else if (colorValue.equals(colorBlue)) {
-                return ResourcesCompat.getColorStateList(getResources(), R.color.color_blue, null);
+                return R.color.color_blue;
             } else if (colorValue.equals(colorWhite)) {
-                return ResourcesCompat.getColorStateList(getResources(), R.color.color_white, null);
+                return R.color.color_white;
             } else if (colorValue.equals(colorBlack)) {
-                return ResourcesCompat.getColorStateList(getResources(), R.color.color_black, null);
+                return R.color.color_black;
             }
         }
         return null;
     }
 
-    Typeface getTypefaceFromPrefs(Context context, SharedPreferences sharedPreferences) {
+    Integer getTypefaceFromPrefs(SharedPreferences sharedPreferences) {
         String delius = getString(R.string.font_delius_value);
         String expletus = getString(R.string.font_expletus_value);
         String tangerine = getString(R.string.font_tangerine_value);
@@ -94,11 +109,11 @@ public class MainFragment extends Fragment {
 
         if (!typeFaceValue.equals(defaultPrefValue)) {
             if (typeFaceValue.equals(delius)) {
-                return ResourcesCompat.getFont(context, R.font.delius);
+                return R.font.delius;
             } else if (typeFaceValue.equals(expletus)) {
-                return ResourcesCompat.getFont(context, R.font.expletus);
+                return R.font.expletus;
             } else if (typeFaceValue.equals(tangerine)) {
-                return ResourcesCompat.getFont(context, R.font.tangerine);
+                return R.font.tangerine;
             }
         }
         return null;

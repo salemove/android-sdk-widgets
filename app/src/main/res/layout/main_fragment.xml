@@ -4,19 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/tool_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/top_app_bar"
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/app_name" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_begin="16dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/top_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="8dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
@@ -33,29 +41,7 @@
         android:text="@string/main_open_settings"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="@id/top_guideline" />
-
-    <Button
-        android:id="@+id/activity_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_m"
-        android:text="@string/main_launch_activity"
-        app:icon="@drawable/ic_baseline_chat_bubble"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/settings_button" />
-
-    <Button
-        android:id="@+id/fragment_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_m"
-        android:text="@string/main_launch_fragment"
-        app:icon="@drawable/ic_baseline_chat_bubble"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/activity_button" />
+        app:layout_constraintTop_toBottomOf="@id/tool_bar_layout" />
 
     <Button
         android:id="@+id/embed_button"
@@ -66,7 +52,7 @@
         app:icon="@drawable/ic_baseline_chat_bubble"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/fragment_button" />
+        app:layout_constraintTop_toBottomOf="@id/settings_button" />
 
     <com.glia.widgets.ChatView
         android:id="@+id/chat_view"

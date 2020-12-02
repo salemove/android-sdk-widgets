@@ -13,8 +13,8 @@
     <string name="settings_expletus">Expletus Sans</string>
     <string name="settings_tangerine">Tangerine</string>
     <string name="settings_chat_bg_color">Chat screen background color</string>
-    <string name="settings_chat_primary_color">Primary color</string>
-    <string name="settings_chat_sender_bg_color">Chat message sender background color</string>
+    <string name="settings_chat_primary_color">Primary brand color</string>
+    <string name="settings_chat_operator_bg_color">Chat operator background message color</string>
     <string name="settings_chat_message_font_family">Chat message font family</string>
     <string name="settings_chat_message_font_color">Chat message font color</string>
     <string name="settings_chat_message_font_size">Chat message font size</string>
@@ -22,6 +22,10 @@
     <string name="settings_chat_message_font_size_small">Small</string>
     <string name="settings_message_font_size_medium">Medium</string>
     <string name="settings_message_font_size_large">Large</string>
+    <string name="settings_header_title">Title</string>
+    <string name="settings_api_token">Api token</string>
+    <string name="settings_app_token">App token</string>
+    <string name="settings_site_id">Site id</string>
 
     <string name="main_open_settings">Open Settings</string>
     <string name="main_launch_activity">Launch Chat in Activity</string>

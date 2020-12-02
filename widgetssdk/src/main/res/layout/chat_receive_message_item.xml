@@ -6,6 +6,13 @@
     android:layout_marginTop="@dimen/medium"
     android:orientation="vertical">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/end_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.75" />
+
     <TextView
         android:id="@+id/content"
         android:layout_width="0dp"
@@ -13,10 +20,10 @@
         android:background="@drawable/bg_message"
         android:backgroundTint="@color/light_gray_color"
         android:textColor="@color/black_text_color"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.7" />
+        app:layout_constraintWidth_default="wrap" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

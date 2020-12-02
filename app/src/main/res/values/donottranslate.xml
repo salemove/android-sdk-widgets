@@ -2,11 +2,15 @@
 <resources>
     <string name="pref_bg_color">bg_color</string>
     <string name="pref_primary_color">primary_color</string>
-    <string name="pref_sender_bg_color">sender_bg_color</string>
+    <string name="pref_operator_bg_color">sender_bg_color</string>
     <string name="pref_text_color">text_color</string>
     <string name="pref_font_family">font_family</string>
     <string name="pref_font_color">font_color</string>
     <string name="pref_font_size">font_size</string>
+    <string name="pref_header_title">header_title</string>
+    <string name="pref_api_token">api_token</string>
+    <string name="pref_app_token">app_token</string>
+    <string name="pref_site_id">site_id</string>
 
     <string name="default_value">default</string>
     <string name="color_white_value">white</string>

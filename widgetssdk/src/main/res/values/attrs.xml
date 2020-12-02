@@ -2,11 +2,12 @@
 <resources>
 
     <declare-styleable name="ChatView">
-        <attr name="backgroundTint" format="color" />
-        <attr name="senderMessageTint" format="color" />
-        <attr name="receiverMessageTint" format="color" />
+        <attr name="title" format="string" />
+        <attr name="chatBgColor" format="reference" />
+        <attr name="operatorBackgroundColor" format="reference" />
+        <attr name="primaryColor" format="reference" />
         <attr name="android:fontFamily" format="reference" />
-        <attr name="primaryTextColor" format="color" />
+        <attr name="primaryTextColor" format="reference" />
     </declare-styleable>
 
     <attr name="gliaChatTheme" format="reference" />

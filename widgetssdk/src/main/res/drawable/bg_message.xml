@@ -5,5 +5,5 @@
         android:left="@dimen/large"
         android:right="@dimen/large"
         android:top="@dimen/medium" />
-    <corners android:radius="5dp" />
+    <corners android:radius="@dimen/large" />
 </shape>

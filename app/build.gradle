@@ -36,6 +36,7 @@ android {
         master {
             initWith debug
             applicationIdSuffix '.master'
+            matchingFallbacks = ['debug']
         }
         release {
             initWith debug
@@ -74,7 +75,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$navVersion"
     implementation "androidx.preference:preference:$preferenceVersion"
     implementation "com.glia:android-sdk:$gliaSdkVersion"
-    implementation project(path: ':widgetssdk', configuration: 'default')
+    implementation project(path: ':widgetssdk')
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"

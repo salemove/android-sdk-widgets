@@ -1,6 +1,6 @@
 package com.glia.widgets.chat;
 
-class ChatItem {
+public class ChatItem {
     private final int viewType;
 
     protected ChatItem(int viewType) {

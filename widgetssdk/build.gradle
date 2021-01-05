@@ -3,7 +3,6 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
-    publishNonDefault true
     defaultPublishConfig "debug"
     defaultConfig {
         minSdkVersion 24
@@ -45,6 +44,8 @@ ext {
     junitVersion = '4.13.1'
     androidXTestVersion = '1.1.2'
     espresso = '3.3.0'
+    lottieVersion = '3.5.0'
+    leakCanaryVersion = '2.5'
 }
 
 dependencies {
@@ -55,4 +56,6 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
+    implementation "com.airbnb.android:lottie:$lottieVersion"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 }

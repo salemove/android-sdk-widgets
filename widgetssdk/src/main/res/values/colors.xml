@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="color_primary">#0F6BFF</color>
-    <color name="light_gray_color">#F3F3F3</color>
-    <color name="gray_stroke_color">#6C7683</color>
-    <color name="black_text_color">#2C0735</color>
-    <color name="color_white">#FFFFFF</color>
+    <color name="glia_brand_primary_color">#0F6BFF</color>
+    <color name="glia_base_dark_color">#2C0735</color>
+    <color name="glia_base_light_color">#FFFFFF</color>
+    <color name="glia_base_normal_color">#6C7683</color>
+    <color name="glia_system_negative_color">#D11149</color>
+    <color name="glia_system_agent_bubble_color">#F3F3F3</color>
 </resources>

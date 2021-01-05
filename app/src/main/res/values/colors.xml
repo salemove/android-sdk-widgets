@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="color_primary">#0F6BFF</color>
-    <color name="color_secondary">#C04CFD</color>
     <color name="color_black_text">@android:color/black</color>
 
     <color name="color_grey">#607d8b</color>

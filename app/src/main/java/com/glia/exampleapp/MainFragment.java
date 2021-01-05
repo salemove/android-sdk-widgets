@@ -20,6 +20,8 @@ import com.glia.widgets.UiTheme;
 
 public class MainFragment extends Fragment {
 
+    private ChatView chatView;
+
     public MainFragment() {
     }
 
@@ -34,42 +36,63 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        FragmentActivity activity = getActivity();
+        FragmentActivity activity = requireActivity();
         view.findViewById(R.id.settings_button).setOnClickListener(view1 -> {
-            if (activity != null) {
-                NavController navController =
-                        Navigation.findNavController(activity, R.id.nav_host_fragment);
-                navController.navigate(R.id.settings);
-            }
+            NavController navController =
+                    Navigation.findNavController(activity, R.id.nav_host_fragment);
+            navController.navigate(R.id.settings);
         });
-        ChatView chatView = view.findViewById(R.id.chat_view);
-        chatView.setOnBackClickedListener(view2 -> chatView.stop());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        chatView = view.findViewById(R.id.chat_view);
         view.findViewById(R.id.embed_button).setOnClickListener(view1 -> {
-            UiTheme theme = getUiThemeByPrefs(sharedPreferences);
-            chatView.setTheme(theme);
-            chatView.start();
+            if (chatView.isStarted()) {
+                chatView.show();
+            } else {
+                chatView.startChat(
+                        getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences),
+                        getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences));
+            }
         });
     }
 
-    String getAppbarTitleFromPrefs(SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(getString(R.string.pref_header_title), null);
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        UiTheme theme = getUiThemeByPrefs(sharedPreferences);
+        // Doing this here because user can navigate to settings and change values anytime
+        chatView.setTheme(theme);
+    }
+
+    @Override
+    public void onDestroyView() {
+        chatView.onDestroyView();
+        super.onDestroyView();
+    }
+
+    String getStringFromPrefs(@StringRes int keyValue, String defaultValue, SharedPreferences sharedPreferences) {
+        return sharedPreferences.getString(getString(keyValue), defaultValue);
     }
 
     UiTheme getUiThemeByPrefs(SharedPreferences sharedPreferences) {
-        String title = getAppbarTitleFromPrefs(sharedPreferences);
-        Integer bgColor = getColorValueFromPrefs(R.string.pref_bg_color, sharedPreferences);
-        Integer primaryColor = getColorValueFromPrefs(R.string.pref_primary_color, sharedPreferences);
-        Integer opearatorBgColor = getColorValueFromPrefs(R.string.pref_operator_bg_color, sharedPreferences);
+        String title = getStringFromPrefs(R.string.pref_header_title, null, sharedPreferences);
+        Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences);
+        Integer baseDarkColor = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences);
+        Integer baseNormalColor = getColorValueFromPrefs(R.string.pref_base_normal_color, sharedPreferences);
+        Integer brandPrimaryColor = getColorValueFromPrefs(R.string.pref_brand_primary_color, sharedPreferences);
+        Integer systemAgentBubbleColor = getColorValueFromPrefs(R.string.pref_system_agent_bubble_color, sharedPreferences);
         Integer fontFamily = getTypefaceFromPrefs(sharedPreferences);
-        Integer primaryTextColor = getColorValueFromPrefs(R.string.pref_text_color, sharedPreferences);
+        Integer systemNegativeColor = getColorValueFromPrefs(R.string.pref_system_negative_color, sharedPreferences);
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
-        builder.setTitle(title);
-        builder.setBackgroundColorRes(bgColor);
-        builder.setOperatorMessageBgColorRes(opearatorBgColor);
-        builder.setPrimaryBrandColorRes(primaryColor);
+
+        builder.setAppBarTitle(title);
+        builder.setBaseLightColor(baseLightColor);
+        builder.setBaseDarkColor(baseDarkColor);
+        builder.setBaseNormalColor(baseNormalColor);
+        builder.setSystemAgentBubbleColor(systemAgentBubbleColor);
+        builder.setBrandPrimaryColor(brandPrimaryColor);
         builder.setFontRes(fontFamily);
-        builder.setPrimaryTextColorRes(primaryTextColor);
+        builder.setSystemNegativeColor(systemNegativeColor);
         return builder.build();
     }
 

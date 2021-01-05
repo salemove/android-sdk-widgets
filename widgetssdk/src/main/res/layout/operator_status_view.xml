@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/placeholder_layout"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/pulsation_animation"
+        android:layout_width="@dimen/pulsation_animation_size"
+        android:layout_height="@dimen/pulsation_animation_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_colorFilter="?attr/gliaBrandPrimaryColor"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/pulsation_lottie_animation"
+        app:lottie_speed="0.75" />
+
+    <ImageView
+        android:id="@+id/place_holder_view"
+        android:layout_width="@dimen/place_holder_size"
+        android:layout_height="@dimen/place_holder_size"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/small"
+        android:background="@drawable/bg_circle"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_person" />
+
+    <View
+        android:id="@+id/corners_view"
+        android:layout_width="@dimen/profile_picture_size"
+        android:layout_height="@dimen/profile_picture_size"
+        android:background="@drawable/bg_outline_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profile_picture_view"
+        android:layout_width="@dimen/profile_picture_size"
+        android:layout_height="@dimen/profile_picture_size"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@color/glia_brand_primary_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+        app:srcCompat="@drawable/ic_baseline_person" />
+
+</merge>

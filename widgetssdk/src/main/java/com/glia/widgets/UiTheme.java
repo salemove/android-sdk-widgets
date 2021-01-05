@@ -1,163 +1,138 @@
 package com.glia.widgets;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import androidx.annotation.ColorRes;
 import androidx.annotation.FontRes;
 
-public class UiTheme implements Parcelable {
+public class UiTheme {
 
-    private final String title;
+    private final String appBarTitle;
     private @ColorRes
-    final Integer primaryBrandColorRes;
+    final Integer brandPrimaryColor;
     private @ColorRes
-    final Integer backgroundColorRes;
+    final Integer baseLightColor;
     private @ColorRes
-    final Integer operatorMessageBgColorRes;
+    final Integer baseDarkColor;
+    private @ColorRes
+    final Integer baseNormalColor;
+    private @ColorRes
+    final Integer systemAgentBubbleColor;
     private @FontRes
     final Integer fontRes;
     private @ColorRes
-    final Integer primaryTextColorRes;
+    final Integer systemNegativeColor;
 
-    private UiTheme(String title,
-                    Integer primaryBrandColorRes,
-                    Integer backgroundColorRes,
-                    Integer operatorMessageBgColorRes,
+    private UiTheme(String appBarTitle,
+                    Integer brandPrimaryColor,
+                    Integer baseLightColor,
+                    Integer baseDarkColor,
+                    Integer baseNormalColor,
+                    Integer systemAgentBubbleColor,
                     Integer fontRes,
-                    Integer primaryTextColorRes) {
-        this.title = title;
-        this.primaryBrandColorRes = primaryBrandColorRes;
-        this.backgroundColorRes = backgroundColorRes;
-        this.operatorMessageBgColorRes = operatorMessageBgColorRes;
+                    Integer systemNegativeColor) {
+        this.appBarTitle = appBarTitle;
+        this.brandPrimaryColor = brandPrimaryColor;
+        this.baseLightColor = baseLightColor;
+        this.baseDarkColor = baseDarkColor;
+        this.baseNormalColor = baseNormalColor;
+        this.systemAgentBubbleColor = systemAgentBubbleColor;
         this.fontRes = fontRes;
-        this.primaryTextColorRes = primaryTextColorRes;
-    }
-
-    protected UiTheme(Parcel in) {
-        title = in.readString();
-        if (in.readByte() == 0) {
-            primaryBrandColorRes = null;
-        } else {
-            primaryBrandColorRes = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            backgroundColorRes = null;
-        } else {
-            backgroundColorRes = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            operatorMessageBgColorRes = null;
-        } else {
-            operatorMessageBgColorRes = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            fontRes = null;
-        } else {
-            fontRes = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            primaryTextColorRes = null;
-        } else {
-            primaryTextColorRes = in.readInt();
-        }
-    }
-
-    public static final Creator<UiTheme> CREATOR = new Creator<UiTheme>() {
-        @Override
-        public UiTheme createFromParcel(Parcel in) {
-            return new UiTheme(in);
-        }
-
-        @Override
-        public UiTheme[] newArray(int size) {
-            return new UiTheme[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(title);
-        parcel.writeInt(this.primaryBrandColorRes != null ? this.primaryBrandColorRes : -1);
-        parcel.writeInt(this.backgroundColorRes != null ? this.backgroundColorRes : -1);
-        parcel.writeInt(this.operatorMessageBgColorRes != null ? this.operatorMessageBgColorRes : -1);
-        parcel.writeInt(this.fontRes != null ? this.fontRes : -1);
-        parcel.writeInt(this.primaryTextColorRes != null ? this.primaryTextColorRes : -1);
+        this.systemNegativeColor = systemNegativeColor;
     }
 
     public static class UiThemeBuilder {
-        private String title;
+        private String appBarTitle;
         private @ColorRes
-        Integer primaryBrandColorRes;
+        Integer brandPrimaryColor;
         private @ColorRes
-        Integer backgroundColorRes;
+        Integer baseLightColor;
         private @ColorRes
-        Integer operatorMessageBgColorRes;
+        Integer baseDarkColor;
+        private @ColorRes
+        Integer baseNormalColor;
+        private @ColorRes
+        Integer systemAgentBubbleColor;
         private @FontRes
         Integer fontRes;
         private @ColorRes
-        Integer primaryTextColorRes;
+        Integer systemNegativeColor;
 
-        public void setTitle(String title) {
-            this.title = title;
+        public void setAppBarTitle(String appBarTitle) {
+            this.appBarTitle = appBarTitle;
         }
 
-        public void setPrimaryBrandColorRes(Integer primaryBrandColorRes) {
-            this.primaryBrandColorRes = primaryBrandColorRes;
+        public void setFontRes(@FontRes Integer fontRes) {
+            if (fontRes != null && fontRes != 0) {
+                this.fontRes = fontRes;
+            } else {
+                this.fontRes = null;
+            }
         }
 
-        public void setBackgroundColorRes(Integer backgroundColorRes) {
-            this.backgroundColorRes = backgroundColorRes;
+        public void setBrandPrimaryColor(@ColorRes Integer brandPrimaryColor) {
+            this.brandPrimaryColor = brandPrimaryColor;
         }
 
-        public void setOperatorMessageBgColorRes(Integer operatorMessageBgColorRes) {
-            this.operatorMessageBgColorRes = operatorMessageBgColorRes;
+        public void setBaseLightColor(@ColorRes Integer baseLightColor) {
+            this.baseLightColor = baseLightColor;
         }
 
-        public void setFontRes(Integer fontRes) {
-            this.fontRes = fontRes;
+        public void setBaseDarkColor(@ColorRes Integer baseDarkColor) {
+            this.baseDarkColor = baseDarkColor;
         }
 
-        public void setPrimaryTextColorRes(Integer primaryTextColorRes) {
-            this.primaryTextColorRes = primaryTextColorRes;
+        public void setBaseNormalColor(Integer baseNormalColor) {
+            this.baseNormalColor = baseNormalColor;
+        }
+
+        public void setSystemAgentBubbleColor(@ColorRes Integer systemAgentBubbleColor) {
+            this.systemAgentBubbleColor = systemAgentBubbleColor;
+        }
+
+        public void setSystemNegativeColor(@ColorRes Integer systemNegativeColor) {
+            this.systemNegativeColor = systemNegativeColor;
         }
 
         public UiTheme build() {
-            return new UiTheme(title,
-                    primaryBrandColorRes,
-                    backgroundColorRes,
-                    operatorMessageBgColorRes,
+            return new UiTheme(appBarTitle,
+                    brandPrimaryColor,
+                    baseLightColor,
+                    baseDarkColor,
+                    baseNormalColor,
+                    systemAgentBubbleColor,
                     fontRes,
-                    primaryTextColorRes);
+                    systemNegativeColor);
         }
     }
 
-    public String getTitle() {
-        return title;
+    public String getAppBarTitle() {
+        return appBarTitle;
     }
 
-    public Integer getPrimaryBrandColorRes() {
-        return primaryBrandColorRes;
+    public Integer getBrandPrimaryColor() {
+        return brandPrimaryColor;
     }
 
-    public Integer getBackgroundColorRes() {
-        return backgroundColorRes;
+    public Integer getBaseLightColor() {
+        return baseLightColor;
     }
 
-    public Integer getOperatorMessageBgColorRes() {
-        return operatorMessageBgColorRes;
+    public Integer getBaseDarkColor() {
+        return baseDarkColor;
+    }
+
+    public Integer getBaseNormalColor() {
+        return baseNormalColor;
+    }
+
+    public Integer getSystemAgentBubbleColor() {
+        return systemAgentBubbleColor;
     }
 
     public Integer getFontRes() {
         return fontRes;
     }
 
-    public Integer getPrimaryTextColorRes() {
-        return primaryTextColorRes;
+    public Integer getSystemNegativeColor() {
+        return systemNegativeColor;
     }
 }

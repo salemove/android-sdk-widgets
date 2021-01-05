@@ -2,14 +2,23 @@
 <resources>
 
     <declare-styleable name="ChatView">
-        <attr name="title" format="string" />
-        <attr name="chatBgColor" format="reference" />
-        <attr name="operatorBackgroundColor" format="reference" />
-        <attr name="primaryColor" format="reference" />
+        <attr name="appBarTitle" format="string" />
+        <attr name="brandPrimaryColor" format="reference" />
+        <attr name="baseDarkColor" format="reference" />
+        <attr name="baseLightColor" format="reference" />
+        <attr name="baseNormalColor" format="reference" />
+        <attr name="systemAgentBubbleColor" format="reference" />
+        <attr name="systemNegativeColor" format="reference" />
         <attr name="android:fontFamily" format="reference" />
-        <attr name="primaryTextColor" format="reference" />
     </declare-styleable>
 
-    <attr name="gliaChatTheme" format="reference" />
+    <attr name="gliaChatStyle" format="reference" />
+
+    <attr name="gliaBrandPrimaryColor" format="reference" />
+    <attr name="gliaBaseDarkColor" format="reference" />
+    <attr name="gliaBaseLightColor" format="reference" />
+    <attr name="gliaBaseNormalColor" format="reference" />
+    <attr name="gliaSystemAgentBubbleColor" format="reference" />
+    <attr name="gliaSystemNegativeColor" format="reference" />
 
 </resources>

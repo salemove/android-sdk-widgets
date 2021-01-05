@@ -3,27 +3,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/medium"
-    android:orientation="vertical">
+    android:layout_marginTop="@dimen/medium">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.25" />
+        app:layout_constraintGuide_begin="@dimen/chat_send_margin_start" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/end_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/chat_send_margin_end" />
 
     <TextView
         android:id="@+id/content"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_message"
-        android:backgroundTint="@color/light_gray_color"
-        android:textColor="@color/black_text_color"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="?attr/gliaBrandPrimaryColor"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

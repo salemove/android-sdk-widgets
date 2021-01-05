@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="chat_title">Chat</string>
+
     <string name="chat_enter_message">Enter message</string>
     <string name="chat_send_content_description">Send message button</string>
+    <string name="chat_in_queue_message">An MSR will be with you shortly.</string>
+    <string name="chat_operator_has_joined">%1$s has joined the conversation</string>
+
+    <string name="top_app_bar_close">Close</string>
+    <string name="top_app_bar_chat_end">End</string>
+
+    <string name="chat_dialog_leave_title">Are you sure you want to leave?</string>
+    <string name="chat_dialog_leave_message">You will lose your place in the queue.</string>
+    <string name="chat_dialog_yes">Yes</string>
+    <string name="chat_dialog_no">No</string>
+    <string name="chat_dialog_operators_unavailable_title">We\'re sorry</string>
+    <string name="chat_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
+    <string name="chat_dialog_unexpected_error_title">We\re sorry, there has been an unexpected error.</string>
+    <string name="chat_dialog_unexpected_error_message">Please try again later.</string>
+    <string name="chat_dialog_ok">Ok</string>
+
 </resources>

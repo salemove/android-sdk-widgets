@@ -1,6 +1,6 @@
 package com.glia.widgets.chat;
 
-class SendMessageItem extends ChatItem {
+public class SendMessageItem extends ChatItem {
     private final String message;
 
     public SendMessageItem(String message) {

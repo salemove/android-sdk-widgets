@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="small">4dp</dimen>
     <dimen name="medium">8dp</dimen>
     <dimen name="large">16dp</dimen>
+    <dimen name="large_x_large">24dp</dimen>
     <dimen name="x_large">32dp</dimen>
+
+    <dimen name="pulsation_animation_size">142dp</dimen>
+    <dimen name="profile_picture_size">80dp</dimen>
+    <dimen name="place_holder_size">40dp</dimen>
+    <dimen name="place_holder_corners_size">24dp</dimen>
+
+    <dimen name="app_bar_end_button_width">60dp</dimen>
+    <dimen name="app_bar_end_button_margin_end">42dp</dimen>
+    <dimen name="button_min_height">40dp</dimen>
+
+    <dimen name="chat_send_margin_start">88dp</dimen>
+    <dimen name="chat_send_margin_end">16dp</dimen>
+
+    <dimen name="chat_receive_margin_start">44dp</dimen>
+    <dimen name="chat_receive_message_end">60dp</dimen>
+
 </resources>

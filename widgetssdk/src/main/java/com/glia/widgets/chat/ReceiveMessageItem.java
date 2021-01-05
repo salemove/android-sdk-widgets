@@ -1,14 +1,16 @@
 package com.glia.widgets.chat;
 
-class ReceiveMessageItem extends ChatItem {
-    private final String message;
+import java.util.List;
 
-    public ReceiveMessageItem(String message) {
+public class ReceiveMessageItem extends ChatItem {
+    private final List<String> messages;
+
+    public ReceiveMessageItem(List<String> messages) {
         super(ChatAdapter.RECEIVE_MESSAGE_VIEW_TYPE);
-        this.message = message;
+        this.messages = messages;
     }
 
-    public String getMessage() {
-        return message;
+    public List<String> getMessages() {
+        return messages;
     }
 }

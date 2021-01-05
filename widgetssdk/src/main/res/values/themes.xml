@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Application.Glia.Chat" parent="">
+        <item name="brandPrimaryColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="baseLightColor">?attr/gliaBaseLightColor</item>
+        <item name="baseDarkColor">?attr/gliaBaseDarkColor</item>
+        <item name="systemAgentBubbleColor">?attr/gliaSystemAgentBubbleColor</item>
+        <item name="baseNormalColor">?attr/gliaBaseNormalColor</item>
+        <item name="android:fontFamily">?attr/fontFamily</item>
+        <item name="appBarTitle">@string/chat_title</item>
+        <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
+    </style>
+
+    <style name="ThemeOverlay.Glia.Chat" parent="">
+        <item name="gliaBrandPrimaryColor">@color/glia_brand_primary_color</item>
+        <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>
+        <item name="gliaBaseLightColor">@color/glia_base_light_color</item>
+        <item name="gliaBaseNormalColor">@color/glia_base_normal_color</item>
+        <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
+        <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
+
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
+        </item>
+        <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
+        <item name="textAppearanceHeadline2">@style/Application.Glia.Header2</item>
+        <item name="textAppearanceHeadline3">@style/Application.Glia.Header3</item>
+        <item name="textAppearanceCaption">@style/Application.Glia.Caption</item>
+        <item name="textAppearanceBody1">@style/Application.Glia.Body</item>
+        <item name="textAppearanceSubtitle2">@style/Application.Glia.Subtitle2</item>
+    </style>
+
+    <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/Application.Glia.Header2.Dialog</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/Application.Glia.Body.Dialog</item>
+        <item name="backgroundTint">?attr/gliaBaseLightColor</item>
+
+        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Extended
+        </item>
+        <item name="buttonBarNeutralButtonStyle">
+            @style/Application.Glia.Chat.Button.Extended.Negative
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button</item>
+    </style>
+
+</resources>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="chat_title">Chat</string>
 
     <string name="chat_enter_message">Enter message</string>
@@ -20,5 +19,7 @@
     <string name="chat_dialog_unexpected_error_title">We\re sorry, there has been an unexpected error.</string>
     <string name="chat_dialog_unexpected_error_message">Please try again later.</string>
     <string name="chat_dialog_ok">Ok</string>
+    <string name="chat_dialog_overlay_permissions_title">Overlay Permissions Required</string>
+    <string name="chat_dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
 
 </resources>

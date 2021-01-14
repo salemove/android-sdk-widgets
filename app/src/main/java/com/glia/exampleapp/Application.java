@@ -4,8 +4,8 @@ import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
 
-import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.GliaWidgetsConfig;
 
 public class Application extends android.app.Application {
 

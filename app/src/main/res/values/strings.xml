@@ -30,10 +30,12 @@
     <string name="settings_other">Other</string>
     <string name="settings_company_name">Company name</string>
     <string name="settings_queue_id">Queue id</string>
+    <string name="settings_context_url">Context url</string>
 
     <string name="main_open_settings">Open Settings</string>
     <string name="main_launch_activity">Launch Chat in Activity</string>
     <string name="main_launch_fragment">Launch Chat in Fragment</string>
-    <string name="main_embed_in_this_view">Embed Chat in this view</string>
+    <string name="main_start_in_this_view">Start Chat in this view</string>
+    <string name="main_start_chat_flow">Start new chat flow</string>
 
 </resources>

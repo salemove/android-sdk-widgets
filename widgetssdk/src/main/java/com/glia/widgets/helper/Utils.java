@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.helper;
 
 import android.content.Context;
 

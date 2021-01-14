@@ -48,13 +48,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
-        android:text="@string/main_embed_in_this_view"
+        android:text="@string/main_start_in_this_view"
         app:icon="@drawable/ic_baseline_chat_bubble"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/settings_button" />
 
-    <com.glia.widgets.ChatView
+    <Button
+        android:id="@+id/activity_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        android:text="@string/main_start_chat_flow"
+        app:icon="@drawable/ic_baseline_chat_bubble"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/embed_button" />
+
+    <com.glia.widgets.chat.ChatView
         android:id="@+id/chat_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

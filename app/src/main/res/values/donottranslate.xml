@@ -15,6 +15,7 @@
     <string name="pref_site_id">site_id</string>
     <string name="pref_company_name">company_name</string>
     <string name="pref_queue_id">queue_id</string>
+    <string name="pref_context_url">context_url</string>
 
     <string name="default_value">default</string>
     <string name="color_blue_value">blue</string>

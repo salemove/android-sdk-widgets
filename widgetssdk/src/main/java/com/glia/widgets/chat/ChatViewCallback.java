@@ -1,22 +1,18 @@
 package com.glia.widgets.chat;
 
+import android.util.Pair;
+
 import java.util.List;
 
 public interface ChatViewCallback {
 
-    void queueing(OperatorStatusItem item);
+    void emitState(ChatState chatState);
 
-    void chatStarted(OperatorStatusItem item);
+    void emitItems(List<ChatItem> items,
+                   Pair<Integer, Integer> indexesToBeInvalidated,
+                   boolean scrollToBottom);
 
-    void appendItem(ChatItem item);
+    void emitDialog(DialogsState dialogsState);
 
-    void replaceReceiverItem(ReceiveMessageItem item);
-
-    void replaceItems(List<ChatItem> items);
-
-    void engagementEndShowNoMoreOperatorsDialog();
-
-    void engagementEndNoDialog();
-
-    void unexpectedError();
+    void handleFloatingChatHead(boolean show);
 }

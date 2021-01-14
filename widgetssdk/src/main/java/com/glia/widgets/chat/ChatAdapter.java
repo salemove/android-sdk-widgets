@@ -3,6 +3,7 @@ package com.glia.widgets.chat;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,26 +144,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public void replaceAllItems(List<ChatItem> chatItems) {
-        this.chatItems = chatItems;
-        notifyDataSetChanged();
-    }
-
-    public void addItem(ChatItem chatItem) {
-        this.chatItems.add(chatItem);
-        notifyItemRangeInserted(this.chatItems.size() - 1, this.chatItems.size() - 1);
-    }
-
-    public void replaceReceiverItem(ReceiveMessageItem item) {
-        this.chatItems.remove(this.chatItems.size() - 1);
-        this.chatItems.add(item);
-        notifyItemChanged(this.chatItems.size() - 1, this.chatItems.size() - 1);
-    }
-
-    public void changeOperatorStatus(OperatorStatusItem operatorStatusItem) {
-        this.chatItems.remove(0);
-        this.chatItems.add(0, operatorStatusItem);
-        notifyItemChanged(0);
+    public void replaceItems(List<ChatItem> items, Pair<Integer, Integer> range) {
+        this.chatItems = items;
+        notifyItemRangeChanged(range.first, range.second, chatItems);
     }
 
     @NonNull

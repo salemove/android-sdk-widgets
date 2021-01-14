@@ -2,4 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.glia.widgets">
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application>
+
+        <activity android:name=".chat.ChatActivity" />
+
+        <service
+            android:name="com.glia.widgets.chat.head.ChatHeadService"
+            android:enabled="true"
+            android:stopWithTask="true" />
+
+    </application>
+
 </manifest>

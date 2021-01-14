@@ -1,5 +1,6 @@
 package com.glia.exampleapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,10 +16,14 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.preference.PreferenceManager;
 
-import com.glia.widgets.ChatView;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.chat.ChatView;
 
 public class MainFragment extends Fragment {
+
+    private static final String STARTED = "started";
 
     private ChatView chatView;
 
@@ -48,11 +53,31 @@ public class MainFragment extends Fragment {
             if (chatView.isStarted()) {
                 chatView.show();
             } else {
-                chatView.startChat(
+                chatView.startEmbeddedChat(
                         getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences),
-                        getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences));
+                        getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences),
+                        getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences));
             }
         });
+        view.findViewById(R.id.activity_button).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), ChatActivity.class);
+            intent.putExtra(GliaWidgets.COMPANY_NAME,
+                    getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences));
+            intent.putExtra(GliaWidgets.QUEUE_ID,
+                    getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences));
+            intent.putExtra(GliaWidgets.CONTEXT_URL,
+                    getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences));
+            UiTheme uiTheme = getUiThemeByPrefs(sharedPreferences);
+            intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
+            startActivity(intent);
+        });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(STARTED)) {
+            chatView.startEmbeddedChat(
+                    getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences),
+                    getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences),
+                    getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences));
+        }
     }
 
     @Override
@@ -68,6 +93,14 @@ public class MainFragment extends Fragment {
     public void onDestroyView() {
         chatView.onDestroyView();
         super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (chatView.isStarted()) {
+            outState.putBoolean(STARTED, chatView.isStarted());
+        }
     }
 
     String getStringFromPrefs(@StringRes int keyValue, String defaultValue, SharedPreferences sharedPreferences) {

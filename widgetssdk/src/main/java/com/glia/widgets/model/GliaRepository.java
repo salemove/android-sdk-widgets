@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.model;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
@@ -7,6 +7,7 @@ import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.queuing.QueueTicket;
+import com.glia.widgets.chat.ChatGliaCallback;
 
 import java.util.function.Consumer;
 
@@ -23,10 +24,10 @@ public class GliaRepository {
     private final Consumer<OmnicoreEngagement> engagementHandler = engagement ->
             callback.engagementSuccess(engagement);
 
-    public void init(ChatGliaCallback callback, String queueId) {
+    public void init(ChatGliaCallback callback, String queueId, String contextUrl) {
         this.callback = callback;
         callback.queueForEngagementStart();
-        VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, "https://en.wikipedia.org/wiki/Hamburger");
+        VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
         Glia.on(Glia.Events.ENGAGEMENT, engagementHandler);
         Glia.queueForEngagement(queueId, visitorContext, response -> {
             if (response != null) {

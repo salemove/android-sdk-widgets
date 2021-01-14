@@ -1,197 +1,378 @@
 package com.glia.widgets.chat;
 
-import android.util.Log;
+import android.util.Pair;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.helper.Logger;
+import com.glia.widgets.model.GliaRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChatController {
 
     private ChatViewCallback viewCallback;
     private ChatGliaCallback gliaCallback;
-    private final GliaRepository repository;
-    private final String companyName;
-    private String queueTicketId;
-    private final String queueId;
-    private boolean historyLoaded = false;
+    private GliaRepository repository;
+
     private final String TAG = "ChatController";
-    // Remembers which button to display on top app bar.
-    private boolean operatorOnline = false;
-    private List<String> previousAgentMessages = new ArrayList<>();
+    private volatile ChatState chatState;
+    public volatile DialogsState dialogsState;
 
-    public ChatController(ChatViewCallback viewCallback,
-                          GliaRepository gliaRepository,
-                          String companyName,
-                          String queueId) {
+    public ChatController(ChatViewCallback viewCallback) {
         this.viewCallback = viewCallback;
-        this.companyName = companyName;
-        this.queueId = queueId;
+        this.chatState = new ChatState.Builder()
+                .setUseFloatingChatHeads(false)
+                .setQueueTicketId(null)
+                .setHistoryLoaded(false)
+                .setOperatorOnline(false)
+                .setCompanyName(null)
+                .setQueueId(null)
+                .setContextUrl(null)
+                .setIsVisible(false)
+                .setIntegratorChatStarted(false)
+                .setHasOverlayPermissions(false)
+                .setOverlaysPermissionDialogShown(false)
+                .setChatItems(new ArrayList<>())
+                .createChatState();
+        this.dialogsState = new DialogsState(false, false, false, false);
+    }
+
+    public void initChat(GliaRepository gliaRepository,
+                         String companyName,
+                         String queueId,
+                         String contextUrl,
+                         boolean useChatHeads) {
+        if (useChatHeads && chatState.hasOverlayPermissions) {
+            handleFloatingChatheads(false);
+        }
+        if (chatState.integratorChatStarted) {
+            return;
+        }
         this.repository = gliaRepository;
+        emitViewState(chatState.queueingStarted(useChatHeads, companyName, queueId, contextUrl));
         initControllerCallback();
+        repository.init(gliaCallback, queueId, contextUrl);
     }
 
-    private void initControllerCallback() {
-        gliaCallback = new ChatGliaCallback() {
-            @Override
-            public void queueForEngagementStart() {
-                if (viewCallback != null) {
-                    Log.d(TAG, "queueForEngagementStart");
-                    List<ChatItem> items = new ArrayList<>();
-                    items.add(OperatorStatusItem.QueueingStatusItem(companyName));
-                    viewCallback.replaceItems(items);
-                }
-            }
-
-            @Override
-            public void queueForEngangmentSuccess() {
-                Log.d(TAG, "queueForEngagementSuccess");
-                if (!operatorOnline) {
-                    viewCallback.queueing(OperatorStatusItem.QueueingStatusItem(companyName));
-                }
-            }
-
-            @Override
-            public void queueForTicketSuccess(String ticketId) {
-                Log.d(TAG, "queueTicketSuccess");
-                queueTicketId = ticketId;
-                if (!operatorOnline) {
-                    viewCallback.queueing(OperatorStatusItem.QueueingStatusItem(companyName));
-                }
-            }
-
-            @Override
-            public void engagementEndedByOperator() {
-                stop(true);
-            }
-
-            @Override
-            public void engagementEnded(boolean showDialog) {
-                Log.d(TAG, "engagementEnded");
-                if (showDialog) {
-                    viewCallback.engagementEndShowNoMoreOperatorsDialog();
-                } else {
-                    viewCallback.engagementEndNoDialog();
-                }
-                operatorOnline = false;
-            }
-
-            @Override
-            public void engagementSuccess(OmnicoreEngagement engagement) {
-                Log.d(TAG, "engagementSuccess");
-                if (!operatorOnline) {
-                    viewCallback.chatStarted(
-                            OperatorStatusItem.OperatorFoundStatusItem(
-                                    companyName, engagement.getOperator().getName()));
-                    operatorOnline = true;
-                }
-                if (!historyLoaded) {
-                    loadHistory();
-                    historyLoaded = true;
-                }
-            }
-
-            @Override
-            public void onMessage(ChatMessage message) {
-                Log.d(TAG, "onMessage:\n" + message.toString());
-                handleNewMessage(message);
-            }
-
-            @Override
-            public void chatHistoryLoaded(ChatMessage[] messages, Throwable error) {
-                Log.d(TAG, "chatHistoryLoaded");
-                if (error != null && (messages == null || messages.length == 0)) {
-                    Log.e(TAG, "chatHistoryLoaded error");
-                    this.error(error);
-                }
-                if (messages == null || messages.length == 0) {
-                    return;
-                }
-                Arrays.stream(messages).forEachOrdered(message -> handleNewMessage(message));
-                initMessaging();
-            }
-
-            @Override
-            public void error(GliaException exception) {
-                Log.e(TAG, exception.toString());
-                viewCallback.unexpectedError();
-            }
-
-            @Override
-            public void error(Throwable throwable) {
-                Log.e(TAG, throwable.toString());
-                viewCallback.unexpectedError();
-            }
-        };
+    private synchronized void emitViewState(ChatState state) {
+        if (setState(state) && viewCallback != null) {
+            Logger.d(TAG, "Emit state:\n" + state.toString());
+            viewCallback.emitState(chatState);
+        }
     }
 
-    public void init(String queueId) {
-        repository.init(gliaCallback, queueId);
-    }
-
-    public void stop(boolean showDialog) {
-        repository.stop(queueTicketId, showDialog);
-    }
-
-    public void onDestroy() {
-        repository.onDestroyView();
+    public void onDestroy(boolean retain) {
         viewCallback = null;
-        gliaCallback = null;
+        if (!retain && chatState.useFloatingChatHeads && repository != null) {
+            repository.onDestroyView();
+        }
+        if (!retain && chatState.useFloatingChatHeads) {
+            gliaCallback = null;
+        }
     }
 
     public void sendMessagePreview(String message) {
         if (isMessageValid(message)) {
+            Logger.d(TAG, "Send preview: " + message);
             repository.sendMessagePreview(message);
         }
     }
 
     public void sendMessage(String message) {
         if (isMessageValid(message)) {
+            Logger.d(TAG, "Send MESSAGE: " + message);
             repository.sendMessage(message);
         }
     }
 
-    private void initMessaging() {
-        repository.initMessaging();
-    }
-
-    private void loadHistory() {
-        repository.loadHistory();
-    }
-
     public String getCompanyName() {
-        return companyName;
+        return chatState.companyName;
     }
 
     public String getQueueId() {
-        return queueId;
+        return chatState.queueId;
     }
 
-    private void handleNewMessage(ChatMessage message) {
-        if (message.getSender() == Chat.Participant.VISITOR) {
-            viewCallback.appendItem(new SendMessageItem(message.getContent()));
-            previousAgentMessages = new ArrayList<>();
-        } else {
-            if (previousAgentMessages.isEmpty()) {
-                previousAgentMessages.add(message.getContent());
-                viewCallback.appendItem(new ReceiveMessageItem(new ArrayList<>(previousAgentMessages)));
-            } else {
-                viewCallback.replaceReceiverItem(getReceiverItemWithAppendedMessage(message));
-            }
+    public String getContextUrl() {
+        return chatState.contextUrl;
+    }
+
+    public boolean isStarted() {
+        return chatState.integratorChatStarted;
+    }
+
+    public void show() {
+        if (!chatState.isVisible) {
+            emitViewState(chatState.show());
         }
     }
 
-    private ReceiveMessageItem getReceiverItemWithAppendedMessage(ChatMessage message) {
-        previousAgentMessages.add(message.getContent());
-        return new ReceiveMessageItem(new ArrayList<>(previousAgentMessages));
+    public void onBackArrowClicked() {
+        if (!chatState.useFloatingChatHeads) {
+            emitViewState(chatState.hide());
+        } else if (chatState.hasOverlayPermissions) {
+            handleFloatingChatheads(true);
+        }
+    }
+
+    public void noMoreOperatorsAvailableDismissed() {
+        stop(false, false);
+        dismissDialogs();
+    }
+
+    public void unexpectedErrorDialogDismissed() {
+        stop(false, false);
+        dismissDialogs();
+    }
+
+    public void exitDialogYesClicked() {
+        stop(false, false);
+        dismissDialogs();
+    }
+
+    public void exitDialogDismissClicked() {
+        dismissDialogs();
+    }
+
+    public void leaveChatClicked() {
+        showExitDialog();
+    }
+
+    public boolean isChatVisible() {
+        return chatState.isVisible;
+    }
+
+    public void setViewCallback(ChatViewCallback chatViewCallback) {
+        this.viewCallback = chatViewCallback;
+        viewCallback.emitState(chatState);
+        viewCallback.emitItems(chatState.chatItems, new Pair<>(0, chatState.chatItems.size()), true);
+        viewCallback.emitDialog(dialogsState);
+    }
+
+    public void onResume(boolean hasOverlaysPermission) {
+        if (!hasOverlaysPermission && !chatState.overlaysPermissionDialogShown) {
+            showOverlayPermissionsDialog();
+        }
+        emitViewState(chatState.drawOverlaysPermissionChanged(hasOverlaysPermission));
+    }
+
+    public void overlayPermissionsDialogDismissed() {
+        emitDialogState(new DialogsState(false, false, false, false));
+    }
+
+    private synchronized void emitChatItems(ChatState state,
+                                            Pair<Integer, Integer> range,
+                                            boolean scrollToBottom) {
+        if (setState(state) && viewCallback != null) {
+            Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
+                    "\nRange: " + range.toString() +
+                    "\nScrollToBottom: " + scrollToBottom +
+                    "\n(State): " + state.toString());
+            viewCallback.emitItems(state.chatItems, range, scrollToBottom);
+        }
+    }
+
+    private synchronized void emitDialogState(DialogsState state) {
+        if (setDialogState(state) && viewCallback != null) {
+            Logger.d(TAG, "Emit dialog state:\n" + dialogsState.toString());
+            viewCallback.emitDialog(dialogsState);
+        }
+    }
+
+    private synchronized boolean setState(ChatState state) {
+        if (this.chatState.equals(state)) return false;
+        this.chatState = state;
+        return true;
+    }
+
+    private synchronized boolean setDialogState(DialogsState dialogsState) {
+        if (this.dialogsState.equals(dialogsState)) return false;
+        this.dialogsState = dialogsState;
+        return true;
+    }
+
+    private void initControllerCallback() {
+        if (gliaCallback != null) return;
+        gliaCallback = new ChatGliaCallback() {
+            @Override
+            public void queueForEngagementStart() {
+                Logger.d(TAG, "queueForEngagementStart");
+                viewInitQueueing();
+            }
+
+            @Override
+            public void queueForEngangmentSuccess() {
+                Logger.d(TAG, "queueForEngagementSuccess");
+                viewInitQueueing();
+            }
+
+            @Override
+            public void queueForTicketSuccess(String ticketId) {
+                Logger.d(TAG, "queueForTicketSuccess");
+                emitViewState(chatState.queueTicketSuccess(ticketId));
+            }
+
+            @Override
+            public void engagementEndedByOperator() {
+                stop(true, chatState.useFloatingChatHeads);
+            }
+
+            @Override
+            public void engagementEnded(boolean showDialog) {
+                Logger.d(TAG, "engagementEnded");
+                if (showDialog) {
+                    showNoMoreOperatorsAvailableDialog();
+                } else {
+                    emitViewState(chatState.stop(false));
+                }
+            }
+
+            @Override
+            public void engagementSuccess(OmnicoreEngagement engagement) {
+                Logger.d(TAG, "engagementSuccess");
+                operatorOnlineStartChatUi(engagement.getOperator().getName());
+                if (!chatState.historyLoaded) {
+                    repository.loadHistory();
+                }
+            }
+
+            @Override
+            public void onMessage(ChatMessage message) {
+                Logger.d(TAG, "onMessage:\n" + message.getContent());
+                List<ChatItem> newItems = getNewChatItems(message);
+                emitChatItems(chatState.changeItems(newItems),
+                        new Pair<>(chatState.chatItems.size() - 1, 1),
+                        true);
+            }
+
+            @Override
+            public synchronized void chatHistoryLoaded(ChatMessage[] messages, Throwable error) {
+                Logger.d(TAG, "chatHistoryLoaded");
+                if (error != null && (messages == null || messages.length == 0)) {
+                    Logger.e(TAG, "chatHistoryLoaded error");
+                    this.error(error);
+                }
+                List<ChatItem> items = chatState.chatItems;
+                if (messages != null) {
+                    for (ChatMessage message : messages) {
+                        items = getNewChatItems(message);
+                    }
+                    // If history added. Add name operator name after history.
+                    if (items.size() > 1) {
+                        items.add(items.get(0));
+                        items.remove(0);
+                    }
+                }
+                emitChatItems(
+                        chatState.historyLoaded(items),
+                        new Pair<>(0, items.size()),
+                        true);
+                repository.initMessaging();
+            }
+
+            @Override
+            public void error(GliaException exception) {
+                Logger.e(TAG, exception.toString());
+                showUnexpectedErrorDialog();
+                emitViewState(chatState.stop(chatState.useFloatingChatHeads));
+            }
+
+            @Override
+            public void error(Throwable throwable) {
+                Logger.e(TAG, throwable.toString());
+                showUnexpectedErrorDialog();
+                emitViewState(chatState.stop(chatState.useFloatingChatHeads));
+            }
+        };
+    }
+
+    private void viewInitQueueing() {
+        if (!chatState.operatorOnline) {
+            List<ChatItem> items = new ArrayList<>();
+            items.add(OperatorStatusItem.QueueingStatusItem(chatState.companyName));
+            emitViewState(chatState.initQueueing());
+            emitChatItems(chatState.changeItems(items), new Pair<>(0, 1), false);
+        }
+    }
+
+    private void operatorOnlineStartChatUi(String operatorName) {
+        if (!chatState.operatorOnline) {
+            List<ChatItem> items = new ArrayList<>();
+            items.add(OperatorStatusItem.OperatorFoundStatusItem(chatState.companyName, operatorName));
+            emitViewState(chatState.engagementStarted());
+            emitChatItems(chatState.changeItems(items), new Pair<>(0, 1), false);
+        }
+    }
+
+    private void stop(boolean showDialog, boolean isVisible) {
+        repository.stop(chatState.queueTicketId, showDialog);
+        emitViewState(chatState.stop(isVisible));
+        if (showDialog && !dialogsState.noOperatorsAvailableDialogShowing) {
+            showNoMoreOperatorsAvailableDialog();
+        }
+    }
+
+    private List<ChatItem> getNewChatItems(ChatMessage message) {
+        List<ChatItem> chatItems = chatState.chatItems;
+        if (message.getSender() == Chat.Participant.VISITOR) {
+            chatItems.add(new SendMessageItem(message.getContent()));
+        } else {
+            List<String> messages;
+            if (chatItems.get(chatItems.size() - 1) instanceof ReceiveMessageItem) {
+                ReceiveMessageItem lastItemInView = (ReceiveMessageItem) chatItems.get(chatItems.size() - 1);
+                chatItems.remove(lastItemInView);
+                messages = lastItemInView.getMessages();
+            } else {
+                messages = new ArrayList<>();
+            }
+            messages.add(message.getContent());
+            chatItems.add(new ReceiveMessageItem(messages));
+        }
+
+        return chatItems;
     }
 
     private boolean isMessageValid(String message) {
         return message.length() > 0;
+    }
+
+    private void dismissDialogs() {
+        Logger.d(TAG, "Dismiss dialogs");
+        emitDialogState(new DialogsState(false, false, false, false));
+    }
+
+    private void showExitDialog() {
+        if (!dialogsState.isDialogShowing()) {
+            emitDialogState(new DialogsState(false, false, false, true));
+        }
+    }
+
+    private void showNoMoreOperatorsAvailableDialog() {
+        if (!dialogsState.isDialogShowing()) {
+            emitDialogState(new DialogsState(false, true, false, false));
+        }
+    }
+
+    private void showUnexpectedErrorDialog() {
+        if (!dialogsState.isDialogShowing()) {
+            emitDialogState(new DialogsState(false, false, true, false));
+        }
+    }
+
+    private void handleFloatingChatheads(boolean show) {
+        if (viewCallback != null && chatState.useFloatingChatHeads) {
+            Logger.d(TAG, "handleFloatingChatHeads, show: " + show);
+            viewCallback.handleFloatingChatHead(show);
+        }
+    }
+
+    private void showOverlayPermissionsDialog() {
+        if (!dialogsState.isDialogShowing()) {
+            emitDialogState(new DialogsState(true, false, false, false));
+        }
     }
 }

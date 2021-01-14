@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:layout_marginEnd="@dimen/app_bar_end_button_margin_end"
+                android:layout_marginEnd="@dimen/large"
                 android:minWidth="@dimen/app_bar_end_button_width"
                 android:text="@string/top_app_bar_chat_end"
                 android:visibility="gone" />
@@ -70,6 +70,9 @@
             android:enabled="false"
             android:hint="@string/chat_enter_message"
             android:importantForAutofill="no"
+            android:layout_marginVertical="@dimen/medium"
+            android:layout_marginStart="@dimen/medium"
+            android:layout_marginEnd="@dimen/medium"
             android:textColor="@color/glia_base_dark_color"
             android:textColorHint="?attr/gliaBaseNormalColor" />
 
@@ -80,7 +83,9 @@
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/chat_send_content_description"
-            android:padding="@dimen/large"
+            android:paddingVertical="@dimen/large"
+            android:paddingStart="@dimen/medium"
+            android:paddingEnd="@dimen/large"
             android:src="@drawable/ic_baseline_send"
             android:tint="?attr/gliaBrandPrimaryColor"
             android:visibility="gone" />

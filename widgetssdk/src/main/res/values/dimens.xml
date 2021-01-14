@@ -12,7 +12,6 @@
     <dimen name="place_holder_corners_size">24dp</dimen>
 
     <dimen name="app_bar_end_button_width">60dp</dimen>
-    <dimen name="app_bar_end_button_margin_end">42dp</dimen>
     <dimen name="button_min_height">40dp</dimen>
 
     <dimen name="chat_send_margin_start">88dp</dimen>
@@ -20,5 +19,8 @@
 
     <dimen name="chat_receive_margin_start">44dp</dimen>
     <dimen name="chat_receive_message_end">60dp</dimen>
+
+    <dimen name="chat_head_size">64dp</dimen>
+    <dimen name="chat_head_placeholder_size">32dp</dimen>
 
 </resources>

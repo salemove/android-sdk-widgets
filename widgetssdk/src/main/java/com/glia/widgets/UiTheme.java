@@ -1,9 +1,12 @@
 package com.glia.widgets;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.ColorRes;
 import androidx.annotation.FontRes;
 
-public class UiTheme {
+public class UiTheme implements Parcelable {
 
     private final String appBarTitle;
     private @ColorRes
@@ -37,6 +40,109 @@ public class UiTheme {
         this.systemAgentBubbleColor = systemAgentBubbleColor;
         this.fontRes = fontRes;
         this.systemNegativeColor = systemNegativeColor;
+    }
+
+    protected UiTheme(Parcel in) {
+        appBarTitle = in.readString();
+        if (in.readByte() == 0) {
+            brandPrimaryColor = null;
+        } else {
+            brandPrimaryColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            baseLightColor = null;
+        } else {
+            baseLightColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            baseDarkColor = null;
+        } else {
+            baseDarkColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            baseNormalColor = null;
+        } else {
+            baseNormalColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            systemAgentBubbleColor = null;
+        } else {
+            systemAgentBubbleColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            fontRes = null;
+        } else {
+            fontRes = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            systemNegativeColor = null;
+        } else {
+            systemNegativeColor = in.readInt();
+        }
+    }
+
+    public static final Creator<UiTheme> CREATOR = new Creator<UiTheme>() {
+        @Override
+        public UiTheme createFromParcel(Parcel in) {
+            return new UiTheme(in);
+        }
+
+        @Override
+        public UiTheme[] newArray(int size) {
+            return new UiTheme[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(appBarTitle);
+        if (brandPrimaryColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(brandPrimaryColor);
+        }
+        if (baseLightColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(baseLightColor);
+        }
+        if (baseDarkColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(baseDarkColor);
+        }
+        if (baseNormalColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(baseNormalColor);
+        }
+        if (systemAgentBubbleColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(systemAgentBubbleColor);
+        }
+        if (fontRes == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(fontRes);
+        }
+        if (systemNegativeColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(systemNegativeColor);
+        }
     }
 
     public static class UiThemeBuilder {

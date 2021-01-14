@@ -45,7 +45,7 @@ ext {
     androidXTestVersion = '1.1.2'
     espresso = '3.3.0'
     lottieVersion = '3.5.0'
-    leakCanaryVersion = '2.5'
+    leakCanaryVersion = '2.6'
 }
 
 dependencies {
@@ -57,5 +57,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
     implementation "com.airbnb.android:lottie:$lottieVersion"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+    // removed because becomes slow on Android 11. They say it is fixed, but I still have the issue.
+    // https://square.github.io/leakcanary/changelog/
+    // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 }

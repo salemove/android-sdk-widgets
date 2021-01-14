@@ -4,8 +4,16 @@ import android.app.Application;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
+import com.glia.widgets.di.ChatControllerFactory;
 
 public class GliaWidgets {
+
+    public static final String UI_THEME = "ui_theme";
+    public static final String COMPANY_NAME = "company_name";
+    public static final String QUEUE_ID = "queue_id";
+    public static final String CONTEXT_URL = "context_url";
+
+    private static ChatControllerFactory chatControllerFactory;
 
     public synchronized static void onAppCreate(Application application) {
         Glia.onAppCreate(application);
@@ -21,5 +29,10 @@ public class GliaWidgets {
                 .build();
 
         Glia.init(gliaConfig);
+        chatControllerFactory = new ChatControllerFactory();
+    }
+
+    public static ChatControllerFactory getChatControllerFactory() {
+        return chatControllerFactory;
     }
 }

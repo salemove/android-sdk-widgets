@@ -19,42 +19,30 @@
         app:lottie_rawRes="@raw/pulsation_lottie_animation"
         app:lottie_speed="0.75" />
 
-    <ImageView
-        android:id="@+id/place_holder_view"
-        android:layout_width="@dimen/place_holder_size"
-        android:layout_height="@dimen/place_holder_size"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/small"
-        android:background="@drawable/bg_circle"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_person" />
-
-    <View
-        android:id="@+id/corners_view"
-        android:layout_width="@dimen/profile_picture_size"
-        android:layout_height="@dimen/profile_picture_size"
-        android:background="@drawable/bg_outline_circle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profile_picture_view"
         android:layout_width="@dimen/profile_picture_size"
         android:layout_height="@dimen/profile_picture_size"
         android:layout_gravity="center"
         android:scaleType="centerCrop"
-        android:src="@color/glia_brand_primary_color"
-        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/pulsation_animation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/pulsation_animation"
         app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
-        app:srcCompat="@drawable/ic_baseline_person" />
+        app:srcCompat="?attr/gliaBrandPrimaryColor" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/placeholder_view"
+        android:layout_width="@dimen/place_holder_size"
+        android:layout_height="@dimen/place_holder_size"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
+        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
+        app:layout_constraintStart_toStartOf="@id/profile_picture_view"
+        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
+        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+        app:srcCompat="@drawable/ic_person" />
 
 </merge>

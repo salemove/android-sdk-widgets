@@ -18,6 +18,8 @@ public class UiTheme implements Parcelable {
     private @ColorRes
     final Integer baseNormalColor;
     private @ColorRes
+    final Integer baseShadeColor;
+    private @ColorRes
     final Integer systemAgentBubbleColor;
     private @FontRes
     final Integer fontRes;
@@ -29,6 +31,7 @@ public class UiTheme implements Parcelable {
                     Integer baseLightColor,
                     Integer baseDarkColor,
                     Integer baseNormalColor,
+                    Integer baseShadeColor,
                     Integer systemAgentBubbleColor,
                     Integer fontRes,
                     Integer systemNegativeColor) {
@@ -37,6 +40,7 @@ public class UiTheme implements Parcelable {
         this.baseLightColor = baseLightColor;
         this.baseDarkColor = baseDarkColor;
         this.baseNormalColor = baseNormalColor;
+        this.baseShadeColor = baseShadeColor;
         this.systemAgentBubbleColor = systemAgentBubbleColor;
         this.fontRes = fontRes;
         this.systemNegativeColor = systemNegativeColor;
@@ -65,6 +69,11 @@ public class UiTheme implements Parcelable {
             baseNormalColor = in.readInt();
         }
         if (in.readByte() == 0) {
+            baseShadeColor = null;
+        } else {
+            baseShadeColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
             systemAgentBubbleColor = null;
         } else {
             systemAgentBubbleColor = in.readInt();
@@ -79,23 +88,6 @@ public class UiTheme implements Parcelable {
         } else {
             systemNegativeColor = in.readInt();
         }
-    }
-
-    public static final Creator<UiTheme> CREATOR = new Creator<UiTheme>() {
-        @Override
-        public UiTheme createFromParcel(Parcel in) {
-            return new UiTheme(in);
-        }
-
-        @Override
-        public UiTheme[] newArray(int size) {
-            return new UiTheme[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     @Override
@@ -125,6 +117,12 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(baseNormalColor);
         }
+        if (baseShadeColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(baseShadeColor);
+        }
         if (systemAgentBubbleColor == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -145,6 +143,23 @@ public class UiTheme implements Parcelable {
         }
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<UiTheme> CREATOR = new Creator<UiTheme>() {
+        @Override
+        public UiTheme createFromParcel(Parcel in) {
+            return new UiTheme(in);
+        }
+
+        @Override
+        public UiTheme[] newArray(int size) {
+            return new UiTheme[size];
+        }
+    };
+
     public static class UiThemeBuilder {
         private String appBarTitle;
         private @ColorRes
@@ -155,6 +170,8 @@ public class UiTheme implements Parcelable {
         Integer baseDarkColor;
         private @ColorRes
         Integer baseNormalColor;
+        private @ColorRes
+        Integer baseShadeColor;
         private @ColorRes
         Integer systemAgentBubbleColor;
         private @FontRes
@@ -190,6 +207,10 @@ public class UiTheme implements Parcelable {
             this.baseNormalColor = baseNormalColor;
         }
 
+        public void setBaseShadeColor(Integer baseShadeColor) {
+            this.baseShadeColor = baseShadeColor;
+        }
+
         public void setSystemAgentBubbleColor(@ColorRes Integer systemAgentBubbleColor) {
             this.systemAgentBubbleColor = systemAgentBubbleColor;
         }
@@ -204,6 +225,7 @@ public class UiTheme implements Parcelable {
                     baseLightColor,
                     baseDarkColor,
                     baseNormalColor,
+                    baseShadeColor,
                     systemAgentBubbleColor,
                     fontRes,
                     systemNegativeColor);
@@ -228,6 +250,10 @@ public class UiTheme implements Parcelable {
 
     public Integer getBaseNormalColor() {
         return baseNormalColor;
+    }
+
+    public Integer getBaseShadeColor() {
+        return baseShadeColor;
     }
 
     public Integer getSystemAgentBubbleColor() {

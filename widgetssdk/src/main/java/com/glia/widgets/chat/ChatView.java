@@ -38,6 +38,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.head.ChatHeadService;
 import com.glia.widgets.model.GliaRepository;
 import com.glia.widgets.view.Dialogs;
@@ -65,12 +67,15 @@ public class ChatView extends LinearLayout {
     private MaterialToolbar toolbar;
     private TextView toolbarTitle;
     private Button chatEndButton;
+    private View dividerView;
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
     private Integer defaultStatusbarColor;
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
+
+    private final Resources resources;
 
     public ChatView(Context context) {
         this(context, null);
@@ -95,6 +100,9 @@ public class ChatView extends LinearLayout {
                 defStyleAttr,
                 defStyleRes
         );
+
+        this.resources = getResources();
+
         initConfigurations();
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
@@ -109,8 +117,8 @@ public class ChatView extends LinearLayout {
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
-                    chatEditText.setEnabled(chatState.operatorOnline);
-                    if (chatState.operatorOnline) {
+                    chatEditText.setEnabled(chatState.isOperatorOnline());
+                    if (chatState.isOperatorOnline()) {
                         chatEndButton.setVisibility(VISIBLE);
                         toolbar.getMenu().findItem(R.id.close_button).setVisible(false);
                     } else {
@@ -145,14 +153,26 @@ public class ChatView extends LinearLayout {
 
             @Override
             public void emitDialog(DialogsState dialogsState) {
-                if (dialogsState.noOperatorsAvailableDialogShowing) {
-                    post(() -> showNoMoreOperatorsAvailableDialog());
-                } else if (dialogsState.unexpectedErrorDialogShowing) {
+                if (dialogsState instanceof DialogsState.NoDialog) {
+                    post(() -> {
+                        if (alertDialog != null) {
+                            alertDialog.dismiss();
+                            alertDialog = null;
+                        }
+                    });
+                } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
                     post(() -> showUnexpectedErrorDialog());
-                } else if (dialogsState.exitDialogShowing) {
-                    post(() -> showExitDialog());
-                } else if (dialogsState.overlayPermissionsShowing) {
+                } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
+                    post(() -> showExitQueueDialog());
+                } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
                     post(() -> showOverlayPermissionsDialog());
+                } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
+                    post(() -> showEndEngagementDialog(
+                            ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+                } else if (dialogsState instanceof DialogsState.UpgradeAudioDialog) {
+                    post(() -> showUpgradeDialog(((DialogsState.UpgradeAudioDialog) dialogsState).operatorName));
+                } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
+                    post(() -> showNoMoreOperatorsAvailableDialog());
                 }
             }
 
@@ -224,6 +244,8 @@ public class ChatView extends LinearLayout {
                 uiTheme.getBaseDarkColor() : this.theme.getBaseDarkColor();
         Integer baseNormalColorRes = uiTheme.getBaseNormalColor() != null ?
                 uiTheme.getBaseNormalColor() : this.theme.getBaseNormalColor();
+        Integer baseShadeColorRes = uiTheme.getBaseShadeColor() != null ?
+                uiTheme.getBaseShadeColor() : this.theme.getBaseShadeColor();
         Integer brandPriamryColorRes = uiTheme.getBrandPrimaryColor() != null ?
                 uiTheme.getBrandPrimaryColor() : this.theme.getBrandPrimaryColor();
         Integer systemAgentBubbleColorRes = uiTheme.getSystemAgentBubbleColor() != null ?
@@ -237,6 +259,7 @@ public class ChatView extends LinearLayout {
         builder.setBaseLightColor(baseLightColorRes);
         builder.setBaseDarkColor(baseDarkColorRes);
         builder.setBaseNormalColor(baseNormalColorRes);
+        builder.setBaseShadeColor(baseShadeColorRes);
         builder.setBrandPrimaryColor(brandPriamryColorRes);
         builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
         builder.setFontRes(fontRes);
@@ -331,6 +354,13 @@ public class ChatView extends LinearLayout {
                         R.attr.gliaBaseNormalColor
                 )
         );
+        defaultThemeBuilder.setBaseShadeColor(
+                getTypedArrayValue(
+                        typedArray,
+                        R.styleable.ChatView_baseShadeColor,
+                        R.attr.gliaBaseShadeColor
+                )
+        );
         defaultThemeBuilder.setSystemAgentBubbleColor(
                 getTypedArrayValue(
                         typedArray,
@@ -372,7 +402,7 @@ public class ChatView extends LinearLayout {
             TypedValue typedValue = new TypedValue();
             Resources.Theme theme = this.getContext().getTheme();
             theme.resolveAttribute(defaultValue, typedValue, true);
-            return typedValue.data;
+            return typedValue.resourceId;
         }
     }
 
@@ -395,6 +425,7 @@ public class ChatView extends LinearLayout {
         toolbar = view.findViewById(R.id.chat_top_app_bar);
         toolbarTitle = toolbar.findViewById(R.id.title);
         chatEndButton = toolbar.findViewById(R.id.chat_end_button);
+        dividerView = view.findViewById(R.id.divider_view);
     }
 
     private void setupViewAppearance() {
@@ -408,25 +439,28 @@ public class ChatView extends LinearLayout {
                         this.theme.getBrandPrimaryColor()));
         DrawableCompat.setTint(toolbar.getMenu().findItem(R.id.close_button).getIcon(),
                 ResourcesCompat.getColor(
-                        this.getResources(),
+                        resources,
                         this.theme.getBaseLightColor(),
                         this.getContext().getTheme()));
         toolbarTitle.setTextColor(ResourcesCompat.getColor(
-                this.getResources(),
+                resources,
                 this.theme.getBaseLightColor(),
                 this.getContext().getTheme()));
         DrawableCompat.setTint(
                 Objects.requireNonNull(toolbar.getNavigationIcon()),
                 ResourcesCompat.getColor(
-                        this.getResources(),
+                        resources,
                         this.theme.getBaseLightColor(),
                         this.getContext().getTheme()));
         chatEndButton.setBackgroundTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(),
                         this.theme.getSystemNegativeColor()));
+        dividerView.setBackgroundColor(ContextCompat.getColor(
+                this.getContext(),
+                theme.getBaseShadeColor()));
         chatEndButton.setTextColor(ResourcesCompat.getColor(
-                this.getResources(),
+                resources,
                 this.theme.getBaseLightColor(),
                 this.getContext().getTheme()));
         sendButton.setImageTintList(
@@ -498,7 +532,7 @@ public class ChatView extends LinearLayout {
 
         toolbar.setOnMenuItemClickListener(item -> {
             if (controller != null) {
-                controller.leaveChatClicked();
+                controller.leaveChatQueueClicked();
             }
             return true;
         });
@@ -523,14 +557,14 @@ public class ChatView extends LinearLayout {
         super.onDetachedFromWindow();
     }
 
-    private void showExitDialog() {
-        showOptionsAlertDialog(R.string.chat_dialog_leave_title,
-                R.string.chat_dialog_leave_message,
-                R.string.chat_dialog_yes,
-                R.string.chat_dialog_no,
+    private void showExitQueueDialog() {
+        showOptionsDialog(resources.getString(R.string.chat_dialog_leave_queue_title),
+                resources.getString(R.string.chat_dialog_leave_queue_message),
+                resources.getString(R.string.chat_dialog_yes),
+                resources.getString(R.string.chat_dialog_no),
                 (dialogInterface, i) -> {
                     if (controller != null) {
-                        controller.exitDialogYesClicked();
+                        controller.endEngagementDialogYesClicked();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -542,30 +576,58 @@ public class ChatView extends LinearLayout {
                 (dialogInterface, i) -> {
                     dialogInterface.dismiss();
                     if (controller != null) {
-                        controller.exitDialogDismissClicked();
+                        controller.endEngagementDialogDismissed();
                     }
                     alertDialog = null;
                 },
                 dialog -> {
                     if (controller != null) {
-                        controller.exitDialogDismissClicked();
+                        controller.endEngagementDialogDismissed();
                     }
                     alertDialog = null;
                 }
         );
     }
 
-    private void showOptionsAlertDialog(@StringRes int title,
-                                        @StringRes int message,
-                                        @StringRes int positiveButtonText,
-                                        @StringRes int neutralButtonText,
-                                        DialogInterface.OnClickListener positiveButtonClickListener,
-                                        DialogInterface.OnClickListener neutralButtonClickListener,
-                                        DialogInterface.OnCancelListener cancelListener) {
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-            alertDialog = null;
-        }
+    private void showEndEngagementDialog(String operatorName) {
+        showOptionsDialog(resources.getString(R.string.chat_dialog_end_engagement_title),
+                resources.getString(R.string.chat_dialog_end_engagement_message, operatorName),
+                resources.getString(R.string.chat_dialog_yes),
+                resources.getString(R.string.chat_dialog_no),
+                (dialogInterface, i) -> {
+                    if (controller != null) {
+                        controller.endEngagementDialogYesClicked();
+                    }
+                    if (onEndListener != null) {
+                        onEndListener.onEnd();
+                    }
+                    chatEnded();
+                    alertDialog = null;
+                    dialogInterface.dismiss();
+                },
+                (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    if (controller != null) {
+                        controller.endEngagementDialogDismissed();
+                    }
+                    alertDialog = null;
+                },
+                dialog -> {
+                    if (controller != null) {
+                        controller.endEngagementDialogDismissed();
+                    }
+                    alertDialog = null;
+                }
+        );
+    }
+
+    private void showOptionsDialog(String title,
+                                   String message,
+                                   String positiveButtonText,
+                                   String neutralButtonText,
+                                   DialogInterface.OnClickListener positiveButtonClickListener,
+                                   DialogInterface.OnClickListener neutralButtonClickListener,
+                                   DialogInterface.OnCancelListener cancelListener) {
         alertDialog = Dialogs.showOptionsDialog(
                 this.getContext(),
                 this.theme,
@@ -611,6 +673,25 @@ public class ChatView extends LinearLayout {
                 });
     }
 
+    private void showUpgradeDialog(String operatorName) {
+        alertDialog = Dialogs.showUpgradeDialog(
+                this.getContext(),
+                theme,
+                getResources().getString(R.string.chat_dialog_upgrade_title, operatorName),
+                v -> {
+                    if (controller != null) {
+                        controller.upgradeToAudioClicked();
+                    }
+                    alertDialog.dismiss();
+                },
+                v -> {
+                    if (controller != null) {
+                        controller.closeUpgradeDialogClicked();
+                    }
+                    alertDialog.dismiss();
+                });
+    }
+
     private void showUnexpectedErrorDialog() {
         showAlertDialog(
                 R.string.chat_dialog_unexpected_error_title,
@@ -646,10 +727,10 @@ public class ChatView extends LinearLayout {
     }
 
     private void showOverlayPermissionsDialog() {
-        showOptionsAlertDialog(R.string.chat_dialog_overlay_permissions_title,
-                R.string.chat_dialog_overlay_permissions_message,
-                R.string.chat_dialog_ok,
-                R.string.chat_dialog_no,
+        showOptionsDialog(resources.getString(R.string.chat_dialog_overlay_permissions_title),
+                resources.getString(R.string.chat_dialog_overlay_permissions_message),
+                resources.getString(R.string.chat_dialog_ok),
+                resources.getString(R.string.chat_dialog_no),
                 (dialogInterface, i) -> {
                     if (controller != null) {
                         controller.overlayPermissionsDialogDismissed();
@@ -694,7 +775,7 @@ public class ChatView extends LinearLayout {
 
     private void chatEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        GliaWidgets.getChatControllerFactory().destroyChatController(this);
+        GliaWidgets.getChatControllerFactory().destroyChatController(getActivity());
     }
 
     public interface OnBackClickedListener {

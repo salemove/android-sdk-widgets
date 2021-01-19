@@ -3,6 +3,7 @@ package com.glia.widgets.chat;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -60,5 +61,11 @@ public class ChatActivity extends AppCompatActivity {
     public void onBackPressed() {
         chatView.backPressed();
         super.onBackPressed();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

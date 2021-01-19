@@ -7,6 +7,7 @@
         <item name="baseDarkColor">?attr/gliaBaseDarkColor</item>
         <item name="systemAgentBubbleColor">?attr/gliaSystemAgentBubbleColor</item>
         <item name="baseNormalColor">?attr/gliaBaseNormalColor</item>
+        <item name="baseShadeColor">?attr/gliaBaseShadeColor</item>
         <item name="android:fontFamily">?attr/fontFamily</item>
         <item name="appBarTitle">@string/chat_title</item>
         <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
@@ -18,6 +19,7 @@
         <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>
         <item name="gliaBaseLightColor">@color/glia_base_light_color</item>
         <item name="gliaBaseNormalColor">@color/glia_base_normal_color</item>
+        <item name="gliaBaseShadeColor">@color/glia_base_shade_color</item>
         <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
         <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
 

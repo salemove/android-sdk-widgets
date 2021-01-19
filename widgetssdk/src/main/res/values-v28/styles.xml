@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Application.Glia.Header3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+</resources>

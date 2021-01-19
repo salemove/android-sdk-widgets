@@ -23,7 +23,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:defaultValue="Glia company"
+            app:defaultValue="@string/settings_value_default_company_name"
             app:key="@string/pref_company_name"
             app:title="@string/settings_company_name"
             app:useSimpleSummaryProvider="true" />
@@ -74,6 +74,14 @@
             android:entryValues="@array/color_values"
             android:key="@string/pref_base_normal_color"
             android:title="@string/settings_chat_base_normal_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_base_shade_color"
+            android:title="@string/settings_chat_base_shade_color"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference

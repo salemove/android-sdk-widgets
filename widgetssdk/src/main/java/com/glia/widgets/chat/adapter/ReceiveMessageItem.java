@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.chat.adapter;
 
 import java.util.List;
 

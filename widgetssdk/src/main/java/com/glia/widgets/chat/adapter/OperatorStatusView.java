@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.chat.adapter;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -18,7 +18,6 @@ import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.SimpleColorFilter;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.widgets.R;
-import com.glia.widgets.UiTheme;
 import com.google.android.material.imageview.ShapeableImageView;
 
 class OperatorStatusView extends ConstraintLayout {

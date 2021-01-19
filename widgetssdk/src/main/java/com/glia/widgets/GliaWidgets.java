@@ -35,4 +35,8 @@ public class GliaWidgets {
     public static ChatControllerFactory getChatControllerFactory() {
         return chatControllerFactory;
     }
+
+    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Glia.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 }

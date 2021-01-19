@@ -3,6 +3,7 @@
     <string name="pref_base_light_color">base_light_color</string>
     <string name="pref_base_dark_color">base_dark_color</string>
     <string name="pref_base_normal_color">base_normal_color</string>
+    <string name="pref_base_shade_color">base_shade_color</string>
     <string name="pref_brand_primary_color">brand_primary_color</string>
     <string name="pref_system_agent_bubble_color">system_agent_bubble_color</string>
     <string name="pref_system_negative_color">system_negative_color</string>

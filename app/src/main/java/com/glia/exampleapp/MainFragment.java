@@ -54,7 +54,7 @@ public class MainFragment extends Fragment {
                 chatView.show();
             } else {
                 chatView.startEmbeddedChat(
-                        getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences),
+                        getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences),
                         getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences),
                         getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences));
             }
@@ -62,7 +62,7 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.activity_button).setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), ChatActivity.class);
             intent.putExtra(GliaWidgets.COMPANY_NAME,
-                    getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences));
+                    getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences));
             intent.putExtra(GliaWidgets.QUEUE_ID,
                     getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences));
             intent.putExtra(GliaWidgets.CONTEXT_URL,
@@ -74,7 +74,7 @@ public class MainFragment extends Fragment {
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STARTED)) {
             chatView.startEmbeddedChat(
-                    getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences),
+                    getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences),
                     getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences),
                     getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences));
         }
@@ -103,6 +103,12 @@ public class MainFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     String getStringFromPrefs(@StringRes int keyValue, String defaultValue, SharedPreferences sharedPreferences) {
         return sharedPreferences.getString(getString(keyValue), defaultValue);
     }
@@ -112,6 +118,7 @@ public class MainFragment extends Fragment {
         Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences);
         Integer baseDarkColor = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences);
         Integer baseNormalColor = getColorValueFromPrefs(R.string.pref_base_normal_color, sharedPreferences);
+        Integer baseShadeColor = getColorValueFromPrefs(R.string.pref_base_shade_color, sharedPreferences);
         Integer brandPrimaryColor = getColorValueFromPrefs(R.string.pref_brand_primary_color, sharedPreferences);
         Integer systemAgentBubbleColor = getColorValueFromPrefs(R.string.pref_system_agent_bubble_color, sharedPreferences);
         Integer fontFamily = getTypefaceFromPrefs(sharedPreferences);
@@ -122,6 +129,7 @@ public class MainFragment extends Fragment {
         builder.setBaseLightColor(baseLightColor);
         builder.setBaseDarkColor(baseDarkColor);
         builder.setBaseNormalColor(baseNormalColor);
+        builder.setBaseShadeColor(baseShadeColor);
         builder.setSystemAgentBubbleColor(systemAgentBubbleColor);
         builder.setBrandPrimaryColor(brandPrimaryColor);
         builder.setFontRes(fontFamily);

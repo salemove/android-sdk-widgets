@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.chat.adapter;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -7,6 +7,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int OPERATOR_STATUS_VIEW_TYPE = 0;
     public static final int SEND_MESSAGE_VIEW_TYPE = 1;
     public static final int RECEIVE_MESSAGE_VIEW_TYPE = 2;
+    public static final int MEDIA_UPGRADE_ITEM_TYPE = 3;
     private final UiTheme uiTheme;
 
     private List<ChatItem> chatItems;
@@ -149,6 +152,46 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    private static class MediaUpgradeStartedViewHolder extends RecyclerView.ViewHolder {
+
+        private final Context context;
+        private final ImageView iconView;
+        private final TextView titleView;
+        private final TextView timerView;
+
+        public MediaUpgradeStartedViewHolder(@NonNull View itemView, UiTheme uiTheme) {
+            super(itemView);
+            context = itemView.getContext();
+
+            iconView = itemView.findViewById(R.id.icon_view);
+            titleView = itemView.findViewById(R.id.title_view);
+            timerView = itemView.findViewById(R.id.timer_view);
+
+            int baseShadeColor = ContextCompat.getColor(context, uiTheme.getBaseShadeColor());
+            int baseNormalColor = ContextCompat.getColor(context, uiTheme.getBaseNormalColor());
+            ColorStateList brandPrimaryColorStateList =
+                    ContextCompat.getColorStateList(context, uiTheme.getBrandPrimaryColor());
+            int baseDarkColor = ContextCompat.getColor(context, uiTheme.getBaseDarkColor());
+
+            ((MaterialCardView) itemView.findViewById(R.id.card_view))
+                    .setStrokeColor(baseShadeColor);
+            iconView.setImageTintList(brandPrimaryColorStateList);
+            titleView.setTextColor(baseDarkColor);
+            timerView.setTextColor(baseNormalColor);
+        }
+
+        public void bind(MediaUpgradeStartedTimerItem chatItem) {
+            if (chatItem.type == MediaUpgradeStartedTimerItem.Type.AUDIO) {
+                iconView.setImageResource(R.drawable.ic_baseline_mic);
+                titleView.setText(context.getString(R.string.chat_upgraded_to_audio_call));
+
+            } else {
+                // TODO video coming in future task PRs
+            }
+            timerView.setText(chatItem.time);
+        }
+    }
+
     public void replaceItems(List<ChatItem> items, Pair<Integer, Integer> range) {
         this.chatItems = items;
         notifyItemRangeChanged(range.first, range.second, chatItems);
@@ -170,6 +213,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return new ReceiveMessageViewHolder(
                     inflater.inflate(R.layout.chat_receive_message_item, parent, false),
                     uiTheme);
+        } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
+            return new MediaUpgradeStartedViewHolder(inflater.inflate(
+                    R.layout.chat_media_upgrade_success_timer_item, parent, false),
+                    uiTheme);
         } else {
             throw new IllegalArgumentException("Unknown viewtype: " + viewType);
         }
@@ -184,6 +231,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((SendMessageViewHolder) holder).bind((SendMessageItem) chatItem);
         } else if (chatItem instanceof ReceiveMessageItem) {
             ((ReceiveMessageViewHolder) holder).bind((ReceiveMessageItem) chatItem);
+        } else if (chatItem instanceof MediaUpgradeStartedTimerItem) {
+            ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);
         }
     }
 

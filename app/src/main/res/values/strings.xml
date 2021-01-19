@@ -4,6 +4,7 @@
     <string name="app_name">Glia SDK Widget Example App</string>
 
     <string name="settings_value_default">Default</string>
+    <string name="settings_value_default_company_name">Glia company</string>
     <string name="settings_value_default_restart">Default (needs restart)</string>
     <string name="settings_color_blue">Blue</string>
     <string name="settings_color_grey">Grey</string>
@@ -16,6 +17,7 @@
     <string name="settings_chat_base_light_color">Base light color</string>
     <string name="settings_chat_base_dark_color">Base dark color</string>
     <string name="settings_chat_base_normal_color">Base normal color</string>
+    <string name="settings_chat_base_shade_color">Base shade color</string>
     <string name="settings_chat_brand_primary_color">Brand primary color</string>
     <string name="settings_chat_system_agent_bubble_color">System agent bubble color</string>
     <string name="settings_chat_font_family">Chat message font family</string>

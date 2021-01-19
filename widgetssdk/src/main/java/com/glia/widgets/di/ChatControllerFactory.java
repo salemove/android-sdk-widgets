@@ -4,7 +4,6 @@ import android.app.Activity;
 
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
-import com.glia.widgets.chat.ChatView;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.GliaRepository;
@@ -32,7 +31,10 @@ public class ChatControllerFactory {
         return new GliaRepository();
     }
 
-    public void destroyChatController(ChatView chatView) {
-        this.retainedController = null;
+    public void destroyChatController(Activity activity) {
+        if (activity instanceof ChatActivity && this.retainedController != null) {
+            retainedController.onDestroy(false);
+            retainedController = null;
+        }
     }
 }

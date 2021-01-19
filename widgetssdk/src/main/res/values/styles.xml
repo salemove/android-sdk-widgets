@@ -62,6 +62,7 @@
     <style name="Application.Glia.Header3" parent="TextAppearance.MaterialComponents.Headline3">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+<!--        font weight available from api 28 :(-->
     </style>
 
     <style name="Application.Glia.Body" parent="TextAppearance.MaterialComponents.Body1">

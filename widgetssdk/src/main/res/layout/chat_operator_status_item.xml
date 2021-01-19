@@ -19,7 +19,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/medium" />
 
-    <com.glia.widgets.chat.OperatorStatusView
+    <com.glia.widgets.chat.adapter.OperatorStatusView
         android:id="@+id/status_picture_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

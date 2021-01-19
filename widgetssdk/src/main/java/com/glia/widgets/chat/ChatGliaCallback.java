@@ -23,6 +23,10 @@ public interface ChatGliaCallback {
 
     void chatHistoryLoaded(ChatMessage[] messages, Throwable error);
 
+    void audioUpgradeRequested();
+
+    void audioUpgradeOfferChoiceSubmitSuccess();
+
     void error(GliaException exception);
 
     void error(Throwable throwable);

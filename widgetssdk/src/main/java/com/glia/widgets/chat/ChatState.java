@@ -1,6 +1,9 @@
 package com.glia.widgets.chat;
 
+import com.glia.widgets.chat.adapter.ChatItem;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,7 +13,7 @@ public class ChatState {
     public final boolean useFloatingChatHeads;
     public final String queueTicketId;
     public final boolean historyLoaded;
-    public final boolean operatorOnline;
+    public final String operatorName;
     public final String companyName;
     public final String queueId;
     public final String contextUrl;
@@ -22,7 +25,7 @@ public class ChatState {
             boolean useFloatingChatHeads,
             String queueTicketId,
             boolean historyLoaded,
-            boolean operatorOnline,
+            String operatorName,
             String companyName,
             String queueId,
             String contextUrl,
@@ -34,7 +37,7 @@ public class ChatState {
         this.useFloatingChatHeads = useFloatingChatHeads;
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
-        this.operatorOnline = operatorOnline;
+        this.operatorName = operatorName;
         this.companyName = companyName;
         this.queueId = queueId;
         this.contextUrl = contextUrl;
@@ -42,14 +45,27 @@ public class ChatState {
         this.integratorChatStarted = integratorChatStarted;
         this.hasOverlayPermissions = hasOverlayPermissions;
         this.overlaysPermissionDialogShown = overlaysPermissionDialogShown;
-        this.chatItems = chatItems;
+        this.chatItems = Collections.unmodifiableList(chatItems);
+    }
+
+    public boolean isOperatorOnline() {
+        return operatorName != null;
+    }
+
+    public String getFormattedOperatorName() {
+        int i = operatorName.indexOf(' ');
+        if (i != -1) {
+            return operatorName.substring(0, i);
+        } else {
+            return operatorName;
+        }
     }
 
     public static class Builder {
         private boolean useFloatingChatHeads;
         private String queueTicketId;
         private boolean historyLoaded;
-        private boolean operatorOnline;
+        private String operatorName;
         private String companyName;
         private String queueId;
         private String contextUrl;
@@ -63,7 +79,7 @@ public class ChatState {
             useFloatingChatHeads = chatState.useFloatingChatHeads;
             queueTicketId = chatState.queueTicketId;
             historyLoaded = chatState.historyLoaded;
-            operatorOnline = chatState.operatorOnline;
+            operatorName = chatState.operatorName;
             companyName = chatState.companyName;
             queueId = chatState.queueId;
             contextUrl = chatState.contextUrl;
@@ -90,8 +106,8 @@ public class ChatState {
             return this;
         }
 
-        public Builder setOperatorOnline(boolean operatorOnline) {
-            this.operatorOnline = operatorOnline;
+        public Builder setOperatorName(String operatorName) {
+            this.operatorName = operatorName;
             return this;
         }
 
@@ -136,7 +152,7 @@ public class ChatState {
         }
 
         public ChatState createChatState() {
-            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorOnline, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, chatItems);
+            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, chatItems);
         }
     }
 
@@ -148,7 +164,7 @@ public class ChatState {
                 .setUseFloatingChatHeads(useChatHeads)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
-                .setOperatorOnline(false)
+                .setOperatorName(null)
                 .setCompanyName(companyName)
                 .setQueueId(queueId)
                 .setContextUrl(contextUrl)
@@ -170,17 +186,17 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setHistoryLoaded(false)
-                .setOperatorOnline(false)
+                .setOperatorName(null)
                 .setIntegratorChatStarted(true)
                 .createChatState();
     }
 
 
-    public ChatState engagementStarted() {
+    public ChatState engagementStarted(String operatorName) {
         return new Builder()
                 .copyFrom(this)
                 .setHistoryLoaded(false)
-                .setOperatorOnline(true)
+                .setOperatorName(operatorName)
                 .setIntegratorChatStarted(true)
                 .createChatState();
     }
@@ -190,7 +206,7 @@ public class ChatState {
                 .copyFrom(this)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
-                .setOperatorOnline(false)
+                .setOperatorName(null)
                 .setIsVisible(isVisible)
                 .setIntegratorChatStarted(false)
                 .createChatState();
@@ -242,7 +258,7 @@ public class ChatState {
                 isVisible == chatState.isVisible &&
                 useFloatingChatHeads == chatState.useFloatingChatHeads &&
                 historyLoaded == chatState.historyLoaded &&
-                operatorOnline == chatState.operatorOnline &&
+                operatorName == chatState.operatorName &&
                 hasOverlayPermissions == chatState.hasOverlayPermissions &&
                 overlaysPermissionDialogShown == chatState.overlaysPermissionDialogShown &&
                 Objects.equals(queueTicketId, chatState.queueTicketId) &&
@@ -254,7 +270,7 @@ public class ChatState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, useFloatingChatHeads, queueTicketId, historyLoaded, operatorOnline, companyName, queueId, contextUrl, hasOverlayPermissions, overlaysPermissionDialogShown, chatItems);
+        return Objects.hash(integratorChatStarted, isVisible, useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, companyName, queueId, contextUrl, hasOverlayPermissions, overlaysPermissionDialogShown, chatItems);
     }
 
     @Override
@@ -265,7 +281,7 @@ public class ChatState {
                 ", useFloatingChatHeads=" + useFloatingChatHeads +
                 ", queueTicketId='" + queueTicketId + '\'' +
                 ", historyLoaded=" + historyLoaded +
-                ", operatorOnline=" + operatorOnline +
+                ", operatorName='" + operatorName + '\'' +
                 ", companyName='" + companyName + '\'' +
                 ", queueId='" + queueId + '\'' +
                 ", contextUrl='" + contextUrl + '\'' +

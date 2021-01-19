@@ -7,6 +7,7 @@
         <attr name="baseDarkColor" format="reference" />
         <attr name="baseLightColor" format="reference" />
         <attr name="baseNormalColor" format="reference" />
+        <attr name="baseShadeColor" format="reference" />
         <attr name="systemAgentBubbleColor" format="reference" />
         <attr name="systemNegativeColor" format="reference" />
         <attr name="android:fontFamily" format="reference" />
@@ -18,7 +19,14 @@
     <attr name="gliaBaseDarkColor" format="reference" />
     <attr name="gliaBaseLightColor" format="reference" />
     <attr name="gliaBaseNormalColor" format="reference" />
+    <attr name="gliaBaseShadeColor" format="reference" />
     <attr name="gliaSystemAgentBubbleColor" format="reference" />
     <attr name="gliaSystemNegativeColor" format="reference" />
+
+    <declare-styleable name="OutlinedOptionView">
+        <attr name="icon" format="reference" />
+        <attr name="title" format="string" />
+        <attr name="caption" format="string" />
+    </declare-styleable>
 
 </resources>

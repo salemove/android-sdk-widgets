@@ -2,6 +2,8 @@ package com.glia.widgets.chat;
 
 import android.util.Pair;
 
+import com.glia.widgets.chat.adapter.ChatItem;
+
 import java.util.List;
 
 public interface ChatViewCallback {

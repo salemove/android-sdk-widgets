@@ -48,8 +48,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1" />
 
-    <!--    TODO change color-->
     <View
+        android:id="@+id/divider_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="@dimen/medium"

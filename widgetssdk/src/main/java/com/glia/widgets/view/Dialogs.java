@@ -5,7 +5,10 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,14 +24,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 public class Dialogs {
 
     public static AlertDialog showOptionsDialog(Context context,
-                                         UiTheme theme,
-                                         @StringRes int title,
-                                         @StringRes int message,
-                                         @StringRes int positiveButtonText,
-                                         @StringRes int neutralButtonText,
-                                         DialogInterface.OnClickListener positiveButtonClickListener,
-                                         DialogInterface.OnClickListener neutralButtonClickListener,
-                                         DialogInterface.OnCancelListener cancelListener) {
+                                                UiTheme theme,
+                                                String title,
+                                                String message,
+                                                String positiveButtonText,
+                                                String neutralButtonText,
+                                                DialogInterface.OnClickListener positiveButtonClickListener,
+                                                DialogInterface.OnClickListener neutralButtonClickListener,
+                                                DialogInterface.OnCancelListener cancelListener) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
                 .setMessage(message)
                 .setPositiveButton(positiveButtonText, positiveButtonClickListener)
@@ -85,11 +88,11 @@ public class Dialogs {
     }
 
     public static AlertDialog showAlertDialog(Context context,
-                                       UiTheme theme,
-                                       @StringRes int title,
-                                       @StringRes int message,
-                                       @StringRes int buttonText,
-                                       DialogInterface.OnClickListener buttonClickListener) {
+                                              UiTheme theme,
+                                              @StringRes int title,
+                                              @StringRes int message,
+                                              @StringRes int buttonText,
+                                              DialogInterface.OnClickListener buttonClickListener) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
                 .setMessage(message)
                 .setCancelable(false)
@@ -129,6 +132,40 @@ public class Dialogs {
             messageView.setTypeface(fontFamily);
             negativeButton.setTypeface(fontFamily);
         }
+        dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
+                context, theme.getBaseLightColor()));
+        return dialog;
+    }
+
+
+    public static AlertDialog showUpgradeDialog(Context context, UiTheme theme, String title,
+                                                View.OnClickListener onAudioClickedListener,
+                                                View.OnClickListener onCloseClickListener) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setCancelable(false);
+        View customLayout = LayoutInflater.from(context).inflate(R.layout.upgrade_dialog, null, false);
+        TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
+        OutlinedOptionView upgradeAudioView = customLayout.findViewById(R.id.upgrade_audio_view);
+        // turns out that the phone is not yet available.
+        // OutlinedOptionView upgradePhoneView = customLayout.findViewById(R.id.upgrade_phone_view);
+        ImageView logoView = customLayout.findViewById(R.id.logo_view);
+        ImageView closeView = customLayout.findViewById(R.id.close_view);
+
+        titleView.setTextColor(ContextCompat.getColor(context, theme.getBaseDarkColor()));
+        upgradeAudioView.setTheme(theme);
+        // upgradePhoneView.setTheme(theme);
+        logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
+        closeView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseNormalColor()));
+
+        titleView.setText(title);
+
+        upgradeAudioView.setOnClickListener(onAudioClickedListener);
+        // upgradePhoneView.setOnClickListener(onPhoneClickedListener);
+        closeView.setOnClickListener(onCloseClickListener);
+        builder.setView(customLayout);
+
+        AlertDialog dialog = builder.show();
+
         dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
                 context, theme.getBaseLightColor()));
         return dialog;

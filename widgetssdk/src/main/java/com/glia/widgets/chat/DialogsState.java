@@ -1,24 +1,40 @@
 package com.glia.widgets.chat;
 
-public class DialogsState {
+public interface DialogsState {
 
-    public final boolean overlayPermissionsShowing;
-    public final boolean noOperatorsAvailableDialogShowing;
-    public final boolean unexpectedErrorDialogShowing;
-    public final boolean exitDialogShowing;
+    class NoDialog implements DialogsState {
 
-    public DialogsState(boolean overlayPermissionsShowing,
-                        boolean noOperatorsAvailableDialogShowing,
-                        boolean unexpectedErrorDialogShowing,
-                        boolean exitDialogShowing) {
-        this.overlayPermissionsShowing = overlayPermissionsShowing;
-        this.noOperatorsAvailableDialogShowing = noOperatorsAvailableDialogShowing;
-        this.unexpectedErrorDialogShowing = unexpectedErrorDialogShowing;
-        this.exitDialogShowing = exitDialogShowing;
     }
 
-    public boolean isDialogShowing() {
-        return overlayPermissionsShowing || noOperatorsAvailableDialogShowing ||
-                unexpectedErrorDialogShowing || exitDialogShowing;
+    class OverlayPermissionsDialog implements DialogsState {
+
+    }
+
+    class UnexpectedErrorDialog implements DialogsState {
+
+    }
+
+    class NoMoreOperatorsDialog implements DialogsState {
+
+    }
+
+    class ExitQueueDialog implements DialogsState {
+
+    }
+
+    class EndEngagementDialog implements DialogsState {
+        public final String operatorName;
+
+        public EndEngagementDialog(String operatorName) {
+            this.operatorName = operatorName;
+        }
+    }
+
+    class UpgradeAudioDialog implements DialogsState {
+        public final String operatorName;
+
+        public UpgradeAudioDialog(String operatorName) {
+            this.operatorName = operatorName;
+        }
     }
 }

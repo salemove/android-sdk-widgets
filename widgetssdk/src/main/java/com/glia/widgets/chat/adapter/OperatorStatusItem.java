@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.chat.adapter;
 
 public class OperatorStatusItem extends ChatItem {
     private final String companyName;

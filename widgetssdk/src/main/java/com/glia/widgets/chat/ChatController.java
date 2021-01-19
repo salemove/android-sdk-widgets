@@ -7,11 +7,19 @@ import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
+import com.glia.widgets.chat.adapter.OperatorStatusItem;
+import com.glia.widgets.chat.adapter.ReceiveMessageItem;
+import com.glia.widgets.chat.adapter.SendMessageItem;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.GliaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ChatController {
 
@@ -20,8 +28,43 @@ public class ChatController {
     private GliaRepository repository;
 
     private final String TAG = "ChatController";
+    private final int TIMER_DELAY = 0;
+    private final int TIMER_SECOND_INTERVAL = 1000;
     private volatile ChatState chatState;
-    public volatile DialogsState dialogsState;
+    private volatile DialogsState dialogsState;
+    private MediaUpgradeStartedTimerItem lastTimerItem = null;
+    private final TimerTask timerTask = new TimerTask() {
+        int seconds = 0;
+
+        @Override
+        public void run() {
+            seconds++;
+            String time = Utils.toMmSs(seconds);
+            if (lastTimerItem != null) {
+                int index = chatState.chatItems.indexOf(lastTimerItem);
+                if (index != -1) {
+                    List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
+                    MediaUpgradeStartedTimerItem.Type type = lastTimerItem.type;
+                    newItems.remove(index);
+                    lastTimerItem = new MediaUpgradeStartedTimerItem(type, time);
+                    newItems.add(index, lastTimerItem);
+                    emitChatItems(chatState.changeItems(newItems), new Pair<>(index, 1), false);
+                } else {
+                    cancel();
+                }
+            } else {
+                cancel();
+            }
+            Logger.d(TAG, "timer: " + time);
+        }
+
+        @Override
+        public boolean cancel() {
+            seconds = 0;
+            return super.cancel();
+        }
+    };
+    private final Timer timer = new Timer();
 
     public ChatController(ChatViewCallback viewCallback) {
         this.viewCallback = viewCallback;
@@ -29,7 +72,7 @@ public class ChatController {
                 .setUseFloatingChatHeads(false)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
-                .setOperatorOnline(false)
+                .setOperatorName(null)
                 .setCompanyName(null)
                 .setQueueId(null)
                 .setContextUrl(null)
@@ -39,7 +82,7 @@ public class ChatController {
                 .setOverlaysPermissionDialogShown(false)
                 .setChatItems(new ArrayList<>())
                 .createChatState();
-        this.dialogsState = new DialogsState(false, false, false, false);
+        this.dialogsState = new DialogsState.NoDialog();
     }
 
     public void initChat(GliaRepository gliaRepository,
@@ -47,6 +90,7 @@ public class ChatController {
                          String queueId,
                          String contextUrl,
                          boolean useChatHeads) {
+        Logger.d(TAG, "initChat");
         if (useChatHeads && chatState.hasOverlayPermissions) {
             handleFloatingChatheads(false);
         }
@@ -67,27 +111,120 @@ public class ChatController {
     }
 
     public void onDestroy(boolean retain) {
+        Logger.d(TAG, "onDestroy, retain:" + retain);
         viewCallback = null;
-        if (!retain && chatState.useFloatingChatHeads && repository != null) {
-            repository.onDestroyView();
-        }
-        if (!retain && chatState.useFloatingChatHeads) {
-            gliaCallback = null;
+        if (!retain) {
+            if (chatState.useFloatingChatHeads && repository != null) {
+                repository.onDestroyView();
+            }
+            if (chatState.useFloatingChatHeads) {
+                gliaCallback = null;
+            }
+            timerTask.cancel();
+            timer.cancel();
         }
     }
 
     public void sendMessagePreview(String message) {
+        Logger.d(TAG, "Send preview: " + message);
         if (isMessageValid(message)) {
-            Logger.d(TAG, "Send preview: " + message);
+            Logger.d(TAG, "Send preview valid!: " + message);
             repository.sendMessagePreview(message);
         }
     }
 
     public void sendMessage(String message) {
+        Logger.d(TAG, "Send MESSAGE: " + message);
         if (isMessageValid(message)) {
-            Logger.d(TAG, "Send MESSAGE: " + message);
+            Logger.d(TAG, "Send MESSAGE valid! : " + message);
             repository.sendMessage(message);
         }
+    }
+
+    public void show() {
+        Logger.d(TAG, "show");
+        if (!chatState.isVisible) {
+            emitViewState(chatState.show());
+        }
+    }
+
+    public void onBackArrowClicked() {
+        Logger.d(TAG, "onBackArrowClicked");
+        if (!chatState.useFloatingChatHeads) {
+            emitViewState(chatState.hide());
+        } else if (chatState.hasOverlayPermissions) {
+            handleFloatingChatheads(true);
+        }
+    }
+
+    public void noMoreOperatorsAvailableDismissed() {
+        Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
+        stop(false, false);
+        dismissDialogs();
+    }
+
+    public void unexpectedErrorDialogDismissed() {
+        Logger.d(TAG, "unexpectedErrorDialogDismissed");
+        stop(false, false);
+        dismissDialogs();
+    }
+
+    public void endEngagementDialogYesClicked() {
+        Logger.d(TAG, "endEngagementDialogYesClicked");
+        stop(false, false);
+        dismissDialogs();
+    }
+
+    public void endEngagementDialogDismissed() {
+        Logger.d(TAG, "endEngagementDialogDismissed");
+        dismissDialogs();
+    }
+
+    public void leaveChatClicked() {
+        Logger.d(TAG, "leaveChatClicked");
+        showExitChatDialog();
+    }
+
+    public void leaveChatQueueClicked() {
+        Logger.d(TAG, "leaveChatQueueClicked");
+        showExitQueueDialog();
+    }
+
+    public boolean isChatVisible() {
+        return chatState.isVisible;
+    }
+
+    public void setViewCallback(ChatViewCallback chatViewCallback) {
+        Logger.d(TAG, "setViewCallback");
+        this.viewCallback = chatViewCallback;
+        viewCallback.emitState(chatState);
+        viewCallback.emitItems(chatState.chatItems, new Pair<>(0, chatState.chatItems.size()), true);
+        viewCallback.emitDialog(dialogsState);
+    }
+
+    public void onResume(boolean hasOverlaysPermission) {
+        Logger.d(TAG, "onResume");
+        if (!hasOverlaysPermission && !chatState.overlaysPermissionDialogShown) {
+            showOverlayPermissionsDialog();
+        }
+        emitViewState(chatState.drawOverlaysPermissionChanged(hasOverlaysPermission));
+    }
+
+    public void overlayPermissionsDialogDismissed() {
+        Logger.d(TAG, "overlayPermissionsDialogDismissed");
+        emitDialogState(new DialogsState.NoDialog());
+    }
+
+    public void upgradeToAudioClicked() {
+        Logger.d(TAG, "upgradeToAudioClicked");
+        repository.acceptUpgradeOffer();
+        emitDialogState(new DialogsState.NoDialog());
+    }
+
+    public void closeUpgradeDialogClicked() {
+        Logger.d(TAG, "closeUpgradeDialogClicked");
+        repository.declineOffer();
+        emitDialogState(new DialogsState.NoDialog());
     }
 
     public String getCompanyName() {
@@ -104,65 +241,6 @@ public class ChatController {
 
     public boolean isStarted() {
         return chatState.integratorChatStarted;
-    }
-
-    public void show() {
-        if (!chatState.isVisible) {
-            emitViewState(chatState.show());
-        }
-    }
-
-    public void onBackArrowClicked() {
-        if (!chatState.useFloatingChatHeads) {
-            emitViewState(chatState.hide());
-        } else if (chatState.hasOverlayPermissions) {
-            handleFloatingChatheads(true);
-        }
-    }
-
-    public void noMoreOperatorsAvailableDismissed() {
-        stop(false, false);
-        dismissDialogs();
-    }
-
-    public void unexpectedErrorDialogDismissed() {
-        stop(false, false);
-        dismissDialogs();
-    }
-
-    public void exitDialogYesClicked() {
-        stop(false, false);
-        dismissDialogs();
-    }
-
-    public void exitDialogDismissClicked() {
-        dismissDialogs();
-    }
-
-    public void leaveChatClicked() {
-        showExitDialog();
-    }
-
-    public boolean isChatVisible() {
-        return chatState.isVisible;
-    }
-
-    public void setViewCallback(ChatViewCallback chatViewCallback) {
-        this.viewCallback = chatViewCallback;
-        viewCallback.emitState(chatState);
-        viewCallback.emitItems(chatState.chatItems, new Pair<>(0, chatState.chatItems.size()), true);
-        viewCallback.emitDialog(dialogsState);
-    }
-
-    public void onResume(boolean hasOverlaysPermission) {
-        if (!hasOverlaysPermission && !chatState.overlaysPermissionDialogShown) {
-            showOverlayPermissionsDialog();
-        }
-        emitViewState(chatState.drawOverlaysPermissionChanged(hasOverlaysPermission));
-    }
-
-    public void overlayPermissionsDialogDismissed() {
-        emitDialogState(new DialogsState(false, false, false, false));
     }
 
     private synchronized void emitChatItems(ChatState state,
@@ -287,6 +365,18 @@ public class ChatController {
             }
 
             @Override
+            public void audioUpgradeRequested() {
+                Logger.d(TAG, "audioUpgradeRequested");
+                showUpgradeDialog();
+            }
+
+            @Override
+            public void audioUpgradeOfferChoiceSubmitSuccess() {
+                Logger.d(TAG, "audioUpgradeAcceptSuccess");
+                startTimer(MediaUpgradeStartedTimerItem.Type.AUDIO);
+            }
+
+            @Override
             public void error(GliaException exception) {
                 Logger.e(TAG, exception.toString());
                 showUnexpectedErrorDialog();
@@ -303,7 +393,7 @@ public class ChatController {
     }
 
     private void viewInitQueueing() {
-        if (!chatState.operatorOnline) {
+        if (!chatState.isOperatorOnline()) {
             List<ChatItem> items = new ArrayList<>();
             items.add(OperatorStatusItem.QueueingStatusItem(chatState.companyName));
             emitViewState(chatState.initQueueing());
@@ -312,10 +402,10 @@ public class ChatController {
     }
 
     private void operatorOnlineStartChatUi(String operatorName) {
-        if (!chatState.operatorOnline) {
+        if (!chatState.isOperatorOnline()) {
             List<ChatItem> items = new ArrayList<>();
-            items.add(OperatorStatusItem.OperatorFoundStatusItem(chatState.companyName, operatorName));
-            emitViewState(chatState.engagementStarted());
+            emitViewState(chatState.engagementStarted(operatorName));
+            items.add(OperatorStatusItem.OperatorFoundStatusItem(chatState.companyName, chatState.getFormattedOperatorName()));
             emitChatItems(chatState.changeItems(items), new Pair<>(0, 1), false);
         }
     }
@@ -323,7 +413,7 @@ public class ChatController {
     private void stop(boolean showDialog, boolean isVisible) {
         repository.stop(chatState.queueTicketId, showDialog);
         emitViewState(chatState.stop(isVisible));
-        if (showDialog && !dialogsState.noOperatorsAvailableDialogShowing) {
+        if (showDialog && !isDialogShowing()) {
             showNoMoreOperatorsAvailableDialog();
         }
     }
@@ -393,24 +483,36 @@ public class ChatController {
 
     private void dismissDialogs() {
         Logger.d(TAG, "Dismiss dialogs");
-        emitDialogState(new DialogsState(false, false, false, false));
+        emitDialogState(new DialogsState.NoDialog());
     }
 
-    private void showExitDialog() {
-        if (!dialogsState.isDialogShowing()) {
-            emitDialogState(new DialogsState(false, false, false, true));
+    private void showExitQueueDialog() {
+        if (!isDialogShowing()) {
+            emitDialogState(new DialogsState.ExitQueueDialog());
+        }
+    }
+
+    private void showExitChatDialog() {
+        if (!isDialogShowing() && chatState.isOperatorOnline()) {
+            emitDialogState(new DialogsState.EndEngagementDialog(chatState.getFormattedOperatorName()));
+        }
+    }
+
+    private void showUpgradeDialog() {
+        if (!isDialogShowing() && chatState.isOperatorOnline()) {
+            emitDialogState(new DialogsState.UpgradeAudioDialog(chatState.getFormattedOperatorName()));
         }
     }
 
     private void showNoMoreOperatorsAvailableDialog() {
-        if (!dialogsState.isDialogShowing()) {
-            emitDialogState(new DialogsState(false, true, false, false));
+        if (!isDialogShowing()) {
+            emitDialogState(new DialogsState.NoMoreOperatorsDialog());
         }
     }
 
     private void showUnexpectedErrorDialog() {
-        if (!dialogsState.isDialogShowing()) {
-            emitDialogState(new DialogsState(false, false, true, false));
+        if (!isDialogShowing()) {
+            emitDialogState(new DialogsState.UnexpectedErrorDialog());
         }
     }
 
@@ -422,8 +524,20 @@ public class ChatController {
     }
 
     private void showOverlayPermissionsDialog() {
-        if (!dialogsState.isDialogShowing()) {
-            emitDialogState(new DialogsState(true, false, false, false));
+        if (!isDialogShowing()) {
+            emitDialogState(new DialogsState.OverlayPermissionsDialog());
         }
+    }
+
+    private boolean isDialogShowing() {
+        return !(dialogsState instanceof DialogsState.NoDialog);
+    }
+
+    private void startTimer(MediaUpgradeStartedTimerItem.Type type) {
+        List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
+        lastTimerItem = new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
+        newItems.add(lastTimerItem);
+        emitChatItems(chatState.changeItems(newItems), new Pair<>(newItems.size() - 1, 1), true);
+        timer.schedule(timerTask, TIMER_DELAY, TIMER_SECOND_INTERVAL);
     }
 }

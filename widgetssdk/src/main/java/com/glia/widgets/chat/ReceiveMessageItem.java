@@ -13,4 +13,11 @@ public class ReceiveMessageItem extends ChatItem {
     public List<String> getMessages() {
         return messages;
     }
+
+    @Override
+    public String toString() {
+        return "ReceiveMessageItem{" +
+                "messages=" + messages +
+                '}';
+    }
 }

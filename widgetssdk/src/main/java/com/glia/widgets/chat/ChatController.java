@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.GliaRepository;
@@ -241,12 +242,23 @@ public class ChatController {
             }
 
             @Override
-            public void onMessage(ChatMessage message) {
-                Logger.d(TAG, "onMessage:\n" + message.getContent());
-                List<ChatItem> newItems = getNewChatItems(message);
-                emitChatItems(chatState.changeItems(newItems),
-                        new Pair<>(chatState.chatItems.size() - 1, 1),
+            public void messageDelivered(VisitorMessage visitorMessage) {
+                Logger.d(TAG, "messageDelivered: " + visitorMessage.toString());
+                List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+                Integer invalidateFrom = changeDeliveredIndex(currentChatItems, visitorMessage);
+                emitChatItems(chatState.changeItems(currentChatItems), new Pair<>
+                                (invalidateFrom != null ? invalidateFrom : chatState.chatItems.size() - 1,
+                                        invalidateFrom != null ? currentChatItems.size() - 1 - invalidateFrom : 1),
                         true);
+            }
+
+            @Override
+            public void onMessage(ChatMessage message) {
+                Logger.d(TAG, "onMessage: " + message.getContent());
+                List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+                appendMessageItem(items, message);
+                emitChatItems(chatState.changeItems(items), new Pair<>
+                        (chatState.chatItems.size() - 1, 1), true);
             }
 
             @Override
@@ -256,10 +268,10 @@ public class ChatController {
                     Logger.e(TAG, "chatHistoryLoaded error");
                     this.error(error);
                 }
-                List<ChatItem> items = chatState.chatItems;
+                List<ChatItem> items = new ArrayList<>(chatState.chatItems);
                 if (messages != null) {
                     for (ChatMessage message : messages) {
-                        items = getNewChatItems(message);
+                        appendHistoryChatItem(items, message);
                     }
                     // If history added. Add name operator name after history.
                     if (items.size() > 1) {
@@ -316,24 +328,63 @@ public class ChatController {
         }
     }
 
-    private List<ChatItem> getNewChatItems(ChatMessage message) {
-        List<ChatItem> chatItems = chatState.chatItems;
+    private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
-            chatItems.add(new SendMessageItem(message.getContent()));
-        } else {
-            List<String> messages;
-            if (chatItems.get(chatItems.size() - 1) instanceof ReceiveMessageItem) {
-                ReceiveMessageItem lastItemInView = (ReceiveMessageItem) chatItems.get(chatItems.size() - 1);
-                chatItems.remove(lastItemInView);
-                messages = lastItemInView.getMessages();
-            } else {
-                messages = new ArrayList<>();
-            }
-            messages.add(message.getContent());
-            chatItems.add(new ReceiveMessageItem(messages));
+            currentChatItems.add(new SendMessageItem(null, false, message.getContent()));
+        } else if (message.getSender() == Chat.Participant.OPERATOR) {
+            changeLastOperatorMessages(currentChatItems, message);
         }
+    }
 
-        return chatItems;
+    private void appendMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
+        if (message.getSender() == Chat.Participant.VISITOR) {
+            appendSentMessage(currentChatItems, message);
+        } else if (message.getSender() == Chat.Participant.OPERATOR) {
+            changeLastOperatorMessages(currentChatItems, message);
+        }
+    }
+
+    private void appendSentMessage(List<ChatItem> items, ChatMessage message) {
+        items.add(new SendMessageItem(message.getId(), false, message.getContent()));
+    }
+
+    private Integer changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
+        Integer invalidateFrom = null;
+        for (int i = currentChatItems.size() - 1; i >= 0; i--) {
+            if (currentChatItems.get(i) instanceof SendMessageItem) {
+                SendMessageItem item = (SendMessageItem) currentChatItems.get(i);
+                if (item.getId() == null) {
+                    // id-s are null in case of history items. break out of loop.
+                    break;
+                } else if (item.getId().equals(message.getId())) {
+                    // the visitormessage. show delivered for it.
+                    currentChatItems.remove(i);
+                    currentChatItems.add(i,
+                            new SendMessageItem(message.getId(), true, message.getContent()));
+                } else if (item.isShowDelivered()) {
+                    // remove all other delivered references
+                    currentChatItems.remove(i);
+                    currentChatItems.add(i, new SendMessageItem(item.getId(),
+                            false,
+                            item.getMessage()));
+                    invalidateFrom = i;
+                }
+            }
+        }
+        return invalidateFrom;
+    }
+
+    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
+        List<String> messages;
+        if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
+            ReceiveMessageItem lastItemInView = (ReceiveMessageItem) currentChatItems.get(currentChatItems.size() - 1);
+            currentChatItems.remove(lastItemInView);
+            messages = lastItemInView.getMessages();
+        } else {
+            messages = new ArrayList<>();
+        }
+        messages.add(message.getContent());
+        currentChatItems.add(new ReceiveMessageItem(messages));
     }
 
     private boolean isMessageValid(String message) {

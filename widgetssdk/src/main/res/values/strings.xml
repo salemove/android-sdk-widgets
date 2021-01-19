@@ -6,6 +6,7 @@
     <string name="chat_send_content_description">Send message button</string>
     <string name="chat_in_queue_message">An MSR will be with you shortly.</string>
     <string name="chat_operator_has_joined">%1$s has joined the conversation</string>
+    <string name="chat_delivered">Delivered</string>
 
     <string name="top_app_bar_close">Close</string>
     <string name="top_app_bar_chat_end">End</string>

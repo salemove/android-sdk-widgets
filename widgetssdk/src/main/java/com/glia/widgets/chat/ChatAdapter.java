@@ -89,10 +89,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static class SendMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView content;
+        private final TextView deliveredView;
 
         public SendMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
             super(itemView);
             this.content = itemView.findViewById(R.id.content);
+            this.deliveredView = itemView.findViewById(R.id.delivered_view);
             Context context = itemView.getContext();
             ColorStateList primaryBrandColor = ContextCompat.getColorStateList(context, uiTheme.getBrandPrimaryColor());
             content.setBackgroundTintList(primaryBrandColor);
@@ -100,11 +102,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (uiTheme.getFontRes() != null) {
                 Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
                 content.setTypeface(fontFamily);
+                deliveredView.setTypeface(fontFamily);
             }
+            deliveredView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
         }
 
         public void bind(SendMessageItem item) {
             content.setText(item.getMessage());
+            deliveredView.setVisibility(item.isShowDelivered() ? View.VISIBLE : View.GONE);
         }
     }
 

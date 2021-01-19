@@ -35,4 +35,13 @@ public class OperatorStatusItem extends ChatItem {
     public static OperatorStatusItem OperatorFoundStatusItem(String companyName, String operatorName) {
         return new OperatorStatusItem(Status.OPERATOR_CONNECTED, companyName, operatorName);
     }
+
+    @Override
+    public String toString() {
+        return "OperatorStatusItem{" +
+                "companyName='" + companyName + '\'' +
+                ", status=" + status +
+                ", operatorName='" + operatorName + '\'' +
+                '}';
+    }
 }

@@ -2,12 +2,15 @@ package com.glia.widgets.model;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.widgets.chat.ChatGliaCallback;
+import com.glia.widgets.helper.Logger;
 
 import java.util.function.Consumer;
 
@@ -23,6 +26,15 @@ public class GliaRepository {
     };
     private final Consumer<OmnicoreEngagement> engagementHandler = engagement ->
             callback.engagementSuccess(engagement);
+
+    private final RequestCallback<VisitorMessage> sendMessageCallback = (response, exception) -> {
+        if (exception != null) {
+            callback.error(exception);
+        }
+        if (response != null) {
+            callback.messageDelivered(response);
+        }
+    };
 
     public void init(ChatGliaCallback callback, String queueId, String contextUrl) {
         this.callback = callback;
@@ -82,11 +94,7 @@ public class GliaRepository {
 
     public void sendMessage(String message) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, (response, exception) -> {
-                    if (exception != null) {
-                        callback.error(exception);
-                    }
-                }));
+                engagement.getChat().sendMessage(message, sendMessageCallback));
     }
 
     public void loadHistory() {

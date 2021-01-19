@@ -2,6 +2,7 @@ package com.glia.widgets.chat;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 
 public interface ChatGliaCallback {
@@ -25,4 +26,6 @@ public interface ChatGliaCallback {
     void error(GliaException exception);
 
     void error(Throwable throwable);
+
+    void messageDelivered(VisitorMessage visitorMessage);
 }

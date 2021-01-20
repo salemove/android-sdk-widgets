@@ -37,7 +37,7 @@
     <string name="main_open_settings">Open Settings</string>
     <string name="main_launch_activity">Launch Chat in Activity</string>
     <string name="main_launch_fragment">Launch Chat in Fragment</string>
-    <string name="main_start_in_this_view">Start Chat in this view</string>
+    <string name="main_start_in_integrator_app">Start Chat in integrator app</string>
     <string name="main_start_chat_flow">Start new chat flow</string>
 
 </resources>

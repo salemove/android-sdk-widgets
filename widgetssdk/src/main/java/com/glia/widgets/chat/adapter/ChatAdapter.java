@@ -3,7 +3,6 @@ package com.glia.widgets.chat.adapter;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.widgets.R;
@@ -24,13 +25,29 @@ import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private final AsyncListDiffer<ChatItem> differ =
+            new AsyncListDiffer<>(this, DIFF_CALLBACK);
+
+    public static final DiffUtil.ItemCallback<ChatItem> DIFF_CALLBACK
+            = new DiffUtil.ItemCallback<ChatItem>() {
+        @Override
+        public boolean areItemsTheSame(
+                @NonNull ChatItem oldItem, @NonNull ChatItem newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(
+                @NonNull ChatItem oldItem, @NonNull ChatItem newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
+
     public static final int OPERATOR_STATUS_VIEW_TYPE = 0;
     public static final int SEND_MESSAGE_VIEW_TYPE = 1;
     public static final int RECEIVE_MESSAGE_VIEW_TYPE = 2;
     public static final int MEDIA_UPGRADE_ITEM_TYPE = 3;
     private final UiTheme uiTheme;
-
-    private List<ChatItem> chatItems;
 
     public ChatAdapter(UiTheme uiTheme) {
         this.uiTheme = uiTheme;
@@ -192,9 +209,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    public void replaceItems(List<ChatItem> items, Pair<Integer, Integer> range) {
-        this.chatItems = items;
-        notifyItemRangeChanged(range.first, range.second, chatItems);
+    public void submitList(List<ChatItem> items) {
+        differ.submitList(items);
     }
 
     @NonNull
@@ -224,7 +240,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ChatItem chatItem = chatItems.get(position);
+        ChatItem chatItem = differ.getCurrentList().get(position);
         if (chatItem instanceof OperatorStatusItem) {
             ((OperatorStatusViewHolder) holder).bind((OperatorStatusItem) chatItem);
         } else if (chatItem instanceof SendMessageItem) {
@@ -238,14 +254,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        if (this.chatItems != null) {
-            return this.chatItems.size();
-        }
-        return 0;
+        return differ.getCurrentList().size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return chatItems.get(position).getViewType();
+        return differ.getCurrentList().get(position).getViewType();
     }
 }

@@ -10,9 +10,7 @@ public interface ChatViewCallback {
 
     void emitState(ChatState chatState);
 
-    void emitItems(List<ChatItem> items,
-                   Pair<Integer, Integer> indexesToBeInvalidated,
-                   boolean scrollToBottom);
+    void emitItems(List<ChatItem> items);
 
     void emitDialog(DialogsState dialogsState);
 

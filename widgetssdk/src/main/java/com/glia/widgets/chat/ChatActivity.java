@@ -53,7 +53,6 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         onBackClickedListener = null;
         onEndListener = null;
-        chatView.onDestroyView();
         super.onDestroy();
     }
 

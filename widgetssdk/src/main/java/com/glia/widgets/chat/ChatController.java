@@ -1,7 +1,5 @@
 package com.glia.widgets.chat;
 
-import android.util.Pair;
-
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
@@ -28,8 +26,6 @@ public class ChatController {
     private GliaRepository repository;
 
     private final String TAG = "ChatController";
-    private final int TIMER_DELAY = 0;
-    private final int TIMER_SECOND_INTERVAL = 1000;
     private volatile ChatState chatState;
     private volatile DialogsState dialogsState;
     private MediaUpgradeStartedTimerItem lastTimerItem = null;
@@ -48,7 +44,7 @@ public class ChatController {
                     newItems.remove(index);
                     lastTimerItem = new MediaUpgradeStartedTimerItem(type, time);
                     newItems.add(index, lastTimerItem);
-                    emitChatItems(chatState.changeItems(newItems), new Pair<>(index, 1), false);
+                    emitChatItems(chatState.changeItems(newItems));
                 } else {
                     cancel();
                 }
@@ -110,6 +106,21 @@ public class ChatController {
         }
     }
 
+    private synchronized void emitChatItems(ChatState state) {
+        if (setState(state) && viewCallback != null) {
+            Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
+                    "\n(State): " + state.toString());
+            viewCallback.emitItems(state.chatItems);
+        }
+    }
+
+    private synchronized void emitDialogState(DialogsState state) {
+        if (setDialogState(state) && viewCallback != null) {
+            Logger.d(TAG, "Emit dialog state:\n" + dialogsState.toString());
+            viewCallback.emitDialog(dialogsState);
+        }
+    }
+
     public void onDestroy(boolean retain) {
         Logger.d(TAG, "onDestroy, retain:" + retain);
         viewCallback = null;
@@ -127,10 +138,7 @@ public class ChatController {
 
     public void sendMessagePreview(String message) {
         Logger.d(TAG, "Send preview: " + message);
-        if (isMessageValid(message)) {
-            Logger.d(TAG, "Send preview valid!: " + message);
-            repository.sendMessagePreview(message);
-        }
+        repository.sendMessagePreview(message);
     }
 
     public void sendMessage(String message) {
@@ -198,7 +206,7 @@ public class ChatController {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = chatViewCallback;
         viewCallback.emitState(chatState);
-        viewCallback.emitItems(chatState.chatItems, new Pair<>(0, chatState.chatItems.size()), true);
+        viewCallback.emitItems(chatState.chatItems);
         viewCallback.emitDialog(dialogsState);
     }
 
@@ -241,25 +249,6 @@ public class ChatController {
 
     public boolean isStarted() {
         return chatState.integratorChatStarted;
-    }
-
-    private synchronized void emitChatItems(ChatState state,
-                                            Pair<Integer, Integer> range,
-                                            boolean scrollToBottom) {
-        if (setState(state) && viewCallback != null) {
-            Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
-                    "\nRange: " + range.toString() +
-                    "\nScrollToBottom: " + scrollToBottom +
-                    "\n(State): " + state.toString());
-            viewCallback.emitItems(state.chatItems, range, scrollToBottom);
-        }
-    }
-
-    private synchronized void emitDialogState(DialogsState state) {
-        if (setDialogState(state) && viewCallback != null) {
-            Logger.d(TAG, "Emit dialog state:\n" + dialogsState.toString());
-            viewCallback.emitDialog(dialogsState);
-        }
     }
 
     private synchronized boolean setState(ChatState state) {
@@ -323,11 +312,8 @@ public class ChatController {
             public void messageDelivered(VisitorMessage visitorMessage) {
                 Logger.d(TAG, "messageDelivered: " + visitorMessage.toString());
                 List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
-                Integer invalidateFrom = changeDeliveredIndex(currentChatItems, visitorMessage);
-                emitChatItems(chatState.changeItems(currentChatItems), new Pair<>
-                                (invalidateFrom != null ? invalidateFrom : chatState.chatItems.size() - 1,
-                                        invalidateFrom != null ? currentChatItems.size() - 1 - invalidateFrom : 1),
-                        true);
+                changeDeliveredIndex(currentChatItems, visitorMessage);
+                emitChatItems(chatState.changeItems(currentChatItems));
             }
 
             @Override
@@ -335,8 +321,7 @@ public class ChatController {
                 Logger.d(TAG, "onMessage: " + message.getContent());
                 List<ChatItem> items = new ArrayList<>(chatState.chatItems);
                 appendMessageItem(items, message);
-                emitChatItems(chatState.changeItems(items), new Pair<>
-                        (chatState.chatItems.size() - 1, 1), true);
+                emitChatItems(chatState.changeItems(items));
             }
 
             @Override
@@ -357,10 +342,7 @@ public class ChatController {
                         items.remove(0);
                     }
                 }
-                emitChatItems(
-                        chatState.historyLoaded(items),
-                        new Pair<>(0, items.size()),
-                        true);
+                emitChatItems(chatState.historyLoaded(items));
                 repository.initMessaging();
             }
 
@@ -397,7 +379,7 @@ public class ChatController {
             List<ChatItem> items = new ArrayList<>();
             items.add(OperatorStatusItem.QueueingStatusItem(chatState.companyName));
             emitViewState(chatState.initQueueing());
-            emitChatItems(chatState.changeItems(items), new Pair<>(0, 1), false);
+            emitChatItems(chatState.changeItems(items));
         }
     }
 
@@ -406,7 +388,7 @@ public class ChatController {
             List<ChatItem> items = new ArrayList<>();
             emitViewState(chatState.engagementStarted(operatorName));
             items.add(OperatorStatusItem.OperatorFoundStatusItem(chatState.companyName, chatState.getFormattedOperatorName()));
-            emitChatItems(chatState.changeItems(items), new Pair<>(0, 1), false);
+            emitChatItems(chatState.changeItems(items));
         }
     }
 
@@ -420,7 +402,7 @@ public class ChatController {
 
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
-            currentChatItems.add(new SendMessageItem(null, false, message.getContent()));
+            currentChatItems.add(new SendMessageItem(SendMessageItem.HISTORY_ID, false, message.getContent()));
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
         }
@@ -438,13 +420,12 @@ public class ChatController {
         items.add(new SendMessageItem(message.getId(), false, message.getContent()));
     }
 
-    private Integer changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
-        Integer invalidateFrom = null;
+    private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
         for (int i = currentChatItems.size() - 1; i >= 0; i--) {
             if (currentChatItems.get(i) instanceof SendMessageItem) {
                 SendMessageItem item = (SendMessageItem) currentChatItems.get(i);
-                if (item.getId() == null) {
-                    // id-s are null in case of history items. break out of loop.
+                if (item.getId().equals(SendMessageItem.HISTORY_ID)) {
+                    // we reached the history items no point in going searching further
                     break;
                 } else if (item.getId().equals(message.getId())) {
                     // the visitormessage. show delivered for it.
@@ -457,11 +438,9 @@ public class ChatController {
                     currentChatItems.add(i, new SendMessageItem(item.getId(),
                             false,
                             item.getMessage()));
-                    invalidateFrom = i;
                 }
             }
         }
-        return invalidateFrom;
     }
 
     private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
@@ -474,7 +453,7 @@ public class ChatController {
             messages = new ArrayList<>();
         }
         messages.add(message.getContent());
-        currentChatItems.add(new ReceiveMessageItem(messages));
+        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages));
     }
 
     private boolean isMessageValid(String message) {
@@ -537,7 +516,9 @@ public class ChatController {
         List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
         lastTimerItem = new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
         newItems.add(lastTimerItem);
-        emitChatItems(chatState.changeItems(newItems), new Pair<>(newItems.size() - 1, 1), true);
-        timer.schedule(timerTask, TIMER_DELAY, TIMER_SECOND_INTERVAL);
+        emitChatItems(chatState.changeItems(newItems));
+        int timerDelay = 0;
+        int timer1SecInterval = 1000;
+        timer.schedule(timerTask, timerDelay, timer1SecInterval);
     }
 }

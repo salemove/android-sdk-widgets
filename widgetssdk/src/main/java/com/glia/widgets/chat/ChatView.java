@@ -13,7 +13,6 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -76,6 +75,19 @@ public class ChatView extends LinearLayout {
     private OnEndListener onEndListener;
 
     private final Resources resources;
+
+    private final RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            super.onItemRangeInserted(positionStart, itemCount);
+            int totalItemCount = adapter.getItemCount();
+            int lastIndex = totalItemCount - 1;
+            boolean scrollToBottom = positionStart + itemCount >= lastIndex;
+            if (scrollToBottom) {
+                chatRecyclerView.scrollToPosition(lastIndex);
+            }
+        }
+    };
 
     public ChatView(Context context) {
         this(context, null);
@@ -140,14 +152,9 @@ public class ChatView extends LinearLayout {
             }
 
             @Override
-            public void emitItems(List<ChatItem> items,
-                                  Pair<Integer, Integer> range,
-                                  boolean scrollToBottom) {
+            public void emitItems(List<ChatItem> items) {
                 post(() -> {
-                    adapter.replaceItems(items, range);
-                    if (scrollToBottom) {
-                        chatRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
-                    }
+                    adapter.submitList(items);
                 });
             }
 
@@ -309,6 +316,7 @@ public class ChatView extends LinearLayout {
         onBackClickedListener = null;
         destroyController();
         callback = null;
+        adapter.unregisterAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(null);
     }
 
@@ -431,6 +439,7 @@ public class ChatView extends LinearLayout {
     private void setupViewAppearance() {
         adapter = new ChatAdapter(this.theme);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
 
         toolbar.setBackgroundTintList(

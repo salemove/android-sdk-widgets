@@ -16,6 +16,14 @@
             android:id="@+id/settings"
             app:destination="@id/settings_fragment" />
 
+        <action
+            android:id="@+id/chat"
+            app:destination="@id/chat_fragment" />
+
     </fragment>
+
+    <fragment
+        android:id="@+id/chat_fragment"
+        android:name="com.glia.exampleapp.ChatFragment" />
 
 </navigation>

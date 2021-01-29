@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ChatView">
+    <declare-styleable name="GliaView">
         <attr name="appBarTitle" format="string" />
         <attr name="brandPrimaryColor" format="reference" />
         <attr name="baseDarkColor" format="reference" />
@@ -27,6 +27,13 @@
         <attr name="icon" format="reference" />
         <attr name="title" format="string" />
         <attr name="caption" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="AppBarView">
+        <attr name="titleText" format="string" />
+        <attr name="android:backgroundTint" format="reference" />
+        <attr name="lightTint" format="reference" />
+        <attr name="negativeTint" format="reference" />
     </declare-styleable>
 
 </resources>

@@ -3,11 +3,9 @@
     <string name="chat_title">Chat</string>
 
     <string name="chat_enter_message">Enter message</string>
-    <string name="chat_send_content_description">Send message button</string>
     <string name="chat_in_queue_message">An MSR will be with you shortly.</string>
     <string name="chat_operator_has_joined">%1$s has joined the conversation</string>
     <string name="chat_delivered">Delivered</string>
-    <string name="chat_upgrade_success_timer_microphone_content_description">Timer microphone</string>
     <string name="chat_upgraded_to_audio_call">Upgraded to Audio call</string>
 
     <string name="top_app_bar_close">Close</string>
@@ -21,15 +19,19 @@
     <string name="chat_dialog_no">No</string>
     <string name="chat_dialog_operators_unavailable_title">We\'re sorry</string>
     <string name="chat_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
-    <string name="chat_dialog_unexpected_error_title">We\re sorry, there has been an unexpected error.</string>
+    <string name="chat_dialog_unexpected_error_title">We\'re sorry, there has been an unexpected error.</string>
     <string name="chat_dialog_unexpected_error_message">Please try again later.</string>
     <string name="chat_dialog_ok">Ok</string>
     <string name="chat_dialog_overlay_permissions_title">Overlay Permissions Required</string>
     <string name="chat_dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
-    <string name="chat_dialog_upgrade_title">%1$s has offered you to upgrade</string>
-    <string name="chat_dialog_upgrade_audio">Audio</string>
-    <string name="chat_dialog_upgrade_audio_caption">Speak through your phone</string>
-    <string name="chat_dialog_phone">Phone</string>
-    <string name="chat_dialog_phone_caption">Enter your number and we\'ll call you</string>
+    <string name="chat_dialog_upgrade_audio_title">%1$s has offered you to upgrade to audio</string>
+    <string name="chat_dialog_decline">Decline</string>
+    <string name="chat_dialog_accept">Accept</string>
+
+    <string name="call_app_bar_title">Audio call</string>
+    <string name="call_chat_button_label">Chat</string>
+    <string name="call_mute_button_label">Mute</string>
+    <string name="call_speaker_button_label">Speaker</string>
+    <string name="call_minimize_button_label">Minimize</string>
 
 </resources>

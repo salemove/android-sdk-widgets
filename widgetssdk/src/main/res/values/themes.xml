@@ -14,6 +14,12 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
     </style>
 
+    <style name="Application.Glia.Call.Activity" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
     <style name="ThemeOverlay.Glia.Chat" parent="">
         <item name="gliaBrandPrimaryColor">@color/glia_brand_primary_color</item>
         <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>
@@ -24,7 +30,10 @@
         <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
+        </item>
+        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Positive
         </item>
         <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
         <item name="textAppearanceHeadline2">@style/Application.Glia.Header2</item>
@@ -36,16 +45,7 @@
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/Application.Glia.Header2.Dialog</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/Application.Glia.Body.Dialog</item>
-        <item name="backgroundTint">?attr/gliaBaseLightColor</item>
-
-        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Extended
-        </item>
-        <item name="buttonBarNeutralButtonStyle">
-            @style/Application.Glia.Chat.Button.Extended.Negative
-        </item>
-        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button</item>
+        <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
     </style>
 
 </resources>

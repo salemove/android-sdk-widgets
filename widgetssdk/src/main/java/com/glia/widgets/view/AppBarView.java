@@ -1,0 +1,172 @@
+package com.glia.widgets.view;
+
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
+import android.graphics.Typeface;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.annotation.FontRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
+import com.glia.widgets.R;
+import com.glia.widgets.UiTheme;
+import com.glia.widgets.helper.Utils;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
+
+import java.util.Objects;
+
+public class AppBarView extends AppBarLayout {
+
+    private final MaterialToolbar materialToolbar;
+    private final TextView titleView;
+    private final Button endButton;
+
+    public AppBarView(@NonNull Context context) {
+        this(context, null);
+    }
+
+    public AppBarView(@NonNull Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public AppBarView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        View view = View.inflate(context, R.layout.app_bar, this);
+
+        materialToolbar = view.findViewById(R.id.toolbar);
+        titleView = view.findViewById(R.id.title);
+        endButton = view.findViewById(R.id.end_button);
+
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AppBarView);
+        String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
+        ColorStateList backgroundTintList = ContextCompat.getColorStateList(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_android_backgroundTint,
+                        R.attr.gliaBrandPrimaryColor));
+        int lightColor = ContextCompat.getColor(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_lightTint,
+                        R.attr.gliaBaseLightColor));
+        ColorStateList negativeColorStateList = ContextCompat.getColorStateList(this.getContext(),
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_negativeTint,
+                        R.attr.gliaSystemNegativeColor));
+        materialToolbar.setBackgroundTintList(backgroundTintList);
+        titleView.setTextColor(lightColor);
+        materialToolbar.getNavigationIcon().setTint(lightColor);
+        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.close_button).getIcon(),
+                ResourcesCompat.getColor(
+                        getResources(),
+                        Utils.getTypedArrayIntegerValue(typedArray,
+                                context,
+                                R.styleable.AppBarView_lightTint,
+                                R.attr.gliaBaseLightColor),
+                        this.getContext().getTheme()));
+        endButton.setBackgroundTintList(negativeColorStateList);
+        endButton.setTextColor(lightColor);
+        if (title != null) {
+            titleView.setText(title);
+        }
+    }
+
+    public void setTheme(UiTheme theme) {
+        materialToolbar.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                        this.getContext(),
+                        theme.getBrandPrimaryColor()));
+        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.close_button).getIcon(),
+                ResourcesCompat.getColor(
+                        getResources(),
+                        theme.getBaseLightColor(),
+                        this.getContext().getTheme()));
+        titleView.setTextColor(ResourcesCompat.getColor(
+                getResources(),
+                theme.getBaseLightColor(),
+                this.getContext().getTheme()));
+        DrawableCompat.setTint(
+                Objects.requireNonNull(materialToolbar.getNavigationIcon()),
+                ResourcesCompat.getColor(
+                        getResources(),
+                        theme.getBaseLightColor(),
+                        this.getContext().getTheme()));
+        endButton.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                        this.getContext(),
+                        theme.getSystemNegativeColor()));
+        endButton.setTextColor(ResourcesCompat.getColor(
+                getResources(),
+                theme.getBaseLightColor(),
+                this.getContext().getTheme()));
+        if (theme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(
+                    this.getContext(),
+                    theme.getFontRes());
+            titleView.setTypeface(fontFamily);
+            endButton.setTypeface(fontFamily);
+        }
+    }
+
+    public void changeFontFamily(@FontRes int fontRes) {
+        Typeface fontFamily = ResourcesCompat.getFont(
+                this.getContext(),
+                fontRes);
+        titleView.setTypeface(fontFamily);
+        endButton.setTypeface(fontFamily);
+    }
+
+    public void showToolbar(String title) {
+        titleView.setText(title);
+        setVisibility(VISIBLE);
+    }
+
+    public void showXButton() {
+        endButton.setVisibility(GONE);
+        materialToolbar.getMenu().findItem(R.id.close_button).setVisible(true);
+    }
+
+    public void showEndButton() {
+        endButton.setVisibility(VISIBLE);
+        materialToolbar.getMenu().findItem(R.id.close_button).setVisible(false);
+    }
+
+    public void setOnBackClickedListener(OnBackClickedListener onBackClickedListener) {
+        materialToolbar.setNavigationOnClickListener(view -> onBackClickedListener.onBackClicked());
+    }
+
+    public void setOnXClickedListener(OnXClickedListener onXClickedListener) {
+        materialToolbar.setOnMenuItemClickListener(item -> {
+            onXClickedListener.onXClicked();
+            return true;
+        });
+    }
+
+    public void setOnEndChatClickedListener(OnEndChatClickedListener onEndChatClickedListener) {
+        endButton.setOnClickListener(v -> onEndChatClickedListener.onEnd());
+    }
+
+    public interface OnBackClickedListener {
+        void onBackClicked();
+    }
+
+    public interface OnXClickedListener {
+        void onXClicked();
+    }
+
+    public interface OnEndChatClickedListener {
+        void onEnd();
+    }
+}

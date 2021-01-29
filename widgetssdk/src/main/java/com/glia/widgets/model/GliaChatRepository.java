@@ -21,9 +21,9 @@ import com.glia.widgets.helper.Logger;
 
 import java.util.function.Consumer;
 
-public class GliaRepository {
+public class GliaChatRepository {
 
-    private static final String TAG = "GliaRepository";
+    private static final String TAG = "GliaChatRepository";
     private ChatGliaCallback callback;
     private Consumer<QueueTicket> ticketConsumer;
     private Consumer<ChatMessage> messageHandler;
@@ -51,6 +51,7 @@ public class GliaRepository {
     };
     private final Consumer<OperatorMediaState> operatorMediaStateConsumer = operatorMediaState -> {
         Logger.d(TAG, "operatorMediaState: " + operatorMediaState.toString());
+        callback.newOperatorMediaState(operatorMediaState);
     };
     private final Consumer<VisitorMediaState> visitorMediaStateConsumer = visitorMediaState -> {
         Logger.d(TAG, "visitorMediaState: " + visitorMediaState.toString());
@@ -110,7 +111,7 @@ public class GliaRepository {
         });
     }
 
-    public void onDestroyView() {
+    public void onDestroy() {
         callback = null;
         offer = null;
         Glia.off(Glia.Events.ENGAGEMENT, engagementHandler);
@@ -168,7 +169,7 @@ public class GliaRepository {
             offer.decline(exception -> {
                 Log.d(TAG, "Decline success");
                 if (exception == null) {
-                    callback.audioUpgradeOfferChoiceSubmitSuccess();
+                    callback.audioUpgradeOfferChoiceDeniedSuccess();
                 } else {
                     Log.e(TAG, exception.toString());
                 }

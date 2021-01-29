@@ -1,8 +1,7 @@
 package com.glia.widgets.chat;
 
-import android.util.Pair;
-
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.model.DialogsState;
 
 import java.util.List;
 
@@ -15,4 +14,8 @@ public interface ChatViewCallback {
     void emitDialog(DialogsState dialogsState);
 
     void handleFloatingChatHead(boolean show);
+
+    void navigateToCall();
+
+    void destroyView();
 }

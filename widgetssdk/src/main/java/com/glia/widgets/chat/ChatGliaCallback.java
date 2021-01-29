@@ -3,6 +3,7 @@ package com.glia.widgets.chat;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.VisitorMessage;
+import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 
 public interface ChatGliaCallback {
@@ -32,4 +33,8 @@ public interface ChatGliaCallback {
     void error(Throwable throwable);
 
     void messageDelivered(VisitorMessage visitorMessage);
+
+    void audioUpgradeOfferChoiceDeniedSuccess();
+
+    void newOperatorMediaState(OperatorMediaState operatorMediaState);
 }

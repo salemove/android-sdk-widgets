@@ -19,12 +19,15 @@ import androidx.core.content.ContextCompat;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.imageview.ShapeableImageView;
 
 public class ChatHeadService extends Service {
 
+    private final String TAG = "ChatHeadService";
     public static final String IS_VISIBLE = "is_visible";
 
     private WindowManager windowManager;
@@ -37,6 +40,7 @@ public class ChatHeadService extends Service {
     private ShapeableImageView profilePictureView;
     private ShapeableImageView placeholderView;
     private boolean isVisible = true;
+    private String returnDestination;
 
     public ChatHeadService() {
     }
@@ -48,13 +52,33 @@ public class ChatHeadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
-        companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
-        queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
+        String companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
+        if (companyName != null) {
+            this.companyName = companyName;
+        }
+        String queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
+        if (queueId != null) {
+            this.queueId = queueId;
+        }
+        String contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
+        if (contextUrl != null) {
+            this.contextUrl = contextUrl;
+        }
+        String lastTypedText = intent.getStringExtra(ChatActivity.LAST_TYPED_TEXT);
+        if (lastTypedText != null) {
+            this.lastTypedText = lastTypedText;
+        }
+        UiTheme uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+        if (uiTheme != null) {
+            this.uiTheme = uiTheme;
+            useTheme();
+        }
+        returnDestination = intent.getStringExtra(GliaWidgets.RETURN_DESTINATION);
         isVisible = intent.getBooleanExtra(IS_VISIBLE, false);
-        contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
-        lastTypedText = intent.getStringExtra(ChatActivity.LAST_TYPED_TEXT);
-        useTheme();
+        Logger.d(TAG, "companyName: " + this.companyName + ", queueId: " + this.queueId +
+                ", contextUrl: " + this.contextUrl + "lastTypedText: " + this.lastTypedText +
+                ", uiTheme: " + this.uiTheme.toString() + "returnDestination: " + returnDestination +
+                ", isVisible: " + isVisible);
         updateVisibility();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -134,7 +158,7 @@ public class ChatHeadService extends Service {
                         //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
                         //So that is click event.
                         if (xDiff < 10 && yDiff < 10) {
-                            startChatActivity();
+                            returnToEngagement();
                             floatingView.setVisibility(View.GONE);
                         }
                         return true;
@@ -164,14 +188,20 @@ public class ChatHeadService extends Service {
         }
     }
 
-    private void startChatActivity() {
-        Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class);
+    private void returnToEngagement() {
+        if (returnDestination.equals(GliaWidgets.DESTINATION_CHAT)) {
+            startActivity(ChatActivity.class);
+        } else {
+            startActivity(CallActivity.class);
+        }
+    }
+
+    private void startActivity(Class<?> cls) {
+        Intent newIntent = new Intent(getApplicationContext(), cls);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
-        if (uiTheme != null) {
-            newIntent.putExtra(GliaWidgets.UI_THEME, uiTheme);
-        }
+        newIntent.putExtra(GliaWidgets.UI_THEME, uiTheme);
         newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(newIntent);

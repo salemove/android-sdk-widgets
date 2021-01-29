@@ -26,4 +26,10 @@
     <dimen name="chat_head_size">64dp</dimen>
     <dimen name="chat_head_placeholder_size">32dp</dimen>
 
+    <dimen name="call_bottom_margin">44dp</dimen>
+    <dimen name="call_floating_button_size">60dp</dimen>
+    <dimen name="call_floating_button_badge_size">18sp</dimen>
+    <dimen name="call_floating_button_badge_elevation">6dp</dimen>
+    <dimen name="call_buttons_max_width">330dp</dimen>
+
 </resources>

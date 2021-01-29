@@ -5,8 +5,8 @@
         <item name="colorPrimary">@color/color_primary</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgets.Button</item>
-        <!--        example usage-->
-        <!--        <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgets.Chat</item>-->
+        <!--        example usage of compile time styling-->
+<!--                <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgets.Chat</item>-->
     </style>
 
     <style name="Theme.GliaAndroidSdkWidgets.Chat" parent="Application.Glia.Chat">

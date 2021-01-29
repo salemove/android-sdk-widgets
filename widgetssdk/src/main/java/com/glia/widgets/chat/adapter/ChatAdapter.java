@@ -231,7 +231,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     uiTheme);
         } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
             return new MediaUpgradeStartedViewHolder(inflater.inflate(
-                    R.layout.chat_media_upgrade_success_timer_item, parent, false),
+                    R.layout.chat_media_upgrade_item, parent, false),
                     uiTheme);
         } else {
             throw new IllegalArgumentException("Unknown viewtype: " + viewType);

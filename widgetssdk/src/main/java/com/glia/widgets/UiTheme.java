@@ -219,6 +219,18 @@ public class UiTheme implements Parcelable {
             this.systemNegativeColor = systemNegativeColor;
         }
 
+        public void setTheme(UiTheme theme) {
+            this.appBarTitle = theme.appBarTitle;
+            this.brandPrimaryColor = theme.brandPrimaryColor;
+            this.baseLightColor = theme.baseLightColor;
+            this.baseDarkColor = theme.baseDarkColor;
+            this.baseNormalColor = theme.baseNormalColor;
+            this.baseShadeColor = theme.baseShadeColor;
+            this.systemAgentBubbleColor = theme.systemAgentBubbleColor;
+            this.fontRes = theme.fontRes;
+            this.systemNegativeColor = theme.systemNegativeColor;
+        }
+
         public UiTheme build() {
             return new UiTheme(appBarTitle,
                     brandPrimaryColor,

@@ -1,6 +1,8 @@
 package com.glia.widgets.chat;
 
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
+import com.glia.widgets.helper.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +21,7 @@ public class ChatState {
     public final String contextUrl;
     public final boolean hasOverlayPermissions;
     public final boolean overlaysPermissionDialogShown;
+    public final MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
     public final List<ChatItem> chatItems;
 
     private ChatState(
@@ -33,6 +36,7 @@ public class ChatState {
             boolean integratorChatStarted,
             boolean hasOverlayPermissions,
             boolean overlaysPermissionDialogShown,
+            MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem,
             List<ChatItem> chatItems) {
         this.useFloatingChatHeads = useFloatingChatHeads;
         this.queueTicketId = queueTicketId;
@@ -45,6 +49,7 @@ public class ChatState {
         this.integratorChatStarted = integratorChatStarted;
         this.hasOverlayPermissions = hasOverlayPermissions;
         this.overlaysPermissionDialogShown = overlaysPermissionDialogShown;
+        this.mediaUpgradeStartedTimerItem = mediaUpgradeStartedTimerItem;
         this.chatItems = Collections.unmodifiableList(chatItems);
     }
 
@@ -53,12 +58,11 @@ public class ChatState {
     }
 
     public String getFormattedOperatorName() {
-        int i = operatorName.indexOf(' ');
-        if (i != -1) {
-            return operatorName.substring(0, i);
-        } else {
-            return operatorName;
-        }
+        return Utils.formatOperatorName(operatorName);
+    }
+
+    public boolean isMediaUpgradeStarted() {
+        return mediaUpgradeStartedTimerItem != null;
     }
 
     public static class Builder {
@@ -73,6 +77,7 @@ public class ChatState {
         private boolean integratorChatStarted;
         private boolean hasOverlayPermissions;
         private boolean overlaysPermissionDialogShown;
+        private MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
         private List<ChatItem> chatItems;
 
         public Builder copyFrom(ChatState chatState) {
@@ -87,6 +92,7 @@ public class ChatState {
             integratorChatStarted = chatState.integratorChatStarted;
             hasOverlayPermissions = chatState.hasOverlayPermissions;
             overlaysPermissionDialogShown = chatState.overlaysPermissionDialogShown;
+            mediaUpgradeStartedTimerItem = chatState.mediaUpgradeStartedTimerItem;
             chatItems = chatState.chatItems;
             return this;
         }
@@ -146,13 +152,18 @@ public class ChatState {
             return this;
         }
 
+        public Builder setMediaUpgradeStartedItem(MediaUpgradeStartedTimerItem mediaUpgradeStartedItem) {
+            this.mediaUpgradeStartedTimerItem = mediaUpgradeStartedItem;
+            return this;
+        }
+
         public Builder setChatItems(List<ChatItem> chatItems) {
             this.chatItems = chatItems;
             return this;
         }
 
         public ChatState createChatState() {
-            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, chatItems);
+            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems);
         }
     }
 
@@ -161,6 +172,7 @@ public class ChatState {
                                      String queueId,
                                      String contextUrl) {
         return new Builder()
+                .copyFrom(this)
                 .setUseFloatingChatHeads(useChatHeads)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
@@ -227,6 +239,13 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState changeTimerItem(List<ChatItem> newItems, MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem) {
+        return new Builder()
+                .copyFrom(changeItems(newItems))
+                .setMediaUpgradeStartedItem(mediaUpgradeStartedTimerItem)
+                .createChatState();
+    }
+
     public ChatState show() {
         return new Builder()
                 .copyFrom(this)
@@ -245,6 +264,12 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setHasOverlayPermissions(hasOverlaysPermission)
+                .createChatState();
+    }
+
+    public ChatState drawOverlayPermissionsDialogShown(boolean hasOverlayPermissions) {
+        return new Builder()
+                .copyFrom(drawOverlaysPermissionChanged(hasOverlayPermissions))
                 .setOverlaysPermissionDialogShown(true)
                 .createChatState();
     }

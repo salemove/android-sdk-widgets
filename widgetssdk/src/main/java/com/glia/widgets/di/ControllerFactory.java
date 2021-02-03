@@ -7,11 +7,13 @@ import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
+import com.glia.widgets.helper.CallTimer;
 import com.glia.widgets.helper.Logger;
 
 public class ControllerFactory {
 
     private final RepositoryFactory repositoryFactory;
+    private final CallTimer sharedTimer = new CallTimer();
 
     private static final String TAG = "ControllerFactory";
 
@@ -25,11 +27,13 @@ public class ControllerFactory {
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
         if (!(activity instanceof ChatActivity)) {
             Logger.d(TAG, "new");
-            return new ChatController(repositoryFactory.getGliaChatRepository(), chatViewCallback);
+            return new ChatController(repositoryFactory.getGliaChatRepository(), sharedTimer, chatViewCallback);
         }
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
-            retainedChatController = new ChatController(repositoryFactory.getGliaChatRepository(),
+            retainedChatController = new ChatController(
+                    repositoryFactory.getGliaChatRepository(),
+                    sharedTimer,
                     chatViewCallback);
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -41,7 +45,9 @@ public class ControllerFactory {
     public CallController getCallController(CallViewCallback callViewCallback) {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
-            retainedCallController = new CallController(repositoryFactory.getGliaCallRepository(),
+            retainedCallController = new CallController(
+                    repositoryFactory.getGliaCallRepository(),
+                    sharedTimer,
                     callViewCallback);
         } else {
             Logger.d(TAG, "retained call controller");

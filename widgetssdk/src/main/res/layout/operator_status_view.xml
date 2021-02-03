@@ -21,9 +21,10 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profile_picture_view"
-        android:layout_width="@dimen/profile_picture_size"
-        android:layout_height="@dimen/profile_picture_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:background="?attr/gliaBrandPrimaryColor"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="@id/pulsation_animation"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +38,9 @@
         android:layout_width="@dimen/place_holder_size"
         android:layout_height="@dimen/place_holder_size"
         android:layout_gravity="center"
+        android:background="?attr/gliaBrandPrimaryColor"
         android:scaleType="fitCenter"
+        android:tint="?attr/gliaBaseLightColor"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"

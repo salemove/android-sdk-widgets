@@ -4,7 +4,9 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.helper.CallTimer;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.model.GliaCallRepository;
 
@@ -13,12 +15,14 @@ public class CallController {
     private CallViewCallback viewCallback;
     private CallGliaCallback gliaCallback;
     private final GliaCallRepository repository;
+    private CallTimer.TimerStatusListener timerStatusListener;
+    private final CallTimer callTimer;
 
     private final String TAG = "CallController";
     private volatile CallState callState;
     private volatile DialogsState dialogsState;
 
-    public CallController(GliaCallRepository callRepository, CallViewCallback viewCallback) {
+    public CallController(GliaCallRepository callRepository, CallTimer callTimer, CallViewCallback viewCallback) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.callState = new CallState.Builder()
@@ -26,9 +30,11 @@ public class CallController {
                 .setVisible(false)
                 .setHasOverlayPermissions(false)
                 .setMessagesNotSeen(0)
+                .setCallStatus(new CallStatus.NotOngoing())
                 .createCallState();
         this.dialogsState = new DialogsState.NoDialog();
         this.repository = callRepository;
+        this.callTimer = callTimer;
     }
 
     public void initCall() {
@@ -49,6 +55,10 @@ public class CallController {
                 repository.onDestroy();
             }
             gliaCallback = null;
+            if (timerStatusListener != null) {
+                callTimer.removeListener(timerStatusListener);
+                timerStatusListener = null;
+            }
         }
     }
 
@@ -76,7 +86,12 @@ public class CallController {
             @Override
             public void engagementSuccess(OmnicoreEngagement engagement) {
                 Logger.d(TAG, "engagementSuccess");
-                operatorOnlineStartCallUi(engagement.getOperator().getName());
+                emitViewState(callState.engagementStarted(
+                        engagement.getOperator().getName(),
+                        Utils.toMmSs(0))
+                );
+                createNewTimerStatusCallback();
+                callTimer.addListener(timerStatusListener);
             }
 
             @Override
@@ -97,10 +112,6 @@ public class CallController {
                 }
             }
         };
-    }
-
-    private void operatorOnlineStartCallUi(String operatorName) {
-        emitViewState(callState.engagementStarted(operatorName));
     }
 
     private synchronized void emitViewState(CallState state) {
@@ -180,8 +191,10 @@ public class CallController {
     }
 
     private void showExitChatDialog() {
-        if (!isDialogShowing() && callState.isOperatorOnline()) {
-            emitDialogState(new DialogsState.EndEngagementDialog(callState.getFormattedOperatorName()));
+        if (!isDialogShowing() && callState.isCallOngoing()) {
+            CallStatus.StartedAudioCall startedAudioCall =
+                    (CallStatus.StartedAudioCall) callState.callStatus;
+            emitDialogState(new DialogsState.EndEngagementDialog(startedAudioCall.getFormattedOperatorName()));
         }
     }
 
@@ -232,5 +245,23 @@ public class CallController {
         handleFloatingChatheads(true);
         viewCallback.navigateToChat();
         onDestroy(false);
+    }
+
+    private void createNewTimerStatusCallback() {
+        if (timerStatusListener != null) {
+            callTimer.removeListener(timerStatusListener);
+        }
+        timerStatusListener = new CallTimer.TimerStatusListener() {
+            @Override
+            public void onNewTimerValue(String formatedValue) {
+                if (callState.isCallOngoing()) {
+                    emitViewState(callState.newTimerValue(formatedValue));
+                }
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        };
     }
 }

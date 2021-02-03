@@ -1,6 +1,6 @@
 package com.glia.widgets.call;
 
-import com.glia.widgets.helper.Utils;
+import com.glia.widgets.helper.Logger;
 
 import java.util.Objects;
 
@@ -8,34 +8,31 @@ class CallState {
 
     public final boolean integratorCallStarted;
     public final boolean isVisible;
-    public final String operatorName;
     public final int messagesNotSeen;
     public final boolean hasOverlayPermissions;
+    public final CallStatus callStatus;
 
     private CallState(boolean integratorCallStarted,
                       boolean isVisible,
-                      String operatorName,
                       int messagesNotSeen,
-                      boolean hasOverlayPermissions) {
+                      boolean hasOverlayPermissions,
+                      CallStatus callStatus) {
         this.integratorCallStarted = integratorCallStarted;
         this.isVisible = isVisible;
-        this.operatorName = operatorName;
         this.messagesNotSeen = messagesNotSeen;
         this.hasOverlayPermissions = hasOverlayPermissions;
+        this.callStatus = callStatus;
     }
 
-    public boolean isOperatorOnline() {
-        return operatorName != null;
-    }
-
-    public String getFormattedOperatorName() {
-        return Utils.formatOperatorName(operatorName);
+    public boolean isCallOngoing() {
+        Logger.d("isCallOngoing", Boolean.valueOf(callStatus instanceof CallStatus.StartedAudioCall).toString());
+        return callStatus instanceof CallStatus.StartedAudioCall;
     }
 
     public CallState stop() {
         return new Builder()
                 .copyFrom(this)
-                .setOperatorName(null)
+                .setCallStatus(new CallStatus.NotOngoing())
                 .createCallState();
     }
 
@@ -46,10 +43,10 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState engagementStarted(String operatorName) {
+    public CallState engagementStarted(String operatorName, String formatedTimeValue) {
         return new Builder()
                 .copyFrom(this)
-                .setOperatorName(operatorName)
+                .setCallStatus(new CallStatus.StartedAudioCall(operatorName, formatedTimeValue))
                 .createCallState();
     }
 
@@ -74,14 +71,31 @@ class CallState {
                 .createCallState();
     }
 
+    public CallState newTimerValue(String formatedTimeValue) {
+        if (callStatus instanceof CallStatus.StartedAudioCall) {
+            return new Builder()
+                    .copyFrom(this)
+                    .setCallStatus(
+                            new CallStatus.StartedAudioCall(
+                                    ((CallStatus.StartedAudioCall) callStatus).operatorName,
+                                    formatedTimeValue
+                            )
+                    )
+                    .createCallState();
+        } else {
+            return this;
+        }
+    }
+
+
     @Override
     public String toString() {
         return "CallState{" +
                 "integratorCallStarted=" + integratorCallStarted +
                 ", isVisible=" + isVisible +
-                ", operatorName='" + operatorName + '\'' +
                 ", messagesNotSeen=" + messagesNotSeen +
                 ", hasOverlayPermissions=" + hasOverlayPermissions +
+                ", callStatus=" + callStatus +
                 '}';
     }
 
@@ -94,20 +108,20 @@ class CallState {
                 isVisible == callState.isVisible &&
                 messagesNotSeen == callState.messagesNotSeen &&
                 hasOverlayPermissions == callState.hasOverlayPermissions &&
-                Objects.equals(operatorName, callState.operatorName);
+                Objects.equals(callStatus, callState.callStatus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorCallStarted, isVisible, operatorName, messagesNotSeen, hasOverlayPermissions);
+        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen, hasOverlayPermissions, callStatus);
     }
 
     public static class Builder {
         private boolean integratorCallStarted;
         private boolean isVisible;
-        private String operatorName;
         private int messagesNotSeen;
         private boolean hasOverlayPermissions;
+        private CallStatus callStatus;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -116,11 +130,6 @@ class CallState {
 
         public Builder setVisible(boolean visible) {
             isVisible = visible;
-            return this;
-        }
-
-        public Builder setOperatorName(String operatorName) {
-            this.operatorName = operatorName;
             return this;
         }
 
@@ -134,12 +143,17 @@ class CallState {
             return this;
         }
 
+        public Builder setCallStatus(CallStatus callStatus) {
+            this.callStatus = callStatus;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
-            operatorName = callState.operatorName;
             messagesNotSeen = callState.messagesNotSeen;
             hasOverlayPermissions = callState.hasOverlayPermissions;
+            callStatus = callState.callStatus;
             return this;
         }
 
@@ -147,9 +161,9 @@ class CallState {
             return new CallState(
                     integratorCallStarted,
                     isVisible,
-                    operatorName,
                     messagesNotSeen,
-                    hasOverlayPermissions);
+                    hasOverlayPermissions,
+                    callStatus);
         }
     }
 }

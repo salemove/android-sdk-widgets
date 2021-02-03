@@ -30,6 +30,7 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.OperatorStatusView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
@@ -39,8 +40,10 @@ public class CallView extends ConstraintLayout {
     private CallViewCallback callback;
     private CallController controller;
 
-    // TODO ALL Buttons
     private AppBarView appBar;
+    private OperatorStatusView operatorStatusView;
+    private TextView operatorNameView;
+    private TextView callTimerView;
     private TextView chatButtonLabel;
     private TextView muteButtonLabel;
     private TextView speakerButtonLabel;
@@ -154,15 +157,26 @@ public class CallView extends ConstraintLayout {
             @Override
             public void emitState(CallState callState) {
                 post(() -> {
-                    if (callState.isOperatorOnline()) {
+                    if (callState.isCallOngoing()) {
                         appBar.showEndButton();
                     } else {
                         appBar.showXButton();
                     }
 
-                    chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
-                    chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
+                    if (callState.isCallOngoing()) {
+                        CallStatus.StartedAudioCall status =
+                                (CallStatus.StartedAudioCall) callState.callStatus;
 
+                        operatorStatusView.setOperatorImage(android.R.drawable.star_on, false);
+                        operatorNameView.setText(status.getFormattedOperatorName());
+                        callTimerView.setText(status.time);
+                    }
+                    chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
+
+                    chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
+                    operatorStatusView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
+                    operatorNameView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
+                    callTimerView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
                     if (callState.isVisible) {
                         showCall();
                     } else {
@@ -217,7 +231,8 @@ public class CallView extends ConstraintLayout {
             Typeface fontFamily = ResourcesCompat.getFont(
                     this.getContext(),
                     this.theme.getFontRes());
-            chatButtonLabel.setTypeface(fontFamily);
+            operatorNameView.setTypeface(fontFamily);
+            callTimerView.setTypeface(fontFamily);
             chatButtonLabel.setTypeface(fontFamily);
             muteButtonLabel.setTypeface(fontFamily);
             speakerButtonLabel.setTypeface(fontFamily);
@@ -235,6 +250,9 @@ public class CallView extends ConstraintLayout {
     private void initViews() {
         View.inflate(this.getContext(), R.layout.call_view, this);
         appBar = findViewById(R.id.top_app_bar);
+        operatorStatusView = findViewById(R.id.operator_status_view);
+        operatorNameView = findViewById(R.id.operator_name_view);
+        callTimerView = findViewById(R.id.call_timer_view);
         chatButtonLabel = findViewById(R.id.chat_button_label);
         chatButtonBadgeView = findViewById(R.id.chat_button_badge);
         muteButtonLabel = findViewById(R.id.mute_button_label);

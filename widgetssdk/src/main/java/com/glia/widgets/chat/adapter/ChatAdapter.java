@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.view.OperatorStatusView;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;

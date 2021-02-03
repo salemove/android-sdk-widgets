@@ -36,4 +36,8 @@
         <attr name="negativeTint" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="OperatorStatusView">
+        <attr name="connectedIconSize" format="dimension" />
+    </declare-styleable>
+
 </resources>

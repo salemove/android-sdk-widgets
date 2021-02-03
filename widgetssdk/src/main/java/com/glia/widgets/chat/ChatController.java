@@ -11,6 +11,7 @@ import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItem;
 import com.glia.widgets.chat.adapter.SendMessageItem;
+import com.glia.widgets.helper.CallTimer;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
@@ -18,23 +19,23 @@ import com.glia.widgets.model.GliaChatRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ChatController {
 
     private ChatViewCallback viewCallback;
     private ChatGliaCallback gliaCallback;
+    private CallTimer.TimerStatusListener timerStatusListener;
     private final GliaChatRepository repository;
+    private final CallTimer callTimer;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
     private volatile DialogsState dialogsState;
     private boolean isNavigationPending;
-    private TimerTask timerTask;
-    private Timer timer;
 
-    public ChatController(GliaChatRepository gliaChatRepository, ChatViewCallback viewCallback) {
+    public ChatController(GliaChatRepository gliaChatRepository,
+                          CallTimer callTimer,
+                          ChatViewCallback viewCallback) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.chatState = new ChatState.Builder()
@@ -53,6 +54,7 @@ public class ChatController {
                 .createChatState();
         this.dialogsState = new DialogsState.NoDialog();
         this.repository = gliaChatRepository;
+        this.callTimer = callTimer;
         isNavigationPending = false;
     }
 
@@ -105,14 +107,8 @@ public class ChatController {
                 repository.onDestroy();
             }
             gliaCallback = null;
-            if (timerTask != null) {
-                timerTask.cancel();
-                timerTask = null;
-            }
-            if (timer != null) {
-                timer.cancel();
-                timer = null;
-            }
+            timerStatusListener = null;
+            callTimer.clear();
         }
     }
 
@@ -299,12 +295,8 @@ public class ChatController {
 
             @Override
             public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
-                if (operatorMediaState.getAudio() == null && chatState.isMediaUpgradeStarted()
-                        && timerTask != null) {
-                    timerTask.cancel();
-                    timer.cancel();
-                    timerTask = null;
-                    timer = null;
+                if (operatorMediaState.getAudio() == null && chatState.isMediaUpgradeStarted()) {
+                    callTimer.clear();
                 }
             }
 
@@ -522,60 +514,40 @@ public class ChatController {
                 new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
         newItems.add(mediaUpgradeStartedTimerItem);
         emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
-        int timerDelay = 1000;
-        int timer1SecInterval = 1000;
-        createNewTimerTask();
-        createNewTimer();
-        timer.schedule(timerTask, timerDelay, timer1SecInterval);
+        createNewTimerCallback();
+        callTimer.addListener(timerStatusListener);
+        callTimer.startNew();
     }
 
-    private void createNewTimer() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
+    private void createNewTimerCallback() {
+        if (timerStatusListener != null) {
+            callTimer.removeListener(timerStatusListener);
         }
-        timer = new Timer();
-    }
-
-    private void createNewTimerTask() {
-        if (timerTask != null) {
-            timerTask.cancel();
-            timerTask = null;
-        }
-        timerTask = new TimerTask() {
-            int seconds = 1;
-
+        timerStatusListener = new CallTimer.TimerStatusListener() {
             @Override
-            public void run() {
-                String time = Utils.toMmSs(seconds);
+            public void onNewTimerValue(String formatedValue) {
                 if (chatState.isMediaUpgradeStarted()) {
                     int index = chatState.chatItems.indexOf(chatState.mediaUpgradeStartedTimerItem);
                     if (index != -1) {
                         List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
                         MediaUpgradeStartedTimerItem.Type type = chatState.mediaUpgradeStartedTimerItem.type;
                         newItems.remove(index);
-                        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem = new MediaUpgradeStartedTimerItem(type, time);
+                        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem =
+                                new MediaUpgradeStartedTimerItem(type, formatedValue);
                         newItems.add(index, mediaUpgradeStartedTimerItem);
                         emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
-                    } else {
-                        cancel();
                     }
-                } else {
-                    cancel();
                 }
-                Logger.d(TAG, "timer: " + time);
-                seconds++;
             }
 
             @Override
-            public boolean cancel() {
+            public void onCancel() {
                 if (chatState.isMediaUpgradeStarted() &&
                         chatState.chatItems.contains(chatState.mediaUpgradeStartedTimerItem)) {
                     List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
                     newItems.remove(chatState.mediaUpgradeStartedTimerItem);
                     emitChatItems(chatState.changeTimerItem(newItems, null));
                 }
-                return super.cancel();
             }
         };
     }

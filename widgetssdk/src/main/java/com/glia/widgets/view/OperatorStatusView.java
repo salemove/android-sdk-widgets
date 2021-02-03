@@ -1,7 +1,8 @@
-package com.glia.widgets.chat.adapter;
+package com.glia.widgets.view;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -20,7 +21,7 @@ import com.airbnb.lottie.model.KeyPath;
 import com.glia.widgets.R;
 import com.google.android.material.imageview.ShapeableImageView;
 
-class OperatorStatusView extends ConstraintLayout {
+public class OperatorStatusView extends ConstraintLayout {
 
     private final LottieAnimationView pulsationAnimation;
     private final ShapeableImageView profilePictureView;
@@ -41,6 +42,15 @@ class OperatorStatusView extends ConstraintLayout {
         pulsationAnimation = view.findViewById(R.id.pulsation_animation);
         profilePictureView = view.findViewById(R.id.profile_picture_view);
         placeholderView = view.findViewById(R.id.placeholder_view);
+
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.OperatorStatusView);
+        int defaultProfilePictureSize =
+                (int) getResources().getDimension(R.dimen.chat_profile_picture_size);
+        int profilePictureSize =
+                typedArray.getDimensionPixelSize(R.styleable.OperatorStatusView_connectedIconSize, defaultProfilePictureSize);
+        profilePictureView.getLayoutParams().width = profilePictureSize;
+        profilePictureView.getLayoutParams().height = profilePictureSize;
+        typedArray.recycle();
     }
 
     public void setTint(@ColorRes int primaryBrandColorRes, @ColorRes int baseLightColorRes) {

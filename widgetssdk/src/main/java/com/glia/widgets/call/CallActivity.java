@@ -11,7 +11,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
-import com.glia.widgets.chat.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Logger;
 
 public class CallActivity extends Activity {
@@ -34,9 +34,9 @@ public class CallActivity extends Activity {
         navigateToChat();
         finish();
     };
-    private CallView.OnBubbleListener onBubbleListener = (boolean isVisible) -> {
-        startChatHeadService(isVisible);
-        if (isVisible) {
+    private CallView.OnBubbleListener onBubbleListener = (String returnDestination) -> {
+        startChatHeadService(returnDestination);
+        if (returnDestination != null) {
             finish();
         }
     };
@@ -44,6 +44,7 @@ public class CallActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GliaWidgets.addActivityToBackStack(GliaWidgets.CALL_ACTIVITY);
         setContentView(R.layout.call_activity);
 
         callView = findViewById(R.id.call_view);
@@ -69,6 +70,12 @@ public class CallActivity extends Activity {
     }
 
     @Override
+    protected void onPause() {
+        callView.onPause();
+        super.onPause();
+    }
+
+    @Override
     public void onBackPressed() {
         callView.backPressed();
         super.onBackPressed();
@@ -81,7 +88,14 @@ public class CallActivity extends Activity {
         onNavigateToChatListener = null;
         onBubbleListener = null;
         callView.onDestroy();
+        GliaWidgets.removeActivityFromBackStack(GliaWidgets.CALL_ACTIVITY);
         super.onDestroy();
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        callView.onUserInteraction();
     }
 
     @Override
@@ -102,15 +116,14 @@ public class CallActivity extends Activity {
         startActivity(newIntent);
     }
 
-    private void startChatHeadService(boolean isVisible) {
-        Logger.d(TAG, "startChatHeadService, isVisible:" + isVisible);
+    private void startChatHeadService(String returnDestination) {
+        Logger.d(TAG, "startChatHeadService, returnDestination: " + returnDestination);
         Intent newIntent = new Intent(getApplicationContext(), ChatHeadService.class);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
-        newIntent.putExtra(ChatHeadService.IS_VISIBLE, isVisible);
         newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
-        newIntent.putExtra(GliaWidgets.RETURN_DESTINATION, GliaWidgets.DESTINATION_CALL);
+        newIntent.putExtra(GliaWidgets.RETURN_DESTINATION, returnDestination);
         getApplicationContext().startService(newIntent);
     }
 }

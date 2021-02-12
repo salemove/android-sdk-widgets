@@ -29,6 +29,7 @@ public class GliaCallRepository {
     };
     private final Consumer<VisitorMediaState> visitorMediaStateConsumer = visitorMediaState -> {
         Logger.d(TAG, "visitorMediaState: " + visitorMediaState.toString());
+        callback.newVisitorMediaState(visitorMediaState);
     };
     private final Consumer<OmnicoreEngagement> engagementHandler = engagement -> {
         callback.engagementSuccess(engagement);
@@ -45,7 +46,6 @@ public class GliaCallRepository {
     }
 
     public void stop() {
-        callback.engagementEnded();
         stopInternal();
     }
 

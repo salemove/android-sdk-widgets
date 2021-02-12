@@ -7,13 +7,15 @@ import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
-import com.glia.widgets.helper.CallTimer;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.model.MinimizeHandler;
 
 public class ControllerFactory {
 
     private final RepositoryFactory repositoryFactory;
-    private final CallTimer sharedTimer = new CallTimer();
+    private final TimeCounter sharedTimer = new TimeCounter();
+    private final MinimizeHandler minimizeHandler = new MinimizeHandler();
 
     private static final String TAG = "ControllerFactory";
 
@@ -27,14 +29,21 @@ public class ControllerFactory {
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
         if (!(activity instanceof ChatActivity)) {
             Logger.d(TAG, "new");
-            return new ChatController(repositoryFactory.getGliaChatRepository(), sharedTimer, chatViewCallback);
+            return new ChatController(
+                    repositoryFactory.getGliaChatRepository(),
+                    repositoryFactory.getMediaUpgradeOfferRepository(),
+                    sharedTimer,
+                    chatViewCallback,
+                    minimizeHandler);
         }
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
                     repositoryFactory.getGliaChatRepository(),
+                    repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
-                    chatViewCallback);
+                    chatViewCallback,
+                    minimizeHandler);
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -47,8 +56,11 @@ public class ControllerFactory {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
                     repositoryFactory.getGliaCallRepository(),
+                    repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
-                    callViewCallback);
+                    callViewCallback,
+                    new TimeCounter(),
+                    minimizeHandler);
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/chat_button_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/call_chat_button_label"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/chat_button"
+        app:layout_constraintStart_toStartOf="@id/chat_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/chat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small"
+        android:contentDescription="@string/call_chat_content_description"
+        android:src="@drawable/ic_chat_cloud"
+        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:layout_constraintBottom_toTopOf="@id/chat_button_label"
+        app:layout_constraintEnd_toStartOf="@id/video_button"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:rippleColor="?attr/gliaBaseLightColor"
+        app:tint="?attr/gliaBaseLightColor" />
+
+    <TextView
+        android:id="@+id/chat_button_badge"
+        android:layout_width="@dimen/call_floating_button_badge_size"
+        android:layout_height="@dimen/call_floating_button_badge_size"
+        android:background="@drawable/bg_badge"
+        android:elevation="@dimen/call_floating_button_badge_elevation"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constraintEnd_toEndOf="@id/chat_button"
+        app:layout_constraintTop_toTopOf="@id/chat_button" />
+
+    <TextView
+        android:id="@+id/video_button_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/call_video_button_label"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/video_button"
+        app:layout_constraintStart_toStartOf="@id/video_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/video_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small"
+        android:contentDescription="@string/call_mute_content_description"
+        android:enabled="false"
+        android:src="@drawable/ic_baseline_videocam"
+        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:layout_constraintBottom_toTopOf="@id/mute_button_label"
+        app:layout_constraintEnd_toStartOf="@id/mute_button"
+        app:layout_constraintStart_toEndOf="@id/chat_button"
+        app:rippleColor="?attr/gliaBaseLightColor"
+        app:tint="?attr/gliaBaseLightColor" />
+
+    <TextView
+        android:id="@+id/mute_button_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/call_mute_button_label"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/mute_button"
+        app:layout_constraintStart_toStartOf="@id/mute_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/mute_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small"
+        android:contentDescription="@string/call_mute_content_description"
+        android:enabled="false"
+        android:src="@drawable/ic_baseline_mic"
+        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:layout_constraintBottom_toTopOf="@id/mute_button_label"
+        app:layout_constraintEnd_toStartOf="@id/speaker_button"
+        app:layout_constraintStart_toEndOf="@id/video_button"
+        app:rippleColor="?attr/gliaBaseLightColor"
+        app:tint="?attr/gliaBaseLightColor" />
+
+    <TextView
+        android:id="@+id/speaker_button_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/call_speaker_button_label"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/speaker_button"
+        app:layout_constraintStart_toStartOf="@id/speaker_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/speaker_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small"
+        android:contentDescription="@string/call_speaker_content_description"
+        android:enabled="false"
+        android:src="@drawable/ic_baseline_volume_off"
+        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:layout_constraintBottom_toTopOf="@id/speaker_button_label"
+        app:layout_constraintEnd_toStartOf="@id/minimize_button"
+        app:layout_constraintStart_toEndOf="@id/mute_button"
+        app:rippleColor="?attr/gliaBaseLightColor"
+        app:tint="?attr/gliaBaseLightColor" />
+
+    <TextView
+        android:id="@+id/minimize_button_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/call_minimize_button_label"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?attr/gliaBaseLightColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/minimize_button"
+        app:layout_constraintStart_toStartOf="@id/minimize_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/minimize_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small"
+        android:contentDescription="@string/call_minimize_content_description"
+        android:src="@drawable/ic_minimize"
+        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:layout_constraintBottom_toTopOf="@id/minimize_button_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/speaker_button"
+        app:rippleColor="?attr/gliaBaseLightColor"
+        app:tint="?attr/gliaBaseLightColor" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

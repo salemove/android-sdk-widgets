@@ -24,6 +24,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.Objects;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+
 public class AppBarView extends AppBarLayout {
 
     private final MaterialToolbar materialToolbar;
@@ -128,8 +130,11 @@ public class AppBarView extends AppBarLayout {
         endButton.setTypeface(fontFamily);
     }
 
-    public void showToolbar(String title) {
+    public void setTitle(String title){
         titleView.setText(title);
+    }
+
+    public void showToolbar() {
         setVisibility(VISIBLE);
     }
 

@@ -4,25 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <com.glia.widgets.view.AppBarView
-        android:id="@+id/top_app_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/transparent_black_bg"
-        android:elevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:lightTint="?attr/gliaBaseLightColor"
-        app:negativeTint="?attr/gliaSystemNegativeColor"
-        app:titleText="@string/call_audio_app_bar_title" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/large" />
+        app:layout_constraintGuide_percent="0.07" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/bottom_guideline"
@@ -36,27 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/large" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/visitor_video_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/large"
-        android:visibility="gone"
-        app:cardCornerRadius="@dimen/medium"
-        app:layout_constraintBottom_toTopOf="@id/operator_video_container"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toEndOf="@id/operator_data_barrier"
-        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/operator_data_barrier"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:barrierDirection="end"
-        app:constraint_referenced_ids="operator_name_view,call_timer_view" />
+        app:layout_constraintGuide_percent="0.93" />
 
     <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/operator_status_view"
@@ -71,7 +38,7 @@
 
     <TextView
         android:id="@+id/operator_name_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/large"
         android:gravity="center"
@@ -85,7 +52,7 @@
 
     <TextView
         android:id="@+id/call_timer_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/medium"
         android:gravity="center"
@@ -98,21 +65,55 @@
 
     <FrameLayout
         android:id="@+id/operator_video_container"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/call_video_height"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
-        app:layout_constraintTop_toBottomOf="@id/call_timer_view" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/visitor_video_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/large_x_large"
+        android:layout_marginEnd="@dimen/large_x_large"
+        app:cardCornerRadius="@dimen/medium"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintHeight_percent="0.45"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.15" />
+
+    <com.glia.widgets.view.AppBarView
+        android:id="@+id/top_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transparent_black_bg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lightTint="?attr/gliaBaseLightColor"
+        app:negativeTint="?attr/gliaSystemNegativeColor"
+        app:titleText="@string/call_audio_app_bar_title" />
 
     <View
         android:id="@+id/buttons_layout_bg"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@android:color/transparent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent_black_bg"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/buttons_layout" />
+        app:layout_constraintTop_toTopOf="@id/buttons_top_space" />
+
+    <Space
+        android:id="@+id/buttons_top_space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout" />
 
     <include
         android:id="@+id/buttons_layout"
@@ -123,7 +124,6 @@
         app:layout_constraintBottom_toBottomOf="@id/bottom_guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/call_timer_view"
-        app:layout_constraintVertical_bias="1" />
+        app:layout_constraintWidth_max="@dimen/call_buttons_max_width" />
 
 </merge>

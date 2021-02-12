@@ -213,13 +213,13 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState stop(boolean isVisible) {
+    public ChatState stop() {
         return new Builder()
                 .copyFrom(this)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
-                .setIsVisible(isVisible)
+                .setIsVisible(false)
                 .setIntegratorChatStarted(false)
                 .createChatState();
     }
@@ -246,17 +246,10 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState show() {
+    public ChatState changeVisibility(boolean isVisible) {
         return new Builder()
                 .copyFrom(this)
-                .setIsVisible(true)
-                .createChatState();
-    }
-
-    public ChatState hide() {
-        return new Builder()
-                .copyFrom(this)
-                .setIsVisible(false)
+                .setIsVisible(isVisible)
                 .createChatState();
     }
 
@@ -267,9 +260,9 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState drawOverlayPermissionsDialogShown(boolean hasOverlayPermissions) {
+    public ChatState drawOverlayPermissionsDialogShown() {
         return new Builder()
-                .copyFrom(drawOverlaysPermissionChanged(hasOverlayPermissions))
+                .copyFrom(this)
                 .setOverlaysPermissionDialogShown(true)
                 .createChatState();
     }

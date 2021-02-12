@@ -5,13 +5,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -21,44 +24,63 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
+import androidx.transition.TransitionManager;
+import androidx.transition.TransitionSet;
 
+import com.glia.androidsdk.comms.MediaState;
+import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.chat.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.view.AppBarView;
+import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
+import com.google.android.material.transition.MaterialFade;
+import com.google.android.material.transition.SlideDistanceProvider;
+
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class CallView extends ConstraintLayout {
 
-    private AlertDialog alertDialog;
     private CallViewCallback callback;
     private CallController controller;
 
+    private AlertDialog alertDialog;
     private AppBarView appBar;
     private OperatorStatusView operatorStatusView;
     private TextView operatorNameView;
     private TextView callTimerView;
+    private FrameLayout operatorVideoContainer;
+    private VideoView operatorVideoView;
+    private MaterialCardView visitorVideoContainer;
+    private VideoView visitorVideoView;
     private TextView chatButtonLabel;
+    private TextView videoButtonLabel;
     private TextView muteButtonLabel;
     private TextView speakerButtonLabel;
     private TextView minimizeButtonLabel;
+    private View buttonsLayoutBackground;
+    private View buttonsLayout;
     private FloatingActionButton chatButton;
+    private FloatingActionButton videoButton;
+    private FloatingActionButton minimizeButton;
     private TextView chatButtonBadgeView;
 
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToChatListener onNavigateToChatListener;
     private OnBubbleListener onBubbleListener;
+
     private UiTheme theme;
 
     private final Resources resources;
-
     private Integer defaultStatusbarColor;
 
     public CallView(Context context) {
@@ -120,6 +142,14 @@ public class CallView extends ConstraintLayout {
                 controller.chatButtonClicked();
             }
         });
+        minimizeButton.setOnClickListener(v -> {
+            if (controller != null) {
+                controller.minimizeButtonClicked();
+            }
+            if (onEndListener != null) {
+                onEndListener.onEnd();
+            }
+        });
     }
 
     public void startCall() {
@@ -129,6 +159,14 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onDestroy() {
+        if (operatorVideoView != null) {
+            operatorVideoView.release();
+            operatorVideoView = null;
+        }
+        if (visitorVideoView != null) {
+            visitorVideoView.release();
+            visitorVideoView = null;
+        }
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
@@ -144,6 +182,21 @@ public class CallView extends ConstraintLayout {
     public void onResume() {
         if (controller != null) {
             controller.onResume(Settings.canDrawOverlays(this.getContext()));
+            if (operatorVideoView != null) {
+                operatorVideoView.resumeRendering();
+            }
+            if (visitorVideoView != null) {
+                visitorVideoView.resumeRendering();
+            }
+        }
+    }
+
+    public void onPause() {
+        if (operatorVideoView != null) {
+            operatorVideoView.pauseRendering();
+        }
+        if (visitorVideoView != null) {
+            visitorVideoView.resumeRendering();
         }
     }
 
@@ -162,21 +215,38 @@ public class CallView extends ConstraintLayout {
                     } else {
                         appBar.showXButton();
                     }
+                    if (callState.isAudioCall()) {
+                        appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
+                    } else if (callState.isVideoCall()) {
+                        appBar.setTitle(resources.getString(R.string.call_video_app_bar_title));
+                    }
+                    if (resources.getConfiguration().orientation == ORIENTATION_LANDSCAPE &&
+                            callState.isVideoCall()) {
+                        ColorStateList blackTransparentColorStateList =
+                                ContextCompat.getColorStateList(getContext(), R.color.transparent_black_bg);
+                        appBar.setBackgroundTintList(blackTransparentColorStateList);
+                    } else {
+                        ColorStateList transparentColorStateList =
+                                ContextCompat.getColorStateList(getContext(), android.R.color.transparent);
+                        appBar.setBackgroundTintList(transparentColorStateList);
+                    }
 
                     if (callState.isCallOngoing()) {
-                        CallStatus.StartedAudioCall status =
-                                (CallStatus.StartedAudioCall) callState.callStatus;
-
                         operatorStatusView.setOperatorImage(android.R.drawable.star_on, false);
-                        operatorNameView.setText(status.getFormattedOperatorName());
-                        callTimerView.setText(status.time);
+                        operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
+                        callTimerView.setText(callState.callStatus.getTime());
                     }
                     chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
 
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
-                    operatorStatusView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
+                    videoButton.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
+                    videoButtonLabel.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
+                    operatorStatusView.setVisibility(callState.isAudioCall() ? VISIBLE : GONE);
                     operatorNameView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
                     callTimerView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
+                    operatorVideoContainer.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
+                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
+                    handleControlsVisibility(callState);
                     if (callState.isVisible) {
                         showCall();
                     } else {
@@ -203,13 +273,15 @@ public class CallView extends ConstraintLayout {
                             ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
                 } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                     post(() -> showNoMoreOperatorsAvailableDialog());
+                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
                 }
             }
 
             @Override
-            public void handleFloatingChatHead(boolean show) {
+            public void handleFloatingChatHead(String returnDestination) {
                 if (onBubbleListener != null) {
-                    onBubbleListener.call(show);
+                    onBubbleListener.call(returnDestination);
                 }
             }
 
@@ -219,10 +291,71 @@ public class CallView extends ConstraintLayout {
                     onNavigateToChatListener.call();
                 }
             }
+
+            @Override
+            public void startOperatorVideoView(MediaState operatorMediaState) {
+                post(() -> showOperatorVideo(operatorMediaState));
+            }
+
+            @Override
+            public void startVisitorVideoView(MediaState visitorMediaState) {
+                post(() -> showVisitorVideo(visitorMediaState));
+            }
         };
         controller = GliaWidgets
                 .getControllerFactory()
                 .getCallController(callback);
+    }
+
+    private void handleControlsVisibility(CallState callState) {
+        if (resources.getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+            if (shouldFadeInControls(callState)) {
+                TransitionSet transitionSet = new TransitionSet();
+                MaterialFade appBarFade = new MaterialFade();
+                appBarFade.setSecondaryAnimatorProvider(new SlideDistanceProvider(Gravity.TOP));
+                transitionSet.addTransition(appBarFade.addTarget(appBar));
+
+                MaterialFade buttonsFade = new MaterialFade();
+                buttonsFade.setSecondaryAnimatorProvider(new SlideDistanceProvider(Gravity.BOTTOM));
+                transitionSet.addTransition(buttonsFade.addTarget(buttonsLayoutBackground));
+                transitionSet.addTransition(buttonsFade.addTarget(buttonsLayout));
+
+                TransitionManager.beginDelayedTransition(this, transitionSet);
+            } else if (shouldFadeOutControls(callState)) {
+                TransitionSet transitionSet = new TransitionSet();
+                MaterialFade appBarFade = new MaterialFade();
+                appBarFade.setSecondaryAnimatorProvider(new SlideDistanceProvider(Gravity.BOTTOM));
+                transitionSet.addTransition(appBarFade.addTarget(appBar));
+
+                MaterialFade buttonsFade = new MaterialFade();
+                buttonsFade.setSecondaryAnimatorProvider(new SlideDistanceProvider(Gravity.TOP));
+                transitionSet.addTransition(buttonsFade.addTarget(buttonsLayoutBackground));
+                transitionSet.addTransition(buttonsFade.addTarget(buttonsLayout));
+
+                TransitionManager.beginDelayedTransition(this, transitionSet);
+            }
+            appBar.setVisibility(callState.landscapeLayoutControlsVisible ? VISIBLE : GONE);
+            buttonsLayoutBackground.setVisibility(
+                    callState.landscapeLayoutControlsVisible &&
+                            callState.isVideoCall() ?
+                            VISIBLE : GONE
+            );
+            buttonsLayout.setVisibility(callState.landscapeLayoutControlsVisible ? VISIBLE : GONE);
+        } else {
+            appBar.setVisibility(VISIBLE);
+            buttonsLayoutBackground.setVisibility(GONE);
+            buttonsLayout.setVisibility(VISIBLE);
+        }
+    }
+
+    private boolean shouldFadeInControls(CallState callState) {
+        return callState.landscapeLayoutControlsVisible && appBar.getVisibility() == GONE
+                && buttonsLayout.getVisibility() == GONE && buttonsLayoutBackground.getVisibility() == GONE;
+    }
+
+    private boolean shouldFadeOutControls(CallState callState) {
+        return !callState.landscapeLayoutControlsVisible && appBar.getVisibility() == VISIBLE
+                && buttonsLayout.getVisibility() == VISIBLE && buttonsLayoutBackground.getVisibility() == VISIBLE;
     }
 
     private void setupViewAppearance() {
@@ -234,6 +367,7 @@ public class CallView extends ConstraintLayout {
             operatorNameView.setTypeface(fontFamily);
             callTimerView.setTypeface(fontFamily);
             chatButtonLabel.setTypeface(fontFamily);
+            videoButtonLabel.setTypeface(fontFamily);
             muteButtonLabel.setTypeface(fontFamily);
             speakerButtonLabel.setTypeface(fontFamily);
             minimizeButtonLabel.setTypeface(fontFamily);
@@ -253,12 +387,20 @@ public class CallView extends ConstraintLayout {
         operatorStatusView = findViewById(R.id.operator_status_view);
         operatorNameView = findViewById(R.id.operator_name_view);
         callTimerView = findViewById(R.id.call_timer_view);
+        operatorVideoContainer = findViewById(R.id.operator_video_container);
+        visitorVideoContainer = findViewById(R.id.visitor_video_container);
         chatButtonLabel = findViewById(R.id.chat_button_label);
+        videoButtonLabel = findViewById(R.id.video_button_label);
         chatButtonBadgeView = findViewById(R.id.chat_button_badge);
         muteButtonLabel = findViewById(R.id.mute_button_label);
         speakerButtonLabel = findViewById(R.id.speaker_button_label);
         minimizeButtonLabel = findViewById(R.id.minimize_button_label);
         chatButton = findViewById(R.id.chat_button);
+        videoButton = findViewById(R.id.video_button);
+        minimizeButton = findViewById(R.id.minimize_button);
+
+        buttonsLayoutBackground = findViewById(R.id.buttons_layout_bg);
+        buttonsLayout = findViewById(R.id.buttons_layout);
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -280,7 +422,9 @@ public class CallView extends ConstraintLayout {
         builder.setFontRes(fontRes);
         this.theme = builder.build();
         setupViewAppearance();
-        handleStatusbarColor();
+        if (getVisibility() == VISIBLE) {
+            handleStatusbarColor();
+        }
     }
 
     public void setOnBackClickedListener(OnBackClickedListener onBackClicked) {
@@ -362,6 +506,25 @@ public class CallView extends ConstraintLayout {
         );
     }
 
+    private void showUpgradeDialog(DialogOfferType type) {
+        alertDialog = Dialogs.showUpgradeDialog(
+                this.getContext(),
+                theme,
+                type,
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
+                    }
+                },
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
+                    }
+                });
+    }
+
     private void showOptionsDialog(String title,
                                    String message,
                                    String positiveButtonText,
@@ -408,6 +571,8 @@ public class CallView extends ConstraintLayout {
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
+                    callEnded();
+                    alertDialog = null;
                 });
     }
 
@@ -469,6 +634,36 @@ public class CallView extends ConstraintLayout {
         GliaWidgets.getControllerFactory().destroyControllers();
     }
 
+    private void showOperatorVideo(MediaState operatorMediaState) {
+        if (operatorVideoView != null) {
+            operatorVideoView.release();
+            operatorVideoView = null;
+        }
+        if (operatorMediaState != null && operatorMediaState.getVideo() != null) {
+            operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
+            operatorVideoContainer.removeAllViews();
+            operatorVideoContainer.addView(operatorVideoView);
+        }
+    }
+
+    private void showVisitorVideo(MediaState visitorMediaState) {
+        if (visitorVideoView != null) {
+            visitorVideoView.release();
+            visitorVideoView = null;
+        }
+        if (visitorMediaState != null && visitorMediaState.getVideo() != null) {
+            visitorVideoView = visitorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
+            visitorVideoContainer.removeAllViews();
+            visitorVideoContainer.addView(visitorVideoView);
+        }
+    }
+
+    public void onUserInteraction() {
+        if (controller != null) {
+            controller.onUserInteraction();
+        }
+    }
+
     public interface OnBackClickedListener {
         void onBackClicked();
     }
@@ -482,6 +677,6 @@ public class CallView extends ConstraintLayout {
     }
 
     public interface OnBubbleListener {
-        void call(boolean isVisible);
+        void call(String returnDestination);
     }
 }

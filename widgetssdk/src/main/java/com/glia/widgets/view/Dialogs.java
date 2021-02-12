@@ -101,6 +101,13 @@ public class Dialogs {
         messageView.setTextColor(baseDarkColor);
         closeImageButton.setImageTintList(baseNormalColorStateList);
 
+        if (theme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(context, theme.getFontRes());
+
+            titleView.setTypeface(fontFamily);
+            messageView.setTypeface(fontFamily);
+        }
+
         titleView.setText(title);
         messageView.setText(message);
         closeImageButton.setOnClickListener(buttonClickListener);
@@ -115,8 +122,8 @@ public class Dialogs {
 
     public static AlertDialog showUpgradeDialog(Context context,
                                                 UiTheme theme,
-                                                String title,
-                                                View.OnClickListener onAudioClickedListener,
+                                                DialogOfferType type,
+                                                View.OnClickListener onAcceptOfferClickListener,
                                                 View.OnClickListener onCloseClickListener) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setCancelable(false);
@@ -142,9 +149,27 @@ public class Dialogs {
         positiveButton.setBackgroundTintList(primaryBrandColorStateList);
         logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
 
-        titleView.setText(title);
+        if (theme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(context, theme.getFontRes());
 
-        positiveButton.setOnClickListener(onAudioClickedListener);
+            titleView.setTypeface(fontFamily);
+            positiveButton.setTypeface(fontFamily);
+            negativeButton.setTypeface(fontFamily);
+        }
+
+        if (type instanceof DialogOfferType.AudioUpgradeOffer) {
+            titleView.setText(
+                    context.getString(R.string.chat_dialog_upgrade_audio_title, type.getOperatorName())
+            );
+            titleIconView.setImageResource(R.drawable.ic_baseline_mic);
+        } else if (type instanceof DialogOfferType.VideoUpgradeOffer) {
+            titleView.setText(
+                    context.getString(R.string.chat_dialog_upgrade_video_title, type.getOperatorName())
+            );
+            titleIconView.setImageResource(R.drawable.ic_baseline_videocam);
+        }
+
+        positiveButton.setOnClickListener(onAcceptOfferClickListener);
         negativeButton.setOnClickListener(onCloseClickListener);
         builder.setView(customLayout);
 

@@ -1,4 +1,4 @@
-package com.glia.widgets.chat.head;
+package com.glia.widgets.head;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -28,7 +28,6 @@ import com.google.android.material.imageview.ShapeableImageView;
 public class ChatHeadService extends Service {
 
     private final String TAG = "ChatHeadService";
-    public static final String IS_VISIBLE = "is_visible";
 
     private WindowManager windowManager;
     private UiTheme uiTheme;
@@ -74,18 +73,20 @@ public class ChatHeadService extends Service {
             useTheme();
         }
         returnDestination = intent.getStringExtra(GliaWidgets.RETURN_DESTINATION);
-        isVisible = intent.getBooleanExtra(IS_VISIBLE, false);
+        isVisible = returnDestination != null;
         Logger.d(TAG, "companyName: " + this.companyName + ", queueId: " + this.queueId +
                 ", contextUrl: " + this.contextUrl + "lastTypedText: " + this.lastTypedText +
-                ", uiTheme: " + this.uiTheme.toString() + "returnDestination: " + returnDestination +
+                ", uiTheme: " + this.uiTheme + "returnDestination: " + returnDestination +
                 ", isVisible: " + isVisible);
         updateVisibility();
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void updateVisibility() {
+        Logger.d(TAG, "updating visibility");
         if (floatingView != null) {
             if (isVisible) {
+                Logger.d(TAG, "updating visibility visible");
                 floatingView.setVisibility(View.VISIBLE);
             } else {
                 floatingView.setVisibility(View.GONE);
@@ -189,7 +190,7 @@ public class ChatHeadService extends Service {
     }
 
     private void returnToEngagement() {
-        if (returnDestination.equals(GliaWidgets.DESTINATION_CHAT)) {
+        if (returnDestination.equals(GliaWidgets.CHAT_ACTIVITY)) {
             startActivity(ChatActivity.class);
         } else {
             startActivity(CallActivity.class);

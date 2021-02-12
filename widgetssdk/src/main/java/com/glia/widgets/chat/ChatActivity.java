@@ -11,10 +11,12 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
-import com.glia.widgets.chat.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.helper.Logger;
 
 public class ChatActivity extends AppCompatActivity {
 
+    private static final String TAG = "ChatActivity";
     public static final String LAST_TYPED_TEXT = "last_typed_text";
 
     private String companyName;
@@ -33,15 +35,15 @@ public class ChatActivity extends AppCompatActivity {
     };
     private ChatView.OnBubbleListener onBubbleListener = new ChatView.OnBubbleListener() {
         @Override
-        public void call(UiTheme theme, String lastTypedText, boolean isVisible) {
+        public void call(UiTheme theme, String lastTypedText, String returnDestination) {
+            Logger.d(TAG, "startChatHeadService, returnDestination: " + returnDestination);
             Intent newIntent = new Intent(getApplicationContext(), ChatHeadService.class);
             newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
             newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
             newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
             newIntent.putExtra(GliaWidgets.UI_THEME, theme);
-            newIntent.putExtra(ChatHeadService.IS_VISIBLE, isVisible);
             newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
-            newIntent.putExtra(GliaWidgets.RETURN_DESTINATION, GliaWidgets.DESTINATION_CHAT);
+            newIntent.putExtra(GliaWidgets.RETURN_DESTINATION, returnDestination);
             getApplicationContext().startService(newIntent);
         }
     };
@@ -49,6 +51,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GliaWidgets.addActivityToBackStack(GliaWidgets.CHAT_ACTIVITY);
         setContentView(R.layout.chat_activity);
 
         Intent intent = getIntent();
@@ -89,6 +92,7 @@ public class ChatActivity extends AppCompatActivity {
         onNavigateToCallListener = null;
         onBubbleListener = null;
         chatView.onDestroyView();
+        GliaWidgets.removeActivityFromBackStack(GliaWidgets.CHAT_ACTIVITY);
         super.onDestroy();
     }
 

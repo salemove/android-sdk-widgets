@@ -16,25 +16,17 @@ public interface ChatGliaCallback {
 
     void engagementEndedByOperator();
 
-    void engagementEnded(boolean showDialog);
-
     void engagementSuccess(OmnicoreEngagement engagement);
 
     void onMessage(ChatMessage message);
 
     void chatHistoryLoaded(ChatMessage[] messages, Throwable error);
 
-    void audioUpgradeRequested();
-
-    void audioUpgradeOfferChoiceSubmitSuccess();
-
     void error(GliaException exception);
 
     void error(Throwable throwable);
 
     void messageDelivered(VisitorMessage visitorMessage);
-
-    void audioUpgradeOfferChoiceDeniedSuccess();
 
     void newOperatorMediaState(OperatorMediaState operatorMediaState);
 }

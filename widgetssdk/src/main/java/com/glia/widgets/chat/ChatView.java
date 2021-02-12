@@ -32,10 +32,11 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
-import com.glia.widgets.chat.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.view.AppBarView;
+import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
@@ -163,17 +164,17 @@ public class ChatView extends LinearLayout {
                 } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
                     post(() -> showEndEngagementDialog(
                             ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
-                } else if (dialogsState instanceof DialogsState.UpgradeAudioDialog) {
-                    post(() -> showUpgradeDialog(((DialogsState.UpgradeAudioDialog) dialogsState).operatorName));
+                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
                 } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                     post(() -> showNoMoreOperatorsAvailableDialog());
                 }
             }
 
             @Override
-            public void handleFloatingChatHead(boolean show) {
+            public void handleFloatingChatHead(String returnDestination) {
                 if (onBubbleListener != null) {
-                    onBubbleListener.call(theme, chatEditText.getText().toString(), show);
+                    onBubbleListener.call(theme, chatEditText.getText().toString(), returnDestination);
                 }
             }
 
@@ -293,13 +294,14 @@ public class ChatView extends LinearLayout {
         builder.setSystemNegativeColor(systemNegativeColorRes);
         this.theme = builder.build();
         setupViewAppearance();
-        if (controller.isStarted()) {
+        if (getVisibility() == VISIBLE) {
             handleStatusbarColor();
         }
     }
 
     private void showToolbar(String title) {
-        appBar.showToolbar(title);
+        appBar.setTitle(title);
+        appBar.showToolbar();
     }
 
     public void show() {
@@ -581,24 +583,25 @@ public class ChatView extends LinearLayout {
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
+                    chatEnded();
                 });
     }
 
-    private void showUpgradeDialog(String operatorName) {
+    private void showUpgradeDialog(DialogOfferType type) {
         alertDialog = Dialogs.showUpgradeDialog(
                 this.getContext(),
                 theme,
-                getResources().getString(R.string.chat_dialog_upgrade_audio_title, operatorName),
+                type,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
-                        controller.upgradeToAudioClicked();
+                        controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 },
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
-                        controller.closeUpgradeDialogClicked();
+                        controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 });
     }
@@ -651,12 +654,11 @@ public class ChatView extends LinearLayout {
     }
 
     public void onResume() {
-        checkOverlayPermissions();
-    }
-
-    private void checkOverlayPermissions() {
         if (controller != null) {
-            controller.onResume(Settings.canDrawOverlays(this.getContext()));
+            controller.onResume(
+                    Settings.canDrawOverlays(this.getContext()),
+                    GliaWidgets.isInBackstack(GliaWidgets.CALL_ACTIVITY)
+            );
         }
     }
 
@@ -691,6 +693,6 @@ public class ChatView extends LinearLayout {
     }
 
     public interface OnBubbleListener {
-        void call(UiTheme theme, String lastTypedText, boolean isVisible);
+        void call(UiTheme theme, String lastTypedText, String returnDestination);
     }
 }

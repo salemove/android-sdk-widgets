@@ -16,7 +16,7 @@
             android:theme="@style/Application.Glia.Call.Activity" />
 
         <service
-            android:name="com.glia.widgets.chat.head.ChatHeadService"
+            android:name="com.glia.widgets.head.ChatHeadService"
             android:enabled="true"
             android:stopWithTask="true" />
 

@@ -202,9 +202,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chatItem.type == MediaUpgradeStartedTimerItem.Type.AUDIO) {
                 iconView.setImageResource(R.drawable.ic_baseline_mic);
                 titleView.setText(context.getString(R.string.chat_upgraded_to_audio_call));
-
             } else {
-                // TODO video coming in future task PRs
+                iconView.setImageResource(R.drawable.ic_baseline_videocam);
+                titleView.setText(context.getString(R.string.chat_upgraded_to_video_call));
             }
             timerView.setText(chatItem.time);
         }

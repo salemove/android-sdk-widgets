@@ -30,8 +30,10 @@
     <dimen name="call_floating_button_size">60dp</dimen>
     <dimen name="call_floating_button_badge_size">18sp</dimen>
     <dimen name="call_floating_button_badge_elevation">6dp</dimen>
-    <dimen name="call_buttons_max_width">330dp</dimen>
+    <dimen name="call_buttons_max_width">375dp</dimen>
     <dimen name="call_operator_status_image_margin_top">64dp</dimen>
     <dimen name="call_operator_status_image_size">124dp</dimen>
+    <dimen name="call_operator_name_gone_margin_top">66dp</dimen>
+    <dimen name="call_video_height">250dp</dimen>
 
 </resources>

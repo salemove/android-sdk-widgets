@@ -29,6 +29,6 @@
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"
         app:layout_constraintTop_toTopOf="@id/profile_picture_view"
         app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
-        app:srcCompat="@drawable/ic_person" />
+        app:srcCompat="?attr/gliaIconPlaceholder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

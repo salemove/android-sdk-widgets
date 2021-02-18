@@ -12,6 +12,8 @@ public interface CallStatus {
 
     String getFormattedOperatorName();
 
+    String getOperatorProfileImageUrl();
+
     String getTime();
 
     OperatorMediaState getOperatorMediaState();
@@ -29,6 +31,11 @@ public interface CallStatus {
         }
 
         @Override
+        public String getOperatorProfileImageUrl() {
+            return null;
+        }
+
+        @Override
         public String getTime() {
             throw new UnsupportedOperationException("Not supposed to happen!");
         }
@@ -42,10 +49,12 @@ public interface CallStatus {
     class Ongoing implements CallStatus {
         private final String operatorName;
         private final String time;
+        private final String operatorProfileImgUrl;
 
-        public Ongoing(String operatorName, String time) {
+        public Ongoing(String operatorName, String time, String operatorProfileImgUrl) {
             this.operatorName = operatorName;
             this.time = time;
+            this.operatorProfileImgUrl = operatorProfileImgUrl;
         }
 
         @Override
@@ -56,6 +65,11 @@ public interface CallStatus {
         @Override
         public String getFormattedOperatorName() {
             return Utils.formatOperatorName(operatorName);
+        }
+
+        @Override
+        public String getOperatorProfileImageUrl() {
+            return operatorProfileImgUrl;
         }
 
         @Override
@@ -69,36 +83,45 @@ public interface CallStatus {
         }
 
         @Override
-        public String toString() {
-            return "Ongoing{" +
-                    "operatorName='" + operatorName + '\'' +
-                    ", time='" + time + '\'' +
-                    '}';
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Ongoing ongoing = (Ongoing) o;
             return Objects.equals(operatorName, ongoing.operatorName) &&
-                    Objects.equals(time, ongoing.time);
+                    Objects.equals(time, ongoing.time) &&
+                    Objects.equals(operatorProfileImgUrl, ongoing.operatorProfileImgUrl);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time);
+            return Objects.hash(operatorName, time, operatorProfileImgUrl);
+        }
+
+        @Override
+        public String toString() {
+            return "Ongoing{" +
+                    "operatorName='" + operatorName + '\'' +
+                    ", time='" + time + '\'' +
+                    ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
+                    '}';
         }
     }
 
     class StartedAudioCall implements CallStatus {
         private final String operatorName;
         private final String time;
+        private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
 
-        public StartedAudioCall(String operatorName, String time, OperatorMediaState operatorMediaState) {
+        public StartedAudioCall(
+                String operatorName,
+                String time,
+                String operatorProfileImgUrl,
+                OperatorMediaState operatorMediaState
+        ) {
             this.operatorName = operatorName;
             this.time = time;
+            this.operatorProfileImgUrl = operatorProfileImgUrl;
             this.operatorMediaState = operatorMediaState;
         }
 
@@ -110,6 +133,11 @@ public interface CallStatus {
         @Override
         public String getFormattedOperatorName() {
             return Utils.formatOperatorName(operatorName);
+        }
+
+        @Override
+        public String getOperatorProfileImageUrl() {
+            return operatorProfileImgUrl;
         }
 
         @Override
@@ -123,44 +151,49 @@ public interface CallStatus {
         }
 
         @Override
-        public String toString() {
-            return "StartedAudioCall{" +
-                    "operatorName='" + operatorName + '\'' +
-                    ", time='" + time + '\'' +
-                    ", operatorMediaState=" + operatorMediaState +
-                    '}';
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             StartedAudioCall that = (StartedAudioCall) o;
             return Objects.equals(operatorName, that.operatorName) &&
                     Objects.equals(time, that.time) &&
+                    Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                     Objects.equals(operatorMediaState, that.operatorMediaState);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorMediaState);
+            return Objects.hash(operatorName, time, operatorProfileImgUrl, operatorMediaState);
+        }
+
+        @Override
+        public String toString() {
+            return "StartedAudioCall{" +
+                    "operatorName='" + operatorName + '\'' +
+                    ", time='" + time + '\'' +
+                    ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
+                    ", operatorMediaState=" + operatorMediaState +
+                    '}';
         }
     }
 
     class StartedVideoCall implements CallStatus {
         private final String operatorName;
         private final String time;
+        private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
         private final VisitorMediaState visitorMediaState;
 
         public StartedVideoCall(
                 String operatorName,
                 String time,
+                String operatorProfileImgUrl,
                 OperatorMediaState operatorMediaState,
                 VisitorMediaState visitorMediaState
         ) {
             this.operatorName = operatorName;
             this.time = time;
+            this.operatorProfileImgUrl = operatorProfileImgUrl;
             this.operatorMediaState = operatorMediaState;
             this.visitorMediaState = visitorMediaState;
         }
@@ -173,6 +206,11 @@ public interface CallStatus {
         @Override
         public String getFormattedOperatorName() {
             return Utils.formatOperatorName(operatorName);
+        }
+
+        @Override
+        public String getOperatorProfileImageUrl() {
+            return operatorProfileImgUrl;
         }
 
         @Override
@@ -190,29 +228,31 @@ public interface CallStatus {
         }
 
         @Override
-        public String toString() {
-            return "StartedVideoCall{" +
-                    "operatorName='" + operatorName + '\'' +
-                    ", time='" + time + '\'' +
-                    ", operatorMediaState=" + operatorMediaState +
-                    ", visitorMediaState=" + visitorMediaState +
-                    '}';
-        }
-
-        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             StartedVideoCall that = (StartedVideoCall) o;
             return Objects.equals(operatorName, that.operatorName) &&
                     Objects.equals(time, that.time) &&
+                    Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                     Objects.equals(operatorMediaState, that.operatorMediaState) &&
                     Objects.equals(visitorMediaState, that.visitorMediaState);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorMediaState, visitorMediaState);
+            return Objects.hash(operatorName, time, operatorProfileImgUrl, operatorMediaState, visitorMediaState);
+        }
+
+        @Override
+        public String toString() {
+            return "StartedVideoCall{" +
+                    "operatorName='" + operatorName + '\'' +
+                    ", time='" + time + '\'' +
+                    ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
+                    ", operatorMediaState=" + operatorMediaState +
+                    ", visitorMediaState=" + visitorMediaState +
+                    '}';
         }
     }
 }

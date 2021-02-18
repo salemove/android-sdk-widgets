@@ -172,16 +172,21 @@ public class ChatView extends LinearLayout {
             }
 
             @Override
-            public void handleFloatingChatHead(String returnDestination) {
+            public void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination) {
                 if (onBubbleListener != null) {
-                    onBubbleListener.call(theme, chatEditText.getText().toString(), returnDestination);
+                    onBubbleListener.call(
+                            theme,
+                            chatEditText.getText().toString(),
+                            operatorProfileImgUrl,
+                            returnDestination
+                    );
                 }
             }
 
             @Override
             public void navigateToCall() {
                 if (onNavigateToCallListener != null) {
-                    onNavigateToCallListener.call(chatEditText.getText().toString());
+                    onNavigateToCallListener.call(chatEditText.getText().toString(), theme);
                 }
             }
 
@@ -281,6 +286,38 @@ public class ChatView extends LinearLayout {
         Integer fontRes = uiTheme.getFontRes() != null ? uiTheme.getFontRes() : this.theme.getFontRes();
         Integer systemNegativeColorRes = uiTheme.getSystemNegativeColor() != null ?
                 uiTheme.getSystemNegativeColor() : this.theme.getSystemNegativeColor();
+        Integer iconAppBarBack = uiTheme.getIconAppBarBack() != null ?
+                uiTheme.getIconAppBarBack() : this.theme.getIconAppBarBack();
+        Integer iconLeaveQueue = uiTheme.getIconLeaveQueue() != null ?
+                uiTheme.getIconLeaveQueue() : this.theme.getIconLeaveQueue();
+        Integer iconSendMessage = uiTheme.getIconSendMessage() != null ?
+                uiTheme.getIconSendMessage() : this.theme.getIconSendMessage();
+        Integer iconChatAudioUpgrade = uiTheme.getIconChatAudioUpgrade() != null ?
+                uiTheme.getIconChatAudioUpgrade() : this.theme.getIconChatAudioUpgrade();
+        Integer iconUpgradeAudioDialog = uiTheme.getIconUpgradeAudioDialog() != null ?
+                uiTheme.getIconUpgradeAudioDialog() : this.theme.getIconUpgradeAudioDialog();
+        Integer iconCallAudioOn = uiTheme.getIconCallAudioOn() != null ?
+                uiTheme.getIconCallAudioOn() : this.theme.getIconCallAudioOn();
+        Integer iconChatVideoUpgrade = uiTheme.getIconChatVideoUpgrade() != null ?
+                uiTheme.getIconChatVideoUpgrade() : this.theme.getIconChatVideoUpgrade();
+        Integer iconUpgradeVideoDialog = uiTheme.getIconUpgradeVideoDialog() != null ?
+                uiTheme.getIconUpgradeVideoDialog() : this.theme.getIconUpgradeVideoDialog();
+        Integer iconCallVideoOn = uiTheme.getIconCallVideoOn() != null ?
+                uiTheme.getIconCallVideoOn() : this.theme.getIconCallVideoOn();
+        Integer iconCallAudioOff = uiTheme.getIconCallAudioOff() != null ?
+                uiTheme.getIconCallAudioOff() : this.theme.getIconCallAudioOff();
+        Integer iconCallVideoOff = uiTheme.getIconCallVideoOff() != null ?
+                uiTheme.getIconCallVideoOff() : this.theme.getIconCallVideoOff();
+        Integer iconCallChat = uiTheme.getIconCallChat() != null ?
+                uiTheme.getIconCallChat() : this.theme.getIconCallChat();
+        Integer iconCallSpeakerOn = uiTheme.getIconCallSpeakerOn() != null ?
+                uiTheme.getIconCallSpeakerOn() : this.theme.getIconCallSpeakerOn();
+        Integer iconCallSpeakerOff = uiTheme.getIconCallSpeakerOff() != null ?
+                uiTheme.getIconCallSpeakerOff() : this.theme.getIconCallSpeakerOff();
+        Integer iconCallMinimize = uiTheme.getIconCallMinimize() != null ?
+                uiTheme.getIconCallMinimize() : this.theme.getIconCallMinimize();
+        Integer iconPlaceholder = uiTheme.getIconPlaceholder() != null ?
+                uiTheme.getIconPlaceholder() : this.theme.getIconPlaceholder();
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
@@ -292,6 +329,22 @@ public class ChatView extends LinearLayout {
         builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
         builder.setFontRes(fontRes);
         builder.setSystemNegativeColor(systemNegativeColorRes);
+        builder.setIconAppBarBack(iconAppBarBack);
+        builder.setIconLeaveQueue(iconLeaveQueue);
+        builder.setIconSendMessage(iconSendMessage);
+        builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
+        builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
+        builder.setIconCallAudioOn(iconCallAudioOn);
+        builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
+        builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
+        builder.setIconCallVideoOn(iconCallVideoOn);
+        builder.setIconCallAudioOff(iconCallAudioOff);
+        builder.setIconCallVideoOff(iconCallVideoOff);
+        builder.setIconCallChat(iconCallChat);
+        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
+        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
+        builder.setIconCallMinimize(iconCallMinimize);
+        builder.setIconPlaceholder(iconPlaceholder);
         this.theme = builder.build();
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {
@@ -386,6 +439,13 @@ public class ChatView extends LinearLayout {
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
 
+        appBar.setTheme(this.theme);
+
+        //icons
+        sendButton.setImageResource(this.theme.getIconSendMessage());
+
+
+        // colors
         dividerView.setBackgroundColor(ContextCompat.getColor(
                 this.getContext(),
                 this.theme.getBaseShadeColor()));
@@ -397,18 +457,19 @@ public class ChatView extends LinearLayout {
                 this.getContext(), this.theme.getBaseDarkColor()));
         chatEditText.setHintTextColor(ContextCompat.getColor(
                 this.getContext(), this.theme.getBaseNormalColor()));
-        appBar.setTheme(this.theme);
+        setBackgroundColor(
+                ContextCompat.getColor(this.getContext(), this.theme.getBaseLightColor()));
+        // fonts
         if (this.theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(
                     this.getContext(),
                     this.theme.getFontRes());
             chatEditText.setTypeface(fontFamily);
         }
+        // texts
         if (this.theme.getAppBarTitle() != null) {
             showToolbar(this.theme.getAppBarTitle());
         }
-        setBackgroundColor(
-                ContextCompat.getColor(this.getContext(), this.theme.getBaseLightColor()));
     }
 
     private void handleStatusbarColor() {
@@ -689,10 +750,22 @@ public class ChatView extends LinearLayout {
     }
 
     public interface OnNavigateToCallListener {
-        void call(String lastTypedText);
+        /**
+         *
+         * @param lastTypedText
+         * @param theme using actual theme assembled in this view because of callActivity being
+         *              translucent.
+         *              The translucent flag can only be set in the manifest, programmatically it can
+         *              not be done. Setting the theme however removes our attr gliaChatStyle from
+         *              the theme attributes available only in the app theme.
+         *              So the only way to get our theme for now is by passing it during navigation.
+         *              Will need to research ways to fix this, but seems highly unlikely there
+         *              is a fix.
+         */
+        void call(String lastTypedText, UiTheme theme);
     }
 
     public interface OnBubbleListener {
-        void call(UiTheme theme, String lastTypedText, String returnDestination);
+        void call(UiTheme theme, String lastTypedText, String operatorProfileImgUrl, String returnDestination);
     }
 }

@@ -24,6 +24,7 @@ import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.squareup.picasso.Picasso;
 
 public class ChatHeadService extends Service {
 
@@ -31,6 +32,7 @@ public class ChatHeadService extends Service {
 
     private WindowManager windowManager;
     private UiTheme uiTheme;
+    private String operatorProfileImgUrl;
     private String companyName;
     private String queueId;
     private String contextUrl;
@@ -68,18 +70,35 @@ public class ChatHeadService extends Service {
             this.lastTypedText = lastTypedText;
         }
         UiTheme uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+        operatorProfileImgUrl = intent.getStringExtra(GliaWidgets.OPERATOR_PROFILE_IMG_URL);
+        returnDestination = intent.getStringExtra(GliaWidgets.RETURN_DESTINATION);
         if (uiTheme != null) {
             this.uiTheme = uiTheme;
             useTheme();
         }
-        returnDestination = intent.getStringExtra(GliaWidgets.RETURN_DESTINATION);
         isVisible = returnDestination != null;
         Logger.d(TAG, "companyName: " + this.companyName + ", queueId: " + this.queueId +
                 ", contextUrl: " + this.contextUrl + "lastTypedText: " + this.lastTypedText +
                 ", uiTheme: " + this.uiTheme + "returnDestination: " + returnDestination +
                 ", isVisible: " + isVisible);
+        updateImage();
         updateVisibility();
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void updateImage() {
+        Logger.d(TAG, "updating image. operatorProfileImgUrl: " + operatorProfileImgUrl);
+        if (placeholderView != null && profilePictureView != null) {
+            if (operatorProfileImgUrl != null) {
+                Picasso.with(getApplicationContext()).load(operatorProfileImgUrl).into(profilePictureView);
+                placeholderView.setVisibility(View.GONE);
+            } else {
+                int primaryColor = ContextCompat.getColor(this, uiTheme.getBrandPrimaryColor());
+                profilePictureView.setImageDrawable(null);
+                profilePictureView.setBackgroundColor(primaryColor);
+                placeholderView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void updateVisibility() {
@@ -98,6 +117,7 @@ public class ChatHeadService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         floatingView = LayoutInflater.from(this).inflate(R.layout.floating_chat_head, null);
         profilePictureView = floatingView.findViewById(R.id.profile_picture_view);
         placeholderView = floatingView.findViewById(R.id.placeholder_view);
@@ -180,6 +200,8 @@ public class ChatHeadService extends Service {
 
     private void useTheme() {
         if (uiTheme != null) {
+            placeholderView.setImageResource(uiTheme.getIconPlaceholder());
+            // colors
             ColorStateList backgroundColor =
                     ContextCompat.getColorStateList(this, uiTheme.getBaseLightColor());
             int primaryColor = ContextCompat.getColor(this, uiTheme.getBrandPrimaryColor());

@@ -70,6 +70,8 @@ public class CallView extends ConstraintLayout {
     private View buttonsLayout;
     private FloatingActionButton chatButton;
     private FloatingActionButton videoButton;
+    private FloatingActionButton muteButton;
+    private FloatingActionButton speakerButton;
     private FloatingActionButton minimizeButton;
     private TextView chatButtonBadgeView;
 
@@ -88,8 +90,7 @@ public class CallView extends ConstraintLayout {
     }
 
     public CallView(Context context, @Nullable AttributeSet attrs) {
-        // using defStyleAttr = 0 so overriding not allowed by integrator
-        this(context, attrs, 0);
+        this(context, attrs, R.attr.gliaChatStyle);
     }
 
     public CallView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -232,7 +233,13 @@ public class CallView extends ConstraintLayout {
                     }
 
                     if (callState.isCallOngoing()) {
-                        operatorStatusView.setOperatorImage(android.R.drawable.star_on, false);
+                        operatorStatusView.isPulsationAnimationShowing(false);
+                        if (callState.callStatus.getOperatorProfileImageUrl() != null) {
+                            operatorStatusView.setOperatorImage(
+                                    callState.callStatus.getOperatorProfileImageUrl());
+                        } else {
+                            operatorStatusView.showPlaceHolder();
+                        }
                         operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
                         callTimerView.setText(callState.callStatus.getTime());
                     }
@@ -279,9 +286,9 @@ public class CallView extends ConstraintLayout {
             }
 
             @Override
-            public void handleFloatingChatHead(String returnDestination) {
+            public void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination) {
                 if (onBubbleListener != null) {
-                    onBubbleListener.call(returnDestination);
+                    onBubbleListener.call(operatorProfileImgUrl, returnDestination);
                 }
             }
 
@@ -359,6 +366,14 @@ public class CallView extends ConstraintLayout {
     }
 
     private void setupViewAppearance() {
+        // icons
+        appBar.setIcons(this.theme);
+        chatButton.setImageResource(this.theme.getIconCallChat());
+        videoButton.setImageResource(this.theme.getIconCallVideoOn());
+        muteButton.setImageResource(this.theme.getIconCallAudioOn());
+        speakerButton.setImageResource(this.theme.getIconCallSpeakerOn());
+        minimizeButton.setImageResource(this.theme.getIconCallMinimize());
+        // fonts
         if (this.theme.getFontRes() != null) {
             appBar.changeFontFamily(this.theme.getFontRes());
             Typeface fontFamily = ResourcesCompat.getFont(
@@ -397,6 +412,8 @@ public class CallView extends ConstraintLayout {
         minimizeButtonLabel = findViewById(R.id.minimize_button_label);
         chatButton = findViewById(R.id.chat_button);
         videoButton = findViewById(R.id.video_button);
+        muteButton = findViewById(R.id.mute_button);
+        speakerButton = findViewById(R.id.speaker_button);
         minimizeButton = findViewById(R.id.minimize_button);
 
         buttonsLayoutBackground = findViewById(R.id.buttons_layout_bg);
@@ -416,10 +433,58 @@ public class CallView extends ConstraintLayout {
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
         Integer fontRes = uiTheme.getFontRes() != null ? uiTheme.getFontRes() : this.theme.getFontRes();
+        Integer iconAppBarBack = uiTheme.getIconAppBarBack() != null ?
+                uiTheme.getIconAppBarBack() : this.theme.getIconAppBarBack();
+        Integer iconLeaveQueue = uiTheme.getIconLeaveQueue() != null ?
+                uiTheme.getIconLeaveQueue() : this.theme.getIconLeaveQueue();
+        Integer iconSendMessage = uiTheme.getIconSendMessage() != null ?
+                uiTheme.getIconSendMessage() : this.theme.getIconSendMessage();
+        Integer iconChatAudioUpgrade = uiTheme.getIconChatAudioUpgrade() != null ?
+                uiTheme.getIconChatAudioUpgrade() : this.theme.getIconChatAudioUpgrade();
+        Integer iconUpgradeAudioDialog = uiTheme.getIconUpgradeAudioDialog() != null ?
+                uiTheme.getIconUpgradeAudioDialog() : this.theme.getIconUpgradeAudioDialog();
+        Integer iconCallAudioOn = uiTheme.getIconCallAudioOn() != null ?
+                uiTheme.getIconCallAudioOn() : this.theme.getIconCallAudioOn();
+        Integer iconChatVideoUpgrade = uiTheme.getIconChatVideoUpgrade() != null ?
+                uiTheme.getIconChatVideoUpgrade() : this.theme.getIconChatVideoUpgrade();
+        Integer iconUpgradeVideoDialog = uiTheme.getIconUpgradeVideoDialog() != null ?
+                uiTheme.getIconUpgradeVideoDialog() : this.theme.getIconUpgradeVideoDialog();
+        Integer iconCallVideoOn = uiTheme.getIconCallVideoOn() != null ?
+                uiTheme.getIconCallVideoOn() : this.theme.getIconCallVideoOn();
+        Integer iconCallAudioOff = uiTheme.getIconCallAudioOff() != null ?
+                uiTheme.getIconCallAudioOff() : this.theme.getIconCallAudioOff();
+        Integer iconCallVideoOff = uiTheme.getIconCallVideoOff() != null ?
+                uiTheme.getIconCallVideoOff() : this.theme.getIconCallVideoOff();
+        Integer iconCallChat = uiTheme.getIconCallChat() != null ?
+                uiTheme.getIconCallChat() : this.theme.getIconCallChat();
+        Integer iconCallSpeakerOn = uiTheme.getIconCallSpeakerOn() != null ?
+                uiTheme.getIconCallSpeakerOn() : this.theme.getIconCallSpeakerOn();
+        Integer iconCallSpeakerOff = uiTheme.getIconCallSpeakerOff() != null ?
+                uiTheme.getIconCallSpeakerOff() : this.theme.getIconCallSpeakerOff();
+        Integer iconCallMinimize = uiTheme.getIconCallMinimize() != null ?
+                uiTheme.getIconCallMinimize() : this.theme.getIconCallMinimize();
+        Integer iconPlaceholder = uiTheme.getIconPlaceholder() != null ?
+                uiTheme.getIconPlaceholder() : this.theme.getIconPlaceholder();
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setTheme(this.theme);
         builder.setFontRes(fontRes);
+        builder.setIconAppBarBack(iconAppBarBack);
+        builder.setIconLeaveQueue(iconLeaveQueue);
+        builder.setIconSendMessage(iconSendMessage);
+        builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
+        builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
+        builder.setIconCallAudioOn(iconCallAudioOn);
+        builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
+        builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
+        builder.setIconCallVideoOn(iconCallVideoOn);
+        builder.setIconCallAudioOff(iconCallAudioOff);
+        builder.setIconCallVideoOff(iconCallVideoOff);
+        builder.setIconCallChat(iconCallChat);
+        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
+        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
+        builder.setIconCallMinimize(iconCallMinimize);
+        builder.setIconPlaceholder(iconPlaceholder);
         this.theme = builder.build();
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {
@@ -677,6 +742,6 @@ public class CallView extends ConstraintLayout {
     }
 
     public interface OnBubbleListener {
-        void call(String returnDestination);
+        void call(String profileImgUrl, String returnDestination);
     }
 }

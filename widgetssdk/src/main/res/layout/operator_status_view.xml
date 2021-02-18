@@ -35,8 +35,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/placeholder_view"
-        android:layout_width="@dimen/place_holder_size"
-        android:layout_height="@dimen/place_holder_size"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_gravity="center"
         android:background="?attr/gliaBrandPrimaryColor"
         android:scaleType="fitCenter"
@@ -46,6 +46,6 @@
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"
         app:layout_constraintTop_toTopOf="@id/profile_picture_view"
         app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
-        app:srcCompat="@drawable/ic_person" />
+        app:srcCompat="?attr/gliaIconPlaceholder" />
 
 </merge>

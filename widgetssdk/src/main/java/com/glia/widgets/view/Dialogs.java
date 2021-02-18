@@ -161,12 +161,17 @@ public class Dialogs {
             titleView.setText(
                     context.getString(R.string.chat_dialog_upgrade_audio_title, type.getOperatorName())
             );
-            titleIconView.setImageResource(R.drawable.ic_baseline_mic);
-        } else if (type instanceof DialogOfferType.VideoUpgradeOffer) {
+            titleIconView.setImageResource(theme.getIconUpgradeAudioDialog());
+        } else if (type instanceof DialogOfferType.VideoUpgradeOffer2Way) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_video_title, type.getOperatorName())
+                    context.getString(R.string.chat_dialog_upgrade_video_2_way_title, type.getOperatorName())
             );
-            titleIconView.setImageResource(R.drawable.ic_baseline_videocam);
+            titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
+        } else if(type instanceof DialogOfferType.VideoUpgradeOffer1Way){
+            titleView.setText(
+                    context.getString(R.string.chat_dialog_upgrade_video_1_way_title, type.getOperatorName())
+            );
+            titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
         }
 
         positiveButton.setOnClickListener(onAcceptOfferClickListener);

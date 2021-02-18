@@ -11,7 +11,7 @@
         android:elevation="0dp"
         app:elevation="0dp"
         app:menu="@menu/top_app_bar"
-        app:navigationIcon="@drawable/ic_baseline_arrow_back">
+        app:navigationIcon="?attr/gliaIconAppBarBack">
 
         <TextView
             android:id="@+id/title"

@@ -5,20 +5,27 @@ import java.util.Objects;
 
 public class ReceiveMessageItem extends ChatItem {
     private final List<String> messages;
+    private final String operatorProfileImgUrl;
 
-    public ReceiveMessageItem(String id, List<String> messages) {
+    public ReceiveMessageItem(String id, List<String> messages, String operatorProfileImgUrl) {
         super(id, ChatAdapter.RECEIVE_MESSAGE_VIEW_TYPE);
         this.messages = messages;
+        this.operatorProfileImgUrl = operatorProfileImgUrl;
     }
 
     public List<String> getMessages() {
         return messages;
     }
 
+    public String getOperatorProfileImgUrl() {
+        return operatorProfileImgUrl;
+    }
+
     @Override
     public String toString() {
         return "ReceiveMessageItem{" +
                 "messages=" + messages +
+                ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                 '}';
     }
 
@@ -28,11 +35,12 @@ public class ReceiveMessageItem extends ChatItem {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         ReceiveMessageItem that = (ReceiveMessageItem) o;
-        return Objects.equals(messages, that.messages);
+        return Objects.equals(messages, that.messages) &&
+                Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), messages);
+        return Objects.hash(super.hashCode(), messages, operatorProfileImgUrl);
     }
 }

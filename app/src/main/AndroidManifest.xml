@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:allowBackup="true"
-        android:theme="@style/Theme.GliaAndroidSDKWidgets">
+        android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
 
         <activity android:name=".Activity" />
 

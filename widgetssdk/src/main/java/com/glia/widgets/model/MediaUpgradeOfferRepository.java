@@ -46,7 +46,7 @@ public class MediaUpgradeOfferRepository {
     }
 
     public void declineOffer(MediaUpgradeOffer offer, Submitter submitter) {
-        offer.accept(exception -> {
+        offer.decline(exception -> {
             if (exception == null) {
                 Logger.d(TAG, "declineOfferSuccess");
                 for (MediaUpgradeOfferRepositoryCallback callback : callbacks) {

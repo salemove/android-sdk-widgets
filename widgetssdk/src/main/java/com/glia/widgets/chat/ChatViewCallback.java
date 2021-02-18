@@ -13,7 +13,7 @@ public interface ChatViewCallback {
 
     void emitDialog(DialogsState dialogsState);
 
-    void handleFloatingChatHead(String returnDestination);
+    void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination);
 
     void navigateToCall();
 

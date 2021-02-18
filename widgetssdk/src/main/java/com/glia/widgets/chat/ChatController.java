@@ -86,7 +86,7 @@ public class ChatController {
         }
         emitViewState(chatState.queueingStarted(useChatHeads, companyName, queueId, contextUrl));
         if (useChatHeads) {
-            handleFloatingChatheads(null);
+            handleFloatingChatheads(null, null);
         }
         initControllerCallback();
         initMediaUpgradeCallback();
@@ -165,7 +165,7 @@ public class ChatController {
         if (!chatState.useFloatingChatHeads) {
             emitViewState(chatState.changeVisibility(false));
         } else if (chatState.hasOverlayPermissions) {
-            handleFloatingChatheads(GliaWidgets.CHAT_ACTIVITY);
+            handleFloatingChatheads(chatState.operatorProfileImgUrl, GliaWidgets.CHAT_ACTIVITY);
         }
     }
 
@@ -224,7 +224,7 @@ public class ChatController {
         }
         emitViewState(chatState.drawOverlaysPermissionChanged(hasOverlaysPermission));
         if (!isCallActivityInBackstack && chatState.isMediaUpgradeStarted()) {
-            handleFloatingChatheads(GliaWidgets.CALL_ACTIVITY);
+            handleFloatingChatheads(chatState.operatorProfileImgUrl, GliaWidgets.CALL_ACTIVITY);
         }
     }
 
@@ -302,7 +302,12 @@ public class ChatController {
             @Override
             public void engagementSuccess(OmnicoreEngagement engagement) {
                 Logger.d(TAG, "engagementSuccess");
-                operatorOnlineStartChatUi(engagement.getOperator().getName());
+                String operatorProfileImgUrl = null;
+                try {
+                    operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
+                } catch (Exception e) {
+                }
+                operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
                 if (!chatState.historyLoaded) {
                     repository.loadHistory();
                 }
@@ -319,11 +324,6 @@ public class ChatController {
             @Override
             public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
                 Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
-                if (operatorMediaState.getVideo() == null &&
-                        operatorMediaState.getAudio() == null &&
-                        chatState.isMediaUpgradeStarted()) {
-                    callTimer.clear();
-                }
             }
 
             @Override
@@ -383,10 +383,13 @@ public class ChatController {
                     // audio call
                     Logger.d(TAG, "audioUpgradeRequested");
                     showUpgradeAudioDialog(offer);
-                } else if (offer.video == MediaDirection.ONE_WAY || offer.video == MediaDirection.TWO_WAY) {
+                } else if (offer.video == MediaDirection.TWO_WAY) {
                     // video call
-                    Logger.d(TAG, "videoUpgradeRequested");
-                    showUpgradeVideoDialog(offer);
+                    Logger.d(TAG, "2 way videoUpgradeRequested");
+                    showUpgradeVideoDialog2Way(offer);
+                } else if (offer.video == MediaDirection.ONE_WAY) {
+                    Logger.d(TAG, "1 way videoUpgradeRequested");
+                    showUpgradeVideoDialog1Way(offer);
                 }
             }
 
@@ -452,11 +455,14 @@ public class ChatController {
         }
     }
 
-    private void operatorOnlineStartChatUi(String operatorName) {
+    private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
         if (!chatState.isOperatorOnline()) {
             List<ChatItem> items = new ArrayList<>();
-            emitViewState(chatState.engagementStarted(operatorName));
-            items.add(OperatorStatusItem.OperatorFoundStatusItem(chatState.companyName, chatState.getFormattedOperatorName()));
+            emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+            items.add(OperatorStatusItem.OperatorFoundStatusItem(
+                    chatState.companyName,
+                    chatState.getFormattedOperatorName(),
+                    profileImgUrl));
             emitChatItems(chatState.changeItems(items));
         }
     }
@@ -521,7 +527,7 @@ public class ChatController {
             messages = new ArrayList<>();
         }
         messages.add(message.getContent());
-        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages));
+        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages, chatState.operatorProfileImgUrl));
     }
 
     private boolean isMessageValid(String message) {
@@ -555,10 +561,20 @@ public class ChatController {
         }
     }
 
-    private void showUpgradeVideoDialog(MediaUpgradeOffer mediaUpgradeOffer) {
+    private void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer) {
         if (!isDialogShowing() && chatState.isOperatorOnline()) {
             emitDialogState(new DialogsState.UpgradeDialog(
-                    new DialogOfferType.VideoUpgradeOffer(
+                    new DialogOfferType.VideoUpgradeOffer2Way(
+                            mediaUpgradeOffer,
+                            chatState.getFormattedOperatorName()
+                    )));
+        }
+    }
+
+    private void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer) {
+        if (!isDialogShowing() && chatState.isOperatorOnline()) {
+            emitDialogState(new DialogsState.UpgradeDialog(
+                    new DialogOfferType.VideoUpgradeOffer1Way(
                             mediaUpgradeOffer,
                             chatState.getFormattedOperatorName()
                     )));
@@ -584,11 +600,12 @@ public class ChatController {
      *                          or {@link com.glia.widgets.GliaWidgets#CHAT_ACTIVITY}
      *                          hides chat head if anything else.
      */
-    private void handleFloatingChatheads(String returnDestination) {
+    private void handleFloatingChatheads(String operatorProfileImgUrl, String returnDestination) {
         Logger.d(TAG, "handleFloatingChatHeads, useFloatingChatHeads: " + chatState.useFloatingChatHeads);
         if (chatState.hasOverlayPermissions && viewCallback != null && chatState.useFloatingChatHeads) {
-            Logger.d(TAG, "USING handleFloatingChatHeads, returnDestination: " + returnDestination);
-            viewCallback.handleFloatingChatHead(returnDestination);
+            Logger.d(TAG, "USING handleFloatingChatHeads, operatorProfileImgUrl: "
+                    + operatorProfileImgUrl + "returnDestination: " + returnDestination);
+            viewCallback.handleFloatingChatHead(operatorProfileImgUrl, returnDestination);
         }
     }
 

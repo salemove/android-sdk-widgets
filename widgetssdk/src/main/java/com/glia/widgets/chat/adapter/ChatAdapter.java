@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -72,7 +73,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             context = itemView.getContext();
 
-            statusPictureView.setTint(uiTheme.getBrandPrimaryColor(), uiTheme.getBaseLightColor());
+            statusPictureView.setTheme(uiTheme);
             chatStartingHeadingView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
             chatStartingCaptionView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
             chatStartedNameView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
@@ -90,13 +91,17 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void bind(OperatorStatusItem item) {
             chatStartingHeadingView.setText(item.getCompanyName());
             if (item.getStatus() == OperatorStatusItem.Status.IN_QUEUE) {
-                statusPictureView.removeOperatorImage();
+                statusPictureView.showPlaceHolder();
                 chatStartingHeadingView.setVisibility(View.VISIBLE);
                 chatStartingCaptionView.setVisibility(View.VISIBLE);
                 chatStartedNameView.setVisibility(View.GONE);
                 chatStartedCaptionView.setVisibility(View.GONE);
             } else if (item.getStatus() == OperatorStatusItem.Status.OPERATOR_CONNECTED) {
-                statusPictureView.setOperatorImage(android.R.drawable.star_on, false);
+                if (item.getProfileImgUrl() != null) {
+                    statusPictureView.setOperatorImage(item.getProfileImgUrl());
+                } else {
+                    statusPictureView.showPlaceHolder();
+                }
                 chatStartedNameView.setText(item.getOperatorName());
                 chatStartedCaptionView.setText(context.getString(R.string.chat_operator_has_joined, item.getOperatorName()));
 
@@ -105,6 +110,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 chatStartedNameView.setVisibility(View.VISIBLE);
                 chatStartedCaptionView.setVisibility(View.VISIBLE);
             }
+            statusPictureView
+                    .isPulsationAnimationShowing(item.getStatus() == OperatorStatusItem.Status.IN_QUEUE);
         }
     }
 
@@ -138,12 +145,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private final LinearLayout contentLayout;
         private final UiTheme uiTheme;
         private final Context context;
+        private final OperatorStatusView operatorStatusView;
 
         public ReceiveMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
             super(itemView);
             this.contentLayout = itemView.findViewById(R.id.content_layout);
             context = itemView.getContext();
             this.uiTheme = uiTheme;
+            this.operatorStatusView = itemView.findViewById(R.id.chat_head_view);
+            operatorStatusView.setTheme(uiTheme);
+            operatorStatusView.isPulsationAnimationShowing(false);
         }
 
         public void bind(ReceiveMessageItem item) {
@@ -152,6 +163,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 TextView contentView = getContentView();
                 contentView.setText(content);
                 contentLayout.addView(contentView);
+            }
+            if (item.getOperatorProfileImgUrl() != null) {
+                operatorStatusView.setOperatorImage(item.getOperatorProfileImgUrl());
+            } else {
+                operatorStatusView.showPlaceHolder();
             }
         }
 
@@ -176,34 +192,49 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private final ImageView iconView;
         private final TextView titleView;
         private final TextView timerView;
+        private final @DrawableRes
+        Integer upgradeAudioIcon;
+        private final @DrawableRes
+        Integer upgradeVideoIcon;
 
         public MediaUpgradeStartedViewHolder(@NonNull View itemView, UiTheme uiTheme) {
             super(itemView);
             context = itemView.getContext();
 
+            MaterialCardView layoutCardView = itemView.findViewById(R.id.card_view);
             iconView = itemView.findViewById(R.id.icon_view);
             titleView = itemView.findViewById(R.id.title_view);
             timerView = itemView.findViewById(R.id.timer_view);
 
+            this.upgradeAudioIcon = uiTheme.getIconChatAudioUpgrade();
+            this.upgradeVideoIcon = uiTheme.getIconChatVideoUpgrade();
+
+            ColorStateList baseLightStateList = ContextCompat.getColorStateList(context, uiTheme.getBaseLightColor());
             int baseShadeColor = ContextCompat.getColor(context, uiTheme.getBaseShadeColor());
             int baseNormalColor = ContextCompat.getColor(context, uiTheme.getBaseNormalColor());
             ColorStateList brandPrimaryColorStateList =
                     ContextCompat.getColorStateList(context, uiTheme.getBrandPrimaryColor());
             int baseDarkColor = ContextCompat.getColor(context, uiTheme.getBaseDarkColor());
 
-            ((MaterialCardView) itemView.findViewById(R.id.card_view))
-                    .setStrokeColor(baseShadeColor);
+            layoutCardView.setBackgroundTintList(baseLightStateList);
+            layoutCardView.setStrokeColor(baseShadeColor);
             iconView.setImageTintList(brandPrimaryColorStateList);
             titleView.setTextColor(baseDarkColor);
             timerView.setTextColor(baseNormalColor);
+
+            if (uiTheme.getFontRes() != null) {
+                Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
+                titleView.setTypeface(fontFamily);
+                timerView.setTypeface(fontFamily);
+            }
         }
 
         public void bind(MediaUpgradeStartedTimerItem chatItem) {
             if (chatItem.type == MediaUpgradeStartedTimerItem.Type.AUDIO) {
-                iconView.setImageResource(R.drawable.ic_baseline_mic);
+                iconView.setImageResource(upgradeAudioIcon);
                 titleView.setText(context.getString(R.string.chat_upgraded_to_audio_call));
             } else {
-                iconView.setImageResource(R.drawable.ic_baseline_videocam);
+                iconView.setImageResource(upgradeVideoIcon);
                 titleView.setText(context.getString(R.string.chat_upgraded_to_video_call));
             }
             timerView.setText(chatItem.time);

@@ -18,19 +18,17 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/chat_receive_message_end" />
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/chat_head_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small"
         android:layout_marginEnd="@dimen/small"
-        android:backgroundTint="?attr/gliaBrandPrimaryColor"
-        android:scaleType="centerCrop"
-        android:src="@android:drawable/star_on"
+        app:connectedImageSize="@dimen/receive_message_item_chat_head_size"
         app:layout_constraintBottom_toBottomOf="@id/content_layout"
         app:layout_constraintEnd_toStartOf="@id/start_guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView" />
+        app:placeholderBackgroundSize="36dp" />
 
     <LinearLayout
         android:id="@+id/content_layout"

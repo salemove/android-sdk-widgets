@@ -26,7 +26,7 @@ public class Utils {
         return String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
     }
 
-    public static String formatOperatorName(String operatorName){
+    public static String formatOperatorName(String operatorName) {
         int i = operatorName.indexOf(' ');
         if (i != -1) {
             return operatorName.substring(0, i);
@@ -100,6 +100,134 @@ public class Utils {
                         R.attr.fontFamily
                 )
         );
+        defaultThemeBuilder.setIconAppBarBack(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconAppBarBack,
+                        R.attr.gliaIconAppBarBack
+                )
+        );
+        defaultThemeBuilder.setIconLeaveQueue(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconLeaveQueue,
+                        R.attr.gliaIconLeaveQueue
+                )
+        );
+        defaultThemeBuilder.setIconSendMessage(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconSendMessage,
+                        R.attr.gliaIconSendMessage
+                )
+        );
+        defaultThemeBuilder.setIconChatAudioUpgrade(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconChatAudioUpgrade,
+                        R.attr.gliaIconChatAudioUpgrade
+                )
+        );
+        defaultThemeBuilder.setIconUpgradeAudioDialog(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconUpgradeAudioDialog,
+                        R.attr.gliaIconUpgradeAudioDialog
+                )
+        );
+        defaultThemeBuilder.setIconCallAudioOn(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallAudioOn,
+                        R.attr.gliaIconCallAudioOn
+                )
+        );
+        defaultThemeBuilder.setIconChatVideoUpgrade(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconChatVideoUpgrade,
+                        R.attr.gliaIconChatVideoUpgrade
+                )
+        );
+        defaultThemeBuilder.setIconUpgradeVideoDialog(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconUpgradeVideoDialog,
+                        R.attr.gliaIconUpgradeVideoDialog
+                )
+        );
+        defaultThemeBuilder.setIconCallVideoOn(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallVideoOn,
+                        R.attr.gliaIconCallVideoOn
+                )
+        );
+        defaultThemeBuilder.setIconCallAudioOff(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallAudioOff,
+                        R.attr.gliaIconCallAudioOff
+                )
+        );
+        defaultThemeBuilder.setIconCallVideoOff(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallVideoOff,
+                        R.attr.gliaIconCallVideoOff
+                )
+        );
+        defaultThemeBuilder.setIconCallChat(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallChat,
+                        R.attr.gliaIconCallChat
+                )
+        );
+        defaultThemeBuilder.setIconCallSpeakerOn(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallSpeakerOn,
+                        R.attr.gliaIconCallSpeakerOn
+                )
+        );
+        defaultThemeBuilder.setIconCallSpeakerOff(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallSpeakerOff,
+                        R.attr.gliaIconCallSpeakerOff
+                )
+        );
+        defaultThemeBuilder.setIconCallMinimize(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallMinimize,
+                        R.attr.gliaIconCallMinimize
+                )
+        );
+        defaultThemeBuilder.setIconPlaceholder(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconPlaceholder,
+                        R.attr.gliaIconPlaceholder
+                )
+        );
         return defaultThemeBuilder.build();
     }
 
@@ -126,11 +254,16 @@ public class Utils {
         if (typedArray.hasValue(index)) {
             return typedArray.getResourceId(index, 0);
         } else {
-            TypedValue typedValue = new TypedValue();
-            Resources.Theme theme = context.getTheme();
-            theme.resolveAttribute(defaultValue, typedValue, true);
-            return typedValue.resourceId;
+            return getAttrResourceId(context, defaultValue);
         }
+    }
+
+    public static Integer getAttrResourceId(Context context,
+                                            @AttrRes int attrId) {
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = context.getTheme();
+        theme.resolveAttribute(attrId, typedValue, true);
+        return typedValue.resourceId;
     }
 
     public static Activity getActivity(Context context) {

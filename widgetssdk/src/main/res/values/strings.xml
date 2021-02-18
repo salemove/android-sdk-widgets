@@ -26,7 +26,8 @@
     <string name="chat_dialog_overlay_permissions_title">Overlay Permissions Required</string>
     <string name="chat_dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
     <string name="chat_dialog_upgrade_audio_title">%1$s has offered you to upgrade to audio</string>
-    <string name="chat_dialog_upgrade_video_title">%1$s has offered you to upgrade to video</string>
+    <string name="chat_dialog_upgrade_video_2_way_title">%1$s has offered you to upgrade to video</string>
+    <string name="chat_dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
     <string name="chat_dialog_decline">Decline</string>
     <string name="chat_dialog_accept">Accept</string>
 

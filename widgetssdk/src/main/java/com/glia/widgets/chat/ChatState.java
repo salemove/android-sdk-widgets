@@ -16,6 +16,7 @@ public class ChatState {
     public final String queueTicketId;
     public final boolean historyLoaded;
     public final String operatorName;
+    public final String operatorProfileImgUrl;
     public final String companyName;
     public final String queueId;
     public final String contextUrl;
@@ -29,6 +30,7 @@ public class ChatState {
             String queueTicketId,
             boolean historyLoaded,
             String operatorName,
+            String operatorProfileImgUrl,
             String companyName,
             String queueId,
             String contextUrl,
@@ -42,6 +44,7 @@ public class ChatState {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
+        this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.companyName = companyName;
         this.queueId = queueId;
         this.contextUrl = contextUrl;
@@ -70,6 +73,7 @@ public class ChatState {
         private String queueTicketId;
         private boolean historyLoaded;
         private String operatorName;
+        private String operatorProfileImgUrl;
         private String companyName;
         private String queueId;
         private String contextUrl;
@@ -85,6 +89,7 @@ public class ChatState {
             queueTicketId = chatState.queueTicketId;
             historyLoaded = chatState.historyLoaded;
             operatorName = chatState.operatorName;
+            operatorProfileImgUrl = chatState.operatorProfileImgUrl;
             companyName = chatState.companyName;
             queueId = chatState.queueId;
             contextUrl = chatState.contextUrl;
@@ -114,6 +119,11 @@ public class ChatState {
 
         public Builder setOperatorName(String operatorName) {
             this.operatorName = operatorName;
+            return this;
+        }
+
+        public Builder setOperatorProfileImgUrl(String operatorProfileImgUrl) {
+            this.operatorProfileImgUrl = operatorProfileImgUrl;
             return this;
         }
 
@@ -163,7 +173,7 @@ public class ChatState {
         }
 
         public ChatState createChatState() {
-            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems);
+            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems);
         }
     }
 
@@ -177,6 +187,7 @@ public class ChatState {
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
                 .setCompanyName(companyName)
                 .setQueueId(queueId)
                 .setContextUrl(contextUrl)
@@ -199,16 +210,18 @@ public class ChatState {
                 .copyFrom(this)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
                 .setIntegratorChatStarted(true)
                 .createChatState();
     }
 
 
-    public ChatState engagementStarted(String operatorName) {
+    public ChatState engagementStarted(String operatorName, String operatorProfileImgUrl) {
         return new Builder()
                 .copyFrom(this)
                 .setHistoryLoaded(false)
                 .setOperatorName(operatorName)
+                .setOperatorProfileImgUrl(operatorProfileImgUrl)
                 .setIntegratorChatStarted(true)
                 .createChatState();
     }
@@ -219,6 +232,7 @@ public class ChatState {
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
                 .createChatState();
@@ -276,19 +290,21 @@ public class ChatState {
                 isVisible == chatState.isVisible &&
                 useFloatingChatHeads == chatState.useFloatingChatHeads &&
                 historyLoaded == chatState.historyLoaded &&
-                operatorName == chatState.operatorName &&
                 hasOverlayPermissions == chatState.hasOverlayPermissions &&
                 overlaysPermissionDialogShown == chatState.overlaysPermissionDialogShown &&
                 Objects.equals(queueTicketId, chatState.queueTicketId) &&
+                Objects.equals(operatorName, chatState.operatorName) &&
+                Objects.equals(operatorProfileImgUrl, chatState.operatorProfileImgUrl) &&
                 Objects.equals(companyName, chatState.companyName) &&
                 Objects.equals(queueId, chatState.queueId) &&
                 Objects.equals(contextUrl, chatState.contextUrl) &&
+                Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
                 Objects.equals(chatItems, chatState.chatItems);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, companyName, queueId, contextUrl, hasOverlayPermissions, overlaysPermissionDialogShown, chatItems);
+        return Objects.hash(integratorChatStarted, isVisible, useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, hasOverlayPermissions, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems);
     }
 
     @Override
@@ -300,11 +316,13 @@ public class ChatState {
                 ", queueTicketId='" + queueTicketId + '\'' +
                 ", historyLoaded=" + historyLoaded +
                 ", operatorName='" + operatorName + '\'' +
+                ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                 ", companyName='" + companyName + '\'' +
                 ", queueId='" + queueId + '\'' +
                 ", contextUrl='" + contextUrl + '\'' +
                 ", hasOverlayPermissions=" + hasOverlayPermissions +
                 ", overlaysPermissionDialogShown=" + overlaysPermissionDialogShown +
+                ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
                 ", chatItems=" + chatItems +
                 '}';
     }

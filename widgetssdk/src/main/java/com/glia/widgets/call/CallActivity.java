@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -20,7 +21,7 @@ public class CallActivity extends Activity {
 
     private String companyName;
     private String queueId;
-    private UiTheme uiTheme;
+    private UiTheme runtimeTheme;
     private String contextUrl;
     private String lastTypedText;
 
@@ -34,28 +35,28 @@ public class CallActivity extends Activity {
         navigateToChat();
         finish();
     };
-    private CallView.OnBubbleListener onBubbleListener = (String returnDestination) -> {
-        startChatHeadService(returnDestination);
-        if (returnDestination != null) {
-            finish();
-        }
-    };
+    private CallView.OnBubbleListener onBubbleListener =
+            (String operatorProfileImgUrl, String returnDestination) -> {
+                startChatHeadService(operatorProfileImgUrl, returnDestination);
+                if (returnDestination != null) {
+                    finish();
+                }
+            };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GliaWidgets.addActivityToBackStack(GliaWidgets.CALL_ACTIVITY);
         setContentView(R.layout.call_activity);
-
         callView = findViewById(R.id.call_view);
 
         Intent intent = getIntent();
         companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
         queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-        uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+        runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
         lastTypedText = intent.getStringExtra(ChatActivity.LAST_TYPED_TEXT);
-        callView.setTheme(uiTheme);
+        callView.setTheme(runtimeTheme);
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
@@ -110,13 +111,13 @@ public class CallActivity extends Activity {
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
-        newIntent.putExtra(GliaWidgets.UI_THEME, uiTheme);
+        newIntent.putExtra(GliaWidgets.UI_THEME, runtimeTheme);
         newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
         newIntent.putExtra(GliaWidgets.IS_ORIGIN_CALL, true);
         startActivity(newIntent);
     }
 
-    private void startChatHeadService(String returnDestination) {
+    private void startChatHeadService(String operatorProfileImgUrl, String returnDestination) {
         Logger.d(TAG, "startChatHeadService, returnDestination: " + returnDestination);
         Intent newIntent = new Intent(getApplicationContext(), ChatHeadService.class);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
@@ -124,6 +125,7 @@ public class CallActivity extends Activity {
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
         newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
         newIntent.putExtra(GliaWidgets.RETURN_DESTINATION, returnDestination);
+        newIntent.putExtra(GliaWidgets.OPERATOR_PROFILE_IMG_URL, operatorProfileImgUrl);
         getApplicationContext().startService(newIntent);
     }
 }

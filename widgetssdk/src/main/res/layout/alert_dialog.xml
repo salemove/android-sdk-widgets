@@ -48,7 +48,7 @@
         android:layout_marginBottom="@dimen/large_x_large"
         android:background="?attr/selectableItemBackground"
         android:contentDescription="@string/chat_alert_dialog_close_content_description"
-        android:src="@drawable/ic_baseline_close"
+        android:src="?attr/gliaIconLeaveQueue"
         android:tint="?attr/gliaBaseNormalColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"

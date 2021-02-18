@@ -24,8 +24,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.Objects;
 
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
-
 public class AppBarView extends AppBarLayout {
 
     private final MaterialToolbar materialToolbar;
@@ -37,7 +35,7 @@ public class AppBarView extends AppBarLayout {
     }
 
     public AppBarView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, R.attr.gliaChatStyle);
     }
 
     public AppBarView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -49,7 +47,13 @@ public class AppBarView extends AppBarLayout {
         endButton = view.findViewById(R.id.end_button);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AppBarView);
-        String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
+        Integer backIconResId = Utils.getTypedArrayIntegerValue(
+                typedArray,
+                context,
+                R.styleable.AppBarView_backIcon,
+                R.attr.gliaIconAppBarBack);
+        materialToolbar.setNavigationIcon(backIconResId);
+
         ColorStateList backgroundTintList = ContextCompat.getColorStateList(
                 context,
                 Utils.getTypedArrayIntegerValue(typedArray,
@@ -70,7 +74,7 @@ public class AppBarView extends AppBarLayout {
         materialToolbar.setBackgroundTintList(backgroundTintList);
         titleView.setTextColor(lightColor);
         materialToolbar.getNavigationIcon().setTint(lightColor);
-        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.close_button).getIcon(),
+        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
                 ResourcesCompat.getColor(
                         getResources(),
                         Utils.getTypedArrayIntegerValue(typedArray,
@@ -80,17 +84,28 @@ public class AppBarView extends AppBarLayout {
                         this.getContext().getTheme()));
         endButton.setBackgroundTintList(negativeColorStateList);
         endButton.setTextColor(lightColor);
+
+        String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
         if (title != null) {
             titleView.setText(title);
         }
     }
 
+    public void setIcons(UiTheme theme) {
+        materialToolbar.setNavigationIcon(theme.getIconAppBarBack());
+        materialToolbar.getMenu().findItem(R.id.leave_queue_button).setIcon(theme.getIconLeaveQueue());
+    }
+
     public void setTheme(UiTheme theme) {
+        // icons
+        setIcons(theme);
+
+        // colors
         materialToolbar.setBackgroundTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(),
                         theme.getBrandPrimaryColor()));
-        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.close_button).getIcon(),
+        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
                 ResourcesCompat.getColor(
                         getResources(),
                         theme.getBaseLightColor(),
@@ -113,12 +128,9 @@ public class AppBarView extends AppBarLayout {
                 getResources(),
                 theme.getBaseLightColor(),
                 this.getContext().getTheme()));
+        // fonts
         if (theme.getFontRes() != null) {
-            Typeface fontFamily = ResourcesCompat.getFont(
-                    this.getContext(),
-                    theme.getFontRes());
-            titleView.setTypeface(fontFamily);
-            endButton.setTypeface(fontFamily);
+            changeFontFamily(theme.getFontRes());
         }
     }
 
@@ -130,7 +142,7 @@ public class AppBarView extends AppBarLayout {
         endButton.setTypeface(fontFamily);
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         titleView.setText(title);
     }
 
@@ -140,12 +152,12 @@ public class AppBarView extends AppBarLayout {
 
     public void showXButton() {
         endButton.setVisibility(GONE);
-        materialToolbar.getMenu().findItem(R.id.close_button).setVisible(true);
+        materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(true);
     }
 
     public void showEndButton() {
         endButton.setVisibility(VISIBLE);
-        materialToolbar.getMenu().findItem(R.id.close_button).setVisible(false);
+        materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(false);
     }
 
     public void setOnBackClickedListener(OnBackClickedListener onBackClickedListener) {

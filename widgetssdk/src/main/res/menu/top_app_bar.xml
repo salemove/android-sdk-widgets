@@ -2,8 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/close_button"
-        android:icon="@drawable/ic_baseline_close"
+        android:id="@+id/leave_queue_button"
+        android:icon="?attr/gliaIconLeaveQueue"
         android:title="@string/top_app_bar_close"
         app:iconTint="?attr/gliaBaseLightColor"
         app:showAsAction="always" />

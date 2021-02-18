@@ -7,8 +7,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -19,7 +17,9 @@ import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.SimpleColorFilter;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.widgets.R;
+import com.glia.widgets.UiTheme;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.squareup.picasso.Picasso;
 
 public class OperatorStatusView extends ConstraintLayout {
 
@@ -27,6 +27,9 @@ public class OperatorStatusView extends ConstraintLayout {
     private final ShapeableImageView profilePictureView;
     private final ShapeableImageView placeholderView;
     private int primaryColor;
+    private final int connectedImageSize;
+    private final int placeholderBackgroundSize;
+    private final int placeHolderSize;
 
     public OperatorStatusView(@NonNull Context context) {
         this(context, null);
@@ -44,45 +47,61 @@ public class OperatorStatusView extends ConstraintLayout {
         placeholderView = view.findViewById(R.id.placeholder_view);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.OperatorStatusView);
-        int defaultProfilePictureSize =
-                (int) getResources().getDimension(R.dimen.chat_profile_picture_size);
-        int profilePictureSize =
-                typedArray.getDimensionPixelSize(R.styleable.OperatorStatusView_connectedIconSize, defaultProfilePictureSize);
-        profilePictureView.getLayoutParams().width = profilePictureSize;
-        profilePictureView.getLayoutParams().height = profilePictureSize;
+        placeholderBackgroundSize =
+                typedArray.getDimensionPixelSize(
+                        R.styleable.OperatorStatusView_placeholderBackgroundSize,
+                        (int) getResources().getDimension(R.dimen.chat_profile_picture_size)
+                );
+        placeHolderSize = placeholderBackgroundSize / 2;
+        connectedImageSize =
+                typedArray.getDimensionPixelSize(
+                        R.styleable.OperatorStatusView_connectedImageSize,
+                        placeholderBackgroundSize
+                );
         typedArray.recycle();
     }
 
-    public void setTint(@ColorRes int primaryBrandColorRes, @ColorRes int baseLightColorRes) {
-        ColorStateList backgroundColor = ContextCompat.getColorStateList(this.getContext(), baseLightColorRes);
-        primaryColor = ContextCompat.getColor(this.getContext(), primaryBrandColorRes);
+    public void setTheme(UiTheme theme) {
+        // icons
+        placeholderView.setImageResource(theme.getIconPlaceholder());
+
+        // colors
+        ColorStateList backgroundColor = ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor());
+        primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
         pulsationAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
-                frameInfo -> new SimpleColorFilter(this.getContext().getColor(primaryBrandColorRes))
+                frameInfo -> new SimpleColorFilter(this.getContext().getColor(theme.getBrandPrimaryColor()))
         );
         profilePictureView.setBackgroundColor(primaryColor);
         placeholderView.setBackgroundColor(primaryColor);
         placeholderView.setImageTintList(backgroundColor);
     }
 
-    public void setOperatorImage(@DrawableRes int profileDrawableRes, boolean loading) {
-        if (loading) {
+    public void setOperatorImage(String profileImgUrl) {
+        profilePictureView.getLayoutParams().width = connectedImageSize;
+        profilePictureView.getLayoutParams().height = connectedImageSize;
+        Picasso.with(this.getContext()).load(profileImgUrl).into(profilePictureView);
+        placeholderView.setVisibility(GONE);
+    }
+
+    public void showPlaceHolder() {
+        profilePictureView.getLayoutParams().width = placeholderBackgroundSize;
+        profilePictureView.getLayoutParams().height = placeholderBackgroundSize;
+        placeholderView.getLayoutParams().width = placeHolderSize;
+        placeholderView.getLayoutParams().height = placeHolderSize;
+        ColorDrawable cd = new ColorDrawable(primaryColor);
+        profilePictureView.setImageDrawable(cd);
+        placeholderView.setVisibility(VISIBLE);
+    }
+
+    public void isPulsationAnimationShowing(boolean show) {
+        if (show) {
             pulsationAnimation.playAnimation();
             pulsationAnimation.setVisibility(VISIBLE);
         } else {
             pulsationAnimation.cancelAnimation();
             pulsationAnimation.setVisibility(GONE);
         }
-        profilePictureView.setImageDrawable(ContextCompat.getDrawable(this.getContext(), profileDrawableRes));
-        placeholderView.setVisibility(GONE);
-    }
-
-    public void removeOperatorImage() {
-        pulsationAnimation.playAnimation();
-        pulsationAnimation.setVisibility(VISIBLE);
-        ColorDrawable cd = new ColorDrawable(primaryColor);
-        profilePictureView.setImageDrawable(cd);
-        placeholderView.setVisibility(VISIBLE);
     }
 }

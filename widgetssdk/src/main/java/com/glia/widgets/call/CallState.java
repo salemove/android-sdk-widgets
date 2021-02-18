@@ -69,10 +69,18 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState engagementStarted(String operatorName, String formatedTimeValue) {
+    public CallState engagementStarted(
+            String operatorName,
+            String operatorProfileImgUrl,
+            String formatedTimeValue) {
         return new Builder()
                 .copyFrom(this)
-                .setCallStatus(new CallStatus.Ongoing(operatorName, formatedTimeValue))
+                .setCallStatus(
+                        new CallStatus.Ongoing(
+                                operatorName,
+                                formatedTimeValue,
+                                operatorProfileImgUrl)
+                )
                 .createCallState();
     }
 
@@ -97,6 +105,7 @@ class CallState {
                         new CallStatus.StartedVideoCall(
                                 callStatus.getOperatorName(),
                                 callStatus.getTime(),
+                                callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
                                 callStatus instanceof CallStatus.StartedVideoCall ?
                                         ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState() :
@@ -113,6 +122,7 @@ class CallState {
                         new CallStatus.StartedVideoCall(
                                 callStatus.getOperatorName(),
                                 callStatus.getTime(),
+                                callStatus.getOperatorProfileImageUrl(),
                                 callStatus.getOperatorMediaState(),
                                 visitorMediaState)
                 )
@@ -127,6 +137,7 @@ class CallState {
                         new CallStatus.StartedAudioCall(
                                 callStatus.getOperatorName(),
                                 callStatus.getTime(),
+                                callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState)
                 )
                 .setLandscapeLayoutControlsVisible(true)
@@ -141,6 +152,7 @@ class CallState {
                             new CallStatus.StartedAudioCall(
                                     callStatus.getOperatorName(),
                                     formatedTimeValue,
+                                    callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState()
                             )
                     )
@@ -152,6 +164,7 @@ class CallState {
                             new CallStatus.StartedVideoCall(
                                     callStatus.getOperatorName(),
                                     formatedTimeValue,
+                                    callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
                                     ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState()
                             )

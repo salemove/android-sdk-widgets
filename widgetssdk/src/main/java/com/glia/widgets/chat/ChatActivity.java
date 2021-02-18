@@ -21,7 +21,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private String companyName;
     private String queueId;
-    private UiTheme uiTheme;
+    private UiTheme runtimeTheme;
     private String contextUrl;
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
@@ -29,13 +29,19 @@ public class ChatActivity extends AppCompatActivity {
         finish();
     };
     private ChatView.OnEndListener onEndListener = this::finish;
-    private ChatView.OnNavigateToCallListener onNavigateToCallListener = (String lastTypedText) -> {
-        navigateToCall(lastTypedText);
-        chatView.navigateToCallSuccess();
-    };
+    private ChatView.OnNavigateToCallListener onNavigateToCallListener =
+            (String lastTypedText, UiTheme theme) -> {
+                navigateToCall(lastTypedText, theme);
+                chatView.navigateToCallSuccess();
+            };
     private ChatView.OnBubbleListener onBubbleListener = new ChatView.OnBubbleListener() {
         @Override
-        public void call(UiTheme theme, String lastTypedText, String returnDestination) {
+        public void call(
+                UiTheme theme,
+                String lastTypedText,
+                String operatorProfileImgUrl,
+                String returnDestination
+        ) {
             Logger.d(TAG, "startChatHeadService, returnDestination: " + returnDestination);
             Intent newIntent = new Intent(getApplicationContext(), ChatHeadService.class);
             newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
@@ -44,6 +50,7 @@ public class ChatActivity extends AppCompatActivity {
             newIntent.putExtra(GliaWidgets.UI_THEME, theme);
             newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
             newIntent.putExtra(GliaWidgets.RETURN_DESTINATION, returnDestination);
+            newIntent.putExtra(GliaWidgets.OPERATOR_PROFILE_IMG_URL, operatorProfileImgUrl);
             getApplicationContext().startService(newIntent);
         }
     };
@@ -57,14 +64,14 @@ public class ChatActivity extends AppCompatActivity {
         Intent intent = getIntent();
         companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
         queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-        uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+        runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
         boolean isOriginCall = intent.getBooleanExtra(GliaWidgets.IS_ORIGIN_CALL, false);
         String lastTypedText = intent.getStringExtra(LAST_TYPED_TEXT);
 
         chatView = findViewById(R.id.chat_view);
-        if (uiTheme != null) {
-            chatView.setTheme(uiTheme);
+        if (runtimeTheme != null) {
+            chatView.setTheme(runtimeTheme);
         }
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnEndListener(onEndListener);
@@ -108,12 +115,12 @@ public class ChatActivity extends AppCompatActivity {
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void navigateToCall(String lastTypedText) {
+    private void navigateToCall(String lastTypedText, UiTheme theme) {
         Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
-        newIntent.putExtra(GliaWidgets.UI_THEME, uiTheme);
+        newIntent.putExtra(GliaWidgets.UI_THEME, theme);
         newIntent.putExtra(ChatActivity.LAST_TYPED_TEXT, lastTypedText);
         startActivity(newIntent);
     }

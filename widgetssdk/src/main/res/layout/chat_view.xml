@@ -53,7 +53,7 @@
             android:paddingVertical="@dimen/large"
             android:paddingStart="@dimen/medium"
             android:paddingEnd="@dimen/large"
-            android:src="@drawable/ic_baseline_send"
+            android:src="?attr/gliaIconSendMessage"
             android:tint="?attr/gliaBrandPrimaryColor"
             android:visibility="gone" />
 

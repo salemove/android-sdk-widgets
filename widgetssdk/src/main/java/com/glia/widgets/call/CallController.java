@@ -81,7 +81,10 @@ public class CallController {
 
     private void initMinimizeCallback() {
         minimizeCalledListener = () -> {
-            handleFloatingChatheads(GliaWidgets.CALL_ACTIVITY);
+            handleFloatingChatheads(
+                    callState.callStatus.getOperatorProfileImageUrl(),
+                    GliaWidgets.CALL_ACTIVITY
+            );
             onDestroy(true);
         };
     }
@@ -123,8 +126,14 @@ public class CallController {
             @Override
             public void engagementSuccess(OmnicoreEngagement engagement) {
                 Logger.d(TAG, "engagementSuccess");
+                String operatorProfileImgUrl = null;
+                try {
+                    operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
+                } catch (Exception e) {
+                }
                 emitViewState(callState.engagementStarted(
                         engagement.getOperator().getName(),
+                        operatorProfileImgUrl,
                         Utils.toMmSs(0))
                 );
                 createNewTimerStatusCallback();
@@ -154,16 +163,6 @@ public class CallController {
                     if (callState.isCallOngoing()) {
                         emitViewState(callState.audioCallStarted(operatorMediaState));
                     }
-                } else {
-                    operatorMediaState.getAudio();
-                    // for now using this as operator cancelled audio call
-                    Logger.d(TAG, "newOperatorMediaState: audio, video null");
-                    if (callState.hasOverlayPermissions) {
-                        handleFloatingChatheads(null);
-                    }
-                    if (viewCallback != null) {
-                        viewCallback.navigateToChat();
-                    }
                 }
             }
 
@@ -181,11 +180,17 @@ public class CallController {
         mediaUpgradeOfferRepositoryCallback = new MediaUpgradeOfferRepositoryCallback() {
             @Override
             public void newOffer(MediaUpgradeOffer offer) {
-                if (offer.video == MediaDirection.ONE_WAY || offer.video == MediaDirection.TWO_WAY) {
-                    if (offer.video != null) {
-                        Logger.d(TAG, "videoUpgradeRequested");
-                        showUpgradeVideoDialog(offer);
-                    }
+                if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
+                    // audio call
+                    Logger.d(TAG, "audioUpgradeRequested");
+                    showUpgradeAudioDialog(offer);
+                } else if (offer.video == MediaDirection.TWO_WAY) {
+                    // video call
+                    Logger.d(TAG, "2 way videoUpgradeRequested");
+                    showUpgradeVideoDialog2Way(offer);
+                } else if (offer.video == MediaDirection.ONE_WAY) {
+                    Logger.d(TAG, "1 way videoUpgradeRequested");
+                    showUpgradeVideoDialog1Way(offer);
                 }
             }
 
@@ -339,7 +344,10 @@ public class CallController {
         if (!callState.hasOverlayPermissions) {
             emitViewState(callState.changeVisibility(false));
         } else if (callState.hasOverlayPermissions) {
-            handleFloatingChatheads(GliaWidgets.CALL_ACTIVITY);
+            handleFloatingChatheads(
+                    callState.callStatus.getOperatorProfileImageUrl(),
+                    GliaWidgets.CALL_ACTIVITY
+            );
         }
     }
 
@@ -350,10 +358,10 @@ public class CallController {
      *                          or {@link com.glia.widgets.GliaWidgets#CHAT_ACTIVITY}
      *                          hides chat head if anything else.
      */
-    private void handleFloatingChatheads(String returnDestination) {
+    private void handleFloatingChatheads(String operatorProfileImgUrl, String returnDestination) {
         if (viewCallback != null && callState.hasOverlayPermissions) {
             Logger.d(TAG, "handleFloatingChatHeads, returnDestination: " + returnDestination);
-            viewCallback.handleFloatingChatHead(returnDestination);
+            viewCallback.handleFloatingChatHead(operatorProfileImgUrl, returnDestination);
         }
     }
 
@@ -363,10 +371,30 @@ public class CallController {
         }
     }
 
-    private void showUpgradeVideoDialog(MediaUpgradeOffer mediaUpgradeOffer) {
+    private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {
         if (!isDialogShowing() && callState.isCallOngoing()) {
             emitDialogState(new DialogsState.UpgradeDialog(
-                    new DialogOfferType.VideoUpgradeOffer(
+                    new DialogOfferType.AudioUpgradeOffer(
+                            mediaUpgradeOffer,
+                            callState.callStatus.getFormattedOperatorName()
+                    )));
+        }
+    }
+
+    private void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer) {
+        if (!isDialogShowing() && callState.isCallOngoing()) {
+            emitDialogState(new DialogsState.UpgradeDialog(
+                    new DialogOfferType.VideoUpgradeOffer2Way(
+                            mediaUpgradeOffer,
+                            callState.callStatus.getFormattedOperatorName()
+                    )));
+        }
+    }
+
+    private void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer) {
+        if (!isDialogShowing() && callState.isCallOngoing()) {
+            emitDialogState(new DialogsState.UpgradeDialog(
+                    new DialogOfferType.VideoUpgradeOffer1Way(
                             mediaUpgradeOffer,
                             callState.callStatus.getFormattedOperatorName()
                     )));
@@ -383,13 +411,19 @@ public class CallController {
         Logger.d(TAG, "onResume, canDrawOverlays: " + canDrawOverlays);
         emitViewState(callState.drawOverlaysPermissionChanged(canDrawOverlays));
         if (callState.hasOverlayPermissions) {
-            handleFloatingChatheads(null);
+            handleFloatingChatheads(
+                    callState.callStatus.getOperatorProfileImageUrl(),
+                    null
+            );
         }
     }
 
     public void chatButtonClicked() {
         Logger.d(TAG, "chatButtonClicked");
-        handleFloatingChatheads(GliaWidgets.CALL_ACTIVITY);
+        handleFloatingChatheads(
+                callState.callStatus.getOperatorProfileImageUrl(),
+                GliaWidgets.CALL_ACTIVITY
+        );
         viewCallback.navigateToChat();
         emitViewState(callState.changeNumberOfMessages(0));
         onDestroy(true);

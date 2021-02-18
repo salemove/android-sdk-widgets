@@ -16,7 +16,8 @@
     </style>
 
     <style name="ThemeOVerlay.GliaAndroidSDKWidgetsExample.Chat" parent="ThemeOverlay.Glia.Chat">
-        <item name="gliaIconCallMinimize">@drawable/ic_baseline_volume_off</item>
+        <item name="gliaIconAppBarBack">@drawable/ic_baseline_volume_off</item>
+        <item name="gliaIconCallMinimize">@drawable/ic_person</item>
     </style>
 
     <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.MaterialComponents.Button.TextButton.Icon">

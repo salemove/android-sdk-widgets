@@ -38,5 +38,6 @@
     <string name="call_mute_button_label">Mute</string>
     <string name="call_speaker_button_label">Speaker</string>
     <string name="call_minimize_button_label">Minimize</string>
+    <string name="call_connecting_with">Connecting with %1$s</string>
 
 </resources>

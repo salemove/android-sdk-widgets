@@ -70,8 +70,8 @@
     </declare-styleable>
 
     <declare-styleable name="OperatorStatusView">
-        <attr name="connectedImageSize" format="dimension" />
-        <attr name="placeholderBackgroundSize" format="dimension" />
+        <attr name="imageSize" format="dimension" />
+        <attr name="rippleTint" format="reference" />
     </declare-styleable>
 
 </resources>

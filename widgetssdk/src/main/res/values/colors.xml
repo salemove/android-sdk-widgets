@@ -10,4 +10,5 @@
 
     <color name="transparent_black_bg">#B3000000</color>
     <color name="transparent_black_buttons_bg">#66000000</color>
+    <color name="call_ripple_color_white">#FFFFFF</color>
 </resources>

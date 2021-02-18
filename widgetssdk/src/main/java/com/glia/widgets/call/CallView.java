@@ -57,6 +57,7 @@ public class CallView extends ConstraintLayout {
     private OperatorStatusView operatorStatusView;
     private TextView operatorNameView;
     private TextView callTimerView;
+    private TextView connectingView;
     private FrameLayout operatorVideoContainer;
     private VideoView operatorVideoView;
     private MaterialCardView visitorVideoContainer;
@@ -211,16 +212,41 @@ public class CallView extends ConstraintLayout {
             @Override
             public void emitState(CallState callState) {
                 post(() -> {
-                    if (callState.isCallOngoing()) {
+                    if (callState.hasMedia()) {
                         appBar.showEndButton();
+                        if (callState.isAudioCall()) {
+                            appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
+                        } else if (callState.isVideoCall()) {
+                            appBar.setTitle(resources.getString(R.string.call_video_app_bar_title));
+                        }
                     } else {
                         appBar.showXButton();
+                        appBar.setTitle("");
                     }
-                    if (callState.isAudioCall()) {
-                        appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
-                    } else if (callState.isVideoCall()) {
-                        appBar.setTitle(resources.getString(R.string.call_video_app_bar_title));
+                    operatorStatusView.isRippleAnimationShowing(callState.showRippleAnimation());
+                    if (callState.isMediaEngagementStarted()) {
+                        if (callState.hasMedia() &&
+                                callState.callStatus.getOperatorProfileImageUrl() != null) {
+                            operatorStatusView.showProfileImage(
+                                    callState.callStatus.getOperatorProfileImageUrl());
+                        } else if (callState.isCallOngoig() && callState.callStatus.getOperatorProfileImageUrl() != null) {
+                            operatorStatusView.showDefaultSizeProfileImage(callState.callStatus.getOperatorProfileImageUrl());
+                        } else {
+                            operatorStatusView.showDefaultSizePlaceHolder();
+                        }
                     }
+                    if (callState.callStatus.getFormattedOperatorName() != null) {
+                        operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
+                        connectingView.setText(resources.getString(
+                                R.string.call_connecting_with,
+                                callState.callStatus.getFormattedOperatorName()
+                        ));
+                    }
+                    if (callState.callStatus.getTime() != null) {
+                        callTimerView.setText(callState.callStatus.getTime());
+                    }
+                    chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
+
                     if (resources.getConfiguration().orientation == ORIENTATION_LANDSCAPE &&
                             callState.isVideoCall()) {
                         ColorStateList blackTransparentColorStateList =
@@ -232,25 +258,13 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
-                    if (callState.isCallOngoing()) {
-                        operatorStatusView.isPulsationAnimationShowing(false);
-                        if (callState.callStatus.getOperatorProfileImageUrl() != null) {
-                            operatorStatusView.setOperatorImage(
-                                    callState.callStatus.getOperatorProfileImageUrl());
-                        } else {
-                            operatorStatusView.showPlaceHolder();
-                        }
-                        operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
-                        callTimerView.setText(callState.callStatus.getTime());
-                    }
-                    chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
-
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
                     videoButton.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
                     videoButtonLabel.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
-                    operatorStatusView.setVisibility(callState.isAudioCall() ? VISIBLE : GONE);
-                    operatorNameView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
-                    callTimerView.setVisibility(callState.isCallOngoing() ? VISIBLE : GONE);
+                    operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
+                    operatorNameView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
+                    callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
+                    connectingView.setVisibility(callState.hasMedia() ? GONE : VISIBLE);
                     operatorVideoContainer.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
                     visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     handleControlsVisibility(callState);
@@ -368,6 +382,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewAppearance() {
         // icons
         appBar.setIcons(this.theme);
+        operatorStatusView.setPlaceHolderIcon(theme);
         chatButton.setImageResource(this.theme.getIconCallChat());
         videoButton.setImageResource(this.theme.getIconCallVideoOn());
         muteButton.setImageResource(this.theme.getIconCallAudioOn());
@@ -381,6 +396,7 @@ public class CallView extends ConstraintLayout {
                     this.theme.getFontRes());
             operatorNameView.setTypeface(fontFamily);
             callTimerView.setTypeface(fontFamily);
+            connectingView.setTypeface(fontFamily);
             chatButtonLabel.setTypeface(fontFamily);
             videoButtonLabel.setTypeface(fontFamily);
             muteButtonLabel.setTypeface(fontFamily);
@@ -402,6 +418,7 @@ public class CallView extends ConstraintLayout {
         operatorStatusView = findViewById(R.id.operator_status_view);
         operatorNameView = findViewById(R.id.operator_name_view);
         callTimerView = findViewById(R.id.call_timer_view);
+        connectingView = findViewById(R.id.connecting_view);
         operatorVideoContainer = findViewById(R.id.operator_video_container);
         visitorVideoContainer = findViewById(R.id.visitor_video_container);
         chatButtonLabel = findViewById(R.id.chat_button_label);

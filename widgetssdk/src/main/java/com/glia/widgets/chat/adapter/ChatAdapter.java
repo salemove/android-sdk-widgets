@@ -98,7 +98,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 chatStartedCaptionView.setVisibility(View.GONE);
             } else if (item.getStatus() == OperatorStatusItem.Status.OPERATOR_CONNECTED) {
                 if (item.getProfileImgUrl() != null) {
-                    statusPictureView.setOperatorImage(item.getProfileImgUrl());
+                    statusPictureView.showProfileImage(item.getProfileImgUrl());
                 } else {
                     statusPictureView.showPlaceHolder();
                 }
@@ -111,7 +111,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 chatStartedCaptionView.setVisibility(View.VISIBLE);
             }
             statusPictureView
-                    .isPulsationAnimationShowing(item.getStatus() == OperatorStatusItem.Status.IN_QUEUE);
+                    .isRippleAnimationShowing(item.getStatus() == OperatorStatusItem.Status.IN_QUEUE);
         }
     }
 
@@ -154,7 +154,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.uiTheme = uiTheme;
             this.operatorStatusView = itemView.findViewById(R.id.chat_head_view);
             operatorStatusView.setTheme(uiTheme);
-            operatorStatusView.isPulsationAnimationShowing(false);
+            operatorStatusView.isRippleAnimationShowing(false);
         }
 
         public void bind(ReceiveMessageItem item) {
@@ -165,7 +165,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 contentLayout.addView(contentView);
             }
             if (item.getOperatorProfileImgUrl() != null) {
-                operatorStatusView.setOperatorImage(item.getOperatorProfileImgUrl());
+                operatorStatusView.showProfileImage(item.getOperatorProfileImgUrl());
             } else {
                 operatorStatusView.showPlaceHolder();
             }

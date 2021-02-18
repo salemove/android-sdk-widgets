@@ -64,10 +64,24 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/call_operator_status_image_margin_top"
         android:visibility="gone"
-        app:connectedImageSize="@dimen/call_operator_status_image_size"
+        app:imageSize="@dimen/call_operator_status_image_size"
+        app:rippleTint="@color/call_ripple_color_white"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
+
+    <TextView
+        android:id="@+id/connecting_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceHeadline2"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
 
     <TextView
         android:id="@+id/operator_name_view"

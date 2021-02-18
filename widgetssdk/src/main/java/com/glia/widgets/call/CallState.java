@@ -28,8 +28,28 @@ class CallState {
         this.landscapeLayoutControlsVisible = landscapeLayoutControlsVisible;
     }
 
-    public boolean isCallOngoing() {
-        return callStatus instanceof CallStatus.Ongoing || isAudioCall() || isVideoCall();
+    public boolean showOperatorStatusView() {
+        return isCallNotOngoing() || isCallOngoig() || isAudioCall();
+    }
+
+    public boolean showRippleAnimation() {
+        return isCallNotOngoing() || isCallOngoig();
+    }
+
+    public boolean isMediaEngagementStarted() {
+        return isCallOngoig() || hasMedia();
+    }
+
+    public boolean isCallNotOngoing() {
+        return callStatus instanceof CallStatus.NotOngoing;
+    }
+
+    public boolean isCallOngoig() {
+        return callStatus instanceof CallStatus.Ongoing;
+    }
+
+    public boolean hasMedia() {
+        return isAudioCall() || isVideoCall();
     }
 
     public boolean isVideoCall() {
@@ -80,6 +100,19 @@ class CallState {
                                 operatorName,
                                 formatedTimeValue,
                                 operatorProfileImgUrl)
+                )
+                .createCallState();
+    }
+
+    public CallState backToOngoing() {
+        return new Builder()
+                .copyFrom(this)
+                .setCallStatus(
+                        new CallStatus.Ongoing(
+                                callStatus.getOperatorName(),
+                                callStatus.getTime(),
+                                callStatus.getOperatorProfileImageUrl()
+                        )
                 )
                 .createCallState();
     }

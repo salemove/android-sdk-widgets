@@ -23,7 +23,7 @@ import com.squareup.picasso.Picasso;
 
 public class OperatorStatusView extends ConstraintLayout {
 
-    private final LottieAnimationView pulsationAnimation;
+    private final LottieAnimationView rippleAnimation;
     private final ShapeableImageView profilePictureView;
     private final ShapeableImageView placeholderView;
     private int primaryColor;
@@ -42,33 +42,45 @@ public class OperatorStatusView extends ConstraintLayout {
     public OperatorStatusView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         View view = inflate(context, R.layout.operator_status_view, this);
-        pulsationAnimation = view.findViewById(R.id.pulsation_animation);
+        rippleAnimation = view.findViewById(R.id.ripple_animation);
         profilePictureView = view.findViewById(R.id.profile_picture_view);
         placeholderView = view.findViewById(R.id.placeholder_view);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.OperatorStatusView);
+        int rippleAnimationColor = typedArray.getResourceId(R.styleable.OperatorStatusView_rippleTint, 0);
+        if (rippleAnimationColor != 0) {
+            rippleAnimation.addValueCallback(
+                    new KeyPath("**"),
+                    LottieProperty.COLOR_FILTER,
+                    frameInfo -> new SimpleColorFilter(this.getContext().getColor(rippleAnimationColor))
+            );
+        }
         placeholderBackgroundSize =
                 typedArray.getDimensionPixelSize(
-                        R.styleable.OperatorStatusView_placeholderBackgroundSize,
+                        R.styleable.OperatorStatusView_imageSize,
                         (int) getResources().getDimension(R.dimen.chat_profile_picture_size)
                 );
         placeHolderSize = placeholderBackgroundSize / 2;
         connectedImageSize =
                 typedArray.getDimensionPixelSize(
-                        R.styleable.OperatorStatusView_connectedImageSize,
+                        R.styleable.OperatorStatusView_imageSize,
                         placeholderBackgroundSize
                 );
         typedArray.recycle();
     }
 
+    public void setPlaceHolderIcon(UiTheme theme) {
+        placeholderView.setImageResource(theme.getIconPlaceholder());
+    }
+
     public void setTheme(UiTheme theme) {
         // icons
-        placeholderView.setImageResource(theme.getIconPlaceholder());
+        setPlaceHolderIcon(theme);
 
         // colors
         ColorStateList backgroundColor = ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor());
         primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
-        pulsationAnimation.addValueCallback(
+        rippleAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
                 frameInfo -> new SimpleColorFilter(this.getContext().getColor(theme.getBrandPrimaryColor()))
@@ -78,11 +90,10 @@ public class OperatorStatusView extends ConstraintLayout {
         placeholderView.setImageTintList(backgroundColor);
     }
 
-    public void setOperatorImage(String profileImgUrl) {
+    public void showProfileImage(String profileImgUrl) {
         profilePictureView.getLayoutParams().width = connectedImageSize;
         profilePictureView.getLayoutParams().height = connectedImageSize;
-        Picasso.with(this.getContext()).load(profileImgUrl).into(profilePictureView);
-        placeholderView.setVisibility(GONE);
+        showProfilePictureView(profileImgUrl);
     }
 
     public void showPlaceHolder() {
@@ -90,18 +101,43 @@ public class OperatorStatusView extends ConstraintLayout {
         profilePictureView.getLayoutParams().height = placeholderBackgroundSize;
         placeholderView.getLayoutParams().width = placeHolderSize;
         placeholderView.getLayoutParams().height = placeHolderSize;
+        showPlaceHolderView();
+    }
+
+    public void showDefaultSizeProfileImage(String profileImgUrl) {
+        int backgroundSize = (int) getResources().getDimension(R.dimen.chat_profile_picture_size);
+        profilePictureView.getLayoutParams().width = backgroundSize;
+        profilePictureView.getLayoutParams().height = backgroundSize;
+        showProfilePictureView(profileImgUrl);
+    }
+
+    public void showDefaultSizePlaceHolder() {
+        int backgroundSize = (int) getResources().getDimension(R.dimen.chat_profile_picture_size);
+        profilePictureView.getLayoutParams().width = backgroundSize;
+        profilePictureView.getLayoutParams().height = backgroundSize;
+        placeholderView.getLayoutParams().width = backgroundSize / 2;
+        placeholderView.getLayoutParams().height = backgroundSize / 2;
+        showPlaceHolderView();
+    }
+
+    private void showPlaceHolderView() {
         ColorDrawable cd = new ColorDrawable(primaryColor);
         profilePictureView.setImageDrawable(cd);
         placeholderView.setVisibility(VISIBLE);
     }
 
-    public void isPulsationAnimationShowing(boolean show) {
+    private void showProfilePictureView(String profileImgUrl) {
+        Picasso.with(this.getContext()).load(profileImgUrl).into(profilePictureView);
+        placeholderView.setVisibility(GONE);
+    }
+
+    public void isRippleAnimationShowing(boolean show) {
         if (show) {
-            pulsationAnimation.playAnimation();
-            pulsationAnimation.setVisibility(VISIBLE);
+            rippleAnimation.playAnimation();
+            rippleAnimation.setVisibility(VISIBLE);
         } else {
-            pulsationAnimation.cancelAnimation();
-            pulsationAnimation.setVisibility(GONE);
+            rippleAnimation.cancelAnimation();
+            rippleAnimation.setVisibility(GONE);
         }
     }
 }

@@ -22,12 +22,12 @@ public interface CallStatus {
 
         @Override
         public String getOperatorName() {
-            throw new UnsupportedOperationException("Not supposed to happen!");
+            return null;
         }
 
         @Override
         public String getFormattedOperatorName() {
-            throw new UnsupportedOperationException("Not supposed to happen!");
+            return null;
         }
 
         @Override
@@ -37,12 +37,12 @@ public interface CallStatus {
 
         @Override
         public String getTime() {
-            throw new UnsupportedOperationException("Not supposed to happen!");
+            return null;
         }
 
         @Override
         public OperatorMediaState getOperatorMediaState() {
-            throw new UnsupportedOperationException("Not supposed to happen!");
+            return null;
         }
     }
 

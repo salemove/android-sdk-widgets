@@ -24,11 +24,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small"
         android:layout_marginEnd="@dimen/small"
-        app:connectedImageSize="@dimen/receive_message_item_chat_head_size"
+        app:imageSize="@dimen/receive_message_item_chat_head_size"
         app:layout_constraintBottom_toBottomOf="@id/content_layout"
         app:layout_constraintEnd_toStartOf="@id/start_guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:placeholderBackgroundSize="36dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/content_layout"

@@ -154,14 +154,19 @@ public class CallController {
                 Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
                 if (operatorMediaState.getVideo() != null) {
                     Logger.d(TAG, "newOperatorMediaState: video");
-                    if (callState.isCallOngoing()) {
+                    if (callState.isMediaEngagementStarted()) {
                         emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState));
                     }
                     startOperatorVideo(operatorMediaState);
                 } else if (operatorMediaState.getAudio() != null) {
                     Logger.d(TAG, "newOperatorMediaState: audio");
-                    if (callState.isCallOngoing()) {
+                    if (callState.isMediaEngagementStarted()) {
                         emitViewState(callState.audioCallStarted(operatorMediaState));
+                    }
+                } else {
+                    Logger.d(TAG, "newOperatorMediaState: null");
+                    if (callState.isMediaEngagementStarted()) {
+                        emitViewState(callState.backToOngoing());
                     }
                 }
             }
@@ -170,7 +175,7 @@ public class CallController {
             public void newVisitorMediaState(VisitorMediaState visitorMediaState) {
                 if (visitorMediaState.getVideo() != null) {
                     Logger.d(TAG, "newVisitorMediaState: video");
-                    if (callState.isCallOngoing()) {
+                    if (callState.isMediaEngagementStarted()) {
                         emitViewState(callState.videoCallVisitorVideoStarted(visitorMediaState));
                     }
                     startVisitorVideo(visitorMediaState);
@@ -324,7 +329,7 @@ public class CallController {
     }
 
     private void showExitChatDialog() {
-        if (!isDialogShowing() && callState.isCallOngoing()) {
+        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
             emitDialogState(new DialogsState.EndEngagementDialog(
                     callState.callStatus.getFormattedOperatorName()));
         }
@@ -372,7 +377,7 @@ public class CallController {
     }
 
     private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {
-        if (!isDialogShowing() && callState.isCallOngoing()) {
+        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
             emitDialogState(new DialogsState.UpgradeDialog(
                     new DialogOfferType.AudioUpgradeOffer(
                             mediaUpgradeOffer,
@@ -382,7 +387,7 @@ public class CallController {
     }
 
     private void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer) {
-        if (!isDialogShowing() && callState.isCallOngoing()) {
+        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
             emitDialogState(new DialogsState.UpgradeDialog(
                     new DialogOfferType.VideoUpgradeOffer2Way(
                             mediaUpgradeOffer,
@@ -392,7 +397,7 @@ public class CallController {
     }
 
     private void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer) {
-        if (!isDialogShowing() && callState.isCallOngoing()) {
+        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
             emitDialogState(new DialogsState.UpgradeDialog(
                     new DialogOfferType.VideoUpgradeOffer1Way(
                             mediaUpgradeOffer,
@@ -436,7 +441,7 @@ public class CallController {
         callTimerStatusListener = new TimeCounter.FormattedTimerStatusListener() {
             @Override
             public void onNewTimerValue(String formatedValue) {
-                if (callState.isCallOngoing()) {
+                if (callState.hasMedia()) {
                     emitViewState(callState.newTimerValue(formatedValue));
                 }
             }

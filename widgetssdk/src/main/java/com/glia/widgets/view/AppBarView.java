@@ -22,8 +22,6 @@ import com.glia.widgets.helper.Utils;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 
-import java.util.Objects;
-
 public class AppBarView extends AppBarLayout {
 
     private final MaterialToolbar materialToolbar;
@@ -91,14 +89,10 @@ public class AppBarView extends AppBarLayout {
         }
     }
 
-    public void setIcons(UiTheme theme) {
-        materialToolbar.setNavigationIcon(theme.getIconAppBarBack());
-        materialToolbar.getMenu().findItem(R.id.leave_queue_button).setIcon(theme.getIconLeaveQueue());
-    }
-
     public void setTheme(UiTheme theme) {
         // icons
-        setIcons(theme);
+        materialToolbar.setNavigationIcon(theme.getIconAppBarBack());
+        materialToolbar.getMenu().findItem(R.id.leave_queue_button).setIcon(theme.getIconLeaveQueue());
 
         // colors
         materialToolbar.setBackgroundTintList(
@@ -114,12 +108,8 @@ public class AppBarView extends AppBarLayout {
                 getResources(),
                 theme.getBaseLightColor(),
                 this.getContext().getTheme()));
-        DrawableCompat.setTint(
-                Objects.requireNonNull(materialToolbar.getNavigationIcon()),
-                ResourcesCompat.getColor(
-                        getResources(),
-                        theme.getBaseLightColor(),
-                        this.getContext().getTheme()));
+        materialToolbar.getNavigationIcon().setTint(
+                ContextCompat.getColor(this.getContext(), theme.getBaseLightColor()));
         endButton.setBackgroundTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(),

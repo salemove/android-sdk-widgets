@@ -380,8 +380,8 @@ public class CallView extends ConstraintLayout {
     }
 
     private void setupViewAppearance() {
+        setAppBarTheme();
         // icons
-        appBar.setIcons(this.theme);
         operatorStatusView.setPlaceHolderIcon(theme);
         chatButton.setImageResource(this.theme.getIconCallChat());
         videoButton.setImageResource(this.theme.getIconCallVideoOn());
@@ -403,6 +403,16 @@ public class CallView extends ConstraintLayout {
             speakerButtonLabel.setTypeface(fontFamily);
             minimizeButtonLabel.setTypeface(fontFamily);
         }
+    }
+
+    private void setAppBarTheme() {
+        UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
+        builder.setIconAppBarBack(theme.getIconAppBarBack());
+        builder.setIconLeaveQueue(theme.getIconLeaveQueue());
+        builder.setSystemNegativeColor(R.color.glia_system_negative_color);
+        builder.setBaseLightColor(R.color.glia_base_light_color);
+        builder.setBrandPrimaryColor(R.color.transparent_black_bg);
+        appBar.setTheme(builder.build());
     }
 
     private void initConfigurations() {

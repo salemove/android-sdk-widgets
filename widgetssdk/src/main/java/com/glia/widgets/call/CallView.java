@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -27,6 +28,7 @@ import androidx.core.view.ViewCompat;
 import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
+import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.GliaWidgets;
@@ -35,6 +37,8 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
@@ -51,6 +55,9 @@ public class CallView extends ConstraintLayout {
 
     private CallViewCallback callback;
     private CallController controller;
+
+    private ScreenSharingController screenSharingController;
+    private GliaScreenSharingCallback screenSharingCallback;
 
     private AlertDialog alertDialog;
     private AppBarView appBar;
@@ -204,6 +211,7 @@ public class CallView extends ConstraintLayout {
 
     private void destroyController() {
         GliaWidgets.getControllerFactory().destroyCallController(true);
+        GliaWidgets.getControllerFactory().destroyScreenSharingController(true);
         controller = null;
     }
 
@@ -323,9 +331,41 @@ public class CallView extends ConstraintLayout {
                 post(() -> showVisitorVideo(visitorMediaState));
             }
         };
+
+        screenSharingCallback = new GliaScreenSharingCallback() {
+            @Override
+            public void onScreenSharingRequest() {
+                Utils.getActivity(getContext()).runOnUiThread(
+                        () -> showScreenSharingDialog()
+                );
+            }
+
+            @Override
+            public void onScreenSharingRequestError(GliaException exception) {
+                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+            }
+        };
+
         controller = GliaWidgets
                 .getControllerFactory()
                 .getCallController(callback);
+
+        screenSharingController =
+                GliaWidgets
+                        .getControllerFactory()
+                        .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void showScreenSharingDialog() {
+        if (alertDialog == null || !alertDialog.isShowing())
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    R.string.chat_dialog_decline,
+                    R.string.chat_dialog_accept,
+                    view -> screenSharingController.onScreenSharingAccepted(getContext()),
+                    view -> screenSharingController.onScreenSharingDeclined()
+            );
     }
 
     private void handleControlsVisibility(CallState callState) {
@@ -476,6 +516,8 @@ public class CallView extends ConstraintLayout {
                 uiTheme.getIconChatVideoUpgrade() : this.theme.getIconChatVideoUpgrade();
         Integer iconUpgradeVideoDialog = uiTheme.getIconUpgradeVideoDialog() != null ?
                 uiTheme.getIconUpgradeVideoDialog() : this.theme.getIconUpgradeVideoDialog();
+        Integer iconScreenSharingDialog = uiTheme.getIconScreenSharingDialog() != null ?
+                uiTheme.getIconScreenSharingDialog() : this.theme.getIconScreenSharingDialog();
         Integer iconCallVideoOn = uiTheme.getIconCallVideoOn() != null ?
                 uiTheme.getIconCallVideoOn() : this.theme.getIconCallVideoOn();
         Integer iconCallAudioOff = uiTheme.getIconCallAudioOff() != null ?
@@ -504,6 +546,7 @@ public class CallView extends ConstraintLayout {
         builder.setIconCallAudioOn(iconCallAudioOn);
         builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
         builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
+        builder.setIconScreenSharingDialog(iconScreenSharingDialog);
         builder.setIconCallVideoOn(iconCallVideoOn);
         builder.setIconCallAudioOff(iconCallAudioOff);
         builder.setIconCallVideoOff(iconCallVideoOff);

@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -27,6 +28,7 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.glia.androidsdk.GliaException;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -35,6 +37,8 @@ import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.screensharing.ScreenSharingController;
+import com.glia.widgets.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
@@ -50,6 +54,9 @@ public class ChatView extends LinearLayout {
 
     private ChatViewCallback callback;
     private ChatController controller;
+
+    private ScreenSharingController screenSharingController;
+    private GliaScreenSharingCallback screenSharingCallback;
 
     private RecyclerView chatRecyclerView;
     private ImageButton sendButton;
@@ -197,10 +204,43 @@ public class ChatView extends LinearLayout {
                 }
             }
         };
+
+        screenSharingCallback = new GliaScreenSharingCallback() {
+            @Override
+            public void onScreenSharingRequest() {
+                Utils.getActivity(getContext()).runOnUiThread(
+                        () -> showScreenSharingDialog()
+                );
+            }
+
+            @Override
+            public void onScreenSharingRequestError(GliaException exception) {
+                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+            }
+        };
+
         controller = GliaWidgets
                 .getControllerFactory()
                 .getChatController(Utils.getActivity(this.getContext()), callback);
         controller.setOverlayPermissions(Settings.canDrawOverlays(this.getContext()));
+
+        screenSharingController = GliaWidgets
+                .getControllerFactory()
+                .getScreenSharingController(screenSharingCallback);
+
+    }
+
+    private void showScreenSharingDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    R.string.chat_dialog_decline,
+                    R.string.chat_dialog_accept,
+                    view -> screenSharingController.onScreenSharingAccepted(getContext()),
+                    view -> screenSharingController.onScreenSharingDeclined()
+            );
+        }
     }
 
     private void showChat() {
@@ -302,6 +342,8 @@ public class ChatView extends LinearLayout {
                 uiTheme.getIconChatVideoUpgrade() : this.theme.getIconChatVideoUpgrade();
         Integer iconUpgradeVideoDialog = uiTheme.getIconUpgradeVideoDialog() != null ?
                 uiTheme.getIconUpgradeVideoDialog() : this.theme.getIconUpgradeVideoDialog();
+        Integer iconScreenSharingDialog = uiTheme.getIconScreenSharingDialog() != null ?
+                uiTheme.getIconScreenSharingDialog() : this.theme.getIconScreenSharingDialog();
         Integer iconCallVideoOn = uiTheme.getIconCallVideoOn() != null ?
                 uiTheme.getIconCallVideoOn() : this.theme.getIconCallVideoOn();
         Integer iconCallAudioOff = uiTheme.getIconCallAudioOff() != null ?
@@ -337,6 +379,7 @@ public class ChatView extends LinearLayout {
         builder.setIconCallAudioOn(iconCallAudioOn);
         builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
         builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
+        builder.setIconScreenSharingDialog(iconScreenSharingDialog);
         builder.setIconCallVideoOn(iconCallVideoOn);
         builder.setIconCallAudioOff(iconCallAudioOff);
         builder.setIconCallVideoOff(iconCallVideoOff);
@@ -720,6 +763,9 @@ public class ChatView extends LinearLayout {
                     Settings.canDrawOverlays(this.getContext()),
                     GliaWidgets.isInBackstack(GliaWidgets.CALL_ACTIVITY)
             );
+
+            if (screenSharingCallback != null)
+                screenSharingController.setGliaScreenSharingCallback(screenSharingCallback);
         }
     }
 
@@ -751,16 +797,15 @@ public class ChatView extends LinearLayout {
 
     public interface OnNavigateToCallListener {
         /**
-         *
          * @param lastTypedText
-         * @param theme using actual theme assembled in this view because of callActivity being
-         *              translucent.
-         *              The translucent flag can only be set in the manifest, programmatically it can
-         *              not be done. Setting the theme however removes our attr gliaChatStyle from
-         *              the theme attributes available only in the app theme.
-         *              So the only way to get our theme for now is by passing it during navigation.
-         *              Will need to research ways to fix this, but seems highly unlikely there
-         *              is a fix.
+         * @param theme         using actual theme assembled in this view because of callActivity being
+         *                      translucent.
+         *                      The translucent flag can only be set in the manifest, programmatically it can
+         *                      not be done. Setting the theme however removes our attr gliaChatStyle from
+         *                      the theme attributes available only in the app theme.
+         *                      So the only way to get our theme for now is by passing it during navigation.
+         *                      Will need to research ways to fix this, but seems highly unlikely there
+         *                      is a fix.
          */
         void call(String lastTypedText, UiTheme theme);
     }

@@ -1,6 +1,7 @@
 package com.glia.widgets;
 
 import android.app.Application;
+import android.content.Intent;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
@@ -39,11 +40,7 @@ public class GliaWidgets {
                 .build();
 
         Glia.init(gliaConfig);
-        controllerFactory = new ControllerFactory(getRepositoryFactory());
-    }
-
-    private static RepositoryFactory getRepositoryFactory() {
-        return new RepositoryFactory();
+        controllerFactory = new ControllerFactory(new RepositoryFactory());
     }
 
     public static ControllerFactory getControllerFactory() {
@@ -52,6 +49,10 @@ public class GliaWidgets {
 
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Glia.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+    
+    public static void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
     }
 
     /**

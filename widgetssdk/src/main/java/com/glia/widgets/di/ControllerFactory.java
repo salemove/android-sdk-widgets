@@ -7,6 +7,8 @@ import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
+import com.glia.widgets.screensharing.ScreenSharingController;
+import com.glia.widgets.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.model.MinimizeHandler;
@@ -21,6 +23,7 @@ public class ControllerFactory {
 
     private ChatController retainedChatController;
     private CallController retainedCallController;
+    private ScreenSharingController retainedScreenSharingController;
 
     public ControllerFactory(RepositoryFactory repositoryFactory) {
         this.repositoryFactory = repositoryFactory;
@@ -68,8 +71,20 @@ public class ControllerFactory {
         return retainedCallController;
     }
 
+    public ScreenSharingController getScreenSharingController(GliaScreenSharingCallback gliaScreenSharingCallback) {
+        if (retainedScreenSharingController == null) {
+            Logger.d(TAG, "new screen sharing controller");
+            retainedScreenSharingController = new ScreenSharingController(repositoryFactory.getGliaScreenSharingRepository(), gliaScreenSharingCallback);
+        } else {
+            Logger.d(TAG, "retained screen sharing controller");
+            retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+        }
+        return retainedScreenSharingController;
+    }
+
     public void destroyControllers() {
         destroyCallController(false);
+        destroyScreenSharingController(false);
         destroyChatController();
     }
 
@@ -80,6 +95,16 @@ public class ControllerFactory {
         }
         if (!retain) {
             retainedCallController = null;
+        }
+    }
+
+    public void destroyScreenSharingController(boolean retain) {
+        Logger.d(TAG, "destroyScreenSharingController, retain: " + retain);
+        if (retainedScreenSharingController != null) {
+            retainedScreenSharingController.onDestroy(retain);
+        }
+        if (!retain) {
+            retainedScreenSharingController = null;
         }
     }
 

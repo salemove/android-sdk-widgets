@@ -43,6 +43,8 @@ public class UiTheme implements Parcelable {
     private @DrawableRes
     final Integer iconUpgradeVideoDialog;
     private @DrawableRes
+    final Integer iconScreenSharingDialog;
+    private @DrawableRes
     final Integer iconCallVideoOn;
     private @DrawableRes
     final Integer iconCallAudioOff;
@@ -76,6 +78,7 @@ public class UiTheme implements Parcelable {
                     Integer iconCallAudioOn,
                     Integer iconChatVideoUpgrade,
                     Integer iconUpgradeVideoDialog,
+                    Integer iconScreenSharingDialog,
                     Integer iconCallVideoOn,
                     Integer iconCallAudioOff,
                     Integer iconCallVideoOff,
@@ -101,6 +104,7 @@ public class UiTheme implements Parcelable {
         this.iconCallAudioOn = iconCallAudioOn;
         this.iconChatVideoUpgrade = iconChatVideoUpgrade;
         this.iconUpgradeVideoDialog = iconUpgradeVideoDialog;
+        this.iconScreenSharingDialog = iconScreenSharingDialog;
         this.iconCallVideoOn = iconCallVideoOn;
         this.iconCallAudioOff = iconCallAudioOff;
         this.iconCallVideoOff = iconCallVideoOff;
@@ -192,6 +196,11 @@ public class UiTheme implements Parcelable {
             iconUpgradeVideoDialog = null;
         } else {
             iconUpgradeVideoDialog = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            iconScreenSharingDialog = null;
+        } else {
+            iconScreenSharingDialog = in.readInt();
         }
         if (in.readByte() == 0) {
             iconCallVideoOn = null;
@@ -316,6 +325,12 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(iconUpgradeAudioDialog);
         }
+        if (iconScreenSharingDialog == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(iconScreenSharingDialog);
+        }
         if (iconCallAudioOn == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -430,6 +445,8 @@ public class UiTheme implements Parcelable {
         private @DrawableRes
         Integer iconUpgradeAudioDialog;
         private @DrawableRes
+        Integer iconScreenSharingDialog;
+        private @DrawableRes
         Integer iconCallAudioOn;
         private @DrawableRes
         Integer iconChatVideoUpgrade;
@@ -524,6 +541,10 @@ public class UiTheme implements Parcelable {
             this.iconUpgradeVideoDialog = iconUpgradeVideoDialog;
         }
 
+        public void setIconScreenSharingDialog(@DrawableRes Integer iconScreenSharingDialog) {
+            this.iconScreenSharingDialog = iconScreenSharingDialog;
+        }
+
         public void setIconCallVideoOn(@DrawableRes Integer iconCallVideoOn) {
             this.iconCallVideoOn = iconCallVideoOn;
         }
@@ -574,6 +595,7 @@ public class UiTheme implements Parcelable {
             this.iconCallAudioOn = theme.iconCallAudioOn;
             this.iconChatVideoUpgrade = theme.iconChatVideoUpgrade;
             this.iconUpgradeVideoDialog = theme.iconUpgradeVideoDialog;
+            this.iconScreenSharingDialog = theme.iconScreenSharingDialog;
             this.iconCallVideoOn = theme.iconCallVideoOn;
             this.iconCallAudioOff = theme.iconCallAudioOff;
             this.iconCallVideoOff = theme.iconCallVideoOff;
@@ -602,6 +624,7 @@ public class UiTheme implements Parcelable {
                     iconCallAudioOn,
                     iconChatVideoUpgrade,
                     iconUpgradeVideoDialog,
+                    iconScreenSharingDialog,
                     iconCallVideoOn,
                     iconCallAudioOff,
                     iconCallVideoOff,
@@ -679,6 +702,10 @@ public class UiTheme implements Parcelable {
 
     public Integer getIconUpgradeVideoDialog() {
         return iconUpgradeVideoDialog;
+    }
+
+    public Integer getIconScreenSharingDialog() {
+        return iconScreenSharingDialog;
     }
 
     public Integer getIconCallVideoOn() {

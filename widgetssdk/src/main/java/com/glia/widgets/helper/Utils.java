@@ -164,6 +164,14 @@ public class Utils {
                         R.attr.gliaIconUpgradeVideoDialog
                 )
         );
+        defaultThemeBuilder.setIconScreenSharingDialog(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconScreenSharingDialog,
+                        R.attr.gliaIconScreenSharingDialog
+                )
+        );
         defaultThemeBuilder.setIconCallVideoOn(
                 getTypedArrayIntegerValue(
                         typedArray,

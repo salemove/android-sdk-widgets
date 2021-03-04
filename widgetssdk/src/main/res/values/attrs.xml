@@ -19,6 +19,7 @@
         <attr name="iconCallAudioOn" format="reference" />
         <attr name="iconChatVideoUpgrade" format="reference" />
         <attr name="iconUpgradeVideoDialog" format="reference" />
+        <attr name="iconScreenSharingDialog" format="reference" />
         <attr name="iconCallVideoOn" format="reference" />
         <attr name="iconCallAudioOff" format="reference" />
         <attr name="iconCallVideoOff" format="reference" />
@@ -46,6 +47,7 @@
     <attr name="gliaIconCallAudioOn" format="reference" />
     <attr name="gliaIconChatVideoUpgrade" format="reference" />
     <attr name="gliaIconUpgradeVideoDialog" format="reference" />
+    <attr name="gliaIconScreenSharingDialog" format="reference" />
     <attr name="gliaIconCallVideoOn" format="reference" />
     <attr name="gliaIconCallAudioOff" format="reference" />
     <attr name="gliaIconCallVideoOff" format="reference" />

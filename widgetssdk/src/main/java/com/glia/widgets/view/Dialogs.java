@@ -167,7 +167,7 @@ public class Dialogs {
                     context.getString(R.string.chat_dialog_upgrade_video_2_way_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
-        } else if(type instanceof DialogOfferType.VideoUpgradeOffer1Way){
+        } else if (type instanceof DialogOfferType.VideoUpgradeOffer1Way) {
             titleView.setText(
                     context.getString(R.string.chat_dialog_upgrade_video_1_way_title, type.getOperatorName())
             );
@@ -180,6 +180,71 @@ public class Dialogs {
 
         AlertDialog dialog = builder.show();
 
+        dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
+                context, theme.getBaseLightColor()));
+        return dialog;
+    }
+
+    public static AlertDialog showScreenSharingDialog(
+            Context context,
+            UiTheme theme,
+            @StringRes int negativeButtonText,
+            @StringRes int positiveButtonText,
+            View.OnClickListener positiveButtonClickListener,
+            View.OnClickListener negativeButtonClickListener
+    ) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setCancelable(false);
+
+        View customLayout = LayoutInflater.from(context).inflate(R.layout.screensharing_dialog, null, false);
+        ImageView titleIconView = customLayout.findViewById(R.id.title_icon);
+        TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
+        TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
+        MaterialButton negativeButton = customLayout.findViewById(R.id.negative_button);
+        MaterialButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        ImageView logoView = customLayout.findViewById(R.id.logo_view);
+
+        int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
+        int baseLightColor = ContextCompat.getColor(context, theme.getBaseLightColor());
+        ColorStateList primaryBrandColorStateList =
+                ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
+        ColorStateList systemNegativeColorStateList =
+                ContextCompat.getColorStateList(context, theme.getSystemNegativeColor());
+
+        titleIconView.setImageTintList(primaryBrandColorStateList);
+        titleView.setTextColor(baseDarkColor);
+        messageView.setTextColor(baseDarkColor);
+        negativeButton.setTextColor(baseLightColor);
+        positiveButton.setTextColor(baseLightColor);
+        negativeButton.setBackgroundTintList(systemNegativeColorStateList);
+        positiveButton.setBackgroundTintList(primaryBrandColorStateList);
+        logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
+
+        if (theme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(context, theme.getFontRes());
+
+            titleView.setTypeface(fontFamily);
+            messageView.setTypeface(fontFamily);
+            positiveButton.setTypeface(fontFamily);
+            negativeButton.setTypeface(fontFamily);
+        }
+
+        titleView.setText(context.getText(R.string.dialog_screen_sharing_offer_title));
+        messageView.setText(context.getText(R.string.dialog_screen_sharing_offer_message));
+        negativeButton.setText(negativeButtonText);
+        positiveButton.setText(positiveButtonText);
+
+        builder.setView(customLayout);
+
+        AlertDialog dialog = builder.show();
+        negativeButton.setOnClickListener(view -> {
+            dialog.dismiss();
+            negativeButtonClickListener.onClick(view);
+        });
+        positiveButton.setOnClickListener(view -> {
+            dialog.dismiss();
+            positiveButtonClickListener.onClick(view);
+        });
         dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
                 context, theme.getBaseLightColor()));
         return dialog;

@@ -2,6 +2,7 @@ package com.glia.widgets.call;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -56,6 +57,8 @@ public class CallController {
                 .setMessagesNotSeen(0)
                 .setCallStatus(new CallStatus.NotOngoing())
                 .setLandscapeLayoutControlsVisible(false)
+                .setIsMuted(false)
+                .setHasVideo(false)
                 .createCallState();
         this.dialogsState = new DialogsState.NoDialog();
         this.repository = callRepository;
@@ -173,11 +176,10 @@ public class CallController {
 
             @Override
             public void newVisitorMediaState(VisitorMediaState visitorMediaState) {
+                Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState.toString());
+                emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
                 if (visitorMediaState.getVideo() != null) {
                     Logger.d(TAG, "newVisitorMediaState: video");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.videoCallVisitorVideoStarted(visitorMediaState));
-                    }
                     startVisitorVideo(visitorMediaState);
                 }
             }
@@ -480,6 +482,44 @@ public class CallController {
     public void minimizeButtonClicked() {
         Logger.d(TAG, "minimizeButtonClicked");
         minimizeHandler.minimize();
+    }
+
+    public void muteButtonClicked() {
+        Logger.d(TAG, "muteButtonClicked");
+        if (callState.hasMedia()) {
+            VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
+            Logger.d(TAG, "muteButton status:" + currentMediaState.getAudio().getStatus().toString());
+            if (currentMediaState.getAudio().getStatus() == Media.Status.PAUSED) {
+                currentMediaState.getAudio().unmute();
+                if (currentMediaState.getAudio().getStatus() == Media.Status.PLAYING) {
+                    emitViewState(callState.muteStatusChanged(false));
+                }
+            } else if (currentMediaState.getAudio().getStatus() == Media.Status.PLAYING) {
+                currentMediaState.getAudio().mute();
+                if (currentMediaState.getAudio().getStatus() == Media.Status.PAUSED) {
+                    emitViewState(callState.muteStatusChanged(true));
+                }
+            }
+        }
+    }
+
+    public void videoButtonClicked() {
+        Logger.d(TAG, "videoButtonClicked");
+        if (callState.hasMedia()) {
+            VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
+            Logger.d(TAG, "videoButton status:" + currentMediaState.getAudio().getStatus().toString());
+            if (currentMediaState.getVideo().getStatus() == Media.Status.PAUSED) {
+                currentMediaState.getVideo().resume();
+                if (currentMediaState.getVideo().getStatus() == Media.Status.PLAYING) {
+                    emitViewState(callState.hasVideoChanged(true));
+                }
+            } else if (currentMediaState.getVideo().getStatus() == Media.Status.PLAYING) {
+                currentMediaState.getVideo().pause();
+                if (currentMediaState.getVideo().getStatus() == Media.Status.PAUSED) {
+                    emitViewState(callState.hasVideoChanged(false));
+                }
+            }
+        }
     }
 
     private void restartInactivityTimeCounter() {

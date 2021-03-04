@@ -159,6 +159,17 @@ public class CallView extends ConstraintLayout {
                 onEndListener.onEnd();
             }
         });
+        muteButton.setOnClickListener(v -> {
+            if (controller != null) {
+                controller.muteButtonClicked();
+            }
+        });
+
+        videoButton.setOnClickListener(v -> {
+            if (controller != null) {
+                controller.videoButtonClicked();
+            }
+        });
     }
 
     public void startCall() {
@@ -266,9 +277,21 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
+                    muteButton.setEnabled(callState.hasMedia());
+                    videoButton.setEnabled(callState.is2WayVideoCall());
+                    setButtonActivated(videoButton, theme.getIconCallVideoOn(),
+                            theme.getIconCallVideoOff(), callState.hasVideo);
+                    setButtonActivated(muteButton, theme.getIconCallAudioOn(),
+                            theme.getIconCallAudioOff(), callState.isMuted);
+                    muteButtonLabel.setText(callState.isMuted ?
+                            R.string.call_mute_button_unmute :
+                            R.string.call_mute_button_mute
+                    );
+
+
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
-                    videoButton.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
-                    videoButtonLabel.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
+                    videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
+                    videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
                     operatorNameView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
@@ -366,6 +389,24 @@ public class CallView extends ConstraintLayout {
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
+    }
+
+    private void setButtonActivated(FloatingActionButton floatingActionButton,
+                                    Integer activatedDrawableRes,
+                                    Integer notActivatedDrawableRes,
+                                    boolean isActivated
+    ) {
+        floatingActionButton.setActivated(isActivated);
+        floatingActionButton.setImageResource(isActivated ? activatedDrawableRes : notActivatedDrawableRes);
+    }
+
+    private void setButtonActivated(FloatingActionButton floatingActionButton,
+                                    Integer activatedDrawableRes,
+                                    Integer notActivatedDrawableRes,
+                                    boolean isActivated
+    ) {
+        floatingActionButton.setActivated(isActivated);
+        floatingActionButton.setImageResource(isActivated ? activatedDrawableRes : notActivatedDrawableRes);
     }
 
     private void handleControlsVisibility(CallState callState) {

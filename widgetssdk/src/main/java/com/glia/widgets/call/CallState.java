@@ -1,5 +1,6 @@
 package com.glia.widgets.call;
 
+import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 
@@ -13,19 +14,25 @@ class CallState {
     public final boolean hasOverlayPermissions;
     public final CallStatus callStatus;
     public final boolean landscapeLayoutControlsVisible;
+    public final boolean isMuted;
+    public final boolean hasVideo;
 
     private CallState(boolean integratorCallStarted,
                       boolean isVisible,
                       int messagesNotSeen,
                       boolean hasOverlayPermissions,
                       CallStatus callStatus,
-                      boolean landscapeLayoutControlsVisible) {
+                      boolean landscapeLayoutControlsVisible,
+                      boolean isMuted,
+                      boolean hasVideo) {
         this.integratorCallStarted = integratorCallStarted;
         this.isVisible = isVisible;
         this.messagesNotSeen = messagesNotSeen;
         this.hasOverlayPermissions = hasOverlayPermissions;
         this.callStatus = callStatus;
         this.landscapeLayoutControlsVisible = landscapeLayoutControlsVisible;
+        this.isMuted = isMuted;
+        this.hasVideo = hasVideo;
     }
 
     public boolean showOperatorStatusView() {
@@ -148,18 +155,15 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState videoCallVisitorVideoStarted(VisitorMediaState visitorMediaState) {
+    public CallState visitorMediaStateChanged(VisitorMediaState visitorMediaState) {
+        callStatus.setVisitorMediaState(visitorMediaState);
         return new Builder()
                 .copyFrom(this)
-                .setCallStatus(
-                        new CallStatus.StartedVideoCall(
-                                callStatus.getOperatorName(),
-                                callStatus.getTime(),
-                                callStatus.getOperatorProfileImageUrl(),
-                                callStatus.getOperatorMediaState(),
-                                visitorMediaState)
+                .setHasVideo(
+                        visitorMediaState.getVideo() != null &&
+                                visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING
                 )
-                .setLandscapeLayoutControlsVisible(false)
+                .setIsMuted(false)
                 .createCallState();
     }
 
@@ -171,7 +175,8 @@ class CallState {
                                 callStatus.getOperatorName(),
                                 callStatus.getTime(),
                                 callStatus.getOperatorProfileImageUrl(),
-                                operatorMediaState)
+                                operatorMediaState,
+                                callStatus.getVisitorMediaState())
                 )
                 .setLandscapeLayoutControlsVisible(true)
                 .createCallState();
@@ -186,7 +191,8 @@ class CallState {
                                     callStatus.getOperatorName(),
                                     formatedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
-                                    callStatus.getOperatorMediaState()
+                                    callStatus.getOperatorMediaState(),
+                                    callStatus.getVisitorMediaState()
                             )
                     )
                     .createCallState();
@@ -215,6 +221,20 @@ class CallState {
                 .createCallState();
     }
 
+    public CallState muteStatusChanged(boolean isMuted) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsMuted(isMuted)
+                .createCallState();
+    }
+
+    public CallState hasVideoChanged(boolean hasVideo) {
+        return new Builder()
+                .copyFrom(this)
+                .setHasVideo(hasVideo)
+                .createCallState();
+    }
+
     @Override
     public String toString() {
         return "CallState{" +
@@ -224,6 +244,8 @@ class CallState {
                 ", hasOverlayPermissions=" + hasOverlayPermissions +
                 ", callStatus=" + callStatus +
                 ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
+                ", isMuted=" + isMuted +
+                ", hasVideo=" + hasVideo +
                 '}';
     }
 
@@ -237,12 +259,15 @@ class CallState {
                 messagesNotSeen == callState.messagesNotSeen &&
                 hasOverlayPermissions == callState.hasOverlayPermissions &&
                 landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
+                isMuted == callState.isMuted &&
+                hasVideo == callState.hasVideo &&
                 Objects.equals(callStatus, callState.callStatus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen, hasOverlayPermissions, callStatus, landscapeLayoutControlsVisible);
+        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen, hasOverlayPermissions,
+                callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo);
     }
 
     public static class Builder {
@@ -252,6 +277,8 @@ class CallState {
         private boolean hasOverlayPermissions;
         private CallStatus callStatus;
         private boolean landscapeLayoutControlsVisible;
+        private boolean isMuted;
+        private boolean hasVideo;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -283,6 +310,16 @@ class CallState {
             return this;
         }
 
+        public Builder setIsMuted(boolean isMuted) {
+            this.isMuted = isMuted;
+            return this;
+        }
+
+        public Builder setHasVideo(boolean hasVideo) {
+            this.hasVideo = hasVideo;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -290,6 +327,8 @@ class CallState {
             hasOverlayPermissions = callState.hasOverlayPermissions;
             callStatus = callState.callStatus;
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
+            isMuted = callState.isMuted;
+            hasVideo = callState.hasVideo;
             return this;
         }
 
@@ -300,7 +339,9 @@ class CallState {
                     messagesNotSeen,
                     hasOverlayPermissions,
                     callStatus,
-                    landscapeLayoutControlsVisible);
+                    landscapeLayoutControlsVisible,
+                    isMuted,
+                    hasVideo);
         }
     }
 }

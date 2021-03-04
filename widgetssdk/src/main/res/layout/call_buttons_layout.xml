@@ -23,13 +23,13 @@
         android:layout_marginBottom="@dimen/small"
         android:contentDescription="@string/call_chat_content_description"
         android:src="?attr/gliaIconCallChat"
-        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/chat_button_label"
         app:layout_constraintEnd_toStartOf="@id/video_button"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:rippleColor="@color/glia_base_light_color"
-        app:tint="@color/glia_base_light_color" />
+        app:rippleColor="@color/call_fab_ripple_color_states"
+        app:tint="@color/call_fab_icon_color_states" />
 
     <TextView
         android:id="@+id/chat_button_badge"
@@ -61,21 +61,20 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/small"
         android:contentDescription="@string/call_mute_content_description"
-        android:enabled="false"
         android:src="?attr/gliaIconCallVideoOn"
-        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/mute_button_label"
         app:layout_constraintEnd_toStartOf="@id/mute_button"
         app:layout_constraintStart_toEndOf="@id/chat_button"
-        app:rippleColor="@color/glia_base_light_color"
-        app:tint="@color/glia_base_light_color" />
+        app:rippleColor="@color/call_fab_ripple_color_states"
+        app:tint="@color/call_fab_icon_color_states" />
 
     <TextView
         android:id="@+id/mute_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/call_mute_button_label"
+        android:text="@string/call_mute_button_mute"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="@color/glia_base_light_color"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -88,14 +87,13 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/small"
         android:contentDescription="@string/call_mute_content_description"
-        android:enabled="false"
         android:src="?attr/gliaIconCallAudioOn"
-        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/mute_button_label"
         app:layout_constraintEnd_toStartOf="@id/speaker_button"
         app:layout_constraintStart_toEndOf="@id/video_button"
-        app:rippleColor="@color/glia_base_light_color"
-        app:tint="@color/glia_base_light_color" />
+        app:rippleColor="@color/call_fab_ripple_color_states"
+        app:tint="@color/call_fab_icon_color_states" />
 
     <TextView
         android:id="@+id/speaker_button_label"
@@ -117,12 +115,12 @@
         android:contentDescription="@string/call_speaker_content_description"
         android:enabled="false"
         android:src="?attr/gliaIconCallSpeakerOff"
-        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/speaker_button_label"
         app:layout_constraintEnd_toStartOf="@id/minimize_button"
         app:layout_constraintStart_toEndOf="@id/mute_button"
-        app:rippleColor="@color/glia_base_light_color"
-        app:tint="@color/glia_base_light_color" />
+        app:rippleColor="@color/call_fab_ripple_color_states"
+        app:tint="@color/call_fab_icon_color_states" />
 
     <TextView
         android:id="@+id/minimize_button_label"
@@ -143,11 +141,11 @@
         android:layout_marginBottom="@dimen/small"
         android:contentDescription="@string/call_minimize_content_description"
         android:src="?attr/gliaIconCallMinimize"
-        app:backgroundTint="@color/transparent_black_buttons_bg"
+        app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/minimize_button_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/speaker_button"
-        app:rippleColor="@color/glia_base_light_color"
-        app:tint="@color/glia_base_light_color" />
+        app:rippleColor="@color/call_fab_ripple_color_states"
+        app:tint="@color/call_fab_icon_color_states" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

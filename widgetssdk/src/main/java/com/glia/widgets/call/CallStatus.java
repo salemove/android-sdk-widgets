@@ -18,6 +18,10 @@ public interface CallStatus {
 
     OperatorMediaState getOperatorMediaState();
 
+    VisitorMediaState getVisitorMediaState();
+
+    void setVisitorMediaState(VisitorMediaState visitorMediaState);
+
     class NotOngoing implements CallStatus {
 
         @Override
@@ -43,6 +47,15 @@ public interface CallStatus {
         @Override
         public OperatorMediaState getOperatorMediaState() {
             return null;
+        }
+
+        @Override
+        public VisitorMediaState getVisitorMediaState() {
+            return null;
+        }
+
+        @Override
+        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
         }
     }
 
@@ -83,6 +96,16 @@ public interface CallStatus {
         }
 
         @Override
+        public VisitorMediaState getVisitorMediaState() {
+            return null;
+        }
+
+        @Override
+        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -112,17 +135,20 @@ public interface CallStatus {
         private final String time;
         private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
+        private VisitorMediaState visitorMediaState;
 
         public StartedAudioCall(
                 String operatorName,
                 String time,
                 String operatorProfileImgUrl,
-                OperatorMediaState operatorMediaState
+                OperatorMediaState operatorMediaState,
+                VisitorMediaState visitorMediaState
         ) {
             this.operatorName = operatorName;
             this.time = time;
             this.operatorProfileImgUrl = operatorProfileImgUrl;
             this.operatorMediaState = operatorMediaState;
+            this.visitorMediaState = visitorMediaState;
         }
 
         @Override
@@ -151,6 +177,16 @@ public interface CallStatus {
         }
 
         @Override
+        public VisitorMediaState getVisitorMediaState() {
+            return visitorMediaState;
+        }
+
+        @Override
+        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+            this.visitorMediaState = visitorMediaState;
+        }
+
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -158,12 +194,13 @@ public interface CallStatus {
             return Objects.equals(operatorName, that.operatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
-                    Objects.equals(operatorMediaState, that.operatorMediaState);
+                    Objects.equals(operatorMediaState, that.operatorMediaState) &&
+                    Objects.equals(visitorMediaState, that.visitorMediaState);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorProfileImgUrl, operatorMediaState);
+            return Objects.hash(operatorName, time, operatorProfileImgUrl, operatorMediaState, visitorMediaState);
         }
 
         @Override
@@ -173,6 +210,7 @@ public interface CallStatus {
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                     ", operatorMediaState=" + operatorMediaState +
+                    ", visitorMediaState=" + visitorMediaState +
                     '}';
         }
     }
@@ -182,7 +220,7 @@ public interface CallStatus {
         private final String time;
         private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
-        private final VisitorMediaState visitorMediaState;
+        private VisitorMediaState visitorMediaState;
 
         public StartedVideoCall(
                 String operatorName,
@@ -223,8 +261,14 @@ public interface CallStatus {
             return operatorMediaState;
         }
 
+        @Override
         public VisitorMediaState getVisitorMediaState() {
             return visitorMediaState;
+        }
+
+        @Override
+        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+            this.visitorMediaState = visitorMediaState;
         }
 
         @Override

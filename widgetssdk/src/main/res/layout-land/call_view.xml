@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/top_app_bar"
-        app:rippleTint="@color/call_ripple_color_white" />
+        app:rippleTint="@color/glia_base_light_color" />
 
     <TextView
         android:id="@+id/connecting_view"

@@ -65,8 +65,8 @@ class CallState {
 
     public boolean is2WayVideoCall() {
         return callStatus instanceof CallStatus.StartedVideoCall &&
-                ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState() != null &&
-                ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState().getVideo() != null;
+                callStatus.getVisitorMediaState() != null &&
+                callStatus.getVisitorMediaState().getVideo() != null;
     }
 
     public boolean isAudioCall() {

@@ -325,12 +325,6 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(iconUpgradeAudioDialog);
         }
-        if (iconScreenSharingDialog == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconScreenSharingDialog);
-        }
         if (iconCallAudioOn == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -348,6 +342,12 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(iconUpgradeVideoDialog);
+        }
+        if (iconScreenSharingDialog == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(iconScreenSharingDialog);
         }
         if (iconCallVideoOn == null) {
             dest.writeByte((byte) 0);

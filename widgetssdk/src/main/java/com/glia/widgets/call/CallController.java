@@ -486,8 +486,8 @@ public class CallController {
 
     public void muteButtonClicked() {
         Logger.d(TAG, "muteButtonClicked");
-        if (callState.hasMedia()) {
-            VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
+        VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
+        if (currentMediaState != null && currentMediaState.getAudio() != null) {
             Logger.d(TAG, "muteButton status:" + currentMediaState.getAudio().getStatus().toString());
             if (currentMediaState.getAudio().getStatus() == Media.Status.PAUSED) {
                 currentMediaState.getAudio().unmute();

@@ -29,6 +29,7 @@ import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.GliaWidgets;
@@ -277,7 +278,7 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
-                    muteButton.setEnabled(callState.hasMedia());
+                    muteButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
                     videoButton.setEnabled(callState.is2WayVideoCall());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);
@@ -288,7 +289,6 @@ public class CallView extends ConstraintLayout {
                             R.string.call_mute_button_mute
                     );
 
-
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
@@ -296,8 +296,13 @@ public class CallView extends ConstraintLayout {
                     operatorNameView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.hasMedia() ? GONE : VISIBLE);
-                    operatorVideoContainer.setVisibility(callState.isVideoCall() ? VISIBLE : GONE);
-                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
+                    operatorVideoContainer.setVisibility(callState.isVideoCall() &&
+                            callState.callStatus.getOperatorMediaState().getVideo().getStatus() ==
+                                    Media.Status.PLAYING ?
+                            VISIBLE : GONE);
+                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() &&
+                            callState.callStatus.getVisitorMediaState().getVideo().getStatus() ==
+                                    Media.Status.PLAYING ? VISIBLE : GONE);
                     handleControlsVisibility(callState);
                     if (callState.isVisible) {
                         showCall();
@@ -389,15 +394,6 @@ public class CallView extends ConstraintLayout {
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
-    }
-
-    private void setButtonActivated(FloatingActionButton floatingActionButton,
-                                    Integer activatedDrawableRes,
-                                    Integer notActivatedDrawableRes,
-                                    boolean isActivated
-    ) {
-        floatingActionButton.setActivated(isActivated);
-        floatingActionButton.setImageResource(isActivated ? activatedDrawableRes : notActivatedDrawableRes);
     }
 
     private void setButtonActivated(FloatingActionButton floatingActionButton,

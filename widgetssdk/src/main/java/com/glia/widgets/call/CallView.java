@@ -38,7 +38,6 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -58,7 +57,7 @@ public class CallView extends ConstraintLayout {
     private CallController controller;
 
     private ScreenSharingController screenSharingController;
-    private GliaScreenSharingCallback screenSharingCallback;
+    private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private AlertDialog alertDialog;
     private AppBarView appBar;
@@ -351,12 +350,17 @@ public class CallView extends ConstraintLayout {
             }
         };
 
-        screenSharingCallback = new GliaScreenSharingCallback() {
+        screenSharingCallback = new ScreenSharingController.ViewCallback() {
             @Override
-            public void onScreenSharingRequest() {
+            public void onShowScreenSharingRequestDialog() {
                 Utils.getActivity(getContext()).runOnUiThread(
                         () -> showScreenSharingDialog()
                 );
+            }
+
+            @Override
+            public void onShowEndScreenSharingDialog() {
+                showScreenSharingEndDialog();
             }
 
             @Override
@@ -380,11 +384,28 @@ public class CallView extends ConstraintLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    R.string.chat_dialog_decline,
+                    getContext().getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    getContext().getText(R.string.dialog_screen_sharing_offer_message).toString(),
                     R.string.chat_dialog_accept,
+                    R.string.chat_dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
+    }
+
+    private void showScreenSharingEndDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    getContext().getString(R.string.dialog_screen_sharing_end_title),
+                    getContext().getString(R.string.dialog_screen_sharing_end_message),
+                    R.string.chat_dialog_cancel,
+                    R.string.chat_dialog_end_sharing,
+                    view -> alertDialog.dismiss(),
+                    view -> screenSharingController.onEndScreenSharing(getContext())
+            );
+        }
     }
 
     private void setButtonActivated(FloatingActionButton floatingActionButton,

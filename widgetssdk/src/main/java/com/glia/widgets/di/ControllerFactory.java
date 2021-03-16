@@ -11,7 +11,6 @@ import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.screensharing.ScreenSharingController;
 
 public class ControllerFactory {
@@ -80,13 +79,15 @@ public class ControllerFactory {
         return retainedCallController;
     }
 
-    public ScreenSharingController getScreenSharingController(GliaScreenSharingCallback gliaScreenSharingCallback) {
-        if (retainedScreenSharingController == null) {
-            Logger.d(TAG, "new screen sharing controller");
-            retainedScreenSharingController = new ScreenSharingController(repositoryFactory.getGliaScreenSharingRepository(), gliaScreenSharingCallback);
-        } else {
-            Logger.d(TAG, "retained screen sharing controller");
-            retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+    public ScreenSharingController getScreenSharingController(ScreenSharingController.ViewCallback gliaScreenSharingCallback) {
+        if (gliaScreenSharingCallback != null) {
+            if (retainedScreenSharingController == null) {
+                Logger.d(TAG, "new screen sharing controller");
+                retainedScreenSharingController = new ScreenSharingController(repositoryFactory.getGliaScreenSharingRepository(), gliaScreenSharingCallback);
+            } else {
+                Logger.d(TAG, "retained screen sharing controller");
+                retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+            }
         }
         return retainedScreenSharingController;
     }

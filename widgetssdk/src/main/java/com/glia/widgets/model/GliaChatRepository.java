@@ -65,7 +65,7 @@ public class GliaChatRepository {
     public void stop(String queueTicketId) {
         if (queueTicketId != null) {
             Glia.cancelQueueTicket(queueTicketId, e -> {
-                if (e != null) {
+                if (e != null && callback != null) {
                     callback.error(e);
                 }
             });

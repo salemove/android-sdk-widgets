@@ -427,7 +427,7 @@ public class ChatView extends LinearLayout {
                     R.string.dialog_cancel,
                     R.string.dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),
-                    view -> screenSharingController.onEndScreenSharing(getContext())
+                    view -> screenSharingController.onEndScreenSharing()
             );
         }
     }

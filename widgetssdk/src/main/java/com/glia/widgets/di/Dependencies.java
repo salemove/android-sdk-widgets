@@ -7,6 +7,8 @@ import com.glia.widgets.Constants;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.notification.device.INotificationManager;
+import com.glia.widgets.notification.device.NotificationManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ public class Dependencies {
     private final static String TAG = "Dependencies";
     private static ControllerFactory controllerFactory;
     private static final List<String> activitiesInBackstack = new ArrayList<>();
+    private static INotificationManager notificationManager;
 
     public static void onAppCreate(Application application) {
         controllerFactory = new ControllerFactory(new RepositoryFactory());
@@ -31,6 +34,12 @@ public class Dependencies {
                         application.stopService(new Intent(application, ChatHeadService.class));
                     }
                 });
+
+        notificationManager = new NotificationManager(application);
+    }
+
+    public static INotificationManager getNotificationManager() {
+        return notificationManager;
     }
 
     public static void init() {

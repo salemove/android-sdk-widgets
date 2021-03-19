@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -43,6 +44,7 @@ import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.SingleChoiceCardView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.util.List;
@@ -72,6 +74,14 @@ public class ChatView extends LinearLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToCallListener onNavigateToCallListener;
+    private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
+        @Override
+        public void onClicked(String id, SingleChoiceAttachment singleChoiceAttachment) {
+            if (controller != null) {
+                controller.singleChoiceOptionClicked(id, singleChoiceAttachment);
+            }
+        }
+    };
 
     private final Resources resources;
 
@@ -396,7 +406,7 @@ public class ChatView extends LinearLayout {
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme);
+        adapter = new ChatAdapter(this.theme, onOptionClickedListener);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);

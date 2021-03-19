@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.SingleChoiceCardView;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
@@ -50,9 +51,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int RECEIVE_MESSAGE_VIEW_TYPE = 2;
     public static final int MEDIA_UPGRADE_ITEM_TYPE = 3;
     private final UiTheme uiTheme;
+    private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener;
 
-    public ChatAdapter(UiTheme uiTheme) {
+    public ChatAdapter(UiTheme uiTheme, SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener) {
         this.uiTheme = uiTheme;
+        this.onOptionClickedListener = onOptionClickedListener;
     }
 
     private static class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
@@ -157,12 +160,38 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             operatorStatusView.isRippleAnimationShowing(false);
         }
 
-        public void bind(ReceiveMessageItem item) {
+        public void bind(
+                ReceiveMessageItem item,
+                SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener
+        ) {
             contentLayout.removeAllViews();
-            for (String content : item.getMessages()) {
-                TextView contentView = getContentView();
-                contentView.setText(content);
-                contentLayout.addView(contentView);
+            for (ReceiveMessageItemMessage message : item.getMessages()) {
+                if (message.attachments != null) {
+                    SingleChoiceCardView singleChoiceCardView = new SingleChoiceCardView(context);
+                    singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
+                    singleChoiceCardView.setData(
+                            item.getId(),
+                            message.content,
+                            message.attachments,
+                            uiTheme
+                    );
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                    params.setMargins(
+                            0,
+                            Float.valueOf(context.getResources().getDimension(R.dimen.medium))
+                                    .intValue(),
+                            0,
+                            0
+                    );
+                    contentLayout.addView(singleChoiceCardView, params);
+                } else {
+                    TextView contentView = getMessageContentView();
+                    contentView.setText(message.content);
+                    contentLayout.addView(contentView);
+                }
             }
             if (item.getOperatorProfileImgUrl() != null) {
                 operatorStatusView.showProfileImage(item.getOperatorProfileImgUrl());
@@ -171,7 +200,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
         }
 
-        private TextView getContentView() {
+        private TextView getMessageContentView() {
             TextView contentView = (TextView) LayoutInflater.from(context)
                     .inflate(R.layout.chat_receive_message_content, contentLayout, false);
             ColorStateList operatorBgColor =
@@ -278,7 +307,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (chatItem instanceof SendMessageItem) {
             ((SendMessageViewHolder) holder).bind((SendMessageItem) chatItem);
         } else if (chatItem instanceof ReceiveMessageItem) {
-            ((ReceiveMessageViewHolder) holder).bind((ReceiveMessageItem) chatItem);
+            ((ReceiveMessageViewHolder) holder).bind(
+                    (ReceiveMessageItem) chatItem,
+                    onOptionClickedListener
+            );
         } else if (chatItem instanceof MediaUpgradeStartedTimerItem) {
             ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);
         }

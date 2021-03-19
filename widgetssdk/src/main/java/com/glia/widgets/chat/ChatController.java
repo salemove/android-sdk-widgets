@@ -3,6 +3,8 @@ package com.glia.widgets.chat;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.SingleChoiceAttachment;
+import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
@@ -14,6 +16,7 @@ import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItem;
+import com.glia.widgets.chat.adapter.ReceiveMessageItemMessage;
 import com.glia.widgets.chat.adapter.SendMessageItem;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
@@ -28,6 +31,7 @@ import com.glia.widgets.model.MinimizeHandler;
 import com.glia.widgets.view.DialogOfferType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatController {
@@ -221,6 +225,7 @@ public class ChatController {
 
     public boolean isChatVisible() {
         return chatState.isVisible;
+
     }
 
     public void setViewCallback(ChatViewCallback chatViewCallback) {
@@ -326,7 +331,8 @@ public class ChatController {
 
             @Override
             public void messageDelivered(VisitorMessage visitorMessage) {
-                Logger.d(TAG, "messageDelivered: " + visitorMessage.toString());
+                Logger.d(TAG, "messageDelivered: " + visitorMessage.toString() +
+                        ", id: " + visitorMessage.getId());
                 List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
                 changeDeliveredIndex(currentChatItems, visitorMessage);
                 emitChatItems(chatState.changeItems(currentChatItems));
@@ -339,7 +345,22 @@ public class ChatController {
 
             @Override
             public void onMessage(ChatMessage message) {
-                Logger.d(TAG, "onMessage: " + message.getContent());
+                Logger.d(TAG, "onMessage: " + message.getContent() +
+                        ", id: " + message.getId());
+                if (message.getAttachment() != null && message.getAttachment()
+                        instanceof SingleChoiceAttachment) {
+                    SingleChoiceAttachment attachment =
+                            (SingleChoiceAttachment) message.getAttachment();
+                    if (attachment.getOptions() != null) {
+                        for (SingleChoiceOption option : attachment.getOptions()) {
+                            Logger.d(TAG, "onMessage, option text: " + option.getText() +
+                                    ", option value: " + option.getValue());
+                        }
+                    }
+                    if (attachment.getSelectedOption() != null) {
+                        Logger.d(TAG, "selectedOption: " + attachment.getSelectedOption());
+                    }
+                }
                 List<ChatItem> items = new ArrayList<>(chatState.chatItems);
                 appendMessageItem(items, message);
                 emitChatItems(chatState.changeItems(items));
@@ -467,15 +488,13 @@ public class ChatController {
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
-        if (!chatState.isOperatorOnline()) {
-            List<ChatItem> items = new ArrayList<>();
-            emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
-            items.add(OperatorStatusItem.OperatorFoundStatusItem(
-                    chatState.companyName,
-                    chatState.getFormattedOperatorName(),
-                    profileImgUrl));
-            emitChatItems(chatState.changeItems(items));
-        }
+        List<ChatItem> items = new ArrayList<>();
+        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+        items.add(OperatorStatusItem.OperatorFoundStatusItem(
+                chatState.companyName,
+                chatState.getFormattedOperatorName(),
+                profileImgUrl));
+        emitChatItems(chatState.changeItems(items));
     }
 
     private void stop() {
@@ -529,7 +548,7 @@ public class ChatController {
     }
 
     private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
-        List<String> messages;
+        List<ReceiveMessageItemMessage> messages;
         if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
             ReceiveMessageItem lastItemInView = (ReceiveMessageItem) currentChatItems.get(currentChatItems.size() - 1);
             currentChatItems.remove(lastItemInView);
@@ -537,7 +556,13 @@ public class ChatController {
         } else {
             messages = new ArrayList<>();
         }
-        messages.add(message.getContent());
+        messages.add(new ReceiveMessageItemMessage(
+                message.getContent(),
+                message.getAttachment() != null &&
+                        message.getAttachment() instanceof SingleChoiceAttachment ?
+                        Arrays.asList(
+                                ((SingleChoiceAttachment) message.getAttachment()).getOptions()) :
+                        null));
         currentChatItems.add(new ReceiveMessageItem(message.getId(), messages, chatState.operatorProfileImgUrl));
     }
 
@@ -667,5 +692,12 @@ public class ChatController {
                 }
             }
         };
+    }
+
+    public void singleChoiceOptionClicked(String id, SingleChoiceAttachment singleChoiceAttachment) {
+        Logger.d(TAG,
+                "singleChoiceOptionClicked, id: " + id +
+                        ", optionValue: " + singleChoiceAttachment);
+        repository.sendMessage(singleChoiceAttachment);
     }
 }

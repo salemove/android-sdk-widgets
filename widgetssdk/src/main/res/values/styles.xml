@@ -41,6 +41,14 @@
         <item name="android:backgroundTint">?attr/gliaSystemNegativeColor</item>
     </style>
 
+    <style name="Application.Glia.Chat.Button.Neutral" parent="Widget.MaterialComponents.Button">
+        <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
+        </item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:backgroundTint">?attr/systemAgentBubbleColor</item>
+    </style>
+
     <style name="Application.Glia.Header1" parent="TextAppearance.MaterialComponents.Headline1">
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>

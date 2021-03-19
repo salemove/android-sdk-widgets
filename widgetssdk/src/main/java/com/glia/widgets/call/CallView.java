@@ -87,7 +87,6 @@ public class CallView extends ConstraintLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToChatListener onNavigateToChatListener;
-    private OnBubbleListener onBubbleListener;
 
     private UiTheme theme;
 
@@ -131,7 +130,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewActions() {
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
-                controller.onBackArrowClicked();
+                controller.onBackArrowClicked(GliaWidgets.isInBackstack(GliaWidgets.CHAT_ACTIVITY));
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -195,7 +194,6 @@ public class CallView extends ConstraintLayout {
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToChatListener = null;
-        onBubbleListener = null;
         destroyController();
         callback = null;
     }
@@ -332,13 +330,6 @@ public class CallView extends ConstraintLayout {
                     post(() -> showNoMoreOperatorsAvailableDialog());
                 } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
                     post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
-                }
-            }
-
-            @Override
-            public void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination) {
-                if (onBubbleListener != null) {
-                    onBubbleListener.call(operatorProfileImgUrl, returnDestination);
                 }
             }
 
@@ -611,13 +602,9 @@ public class CallView extends ConstraintLayout {
         this.onNavigateToChatListener = onNavigateToChatListener;
     }
 
-    public void setOnBubbleListener(OnBubbleListener onBubbleListener) {
-        this.onBubbleListener = onBubbleListener;
-    }
-
     public void backPressed() {
         if (controller != null) {
-            controller.onBackArrowClicked();
+            controller.onBackArrowClicked(GliaWidgets.isInBackstack(GliaWidgets.CHAT_ACTIVITY));
         }
     }
 
@@ -846,9 +833,5 @@ public class CallView extends ConstraintLayout {
 
     public interface OnNavigateToChatListener {
         void call();
-    }
-
-    public interface OnBubbleListener {
-        void call(String profileImgUrl, String returnDestination);
     }
 }

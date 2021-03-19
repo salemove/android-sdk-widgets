@@ -1,6 +1,7 @@
 package com.glia.widgets.di;
 
 import com.glia.widgets.model.GliaCallRepository;
+import com.glia.widgets.model.GliaChatHeadControllerRepository;
 import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.GliaScreenSharingRepository;
@@ -26,5 +27,9 @@ public class RepositoryFactory {
 
     public GliaScreenSharingRepository getGliaScreenSharingRepository() {
         return new GliaScreenSharingRepository();
+    }
+
+    public GliaChatHeadControllerRepository getGliaChatHeadControllerRepository(){
+        return new GliaChatHeadControllerRepository();
     }
 }

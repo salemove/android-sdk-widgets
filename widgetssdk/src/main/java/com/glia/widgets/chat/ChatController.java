@@ -9,14 +9,17 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItem;
 import com.glia.widgets.chat.adapter.SendMessageItem;
+import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
@@ -41,6 +44,7 @@ public class ChatController {
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final MinimizeHandler minimizeHandler;
+    private final ChatHeadsController chatHeadsController;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
@@ -51,11 +55,11 @@ public class ChatController {
                           MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
                           TimeCounter callTimer,
                           ChatViewCallback viewCallback,
-                          MinimizeHandler minimizeHandler) {
+                          MinimizeHandler minimizeHandler,
+                          ChatHeadsController chatHeadsController) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.chatState = new ChatState.Builder()
-                .setUseFloatingChatHeads(false)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
@@ -64,30 +68,42 @@ public class ChatController {
                 .setContextUrl(null)
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
-                .setHasOverlayPermissions(false)
                 .setOverlaysPermissionDialogShown(false)
                 .setChatItems(new ArrayList<>())
+                .setLastTypedText("")
                 .createChatState();
         this.dialogsState = new DialogsState.NoDialog();
         this.repository = gliaChatRepository;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.callTimer = callTimer;
         this.minimizeHandler = minimizeHandler;
+        this.chatHeadsController = chatHeadsController;
         isNavigationPending = false;
     }
 
     public void initChat(String companyName,
                          String queueId,
                          String contextUrl,
-                         boolean useChatHeads) {
-        Logger.d(TAG, "initChat, useChatHeads: " + useChatHeads);
+                         boolean useOverlays,
+                         boolean isConfigurationChange,
+                         UiTheme uiTheme,
+                         boolean hasOverlayPermissions
+    ) {
+        chatHeadsController.setHasOverlayPermissions(hasOverlayPermissions);
+        if (!isConfigurationChange) {
+            chatHeadsController.onNavigatedToChat(
+                    new ChatHeadInput(
+                            chatState.companyName,
+                            chatState.queueId,
+                            chatState.contextUrl,
+                            uiTheme
+                    ));
+        }
         if (chatState.integratorChatStarted || dialogsState.showingChatEnderDialog()) {
             return;
         }
-        emitViewState(chatState.queueingStarted(useChatHeads, companyName, queueId, contextUrl));
-        if (useChatHeads) {
-            handleFloatingChatheads(null, null);
-        }
+        emitViewState(chatState.queueingStarted(companyName, queueId, contextUrl));
+        chatHeadsController.setUseOverlays(useOverlays);
         initControllerCallback();
         initMediaUpgradeCallback();
         initMinimizeCallback();
@@ -97,9 +113,7 @@ public class ChatController {
     }
 
     private void initMinimizeCallback() {
-        this.minimizeCalledListener = () -> {
-            onDestroy(true);
-        };
+        this.minimizeCalledListener = () -> onDestroy(true);
     }
 
     private synchronized void emitViewState(ChatState state) {
@@ -142,15 +156,18 @@ public class ChatController {
 
     public void sendMessagePreview(String message) {
         Logger.d(TAG, "Send preview: " + message);
+        emitViewState(chatState.chatInputChanged(message));
         repository.sendMessagePreview(message);
     }
 
-    public void sendMessage(String message) {
+    public boolean sendMessage(String message) {
         Logger.d(TAG, "Send MESSAGE: " + message);
-        if (isMessageValid(message)) {
+        boolean valid = isMessageValid(message);
+        if (valid) {
             Logger.d(TAG, "Send MESSAGE valid! : " + message);
             repository.sendMessage(message);
         }
+        return valid;
     }
 
     public void show() {
@@ -162,29 +179,29 @@ public class ChatController {
 
     public void onBackArrowClicked() {
         Logger.d(TAG, "onBackArrowClicked");
-        if (!chatState.useFloatingChatHeads) {
-            emitViewState(chatState.changeVisibility(false));
-        } else if (chatState.hasOverlayPermissions) {
-            handleFloatingChatheads(chatState.operatorProfileImgUrl, GliaWidgets.CHAT_ACTIVITY);
-        }
+        emitViewState(chatState.changeVisibility(false));
+        chatHeadsController.onBackButtonPressed(GliaWidgets.CHAT_ACTIVITY, false, null);
     }
 
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
         dismissDialogs();
+        chatHeadsController.chatEndedByUser();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
         dismissDialogs();
+        chatHeadsController.chatEndedByUser();
     }
 
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
         stop();
         dismissDialogs();
+        chatHeadsController.chatEndedByUser();
     }
 
     public void endEngagementDialogDismissed() {
@@ -212,20 +229,19 @@ public class ChatController {
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
         viewCallback.emitDialog(dialogsState);
+        viewCallback.setLastTypedText(chatState.lastTypedText);
         if (isNavigationPending) {
             viewCallback.navigateToCall();
         }
     }
 
-    public void onResume(boolean hasOverlaysPermission, boolean isCallActivityInBackstack) {
+    public void onResume(boolean hasOverlaysPermission) {
         Logger.d(TAG, "onResume: " + hasOverlaysPermission);
         if (!hasOverlaysPermission && !chatState.overlaysPermissionDialogShown) {
             showOverlayPermissionsDialog();
         }
-        emitViewState(chatState.drawOverlaysPermissionChanged(hasOverlaysPermission));
-        if (!isCallActivityInBackstack && chatState.isMediaUpgradeStarted()) {
-            handleFloatingChatheads(chatState.operatorProfileImgUrl, GliaWidgets.CALL_ACTIVITY);
-        }
+        chatHeadsController.setHasOverlayPermissions(hasOverlaysPermission);
+        emitViewState(chatState.changeVisibility(chatState.integratorChatStarted));
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -249,11 +265,6 @@ public class ChatController {
     public void navigateToCallSuccess() {
         Logger.d(TAG, "navigateToCallSuccess");
         isNavigationPending = false;
-    }
-
-    public void setOverlayPermissions(boolean canDrawOverlays) {
-        Logger.d(TAG, "setOverlayPermissions: " + canDrawOverlays);
-        emitViewState(chatState.drawOverlaysPermissionChanged(canDrawOverlays));
     }
 
     private synchronized boolean setState(ChatState state) {
@@ -293,7 +304,7 @@ public class ChatController {
             public void engagementEndedByOperator() {
                 Logger.d(TAG, "engagementEndedByOperator");
                 stop();
-                emitViewState(chatState.changeVisibility(chatState.useFloatingChatHeads));
+                emitViewState(chatState.changeVisibility(false));
                 if (!isDialogShowing()) {
                     showNoMoreOperatorsAvailableDialog();
                 }
@@ -362,7 +373,7 @@ public class ChatController {
                 Logger.e(TAG, exception.toString());
                 showUnexpectedErrorDialog();
                 emitViewState(chatState.stop());
-                emitViewState(chatState.changeVisibility(chatState.useFloatingChatHeads));
+                emitViewState(chatState.changeVisibility(false));
             }
 
             @Override
@@ -370,7 +381,7 @@ public class ChatController {
                 Logger.e(TAG, throwable.toString());
                 showUnexpectedErrorDialog();
                 emitViewState(chatState.stop());
-                emitViewState(chatState.changeVisibility(chatState.useFloatingChatHeads));
+                emitViewState(chatState.changeVisibility(false));
             }
         };
     }
@@ -590,22 +601,6 @@ public class ChatController {
     private void showUnexpectedErrorDialog() {
         if (!isDialogShowing()) {
             emitDialogState(new DialogsState.UnexpectedErrorDialog());
-        }
-    }
-
-    /**
-     * Method for either showing or hiding the floating chat head.
-     *
-     * @param returnDestination 1 of either {@link com.glia.widgets.GliaWidgets#CALL_ACTIVITY}
-     *                          or {@link com.glia.widgets.GliaWidgets#CHAT_ACTIVITY}
-     *                          hides chat head if anything else.
-     */
-    private void handleFloatingChatheads(String operatorProfileImgUrl, String returnDestination) {
-        Logger.d(TAG, "handleFloatingChatHeads, useFloatingChatHeads: " + chatState.useFloatingChatHeads);
-        if (chatState.hasOverlayPermissions && viewCallback != null && chatState.useFloatingChatHeads) {
-            Logger.d(TAG, "USING handleFloatingChatHeads, operatorProfileImgUrl: "
-                    + operatorProfileImgUrl + "returnDestination: " + returnDestination);
-            viewCallback.handleFloatingChatHead(operatorProfileImgUrl, returnDestination);
         }
     }
 

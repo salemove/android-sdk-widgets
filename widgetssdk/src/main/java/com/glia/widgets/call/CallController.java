@@ -9,6 +9,7 @@ import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -32,6 +33,7 @@ public class CallController {
     private final TimeCounter callTimer;
     private final TimeCounter inactivityTimeCounter;
     private final MinimizeHandler minimizeHandler;
+    private final ChatHeadsController chatHeadsController;
     private final static int MAX_IDLE_TIME = 3200;
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
     private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
@@ -46,14 +48,14 @@ public class CallController {
             TimeCounter callTimer,
             CallViewCallback viewCallback,
             TimeCounter inactivityTimeCounter,
-            MinimizeHandler minimizeHandler
+            MinimizeHandler minimizeHandler,
+            ChatHeadsController chatHeadsController
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.callState = new CallState.Builder()
                 .setIntegratorCallStarted(false)
                 .setVisible(false)
-                .setHasOverlayPermissions(false)
                 .setMessagesNotSeen(0)
                 .setCallStatus(new CallStatus.NotOngoing())
                 .setLandscapeLayoutControlsVisible(false)
@@ -66,10 +68,12 @@ public class CallController {
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.inactivityTimeCounter = inactivityTimeCounter;
         this.minimizeHandler = minimizeHandler;
+        this.chatHeadsController = chatHeadsController;
     }
 
     public void initCall() {
         Logger.d(TAG, "initCall");
+        chatHeadsController.onNavigatedToCall();
         if (callState.integratorCallStarted || dialogsState.showingChatEnderDialog()) {
             return;
         }
@@ -84,10 +88,7 @@ public class CallController {
 
     private void initMinimizeCallback() {
         minimizeCalledListener = () -> {
-            handleFloatingChatheads(
-                    callState.callStatus.getOperatorProfileImageUrl(),
-                    GliaWidgets.CALL_ACTIVITY
-            );
+            chatHeadsController.onMinimizeButtonClicked(callState.messagesNotSeen);
             onDestroy(true);
         };
     }
@@ -300,6 +301,7 @@ public class CallController {
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
         stop();
+        chatHeadsController.chatEndedByUser();
         dismissDialogs();
     }
 
@@ -312,12 +314,14 @@ public class CallController {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
         dismissDialogs();
+        chatHeadsController.chatEndedByUser();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
         dismissDialogs();
+        chatHeadsController.chatEndedByUser();
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -346,30 +350,13 @@ public class CallController {
         showExitQueueDialog();
     }
 
-    public void onBackArrowClicked() {
+    public void onBackArrowClicked(boolean isChatInBackstack) {
         Logger.d(TAG, "onBackArrowClicked");
-        if (!callState.hasOverlayPermissions) {
-            emitViewState(callState.changeVisibility(false));
-        } else if (callState.hasOverlayPermissions) {
-            handleFloatingChatheads(
-                    callState.callStatus.getOperatorProfileImageUrl(),
-                    GliaWidgets.CALL_ACTIVITY
-            );
-        }
-    }
-
-    /**
-     * Method for either showing or hiding the floating chat head.
-     *
-     * @param returnDestination 1 of either {@link com.glia.widgets.GliaWidgets#CALL_ACTIVITY}
-     *                          or {@link com.glia.widgets.GliaWidgets#CHAT_ACTIVITY}
-     *                          hides chat head if anything else.
-     */
-    private void handleFloatingChatheads(String operatorProfileImgUrl, String returnDestination) {
-        if (viewCallback != null && callState.hasOverlayPermissions) {
-            Logger.d(TAG, "handleFloatingChatHeads, returnDestination: " + returnDestination);
-            viewCallback.handleFloatingChatHead(operatorProfileImgUrl, returnDestination);
-        }
+        chatHeadsController.onBackButtonPressed(
+                GliaWidgets.CALL_ACTIVITY,
+                isChatInBackstack,
+                callState.messagesNotSeen
+        );
     }
 
     private void showExitQueueDialog() {
@@ -416,24 +403,17 @@ public class CallController {
 
     public void onResume(boolean canDrawOverlays) {
         Logger.d(TAG, "onResume, canDrawOverlays: " + canDrawOverlays);
-        emitViewState(callState.drawOverlaysPermissionChanged(canDrawOverlays));
-        if (callState.hasOverlayPermissions) {
-            handleFloatingChatheads(
-                    callState.callStatus.getOperatorProfileImageUrl(),
-                    null
-            );
-        }
+        chatHeadsController.setHasOverlayPermissions(canDrawOverlays);
     }
 
     public void chatButtonClicked() {
         Logger.d(TAG, "chatButtonClicked");
-        handleFloatingChatheads(
-                callState.callStatus.getOperatorProfileImageUrl(),
-                GliaWidgets.CALL_ACTIVITY
-        );
-        viewCallback.navigateToChat();
+        if (viewCallback != null) {
+            viewCallback.navigateToChat();
+        }
         emitViewState(callState.changeNumberOfMessages(0));
         onDestroy(true);
+        chatHeadsController.onChatButtonClicked();
     }
 
     private void createNewTimerStatusCallback() {

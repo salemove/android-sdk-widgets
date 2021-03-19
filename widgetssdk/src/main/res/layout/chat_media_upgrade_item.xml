@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/chat_receive_margin_start"
         android:layout_marginEnd="@dimen/chat_receive_message_end"
+        app:cardBackgroundColor="?attr/gliaBaseLightColor"
         app:cardCornerRadius="@dimen/medium"
         app:strokeColor="?attr/gliaBaseShadeColor"
         app:strokeWidth="@dimen/px">
@@ -38,8 +39,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/large"
-                android:contentDescription="@string/chat_upgrade_success_timer_microphone_content_description"
-                android:src="@drawable/ic_baseline_mic"
+                android:contentDescription="@string/chat_media_upgrade_item_mic_content_description"
+                android:src="?attr/gliaIconChatAudioUpgrade"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
                 app:layout_constraintTop_toTopOf="parent"

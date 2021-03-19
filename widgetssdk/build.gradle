@@ -40,12 +40,13 @@ ext {
     appCompatVersion = '1.2.0'
     materialVersion = '1.2.1'
     constraintLayoutVersion = '2.0.4'
-    gliaSdkVersion = '0.13.2'
+    gliaSdkVersion = '0.15.0'
     junitVersion = '4.13.1'
     androidXTestVersion = '1.1.2'
     espresso = '3.3.0'
     lottieVersion = '3.5.0'
     leakCanaryVersion = '2.6'
+    picassoVersion = '2.5.2'
 }
 
 dependencies {
@@ -57,7 +58,8 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
     implementation "com.airbnb.android:lottie:$lottieVersion"
+    implementation "com.squareup.picasso:picasso:$picassoVersion"
     // removed because becomes slow on Android 11. They say it is fixed, but I still have the issue.
     // https://square.github.io/leakcanary/changelog/
-    // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+//    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 }

@@ -1,9 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="Application.Glia.Header1" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:textFontWeight">700</item>
+    </style>
+
+    <style name="Application.Glia.Header2" parent="TextAppearance.MaterialComponents.Headline2">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+
     <style name="Application.Glia.Header3" parent="TextAppearance.MaterialComponents.Headline3">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
         <item name="android:textFontWeight">500</item>
     </style>
+
+    <style name="Application.Glia.Body" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+
+    <style name="Application.Glia.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+
+    <style name="Application.Glia.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/gliaBaseNormalColor</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
+
 </resources>

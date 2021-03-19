@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ChatView">
+    <declare-styleable name="GliaView">
         <attr name="appBarTitle" format="string" />
         <attr name="brandPrimaryColor" format="reference" />
         <attr name="baseDarkColor" format="reference" />
@@ -11,6 +11,23 @@
         <attr name="systemAgentBubbleColor" format="reference" />
         <attr name="systemNegativeColor" format="reference" />
         <attr name="android:fontFamily" format="reference" />
+        <attr name="iconAppBarBack" format="reference" />
+        <attr name="iconLeaveQueue" format="reference" />
+        <attr name="iconSendMessage" format="reference" />
+        <attr name="iconChatAudioUpgrade" format="reference" />
+        <attr name="iconUpgradeAudioDialog" format="reference" />
+        <attr name="iconCallAudioOn" format="reference" />
+        <attr name="iconChatVideoUpgrade" format="reference" />
+        <attr name="iconUpgradeVideoDialog" format="reference" />
+        <attr name="iconScreenSharingDialog" format="reference" />
+        <attr name="iconCallVideoOn" format="reference" />
+        <attr name="iconCallAudioOff" format="reference" />
+        <attr name="iconCallVideoOff" format="reference" />
+        <attr name="iconCallChat" format="reference" />
+        <attr name="iconCallSpeakerOn" format="reference" />
+        <attr name="iconCallSpeakerOff" format="reference" />
+        <attr name="iconCallMinimize" format="reference" />
+        <attr name="iconPlaceholder" format="reference" />
     </declare-styleable>
 
     <attr name="gliaChatStyle" format="reference" />
@@ -22,11 +39,41 @@
     <attr name="gliaBaseShadeColor" format="reference" />
     <attr name="gliaSystemAgentBubbleColor" format="reference" />
     <attr name="gliaSystemNegativeColor" format="reference" />
+    <attr name="gliaIconAppBarBack" format="reference" />
+    <attr name="gliaIconLeaveQueue" format="reference" />
+    <attr name="gliaIconSendMessage" format="reference" />
+    <attr name="gliaIconChatAudioUpgrade" format="reference" />
+    <attr name="gliaIconUpgradeAudioDialog" format="reference" />
+    <attr name="gliaIconCallAudioOn" format="reference" />
+    <attr name="gliaIconChatVideoUpgrade" format="reference" />
+    <attr name="gliaIconUpgradeVideoDialog" format="reference" />
+    <attr name="gliaIconScreenSharingDialog" format="reference" />
+    <attr name="gliaIconCallVideoOn" format="reference" />
+    <attr name="gliaIconCallAudioOff" format="reference" />
+    <attr name="gliaIconCallVideoOff" format="reference" />
+    <attr name="gliaIconCallChat" format="reference" />
+    <attr name="gliaIconCallSpeakerOn" format="reference" />
+    <attr name="gliaIconCallSpeakerOff" format="reference" />
+    <attr name="gliaIconCallMinimize" format="reference" />
+    <attr name="gliaIconPlaceholder" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />
         <attr name="title" format="string" />
         <attr name="caption" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="AppBarView">
+        <attr name="titleText" format="string" />
+        <attr name="android:backgroundTint" format="reference" />
+        <attr name="lightTint" format="reference" />
+        <attr name="negativeTint" format="reference" />
+        <attr name="backIcon" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="OperatorStatusView">
+        <attr name="imageSize" format="dimension" />
+        <attr name="rippleTint" format="reference" />
     </declare-styleable>
 
 </resources>

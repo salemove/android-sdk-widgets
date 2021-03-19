@@ -71,6 +71,7 @@ public class OutlinedOptionView extends FrameLayout {
 
     public void setTheme(UiTheme theme) {
         cardView.setStrokeColor(ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor()));
+        cardView.setBackgroundTintList(ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor()));
         iconView.setImageTintList(ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor()));
         titleView.setTextColor(ContextCompat.getColor(this.getContext(), theme.getBaseDarkColor()));
         captionView.setTextColor(ContextCompat.getColor(this.getContext(), theme.getBaseDarkColor()));

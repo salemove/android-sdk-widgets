@@ -7,12 +7,14 @@ public class OperatorStatusItem extends ChatItem {
     private final String companyName;
     private final Status status;
     private final String operatorName;
+    private final String profileImgUrl;
 
-    public OperatorStatusItem(Status status, String companyName, String operatorName) {
+    public OperatorStatusItem(Status status, String companyName, String operatorName, String profileImgUrl) {
         super(ID, ChatAdapter.OPERATOR_STATUS_VIEW_TYPE);
         this.companyName = companyName;
         this.status = status;
         this.operatorName = operatorName;
+        this.profileImgUrl = profileImgUrl;
     }
 
     public String getCompanyName() {
@@ -27,16 +29,20 @@ public class OperatorStatusItem extends ChatItem {
         return operatorName;
     }
 
+    public String getProfileImgUrl() {
+        return profileImgUrl;
+    }
+
     public enum Status {
         IN_QUEUE, OPERATOR_CONNECTED
     }
 
     public static OperatorStatusItem QueueingStatusItem(String companyName) {
-        return new OperatorStatusItem(OperatorStatusItem.Status.IN_QUEUE, companyName, null);
+        return new OperatorStatusItem(OperatorStatusItem.Status.IN_QUEUE, companyName, null, null);
     }
 
-    public static OperatorStatusItem OperatorFoundStatusItem(String companyName, String operatorName) {
-        return new OperatorStatusItem(Status.OPERATOR_CONNECTED, companyName, operatorName);
+    public static OperatorStatusItem OperatorFoundStatusItem(String companyName, String operatorName, String profileImgUrl) {
+        return new OperatorStatusItem(Status.OPERATOR_CONNECTED, companyName, operatorName, profileImgUrl);
     }
 
     @Override
@@ -45,6 +51,7 @@ public class OperatorStatusItem extends ChatItem {
                 "companyName='" + companyName + '\'' +
                 ", status=" + status +
                 ", operatorName='" + operatorName + '\'' +
+                ", profileImgUrl='" + profileImgUrl + '\'' +
                 '}';
     }
 
@@ -56,11 +63,12 @@ public class OperatorStatusItem extends ChatItem {
         OperatorStatusItem that = (OperatorStatusItem) o;
         return Objects.equals(companyName, that.companyName) &&
                 status == that.status &&
-                Objects.equals(operatorName, that.operatorName);
+                Objects.equals(operatorName, that.operatorName) &&
+                Objects.equals(profileImgUrl, that.profileImgUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), companyName, status, operatorName);
+        return Objects.hash(super.hashCode(), companyName, status, operatorName, profileImgUrl);
     }
 }

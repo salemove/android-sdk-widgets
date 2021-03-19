@@ -6,24 +6,19 @@
         <item name="android:backgroundTint">@android:color/transparent</item>
     </style>
 
-    <style name="Application.Glia.Chat.Toolbar" parent="">
-        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
-        <item name="android:textColor">?attr/gliaBaseLightColor</item>
-    </style>
-
     <style name="Application.Glia.Chat.CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
     <style name="MaterialAlertDialog.App" parent="MaterialAlertDialog.MaterialComponents">
-        <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.MediumComponent
+        <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.Dialog
         </item>
     </style>
 
-    <style name="Application.Glia.Chat.ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+    <style name="Application.Glia.Chat.ShapeAppearance.Dialog" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/medium</item>
+        <item name="cornerSize">@dimen/x_large</item>
     </style>
 
     <style name="Application.Glia.Chat.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
@@ -34,18 +29,16 @@
     <style name="Application.Glia.Chat.Button" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
         </item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle2</item>
+        <item name="android:textColor">?attr/gliaBaseLightColor</item>
+    </style>
+
+    <style name="Application.Glia.Chat.Button.Positive" parent="Application.Glia.Chat.Button">
+        <item name="android:backgroundTint">?attr/gliaBrandPrimaryColor</item>
     </style>
 
     <style name="Application.Glia.Chat.Button.Negative" parent="Application.Glia.Chat.Button">
-        <item name="backgroundTint">?attr/gliaSystemNegativeColor</item>
-    </style>
-
-    <style name="Application.Glia.Chat.Button.Extended" parent="Application.Glia.Chat.Button">
-        <item name="android:layout_weight">1</item>
-    </style>
-
-    <style name="Application.Glia.Chat.Button.Extended.Negative" parent="Application.Glia.Chat.Button.Extended">
-        <item name="backgroundTint">?attr/gliaSystemNegativeColor</item>
+        <item name="android:backgroundTint">?attr/gliaSystemNegativeColor</item>
     </style>
 
     <style name="Application.Glia.Header1" parent="TextAppearance.MaterialComponents.Headline1">
@@ -62,7 +55,7 @@
     <style name="Application.Glia.Header3" parent="TextAppearance.MaterialComponents.Headline3">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
-<!--        font weight available from api 28 :(-->
+        <!--        font weight available from api 28 :(-->
     </style>
 
     <style name="Application.Glia.Body" parent="TextAppearance.MaterialComponents.Body1">
@@ -77,15 +70,12 @@
 
     <style name="Application.Glia.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/gliaBaseNormalColor</item>
     </style>
 
     <style name="Application.Glia.Header2.Dialog" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
         <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="Application.Glia.Body.Dialog" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
-        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
     </style>
 
 </resources>

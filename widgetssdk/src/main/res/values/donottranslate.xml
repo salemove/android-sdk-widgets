@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="outlined_options_icon_description">Outlined options icon description</string>
+
+    <string name="outlined_options_icon_content_description">Outlined options icon description</string>
+    <string name="chat_send_content_description">Send message button content description</string>
+    <string name="chat_media_upgrade_item_mic_content_description">Timer microphone </string>
+    <string name="chat_alert_dialog_close_content_description">Close button content description</string>
+    <string name="chat_glia_logo_content_description">Glia logo content description</string>
+    <string name="chat_audio_icon_content_description">Audio icon content description</string>
+
+    <string name="screensharing_dialog_icon_content_description">Screen sharing icon content description</string>
+
+    <string name="call_minimize_content_description">Call minimize content description</string>
+    <string name="call_speaker_content_description">Call speaker content description</string>
+    <string name="call_mute_content_description">Call mute content description</string>
+    <string name="call_chat_content_description">Call chat content description</string>
+
 </resources>

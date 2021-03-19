@@ -11,7 +11,30 @@
         <item name="android:fontFamily">?attr/fontFamily</item>
         <item name="appBarTitle">@string/chat_title</item>
         <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
+        <item name="iconAppBarBack">?attr/gliaIconAppBarBack</item>
+        <item name="iconLeaveQueue">?attr/gliaIconLeaveQueue</item>
+        <item name="iconSendMessage">?attr/gliaIconSendMessage</item>
+        <item name="iconChatAudioUpgrade">?attr/gliaIconChatAudioUpgrade</item>
+        <item name="iconUpgradeAudioDialog">?attr/gliaIconUpgradeAudioDialog</item>
+        <item name="iconCallAudioOn">?attr/gliaIconCallAudioOn</item>
+        <item name="iconChatVideoUpgrade">?attr/gliaIconChatVideoUpgrade</item>
+        <item name="iconUpgradeVideoDialog">?attr/gliaIconUpgradeVideoDialog</item>
+        <item name="iconCallVideoOn">?attr/gliaIconCallVideoOn</item>
+        <item name="iconCallAudioOff">?attr/gliaIconCallAudioOff</item>
+        <item name="iconCallVideoOff">?attr/gliaIconCallVideoOff</item>
+        <item name="iconCallChat">?attr/gliaIconCallChat</item>
+        <item name="iconCallSpeakerOn">?attr/gliaIconCallSpeakerOn</item>
+        <item name="iconCallSpeakerOff">?attr/gliaIconCallSpeakerOff</item>
+        <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
+        <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
+
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
+    </style>
+
+    <style name="Application.Glia.Call.Activity" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat" parent="">
@@ -22,9 +45,28 @@
         <item name="gliaBaseShadeColor">@color/glia_base_shade_color</item>
         <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
         <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
+        <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
+        <item name="gliaIconLeaveQueue">@drawable/ic_baseline_close</item>
+        <item name="gliaIconSendMessage">@drawable/ic_baseline_send</item>
+        <item name="gliaIconChatAudioUpgrade">@drawable/ic_baseline_mic</item>
+        <item name="gliaIconUpgradeAudioDialog">@drawable/ic_baseline_mic</item>
+        <item name="gliaIconCallAudioOn">@drawable/ic_baseline_mic</item>
+        <item name="gliaIconChatVideoUpgrade">@drawable/ic_baseline_videocam</item>
+        <item name="gliaIconUpgradeVideoDialog">@drawable/ic_baseline_videocam</item>
+        <item name="gliaIconCallVideoOn">@drawable/ic_baseline_videocam</item>
+        <item name="gliaIconCallAudioOff">@drawable/ic_baseline_mic_off</item>
+        <item name="gliaIconCallVideoOff">@drawable/ic_baseline_videocam_off</item>
+        <item name="gliaIconCallChat">@drawable/ic_chat_cloud</item>
+        <item name="gliaIconCallSpeakerOn">@drawable/ic_baseline_volume_up</item>
+        <item name="gliaIconCallSpeakerOff">@drawable/ic_baseline_volume_off</item>
+        <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
+        <item name="gliaIconPlaceholder">@drawable/ic_person</item>
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
+        </item>
+        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Positive
         </item>
         <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
         <item name="textAppearanceHeadline2">@style/Application.Glia.Header2</item>
@@ -36,16 +78,7 @@
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/Application.Glia.Header2.Dialog</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/Application.Glia.Body.Dialog</item>
-        <item name="backgroundTint">?attr/gliaBaseLightColor</item>
-
-        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Extended
-        </item>
-        <item name="buttonBarNeutralButtonStyle">
-            @style/Application.Glia.Chat.Button.Extended.Negative
-        </item>
-        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button</item>
+        <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
     </style>
 
 </resources>

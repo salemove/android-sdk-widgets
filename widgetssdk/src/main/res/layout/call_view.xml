@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.glia.widgets.view.AppBarView
+        android:id="@+id/top_app_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transparent_black_bg"
+        android:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lightTint="@color/glia_base_light_color"
+        app:negativeTint="@color/glia_system_negative_color"
+        app:titleText="@string/call_audio_app_bar_title" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/start_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/large" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="@dimen/call_bottom_margin" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/end_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/large" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/visitor_video_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/large"
+        android:visibility="gone"
+        app:cardCornerRadius="@dimen/medium"
+        app:layout_constraintBottom_toTopOf="@id/operator_video_container"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toEndOf="@id/operator_data_barrier"
+        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/operator_data_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="operator_name_view,call_timer_view" />
+
+    <com.glia.widgets.view.OperatorStatusView
+        android:id="@+id/operator_status_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/call_operator_status_image_margin_top"
+        android:visibility="gone"
+        app:imageSize="@dimen/call_operator_status_image_size"
+        app:rippleTint="@color/glia_base_light_color"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
+
+    <TextView
+        android:id="@+id/connecting_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceHeadline2"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
+
+    <TextView
+        android:id="@+id/operator_name_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceHeadline1"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/operator_status_view"
+        app:layout_goneMarginTop="@dimen/call_operator_name_gone_margin_top" />
+
+    <TextView
+        android:id="@+id/call_timer_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/medium"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/operator_name_view" />
+
+    <FrameLayout
+        android:id="@+id/operator_video_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/call_video_height"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintTop_toBottomOf="@id/call_timer_view" />
+
+    <View
+        android:id="@+id/buttons_layout_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/buttons_layout" />
+
+    <include
+        android:id="@+id/buttons_layout"
+        layout="@layout/call_buttons_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@id/bottom_guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/call_timer_view"
+        app:layout_constraintVertical_bias="1" />
+
+</merge>

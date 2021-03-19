@@ -4,65 +4,55 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.VisitorMessage;
+import com.glia.androidsdk.comms.MediaDirection;
+import com.glia.androidsdk.comms.MediaUpgradeOffer;
+import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItem;
 import com.glia.widgets.chat.adapter.SendMessageItem;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.GliaRepository;
+import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.model.GliaChatRepository;
+import com.glia.widgets.model.MediaUpgradeOfferRepository;
+import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.model.MinimizeHandler;
+import com.glia.widgets.view.DialogOfferType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ChatController {
 
+    private static final int CALL_TIMER_DELAY = 1000;
+    private static final int CALL_TIMER_TICKER_VALUE = 1000;
+
     private ChatViewCallback viewCallback;
     private ChatGliaCallback gliaCallback;
-    private GliaRepository repository;
+    private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
+    private TimeCounter.FormattedTimerStatusListener timerStatusListener;
+    private MinimizeHandler.OnMinimizeCalledListener minimizeCalledListener;
+    private final GliaChatRepository repository;
+    private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
+    private final TimeCounter callTimer;
+    private final MinimizeHandler minimizeHandler;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
     private volatile DialogsState dialogsState;
-    private MediaUpgradeStartedTimerItem lastTimerItem = null;
-    private final TimerTask timerTask = new TimerTask() {
-        int seconds = 0;
+    private boolean isNavigationPending;
 
-        @Override
-        public void run() {
-            seconds++;
-            String time = Utils.toMmSs(seconds);
-            if (lastTimerItem != null) {
-                int index = chatState.chatItems.indexOf(lastTimerItem);
-                if (index != -1) {
-                    List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
-                    MediaUpgradeStartedTimerItem.Type type = lastTimerItem.type;
-                    newItems.remove(index);
-                    lastTimerItem = new MediaUpgradeStartedTimerItem(type, time);
-                    newItems.add(index, lastTimerItem);
-                    emitChatItems(chatState.changeItems(newItems));
-                } else {
-                    cancel();
-                }
-            } else {
-                cancel();
-            }
-            Logger.d(TAG, "timer: " + time);
-        }
-
-        @Override
-        public boolean cancel() {
-            seconds = 0;
-            return super.cancel();
-        }
-    };
-    private final Timer timer = new Timer();
-
-    public ChatController(ChatViewCallback viewCallback) {
+    public ChatController(GliaChatRepository gliaChatRepository,
+                          MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
+                          TimeCounter callTimer,
+                          ChatViewCallback viewCallback,
+                          MinimizeHandler minimizeHandler) {
+        Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.chatState = new ChatState.Builder()
                 .setUseFloatingChatHeads(false)
@@ -79,24 +69,37 @@ public class ChatController {
                 .setChatItems(new ArrayList<>())
                 .createChatState();
         this.dialogsState = new DialogsState.NoDialog();
+        this.repository = gliaChatRepository;
+        this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
+        this.callTimer = callTimer;
+        this.minimizeHandler = minimizeHandler;
+        isNavigationPending = false;
     }
 
-    public void initChat(GliaRepository gliaRepository,
-                         String companyName,
+    public void initChat(String companyName,
                          String queueId,
                          String contextUrl,
                          boolean useChatHeads) {
-        Logger.d(TAG, "initChat");
-        if (useChatHeads && chatState.hasOverlayPermissions) {
-            handleFloatingChatheads(false);
-        }
-        if (chatState.integratorChatStarted) {
+        Logger.d(TAG, "initChat, useChatHeads: " + useChatHeads);
+        if (chatState.integratorChatStarted || dialogsState.showingChatEnderDialog()) {
             return;
         }
-        this.repository = gliaRepository;
         emitViewState(chatState.queueingStarted(useChatHeads, companyName, queueId, contextUrl));
+        if (useChatHeads) {
+            handleFloatingChatheads(null, null);
+        }
         initControllerCallback();
+        initMediaUpgradeCallback();
+        initMinimizeCallback();
         repository.init(gliaCallback, queueId, contextUrl);
+        mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
+        minimizeHandler.addListener(minimizeCalledListener);
+    }
+
+    private void initMinimizeCallback() {
+        this.minimizeCalledListener = () -> {
+            onDestroy(true);
+        };
     }
 
     private synchronized void emitViewState(ChatState state) {
@@ -123,16 +126,17 @@ public class ChatController {
 
     public void onDestroy(boolean retain) {
         Logger.d(TAG, "onDestroy, retain:" + retain);
+        destroyView();
         viewCallback = null;
         if (!retain) {
-            if (chatState.useFloatingChatHeads && repository != null) {
-                repository.onDestroyView();
-            }
-            if (chatState.useFloatingChatHeads) {
-                gliaCallback = null;
-            }
-            timerTask.cancel();
-            timer.cancel();
+            repository.onDestroy();
+            gliaCallback = null;
+            mediaUpgradeOfferRepository.stopAll();
+            mediaUpgradeOfferRepositoryCallback = null;
+            timerStatusListener = null;
+            callTimer.clear();
+            minimizeCalledListener = null;
+            minimizeHandler.clear();
         }
     }
 
@@ -152,34 +156,34 @@ public class ChatController {
     public void show() {
         Logger.d(TAG, "show");
         if (!chatState.isVisible) {
-            emitViewState(chatState.show());
+            emitViewState(chatState.changeVisibility(true));
         }
     }
 
     public void onBackArrowClicked() {
         Logger.d(TAG, "onBackArrowClicked");
         if (!chatState.useFloatingChatHeads) {
-            emitViewState(chatState.hide());
+            emitViewState(chatState.changeVisibility(false));
         } else if (chatState.hasOverlayPermissions) {
-            handleFloatingChatheads(true);
+            handleFloatingChatheads(chatState.operatorProfileImgUrl, GliaWidgets.CHAT_ACTIVITY);
         }
     }
 
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
-        stop(false, false);
+        stop();
         dismissDialogs();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
-        stop(false, false);
+        stop();
         dismissDialogs();
     }
 
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
-        stop(false, false);
+        stop();
         dismissDialogs();
     }
 
@@ -208,47 +212,48 @@ public class ChatController {
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
         viewCallback.emitDialog(dialogsState);
+        if (isNavigationPending) {
+            viewCallback.navigateToCall();
+        }
     }
 
-    public void onResume(boolean hasOverlaysPermission) {
-        Logger.d(TAG, "onResume");
+    public void onResume(boolean hasOverlaysPermission, boolean isCallActivityInBackstack) {
+        Logger.d(TAG, "onResume: " + hasOverlaysPermission);
         if (!hasOverlaysPermission && !chatState.overlaysPermissionDialogShown) {
             showOverlayPermissionsDialog();
         }
         emitViewState(chatState.drawOverlaysPermissionChanged(hasOverlaysPermission));
+        if (!isCallActivityInBackstack && chatState.isMediaUpgradeStarted()) {
+            handleFloatingChatheads(chatState.operatorProfileImgUrl, GliaWidgets.CALL_ACTIVITY);
+        }
     }
 
     public void overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed");
+        emitViewState(chatState.drawOverlayPermissionsDialogShown());
         emitDialogState(new DialogsState.NoDialog());
     }
 
-    public void upgradeToAudioClicked() {
+    public void acceptUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "upgradeToAudioClicked");
-        repository.acceptUpgradeOffer();
+        mediaUpgradeOfferRepository.acceptOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
         emitDialogState(new DialogsState.NoDialog());
     }
 
-    public void closeUpgradeDialogClicked() {
+    public void declineUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "closeUpgradeDialogClicked");
-        repository.declineOffer();
+        mediaUpgradeOfferRepository.declineOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
         emitDialogState(new DialogsState.NoDialog());
     }
 
-    public String getCompanyName() {
-        return chatState.companyName;
+    public void navigateToCallSuccess() {
+        Logger.d(TAG, "navigateToCallSuccess");
+        isNavigationPending = false;
     }
 
-    public String getQueueId() {
-        return chatState.queueId;
-    }
-
-    public String getContextUrl() {
-        return chatState.contextUrl;
-    }
-
-    public boolean isStarted() {
-        return chatState.integratorChatStarted;
+    public void setOverlayPermissions(boolean canDrawOverlays) {
+        Logger.d(TAG, "setOverlayPermissions: " + canDrawOverlays);
+        emitViewState(chatState.drawOverlaysPermissionChanged(canDrawOverlays));
     }
 
     private synchronized boolean setState(ChatState state) {
@@ -286,23 +291,23 @@ public class ChatController {
 
             @Override
             public void engagementEndedByOperator() {
-                stop(true, chatState.useFloatingChatHeads);
-            }
-
-            @Override
-            public void engagementEnded(boolean showDialog) {
-                Logger.d(TAG, "engagementEnded");
-                if (showDialog) {
+                Logger.d(TAG, "engagementEndedByOperator");
+                stop();
+                emitViewState(chatState.changeVisibility(chatState.useFloatingChatHeads));
+                if (!isDialogShowing()) {
                     showNoMoreOperatorsAvailableDialog();
-                } else {
-                    emitViewState(chatState.stop(false));
                 }
             }
 
             @Override
             public void engagementSuccess(OmnicoreEngagement engagement) {
                 Logger.d(TAG, "engagementSuccess");
-                operatorOnlineStartChatUi(engagement.getOperator().getName());
+                String operatorProfileImgUrl = null;
+                try {
+                    operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
+                } catch (Exception e) {
+                }
+                operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
                 if (!chatState.historyLoaded) {
                     repository.loadHistory();
                 }
@@ -314,6 +319,11 @@ public class ChatController {
                 List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
                 changeDeliveredIndex(currentChatItems, visitorMessage);
                 emitChatItems(chatState.changeItems(currentChatItems));
+            }
+
+            @Override
+            public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
+                Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
             }
 
             @Override
@@ -344,32 +354,87 @@ public class ChatController {
                 }
                 emitChatItems(chatState.historyLoaded(items));
                 repository.initMessaging();
-            }
-
-            @Override
-            public void audioUpgradeRequested() {
-                Logger.d(TAG, "audioUpgradeRequested");
-                showUpgradeDialog();
-            }
-
-            @Override
-            public void audioUpgradeOfferChoiceSubmitSuccess() {
-                Logger.d(TAG, "audioUpgradeAcceptSuccess");
-                startTimer(MediaUpgradeStartedTimerItem.Type.AUDIO);
+                mediaUpgradeOfferRepository.startListening();
             }
 
             @Override
             public void error(GliaException exception) {
                 Logger.e(TAG, exception.toString());
                 showUnexpectedErrorDialog();
-                emitViewState(chatState.stop(chatState.useFloatingChatHeads));
+                emitViewState(chatState.stop());
+                emitViewState(chatState.changeVisibility(chatState.useFloatingChatHeads));
             }
 
             @Override
             public void error(Throwable throwable) {
                 Logger.e(TAG, throwable.toString());
                 showUnexpectedErrorDialog();
-                emitViewState(chatState.stop(chatState.useFloatingChatHeads));
+                emitViewState(chatState.stop());
+                emitViewState(chatState.changeVisibility(chatState.useFloatingChatHeads));
+            }
+        };
+    }
+
+    private void initMediaUpgradeCallback() {
+        mediaUpgradeOfferRepositoryCallback = new MediaUpgradeOfferRepositoryCallback() {
+            @Override
+            public void newOffer(MediaUpgradeOffer offer) {
+                if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
+                    // audio call
+                    Logger.d(TAG, "audioUpgradeRequested");
+                    showUpgradeAudioDialog(offer);
+                } else if (offer.video == MediaDirection.TWO_WAY) {
+                    // video call
+                    Logger.d(TAG, "2 way videoUpgradeRequested");
+                    showUpgradeVideoDialog2Way(offer);
+                } else if (offer.video == MediaDirection.ONE_WAY) {
+                    Logger.d(TAG, "1 way videoUpgradeRequested");
+                    showUpgradeVideoDialog1Way(offer);
+                }
+            }
+
+            @Override
+            public void upgradeOfferChoiceSubmitSuccess(
+                    MediaUpgradeOffer offer,
+                    MediaUpgradeOfferRepository.Submitter submitter
+            ) {
+                Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess, offer: " +
+                        offer.toString() + ", submitter: " + submitter.toString());
+                MediaUpgradeStartedTimerItem.Type type = null;
+                if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
+                    Logger.d(TAG, "audioUpgradeAcceptSuccess");
+                    type = MediaUpgradeStartedTimerItem.Type.AUDIO;
+                } else if (offer.video == MediaDirection.ONE_WAY || offer.video == MediaDirection.TWO_WAY) {
+                    Logger.d(TAG, "videoUpgradeAcceptSuccess");
+                    type = MediaUpgradeStartedTimerItem.Type.VIDEO;
+                }
+                if (type != null) {
+                    if (chatState.isMediaUpgradeStarted()) {
+                        upgradeMediaItem(type);
+                    } else {
+                        startTimer(type);
+                    }
+                    if (submitter == MediaUpgradeOfferRepository.Submitter.CHAT) {
+                        if (viewCallback != null) {
+                            Logger.d(TAG, "navigateToCall");
+                            viewCallback.navigateToCall();
+                        }
+                        isNavigationPending = true;
+                    }
+                }
+                if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                    dismissDialogs();
+                }
+            }
+
+            @Override
+            public void upgradeOfferChoiceDeclinedSuccess(
+                    MediaUpgradeOfferRepository.Submitter submitter
+            ) {
+                Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
+                if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                    dismissDialogs();
+                }
             }
         };
     }
@@ -383,21 +448,30 @@ public class ChatController {
         }
     }
 
-    private void operatorOnlineStartChatUi(String operatorName) {
+    private void destroyView() {
+        if (viewCallback != null) {
+            Logger.d(TAG, "destroyingView");
+            viewCallback.destroyView();
+        }
+    }
+
+    private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
         if (!chatState.isOperatorOnline()) {
             List<ChatItem> items = new ArrayList<>();
-            emitViewState(chatState.engagementStarted(operatorName));
-            items.add(OperatorStatusItem.OperatorFoundStatusItem(chatState.companyName, chatState.getFormattedOperatorName()));
+            emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+            items.add(OperatorStatusItem.OperatorFoundStatusItem(
+                    chatState.companyName,
+                    chatState.getFormattedOperatorName(),
+                    profileImgUrl));
             emitChatItems(chatState.changeItems(items));
         }
     }
 
-    private void stop(boolean showDialog, boolean isVisible) {
-        repository.stop(chatState.queueTicketId, showDialog);
-        emitViewState(chatState.stop(isVisible));
-        if (showDialog && !isDialogShowing()) {
-            showNoMoreOperatorsAvailableDialog();
-        }
+    private void stop() {
+        Logger.d(TAG, "Stop, engagement ended");
+        repository.stop(chatState.queueTicketId);
+        mediaUpgradeOfferRepository.stopAll();
+        emitViewState(chatState.stop());
     }
 
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
@@ -453,7 +527,7 @@ public class ChatController {
             messages = new ArrayList<>();
         }
         messages.add(message.getContent());
-        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages));
+        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages, chatState.operatorProfileImgUrl));
     }
 
     private boolean isMessageValid(String message) {
@@ -477,9 +551,33 @@ public class ChatController {
         }
     }
 
-    private void showUpgradeDialog() {
+    private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {
         if (!isDialogShowing() && chatState.isOperatorOnline()) {
-            emitDialogState(new DialogsState.UpgradeAudioDialog(chatState.getFormattedOperatorName()));
+            emitDialogState(new DialogsState.UpgradeDialog(
+                    new DialogOfferType.AudioUpgradeOffer(
+                            mediaUpgradeOffer,
+                            chatState.getFormattedOperatorName()
+                    )));
+        }
+    }
+
+    private void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer) {
+        if (!isDialogShowing() && chatState.isOperatorOnline()) {
+            emitDialogState(new DialogsState.UpgradeDialog(
+                    new DialogOfferType.VideoUpgradeOffer2Way(
+                            mediaUpgradeOffer,
+                            chatState.getFormattedOperatorName()
+                    )));
+        }
+    }
+
+    private void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer) {
+        if (!isDialogShowing() && chatState.isOperatorOnline()) {
+            emitDialogState(new DialogsState.UpgradeDialog(
+                    new DialogOfferType.VideoUpgradeOffer1Way(
+                            mediaUpgradeOffer,
+                            chatState.getFormattedOperatorName()
+                    )));
         }
     }
 
@@ -495,10 +593,19 @@ public class ChatController {
         }
     }
 
-    private void handleFloatingChatheads(boolean show) {
-        if (viewCallback != null && chatState.useFloatingChatHeads) {
-            Logger.d(TAG, "handleFloatingChatHeads, show: " + show);
-            viewCallback.handleFloatingChatHead(show);
+    /**
+     * Method for either showing or hiding the floating chat head.
+     *
+     * @param returnDestination 1 of either {@link com.glia.widgets.GliaWidgets#CALL_ACTIVITY}
+     *                          or {@link com.glia.widgets.GliaWidgets#CHAT_ACTIVITY}
+     *                          hides chat head if anything else.
+     */
+    private void handleFloatingChatheads(String operatorProfileImgUrl, String returnDestination) {
+        Logger.d(TAG, "handleFloatingChatHeads, useFloatingChatHeads: " + chatState.useFloatingChatHeads);
+        if (chatState.hasOverlayPermissions && viewCallback != null && chatState.useFloatingChatHeads) {
+            Logger.d(TAG, "USING handleFloatingChatHeads, operatorProfileImgUrl: "
+                    + operatorProfileImgUrl + "returnDestination: " + returnDestination);
+            viewCallback.handleFloatingChatHead(operatorProfileImgUrl, returnDestination);
         }
     }
 
@@ -513,12 +620,57 @@ public class ChatController {
     }
 
     private void startTimer(MediaUpgradeStartedTimerItem.Type type) {
+        Logger.d(TAG, "startTimer");
         List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
-        lastTimerItem = new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
-        newItems.add(lastTimerItem);
-        emitChatItems(chatState.changeItems(newItems));
-        int timerDelay = 0;
-        int timer1SecInterval = 1000;
-        timer.schedule(timerTask, timerDelay, timer1SecInterval);
+        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem =
+                new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
+        newItems.add(mediaUpgradeStartedTimerItem);
+        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
+        createNewTimerCallback();
+        callTimer.addFormattedValueListener(timerStatusListener);
+        callTimer.startNew(CALL_TIMER_DELAY, CALL_TIMER_TICKER_VALUE);
+    }
+
+    private void upgradeMediaItem(MediaUpgradeStartedTimerItem.Type type) {
+        Logger.d(TAG, "upgradeMediaItem");
+        List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
+        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem =
+                new MediaUpgradeStartedTimerItem(type, chatState.mediaUpgradeStartedTimerItem.time);
+        newItems.remove(chatState.mediaUpgradeStartedTimerItem);
+        newItems.add(mediaUpgradeStartedTimerItem);
+        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
+    }
+
+    private void createNewTimerCallback() {
+        if (timerStatusListener != null) {
+            callTimer.removeFormattedValueListener(timerStatusListener);
+        }
+        timerStatusListener = new TimeCounter.FormattedTimerStatusListener() {
+            @Override
+            public void onNewTimerValue(String formatedValue) {
+                if (chatState.isMediaUpgradeStarted()) {
+                    int index = chatState.chatItems.indexOf(chatState.mediaUpgradeStartedTimerItem);
+                    if (index != -1) {
+                        List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
+                        MediaUpgradeStartedTimerItem.Type type = chatState.mediaUpgradeStartedTimerItem.type;
+                        newItems.remove(index);
+                        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem =
+                                new MediaUpgradeStartedTimerItem(type, formatedValue);
+                        newItems.add(index, mediaUpgradeStartedTimerItem);
+                        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancel() {
+                if (chatState.isMediaUpgradeStarted() &&
+                        chatState.chatItems.contains(chatState.mediaUpgradeStartedTimerItem)) {
+                    List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
+                    newItems.remove(chatState.mediaUpgradeStartedTimerItem);
+                    emitChatItems(chatState.changeTimerItem(newItems, null));
+                }
+            }
+        };
     }
 }

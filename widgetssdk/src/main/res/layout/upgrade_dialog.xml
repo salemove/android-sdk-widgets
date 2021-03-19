@@ -18,42 +18,52 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/large_x_large" />
 
+    <ImageView
+        android:id="@+id/chat_title_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large"
+        android:contentDescription="@string/chat_audio_icon_content_description"
+        android:src="?attr/gliaIconUpgradeAudioDialog"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/gliaBrandPrimaryColor" />
+
     <TextView
         android:id="@+id/dialog_title_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large_x_large"
+        android:layout_marginTop="@dimen/small"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline2"
         app:layout_constraintEnd_toStartOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/chat_title_icon" />
 
-    <com.glia.widgets.view.OutlinedOptionView
-        android:id="@+id/upgrade_audio_view"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/negative_button"
+        style="?attr/buttonBarNegativeButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
-        android:minHeight="@dimen/large"
-        app:caption="@string/chat_dialog_upgrade_audio_caption"
-        app:icon="@drawable/ic_baseline_mic"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        android:layout_marginTop="@dimen/large_x_large"
+        android:layout_marginEnd="@dimen/small"
+        android:text="@string/chat_dialog_decline"
+        app:layout_constraintEnd_toStartOf="@id/positive_button"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/dialog_title_view"
-        app:title="@string/chat_dialog_upgrade_audio" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
 
-    <!--    <com.glia.widgets.view.OutlinedOptionView-->
-    <!--        android:id="@+id/upgrade_phone_view"-->
-    <!--        android:layout_width="0dp"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="@dimen/large"-->
-    <!--        android:minHeight="@dimen/large"-->
-    <!--        app:caption="@string/chat_dialog_phone_caption"-->
-    <!--        app:icon="@drawable/ic_baseline_phone_android"-->
-    <!--        app:layout_constraintEnd_toEndOf="@id/end_guideline"-->
-    <!--        app:layout_constraintStart_toStartOf="@id/start_guideline"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/upgrade_audio_view"-->
-    <!--        app:title="@string/chat_dialog_phone" />-->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/positive_button"
+        style="?attr/buttonBarPositiveButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small"
+        android:layout_marginTop="@dimen/large_x_large"
+        android:text="@string/chat_dialog_accept"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toEndOf="@id/negative_button"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
 
     <ImageView
         android:id="@+id/logo_view"
@@ -61,23 +71,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/large_x_large"
         android:layout_marginBottom="@dimen/large_x_large"
+        android:contentDescription="@string/chat_glia_logo_content_description"
         android:src="@drawable/ic_powered_by_glia"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/upgrade_audio_view"
+        app:layout_constraintTop_toBottomOf="@id/positive_button"
         app:layout_constraintVertical_bias="0"
         app:tint="?attr/gliaBaseShadeColor" />
-
-    <ImageView
-        android:id="@+id/close_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/x_large"
-        android:src="@drawable/ic_baseline_close"
-        app:layout_constraintBottom_toBottomOf="@id/logo_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/logo_view"
-        app:tint="?attr/gliaBaseNormalColor" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

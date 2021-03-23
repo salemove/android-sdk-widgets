@@ -2,59 +2,111 @@
 <resources>
 
     <declare-styleable name="GliaView">
+        <!-- Text to be shown on the top of the app bar in the chat -->
         <attr name="appBarTitle" format="string" />
+        <!-- Primary color for your brand. Used for example to set the color of the appbar -->
         <attr name="brandPrimaryColor" format="reference" />
+        <!-- Dark color of the UI widgets. Used for example to change the body text colors.  -->
         <attr name="baseDarkColor" format="reference" />
+        <!-- Light color of the UI widgets. Used for example to change the title text colors.
+         Background color of the chat, etc.  -->
         <attr name="baseLightColor" format="reference" />
+        <!-- Base normal color of the chat  -->
         <attr name="baseNormalColor" format="reference" />
+        <!-- Base shade color of the chat  -->
         <attr name="baseShadeColor" format="reference" />
+        <!-- Color for the operator's chat messages background  -->
         <attr name="systemAgentBubbleColor" format="reference" />
+        <!-- Color for any error or chat widgets.  -->
         <attr name="systemNegativeColor" format="reference" />
+        <!-- Allow overriding the view's fontFamily.  -->
         <attr name="android:fontFamily" format="reference" />
+        <!-- The appbar's back icon resId.  -->
         <attr name="iconAppBarBack" format="reference" />
+        <!-- The appbar's leave queue icon resId.  -->
         <attr name="iconLeaveQueue" format="reference" />
+        <!-- The send message icon resId -->
         <attr name="iconSendMessage" format="reference" />
+        <!-- The icon resId used in chat messages to display an ongoing audio upgrade timer -->
         <attr name="iconChatAudioUpgrade" format="reference" />
+        <!-- The icon resId used in the header of an audio upgrade dialog -->
         <attr name="iconUpgradeAudioDialog" format="reference" />
+        <!-- The icon resId used to set the call's audio on -->
         <attr name="iconCallAudioOn" format="reference" />
+        <!-- The icon resId used in chat messages to display an ongoing video upgrade timer -->
         <attr name="iconChatVideoUpgrade" format="reference" />
+        <!-- The icon resId used in the header of an video upgrade dialog -->
         <attr name="iconUpgradeVideoDialog" format="reference" />
+        <!-- The icon resId used in the header of of a screen sharing upgrade dialog -->
         <attr name="iconScreenSharingDialog" format="reference" />
+        <!-- The icon resId used to set the call's video on -->
         <attr name="iconCallVideoOn" format="reference" />
+        <!-- The icon resId used to set the call's audio off -->
         <attr name="iconCallAudioOff" format="reference" />
+        <!-- The icon resId used set the call's video off -->
         <attr name="iconCallVideoOff" format="reference" />
+        <!-- The icon resId used to navigate back to the chat from a call -->
         <attr name="iconCallChat" format="reference" />
+        <!-- The icon resId used to set the call's speaker on -->
         <attr name="iconCallSpeakerOn" format="reference" />
+        <!-- The icon resId used to set the call's speaker off -->
         <attr name="iconCallSpeakerOff" format="reference" />
+        <!-- The icon resId used to minimize a call -->
         <attr name="iconCallMinimize" format="reference" />
+        <!-- The icon resId used in a chat head if an operator's profile image is absent -->
         <attr name="iconPlaceholder" format="reference" />
     </declare-styleable>
 
     <attr name="gliaChatStyle" format="reference" />
 
+    <!-- Primary color for your brand. Used for example to set the color of the appbar -->
     <attr name="gliaBrandPrimaryColor" format="reference" />
+    <!-- Dark color of the UI widgets. Used for example to change the body text colors.  -->
     <attr name="gliaBaseDarkColor" format="reference" />
+    <!-- Light color of the UI widgets. Used for example to change the title text colors.
+    Background color of the chat, etc.  -->
     <attr name="gliaBaseLightColor" format="reference" />
+    <!-- Base normal color of the chat  -->
     <attr name="gliaBaseNormalColor" format="reference" />
+    <!-- Base shade color of the chat  -->
     <attr name="gliaBaseShadeColor" format="reference" />
+    <!-- Color for the operator's chat messages background.  -->
     <attr name="gliaSystemAgentBubbleColor" format="reference" />
+    <!-- Color for any error or chat widgets.  -->
     <attr name="gliaSystemNegativeColor" format="reference" />
+    <!-- The appbar's back icon resId.  -->
     <attr name="gliaIconAppBarBack" format="reference" />
+    <!-- The appbar's leave queue icon resId.  -->
     <attr name="gliaIconLeaveQueue" format="reference" />
+    <!-- The send message icon resId -->
     <attr name="gliaIconSendMessage" format="reference" />
+    <!-- The icon resId used in chat messages to display an ongoing audio upgrade timer -->
     <attr name="gliaIconChatAudioUpgrade" format="reference" />
+    <!-- The icon resId used in the header of an audio upgrade dialog -->
     <attr name="gliaIconUpgradeAudioDialog" format="reference" />
+    <!-- The icon resId used to set the call's audio on -->
     <attr name="gliaIconCallAudioOn" format="reference" />
+    <!-- The icon resId used in chat messages to display an ongoing video upgrade timer -->
     <attr name="gliaIconChatVideoUpgrade" format="reference" />
+    <!-- The icon resId used in the header of a video upgrade dialog -->
     <attr name="gliaIconUpgradeVideoDialog" format="reference" />
+    <!-- The icon resId used in the header of of a screen sharing upgrade dialog -->
     <attr name="gliaIconScreenSharingDialog" format="reference" />
+    <!-- The icon resId used to set the call's video on -->
     <attr name="gliaIconCallVideoOn" format="reference" />
+    <!-- The icon resId used to set the call's audio off -->
     <attr name="gliaIconCallAudioOff" format="reference" />
+    <!-- The icon resId used set the call's video off -->
     <attr name="gliaIconCallVideoOff" format="reference" />
+    <!-- The icon resId used to navigate back to the chat from a call -->
     <attr name="gliaIconCallChat" format="reference" />
+    <!-- The icon resId used to set the call's speaker on -->
     <attr name="gliaIconCallSpeakerOn" format="reference" />
+    <!-- The icon resId used to set the call's speaker off -->
     <attr name="gliaIconCallSpeakerOff" format="reference" />
+    <!-- The icon resId used to minimize a call -->
     <attr name="gliaIconCallMinimize" format="reference" />
+    <!-- The icon resId used in a chat head if an operator's profile image is absent -->
     <attr name="gliaIconPlaceholder" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">

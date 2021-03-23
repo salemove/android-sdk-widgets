@@ -76,9 +76,19 @@ public class ChatView extends LinearLayout {
     private OnNavigateToCallListener onNavigateToCallListener;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
-        public void onClicked(String id, SingleChoiceAttachment singleChoiceAttachment) {
+        public void onClicked(
+                String id,
+                int indexInList,
+                int messageIndex,
+                int optionIndex
+        ) {
             if (controller != null) {
-                controller.singleChoiceOptionClicked(id, singleChoiceAttachment);
+                controller.singleChoiceOptionClicked(
+                        id,
+                        indexInList,
+                        messageIndex,
+                        optionIndex
+                );
             }
         }
     };

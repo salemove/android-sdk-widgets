@@ -1,8 +1,11 @@
 package com.glia.widgets.chat;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.MessageAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.androidsdk.chat.VisitorMessage;
@@ -351,6 +354,7 @@ public class ChatController {
                         instanceof SingleChoiceAttachment) {
                     SingleChoiceAttachment attachment =
                             (SingleChoiceAttachment) message.getAttachment();
+
                     if (attachment.getOptions() != null) {
                         for (SingleChoiceOption option : attachment.getOptions()) {
                             Logger.d(TAG, "onMessage, option text: " + option.getText() +
@@ -521,6 +525,13 @@ public class ChatController {
     }
 
     private void appendSentMessage(List<ChatItem> items, ChatMessage message) {
+        // do nothing if single choice response
+        MessageAttachment attachment = message.getAttachment();
+        if (attachment instanceof SingleChoiceAttachment &&
+                ((SingleChoiceAttachment) attachment).getSelectedOption() != null) {
+            Logger.d(TAG, "Not adding singleChoiceAnswer");
+            return;
+        }
         items.add(new SendMessageItem(message.getId(), false, message.getContent()));
     }
 
@@ -548,6 +559,7 @@ public class ChatController {
     }
 
     private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
+        MessageAttachment attachment = message.getAttachment();
         List<ReceiveMessageItemMessage> messages;
         if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
             ReceiveMessageItem lastItemInView = (ReceiveMessageItem) currentChatItems.get(currentChatItems.size() - 1);
@@ -559,10 +571,10 @@ public class ChatController {
         messages.add(new ReceiveMessageItemMessage(
                 message.getContent(),
                 message.getAttachment() != null &&
-                        message.getAttachment() instanceof SingleChoiceAttachment ?
-                        Arrays.asList(
-                                ((SingleChoiceAttachment) message.getAttachment()).getOptions()) :
-                        null));
+                        attachment instanceof SingleChoiceAttachment ?
+                        Arrays.asList(((SingleChoiceAttachment) attachment).getOptions()) :
+                        null,
+                null));
         currentChatItems.add(new ReceiveMessageItem(message.getId(), messages, chatState.operatorProfileImgUrl));
     }
 
@@ -694,10 +706,48 @@ public class ChatController {
         };
     }
 
-    public void singleChoiceOptionClicked(String id, SingleChoiceAttachment singleChoiceAttachment) {
-        Logger.d(TAG,
-                "singleChoiceOptionClicked, id: " + id +
-                        ", optionValue: " + singleChoiceAttachment);
-        repository.sendMessage(singleChoiceAttachment);
+    public void singleChoiceOptionClicked(
+            String id,
+            int indexInList,
+            int messageIndex,
+            int optionIndex
+    ) {
+        Logger.d(TAG, "singleChoiceOptionClicked, id: " + id);
+        if (indexInList == RecyclerView.NO_POSITION) {
+            return;
+        }
+        ChatItem item = chatState.chatItems.get(indexInList);
+        //
+        if (item.getId().equals(id)) {
+            ReceiveMessageItem choiceCardItem =
+                    (ReceiveMessageItem) chatState.chatItems.get(indexInList);
+            ReceiveMessageItemMessage receiveMessageItemMessage =
+                    choiceCardItem.getMessages().get(messageIndex);
+            SingleChoiceOption selectedOption =
+                    receiveMessageItemMessage.attachments.get(optionIndex);
+
+            repository.sendMessage(selectedOption.asSingleChoiceResponse());
+
+            ReceiveMessageItemMessage receiveMessageItemMessageWithSelected =
+                    new ReceiveMessageItemMessage(
+                            receiveMessageItemMessage.content,
+                            receiveMessageItemMessage.attachments,
+                            optionIndex
+                    );
+            List<ReceiveMessageItemMessage> messagesWithSelected =
+                    new ArrayList<>(choiceCardItem.getMessages());
+            messagesWithSelected.remove(messageIndex);
+            messagesWithSelected.add(messageIndex, receiveMessageItemMessageWithSelected);
+            ReceiveMessageItem choiceCardItemWithSelected =
+                    new ReceiveMessageItem(
+                            id,
+                            messagesWithSelected,
+                            choiceCardItem.getOperatorProfileImgUrl()
+                    );
+            List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);
+            modifiedItems.remove(indexInList);
+            modifiedItems.add(indexInList, choiceCardItemWithSelected);
+            emitChatItems(chatState.changeItems(modifiedItems));
+        }
     }
 }

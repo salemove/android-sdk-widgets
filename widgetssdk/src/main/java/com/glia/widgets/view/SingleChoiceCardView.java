@@ -14,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 
-import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -51,16 +50,24 @@ public class SingleChoiceCardView extends FrameLayout {
             String id,
             String content,
             List<SingleChoiceOption> options,
-            UiTheme theme
+            Integer selectedIndex,
+            UiTheme theme,
+            int adapterPosition,
+            int messagePosition
     ) {
         int gliaBaseDarkColor = ContextCompat.getColor(
                 this.getContext(), theme.getBaseDarkColor()
+        );
+        int gliaBaseLightColor = ContextCompat.getColor(
+                this.getContext(), theme.getBaseLightColor()
         );
         int gliaBrandPrimaryColor = ContextCompat.getColor(
                 this.getContext(), theme.getBrandPrimaryColor()
         );
         ColorStateList systemAgentBubbleColorStateList =
                 ContextCompat.getColorStateList(this.getContext(), theme.getSystemAgentBubbleColor());
+        ColorStateList brandPrimaryColorStateList =
+                ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor());
 
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
         contentView.setTextColor(gliaBaseDarkColor);
@@ -68,7 +75,8 @@ public class SingleChoiceCardView extends FrameLayout {
         contentView.setText(content);
         ConstraintSet constraintSet = new ConstraintSet();
         int topViewId = R.id.content_view;
-        for (SingleChoiceOption option : options) {
+        for (int index = 0; index < options.size(); index++) {
+            SingleChoiceOption option = options.get(index);
             MaterialButton button = new MaterialButton(
                     new ContextThemeWrapper(
                             this.getContext(),
@@ -91,8 +99,8 @@ public class SingleChoiceCardView extends FrameLayout {
             );
             button.setLayoutParams(params);
             button.setId(View.generateViewId());
-            button.setTag(option.getValue());
             button.setText(option.getText());
+            button.setEnabled(selectedIndex == null);
             layout.addView(button, layout.getChildCount());
             constraintSet.clone(layout);
 
@@ -117,13 +125,24 @@ public class SingleChoiceCardView extends FrameLayout {
 
             topViewId = button.getId();
 
-            button.setBackgroundTintList(systemAgentBubbleColorStateList);
-            button.setTextColor(gliaBaseDarkColor);
+            button.setBackgroundTintList(
+                    selectedIndex != null && selectedIndex == index ?
+                            brandPrimaryColorStateList :
+                            systemAgentBubbleColorStateList);
+            button.setTextColor(selectedIndex != null && selectedIndex == index ?
+                    gliaBaseLightColor :
+                    gliaBaseDarkColor);
 
             if (onOptionClickedListener != null) {
+                final int optionIndex = index;
                 button.setOnClickListener(v -> {
                     if (onOptionClickedListener != null) {
-                        onOptionClickedListener.onClicked(id, option.asSingleChoiceResponse());
+                        onOptionClickedListener.onClicked(
+                                id,
+                                adapterPosition,
+                                messagePosition,
+                                optionIndex
+                        );
                     }
                 });
             }
@@ -136,6 +155,11 @@ public class SingleChoiceCardView extends FrameLayout {
     }
 
     public interface OnOptionClickedListener {
-        void onClicked(String id, SingleChoiceAttachment singleChoiceAttachment);
+        void onClicked(
+                String id,
+                int indexInList,
+                int indexOfMessage,
+                int indexOfOption
+        );
     }
 }

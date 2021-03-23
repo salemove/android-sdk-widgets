@@ -165,7 +165,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener
         ) {
             contentLayout.removeAllViews();
-            for (ReceiveMessageItemMessage message : item.getMessages()) {
+            for (int messageIndex = 0; messageIndex < item.getMessages().size(); messageIndex++) {
+                ReceiveMessageItemMessage message = item.getMessages().get(messageIndex);
                 if (message.attachments != null) {
                     SingleChoiceCardView singleChoiceCardView = new SingleChoiceCardView(context);
                     singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
@@ -173,7 +174,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             item.getId(),
                             message.content,
                             message.attachments,
-                            uiTheme
+                            message.selectedIndex,
+                            uiTheme,
+                            getAdapterPosition(),
+                            messageIndex
                     );
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,

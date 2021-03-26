@@ -30,6 +30,7 @@ import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
 import com.glia.widgets.view.DialogOfferType;
 
@@ -52,6 +53,7 @@ public class ChatController {
     private final TimeCounter callTimer;
     private final MinimizeHandler minimizeHandler;
     private final ChatHeadsController chatHeadsController;
+    private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
@@ -63,7 +65,8 @@ public class ChatController {
                           TimeCounter callTimer,
                           ChatViewCallback viewCallback,
                           MinimizeHandler minimizeHandler,
-                          ChatHeadsController chatHeadsController) {
+                          ChatHeadsController chatHeadsController,
+                          MessagesNotSeenHandler messagesNotSeenHandler) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.chatState = new ChatState.Builder()
@@ -85,6 +88,7 @@ public class ChatController {
         this.callTimer = callTimer;
         this.minimizeHandler = minimizeHandler;
         this.chatHeadsController = chatHeadsController;
+        this.messagesNotSeenHandler = messagesNotSeenHandler;
         isNavigationPending = false;
     }
 
@@ -105,6 +109,7 @@ public class ChatController {
                             chatState.contextUrl,
                             uiTheme
                     ));
+            messagesNotSeenHandler.onNavigatedToChat();
         }
         if (chatState.integratorChatStarted || dialogsState.showingChatEnderDialog()) {
             return;
@@ -187,7 +192,8 @@ public class ChatController {
     public void onBackArrowClicked() {
         Logger.d(TAG, "onBackArrowClicked");
         emitViewState(chatState.changeVisibility(false));
-        chatHeadsController.onBackButtonPressed(GliaWidgets.CHAT_ACTIVITY, false, null);
+        messagesNotSeenHandler.chatOnBackClicked();
+        chatHeadsController.onBackButtonPressed(GliaWidgets.CHAT_ACTIVITY, false);
     }
 
     public void noMoreOperatorsAvailableDismissed() {
@@ -260,6 +266,7 @@ public class ChatController {
 
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "upgradeToAudioClicked");
+        messagesNotSeenHandler.chatUpgradeOfferAccepted();
         mediaUpgradeOfferRepository.acceptOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
         emitDialogState(new DialogsState.NoDialog());
     }

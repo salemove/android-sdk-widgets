@@ -1,7 +1,6 @@
 package com.glia.widgets.call;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
@@ -17,6 +16,7 @@ import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.model.GliaCallRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
 import com.glia.widgets.view.DialogOfferType;
 
@@ -28,12 +28,14 @@ public class CallController {
     private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
     private TimeCounter.RawTimerStatusListener inactivityTimerStatusListener;
     private MinimizeHandler.OnMinimizeCalledListener minimizeCalledListener;
+    private MessagesNotSeenHandler.MessagesNotSeenHandlerListener messagesNotSeenHandlerListener;
     private final GliaCallRepository repository;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final TimeCounter inactivityTimeCounter;
     private final MinimizeHandler minimizeHandler;
     private final ChatHeadsController chatHeadsController;
+    private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final static int MAX_IDLE_TIME = 3200;
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
     private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
@@ -49,7 +51,8 @@ public class CallController {
             CallViewCallback viewCallback,
             TimeCounter inactivityTimeCounter,
             MinimizeHandler minimizeHandler,
-            ChatHeadsController chatHeadsController
+            ChatHeadsController chatHeadsController,
+            MessagesNotSeenHandler messagesNotSeenHandler
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -69,6 +72,7 @@ public class CallController {
         this.inactivityTimeCounter = inactivityTimeCounter;
         this.minimizeHandler = minimizeHandler;
         this.chatHeadsController = chatHeadsController;
+        this.messagesNotSeenHandler = messagesNotSeenHandler;
     }
 
     public void initCall() {
@@ -80,17 +84,21 @@ public class CallController {
         emitViewState(callState.initCall());
         initControllerCallbacks();
         initMinimizeCallback();
+        initMessagesNotSeenCallback();
         repository.init(gliaCallback);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
         minimizeHandler.addListener(minimizeCalledListener);
+        messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener);
+    }
+
+    private void initMessagesNotSeenCallback() {
+        messagesNotSeenHandlerListener = count ->
+                emitViewState(callState.changeNumberOfMessages(count));
     }
 
     private void initMinimizeCallback() {
-        minimizeCalledListener = () -> {
-            chatHeadsController.onMinimizeButtonClicked(callState.messagesNotSeen);
-            onDestroy(true);
-        };
+        minimizeCalledListener = () -> onDestroy(true);
     }
 
     public void onDestroy(boolean retain) {
@@ -109,6 +117,8 @@ public class CallController {
             inactivityTimerStatusListener = null;
             minimizeCalledListener = null;
             minimizeHandler.clear();
+            messagesNotSeenHandler.removeListener(messagesNotSeenHandlerListener);
+            messagesNotSeenHandlerListener = null;
         }
     }
 
@@ -119,12 +129,6 @@ public class CallController {
                 Logger.e(TAG, exception.toString());
                 showUnexpectedErrorDialog();
                 emitViewState(callState.stop());
-            }
-
-            @Override
-            public void onMessage(ChatMessage message) {
-                Logger.d(TAG, "onMessage: " + message.getContent());
-                emitViewState(callState.changeNumberOfMessages(callState.messagesNotSeen + 1));
             }
 
             @Override
@@ -352,10 +356,10 @@ public class CallController {
 
     public void onBackArrowClicked(boolean isChatInBackstack) {
         Logger.d(TAG, "onBackArrowClicked");
+        messagesNotSeenHandler.callOnBackClicked(isChatInBackstack);
         chatHeadsController.onBackButtonPressed(
                 GliaWidgets.CALL_ACTIVITY,
-                isChatInBackstack,
-                callState.messagesNotSeen
+                isChatInBackstack
         );
     }
 
@@ -411,8 +415,8 @@ public class CallController {
         if (viewCallback != null) {
             viewCallback.navigateToChat();
         }
-        emitViewState(callState.changeNumberOfMessages(0));
         onDestroy(true);
+        messagesNotSeenHandler.callChatButtonClicked();
         chatHeadsController.onChatButtonClicked();
     }
 
@@ -461,6 +465,7 @@ public class CallController {
 
     public void minimizeButtonClicked() {
         Logger.d(TAG, "minimizeButtonClicked");
+        chatHeadsController.onMinimizeButtonClicked();
         minimizeHandler.minimize();
     }
 

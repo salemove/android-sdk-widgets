@@ -172,6 +172,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
                     singleChoiceCardView.setData(
                             item.getId(),
+                            message.imageUrl,
                             message.content,
                             message.attachments,
                             message.selectedIndex,

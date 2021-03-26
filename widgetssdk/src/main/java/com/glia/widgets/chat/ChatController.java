@@ -562,14 +562,26 @@ public class ChatController {
         } else {
             messages = new ArrayList<>();
         }
+        String imageUrl = null;
+        if (attachment instanceof SingleChoiceAttachment) {
+            try {
+                imageUrl = ((SingleChoiceAttachment) attachment).getImageUrl().get();
+            } catch (Exception e) {
+            }
+        }
         messages.add(new ReceiveMessageItemMessage(
                 message.getContent(),
                 message.getAttachment() != null &&
                         attachment instanceof SingleChoiceAttachment ?
                         Arrays.asList(((SingleChoiceAttachment) attachment).getOptions()) :
                         null,
-                null));
-        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages, chatState.operatorProfileImgUrl));
+                null,
+                imageUrl));
+        currentChatItems.add(new ReceiveMessageItem(
+                message.getId(),
+                messages,
+                chatState.operatorProfileImgUrl
+        ));
     }
 
     private boolean isMessageValid(String message) {
@@ -657,7 +669,8 @@ public class ChatController {
                     new ReceiveMessageItemMessage(
                             receiveMessageItemMessage.content,
                             receiveMessageItemMessage.attachments,
-                            optionIndex
+                            optionIndex,
+                            receiveMessageItemMessage.imageUrl
                     );
             List<ReceiveMessageItemMessage> messagesWithSelected =
                     new ArrayList<>(choiceCardItem.getMessages());

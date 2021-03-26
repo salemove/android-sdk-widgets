@@ -53,7 +53,7 @@ public class GliaWidgets {
                 .build();
 
         Glia.init(gliaConfig);
-        controllerFactory.getChatHeadsController().initChatObserving();
+        controllerFactory.init();
     }
 
     public static ControllerFactory getControllerFactory() {

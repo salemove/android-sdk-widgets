@@ -16,6 +16,7 @@ class ChatHeadState {
     public final boolean isOverlayVisible;
     public final boolean useOverlays;
     public final boolean hasOverlayPermissions;
+    public final boolean showMessageCount;
 
     private ChatHeadState(
             int messageCount,
@@ -26,7 +27,8 @@ class ChatHeadState {
             boolean areIntegratedViewsVisible,
             boolean isOverlayVisible,
             boolean useOverlays,
-            boolean hasOverlayPermissions) {
+            boolean hasOverlayPermissions,
+            boolean showMessageCount) {
         this.messageCount = messageCount;
         this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.theme = theme;
@@ -36,6 +38,7 @@ class ChatHeadState {
         this.isOverlayVisible = isOverlayVisible;
         this.useOverlays = useOverlays;
         this.hasOverlayPermissions = hasOverlayPermissions;
+        this.showMessageCount = showMessageCount;
     }
 
     public ChatHeadState onNewMessage(int messageCount) {
@@ -80,6 +83,10 @@ class ChatHeadState {
         return new Builder().copyFrom(this).setHasOverlayPermissions(hasOverlayPermissions).createChatHeadState();
     }
 
+    public ChatHeadState showMessageCount(boolean showMessageCount) {
+        return new Builder().copyFrom(this).setShowMessageCount(showMessageCount).createChatHeadState();
+    }
+
     public static class Builder {
         private int messageCount;
         private String operatorProfileImgUrl;
@@ -90,6 +97,7 @@ class ChatHeadState {
         private boolean isOverlayVisible;
         private boolean useOverlays;
         private boolean hasOverlayPermissions;
+        private boolean showMessageCount;
 
         public Builder copyFrom(ChatHeadState chatHeadState) {
             messageCount = chatHeadState.messageCount;
@@ -101,6 +109,7 @@ class ChatHeadState {
             isOverlayVisible = chatHeadState.isOverlayVisible;
             useOverlays = chatHeadState.useOverlays;
             hasOverlayPermissions = chatHeadState.hasOverlayPermissions;
+            showMessageCount = chatHeadState.showMessageCount;
             return this;
         }
 
@@ -149,6 +158,11 @@ class ChatHeadState {
             return this;
         }
 
+        public Builder setShowMessageCount(boolean showMessageCount) {
+            this.showMessageCount = showMessageCount;
+            return this;
+        }
+
         public ChatHeadState createChatHeadState() {
             return new ChatHeadState(
                     messageCount,
@@ -159,7 +173,8 @@ class ChatHeadState {
                     areIntegratedViewsVisible,
                     isOverlayVisible,
                     useOverlays,
-                    hasOverlayPermissions
+                    hasOverlayPermissions,
+                    showMessageCount
             );
         }
     }
@@ -176,6 +191,7 @@ class ChatHeadState {
                 ", isOverlayVisible=" + isOverlayVisible +
                 ", useOverlays=" + useOverlays +
                 ", hasOverlayPermissions=" + hasOverlayPermissions +
+                ", showMessageCount=" + showMessageCount +
                 '}';
     }
 
@@ -189,6 +205,7 @@ class ChatHeadState {
                 isOverlayVisible == that.isOverlayVisible &&
                 useOverlays == that.useOverlays &&
                 hasOverlayPermissions == that.hasOverlayPermissions &&
+                showMessageCount == that.showMessageCount &&
                 Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                 Objects.equals(theme, that.theme) &&
                 Objects.equals(operatorMediaState, that.operatorMediaState) &&
@@ -197,6 +214,6 @@ class ChatHeadState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(messageCount, operatorProfileImgUrl, theme, operatorMediaState, returnDestination, areIntegratedViewsVisible, isOverlayVisible, useOverlays, hasOverlayPermissions);
+        return Objects.hash(messageCount, operatorProfileImgUrl, theme, operatorMediaState, returnDestination, areIntegratedViewsVisible, isOverlayVisible, useOverlays, hasOverlayPermissions, showMessageCount);
     }
 }

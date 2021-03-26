@@ -7,6 +7,7 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.GliaChatHeadControllerRepository;
 import com.glia.widgets.model.GliaChatHeadControllerRepositoryCallback;
+import com.glia.widgets.model.MessagesNotSeenHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,18 @@ public class ChatHeadsController {
     private OnChatheadSettingsChangedListener overlayListener;
     private ChatHeadServiceListener chatHeadServiceListener;
 
-    public ChatHeadsController(GliaChatHeadControllerRepository gliaChatHeadControllerRepository) {
+    public ChatHeadsController(
+            GliaChatHeadControllerRepository gliaChatHeadControllerRepository,
+            MessagesNotSeenHandler messagesNotSeenHandler
+    ) {
         this.repository = gliaChatHeadControllerRepository;
         this.chatHeadState = new ChatHeadState.Builder()
                 .setMessageCount(0)
                 .createChatHeadState();
+        messagesNotSeenHandler.addListener(count -> {
+            Logger.d(TAG, "new message count received: " + count);
+            emitViewState(chatHeadState.onNewMessage(count));
+        });
     }
 
     public void addListener(OnChatheadSettingsChangedListener listener) {
@@ -69,19 +77,11 @@ public class ChatHeadsController {
 
     public void onBackButtonPressed(
             String callingActivity,
-            boolean isChatInBackstack,
-            Integer unseenMessageCount
+            boolean isChatInBackstack
     ) {
         Logger.d(TAG, "onBackButtonPressed, callingActivity: " + callingActivity +
-                ", isChatInBackstack: " + isChatInBackstack + ", unseenMessageCount: " +
-                unseenMessageCount);
+                ", isChatInBackstack: " + isChatInBackstack);
         if (callingActivity.equals(GliaWidgets.CALL_ACTIVITY)) {
-            // going back to chat
-            if (isChatInBackstack) {
-                emitViewState(chatHeadState.onNewMessage(0));
-            } else if (unseenMessageCount != null) {
-                emitViewState(chatHeadState.onNewMessage(unseenMessageCount));
-            }
             emitViewState(chatHeadState.changeVisibility(
                     chatHeadState.operatorMediaState != null,
                     callingActivity));
@@ -89,22 +89,27 @@ public class ChatHeadsController {
             emitViewState(chatHeadState.onNewMessage(0));
             emitViewState(chatHeadState.changeVisibility(true, callingActivity));
         }
+        emitViewState(chatHeadState.showMessageCount(
+                callingActivity.equals(GliaWidgets.CALL_ACTIVITY) &&
+                        !isChatInBackstack ||
+                        callingActivity.equals(GliaWidgets.CHAT_ACTIVITY)
+        ));
     }
 
-    public void onMinimizeButtonClicked(int unseenMessageCount) {
-        Logger.d(TAG, "onMinimizeButtonClicked, unseenMessageCount: " + unseenMessageCount);
-        emitViewState(chatHeadState.onNewMessage(unseenMessageCount));
+    public void onMinimizeButtonClicked() {
+        Logger.d(TAG, "onMinimizeButtonClicked");
         emitViewState(chatHeadState.changeVisibility(true, GliaWidgets.CALL_ACTIVITY));
+        emitViewState(chatHeadState.showMessageCount(true));
     }
 
     public void onChatButtonClicked() {
         Logger.d(TAG, "onChatButtonClicked");
         emitViewState(chatHeadState.changeVisibility(true, GliaWidgets.CALL_ACTIVITY));
+        emitViewState(chatHeadState.showMessageCount(false));
     }
 
     public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
         Logger.d(TAG, "onNavigatedToChat");
-        emitViewState(chatHeadState.onNewMessage(0));
         boolean hasOngoingMedia = chatHeadState.operatorMediaState != null &&
                 (chatHeadState.operatorMediaState.getAudio() != null ||
                         chatHeadState.operatorMediaState.getVideo() != null);
@@ -118,6 +123,7 @@ public class ChatHeadsController {
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
+        emitViewState(chatHeadState.showMessageCount(false));
     }
 
     public void onNavigatedToCall() {
@@ -170,11 +176,6 @@ public class ChatHeadsController {
 
     private final GliaChatHeadControllerRepositoryCallback repositoryCallback =
             new GliaChatHeadControllerRepositoryCallback() {
-                @Override
-                public void onMessage() {
-                    Logger.d(TAG, "onMessage");
-                    emitViewState(chatHeadState.onNewMessage(chatHeadState.messageCount + 1));
-                }
 
                 @Override
                 public void operatorDataLoaded(Operator operator) {

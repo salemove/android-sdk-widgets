@@ -80,7 +80,7 @@ public class ChatHeadView extends ConstraintLayout {
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
         this.theme = Utils.getFullHybridTheme(this.theme, theme);
-        setupViewAppearance();
+        post(this::setupViewAppearance);
     }
 
     private void setupViewAppearance() {

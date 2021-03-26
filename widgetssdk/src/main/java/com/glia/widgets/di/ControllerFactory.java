@@ -10,6 +10,7 @@ import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
@@ -21,6 +22,7 @@ public class ControllerFactory {
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
     private final ChatHeadsController chatHeadsController;
     private final DialogController dialogController;
+    private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private static final String TAG = "ControllerFactory";
 
@@ -31,8 +33,12 @@ public class ControllerFactory {
 
     public ControllerFactory(RepositoryFactory repositoryFactory) {
         this.repositoryFactory = repositoryFactory;
+        messagesNotSeenHandler = new MessagesNotSeenHandler(
+                repositoryFactory.getGliaMessagesNotSeenRepository()
+        );
         chatHeadsController = new ChatHeadsController(
-                repositoryFactory.getGliaChatHeadControllerRepository()
+                repositoryFactory.getGliaChatHeadControllerRepository(),
+                messagesNotSeenHandler
         );
         dialogController = new DialogController();
     }
@@ -47,7 +53,8 @@ public class ControllerFactory {
                     chatViewCallback,
                     minimizeHandler,
                     chatHeadsController,
-                    dialogController);
+                    dialogController,
+                    messagesNotSeenHandler);
         }
 
         if (retainedChatController == null) {
@@ -59,7 +66,8 @@ public class ControllerFactory {
                     chatViewCallback,
                     minimizeHandler,
                     chatHeadsController,
-                    dialogController);
+                    dialogController,
+                    messagesNotSeenHandler);
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -78,7 +86,8 @@ public class ControllerFactory {
                     new TimeCounter(),
                     minimizeHandler,
                     chatHeadsController,
-                    dialogController
+                    dialogController,
+                    messagesNotSeenHandler
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -145,5 +154,10 @@ public class ControllerFactory {
     public DialogController getDialogController(DialogController.Callback callback) {
         dialogController.addCallback(callback);
         return dialogController;
+    }
+
+    public void init() {
+        chatHeadsController.initChatObserving();
+        messagesNotSeenHandler.init();
     }
 }

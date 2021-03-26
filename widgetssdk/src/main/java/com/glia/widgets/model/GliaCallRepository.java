@@ -22,7 +22,6 @@ public class GliaCallRepository {
             callback.engagementEndedByOperator();
         }
     };
-    private Consumer<ChatMessage> messageHandler;
     private final Consumer<OperatorMediaState> operatorMediaStateConsumer = operatorMediaState -> {
         Logger.d(TAG, "operatorMediaState: " + operatorMediaState.toString());
         callback.newOperatorMediaState(operatorMediaState);
@@ -33,7 +32,6 @@ public class GliaCallRepository {
     };
     private final Consumer<OmnicoreEngagement> engagementHandler = engagement -> {
         callback.engagementSuccess(engagement);
-        engagement.getChat().on(Chat.Events.MESSAGE, messageHandler);
         engagement.on(Engagement.Events.END, engagementEndListener);
         engagement.getMedia().on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
         engagement.getMedia().on(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateConsumer);
@@ -41,7 +39,6 @@ public class GliaCallRepository {
 
     public void init(CallGliaCallback callback) {
         this.callback = callback;
-        messageHandler = callback::onMessage;
         Glia.on(Glia.Events.ENGAGEMENT, engagementHandler);
     }
 
@@ -53,7 +50,6 @@ public class GliaCallRepository {
         callback = null;
         Glia.off(Glia.Events.ENGAGEMENT, engagementHandler);
         Glia.getCurrentEngagement().ifPresent(engagement -> {
-            engagement.getChat().off(Chat.Events.MESSAGE, messageHandler);
             engagement.off(Engagement.Events.END, engagementEndListener);
             engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
             engagement.getMedia().off(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateConsumer);
@@ -63,7 +59,6 @@ public class GliaCallRepository {
     private void stopInternal() {
         Glia.off(Glia.Events.ENGAGEMENT, engagementHandler);
         Glia.getCurrentEngagement().ifPresent(engagement -> {
-            engagement.getChat().off(Chat.Events.MESSAGE, messageHandler);
             engagement.off(Engagement.Events.END, engagementEndListener);
             engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
             engagement.getMedia().off(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateConsumer);

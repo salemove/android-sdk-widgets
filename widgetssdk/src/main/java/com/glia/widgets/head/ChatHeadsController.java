@@ -89,23 +89,16 @@ public class ChatHeadsController {
             emitViewState(chatHeadState.onNewMessage(0));
             emitViewState(chatHeadState.changeVisibility(true, callingActivity));
         }
-        emitViewState(chatHeadState.showMessageCount(
-                callingActivity.equals(GliaWidgets.CALL_ACTIVITY) &&
-                        !isChatInBackstack ||
-                        callingActivity.equals(GliaWidgets.CHAT_ACTIVITY)
-        ));
     }
 
     public void onMinimizeButtonClicked() {
         Logger.d(TAG, "onMinimizeButtonClicked");
         emitViewState(chatHeadState.changeVisibility(true, GliaWidgets.CALL_ACTIVITY));
-        emitViewState(chatHeadState.showMessageCount(true));
     }
 
     public void onChatButtonClicked() {
         Logger.d(TAG, "onChatButtonClicked");
         emitViewState(chatHeadState.changeVisibility(true, GliaWidgets.CALL_ACTIVITY));
-        emitViewState(chatHeadState.showMessageCount(false));
     }
 
     public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
@@ -123,7 +116,6 @@ public class ChatHeadsController {
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
-        emitViewState(chatHeadState.showMessageCount(false));
     }
 
     public void onNavigatedToCall() {

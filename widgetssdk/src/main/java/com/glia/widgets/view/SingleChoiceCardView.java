@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,12 +21,14 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class SingleChoiceCardView extends FrameLayout {
 
     private final MaterialCardView materialCardView;
+    private final ImageView imageView;
     private final ConstraintLayout layout;
     private final TextView contentView;
     private OnOptionClickedListener onOptionClickedListener;
@@ -42,12 +45,14 @@ public class SingleChoiceCardView extends FrameLayout {
         super(context, attrs, defStyleAttr);
         inflate(context, R.layout.single_choice_card_view, this);
         materialCardView = findViewById(R.id.card_view);
+        imageView = findViewById(R.id.image);
         layout = findViewById(R.id.layout);
         contentView = findViewById(R.id.content_view);
     }
 
     public void setData(
             String id,
+            String imageUrl,
             String content,
             List<SingleChoiceOption> options,
             Integer selectedIndex,
@@ -70,6 +75,11 @@ public class SingleChoiceCardView extends FrameLayout {
                 ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor());
 
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
+
+        if (imageUrl != null) {
+            Picasso.with(this.getContext()).load(imageUrl).into(imageView);
+        }
+        imageView.setVisibility(imageUrl != null ? VISIBLE : GONE);
         contentView.setTextColor(gliaBaseDarkColor);
 
         contentView.setText(content);

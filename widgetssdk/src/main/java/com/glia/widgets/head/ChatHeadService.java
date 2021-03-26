@@ -35,10 +35,7 @@ public class ChatHeadService extends Service {
                     if (chatHeadState.theme != null) {
                         chatHeadView.setTheme(chatHeadState.theme);
                     }
-                    chatHeadView.setMessageBadgeCount(
-                            chatHeadState.showMessageCount ?
-                                    chatHeadState.messageCount :
-                                    0);
+                    chatHeadView.setMessageBadgeCount(chatHeadState.messageCount);
                     chatHeadView.updateImage(chatHeadState.operatorProfileImgUrl);
                     chatHeadView.setVisibility(chatHeadState.isOverlayVisible ? View.VISIBLE : View.GONE);
                     returnDestination = chatHeadState.returnDestination;

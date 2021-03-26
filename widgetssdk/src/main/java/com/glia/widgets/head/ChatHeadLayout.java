@@ -31,10 +31,7 @@ public class ChatHeadLayout extends FrameLayout {
                 @Override
                 public void emitState(ChatHeadState chatHeadState) {
                     post(() -> {
-                        chatHeadView.setMessageBadgeCount(
-                                chatHeadState.showMessageCount ?
-                                        chatHeadState.messageCount :
-                                        0);
+                        chatHeadView.setMessageBadgeCount(chatHeadState.messageCount);
                         chatHeadView.updateImage(chatHeadState.operatorProfileImgUrl);
                         if (chatHeadState.theme != null) {
                             chatHeadView.setTheme(chatHeadState.theme);

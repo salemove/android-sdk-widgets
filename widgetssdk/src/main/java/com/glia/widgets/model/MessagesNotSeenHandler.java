@@ -1,5 +1,6 @@
 package com.glia.widgets.model;
 
+import com.glia.androidsdk.chat.Chat;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ public class MessagesNotSeenHandler {
 
     private final static String TAG = "MessagesNotSeenHandler";
     private int count = 0;
+    private boolean isCounting = false;
     private final List<MessagesNotSeenHandlerListener> listeners = new ArrayList<>();
     private final GliaMessagesNotSeenRepository messagesNotSeenRepository;
 
@@ -18,29 +20,37 @@ public class MessagesNotSeenHandler {
 
     public void init() {
         Logger.d(TAG, "init");
-        messagesNotSeenRepository.init(message -> emitCount(count + 1));
+        messagesNotSeenRepository.init(message -> {
+            if (isCounting && message.getSender() == Chat.Participant.OPERATOR) {
+                emitCount(count + 1);
+            }
+        });
     }
 
     public void callOnBackClicked(boolean isChatInBackstack) {
         Logger.d(TAG, "callOnBackClicked");
         if (isChatInBackstack) {
             emitCount(0);
+            isCounting = false;
         }
     }
 
     public void chatOnBackClicked() {
         Logger.d(TAG, "chatOnBackClicked");
         emitCount(0);
+        isCounting = true;
     }
 
     public void callChatButtonClicked() {
         Logger.d(TAG, "callChatButtonClicked");
         emitCount(0);
+        isCounting = false;
     }
 
     public void onNavigatedToChat() {
         Logger.d(TAG, "onNavigatedToChat");
         emitCount(0);
+        isCounting = false;
     }
 
     public void addListener(MessagesNotSeenHandlerListener listener) {
@@ -64,6 +74,7 @@ public class MessagesNotSeenHandler {
 
     public void chatUpgradeOfferAccepted() {
         emitCount(0);
+        isCounting = true;
     }
 
     public interface MessagesNotSeenHandlerListener {

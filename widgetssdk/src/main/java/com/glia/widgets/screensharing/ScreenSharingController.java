@@ -3,6 +3,7 @@ package com.glia.widgets.screensharing;
 import android.content.Context;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.GliaScreenSharingRepository;
@@ -11,14 +12,17 @@ import com.glia.widgets.notification.NotificationActionReceiver;
 public class ScreenSharingController {
     private static final String TAG = "GliaScreenSharingController";
     private final GliaScreenSharingRepository repository;
+    private final DialogController dialogController;
     private ViewCallback viewCallback;
 
     public ScreenSharingController(
             GliaScreenSharingRepository gliaScreenSharingRepository,
+            DialogController gliaDialogController,
             ViewCallback callback
     ) {
         Logger.d(TAG, "init");
         repository = gliaScreenSharingRepository;
+        dialogController = gliaDialogController;
         viewCallback = callback;
         initControllerCallback();
     }
@@ -27,7 +31,7 @@ public class ScreenSharingController {
         repository.init(new GliaScreenSharingCallback() {
             @Override
             public void onScreenSharingRequest() {
-                if (viewCallback != null) viewCallback.onShowScreenSharingRequestDialog();
+                if (viewCallback != null) dialogController.showStartScreenSharingDialog();
                 Logger.d(TAG, "on screen sharing request");
             }
 
@@ -57,17 +61,25 @@ public class ScreenSharingController {
 
     public void onScreenSharingAccepted(Context context) {
         Logger.d(TAG, "onScreenSharingAccepted");
+        dialogController.dismissDialogs();
         showScreenSharingEnabledNotification(context);
         repository.onScreenSharingAccepted(Utils.getActivity(context));
     }
 
     public void onScreenSharingDeclined() {
         Logger.d(TAG, "onScreenSharingDeclined");
+        dialogController.dismissDialogs();
         repository.onScreenSharingDeclined();
+    }
+
+    public void onDismissEndScreenSharing() {
+        Logger.d(TAG, "onDismissEndScreenSharing");
+        dialogController.dismissDialogs();
     }
 
     public void onEndScreenSharing(Context context) {
         Logger.d(TAG, "onEndScreenSharing");
+        dialogController.dismissDialogs();
         hideScreenSharingEnabledNotification(context);
         repository.onEndScreenSharing();
     }
@@ -85,7 +97,7 @@ public class ScreenSharingController {
         if (viewCallback == null) {
             onEndScreenSharing(context);
         } else {
-            viewCallback.onShowEndScreenSharingDialog();
+            dialogController.showEndScreenSharingDialog();
         }
     }
 
@@ -103,10 +115,6 @@ public class ScreenSharingController {
     }
 
     public interface ViewCallback {
-        void onShowScreenSharingRequestDialog();
-
-        void onShowEndScreenSharingDialog();
-
         void onScreenSharingRequestError(GliaException ex);
     }
 }

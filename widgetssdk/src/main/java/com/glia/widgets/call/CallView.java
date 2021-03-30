@@ -38,6 +38,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -310,29 +311,6 @@ public class CallView extends ConstraintLayout {
             }
 
             @Override
-            public void emitDialog(DialogsState dialogsState) {
-                if (dialogsState instanceof DialogsState.NoDialog) {
-                    post(() -> {
-                        if (alertDialog != null) {
-                            alertDialog.dismiss();
-                            alertDialog = null;
-                        }
-                    });
-                } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
-                    post(() -> showUnexpectedErrorDialog());
-                } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
-                    post(() -> showOverlayPermissionsDialog());
-                } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                    post(() -> showEndEngagementDialog(
-                            ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
-                } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
-                    post(() -> showNoMoreOperatorsAvailableDialog());
-                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
-                }
-            }
-
-            @Override
             public void navigateToChat() {
                 if (onNavigateToChatListener != null) {
                     onNavigateToChatListener.call();
@@ -352,18 +330,6 @@ public class CallView extends ConstraintLayout {
 
         screenSharingCallback = new ScreenSharingController.ViewCallback() {
             @Override
-            public void onShowScreenSharingRequestDialog() {
-                Utils.getActivity(getContext()).runOnUiThread(
-                        () -> showScreenSharingDialog()
-                );
-            }
-
-            @Override
-            public void onShowEndScreenSharingDialog() {
-                showScreenSharingEndDialog();
-            }
-
-            @Override
             public void onScreenSharingRequestError(GliaException exception) {
                 Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
             }
@@ -372,6 +338,35 @@ public class CallView extends ConstraintLayout {
         controller = GliaWidgets
                 .getControllerFactory()
                 .getCallController(callback);
+
+        DialogController dialogController = GliaWidgets.getControllerFactory().getDialogController(new DialogController.Callback() {
+            @Override
+            public void emitDialog(DialogsState dialogsState) {
+                if (dialogsState instanceof DialogsState.NoDialog) {
+                    post(() -> {
+                        if (alertDialog != null) {
+                            alertDialog.dismiss();
+                            alertDialog = null;
+                        }
+                    });
+                } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
+                    post(() -> showUnexpectedErrorDialog());
+                } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
+                    post(() -> showOverlayPermissionsDialog());
+                } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
+                    post(() -> showEndEngagementDialog(
+                            ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+                } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
+                    post(() -> showNoMoreOperatorsAvailableDialog());
+                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
+                } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                    post(() -> showScreenSharingDialog());
+                } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                    post(() -> showScreenSharingEndDialog());
+                }
+            }
+        });
 
         screenSharingController =
                 GliaWidgets
@@ -402,7 +397,7 @@ public class CallView extends ConstraintLayout {
                     getContext().getString(R.string.dialog_screen_sharing_end_message),
                     R.string.chat_dialog_cancel,
                     R.string.chat_dialog_end_sharing,
-                    view -> alertDialog.dismiss(),
+                    view -> screenSharingController.onDismissEndScreenSharing(),
                     view -> screenSharingController.onEndScreenSharing(getContext())
             );
         }

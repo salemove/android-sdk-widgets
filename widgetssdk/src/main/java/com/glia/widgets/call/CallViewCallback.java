@@ -7,8 +7,6 @@ public interface CallViewCallback {
 
     void emitState(CallState callState);
 
-    void emitDialog(DialogsState dialogsState);
-
     void navigateToChat();
 
     void startOperatorVideoView(MediaState operatorMediaState);

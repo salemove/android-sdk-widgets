@@ -11,8 +11,6 @@ public interface ChatViewCallback {
 
     void emitItems(List<ChatItem> items);
 
-    void emitDialog(DialogsState dialogsState);
-
     void navigateToCall();
 
     void destroyView();

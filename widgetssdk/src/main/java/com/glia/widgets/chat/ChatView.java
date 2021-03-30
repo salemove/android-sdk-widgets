@@ -30,7 +30,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -148,7 +147,12 @@ public class ChatView extends LinearLayout {
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
-                    chatEditText.setEnabled(chatState.isOperatorOnline());
+                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED);
+                    chatEditText.setHint(
+                            chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD ?
+                                    R.string.chat_single_choice_card_hint :
+                                    R.string.chat_enter_message);
+
                     if (chatState.isOperatorOnline()) {
                         appBar.showEndButton();
                     } else {

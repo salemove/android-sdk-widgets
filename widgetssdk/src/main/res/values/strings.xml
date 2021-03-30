@@ -30,6 +30,7 @@
     <string name="chat_dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
     <string name="chat_dialog_decline">Decline</string>
     <string name="chat_dialog_accept">Accept</string>
+    <string name="chat_single_choice_card_hint">Tap on the answer above</string>
 
     <string name="call_audio_app_bar_title">Audio call</string>
     <string name="call_video_app_bar_title">Video call</string>

@@ -81,6 +81,7 @@ public class ChatController {
                 .setOverlaysPermissionDialogShown(false)
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
+                .setChatInputMode(ChatInputMode.DISABLED)
                 .createChatState();
         this.dialogsState = new DialogsState.NoDialog();
         this.repository = gliaChatRepository;
@@ -528,6 +529,16 @@ public class ChatController {
             appendSentMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
+            if (message.getAttachment() instanceof SingleChoiceAttachment) {
+                SingleChoiceAttachment attachment =
+                        ((SingleChoiceAttachment) message.getAttachment());
+                emitViewState(
+                        chatState.chatInputModeChanged(
+                                attachment.getOptions() != null ?
+                                        ChatInputMode.SINGLE_CHOICE_CARD :
+                                        ChatInputMode.ENABLED
+                        ));
+            }
         }
     }
 

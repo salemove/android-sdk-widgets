@@ -14,6 +14,7 @@ import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.R;
@@ -142,7 +143,13 @@ public class SingleChoiceCardView extends FrameLayout {
             button.setTextColor(selectedIndex != null && selectedIndex == index ?
                     gliaBaseLightColor :
                     gliaBaseDarkColor);
-
+            if (theme.getFontRes() != null) {
+                button.setTypeface(
+                        ResourcesCompat.getFont(
+                                this.getContext(),
+                                theme.getFontRes())
+                );
+            }
             if (onOptionClickedListener != null) {
                 final int optionIndex = index;
                 button.setOnClickListener(v -> {
@@ -157,6 +164,13 @@ public class SingleChoiceCardView extends FrameLayout {
                 });
             }
             constraintSet.applyTo(layout);
+        }
+        if (theme.getFontRes() != null) {
+            contentView.setTypeface(
+                    ResourcesCompat.getFont(
+                            this.getContext(),
+                            theme.getFontRes())
+            );
         }
     }
 

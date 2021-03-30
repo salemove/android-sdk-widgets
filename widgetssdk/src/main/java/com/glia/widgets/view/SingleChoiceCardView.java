@@ -22,6 +22,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class SingleChoiceCardView extends FrameLayout {
     private final ConstraintLayout layout;
     private final TextView contentView;
     private OnOptionClickedListener onOptionClickedListener;
+    private OnImageLoadedListener onImageLoadedListener;
 
     public SingleChoiceCardView(@NonNull Context context) {
         this(context, null);
@@ -59,8 +61,11 @@ public class SingleChoiceCardView extends FrameLayout {
             Integer selectedIndex,
             UiTheme theme,
             int adapterPosition,
-            int messagePosition
+            int messagePosition,
+            OnImageLoadedListener onImageLoadedListener
     ) {
+        this.onImageLoadedListener = onImageLoadedListener;
+
         int gliaBaseDarkColor = ContextCompat.getColor(
                 this.getContext(), theme.getBaseDarkColor()
         );
@@ -78,7 +83,19 @@ public class SingleChoiceCardView extends FrameLayout {
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
 
         if (imageUrl != null) {
-            Picasso.with(this.getContext()).load(imageUrl).into(imageView);
+            Picasso.with(this.getContext()).load(imageUrl).into(imageView, new Callback() {
+                @Override
+                public void onSuccess() {
+                    if (SingleChoiceCardView.this.onImageLoadedListener != null) {
+                        onImageLoadedListener.onLoaded();
+                    }
+                }
+
+                @Override
+                public void onError() {
+                    // do nothing
+                }
+            });
         }
         imageView.setVisibility(imageUrl != null ? VISIBLE : GONE);
         contentView.setTextColor(gliaBaseDarkColor);
@@ -185,5 +202,16 @@ public class SingleChoiceCardView extends FrameLayout {
                 int indexOfMessage,
                 int indexOfOption
         );
+    }
+
+    public interface OnImageLoadedListener {
+        void onLoaded();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        onImageLoadedListener = null;
+        onOptionClickedListener = null;
+        super.onDetachedFromWindow();
     }
 }

@@ -36,6 +36,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.dialog.DialogController;
@@ -52,6 +53,7 @@ import static androidx.lifecycle.Lifecycle.State.INITIALIZED;
 
 public class ChatView extends LinearLayout {
 
+    private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
 
     private ChatViewCallback callback;
@@ -92,6 +94,13 @@ public class ChatView extends LinearLayout {
                         optionIndex
                 );
             }
+        }
+    };
+    private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener = new SingleChoiceCardView.OnImageLoadedListener() {
+        @Override
+        public void onLoaded() {
+            Logger.d(TAG, "onSingleChoiceCardViewImageLoaded, scroll to bottom");
+            chatRecyclerView.smoothScrollToPosition(adapter.getItemCount());
         }
     };
 
@@ -450,7 +459,7 @@ public class ChatView extends LinearLayout {
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme, onOptionClickedListener);
+        adapter = new ChatAdapter(this.theme, onOptionClickedListener, this.onImageLoadedListener);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);

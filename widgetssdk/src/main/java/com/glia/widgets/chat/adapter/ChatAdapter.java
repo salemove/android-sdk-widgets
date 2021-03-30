@@ -52,10 +52,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int MEDIA_UPGRADE_ITEM_TYPE = 3;
     private final UiTheme uiTheme;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener;
+    private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener;
 
-    public ChatAdapter(UiTheme uiTheme, SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener) {
+    public ChatAdapter(
+            UiTheme uiTheme,
+            SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
+            SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener
+    ) {
         this.uiTheme = uiTheme;
         this.onOptionClickedListener = onOptionClickedListener;
+        this.onImageLoadedListener = onImageLoadedListener;
     }
 
     private static class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
@@ -162,7 +168,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void bind(
                 ReceiveMessageItem item,
-                SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener
+                SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
+                SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener
         ) {
             contentLayout.removeAllViews();
             for (int messageIndex = 0; messageIndex < item.getMessages().size(); messageIndex++) {
@@ -178,7 +185,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             message.selectedIndex,
                             uiTheme,
                             getAdapterPosition(),
-                            messageIndex
+                            messageIndex,
+                            message.selectedIndex == null ? onImageLoadedListener : null
                     );
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -314,7 +322,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (chatItem instanceof ReceiveMessageItem) {
             ((ReceiveMessageViewHolder) holder).bind(
                     (ReceiveMessageItem) chatItem,
-                    onOptionClickedListener
+                    onOptionClickedListener,
+                    onImageLoadedListener
             );
         } else if (chatItem instanceof MediaUpgradeStartedTimerItem) {
             ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);

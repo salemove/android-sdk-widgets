@@ -30,19 +30,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.SingleChoiceCardView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.util.List;
@@ -51,6 +53,7 @@ import static androidx.lifecycle.Lifecycle.State.INITIALIZED;
 
 public class ChatView extends LinearLayout {
 
+    private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
 
     private ChatViewCallback callback;
@@ -75,6 +78,31 @@ public class ChatView extends LinearLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToCallListener onNavigateToCallListener;
+    private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
+        @Override
+        public void onClicked(
+                String id,
+                int indexInList,
+                int messageIndex,
+                int optionIndex
+        ) {
+            if (controller != null) {
+                controller.singleChoiceOptionClicked(
+                        id,
+                        indexInList,
+                        messageIndex,
+                        optionIndex
+                );
+            }
+        }
+    };
+    private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener = new SingleChoiceCardView.OnImageLoadedListener() {
+        @Override
+        public void onLoaded() {
+            Logger.d(TAG, "onSingleChoiceCardViewImageLoaded, scroll to bottom");
+            chatRecyclerView.smoothScrollToPosition(adapter.getItemCount());
+        }
+    };
 
     private final Resources resources;
 
@@ -130,7 +158,12 @@ public class ChatView extends LinearLayout {
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
-                    chatEditText.setEnabled(chatState.isOperatorOnline());
+                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED);
+                    chatEditText.setHint(
+                            chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD ?
+                                    R.string.chat_single_choice_card_hint :
+                                    R.string.chat_enter_message);
+
                     if (chatState.isOperatorOnline()) {
                         appBar.showEndButton();
                     } else {
@@ -177,7 +210,7 @@ public class ChatView extends LinearLayout {
             }
         };
 
-        controller = GliaWidgets
+        controller = Dependencies
                 .getControllerFactory()
                 .getChatController(Utils.getActivity(this.getContext()), callback);
 
@@ -212,11 +245,11 @@ public class ChatView extends LinearLayout {
             }
         };
 
-        dialogController = GliaWidgets
+        dialogController = Dependencies
                 .getControllerFactory()
                 .getDialogController(dialogCallback);
 
-        screenSharingController = GliaWidgets
+        screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
     }
@@ -226,8 +259,8 @@ public class ChatView extends LinearLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    getContext().getText(R.string.dialog_screen_sharing_offer_title).toString(),
-                    getContext().getText(R.string.dialog_screen_sharing_offer_message).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_message).toString(),
                     R.string.chat_dialog_accept,
                     R.string.chat_dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
@@ -241,8 +274,8 @@ public class ChatView extends LinearLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    getContext().getString(R.string.dialog_screen_sharing_end_title),
-                    getContext().getString(R.string.dialog_screen_sharing_end_message),
+                    resources.getString(R.string.dialog_screen_sharing_end_title),
+                    resources.getString(R.string.dialog_screen_sharing_end_message),
                     R.string.chat_dialog_cancel,
                     R.string.chat_dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),
@@ -333,7 +366,7 @@ public class ChatView extends LinearLayout {
 
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
-        this.theme = Utils.getFullHybridTheme(theme, this.theme);
+        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {
             handleStatusbarColor();
@@ -426,7 +459,7 @@ public class ChatView extends LinearLayout {
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme);
+        adapter = new ChatAdapter(this.theme, onOptionClickedListener, this.onImageLoadedListener);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
@@ -713,8 +746,7 @@ public class ChatView extends LinearLayout {
 
     private void chatEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        screenSharingController.onDestroy(false);
-        GliaWidgets.getControllerFactory().destroyControllers();
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     private void dismissAlertDialog() {

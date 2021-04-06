@@ -4,16 +4,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class ReceiveMessageItem extends ChatItem {
-    private final List<String> messages;
+    private final List<ReceiveMessageItemMessage> messages;
     private final String operatorProfileImgUrl;
 
-    public ReceiveMessageItem(String id, List<String> messages, String operatorProfileImgUrl) {
+    public ReceiveMessageItem(
+            String id,
+            List<ReceiveMessageItemMessage> messages,
+            String operatorProfileImgUrl
+    ) {
         super(id, ChatAdapter.RECEIVE_MESSAGE_VIEW_TYPE);
         this.messages = messages;
         this.operatorProfileImgUrl = operatorProfileImgUrl;
     }
 
-    public List<String> getMessages() {
+    public List<ReceiveMessageItemMessage> getMessages() {
         return messages;
     }
 

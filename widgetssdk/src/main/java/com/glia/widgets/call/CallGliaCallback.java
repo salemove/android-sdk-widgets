@@ -9,8 +9,6 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 public interface CallGliaCallback {
     void error(GliaException e);
 
-    void onMessage(ChatMessage message);
-
     void engagementSuccess(OmnicoreEngagement engagement);
 
     void engagementEndedByOperator();

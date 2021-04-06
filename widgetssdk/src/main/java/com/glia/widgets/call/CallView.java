@@ -32,13 +32,14 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -133,7 +134,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewActions() {
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
-                controller.onBackArrowClicked(GliaWidgets.isInBackstack(GliaWidgets.CHAT_ACTIVITY));
+                controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -227,8 +228,8 @@ public class CallView extends ConstraintLayout {
     }
 
     private void destroyController() {
-        GliaWidgets.getControllerFactory().destroyCallController(true);
-        GliaWidgets.getControllerFactory().destroyScreenSharingController(true);
+        Dependencies.getControllerFactory().destroyCallController(true);
+        Dependencies.getControllerFactory().destroyScreenSharingController(true);
         controller = null;
     }
 
@@ -342,7 +343,7 @@ public class CallView extends ConstraintLayout {
             }
         };
 
-        controller = GliaWidgets
+        controller = Dependencies
                 .getControllerFactory()
                 .getCallController(callback);
 
@@ -375,12 +376,11 @@ public class CallView extends ConstraintLayout {
             }
         };
 
-        dialogController = GliaWidgets.getControllerFactory().getDialogController(dialogCallback);
+        dialogController = Dependencies.getControllerFactory().getDialogController(dialogCallback);
 
-        screenSharingController =
-                GliaWidgets
-                        .getControllerFactory()
-                        .getScreenSharingController(screenSharingCallback);
+        screenSharingController = Dependencies
+                .getControllerFactory()
+                .getScreenSharingController(screenSharingCallback);
     }
 
     private void showScreenSharingDialog() {
@@ -388,8 +388,8 @@ public class CallView extends ConstraintLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    getContext().getText(R.string.dialog_screen_sharing_offer_title).toString(),
-                    getContext().getText(R.string.dialog_screen_sharing_offer_message).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_message).toString(),
                     R.string.chat_dialog_accept,
                     R.string.chat_dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
@@ -402,8 +402,8 @@ public class CallView extends ConstraintLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    getContext().getString(R.string.dialog_screen_sharing_end_title),
-                    getContext().getString(R.string.dialog_screen_sharing_end_message),
+                    resources.getString(R.string.dialog_screen_sharing_end_title),
+                    resources.getString(R.string.dialog_screen_sharing_end_message),
                     R.string.chat_dialog_cancel,
                     R.string.chat_dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),
@@ -629,7 +629,7 @@ public class CallView extends ConstraintLayout {
 
     public void backPressed() {
         if (controller != null) {
-            controller.onBackArrowClicked(GliaWidgets.isInBackstack(GliaWidgets.CHAT_ACTIVITY));
+            controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
         }
     }
 
@@ -815,7 +815,7 @@ public class CallView extends ConstraintLayout {
 
     private void callEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        GliaWidgets.getControllerFactory().destroyControllers();
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     private void showOperatorVideo(MediaState operatorMediaState) {

@@ -68,6 +68,7 @@
         </item>
         <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Positive
         </item>
+        <item name="buttonBarNeutralButtonStyle">@style/Application.Glia.Chat.Button.Neutral</item>
         <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
         <item name="textAppearanceHeadline2">@style/Application.Glia.Header2</item>
         <item name="textAppearanceHeadline3">@style/Application.Glia.Header3</item>

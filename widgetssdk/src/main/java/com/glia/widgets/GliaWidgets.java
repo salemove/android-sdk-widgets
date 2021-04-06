@@ -5,44 +5,64 @@ import android.content.Intent;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
-import com.glia.widgets.di.ControllerFactory;
-import com.glia.widgets.di.RepositoryFactory;
-import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.helper.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * This class is a starting point for integration with Glia Widgets SDK
+ */
 public class GliaWidgets {
 
+    private final static String TAG = "GliaWidgets";
+    /**
+     * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
+     * navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
     public static final String UI_THEME = "ui_theme";
+    /**
+     * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
+     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
     public static final String COMPANY_NAME = "company_name";
+    /**
+     * Use with {@link android.os.Bundle} to pass in the id of the queue you wish to enroll in
+     * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
     public static final String QUEUE_ID = "queue_id";
+    /**
+     * Use with {@link android.os.Bundle} to pass in a context url as a navigation
+     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
     public static final String CONTEXT_URL = "context_url";
-    public static final String CHAT_ACTIVITY = "chat_activity";
-    public static final String CALL_ACTIVITY = "call_activity";
+    /**
+     * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
+     * use the chat head bubble as an overlay as a navigation argument when
+     * navigating to {@link com.glia.widgets.chat.ChatActivity}
+     * If set to true then the chat head will appear in the overlay and the sdk will ask for
+     * overlay permissions. If false, then the {@link ChatHeadsController} will notify any
+     * listening {@link com.glia.widgets.head.ChatHeadLayout} of any visibility changes.
+     * It is up to the integrator to integrate {@link com.glia.widgets.head.ChatHeadLayout} in their
+     * application.
+     * When this value is not passed then by default this value is true.
+     */
     public static final String USE_OVERLAY = "use_overlay";
 
-    private static ControllerFactory controllerFactory;
-    private static final List<String> activitiesInBackstack = new ArrayList<>();
-
+    /**
+     * Should be called when the application is starting in {@link Application}.onCreate()
+     *
+     * @param application the application where it is initialized
+     */
     public synchronized static void onAppCreate(Application application) {
         Glia.onAppCreate(application);
-        controllerFactory = new ControllerFactory(new RepositoryFactory());
-        controllerFactory.getChatHeadsController().addChatHeadServiceListener(
-                new ChatHeadsController.ChatHeadServiceListener() {
-                    @Override
-                    public void startService() {
-                        application.startService(new Intent(application, ChatHeadService.class));
-                    }
-
-                    @Override
-                    public void stopService() {
-                        application.stopService(new Intent(application, ChatHeadService.class));
-                    }
-                });
+        Dependencies.onAppCreate(application);
+        Logger.d(TAG, "onAppCreate");
     }
 
+    /**
+     * Initializes the Glia core SDK using {@link GliaWidgetsConfig}.
+     *
+     * @param gliaWidgetsConfig Glia configuration
+     */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         GliaConfig gliaConfig = new GliaConfig.Builder()
                 .setApiToken(gliaWidgetsConfig.getApiToken())
@@ -53,41 +73,43 @@ public class GliaWidgets {
                 .build();
 
         Glia.init(gliaConfig);
-        controllerFactory.getChatHeadsController().initChatObserving();
-    }
-
-    public static ControllerFactory getControllerFactory() {
-        return controllerFactory;
-    }
-
-    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Glia.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    public static void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
+        Dependencies.init();
+        Logger.d(TAG, "init");
     }
 
     /**
-     * Needed because CallActivity uses translucent window. And this flag messes with any background
-     * activity lifecycles. Using this to know what activities are in the current backstack.
+     * Accepts permissions request results.
      *
-     * @param activity 1 of either {@link com.glia.widgets.GliaWidgets#CALL_ACTIVITY}
-     *                 or {@link com.glia.widgets.GliaWidgets#CHAT_ACTIVITY}
+     * <p>Some functionalities, for example Video or Audio calls, require to request runtime permissions via
+     * {@link <a href="https://developer.android.com/reference/android/app/Activity.html#requestPermissions(java.lang.String[],%20int)">Activity#requestPermissions(String[], int)</a>}.
+     * The results of such request is passed to your activity's
+     * {@link
+     * <a href="https://developer.android.com/reference/android/app/Activity.html#onRequestPermissionsResult(int,%2520java.lang.String%5B%5D,%2520int%5B%5D)">Activity#onRequestPermissionsResult(int, String[], int[])</a>}
+     * <p>
+     * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
+     *
+     * <p>This method is no-op for other non-Glia triggered results.</p>
      */
-    public static void addActivityToBackStack(String activity) {
-        if (activity.equals(CALL_ACTIVITY) || activity.equals(CHAT_ACTIVITY)) {
-            if (!activitiesInBackstack.contains(activity)) {
-                activitiesInBackstack.add(activity);
-            }
-        }
+    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Logger.d(TAG, "onRequestPermissionsResult");
+        Glia.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public static void removeActivityFromBackStack(String activity) {
-        activitiesInBackstack.remove(activity);
-    }
-
-    public static boolean isInBackstack(String activity) {
-        return activitiesInBackstack.contains(activity);
+    /**
+     * Accepts permissions request results.
+     *
+     * <p>Some functionalities, for example Video or Audio calls, require to request runtime permissions via
+     * {@link <a href="https://developer.android.com/reference/android/app/Activity.html#requestPermissions(java.lang.String[],%20int)">Activity#requestPermissions(String[], int)</a>}.
+     * The results of such request is passed to your activity's
+     * {@link
+     * <a href="https://developer.android.com/reference/android/app/Activity.html#onRequestPermissionsResult(int,%2520java.lang.String%5B%5D,%2520int%5B%5D)">Activity#onRequestPermissionsResult(int, String[], int[])</a>}
+     * <p>
+     * Your activity in turn must call this method to pass the results of the request to Glia SDK.</p>
+     *
+     * <p>This method is no-op for other non-Glia triggered results.</p>
+     */
+    public static void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.d(TAG, "onActivityResult");
+        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
     }
 }

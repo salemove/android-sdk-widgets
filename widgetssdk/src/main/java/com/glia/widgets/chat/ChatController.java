@@ -1,19 +1,25 @@
 package com.glia.widgets.chat;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.MessageAttachment;
+import com.glia.androidsdk.chat.SingleChoiceAttachment;
+import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItem;
+import com.glia.widgets.chat.adapter.ReceiveMessageItemMessage;
 import com.glia.widgets.chat.adapter.SendMessageItem;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
@@ -23,10 +29,12 @@ import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
 import com.glia.widgets.dialog.DialogController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatController {
@@ -44,6 +52,7 @@ public class ChatController {
     private final TimeCounter callTimer;
     private final MinimizeHandler minimizeHandler;
     private final ChatHeadsController chatHeadsController;
+    private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private final DialogController dialogController;
 
@@ -58,7 +67,9 @@ public class ChatController {
                           ChatViewCallback viewCallback,
                           MinimizeHandler minimizeHandler,
                           ChatHeadsController chatHeadsController,
-                          DialogController dialogController) {
+                          DialogController dialogController,
+                          MessagesNotSeenHandler messagesNotSeenHandler
+    ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.chatState = new ChatState.Builder()
@@ -73,6 +84,7 @@ public class ChatController {
                 .setOverlaysPermissionDialogShown(false)
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
+                .setChatInputMode(ChatInputMode.DISABLED)
                 .createChatState();
         this.repository = gliaChatRepository;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -80,6 +92,7 @@ public class ChatController {
         this.minimizeHandler = minimizeHandler;
         this.chatHeadsController = chatHeadsController;
         this.dialogController = dialogController;
+        this.messagesNotSeenHandler = messagesNotSeenHandler;
         isNavigationPending = false;
     }
 
@@ -100,6 +113,7 @@ public class ChatController {
                             chatState.contextUrl,
                             uiTheme
                     ));
+            messagesNotSeenHandler.onNavigatedToChat();
         }
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
@@ -175,7 +189,8 @@ public class ChatController {
     public void onBackArrowClicked() {
         Logger.d(TAG, "onBackArrowClicked");
         emitViewState(chatState.changeVisibility(false));
-        chatHeadsController.onBackButtonPressed(GliaWidgets.CHAT_ACTIVITY, false, null);
+        messagesNotSeenHandler.chatOnBackClicked();
+        chatHeadsController.onBackButtonPressed(Constants.CHAT_ACTIVITY, false);
     }
 
     public void noMoreOperatorsAvailableDismissed() {
@@ -247,6 +262,7 @@ public class ChatController {
 
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "upgradeToAudioClicked");
+        messagesNotSeenHandler.chatUpgradeOfferAccepted();
         mediaUpgradeOfferRepository.acceptOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
         dialogController.dismissDialogs();
     }
@@ -313,7 +329,8 @@ public class ChatController {
 
             @Override
             public void messageDelivered(VisitorMessage visitorMessage) {
-                Logger.d(TAG, "messageDelivered: " + visitorMessage.toString());
+                Logger.d(TAG, "messageDelivered: " + visitorMessage.toString() +
+                        ", id: " + visitorMessage.getId());
                 List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
                 changeDeliveredIndex(currentChatItems, visitorMessage);
                 emitChatItems(chatState.changeItems(currentChatItems));
@@ -326,7 +343,23 @@ public class ChatController {
 
             @Override
             public void onMessage(ChatMessage message) {
-                Logger.d(TAG, "onMessage: " + message.getContent());
+                Logger.d(TAG, "onMessage: " + message.getContent() +
+                        ", id: " + message.getId());
+                if (message.getAttachment() != null && message.getAttachment()
+                        instanceof SingleChoiceAttachment) {
+                    SingleChoiceAttachment attachment =
+                            (SingleChoiceAttachment) message.getAttachment();
+
+                    if (attachment.getOptions() != null) {
+                        for (SingleChoiceOption option : attachment.getOptions()) {
+                            Logger.d(TAG, "onMessage, option text: " + option.getText() +
+                                    ", option value: " + option.getValue());
+                        }
+                    }
+                    if (attachment.getSelectedOption() != null) {
+                        Logger.d(TAG, "selectedOption: " + attachment.getSelectedOption());
+                    }
+                }
                 List<ChatItem> items = new ArrayList<>(chatState.chatItems);
                 appendMessageItem(items, message);
                 emitChatItems(chatState.changeItems(items));
@@ -453,15 +486,13 @@ public class ChatController {
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
-        if (!chatState.isOperatorOnline()) {
-            List<ChatItem> items = new ArrayList<>();
-            emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
-            items.add(OperatorStatusItem.OperatorFoundStatusItem(
-                    chatState.companyName,
-                    chatState.getFormattedOperatorName(),
-                    profileImgUrl));
-            emitChatItems(chatState.changeItems(items));
-        }
+        List<ChatItem> items = new ArrayList<>();
+        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+        items.add(OperatorStatusItem.OperatorFoundStatusItem(
+                chatState.companyName,
+                chatState.getFormattedOperatorName(),
+                profileImgUrl));
+        emitChatItems(chatState.changeItems(items));
     }
 
     private void stop() {
@@ -484,10 +515,27 @@ public class ChatController {
             appendSentMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
+            if (message.getAttachment() instanceof SingleChoiceAttachment) {
+                SingleChoiceAttachment attachment =
+                        ((SingleChoiceAttachment) message.getAttachment());
+                emitViewState(
+                        chatState.chatInputModeChanged(
+                                attachment.getOptions() != null ?
+                                        ChatInputMode.SINGLE_CHOICE_CARD :
+                                        ChatInputMode.ENABLED
+                        ));
+            }
         }
     }
 
     private void appendSentMessage(List<ChatItem> items, ChatMessage message) {
+        // do nothing if single choice response
+        MessageAttachment attachment = message.getAttachment();
+        if (attachment instanceof SingleChoiceAttachment &&
+                ((SingleChoiceAttachment) attachment).getSelectedOption() != null) {
+            Logger.d(TAG, "Not adding singleChoiceAnswer");
+            return;
+        }
         items.add(new SendMessageItem(message.getId(), false, message.getContent()));
     }
 
@@ -515,7 +563,8 @@ public class ChatController {
     }
 
     private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
-        List<String> messages;
+        MessageAttachment attachment = message.getAttachment();
+        List<ReceiveMessageItemMessage> messages;
         if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
             ReceiveMessageItem lastItemInView = (ReceiveMessageItem) currentChatItems.get(currentChatItems.size() - 1);
             currentChatItems.remove(lastItemInView);
@@ -523,8 +572,26 @@ public class ChatController {
         } else {
             messages = new ArrayList<>();
         }
-        messages.add(message.getContent());
-        currentChatItems.add(new ReceiveMessageItem(message.getId(), messages, chatState.operatorProfileImgUrl));
+        String imageUrl = null;
+        if (attachment instanceof SingleChoiceAttachment) {
+            try {
+                imageUrl = ((SingleChoiceAttachment) attachment).getImageUrl().get();
+            } catch (Exception e) {
+            }
+        }
+        messages.add(new ReceiveMessageItemMessage(
+                message.getContent(),
+                message.getAttachment() != null &&
+                        attachment instanceof SingleChoiceAttachment ?
+                        Arrays.asList(((SingleChoiceAttachment) attachment).getOptions()) :
+                        null,
+                null,
+                imageUrl));
+        currentChatItems.add(new ReceiveMessageItem(
+                message.getId(),
+                messages,
+                chatState.operatorProfileImgUrl
+        ));
     }
 
     private boolean isMessageValid(String message) {
@@ -584,5 +651,51 @@ public class ChatController {
                 }
             }
         };
+    }
+
+    public void singleChoiceOptionClicked(
+            String id,
+            int indexInList,
+            int messageIndex,
+            int optionIndex
+    ) {
+        Logger.d(TAG, "singleChoiceOptionClicked, id: " + id);
+        if (indexInList == RecyclerView.NO_POSITION) {
+            return;
+        }
+        ChatItem item = chatState.chatItems.get(indexInList);
+        //
+        if (item.getId().equals(id)) {
+            ReceiveMessageItem choiceCardItem =
+                    (ReceiveMessageItem) chatState.chatItems.get(indexInList);
+            ReceiveMessageItemMessage receiveMessageItemMessage =
+                    choiceCardItem.getMessages().get(messageIndex);
+            SingleChoiceOption selectedOption =
+                    receiveMessageItemMessage.attachments.get(optionIndex);
+
+            repository.sendMessage(selectedOption.asSingleChoiceResponse());
+
+            ReceiveMessageItemMessage receiveMessageItemMessageWithSelected =
+                    new ReceiveMessageItemMessage(
+                            receiveMessageItemMessage.content,
+                            receiveMessageItemMessage.attachments,
+                            optionIndex,
+                            receiveMessageItemMessage.imageUrl
+                    );
+            List<ReceiveMessageItemMessage> messagesWithSelected =
+                    new ArrayList<>(choiceCardItem.getMessages());
+            messagesWithSelected.remove(messageIndex);
+            messagesWithSelected.add(messageIndex, receiveMessageItemMessageWithSelected);
+            ReceiveMessageItem choiceCardItemWithSelected =
+                    new ReceiveMessageItem(
+                            id,
+                            messagesWithSelected,
+                            choiceCardItem.getOperatorProfileImgUrl()
+                    );
+            List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);
+            modifiedItems.remove(indexInList);
+            modifiedItems.add(indexInList, choiceCardItemWithSelected);
+            emitChatItems(chatState.changeItems(modifiedItems));
+        }
     }
 }

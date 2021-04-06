@@ -139,18 +139,6 @@ public class GliaWidgetsConfig {
         }
 
         /**
-         * @param requestCode - request code that is used for requesting Android permissions
-         *                    required for some SDK features, for example transmitting Visitor media.
-         *                    It should be unique integer, that it is not used for your own permission requests.
-         *                    If request code is not set then default one is used. See {@link #requestCode} for default value.
-         *                    Missing permissions are requested at runtime if feature that requires them is used.
-         * @return Builder instance
-         */
-        public void setRequestCode(int requestCode) {
-            this.requestCode = requestCode;
-        }
-
-        /**
          * Builds the final configurations
          *
          * @return Glia SDK configurations

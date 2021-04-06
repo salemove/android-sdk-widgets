@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.screensharing.MediaProjectionService;
 import com.glia.widgets.screensharing.ScreenSharingController;
 
@@ -18,7 +18,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public static final String ACTION_ON_SCREEN_SHARING_START = "com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_START";
     public static final String ACTION_ON_SCREEN_SHARING_END_PRESSED = "com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED";
 
-    private final ScreenSharingController controller = GliaWidgets.getControllerFactory().getScreenSharingController(null);
+    private final ScreenSharingController controller = Dependencies.getControllerFactory().getScreenSharingController(null);
 
     @Override
     public void onReceive(Context context, Intent intent) {

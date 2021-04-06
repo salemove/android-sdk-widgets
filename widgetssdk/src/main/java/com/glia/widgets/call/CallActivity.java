@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.glia.widgets.Constants;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -36,7 +38,7 @@ public class CallActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GliaWidgets.addActivityToBackStack(GliaWidgets.CALL_ACTIVITY);
+        Dependencies.addActivityToBackStack(Constants.CALL_ACTIVITY);
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
 
@@ -76,7 +78,7 @@ public class CallActivity extends Activity {
         onEndListener = null;
         onNavigateToChatListener = null;
         callView.onDestroy();
-        GliaWidgets.removeActivityFromBackStack(GliaWidgets.CALL_ACTIVITY);
+        Dependencies.removeActivityFromBackStack(Constants.CALL_ACTIVITY);
         super.onDestroy();
     }
 

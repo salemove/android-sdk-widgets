@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.glia.widgets.Constants;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -14,11 +16,8 @@ import com.glia.widgets.call.CallActivity;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static final String TAG = "ChatActivity";
-
     private String companyName;
     private String queueId;
-    private UiTheme runtimeTheme;
     private String contextUrl;
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
@@ -36,13 +35,13 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        GliaWidgets.addActivityToBackStack(GliaWidgets.CHAT_ACTIVITY);
+        Dependencies.addActivityToBackStack(Constants.CHAT_ACTIVITY);
         setContentView(R.layout.chat_activity);
 
         Intent intent = getIntent();
         companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
         queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-        runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+        UiTheme runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
         boolean useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
 
@@ -75,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
         onEndListener = null;
         onNavigateToCallListener = null;
         chatView.onDestroyView();
-        GliaWidgets.removeActivityFromBackStack(GliaWidgets.CHAT_ACTIVITY);
+        Dependencies.removeActivityFromBackStack(Constants.CHAT_ACTIVITY);
         super.onDestroy();
     }
 

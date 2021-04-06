@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.annotation.AttrRes;
 import androidx.annotation.StyleableRes;
 
+import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -381,7 +382,7 @@ public class Utils {
             ChatHeadInput chatHeadInput,
             String returnDestination
     ) {
-        if (returnDestination.equals(GliaWidgets.CHAT_ACTIVITY)) {
+        if (returnDestination.equals(Constants.CHAT_ACTIVITY)) {
             return getNavigationIntent(context, ChatActivity.class, chatHeadInput);
         } else {
             return getNavigationIntent(context, CallActivity.class, chatHeadInput);

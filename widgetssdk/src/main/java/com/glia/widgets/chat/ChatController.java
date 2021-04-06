@@ -13,7 +13,7 @@ import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
@@ -190,7 +190,7 @@ public class ChatController {
         Logger.d(TAG, "onBackArrowClicked");
         emitViewState(chatState.changeVisibility(false));
         messagesNotSeenHandler.chatOnBackClicked();
-        chatHeadsController.onBackButtonPressed(GliaWidgets.CHAT_ACTIVITY, false);
+        chatHeadsController.onBackButtonPressed(Constants.CHAT_ACTIVITY, false);
     }
 
     public void noMoreOperatorsAvailableDismissed() {

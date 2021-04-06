@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
@@ -80,7 +80,7 @@ public class ChatHeadLayout extends FrameLayout {
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
         setupViewActions();
-        chatHeadsController = GliaWidgets.getControllerFactory().getChatHeadsController();
+        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
         chatHeadsController.addListener(chatHeadListener);
     }
 

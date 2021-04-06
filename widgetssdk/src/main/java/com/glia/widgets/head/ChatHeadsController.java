@@ -2,7 +2,7 @@ package com.glia.widgets.head;
 
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.OperatorMediaState;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.GliaChatHeadControllerRepository;
@@ -81,11 +81,11 @@ public class ChatHeadsController {
     ) {
         Logger.d(TAG, "onBackButtonPressed, callingActivity: " + callingActivity +
                 ", isChatInBackstack: " + isChatInBackstack);
-        if (callingActivity.equals(GliaWidgets.CALL_ACTIVITY)) {
+        if (callingActivity.equals(Constants.CALL_ACTIVITY)) {
             emitViewState(chatHeadState.changeVisibility(
                     chatHeadState.operatorMediaState != null,
                     callingActivity));
-        } else if (callingActivity.equals(GliaWidgets.CHAT_ACTIVITY)) {
+        } else if (callingActivity.equals(Constants.CHAT_ACTIVITY)) {
             emitViewState(chatHeadState.onNewMessage(0));
             emitViewState(chatHeadState.changeVisibility(true, callingActivity));
         }
@@ -93,12 +93,12 @@ public class ChatHeadsController {
 
     public void onMinimizeButtonClicked() {
         Logger.d(TAG, "onMinimizeButtonClicked");
-        emitViewState(chatHeadState.changeVisibility(true, GliaWidgets.CALL_ACTIVITY));
+        emitViewState(chatHeadState.changeVisibility(true, Constants.CALL_ACTIVITY));
     }
 
     public void onChatButtonClicked() {
         Logger.d(TAG, "onChatButtonClicked");
-        emitViewState(chatHeadState.changeVisibility(true, GliaWidgets.CALL_ACTIVITY));
+        emitViewState(chatHeadState.changeVisibility(true, Constants.CALL_ACTIVITY));
     }
 
     public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
@@ -108,7 +108,7 @@ public class ChatHeadsController {
                         chatHeadState.operatorMediaState.getVideo() != null);
         emitViewState(chatHeadState.changeVisibility(
                 hasOngoingMedia,
-                hasOngoingMedia ? GliaWidgets.CALL_ACTIVITY : null
+                hasOngoingMedia ? Constants.CALL_ACTIVITY : null
         ));
         if (chatHeadInput != null && chatHeadInput.uiTheme != null) {
             emitViewState(chatHeadState.themeChanged(chatHeadInput.uiTheme));

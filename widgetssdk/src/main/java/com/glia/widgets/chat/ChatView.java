@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -240,11 +241,11 @@ public class ChatView extends LinearLayout {
             }
         };
 
-        controller = GliaWidgets
+        controller = Dependencies
                 .getControllerFactory()
                 .getChatController(Utils.getActivity(this.getContext()), callback);
 
-        screenSharingController = GliaWidgets
+        screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
 
@@ -718,7 +719,7 @@ public class ChatView extends LinearLayout {
 
     private void chatEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        GliaWidgets.getControllerFactory().destroyControllers();
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     private void dismissAlertDialog() {

@@ -32,7 +32,8 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.head.ChatHeadService;
@@ -130,7 +131,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewActions() {
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
-                controller.onBackArrowClicked(GliaWidgets.isInBackstack(GliaWidgets.CHAT_ACTIVITY));
+                controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -220,8 +221,8 @@ public class CallView extends ConstraintLayout {
     }
 
     private void destroyController() {
-        GliaWidgets.getControllerFactory().destroyCallController(true);
-        GliaWidgets.getControllerFactory().destroyScreenSharingController(true);
+        Dependencies.getControllerFactory().destroyCallController(true);
+        Dependencies.getControllerFactory().destroyScreenSharingController(true);
         controller = null;
     }
 
@@ -365,14 +366,13 @@ public class CallView extends ConstraintLayout {
             }
         };
 
-        controller = GliaWidgets
+        controller = Dependencies
                 .getControllerFactory()
                 .getCallController(callback);
 
-        screenSharingController =
-                GliaWidgets
-                        .getControllerFactory()
-                        .getScreenSharingController(screenSharingCallback);
+        screenSharingController = Dependencies
+                .getControllerFactory()
+                .getScreenSharingController(screenSharingCallback);
     }
 
     private void showScreenSharingDialog() {
@@ -604,7 +604,7 @@ public class CallView extends ConstraintLayout {
 
     public void backPressed() {
         if (controller != null) {
-            controller.onBackArrowClicked(GliaWidgets.isInBackstack(GliaWidgets.CHAT_ACTIVITY));
+            controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
         }
     }
 
@@ -790,7 +790,7 @@ public class CallView extends ConstraintLayout {
 
     private void callEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        GliaWidgets.getControllerFactory().destroyControllers();
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     private void showOperatorVideo(MediaState operatorMediaState) {

@@ -7,7 +7,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -358,7 +358,7 @@ public class CallController {
         Logger.d(TAG, "onBackArrowClicked");
         messagesNotSeenHandler.callOnBackClicked(isChatInBackstack);
         chatHeadsController.onBackButtonPressed(
-                GliaWidgets.CALL_ACTIVITY,
+                Constants.CALL_ACTIVITY,
                 isChatInBackstack
         );
     }

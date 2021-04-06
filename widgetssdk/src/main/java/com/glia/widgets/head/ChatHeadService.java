@@ -13,7 +13,7 @@ import android.view.WindowManager;
 
 import androidx.core.util.Pair;
 
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
@@ -104,7 +104,7 @@ public class ChatHeadService extends Service {
                     }
                 }));
 
-        controller = GliaWidgets.getControllerFactory().getChatHeadsController();
+        controller = Dependencies.getControllerFactory().getChatHeadsController();
         controller.addOverlayListener(visibilityChangedListener);
     }
 
@@ -112,7 +112,7 @@ public class ChatHeadService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (chatHeadView != null) windowManager.removeView(chatHeadView);
-        GliaWidgets.getControllerFactory().getChatHeadsController().clearOverlayListener();
+        Dependencies.getControllerFactory().getChatHeadsController().clearOverlayListener();
         Logger.d(TAG, "onDestroy");
     }
 }

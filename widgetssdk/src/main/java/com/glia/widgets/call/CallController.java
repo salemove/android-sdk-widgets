@@ -13,12 +13,11 @@ import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.model.GliaCallRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.view.DialogOfferType;
+import com.glia.widgets.dialog.DialogController;
 
 public class CallController {
 
@@ -38,9 +37,10 @@ public class CallController {
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
     private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
 
+    private final DialogController dialogController;
+
     private final String TAG = "CallController";
     private volatile CallState callState;
-    private volatile DialogsState dialogsState;
 
     public CallController(
             GliaCallRepository callRepository,
@@ -49,7 +49,8 @@ public class CallController {
             CallViewCallback viewCallback,
             TimeCounter inactivityTimeCounter,
             MinimizeHandler minimizeHandler,
-            ChatHeadsController chatHeadsController
+            ChatHeadsController chatHeadsController,
+            DialogController dialogController
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -62,7 +63,7 @@ public class CallController {
                 .setIsMuted(false)
                 .setHasVideo(false)
                 .createCallState();
-        this.dialogsState = new DialogsState.NoDialog();
+        this.dialogController = dialogController;
         this.repository = callRepository;
         this.callTimer = callTimer;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -74,7 +75,7 @@ public class CallController {
     public void initCall() {
         Logger.d(TAG, "initCall");
         chatHeadsController.onNavigatedToCall();
-        if (callState.integratorCallStarted || dialogsState.showingChatEnderDialog()) {
+        if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
         emitViewState(callState.initCall());
@@ -117,7 +118,7 @@ public class CallController {
             @Override
             public void error(GliaException exception) {
                 Logger.e(TAG, exception.toString());
-                showUnexpectedErrorDialog();
+                dialogController.showUnexpectedErrorDialog();
                 emitViewState(callState.stop());
             }
 
@@ -148,9 +149,7 @@ public class CallController {
             public void engagementEndedByOperator() {
                 Logger.d(TAG, "engagementEndedByOperator");
                 stop();
-                if (!isDialogShowing()) {
-                    showNoMoreOperatorsAvailableDialog();
-                }
+                dialogController.showNoMoreOperatorsAvailableDialog();
             }
 
             @Override
@@ -208,9 +207,7 @@ public class CallController {
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess");
-                if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                    dismissDialogs();
-                }
+                dialogController.dismissDialogs();
             }
 
             @Override
@@ -218,9 +215,7 @@ public class CallController {
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
-                if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                    dismissDialogs();
-                }
+                dialogController.dismissDialogs();
             }
         };
 
@@ -256,19 +251,6 @@ public class CallController {
         return true;
     }
 
-    private synchronized void emitDialogState(DialogsState state) {
-        if (setDialogState(state) && viewCallback != null) {
-            Logger.d(TAG, "Emit dialog state:\n" + dialogsState.toString());
-            viewCallback.emitDialog(dialogsState);
-        }
-    }
-
-    private synchronized boolean setDialogState(DialogsState dialogsState) {
-        if (this.dialogsState.equals(dialogsState)) return false;
-        this.dialogsState = dialogsState;
-        return true;
-    }
-
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
         repository.stop();
@@ -285,7 +267,7 @@ public class CallController {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = callViewCallback;
         viewCallback.emitState(callState);
-        viewCallback.emitDialog(dialogsState);
+
         if (callState.isVideoCall()) {
             startOperatorVideo(callState.callStatus.getOperatorMediaState());
             if (callState.is2WayVideoCall()) {
@@ -302,52 +284,42 @@ public class CallController {
         Logger.d(TAG, "endEngagementDialogYesClicked");
         stop();
         chatHeadsController.chatEndedByUser();
-        dismissDialogs();
+        dialogController.dismissDialogs();
     }
 
     public void endEngagementDialogDismissed() {
         Logger.d(TAG, "endEngagementDialogDismissed");
-        dismissDialogs();
+        dialogController.dismissDialogs();
     }
 
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
-        dismissDialogs();
+        dialogController.dismissDialogs();
         chatHeadsController.chatEndedByUser();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
-        dismissDialogs();
+        dialogController.dismissDialogs();
         chatHeadsController.chatEndedByUser();
     }
 
     public void overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed");
-        emitDialogState(new DialogsState.NoDialog());
-    }
-
-    private void dismissDialogs() {
-        Logger.d(TAG, "Dismiss dialogs");
-        emitDialogState(new DialogsState.NoDialog());
+        dialogController.dismissDialogs();
     }
 
     private void showExitChatDialog() {
-        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
-            emitDialogState(new DialogsState.EndEngagementDialog(
-                    callState.callStatus.getFormattedOperatorName()));
+        if (callState.isMediaEngagementStarted()) {
+            dialogController.showExitChatDialog(callState.callStatus.getFormattedOperatorName());
         }
-    }
-
-    private boolean isDialogShowing() {
-        return !(dialogsState instanceof DialogsState.NoDialog);
     }
 
     public void leaveChatQueueClicked() {
         Logger.d(TAG, "leaveChatQueueClicked");
-        showExitQueueDialog();
+        dialogController.showExitQueueDialog();
     }
 
     public void onBackArrowClicked(boolean isChatInBackstack) {
@@ -359,46 +331,26 @@ public class CallController {
         );
     }
 
-    private void showExitQueueDialog() {
-        if (!isDialogShowing()) {
-            emitDialogState(new DialogsState.ExitQueueDialog());
-        }
-    }
-
     private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {
-        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
-            emitDialogState(new DialogsState.UpgradeDialog(
-                    new DialogOfferType.AudioUpgradeOffer(
-                            mediaUpgradeOffer,
-                            callState.callStatus.getFormattedOperatorName()
-                    )));
+        if (callState.isMediaEngagementStarted()) {
+            dialogController.showUpgradeAudioDialog(mediaUpgradeOffer, callState.callStatus.getFormattedOperatorName());
         }
     }
 
     private void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer) {
-        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
-            emitDialogState(new DialogsState.UpgradeDialog(
-                    new DialogOfferType.VideoUpgradeOffer2Way(
-                            mediaUpgradeOffer,
-                            callState.callStatus.getFormattedOperatorName()
-                    )));
-        }
+        if (callState.isMediaEngagementStarted())
+            dialogController.showUpgradeVideoDialog2Way(
+                    mediaUpgradeOffer,
+                    callState.callStatus.getFormattedOperatorName()
+            );
     }
 
     private void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer) {
-        if (!isDialogShowing() && callState.isMediaEngagementStarted()) {
-            emitDialogState(new DialogsState.UpgradeDialog(
-                    new DialogOfferType.VideoUpgradeOffer1Way(
-                            mediaUpgradeOffer,
-                            callState.callStatus.getFormattedOperatorName()
-                    )));
-        }
-    }
-
-    private void showUnexpectedErrorDialog() {
-        if (!isDialogShowing()) {
-            emitDialogState(new DialogsState.UnexpectedErrorDialog());
-        }
+        if (callState.isMediaEngagementStarted())
+            dialogController.showUpgradeVideoDialog1Way(
+                    mediaUpgradeOffer,
+                    callState.callStatus.getFormattedOperatorName()
+            );
     }
 
     public void onResume(boolean canDrawOverlays) {
@@ -441,7 +393,7 @@ public class CallController {
                 mediaUpgradeOffer,
                 MediaUpgradeOfferRepository.Submitter.CALL
         );
-        emitDialogState(new DialogsState.NoDialog());
+        dialogController.dismissDialogs();
     }
 
     public void declineUpgradeOfferClicked(MediaUpgradeOffer mediaUpgradeOffer) {
@@ -450,7 +402,7 @@ public class CallController {
                 mediaUpgradeOffer,
                 MediaUpgradeOfferRepository.Submitter.CALL
         );
-        emitDialogState(new DialogsState.NoDialog());
+        dialogController.dismissDialogs();
     }
 
     public void onUserInteraction() {
@@ -517,12 +469,6 @@ public class CallController {
         if (viewCallback != null) {
             Logger.d(TAG, "startVisitorVideo");
             viewCallback.startVisitorVideoView(visitorMediaState);
-        }
-    }
-
-    private void showNoMoreOperatorsAvailableDialog() {
-        if (!isDialogShowing()) {
-            emitDialogState(new DialogsState.NoMoreOperatorsDialog());
         }
     }
 }

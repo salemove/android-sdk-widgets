@@ -188,8 +188,10 @@ public class Dialogs {
     public static AlertDialog showScreenSharingDialog(
             Context context,
             UiTheme theme,
-            @StringRes int negativeButtonText,
+            String title,
+            String message,
             @StringRes int positiveButtonText,
+            @StringRes int negativeButtonText,
             View.OnClickListener positiveButtonClickListener,
             View.OnClickListener negativeButtonClickListener
     ) {
@@ -229,8 +231,8 @@ public class Dialogs {
             negativeButton.setTypeface(fontFamily);
         }
 
-        titleView.setText(context.getText(R.string.dialog_screen_sharing_offer_title));
-        messageView.setText(context.getText(R.string.dialog_screen_sharing_offer_message));
+        titleView.setText(title);
+        messageView.setText(message);
         negativeButton.setText(negativeButtonText);
         positiveButton.setText(positiveButtonText);
 

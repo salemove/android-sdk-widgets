@@ -11,7 +11,7 @@ import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 
 public class ControllerFactory {
@@ -20,6 +20,7 @@ public class ControllerFactory {
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
     private final ChatHeadsController chatHeadsController;
+    private final DialogController dialogController;
 
     private static final String TAG = "ControllerFactory";
 
@@ -27,11 +28,13 @@ public class ControllerFactory {
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
 
+
     public ControllerFactory(RepositoryFactory repositoryFactory) {
         this.repositoryFactory = repositoryFactory;
         chatHeadsController = new ChatHeadsController(
                 repositoryFactory.getGliaChatHeadControllerRepository()
         );
+        dialogController = new DialogController();
     }
 
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
@@ -43,8 +46,10 @@ public class ControllerFactory {
                     sharedTimer,
                     chatViewCallback,
                     minimizeHandler,
-                    chatHeadsController);
+                    chatHeadsController,
+                    dialogController);
         }
+
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
@@ -53,7 +58,8 @@ public class ControllerFactory {
                     sharedTimer,
                     chatViewCallback,
                     minimizeHandler,
-                    chatHeadsController);
+                    chatHeadsController,
+                    dialogController);
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -71,7 +77,8 @@ public class ControllerFactory {
                     callViewCallback,
                     new TimeCounter(),
                     minimizeHandler,
-                    chatHeadsController
+                    chatHeadsController,
+                    dialogController
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -80,18 +87,24 @@ public class ControllerFactory {
         return retainedCallController;
     }
 
-    public ScreenSharingController getScreenSharingController(GliaScreenSharingCallback gliaScreenSharingCallback) {
-        if (retainedScreenSharingController == null) {
-            Logger.d(TAG, "new screen sharing controller");
-            retainedScreenSharingController = new ScreenSharingController(repositoryFactory.getGliaScreenSharingRepository(), gliaScreenSharingCallback);
-        } else {
-            Logger.d(TAG, "retained screen sharing controller");
-            retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+    public ScreenSharingController getScreenSharingController(ScreenSharingController.ViewCallback gliaScreenSharingCallback) {
+        if (gliaScreenSharingCallback != null) {
+            if (retainedScreenSharingController == null) {
+                Logger.d(TAG, "new screen sharing controller");
+                retainedScreenSharingController = new ScreenSharingController(
+                        repositoryFactory.getGliaScreenSharingRepository(),
+                        dialogController,
+                        gliaScreenSharingCallback
+                );
+            } else {
+                Logger.d(TAG, "retained screen sharing controller");
+                retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+            }
         }
         return retainedScreenSharingController;
     }
 
-    public ChatHeadsController getChatHeadsController(){
+    public ChatHeadsController getChatHeadsController() {
         return chatHeadsController;
     }
 
@@ -127,5 +140,10 @@ public class ControllerFactory {
             retainedChatController.onDestroy(false);
             retainedChatController = null;
         }
+    }
+
+    public DialogController getDialogController(DialogController.Callback callback) {
+        dialogController.addCallback(callback);
+        return dialogController;
     }
 }

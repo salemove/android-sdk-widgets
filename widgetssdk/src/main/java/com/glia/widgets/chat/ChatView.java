@@ -38,7 +38,7 @@ import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -56,8 +56,11 @@ public class ChatView extends LinearLayout {
     private ChatViewCallback callback;
     private ChatController controller;
 
+    private DialogController.Callback dialogCallback;
+    private DialogController dialogController;
+
     private ScreenSharingController screenSharingController;
-    private GliaScreenSharingCallback screenSharingCallback;
+    private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private RecyclerView chatRecyclerView;
     private ImageButton sendButton;
@@ -124,7 +127,6 @@ public class ChatView extends LinearLayout {
 
     private void initControls() {
         callback = new ChatViewCallback() {
-
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
@@ -149,6 +151,38 @@ public class ChatView extends LinearLayout {
             }
 
             @Override
+            public void navigateToCall() {
+                if (onNavigateToCallListener != null) {
+                    onNavigateToCallListener.call(theme);
+                }
+            }
+
+            @Override
+            public void destroyView() {
+                if (onEndListener != null) {
+                    onEndListener.onEnd();
+                }
+            }
+
+            @Override
+            public void setLastTypedText(String lastTypedText) {
+                post(() -> chatEditText.setText(lastTypedText));
+            }
+        };
+
+        screenSharingCallback = new ScreenSharingController.ViewCallback() {
+            @Override
+            public void onScreenSharingRequestError(GliaException exception) {
+                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        controller = GliaWidgets
+                .getControllerFactory()
+                .getChatController(Utils.getActivity(this.getContext()), callback);
+
+        dialogCallback = new DialogController.Callback() {
+            @Override
             public void emitDialog(DialogsState dialogsState) {
                 if (dialogsState instanceof DialogsState.NoDialog) {
                     post(() -> {
@@ -170,51 +204,21 @@ public class ChatView extends LinearLayout {
                     post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
                 } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                     post(() -> showNoMoreOperatorsAvailableDialog());
+                } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                    post(() -> showScreenSharingDialog());
+                } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                    post(() -> showScreenSharingEndDialog());
                 }
-            }
-
-            @Override
-            public void navigateToCall() {
-                if (onNavigateToCallListener != null) {
-                    onNavigateToCallListener.call(theme);
-                }
-            }
-
-            @Override
-            public void destroyView() {
-                if (onEndListener != null) {
-                    onEndListener.onEnd();
-                }
-            }
-
-            @Override
-            public void setLastTypedText(String lastTypedText) {
-                post(() -> chatEditText.setText(lastTypedText));
             }
         };
 
-        screenSharingCallback = new GliaScreenSharingCallback() {
-            @Override
-            public void onScreenSharingRequest() {
-                Utils.getActivity(getContext()).runOnUiThread(
-                        () -> showScreenSharingDialog()
-                );
-            }
-
-            @Override
-            public void onScreenSharingRequestError(GliaException exception) {
-                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        controller = GliaWidgets
+        dialogController = GliaWidgets
                 .getControllerFactory()
-                .getChatController(Utils.getActivity(this.getContext()), callback);
+                .getDialogController(dialogCallback);
 
         screenSharingController = GliaWidgets
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
-
     }
 
     private void showScreenSharingDialog() {
@@ -222,10 +226,27 @@ public class ChatView extends LinearLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    R.string.chat_dialog_decline,
+                    getContext().getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    getContext().getText(R.string.dialog_screen_sharing_offer_message).toString(),
                     R.string.chat_dialog_accept,
+                    R.string.chat_dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
+            );
+        }
+    }
+
+    private void showScreenSharingEndDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    getContext().getString(R.string.dialog_screen_sharing_end_title),
+                    getContext().getString(R.string.dialog_screen_sharing_end_message),
+                    R.string.chat_dialog_cancel,
+                    R.string.chat_dialog_end_sharing,
+                    view -> screenSharingController.onDismissEndScreenSharing(),
+                    view -> screenSharingController.onEndScreenSharing(getContext())
             );
         }
     }
@@ -360,6 +381,15 @@ public class ChatView extends LinearLayout {
         callback = null;
         adapter.unregisterAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(null);
+
+        if (screenSharingController != null) {
+            screenSharingController.onDestroy(true);
+        }
+
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+            dialogController = null;
+        }
     }
 
     private void destroyController() {
@@ -615,13 +645,11 @@ public class ChatView extends LinearLayout {
                 theme,
                 type,
                 v -> {
-                    dismissAlertDialog();
                     if (controller != null) {
                         controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 },
                 v -> {
-                    dismissAlertDialog();
                     if (controller != null) {
                         controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
                     }
@@ -685,6 +713,7 @@ public class ChatView extends LinearLayout {
 
     private void chatEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
+        screenSharingController.onDestroy(false);
         GliaWidgets.getControllerFactory().destroyControllers();
     }
 

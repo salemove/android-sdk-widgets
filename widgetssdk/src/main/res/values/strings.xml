@@ -30,6 +30,8 @@
     <string name="chat_dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
     <string name="chat_dialog_decline">Decline</string>
     <string name="chat_dialog_accept">Accept</string>
+    <string name="chat_dialog_cancel">Cancel</string>
+    <string name="chat_dialog_end_sharing">End</string>
 
     <string name="call_audio_app_bar_title">Audio call</string>
     <string name="call_video_app_bar_title">Video call</string>
@@ -43,4 +45,13 @@
 
     <string name="dialog_screen_sharing_offer_title">You are about to share your screen</string>
     <string name="dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
+
+    <string name="dialog_screen_sharing_end_title">End Screen Sharing?</string>
+    <string name="dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
+
+    <string name="notification_screen_sharing_title">You are currently Sharing Your screen</string>
+    <string name="notification_screen_sharing_message">To end sharing push \"END SHARING\" button</string>
+    <string name="notification_action_end_sharing">END SHARING</string>
+    <string name="notification_screen_sharing_channel_name">Screen Sharing notification channel</string>
+
 </resources>

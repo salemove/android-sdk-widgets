@@ -38,7 +38,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -58,7 +58,10 @@ public class CallView extends ConstraintLayout {
     private CallController controller;
 
     private ScreenSharingController screenSharingController;
-    private GliaScreenSharingCallback screenSharingCallback;
+    private ScreenSharingController.ViewCallback screenSharingCallback;
+
+    private DialogController.Callback dialogCallback;
+    private DialogController dialogController;
 
     private AlertDialog alertDialog;
     private AppBarView appBar;
@@ -191,6 +194,10 @@ public class CallView extends ConstraintLayout {
             alertDialog.dismiss();
             alertDialog = null;
         }
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+            dialogController = null;
+        }
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToChatListener = null;
@@ -311,6 +318,36 @@ public class CallView extends ConstraintLayout {
             }
 
             @Override
+            public void navigateToChat() {
+                if (onNavigateToChatListener != null) {
+                    onNavigateToChatListener.call();
+                }
+            }
+
+            @Override
+            public void startOperatorVideoView(MediaState operatorMediaState) {
+                post(() -> showOperatorVideo(operatorMediaState));
+            }
+
+            @Override
+            public void startVisitorVideoView(MediaState visitorMediaState) {
+                post(() -> showVisitorVideo(visitorMediaState));
+            }
+        };
+
+        screenSharingCallback = new ScreenSharingController.ViewCallback() {
+            @Override
+            public void onScreenSharingRequestError(GliaException exception) {
+                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        controller = GliaWidgets
+                .getControllerFactory()
+                .getCallController(callback);
+
+        dialogCallback = new DialogController.Callback() {
+            @Override
             public void emitDialog(DialogsState dialogsState) {
                 if (dialogsState instanceof DialogsState.NoDialog) {
                     post(() -> {
@@ -330,44 +367,15 @@ public class CallView extends ConstraintLayout {
                     post(() -> showNoMoreOperatorsAvailableDialog());
                 } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
                     post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
+                } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                    post(() -> showScreenSharingDialog());
+                } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                    post(() -> showScreenSharingEndDialog());
                 }
-            }
-
-            @Override
-            public void navigateToChat() {
-                if (onNavigateToChatListener != null) {
-                    onNavigateToChatListener.call();
-                }
-            }
-
-            @Override
-            public void startOperatorVideoView(MediaState operatorMediaState) {
-                post(() -> showOperatorVideo(operatorMediaState));
-            }
-
-            @Override
-            public void startVisitorVideoView(MediaState visitorMediaState) {
-                post(() -> showVisitorVideo(visitorMediaState));
             }
         };
 
-        screenSharingCallback = new GliaScreenSharingCallback() {
-            @Override
-            public void onScreenSharingRequest() {
-                Utils.getActivity(getContext()).runOnUiThread(
-                        () -> showScreenSharingDialog()
-                );
-            }
-
-            @Override
-            public void onScreenSharingRequestError(GliaException exception) {
-                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        controller = GliaWidgets
-                .getControllerFactory()
-                .getCallController(callback);
+        dialogController = GliaWidgets.getControllerFactory().getDialogController(dialogCallback);
 
         screenSharingController =
                 GliaWidgets
@@ -380,11 +388,28 @@ public class CallView extends ConstraintLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    R.string.chat_dialog_decline,
+                    getContext().getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    getContext().getText(R.string.dialog_screen_sharing_offer_message).toString(),
                     R.string.chat_dialog_accept,
+                    R.string.chat_dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
+    }
+
+    private void showScreenSharingEndDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    getContext().getString(R.string.dialog_screen_sharing_end_title),
+                    getContext().getString(R.string.dialog_screen_sharing_end_message),
+                    R.string.chat_dialog_cancel,
+                    R.string.chat_dialog_end_sharing,
+                    view -> screenSharingController.onDismissEndScreenSharing(),
+                    view -> screenSharingController.onEndScreenSharing(getContext())
+            );
+        }
     }
 
     private void setButtonActivated(FloatingActionButton floatingActionButton,

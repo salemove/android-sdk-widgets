@@ -56,6 +56,7 @@ public class ChatView extends LinearLayout {
     private ChatViewCallback callback;
     private ChatController controller;
 
+    private DialogController.Callback dialogCallback;
     private DialogController dialogController;
 
     private ScreenSharingController screenSharingController;
@@ -180,37 +181,40 @@ public class ChatView extends LinearLayout {
                 .getControllerFactory()
                 .getChatController(Utils.getActivity(this.getContext()), callback);
 
+        dialogCallback = new DialogController.Callback() {
+            @Override
+            public void emitDialog(DialogsState dialogsState) {
+                if (dialogsState instanceof DialogsState.NoDialog) {
+                    post(() -> {
+                        if (alertDialog != null) {
+                            alertDialog.dismiss();
+                            alertDialog = null;
+                        }
+                    });
+                } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
+                    post(() -> showUnexpectedErrorDialog());
+                } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
+                    post(() -> showExitQueueDialog());
+                } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
+                    post(() -> showOverlayPermissionsDialog());
+                } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
+                    post(() -> showEndEngagementDialog(
+                            ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
+                } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
+                    post(() -> showNoMoreOperatorsAvailableDialog());
+                } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                    post(() -> showScreenSharingDialog());
+                } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                    post(() -> showScreenSharingEndDialog());
+                }
+            }
+        };
+
         dialogController = GliaWidgets
                 .getControllerFactory()
-                .getDialogController(
-                        dialogsState -> {
-                            if (dialogsState instanceof DialogsState.NoDialog) {
-                                post(() -> {
-                                    if (alertDialog != null) {
-                                        alertDialog.dismiss();
-                                        alertDialog = null;
-                                    }
-                                });
-                            } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
-                                post(() -> showUnexpectedErrorDialog());
-                            } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
-                                post(() -> showExitQueueDialog());
-                            } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
-                                post(() -> showOverlayPermissionsDialog());
-                            } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                                post(() -> showEndEngagementDialog(
-                                        ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
-                            } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                                post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
-                            } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
-                                post(() -> showNoMoreOperatorsAvailableDialog());
-                            } else if (dialogsState instanceof  DialogsState.StartScreenSharingDialog) {
-                                post(() -> showScreenSharingDialog());
-                            } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
-                                post(() -> showScreenSharingEndDialog());
-                            }
-                        }
-                );
+                .getDialogController(dialogCallback);
 
         screenSharingController = GliaWidgets
                 .getControllerFactory()
@@ -380,6 +384,11 @@ public class ChatView extends LinearLayout {
 
         if (screenSharingController != null) {
             screenSharingController.onDestroy(true);
+        }
+
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+            dialogController = null;
         }
     }
 
@@ -636,13 +645,11 @@ public class ChatView extends LinearLayout {
                 theme,
                 type,
                 v -> {
-                    dismissAlertDialog();
                     if (controller != null) {
                         controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 },
                 v -> {
-                    dismissAlertDialog();
                     if (controller != null) {
                         controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
                     }

@@ -20,13 +20,14 @@ public class ControllerFactory {
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
     private final ChatHeadsController chatHeadsController;
+    private final DialogController dialogController;
 
     private static final String TAG = "ControllerFactory";
 
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
-    private final DialogController dialogController;
+
 
     public ControllerFactory(RepositoryFactory repositoryFactory) {
         this.repositoryFactory = repositoryFactory;
@@ -142,8 +143,7 @@ public class ControllerFactory {
     }
 
     public DialogController getDialogController(DialogController.Callback callback) {
-        dialogController.setCallback(callback);
-        dialogController.reEmitPreviousDialogState();
+        dialogController.addCallback(callback);
         return dialogController;
     }
 }

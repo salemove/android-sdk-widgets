@@ -5,12 +5,15 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.view.DialogOfferType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DialogController {
     private final static String TAG = "DialogController";
 
     private volatile DialogsState dialogsState;
 
-    private Callback callback;
+    private final List<Callback> viewCallbacks = new ArrayList<>();
 
     public DialogController() {
         this.dialogsState = new DialogsState.NoDialog();
@@ -37,17 +40,12 @@ public class DialogController {
         emitDialogState(new DialogsState.NoDialog());
     }
 
-    public void reEmitPreviousDialogState() {
-        Logger.d(TAG, "ReEmitting state\n" + dialogsState.toString());
-        if (callback != null) {
-            callback.emitDialog(dialogsState);
-        }
-    }
-
     private synchronized void emitDialogState(DialogsState state) {
-        if (setDialogState(state) && callback != null) {
+        if (setDialogState(state)) {
             Logger.d(TAG, "Emit dialog state:\n" + dialogsState.toString());
-            callback.emitDialog(dialogsState);
+            for (Callback callback : viewCallbacks) {
+                callback.emitDialog(dialogsState);
+            }
         }
     }
 
@@ -142,8 +140,15 @@ public class DialogController {
         }
     }
 
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    public void addCallback(Callback callback) {
+        Logger.d(TAG, "addCallback");
+        callback.emitDialog(dialogsState);
+        viewCallbacks.add(callback);
+    }
+
+    public void removeCallback(Callback callback) {
+        Logger.d(TAG, "removeCallback");
+        viewCallbacks.remove(callback);
     }
 
     public interface Callback {

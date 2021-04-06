@@ -60,6 +60,9 @@ public class CallView extends ConstraintLayout {
     private ScreenSharingController screenSharingController;
     private ScreenSharingController.ViewCallback screenSharingCallback;
 
+    private DialogController.Callback dialogCallback;
+    private DialogController dialogController;
+
     private AlertDialog alertDialog;
     private AppBarView appBar;
     private OperatorStatusView operatorStatusView;
@@ -190,6 +193,10 @@ public class CallView extends ConstraintLayout {
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
+        }
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+            dialogController = null;
         }
         onEndListener = null;
         onBackClickedListener = null;
@@ -339,7 +346,7 @@ public class CallView extends ConstraintLayout {
                 .getControllerFactory()
                 .getCallController(callback);
 
-        DialogController dialogController = GliaWidgets.getControllerFactory().getDialogController(new DialogController.Callback() {
+        dialogCallback = new DialogController.Callback() {
             @Override
             public void emitDialog(DialogsState dialogsState) {
                 if (dialogsState instanceof DialogsState.NoDialog) {
@@ -366,7 +373,9 @@ public class CallView extends ConstraintLayout {
                     post(() -> showScreenSharingEndDialog());
                 }
             }
-        });
+        };
+
+        dialogController = GliaWidgets.getControllerFactory().getDialogController(dialogCallback);
 
         screenSharingController =
                 GliaWidgets

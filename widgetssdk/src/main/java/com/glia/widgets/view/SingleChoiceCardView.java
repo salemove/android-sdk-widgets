@@ -81,6 +81,7 @@ public class SingleChoiceCardView extends FrameLayout {
                 ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor());
 
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
+        materialCardView.setBackgroundColor(gliaBaseLightColor);
 
         if (imageUrl != null) {
             Picasso.with(this.getContext()).load(imageUrl).into(imageView, new Callback() {

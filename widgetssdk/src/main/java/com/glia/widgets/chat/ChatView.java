@@ -31,16 +31,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.widgets.Dependencies;
-import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -367,7 +366,7 @@ public class ChatView extends LinearLayout {
 
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
-        this.theme = Utils.getFullHybridTheme(theme, this.theme);
+        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {
             handleStatusbarColor();

@@ -260,8 +260,8 @@ public class ChatView extends LinearLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    getContext().getText(R.string.dialog_screen_sharing_offer_title).toString(),
-                    getContext().getText(R.string.dialog_screen_sharing_offer_message).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_message).toString(),
                     R.string.chat_dialog_accept,
                     R.string.chat_dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
@@ -275,8 +275,8 @@ public class ChatView extends LinearLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    getContext().getString(R.string.dialog_screen_sharing_end_title),
-                    getContext().getString(R.string.dialog_screen_sharing_end_message),
+                    resources.getString(R.string.dialog_screen_sharing_end_title),
+                    resources.getString(R.string.dialog_screen_sharing_end_message),
                     R.string.chat_dialog_cancel,
                     R.string.chat_dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),

@@ -232,7 +232,6 @@ public class ChatController {
 
     public boolean isChatVisible() {
         return chatState.isVisible;
-
     }
 
     public void setViewCallback(ChatViewCallback chatViewCallback) {

@@ -13,7 +13,7 @@ import com.glia.widgets.helper.Logger;
  */
 public class GliaWidgets {
 
-    public final static String TAG = "GliaWidgets";
+    private final static String TAG = "GliaWidgets";
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}

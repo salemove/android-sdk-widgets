@@ -7,12 +7,12 @@ import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.screensharing.ScreenSharingController;
 
 public class ControllerFactory {
@@ -21,7 +21,7 @@ public class ControllerFactory {
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
     private final ChatHeadsController chatHeadsController;
-    private final DialogController dialogController;
+    private final DialogController dialogController = new DialogController();
     private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private static final String TAG = "ControllerFactory";
@@ -40,7 +40,6 @@ public class ControllerFactory {
                 repositoryFactory.getGliaChatHeadControllerRepository(),
                 messagesNotSeenHandler
         );
-        dialogController = new DialogController();
     }
 
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {

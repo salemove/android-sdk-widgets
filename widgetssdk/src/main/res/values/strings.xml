@@ -1,39 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--    chat screen-->
     <string name="chat_title">Chat</string>
-
     <string name="chat_enter_message">Enter message</string>
     <string name="chat_in_queue_message">An MSR will be with you shortly.</string>
     <string name="chat_operator_has_joined">%1$s has joined the conversation</string>
     <string name="chat_delivered">Delivered</string>
     <string name="chat_upgraded_to_audio_call">Upgraded to Audio call</string>
     <string name="chat_upgraded_to_video_call">Upgraded to Video call</string>
+    <string name="chat_single_choice_card_hint">Tap on the answer above</string>
 
+    <!--    top app bar-->
     <string name="top_app_bar_close">Close</string>
     <string name="top_app_bar_chat_end">End</string>
 
-    <string name="chat_dialog_leave_queue_title">Are you sure you want to leave?</string>
-    <string name="chat_dialog_leave_queue_message">You will lose your place in the queue.</string>
-    <string name="chat_dialog_end_engagement_title">End Engagement?</string>
-    <string name="chat_dialog_end_engagement_message">Are you sure you want to end engagement with %1$s?</string>
-    <string name="chat_dialog_yes">Yes</string>
-    <string name="chat_dialog_no">No</string>
-    <string name="chat_dialog_operators_unavailable_title">We\'re sorry</string>
-    <string name="chat_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
-    <string name="chat_dialog_unexpected_error_title">We\'re sorry, there has been an unexpected error.</string>
-    <string name="chat_dialog_unexpected_error_message">Please try again later.</string>
-    <string name="chat_dialog_ok">Ok</string>
-    <string name="chat_dialog_overlay_permissions_title">Overlay Permissions Required</string>
-    <string name="chat_dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
-    <string name="chat_dialog_upgrade_audio_title">%1$s has offered you to upgrade to audio</string>
-    <string name="chat_dialog_upgrade_video_2_way_title">%1$s has offered you to upgrade to video</string>
-    <string name="chat_dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
-    <string name="chat_dialog_decline">Decline</string>
-    <string name="chat_dialog_accept">Accept</string>
-    <string name="chat_dialog_cancel">Cancel</string>
-    <string name="chat_dialog_end_sharing">End</string>
-    <string name="chat_single_choice_card_hint">Tap on the answer above</string>
+    <!--    dialogs-->
+    <string name="dialog_leave_queue_title">Are you sure you want to leave?</string>
+    <string name="dialog_leave_queue_message">You will lose your place in the queue.</string>
+    <string name="dialog_end_engagement_title">End Engagement?</string>
+    <string name="dialog_end_engagement_message">Are you sure you want to end engagement with %1$s?</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
+    <string name="dialog_operators_unavailable_title">We\'re sorry</string>
+    <string name="dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
+    <string name="dialog_unexpected_error_title">We\'re sorry, there has been an unexpected error.</string>
+    <string name="dialog_unexpected_error_message">Please try again later.</string>
+    <string name="dialog_ok">Ok</string>
+    <string name="dialog_overlay_permissions_title">Overlay Permissions Required</string>
+    <string name="dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
+    <string name="dialog_upgrade_audio_title">%1$s has offered you to upgrade to audio</string>
+    <string name="dialog_upgrade_video_2_way_title">%1$s has offered you to upgrade to video</string>
+    <string name="dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
+    <string name="dialog_decline">Decline</string>
+    <string name="dialog_accept">Accept</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_end_sharing">End</string>
+    <string name="dialog_screen_sharing_offer_title">You are about to share your screen</string>
+    <string name="dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
+    <string name="dialog_screen_sharing_end_title">End Screen Sharing?</string>
+    <string name="dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
 
+    <!--    call screen-->
     <string name="call_audio_app_bar_title">Audio call</string>
     <string name="call_video_app_bar_title">Video call</string>
     <string name="call_chat_button_label">Chat</string>
@@ -44,12 +51,7 @@
     <string name="call_minimize_button_label">Minimize</string>
     <string name="call_connecting_with">Connecting with %1$s</string>
 
-    <string name="dialog_screen_sharing_offer_title">You are about to share your screen</string>
-    <string name="dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
-
-    <string name="dialog_screen_sharing_end_title">End Screen Sharing?</string>
-    <string name="dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
-
+    <!--    statusbar notifications-->
     <string name="notification_screen_sharing_title">You are currently Sharing Your screen</string>
     <string name="notification_screen_sharing_message">To end sharing push \"END SHARING\" button</string>
     <string name="notification_action_end_sharing">END SHARING</string>

@@ -37,7 +37,9 @@ public class ChatHeadLayout extends FrameLayout {
                             chatHeadView.setTheme(chatHeadState.theme);
                         }
                         chatHeadView.setVisibility(
-                                chatHeadState.areIntegratedViewsVisible ? VISIBLE : GONE
+                                chatHeadState.useChatHeads &&
+                                        chatHeadState.areIntegratedViewsVisible
+                                        ? VISIBLE : GONE
                         );
                         returnDestination = chatHeadState.returnDestination;
                     });

@@ -37,7 +37,9 @@ public class ChatHeadService extends Service {
                     }
                     chatHeadView.setMessageBadgeCount(chatHeadState.messageCount);
                     chatHeadView.updateImage(chatHeadState.operatorProfileImgUrl);
-                    chatHeadView.setVisibility(chatHeadState.isOverlayVisible ? View.VISIBLE : View.GONE);
+                    chatHeadView.setVisibility(
+                            chatHeadState.useChatHeads && chatHeadState.isOverlayVisible
+                                    ? View.VISIBLE : View.GONE);
                     returnDestination = chatHeadState.returnDestination;
                 }
             };

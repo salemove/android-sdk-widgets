@@ -16,6 +16,8 @@ class ChatHeadState {
     public final boolean isOverlayVisible;
     public final boolean useOverlays;
     public final boolean hasOverlayPermissions;
+    // if false then chat heads are off completely
+    public final boolean useChatHeads;
 
     private ChatHeadState(
             int messageCount,
@@ -26,7 +28,8 @@ class ChatHeadState {
             boolean areIntegratedViewsVisible,
             boolean isOverlayVisible,
             boolean useOverlays,
-            boolean hasOverlayPermissions) {
+            boolean hasOverlayPermissions,
+            boolean useChatHeads) {
         this.messageCount = messageCount;
         this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.theme = theme;
@@ -36,6 +39,7 @@ class ChatHeadState {
         this.isOverlayVisible = isOverlayVisible;
         this.useOverlays = useOverlays;
         this.hasOverlayPermissions = hasOverlayPermissions;
+        this.useChatHeads = useChatHeads;
     }
 
     public ChatHeadState onNewMessage(int messageCount) {
@@ -80,6 +84,10 @@ class ChatHeadState {
         return new Builder().copyFrom(this).setHasOverlayPermissions(hasOverlayPermissions).createChatHeadState();
     }
 
+    public ChatHeadState enableChatHeadsChanged(boolean enableChatHeads) {
+        return new Builder().copyFrom(this).setUseChatHeads(enableChatHeads).createChatHeadState();
+    }
+
     public static class Builder {
         private int messageCount;
         private String operatorProfileImgUrl;
@@ -90,6 +98,8 @@ class ChatHeadState {
         private boolean isOverlayVisible;
         private boolean useOverlays;
         private boolean hasOverlayPermissions;
+        // if false then chat heads are off completely
+        private boolean useChatHeads;
 
         public Builder copyFrom(ChatHeadState chatHeadState) {
             messageCount = chatHeadState.messageCount;
@@ -101,6 +111,7 @@ class ChatHeadState {
             isOverlayVisible = chatHeadState.isOverlayVisible;
             useOverlays = chatHeadState.useOverlays;
             hasOverlayPermissions = chatHeadState.hasOverlayPermissions;
+            useChatHeads = chatHeadState.useChatHeads;
             return this;
         }
 
@@ -149,6 +160,11 @@ class ChatHeadState {
             return this;
         }
 
+        public Builder setUseChatHeads(boolean useChatHeads) {
+            this.useChatHeads = useChatHeads;
+            return this;
+        }
+
         public ChatHeadState createChatHeadState() {
             return new ChatHeadState(
                     messageCount,
@@ -159,7 +175,8 @@ class ChatHeadState {
                     areIntegratedViewsVisible,
                     isOverlayVisible,
                     useOverlays,
-                    hasOverlayPermissions
+                    hasOverlayPermissions,
+                    useChatHeads
             );
         }
     }
@@ -176,6 +193,7 @@ class ChatHeadState {
                 ", isOverlayVisible=" + isOverlayVisible +
                 ", useOverlays=" + useOverlays +
                 ", hasOverlayPermissions=" + hasOverlayPermissions +
+                ", useChatHeads=" + useChatHeads +
                 '}';
     }
 
@@ -192,11 +210,12 @@ class ChatHeadState {
                 Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                 Objects.equals(theme, that.theme) &&
                 Objects.equals(operatorMediaState, that.operatorMediaState) &&
-                Objects.equals(returnDestination, that.returnDestination);
+                Objects.equals(returnDestination, that.returnDestination) &&
+                Objects.equals(useChatHeads, that.useChatHeads);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(messageCount, operatorProfileImgUrl, theme, operatorMediaState, returnDestination, areIntegratedViewsVisible, isOverlayVisible, useOverlays, hasOverlayPermissions);
+        return Objects.hash(messageCount, operatorProfileImgUrl, theme, operatorMediaState, returnDestination, areIntegratedViewsVisible, isOverlayVisible, useOverlays, hasOverlayPermissions, useChatHeads);
     }
 }

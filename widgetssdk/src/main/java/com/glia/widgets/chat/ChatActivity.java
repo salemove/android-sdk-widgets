@@ -52,8 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnNavigateToCallListener(onNavigateToCallListener);
-        chatView.startChatActivityChat(
-                this,
+        chatView.startChat(
                 companyName,
                 queueId,
                 contextUrl,

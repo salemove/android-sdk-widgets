@@ -198,6 +198,7 @@ public class ChatHeadsController {
                 @Override
                 public void engagementEndedByOperator() {
                     emitViewState(chatHeadState.setOperatorMediaState(null));
+                    emitViewState(chatHeadState.setOperatorProfileImgUrl(null));
                 }
             };
 

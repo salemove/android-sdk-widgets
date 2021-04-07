@@ -156,6 +156,14 @@ public class ChatHeadsController {
         return overlayListener != null;
     }
 
+    public void setEnableChatHeads(boolean enableChatHeads) {
+        emitViewState(chatHeadState.enableChatHeadsChanged(enableChatHeads));
+    }
+
+    public boolean showOverlayPermissionsDialog() {
+        return chatHeadState.useChatHeads && !chatHeadState.hasOverlayPermissions;
+    }
+
     public interface OnChatheadSettingsChangedListener {
         void emitState(ChatHeadState chatHeadState);
     }
@@ -185,6 +193,11 @@ public class ChatHeadsController {
                 public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
                     Logger.d(TAG, "new operatorMediaState: " + operatorMediaState);
                     emitViewState(chatHeadState.setOperatorMediaState(operatorMediaState));
+                }
+
+                @Override
+                public void engagementEndedByOperator() {
+                    emitViewState(chatHeadState.setOperatorMediaState(null));
                 }
             };
 

@@ -39,7 +39,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
 
     private void onScreenSharingStart(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(new Intent(context, MediaProjectionService.class));
         } else {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -49,7 +49,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
 
     private void onScreenSharingEnded(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.stopService(new Intent(context, MediaProjectionService.class));
         } else {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

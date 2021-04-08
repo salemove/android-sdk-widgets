@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 

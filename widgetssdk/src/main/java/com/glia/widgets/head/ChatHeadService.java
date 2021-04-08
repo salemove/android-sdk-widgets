@@ -13,8 +13,8 @@ import android.view.WindowManager;
 
 import androidx.core.util.Pair;
 
-import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.ViewHelpers;

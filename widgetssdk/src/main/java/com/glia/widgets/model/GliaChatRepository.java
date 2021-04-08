@@ -6,6 +6,7 @@ import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -34,9 +35,8 @@ public class GliaChatRepository {
         Logger.d(TAG, "operatorMediaState: " + operatorMediaState.toString());
         callback.newOperatorMediaState(operatorMediaState);
     };
-    private final Consumer<VisitorMediaState> visitorMediaStateConsumer = visitorMediaState -> {
-        Logger.d(TAG, "visitorMediaState: " + visitorMediaState.toString());
-    };
+    private final Consumer<VisitorMediaState> visitorMediaStateConsumer = visitorMediaState ->
+            Logger.d(TAG, "visitorMediaState: " + visitorMediaState.toString());
     private final RequestCallback<VisitorMessage> sendMessageCallback = (response, exception) -> {
         if (exception != null) {
             callback.error(exception);
@@ -65,7 +65,7 @@ public class GliaChatRepository {
     public void stop(String queueTicketId) {
         if (queueTicketId != null) {
             Glia.cancelQueueTicket(queueTicketId, e -> {
-                if (e != null) {
+                if (e != null && callback != null) {
                     callback.error(e);
                 }
             });
@@ -119,5 +119,10 @@ public class GliaChatRepository {
             engagement.getMedia().on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
             engagement.getMedia().on(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateConsumer);
         });
+    }
+
+    public void sendMessage(SingleChoiceAttachment singleChoiceAttachment) {
+        Glia.getCurrentEngagement().ifPresent(engagement ->
+                engagement.getChat().sendMessage(singleChoiceAttachment, sendMessageCallback));
     }
 }

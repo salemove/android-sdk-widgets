@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application>
 
         <activity
@@ -19,6 +21,21 @@
             android:name="com.glia.widgets.head.ChatHeadService"
             android:enabled="true"
             android:stopWithTask="true" />
+
+        <receiver
+            android:name=".notification.NotificationActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_ENDED" />
+                <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_START" />
+                <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".screensharing.MediaProjectionService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
     </application>
 

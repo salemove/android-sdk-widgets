@@ -12,7 +12,6 @@ import java.util.Objects;
 public class ChatState {
     public final boolean integratorChatStarted;
     public final boolean isVisible;
-    public final boolean useFloatingChatHeads;
     public final String queueTicketId;
     public final boolean historyLoaded;
     public final String operatorName;
@@ -20,13 +19,13 @@ public class ChatState {
     public final String companyName;
     public final String queueId;
     public final String contextUrl;
-    public final boolean hasOverlayPermissions;
     public final boolean overlaysPermissionDialogShown;
     public final MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
     public final List<ChatItem> chatItems;
+    public final ChatInputMode chatInputMode;
+    public final String lastTypedText;
 
     private ChatState(
-            boolean useFloatingChatHeads,
             String queueTicketId,
             boolean historyLoaded,
             String operatorName,
@@ -36,11 +35,11 @@ public class ChatState {
             String contextUrl,
             boolean isVisible,
             boolean integratorChatStarted,
-            boolean hasOverlayPermissions,
             boolean overlaysPermissionDialogShown,
             MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem,
-            List<ChatItem> chatItems) {
-        this.useFloatingChatHeads = useFloatingChatHeads;
+            List<ChatItem> chatItems,
+            ChatInputMode chatInputMode,
+            String lastTypedText) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -50,10 +49,11 @@ public class ChatState {
         this.contextUrl = contextUrl;
         this.isVisible = isVisible;
         this.integratorChatStarted = integratorChatStarted;
-        this.hasOverlayPermissions = hasOverlayPermissions;
         this.overlaysPermissionDialogShown = overlaysPermissionDialogShown;
         this.mediaUpgradeStartedTimerItem = mediaUpgradeStartedTimerItem;
         this.chatItems = Collections.unmodifiableList(chatItems);
+        this.chatInputMode = chatInputMode;
+        this.lastTypedText = lastTypedText;
     }
 
     public boolean isOperatorOnline() {
@@ -69,7 +69,6 @@ public class ChatState {
     }
 
     public static class Builder {
-        private boolean useFloatingChatHeads;
         private String queueTicketId;
         private boolean historyLoaded;
         private String operatorName;
@@ -79,13 +78,13 @@ public class ChatState {
         private String contextUrl;
         private boolean isVisible;
         private boolean integratorChatStarted;
-        private boolean hasOverlayPermissions;
         private boolean overlaysPermissionDialogShown;
         private MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
         private List<ChatItem> chatItems;
+        private ChatInputMode chatInputMode;
+        private String lastTypedText;
 
         public Builder copyFrom(ChatState chatState) {
-            useFloatingChatHeads = chatState.useFloatingChatHeads;
             queueTicketId = chatState.queueTicketId;
             historyLoaded = chatState.historyLoaded;
             operatorName = chatState.operatorName;
@@ -95,15 +94,11 @@ public class ChatState {
             contextUrl = chatState.contextUrl;
             isVisible = chatState.isVisible;
             integratorChatStarted = chatState.integratorChatStarted;
-            hasOverlayPermissions = chatState.hasOverlayPermissions;
             overlaysPermissionDialogShown = chatState.overlaysPermissionDialogShown;
             mediaUpgradeStartedTimerItem = chatState.mediaUpgradeStartedTimerItem;
             chatItems = chatState.chatItems;
-            return this;
-        }
-
-        public Builder setUseFloatingChatHeads(boolean useFloatingChatHeads) {
-            this.useFloatingChatHeads = useFloatingChatHeads;
+            chatInputMode = chatState.chatInputMode;
+            lastTypedText = chatState.lastTypedText;
             return this;
         }
 
@@ -152,11 +147,6 @@ public class ChatState {
             return this;
         }
 
-        public Builder setHasOverlayPermissions(boolean hasOverlayPermissions) {
-            this.hasOverlayPermissions = hasOverlayPermissions;
-            return this;
-        }
-
         public Builder setOverlaysPermissionDialogShown(boolean overlaysPermissionDialogShown) {
             this.overlaysPermissionDialogShown = overlaysPermissionDialogShown;
             return this;
@@ -172,18 +162,28 @@ public class ChatState {
             return this;
         }
 
+        public Builder setChatInputMode(ChatInputMode chatInputMode) {
+            this.chatInputMode = chatInputMode;
+            return this;
+        }
+
+        public Builder setLastTypedText(String lastTypedText) {
+            this.lastTypedText = lastTypedText;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, hasOverlayPermissions, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText);
         }
     }
 
-    public ChatState queueingStarted(boolean useChatHeads,
-                                     String companyName,
-                                     String queueId,
-                                     String contextUrl) {
+    public ChatState queueingStarted(
+            String companyName,
+            String queueId,
+            String contextUrl
+    ) {
         return new Builder()
                 .copyFrom(this)
-                .setUseFloatingChatHeads(useChatHeads)
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
@@ -223,6 +223,7 @@ public class ChatState {
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
                 .setIntegratorChatStarted(true)
+                .setChatInputMode(ChatInputMode.ENABLED)
                 .createChatState();
     }
 
@@ -267,17 +268,24 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState drawOverlaysPermissionChanged(boolean hasOverlaysPermission) {
-        return new Builder()
-                .copyFrom(this)
-                .setHasOverlayPermissions(hasOverlaysPermission)
-                .createChatState();
-    }
-
     public ChatState drawOverlayPermissionsDialogShown() {
         return new Builder()
                 .copyFrom(this)
                 .setOverlaysPermissionDialogShown(true)
+                .createChatState();
+    }
+
+    public ChatState chatInputChanged(String text) {
+        return new Builder()
+                .copyFrom(this)
+                .setLastTypedText(text)
+                .createChatState();
+    }
+
+    public ChatState chatInputModeChanged(ChatInputMode chatInputMode) {
+        return new Builder()
+                .copyFrom(this)
+                .setChatInputMode(chatInputMode)
                 .createChatState();
     }
 
@@ -288,9 +296,7 @@ public class ChatState {
         ChatState chatState = (ChatState) o;
         return integratorChatStarted == chatState.integratorChatStarted &&
                 isVisible == chatState.isVisible &&
-                useFloatingChatHeads == chatState.useFloatingChatHeads &&
                 historyLoaded == chatState.historyLoaded &&
-                hasOverlayPermissions == chatState.hasOverlayPermissions &&
                 overlaysPermissionDialogShown == chatState.overlaysPermissionDialogShown &&
                 Objects.equals(queueTicketId, chatState.queueTicketId) &&
                 Objects.equals(operatorName, chatState.operatorName) &&
@@ -299,12 +305,14 @@ public class ChatState {
                 Objects.equals(queueId, chatState.queueId) &&
                 Objects.equals(contextUrl, chatState.contextUrl) &&
                 Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
-                Objects.equals(chatItems, chatState.chatItems);
+                Objects.equals(chatItems, chatState.chatItems) &&
+                Objects.equals(chatInputMode, chatState.chatInputMode) &&
+                Objects.equals(lastTypedText, chatState.lastTypedText);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, useFloatingChatHeads, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, hasOverlayPermissions, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems);
+        return Objects.hash(integratorChatStarted, isVisible, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText);
     }
 
     @Override
@@ -312,7 +320,6 @@ public class ChatState {
         return "ChatState{" +
                 "integratorChatStarted=" + integratorChatStarted +
                 ", isVisible=" + isVisible +
-                ", useFloatingChatHeads=" + useFloatingChatHeads +
                 ", queueTicketId='" + queueTicketId + '\'' +
                 ", historyLoaded=" + historyLoaded +
                 ", operatorName='" + operatorName + '\'' +
@@ -320,10 +327,11 @@ public class ChatState {
                 ", companyName='" + companyName + '\'' +
                 ", queueId='" + queueId + '\'' +
                 ", contextUrl='" + contextUrl + '\'' +
-                ", hasOverlayPermissions=" + hasOverlayPermissions +
                 ", overlaysPermissionDialogShown=" + overlaysPermissionDialogShown +
                 ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
                 ", chatItems=" + chatItems +
+                ", chatInputMode=" + chatInputMode +
+                ", lastTypedText: " + lastTypedText +
                 '}';
     }
 }

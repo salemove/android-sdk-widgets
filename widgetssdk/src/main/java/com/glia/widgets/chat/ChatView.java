@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,35 +29,38 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.glia.androidsdk.GliaException;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.screensharing.ScreenSharingController;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.SingleChoiceCardView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.util.List;
 
-import static androidx.lifecycle.Lifecycle.State.INITIALIZED;
-
 public class ChatView extends LinearLayout {
 
+    private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
 
     private ChatViewCallback callback;
     private ChatController controller;
 
+    private DialogController.Callback dialogCallback;
+    private DialogController dialogController;
+
     private ScreenSharingController screenSharingController;
-    private GliaScreenSharingCallback screenSharingCallback;
+    private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private RecyclerView chatRecyclerView;
     private ImageButton sendButton;
@@ -71,7 +75,31 @@ public class ChatView extends LinearLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToCallListener onNavigateToCallListener;
-    private OnBubbleListener onBubbleListener;
+    private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
+        @Override
+        public void onClicked(
+                String id,
+                int indexInList,
+                int messageIndex,
+                int optionIndex
+        ) {
+            if (controller != null) {
+                controller.singleChoiceOptionClicked(
+                        id,
+                        indexInList,
+                        messageIndex,
+                        optionIndex
+                );
+            }
+        }
+    };
+    private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener = new SingleChoiceCardView.OnImageLoadedListener() {
+        @Override
+        public void onLoaded() {
+            Logger.d(TAG, "onSingleChoiceCardViewImageLoaded, scroll to bottom");
+            chatRecyclerView.smoothScrollToPosition(adapter.getItemCount());
+        }
+    };
 
     private final Resources resources;
 
@@ -122,22 +150,180 @@ public class ChatView extends LinearLayout {
         initControls();
     }
 
+    /**
+     * @param uiTheme sets this view's appearance using the parameters provided in the
+     *                {@link com.glia.widgets.UiTheme}
+     */
+    public void setTheme(UiTheme uiTheme) {
+        if (uiTheme == null) return;
+        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+        setupViewAppearance();
+        if (getVisibility() == VISIBLE) {
+            handleStatusbarColor();
+        }
+    }
+
+    /**
+     * Used to start the chat functionality.
+     *
+     * @param companyName Text shown in the chat while waiting in a queue.
+     * @param queueId     The queue id to which you would like to queue to and speak to operators from.
+     * @param contextUrl  Provide some context as to from where are you initiating the chat from.
+     */
+    public void startChat(
+            String companyName,
+            String queueId,
+            String contextUrl) {
+        startChat(companyName, queueId, contextUrl, false, null);
+    }
+
+    /**
+     * @param companyName        Text shown in the chat while waiting in a queue.
+     * @param queueId            The queue id to which you would like to queue to and speak to operators from.
+     * @param contextUrl         Provide some context as to from where are you initiating the chat from.
+     * @param useOverlays        Used to set if the user opted to use overlays or not.
+     *                           See {@link com.glia.widgets.GliaWidgets}.USE_OVERLAY to see its full
+     *                           usage description.
+     *                           Important! This parameter is ignored if the view is not used in the sdk's
+     *                           ChatActivity
+     * @param savedInstanceState Used to see if the activity is being created for the first time.
+     */
+    public void startChat(
+            String companyName,
+            String queueId,
+            String contextUrl,
+            boolean useOverlays,
+            Bundle savedInstanceState) {
+        if (controller != null) {
+            Activity activity = Utils.getActivity(this.getContext());
+            controller.initChat(
+                    companyName,
+                    queueId,
+                    contextUrl,
+                    activity instanceof ChatActivity,
+                    activity instanceof ChatActivity && useOverlays,
+                    activity instanceof ChatActivity && savedInstanceState != null,
+                    this.theme,
+                    Settings.canDrawOverlays(this.getContext())
+            );
+        }
+    }
+
+    /**
+     * Used to force the view to be visible. Will show the current state of the view.
+     */
+    public void show() {
+        if (controller != null) {
+            controller.show();
+        }
+    }
+
+    /**
+     * Used to tell the view that the user has pressed the back button so that the view can
+     * set its state accordingly.
+     */
+    public void backPressed() {
+        if (controller != null) {
+            controller.onBackArrowClicked();
+        }
+    }
+
+    /**
+     * Add a listener here if you wish to be notified when the user clicks the up button on the
+     * appbar.
+     *
+     * @param onBackClicked The callback which is fired when the button is clicked.
+     */
+    public void setOnBackClickedListener(OnBackClickedListener onBackClicked) {
+        this.onBackClickedListener = onBackClicked;
+    }
+
+    /**
+     * Add a listener here to be notified if for any reason the chat should end.
+     *
+     * @param onEndListener The callback which is fired when the chat ends.
+     */
+    public void setOnEndListener(OnEndListener onEndListener) {
+        this.onEndListener = onEndListener;
+    }
+
+    /**
+     * Add a listener here for when the user has accepted an audio or video call and should navigate
+     * to a call.
+     * Important! Should be used together with {@link #navigateToCallSuccess()} to notify the view
+     * of a completed navigation.
+     *
+     * @param onNavigateToCallListener The callback which is fired when the user accepts a media
+     *                                 upgrade offer.
+     */
+    public void setOnNavigateToCallListener(OnNavigateToCallListener onNavigateToCallListener) {
+        this.onNavigateToCallListener = onNavigateToCallListener;
+    }
+
+    /**
+     * Use this method to notify the view when your activity or fragment is back in its resumed
+     * state.
+     */
+    public void onResume() {
+        if (controller != null) {
+            controller.onResume(Settings.canDrawOverlays(this.getContext()));
+            if (screenSharingCallback != null)
+                screenSharingController.setGliaScreenSharingCallback(screenSharingCallback);
+        }
+    }
+
+    /**
+     * Use this method to notify the view that your activity or fragment's view is being destroyed.
+     * Used to dispose of any loose resources.
+     */
+    public void onDestroyView() {
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+            alertDialog = null;
+        }
+        onEndListener = null;
+        onBackClickedListener = null;
+        onNavigateToCallListener = null;
+        destroyController();
+        callback = null;
+        adapter.unregisterAdapterDataObserver(dataObserver);
+        chatRecyclerView.setAdapter(null);
+
+        if (screenSharingController != null) {
+            screenSharingController.onDestroy(true);
+        }
+
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+            dialogController = null;
+        }
+    }
+
+    /**
+     * Use this method together with {@link #setOnNavigateToCallListener(OnNavigateToCallListener)}
+     * to notify the view that you have finished navigating.
+     */
+    public void navigateToCallSuccess() {
+        if (controller != null) {
+            controller.navigateToCallSuccess();
+        }
+    }
+
     private void initControls() {
         callback = new ChatViewCallback() {
-
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
-                    chatEditText.setEnabled(chatState.isOperatorOnline());
+                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED);
+                    chatEditText.setHint(
+                            chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD ?
+                                    R.string.chat_single_choice_card_hint :
+                                    R.string.chat_enter_message);
+
                     if (chatState.isOperatorOnline()) {
                         appBar.showEndButton();
                     } else {
                         appBar.showXButton();
-                        // idk if good idea but not setting because needs to remember previously
-                        // typed message if opened from floating chat head
-                        if (!chatState.useFloatingChatHeads) {
-                            chatEditText.setText("");
-                        }
                     }
 
                     if (chatState.isVisible) {
@@ -154,46 +340,9 @@ public class ChatView extends LinearLayout {
             }
 
             @Override
-            public void emitDialog(DialogsState dialogsState) {
-                if (dialogsState instanceof DialogsState.NoDialog) {
-                    post(() -> {
-                        if (alertDialog != null) {
-                            alertDialog.dismiss();
-                            alertDialog = null;
-                        }
-                    });
-                } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
-                    post(() -> showUnexpectedErrorDialog());
-                } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
-                    post(() -> showExitQueueDialog());
-                } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
-                    post(() -> showOverlayPermissionsDialog());
-                } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                    post(() -> showEndEngagementDialog(
-                            ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
-                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
-                } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
-                    post(() -> showNoMoreOperatorsAvailableDialog());
-                }
-            }
-
-            @Override
-            public void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination) {
-                if (onBubbleListener != null) {
-                    onBubbleListener.call(
-                            theme,
-                            chatEditText.getText().toString(),
-                            operatorProfileImgUrl,
-                            returnDestination
-                    );
-                }
-            }
-
-            @Override
             public void navigateToCall() {
                 if (onNavigateToCallListener != null) {
-                    onNavigateToCallListener.call(chatEditText.getText().toString(), theme);
+                    onNavigateToCallListener.call(theme);
                 }
             }
 
@@ -203,31 +352,54 @@ public class ChatView extends LinearLayout {
                     onEndListener.onEnd();
                 }
             }
-        };
-
-        screenSharingCallback = new GliaScreenSharingCallback() {
-            @Override
-            public void onScreenSharingRequest() {
-                Utils.getActivity(getContext()).runOnUiThread(
-                        () -> showScreenSharingDialog()
-                );
-            }
 
             @Override
-            public void onScreenSharingRequestError(GliaException exception) {
-                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+            public void setLastTypedText(String lastTypedText) {
+                post(() -> chatEditText.setText(lastTypedText));
             }
         };
 
-        controller = GliaWidgets
+        screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+
+        controller = Dependencies
                 .getControllerFactory()
                 .getChatController(Utils.getActivity(this.getContext()), callback);
-        controller.setOverlayPermissions(Settings.canDrawOverlays(this.getContext()));
 
-        screenSharingController = GliaWidgets
+        dialogCallback = dialogsState -> {
+            if (dialogsState instanceof DialogsState.NoDialog) {
+                post(() -> {
+                    if (alertDialog != null) {
+                        alertDialog.dismiss();
+                        alertDialog = null;
+                    }
+                });
+            } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
+                post(this::showUnexpectedErrorDialog);
+            } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
+                post(this::showExitQueueDialog);
+            } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
+                post(this::showOverlayPermissionsDialog);
+            } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
+                post(() -> showEndEngagementDialog(
+                        ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+            } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
+            } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
+                post(this::showNoMoreOperatorsAvailableDialog);
+            } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                post(this::showScreenSharingDialog);
+            } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                post(this::showScreenSharingEndDialog);
+            }
+        };
+
+        dialogController = Dependencies
+                .getControllerFactory()
+                .getDialogController(dialogCallback);
+
+        screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
-
     }
 
     private void showScreenSharingDialog() {
@@ -235,10 +407,27 @@ public class ChatView extends LinearLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    R.string.chat_dialog_decline,
-                    R.string.chat_dialog_accept,
+                    resources.getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_message).toString(),
+                    R.string.dialog_accept,
+                    R.string.dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
+            );
+        }
+    }
+
+    private void showScreenSharingEndDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    resources.getString(R.string.dialog_screen_sharing_end_title),
+                    resources.getString(R.string.dialog_screen_sharing_end_message),
+                    R.string.dialog_cancel,
+                    R.string.dialog_end_sharing,
+                    view -> screenSharingController.onDismissEndScreenSharing(),
+                    view -> screenSharingController.onEndScreenSharing(getContext())
             );
         }
     }
@@ -258,189 +447,9 @@ public class ChatView extends LinearLayout {
         Utils.hideSoftKeyboard(this.getContext(), getWindowToken());
     }
 
-    /**
-     * Method called by ChatActivity to enable chat heads functionality.
-     * And activates chat head functionality if true, else asks for permissions.
-     * The integrator should not call this method, instead please use
-     * {@link #startEmbeddedChat(String, String, String)}
-     * Intended for use in ChatActivity to get chat heads functionality.
-     *
-     * @param chatActivity used to make sure that this is only called from ChatActivity
-     */
-    public void startChatActivityChat(ChatActivity chatActivity,
-                                      String companyName,
-                                      String queueId,
-                                      String contextUrl,
-                                      String lastTypedText,
-                                      boolean isOriginCall) {
-        if (!chatActivity.getLifecycle().getCurrentState().isAtLeast(INITIALIZED)) {
-            throw new IllegalArgumentException("Only intended for internal use. Please see javadoc.");
-        }
-        startChatInternal(
-                companyName,
-                queueId,
-                contextUrl,
-                isOriginCall ? isOriginCall : Utils.getActivity(this.getContext()) instanceof ChatActivity);
-        if (lastTypedText != null) {
-            chatEditText.setText(lastTypedText);
-        }
-    }
-
-    /***
-     * Call when using chat in an embedded view and do not want to use the
-     * chat heads functionality.
-     */
-    public void startEmbeddedChat(String companyName, String queueId, String contextUrl) {
-        startChatInternal(companyName, queueId, contextUrl, false);
-    }
-
-    private void startChatInternal(
-            String companyName,
-            String queueId,
-            String contextUrl,
-            boolean useChatHeads) {
-        if (controller != null) {
-            controller.initChat(
-                    companyName,
-                    queueId,
-                    contextUrl,
-                    useChatHeads);
-        }
-    }
-
-    public void setTheme(UiTheme uiTheme) {
-        if (uiTheme == null) return;
-        String title = uiTheme.getAppBarTitle() != null ? uiTheme.getAppBarTitle() : this.theme.getAppBarTitle();
-        Integer baseLightColorRes = uiTheme.getBaseLightColor() != null ?
-                uiTheme.getBaseLightColor() : this.theme.getBaseLightColor();
-        Integer baseDarkColorRes = uiTheme.getBaseDarkColor() != null ?
-                uiTheme.getBaseDarkColor() : this.theme.getBaseDarkColor();
-        Integer baseNormalColorRes = uiTheme.getBaseNormalColor() != null ?
-                uiTheme.getBaseNormalColor() : this.theme.getBaseNormalColor();
-        Integer baseShadeColorRes = uiTheme.getBaseShadeColor() != null ?
-                uiTheme.getBaseShadeColor() : this.theme.getBaseShadeColor();
-        Integer brandPriamryColorRes = uiTheme.getBrandPrimaryColor() != null ?
-                uiTheme.getBrandPrimaryColor() : this.theme.getBrandPrimaryColor();
-        Integer systemAgentBubbleColorRes = uiTheme.getSystemAgentBubbleColor() != null ?
-                uiTheme.getSystemAgentBubbleColor() : this.theme.getSystemAgentBubbleColor();
-        Integer fontRes = uiTheme.getFontRes() != null ? uiTheme.getFontRes() : this.theme.getFontRes();
-        Integer systemNegativeColorRes = uiTheme.getSystemNegativeColor() != null ?
-                uiTheme.getSystemNegativeColor() : this.theme.getSystemNegativeColor();
-        Integer iconAppBarBack = uiTheme.getIconAppBarBack() != null ?
-                uiTheme.getIconAppBarBack() : this.theme.getIconAppBarBack();
-        Integer iconLeaveQueue = uiTheme.getIconLeaveQueue() != null ?
-                uiTheme.getIconLeaveQueue() : this.theme.getIconLeaveQueue();
-        Integer iconSendMessage = uiTheme.getIconSendMessage() != null ?
-                uiTheme.getIconSendMessage() : this.theme.getIconSendMessage();
-        Integer iconChatAudioUpgrade = uiTheme.getIconChatAudioUpgrade() != null ?
-                uiTheme.getIconChatAudioUpgrade() : this.theme.getIconChatAudioUpgrade();
-        Integer iconUpgradeAudioDialog = uiTheme.getIconUpgradeAudioDialog() != null ?
-                uiTheme.getIconUpgradeAudioDialog() : this.theme.getIconUpgradeAudioDialog();
-        Integer iconCallAudioOn = uiTheme.getIconCallAudioOn() != null ?
-                uiTheme.getIconCallAudioOn() : this.theme.getIconCallAudioOn();
-        Integer iconChatVideoUpgrade = uiTheme.getIconChatVideoUpgrade() != null ?
-                uiTheme.getIconChatVideoUpgrade() : this.theme.getIconChatVideoUpgrade();
-        Integer iconUpgradeVideoDialog = uiTheme.getIconUpgradeVideoDialog() != null ?
-                uiTheme.getIconUpgradeVideoDialog() : this.theme.getIconUpgradeVideoDialog();
-        Integer iconScreenSharingDialog = uiTheme.getIconScreenSharingDialog() != null ?
-                uiTheme.getIconScreenSharingDialog() : this.theme.getIconScreenSharingDialog();
-        Integer iconCallVideoOn = uiTheme.getIconCallVideoOn() != null ?
-                uiTheme.getIconCallVideoOn() : this.theme.getIconCallVideoOn();
-        Integer iconCallAudioOff = uiTheme.getIconCallAudioOff() != null ?
-                uiTheme.getIconCallAudioOff() : this.theme.getIconCallAudioOff();
-        Integer iconCallVideoOff = uiTheme.getIconCallVideoOff() != null ?
-                uiTheme.getIconCallVideoOff() : this.theme.getIconCallVideoOff();
-        Integer iconCallChat = uiTheme.getIconCallChat() != null ?
-                uiTheme.getIconCallChat() : this.theme.getIconCallChat();
-        Integer iconCallSpeakerOn = uiTheme.getIconCallSpeakerOn() != null ?
-                uiTheme.getIconCallSpeakerOn() : this.theme.getIconCallSpeakerOn();
-        Integer iconCallSpeakerOff = uiTheme.getIconCallSpeakerOff() != null ?
-                uiTheme.getIconCallSpeakerOff() : this.theme.getIconCallSpeakerOff();
-        Integer iconCallMinimize = uiTheme.getIconCallMinimize() != null ?
-                uiTheme.getIconCallMinimize() : this.theme.getIconCallMinimize();
-        Integer iconPlaceholder = uiTheme.getIconPlaceholder() != null ?
-                uiTheme.getIconPlaceholder() : this.theme.getIconPlaceholder();
-
-        UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
-        builder.setAppBarTitle(title);
-        builder.setBaseLightColor(baseLightColorRes);
-        builder.setBaseDarkColor(baseDarkColorRes);
-        builder.setBaseNormalColor(baseNormalColorRes);
-        builder.setBaseShadeColor(baseShadeColorRes);
-        builder.setBrandPrimaryColor(brandPriamryColorRes);
-        builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
-        builder.setFontRes(fontRes);
-        builder.setSystemNegativeColor(systemNegativeColorRes);
-        builder.setIconAppBarBack(iconAppBarBack);
-        builder.setIconLeaveQueue(iconLeaveQueue);
-        builder.setIconSendMessage(iconSendMessage);
-        builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
-        builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
-        builder.setIconCallAudioOn(iconCallAudioOn);
-        builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
-        builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
-        builder.setIconScreenSharingDialog(iconScreenSharingDialog);
-        builder.setIconCallVideoOn(iconCallVideoOn);
-        builder.setIconCallAudioOff(iconCallAudioOff);
-        builder.setIconCallVideoOff(iconCallVideoOff);
-        builder.setIconCallChat(iconCallChat);
-        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
-        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
-        builder.setIconCallMinimize(iconCallMinimize);
-        builder.setIconPlaceholder(iconPlaceholder);
-        this.theme = builder.build();
-        setupViewAppearance();
-        if (getVisibility() == VISIBLE) {
-            handleStatusbarColor();
-        }
-    }
-
     private void showToolbar(String title) {
         appBar.setTitle(title);
         appBar.showToolbar();
-    }
-
-    public void show() {
-        if (controller != null) {
-            controller.show();
-        }
-    }
-
-    public void backPressed() {
-        if (controller != null) {
-            controller.onBackArrowClicked();
-        }
-    }
-
-    public void setOnBackClickedListener(OnBackClickedListener onBackClicked) {
-        this.onBackClickedListener = onBackClicked;
-    }
-
-    public void setOnEndListener(OnEndListener onEndListener) {
-        this.onEndListener = onEndListener;
-    }
-
-    public void setOnNavigateToCallListener(OnNavigateToCallListener onNavigateToCallListener) {
-        this.onNavigateToCallListener = onNavigateToCallListener;
-    }
-
-    public void setOnBubbleListener(OnBubbleListener onBubbleListener) {
-        this.onBubbleListener = onBubbleListener;
-    }
-
-    public void onDestroyView() {
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-            alertDialog = null;
-        }
-        onEndListener = null;
-        onBackClickedListener = null;
-        onNavigateToCallListener = null;
-        onBubbleListener = null;
-        destroyController();
-        callback = null;
-        adapter.unregisterAdapterDataObserver(dataObserver);
-        chatRecyclerView.setAdapter(null);
     }
 
     private void destroyController() {
@@ -477,7 +486,7 @@ public class ChatView extends LinearLayout {
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme);
+        adapter = new ChatAdapter(this.theme, onOptionClickedListener, this.onImageLoadedListener);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
@@ -553,10 +562,9 @@ public class ChatView extends LinearLayout {
 
         sendButton.setOnClickListener(view -> {
             String message = chatEditText.getText().toString().trim();
-            if (controller != null) {
-                controller.sendMessage(message);
+            if (controller != null && controller.sendMessage(message)) {
+                chatEditText.setText("");
             }
-            chatEditText.setText("");
             Utils.hideSoftKeyboard(this.getContext(), getWindowToken());
         });
 
@@ -581,10 +589,10 @@ public class ChatView extends LinearLayout {
     }
 
     private void showExitQueueDialog() {
-        showOptionsDialog(resources.getString(R.string.chat_dialog_leave_queue_title),
-                resources.getString(R.string.chat_dialog_leave_queue_message),
-                resources.getString(R.string.chat_dialog_yes),
-                resources.getString(R.string.chat_dialog_no),
+        showOptionsDialog(resources.getString(R.string.dialog_leave_queue_title),
+                resources.getString(R.string.dialog_leave_queue_message),
+                resources.getString(R.string.dialog_yes),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -611,10 +619,10 @@ public class ChatView extends LinearLayout {
     }
 
     private void showEndEngagementDialog(String operatorName) {
-        showOptionsDialog(resources.getString(R.string.chat_dialog_end_engagement_title),
-                resources.getString(R.string.chat_dialog_end_engagement_message, operatorName),
-                resources.getString(R.string.chat_dialog_yes),
-                resources.getString(R.string.chat_dialog_no),
+        showOptionsDialog(resources.getString(R.string.dialog_end_engagement_title),
+                resources.getString(R.string.dialog_end_engagement_message, operatorName),
+                resources.getString(R.string.dialog_yes),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -677,8 +685,8 @@ public class ChatView extends LinearLayout {
 
     private void showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
-                R.string.chat_dialog_operators_unavailable_title,
-                R.string.chat_dialog_operators_unavailable_message,
+                R.string.dialog_operators_unavailable_title,
+                R.string.dialog_operators_unavailable_message,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -697,13 +705,11 @@ public class ChatView extends LinearLayout {
                 theme,
                 type,
                 v -> {
-                    dismissAlertDialog();
                     if (controller != null) {
                         controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 },
                 v -> {
-                    dismissAlertDialog();
                     if (controller != null) {
                         controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
                     }
@@ -712,8 +718,8 @@ public class ChatView extends LinearLayout {
 
     private void showUnexpectedErrorDialog() {
         showAlertDialog(
-                R.string.chat_dialog_unexpected_error_title,
-                R.string.chat_dialog_unexpected_error_message,
+                R.string.dialog_unexpected_error_title,
+                R.string.dialog_unexpected_error_message,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -728,10 +734,10 @@ public class ChatView extends LinearLayout {
 
     private void showOverlayPermissionsDialog() {
         showOptionsDialog(
-                resources.getString(R.string.chat_dialog_overlay_permissions_title),
-                resources.getString(R.string.chat_dialog_overlay_permissions_message),
-                resources.getString(R.string.chat_dialog_ok),
-                resources.getString(R.string.chat_dialog_no),
+                resources.getString(R.string.dialog_overlay_permissions_title),
+                resources.getString(R.string.dialog_overlay_permissions_message),
+                resources.getString(R.string.dialog_ok),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -757,21 +763,9 @@ public class ChatView extends LinearLayout {
         );
     }
 
-    public void onResume() {
-        if (controller != null) {
-            controller.onResume(
-                    Settings.canDrawOverlays(this.getContext()),
-                    GliaWidgets.isInBackstack(GliaWidgets.CALL_ACTIVITY)
-            );
-
-            if (screenSharingCallback != null)
-                screenSharingController.setGliaScreenSharingCallback(screenSharingCallback);
-        }
-    }
-
     private void chatEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        GliaWidgets.getControllerFactory().destroyControllers();
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     private void dismissAlertDialog() {
@@ -781,36 +775,30 @@ public class ChatView extends LinearLayout {
         }
     }
 
-    public void navigateToCallSuccess() {
-        if (controller != null) {
-            controller.navigateToCallSuccess();
-        }
-    }
-
     public interface OnBackClickedListener {
+        /**
+         * Callback which is used to notify the enclosing activity or fragment when the user
+         * clicks on the view's top app bar's up button.
+         */
         void onBackClicked();
     }
 
     public interface OnEndListener {
+        /**
+         * Callback which is fired when the chat is ended. End can happen due to the user clicking
+         * on the end engagement button or the leave queue button.
+         */
         void onEnd();
     }
 
     public interface OnNavigateToCallListener {
         /**
-         * @param lastTypedText
-         * @param theme         using actual theme assembled in this view because of callActivity being
-         *                      translucent.
-         *                      The translucent flag can only be set in the manifest, programmatically it can
-         *                      not be done. Setting the theme however removes our attr gliaChatStyle from
-         *                      the theme attributes available only in the app theme.
-         *                      So the only way to get our theme for now is by passing it during navigation.
-         *                      Will need to research ways to fix this, but seems highly unlikely there
-         *                      is a fix.
+         * Callback which is fired when the user has accepted a media upgrade offer and should be
+         * navigated to a view where they can visually see data about their media upgrade.
+         *
+         * @param theme Used to pass the finalized {@link UiTheme}
+         *              to the activity which is being navigated to.
          */
-        void call(String lastTypedText, UiTheme theme);
-    }
-
-    public interface OnBubbleListener {
-        void call(UiTheme theme, String lastTypedText, String operatorProfileImgUrl, String returnDestination);
+        void call(UiTheme theme);
     }
 }

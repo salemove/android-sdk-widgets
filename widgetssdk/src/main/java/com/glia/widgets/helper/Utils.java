@@ -3,6 +3,7 @@ package com.glia.widgets.helper;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.IBinder;
@@ -12,8 +13,13 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.annotation.AttrRes;
 import androidx.annotation.StyleableRes;
 
+import com.glia.widgets.Constants;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.model.ChatHeadInput;
 
 import java.util.Locale;
 
@@ -287,5 +293,109 @@ public class Utils {
     public static void hideSoftKeyboard(Context context, IBinder windowToken) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(windowToken, 0);
+    }
+
+    public static UiTheme getFullHybridTheme(UiTheme newTheme, UiTheme oldTheme) {
+        String title = newTheme.getAppBarTitle() != null ? newTheme.getAppBarTitle() : oldTheme.getAppBarTitle();
+        Integer baseLightColorRes = newTheme.getBaseLightColor() != null ?
+                newTheme.getBaseLightColor() : oldTheme.getBaseLightColor();
+        Integer baseDarkColorRes = newTheme.getBaseDarkColor() != null ?
+                newTheme.getBaseDarkColor() : oldTheme.getBaseDarkColor();
+        Integer baseNormalColorRes = newTheme.getBaseNormalColor() != null ?
+                newTheme.getBaseNormalColor() : oldTheme.getBaseNormalColor();
+        Integer baseShadeColorRes = newTheme.getBaseShadeColor() != null ?
+                newTheme.getBaseShadeColor() : oldTheme.getBaseShadeColor();
+        Integer brandPriamryColorRes = newTheme.getBrandPrimaryColor() != null ?
+                newTheme.getBrandPrimaryColor() : oldTheme.getBrandPrimaryColor();
+        Integer systemAgentBubbleColorRes = newTheme.getSystemAgentBubbleColor() != null ?
+                newTheme.getSystemAgentBubbleColor() : oldTheme.getSystemAgentBubbleColor();
+        Integer fontRes = newTheme.getFontRes() != null ? newTheme.getFontRes() : oldTheme.getFontRes();
+        Integer systemNegativeColorRes = newTheme.getSystemNegativeColor() != null ?
+                newTheme.getSystemNegativeColor() : oldTheme.getSystemNegativeColor();
+        Integer iconAppBarBack = newTheme.getIconAppBarBack() != null ?
+                newTheme.getIconAppBarBack() : oldTheme.getIconAppBarBack();
+        Integer iconLeaveQueue = newTheme.getIconLeaveQueue() != null ?
+                newTheme.getIconLeaveQueue() : oldTheme.getIconLeaveQueue();
+        Integer iconSendMessage = newTheme.getIconSendMessage() != null ?
+                newTheme.getIconSendMessage() : oldTheme.getIconSendMessage();
+        Integer iconChatAudioUpgrade = newTheme.getIconChatAudioUpgrade() != null ?
+                newTheme.getIconChatAudioUpgrade() : oldTheme.getIconChatAudioUpgrade();
+        Integer iconUpgradeAudioDialog = newTheme.getIconUpgradeAudioDialog() != null ?
+                newTheme.getIconUpgradeAudioDialog() : oldTheme.getIconUpgradeAudioDialog();
+        Integer iconCallAudioOn = newTheme.getIconCallAudioOn() != null ?
+                newTheme.getIconCallAudioOn() : oldTheme.getIconCallAudioOn();
+        Integer iconChatVideoUpgrade = newTheme.getIconChatVideoUpgrade() != null ?
+                newTheme.getIconChatVideoUpgrade() : oldTheme.getIconChatVideoUpgrade();
+        Integer iconUpgradeVideoDialog = newTheme.getIconUpgradeVideoDialog() != null ?
+                newTheme.getIconUpgradeVideoDialog() : oldTheme.getIconUpgradeVideoDialog();
+        Integer iconScreenSharingDialog = newTheme.getIconScreenSharingDialog() != null ?
+                newTheme.getIconScreenSharingDialog() : oldTheme.getIconScreenSharingDialog();
+        Integer iconCallVideoOn = newTheme.getIconCallVideoOn() != null ?
+                newTheme.getIconCallVideoOn() : oldTheme.getIconCallVideoOn();
+        Integer iconCallAudioOff = newTheme.getIconCallAudioOff() != null ?
+                newTheme.getIconCallAudioOff() : oldTheme.getIconCallAudioOff();
+        Integer iconCallVideoOff = newTheme.getIconCallVideoOff() != null ?
+                newTheme.getIconCallVideoOff() : oldTheme.getIconCallVideoOff();
+        Integer iconCallChat = newTheme.getIconCallChat() != null ?
+                newTheme.getIconCallChat() : oldTheme.getIconCallChat();
+        Integer iconCallSpeakerOn = newTheme.getIconCallSpeakerOn() != null ?
+                newTheme.getIconCallSpeakerOn() : oldTheme.getIconCallSpeakerOn();
+        Integer iconCallSpeakerOff = newTheme.getIconCallSpeakerOff() != null ?
+                newTheme.getIconCallSpeakerOff() : oldTheme.getIconCallSpeakerOff();
+        Integer iconCallMinimize = newTheme.getIconCallMinimize() != null ?
+                newTheme.getIconCallMinimize() : oldTheme.getIconCallMinimize();
+        Integer iconPlaceholder = newTheme.getIconPlaceholder() != null ?
+                newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
+
+        UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
+        builder.setAppBarTitle(title);
+        builder.setBaseLightColor(baseLightColorRes);
+        builder.setBaseDarkColor(baseDarkColorRes);
+        builder.setBaseNormalColor(baseNormalColorRes);
+        builder.setBaseShadeColor(baseShadeColorRes);
+        builder.setBrandPrimaryColor(brandPriamryColorRes);
+        builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
+        builder.setFontRes(fontRes);
+        builder.setSystemNegativeColor(systemNegativeColorRes);
+        builder.setIconAppBarBack(iconAppBarBack);
+        builder.setIconLeaveQueue(iconLeaveQueue);
+        builder.setIconSendMessage(iconSendMessage);
+        builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
+        builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
+        builder.setIconCallAudioOn(iconCallAudioOn);
+        builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
+        builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
+        builder.setIconScreenSharingDialog(iconScreenSharingDialog);
+        builder.setIconCallVideoOn(iconCallVideoOn);
+        builder.setIconCallAudioOff(iconCallAudioOff);
+        builder.setIconCallVideoOff(iconCallVideoOff);
+        builder.setIconCallChat(iconCallChat);
+        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
+        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
+        builder.setIconCallMinimize(iconCallMinimize);
+        builder.setIconPlaceholder(iconPlaceholder);
+        return builder.build();
+    }
+
+    public static Intent getReturnToEngagementIntent(
+            Context context,
+            ChatHeadInput chatHeadInput,
+            String returnDestination
+    ) {
+        if (returnDestination.equals(Constants.CHAT_ACTIVITY)) {
+            return getNavigationIntent(context, ChatActivity.class, chatHeadInput);
+        } else {
+            return getNavigationIntent(context, CallActivity.class, chatHeadInput);
+        }
+    }
+
+    private static Intent getNavigationIntent(Context context, Class<?> cls, ChatHeadInput chatHeadInput) {
+        Intent newIntent = new Intent(context, cls);
+        newIntent.putExtra(GliaWidgets.COMPANY_NAME, chatHeadInput.companyName);
+        newIntent.putExtra(GliaWidgets.QUEUE_ID, chatHeadInput.queueId);
+        newIntent.putExtra(GliaWidgets.CONTEXT_URL, chatHeadInput.contextUrl);
+        newIntent.putExtra(GliaWidgets.UI_THEME, chatHeadInput.uiTheme);
+        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return newIntent;
     }
 }

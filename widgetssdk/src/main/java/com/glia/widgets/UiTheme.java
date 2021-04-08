@@ -9,55 +9,134 @@ import androidx.annotation.FontRes;
 
 public class UiTheme implements Parcelable {
 
+    /**
+     * Text to be shown on the top of the app bar in the chat
+     **/
     private final String appBarTitle;
+    /**
+     * Primary color for your brand. Used for example to set the color of the appbar
+     **/
     private @ColorRes
     final Integer brandPrimaryColor;
+    /**
+     * Dark color of the UI widgets. Used for example to change the body text colors
+     **/
     private @ColorRes
     final Integer baseLightColor;
+    /**
+     * Light color of the UI widgets. Used for example to change the title text colors.
+     * Background color of the chat, etc.
+     **/
     private @ColorRes
     final Integer baseDarkColor;
+    /**
+     * Base normal color of the chat
+     */
     private @ColorRes
     final Integer baseNormalColor;
+    /**
+     * Base shade color of the chat
+     */
     private @ColorRes
     final Integer baseShadeColor;
+    /**
+     * Color for the operator's chat messages background
+     */
     private @ColorRes
     final Integer systemAgentBubbleColor;
-    private @FontRes
-    final Integer fontRes;
+    /**
+     * Color for any error or chat widgets
+     */
     private @ColorRes
     final Integer systemNegativeColor;
+    /**
+     * Allow overriding the view's fontFamily
+     */
+    private @FontRes
+    final Integer fontRes;
+    /**
+     * The appbar's back icon resId
+     */
     private @DrawableRes
     final Integer iconAppBarBack;
+    /**
+     * The appbar's leave queue icon resId
+     */
     private @DrawableRes
     final Integer iconLeaveQueue;
+    /**
+     * The send message icon resId
+     */
     private @DrawableRes
     final Integer iconSendMessage;
+    /**
+     * The icon resId used in chat messages to display an ongoing audio upgrade timer
+     */
     private @DrawableRes
     final Integer iconChatAudioUpgrade;
+    /**
+     * The icon resId used in the header of an audio upgrade dialog
+     */
     private @DrawableRes
     final Integer iconUpgradeAudioDialog;
+    /**
+     * The icon resId used to set the call's audio on
+     */
     private @DrawableRes
     final Integer iconCallAudioOn;
+    /**
+     * The icon resId used in chat messages to display an ongoing video upgrade timer
+     */
     private @DrawableRes
     final Integer iconChatVideoUpgrade;
+    /**
+     * The icon resId used in the header of an video upgrade dialog
+     */
     private @DrawableRes
     final Integer iconUpgradeVideoDialog;
+    /**
+     * The icon resId used in the header of of a screen sharing upgrade dialog
+     */
     private @DrawableRes
     final Integer iconScreenSharingDialog;
+    /**
+     * The icon resId used to set the call's video on
+     */
     private @DrawableRes
     final Integer iconCallVideoOn;
+    /**
+     * The icon resId used to set the call's audio off
+     */
     private @DrawableRes
     final Integer iconCallAudioOff;
+    /**
+     * The icon resId used set the call's video off
+     */
     private @DrawableRes
     final Integer iconCallVideoOff;
+    /**
+     * The icon resId used to navigate back to the chat from a call
+     */
     private @DrawableRes
     final Integer iconCallChat;
+    /**
+     * The icon resId used to set the call's speaker on
+     */
     private @DrawableRes
     final Integer iconCallSpeakerOn;
+    /**
+     * The icon resId used to set the call's speaker off
+     */
     private @DrawableRes
     final Integer iconCallSpeakerOff;
+    /**
+     * The icon resId used to minimize a call
+     */
     private @DrawableRes
     final Integer iconCallMinimize;
+    /**
+     * The icon resId used in a chat head if an operator's profile image is absent
+     */
     private @DrawableRes
     final Integer iconPlaceholder;
 
@@ -417,55 +496,134 @@ public class UiTheme implements Parcelable {
     };
 
     public static class UiThemeBuilder {
+        /**
+         * Text to be shown on the top of the app bar in the chat
+         **/
         private String appBarTitle;
+        /**
+         * Primary color for your brand. Used for example to set the color of the appbar
+         **/
         private @ColorRes
         Integer brandPrimaryColor;
+        /**
+         * Dark color of the UI widgets. Used for example to change the body text colors
+         **/
         private @ColorRes
         Integer baseLightColor;
+        /**
+         * Light color of the UI widgets. Used for example to change the title text colors.
+         * Background color of the chat, etc.
+         **/
         private @ColorRes
         Integer baseDarkColor;
+        /**
+         * Base normal color of the chat
+         */
         private @ColorRes
         Integer baseNormalColor;
+        /**
+         * Base shade color of the chat
+         */
         private @ColorRes
         Integer baseShadeColor;
+        /**
+         * Color for the operator's chat messages background
+         */
         private @ColorRes
         Integer systemAgentBubbleColor;
-        private @FontRes
-        Integer fontRes;
+        /**
+         * Color for any error or chat widgets
+         */
         private @ColorRes
         Integer systemNegativeColor;
+        /**
+         * Allow overriding the view's fontFamily
+         */
+        private @FontRes
+        Integer fontRes;
+        /**
+         * The appbar's back icon resId
+         */
         private @DrawableRes
         Integer iconAppBarBack;
+        /**
+         * The appbar's leave queue icon resId
+         */
         private @DrawableRes
         Integer iconLeaveQueue;
+        /**
+         * The send message icon resId
+         */
         private @DrawableRes
         Integer iconSendMessage;
+        /**
+         * The icon resId used in chat messages to display an ongoing audio upgrade timer
+         */
         private @DrawableRes
         Integer iconChatAudioUpgrade;
+        /**
+         * The icon resId used in the header of an audio upgrade dialog
+         */
         private @DrawableRes
         Integer iconUpgradeAudioDialog;
-        private @DrawableRes
-        Integer iconScreenSharingDialog;
+        /**
+         * The icon resId used to set the call's audio on
+         */
         private @DrawableRes
         Integer iconCallAudioOn;
+        /**
+         * The icon resId used in chat messages to display an ongoing video upgrade timer
+         */
         private @DrawableRes
         Integer iconChatVideoUpgrade;
+        /**
+         * The icon resId used in the header of an video upgrade dialog
+         */
         private @DrawableRes
         Integer iconUpgradeVideoDialog;
+        /**
+         * The icon resId used in the header of of a screen sharing upgrade dialog
+         */
+        private @DrawableRes
+        Integer iconScreenSharingDialog;
+        /**
+         * The icon resId used to set the call's video on
+         */
         private @DrawableRes
         Integer iconCallVideoOn;
+        /**
+         * The icon resId used to set the call's audio off
+         */
         private @DrawableRes
         Integer iconCallAudioOff;
+        /**
+         * The icon resId used set the call's video off
+         */
         private @DrawableRes
         Integer iconCallVideoOff;
+        /**
+         * The icon resId used to navigate back to the chat from a call
+         */
         private @DrawableRes
         Integer iconCallChat;
+        /**
+         * The icon resId used to set the call's speaker on
+         */
         private @DrawableRes
         Integer iconCallSpeakerOn;
+        /**
+         * The icon resId used to set the call's speaker off
+         */
         private @DrawableRes
         Integer iconCallSpeakerOff;
+        /**
+         * The icon resId used to minimize a call
+         */
         private @DrawableRes
         Integer iconCallMinimize;
+        /**
+         * The icon resId used in a chat head if an operator's profile image is absent
+         */
         private @DrawableRes
         Integer iconPlaceholder;
 

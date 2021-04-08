@@ -7,17 +7,22 @@ import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
-import com.glia.widgets.screensharing.ScreenSharingController;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
+import com.glia.widgets.screensharing.ScreenSharingController;
 
 public class ControllerFactory {
 
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
+    private final ChatHeadsController chatHeadsController;
+    private final DialogController dialogController = new DialogController();
+    private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private static final String TAG = "ControllerFactory";
 
@@ -25,8 +30,16 @@ public class ControllerFactory {
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
 
+
     public ControllerFactory(RepositoryFactory repositoryFactory) {
         this.repositoryFactory = repositoryFactory;
+        messagesNotSeenHandler = new MessagesNotSeenHandler(
+                repositoryFactory.getGliaMessagesNotSeenRepository()
+        );
+        chatHeadsController = new ChatHeadsController(
+                repositoryFactory.getGliaChatHeadControllerRepository(),
+                messagesNotSeenHandler
+        );
     }
 
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
@@ -37,8 +50,12 @@ public class ControllerFactory {
                     repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
                     chatViewCallback,
-                    minimizeHandler);
+                    minimizeHandler,
+                    chatHeadsController,
+                    dialogController,
+                    messagesNotSeenHandler);
         }
+
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
@@ -46,7 +63,10 @@ public class ControllerFactory {
                     repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
                     chatViewCallback,
-                    minimizeHandler);
+                    minimizeHandler,
+                    chatHeadsController,
+                    dialogController,
+                    messagesNotSeenHandler);
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -63,7 +83,11 @@ public class ControllerFactory {
                     sharedTimer,
                     callViewCallback,
                     new TimeCounter(),
-                    minimizeHandler);
+                    minimizeHandler,
+                    chatHeadsController,
+                    dialogController,
+                    messagesNotSeenHandler
+            );
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);
@@ -71,15 +95,25 @@ public class ControllerFactory {
         return retainedCallController;
     }
 
-    public ScreenSharingController getScreenSharingController(GliaScreenSharingCallback gliaScreenSharingCallback) {
-        if (retainedScreenSharingController == null) {
-            Logger.d(TAG, "new screen sharing controller");
-            retainedScreenSharingController = new ScreenSharingController(repositoryFactory.getGliaScreenSharingRepository(), gliaScreenSharingCallback);
-        } else {
-            Logger.d(TAG, "retained screen sharing controller");
-            retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+    public ScreenSharingController getScreenSharingController(ScreenSharingController.ViewCallback gliaScreenSharingCallback) {
+        if (gliaScreenSharingCallback != null) {
+            if (retainedScreenSharingController == null) {
+                Logger.d(TAG, "new screen sharing controller");
+                retainedScreenSharingController = new ScreenSharingController(
+                        repositoryFactory.getGliaScreenSharingRepository(),
+                        dialogController,
+                        gliaScreenSharingCallback
+                );
+            } else {
+                Logger.d(TAG, "retained screen sharing controller");
+                retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
+            }
         }
         return retainedScreenSharingController;
+    }
+
+    public ChatHeadsController getChatHeadsController() {
+        return chatHeadsController;
     }
 
     public void destroyControllers() {
@@ -114,5 +148,15 @@ public class ControllerFactory {
             retainedChatController.onDestroy(false);
             retainedChatController = null;
         }
+    }
+
+    public DialogController getDialogController(DialogController.Callback callback) {
+        dialogController.addCallback(callback);
+        return dialogController;
+    }
+
+    public void init() {
+        chatHeadsController.initChatObserving();
+        messagesNotSeenHandler.init();
     }
 }

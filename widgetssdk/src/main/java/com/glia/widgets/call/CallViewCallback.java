@@ -7,10 +7,6 @@ public interface CallViewCallback {
 
     void emitState(CallState callState);
 
-    void emitDialog(DialogsState dialogsState);
-
-    void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination);
-
     void navigateToChat();
 
     void startOperatorVideoView(MediaState operatorMediaState);

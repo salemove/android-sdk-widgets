@@ -53,7 +53,7 @@ public class ChatFragment extends Fragment {
         chatView.setTheme(theme);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnBackClickedListener(onBackClickedListener);
-        chatView.startEmbeddedChat(
+        chatView.startChat(
                 Utils.getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences, getResources()),
                 Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences, getResources()),
                 Utils.getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences, getResources()));

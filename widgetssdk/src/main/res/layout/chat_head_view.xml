@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profile_picture_view"
+        android:layout_width="@dimen/chat_head_size"
+        android:layout_height="@dimen/chat_head_size"
+        android:elevation="@dimen/small"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/placeholder_view"
+        android:layout_width="@dimen/chat_head_placeholder_size"
+        android:layout_height="@dimen/chat_head_placeholder_size"
+        android:layout_gravity="center"
+        android:elevation="@dimen/small"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
+        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
+        app:layout_constraintStart_toStartOf="@id/profile_picture_view"
+        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
+        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+        app:srcCompat="?attr/gliaIconPlaceholder" />
+
+    <TextView
+        android:id="@+id/chat_bubble_badge"
+        android:layout_width="@dimen/call_floating_button_badge_size"
+        android:layout_height="@dimen/call_floating_button_badge_size"
+        android:background="@drawable/bg_badge"
+        android:elevation="@dimen/call_floating_button_badge_elevation"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
+        app:layout_constraintTop_toTopOf="@id/profile_picture_view" />
+
+</merge>

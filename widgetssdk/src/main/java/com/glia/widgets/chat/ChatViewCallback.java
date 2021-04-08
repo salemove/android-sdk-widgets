@@ -11,11 +11,9 @@ public interface ChatViewCallback {
 
     void emitItems(List<ChatItem> items);
 
-    void emitDialog(DialogsState dialogsState);
-
-    void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination);
-
     void navigateToCall();
 
     void destroyView();
+
+    void setLastTypedText(String lastTypedText);
 }

@@ -159,17 +159,17 @@ public class Dialogs {
 
         if (type instanceof DialogOfferType.AudioUpgradeOffer) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_audio_title, type.getOperatorName())
+                    context.getString(R.string.dialog_upgrade_audio_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeAudioDialog());
         } else if (type instanceof DialogOfferType.VideoUpgradeOffer2Way) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_video_2_way_title, type.getOperatorName())
+                    context.getString(R.string.dialog_upgrade_video_2_way_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
         } else if (type instanceof DialogOfferType.VideoUpgradeOffer1Way) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_video_1_way_title, type.getOperatorName())
+                    context.getString(R.string.dialog_upgrade_video_1_way_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
         }
@@ -188,8 +188,10 @@ public class Dialogs {
     public static AlertDialog showScreenSharingDialog(
             Context context,
             UiTheme theme,
-            @StringRes int negativeButtonText,
+            String title,
+            String message,
             @StringRes int positiveButtonText,
+            @StringRes int negativeButtonText,
             View.OnClickListener positiveButtonClickListener,
             View.OnClickListener negativeButtonClickListener
     ) {
@@ -229,8 +231,8 @@ public class Dialogs {
             negativeButton.setTypeface(fontFamily);
         }
 
-        titleView.setText(context.getText(R.string.dialog_screen_sharing_offer_title));
-        messageView.setText(context.getText(R.string.dialog_screen_sharing_offer_message));
+        titleView.setText(title);
+        messageView.setText(message);
         negativeButton.setText(negativeButtonText);
         positiveButton.setText(positiveButtonText);
 

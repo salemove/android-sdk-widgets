@@ -32,13 +32,14 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
-import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -58,7 +59,10 @@ public class CallView extends ConstraintLayout {
     private CallController controller;
 
     private ScreenSharingController screenSharingController;
-    private GliaScreenSharingCallback screenSharingCallback;
+    private ScreenSharingController.ViewCallback screenSharingCallback;
+
+    private DialogController.Callback dialogCallback;
+    private DialogController dialogController;
 
     private AlertDialog alertDialog;
     private AppBarView appBar;
@@ -87,7 +91,6 @@ public class CallView extends ConstraintLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToChatListener onNavigateToChatListener;
-    private OnBubbleListener onBubbleListener;
 
     private UiTheme theme;
 
@@ -131,7 +134,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewActions() {
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
-                controller.onBackArrowClicked();
+                controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -192,10 +195,13 @@ public class CallView extends ConstraintLayout {
             alertDialog.dismiss();
             alertDialog = null;
         }
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+            dialogController = null;
+        }
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToChatListener = null;
-        onBubbleListener = null;
         destroyController();
         callback = null;
     }
@@ -222,8 +228,8 @@ public class CallView extends ConstraintLayout {
     }
 
     private void destroyController() {
-        GliaWidgets.getControllerFactory().destroyCallController(true);
-        GliaWidgets.getControllerFactory().destroyScreenSharingController(true);
+        Dependencies.getControllerFactory().destroyCallController(true);
+        Dependencies.getControllerFactory().destroyScreenSharingController(true);
         controller = null;
     }
 
@@ -313,6 +319,36 @@ public class CallView extends ConstraintLayout {
             }
 
             @Override
+            public void navigateToChat() {
+                if (onNavigateToChatListener != null) {
+                    onNavigateToChatListener.call();
+                }
+            }
+
+            @Override
+            public void startOperatorVideoView(MediaState operatorMediaState) {
+                post(() -> showOperatorVideo(operatorMediaState));
+            }
+
+            @Override
+            public void startVisitorVideoView(MediaState visitorMediaState) {
+                post(() -> showVisitorVideo(visitorMediaState));
+            }
+        };
+
+        screenSharingCallback = new ScreenSharingController.ViewCallback() {
+            @Override
+            public void onScreenSharingRequestError(GliaException exception) {
+                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        controller = Dependencies
+                .getControllerFactory()
+                .getCallController(callback);
+
+        dialogCallback = new DialogController.Callback() {
+            @Override
             public void emitDialog(DialogsState dialogsState) {
                 if (dialogsState instanceof DialogsState.NoDialog) {
                     post(() -> {
@@ -332,56 +368,19 @@ public class CallView extends ConstraintLayout {
                     post(() -> showNoMoreOperatorsAvailableDialog());
                 } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
                     post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
+                } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                    post(() -> showScreenSharingDialog());
+                } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                    post(() -> showScreenSharingEndDialog());
                 }
-            }
-
-            @Override
-            public void handleFloatingChatHead(String operatorProfileImgUrl, String returnDestination) {
-                if (onBubbleListener != null) {
-                    onBubbleListener.call(operatorProfileImgUrl, returnDestination);
-                }
-            }
-
-            @Override
-            public void navigateToChat() {
-                if (onNavigateToChatListener != null) {
-                    onNavigateToChatListener.call();
-                }
-            }
-
-            @Override
-            public void startOperatorVideoView(MediaState operatorMediaState) {
-                post(() -> showOperatorVideo(operatorMediaState));
-            }
-
-            @Override
-            public void startVisitorVideoView(MediaState visitorMediaState) {
-                post(() -> showVisitorVideo(visitorMediaState));
             }
         };
 
-        screenSharingCallback = new GliaScreenSharingCallback() {
-            @Override
-            public void onScreenSharingRequest() {
-                Utils.getActivity(getContext()).runOnUiThread(
-                        () -> showScreenSharingDialog()
-                );
-            }
+        dialogController = Dependencies.getControllerFactory().getDialogController(dialogCallback);
 
-            @Override
-            public void onScreenSharingRequestError(GliaException exception) {
-                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        controller = GliaWidgets
+        screenSharingController = Dependencies
                 .getControllerFactory()
-                .getCallController(callback);
-
-        screenSharingController =
-                GliaWidgets
-                        .getControllerFactory()
-                        .getScreenSharingController(screenSharingCallback);
+                .getScreenSharingController(screenSharingCallback);
     }
 
     private void showScreenSharingDialog() {
@@ -389,11 +388,28 @@ public class CallView extends ConstraintLayout {
             alertDialog = Dialogs.showScreenSharingDialog(
                     this.getContext(),
                     theme,
-                    R.string.chat_dialog_decline,
-                    R.string.chat_dialog_accept,
+                    resources.getText(R.string.dialog_screen_sharing_offer_title).toString(),
+                    resources.getText(R.string.dialog_screen_sharing_offer_message).toString(),
+                    R.string.dialog_accept,
+                    R.string.dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
+    }
+
+    private void showScreenSharingEndDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showScreenSharingDialog(
+                    this.getContext(),
+                    theme,
+                    resources.getString(R.string.dialog_screen_sharing_end_title),
+                    resources.getString(R.string.dialog_screen_sharing_end_message),
+                    R.string.dialog_cancel,
+                    R.string.dialog_end_sharing,
+                    view -> screenSharingController.onDismissEndScreenSharing(),
+                    view -> screenSharingController.onEndScreenSharing(getContext())
+            );
+        }
     }
 
     private void setButtonActivated(FloatingActionButton floatingActionButton,
@@ -611,13 +627,9 @@ public class CallView extends ConstraintLayout {
         this.onNavigateToChatListener = onNavigateToChatListener;
     }
 
-    public void setOnBubbleListener(OnBubbleListener onBubbleListener) {
-        this.onBubbleListener = onBubbleListener;
-    }
-
     public void backPressed() {
         if (controller != null) {
-            controller.onBackArrowClicked();
+            controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
         }
     }
 
@@ -647,10 +659,10 @@ public class CallView extends ConstraintLayout {
 
     private void showEndEngagementDialog(String operatorName) {
         showOptionsDialog(
-                resources.getString(R.string.chat_dialog_end_engagement_title),
-                resources.getString(R.string.chat_dialog_end_engagement_message, operatorName),
-                resources.getString(R.string.chat_dialog_yes),
-                resources.getString(R.string.chat_dialog_no),
+                resources.getString(R.string.dialog_end_engagement_title),
+                resources.getString(R.string.dialog_end_engagement_message, operatorName),
+                resources.getString(R.string.dialog_yes),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -733,8 +745,8 @@ public class CallView extends ConstraintLayout {
 
     private void showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
-                R.string.chat_dialog_operators_unavailable_title,
-                R.string.chat_dialog_operators_unavailable_message,
+                R.string.dialog_operators_unavailable_title,
+                R.string.dialog_operators_unavailable_message,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -750,8 +762,8 @@ public class CallView extends ConstraintLayout {
 
     private void showUnexpectedErrorDialog() {
         showAlertDialog(
-                R.string.chat_dialog_unexpected_error_title,
-                R.string.chat_dialog_unexpected_error_message,
+                R.string.dialog_unexpected_error_title,
+                R.string.dialog_unexpected_error_message,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -765,10 +777,10 @@ public class CallView extends ConstraintLayout {
     }
 
     private void showOverlayPermissionsDialog() {
-        showOptionsDialog(resources.getString(R.string.chat_dialog_overlay_permissions_title),
-                resources.getString(R.string.chat_dialog_overlay_permissions_message),
-                resources.getString(R.string.chat_dialog_ok),
-                resources.getString(R.string.chat_dialog_no),
+        showOptionsDialog(resources.getString(R.string.dialog_overlay_permissions_title),
+                resources.getString(R.string.dialog_overlay_permissions_message),
+                resources.getString(R.string.dialog_ok),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -803,7 +815,7 @@ public class CallView extends ConstraintLayout {
 
     private void callEnded() {
         this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
-        GliaWidgets.getControllerFactory().destroyControllers();
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     private void showOperatorVideo(MediaState operatorMediaState) {
@@ -846,9 +858,5 @@ public class CallView extends ConstraintLayout {
 
     public interface OnNavigateToChatListener {
         void call();
-    }
-
-    public interface OnBubbleListener {
-        void call(String profileImgUrl, String returnDestination);
     }
 }

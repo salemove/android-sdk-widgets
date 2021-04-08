@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/large_x_large"
         android:layout_marginEnd="@dimen/small"
-        android:text="@string/chat_dialog_decline"
+        android:text="@string/dialog_decline"
         app:layout_constraintEnd_toStartOf="@id/positive_button"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small"
         android:layout_marginTop="@dimen/large_x_large"
-        android:text="@string/chat_dialog_accept"
+        android:text="@string/dialog_accept"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toEndOf="@id/negative_button"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />

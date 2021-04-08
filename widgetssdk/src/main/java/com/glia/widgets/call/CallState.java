@@ -11,7 +11,6 @@ class CallState {
     public final boolean integratorCallStarted;
     public final boolean isVisible;
     public final int messagesNotSeen;
-    public final boolean hasOverlayPermissions;
     public final CallStatus callStatus;
     public final boolean landscapeLayoutControlsVisible;
     public final boolean isMuted;
@@ -20,7 +19,6 @@ class CallState {
     private CallState(boolean integratorCallStarted,
                       boolean isVisible,
                       int messagesNotSeen,
-                      boolean hasOverlayPermissions,
                       CallStatus callStatus,
                       boolean landscapeLayoutControlsVisible,
                       boolean isMuted,
@@ -28,7 +26,6 @@ class CallState {
         this.integratorCallStarted = integratorCallStarted;
         this.isVisible = isVisible;
         this.messagesNotSeen = messagesNotSeen;
-        this.hasOverlayPermissions = hasOverlayPermissions;
         this.callStatus = callStatus;
         this.landscapeLayoutControlsVisible = landscapeLayoutControlsVisible;
         this.isMuted = isMuted;
@@ -128,13 +125,6 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setVisible(isVisible)
-                .createCallState();
-    }
-
-    public CallState drawOverlaysPermissionChanged(boolean hasOverlayPermissions) {
-        return new Builder()
-                .copyFrom(this)
-                .setHasOverlayPermissions(hasOverlayPermissions)
                 .createCallState();
     }
 
@@ -241,7 +231,6 @@ class CallState {
                 "integratorCallStarted=" + integratorCallStarted +
                 ", isVisible=" + isVisible +
                 ", messagesNotSeen=" + messagesNotSeen +
-                ", hasOverlayPermissions=" + hasOverlayPermissions +
                 ", callStatus=" + callStatus +
                 ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
                 ", isMuted=" + isMuted +
@@ -257,7 +246,6 @@ class CallState {
         return integratorCallStarted == callState.integratorCallStarted &&
                 isVisible == callState.isVisible &&
                 messagesNotSeen == callState.messagesNotSeen &&
-                hasOverlayPermissions == callState.hasOverlayPermissions &&
                 landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
                 isMuted == callState.isMuted &&
                 hasVideo == callState.hasVideo &&
@@ -266,7 +254,7 @@ class CallState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen, hasOverlayPermissions,
+        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
                 callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo);
     }
 
@@ -274,7 +262,6 @@ class CallState {
         private boolean integratorCallStarted;
         private boolean isVisible;
         private int messagesNotSeen;
-        private boolean hasOverlayPermissions;
         private CallStatus callStatus;
         private boolean landscapeLayoutControlsVisible;
         private boolean isMuted;
@@ -292,11 +279,6 @@ class CallState {
 
         public Builder setMessagesNotSeen(int messagesNotSeen) {
             this.messagesNotSeen = messagesNotSeen;
-            return this;
-        }
-
-        public Builder setHasOverlayPermissions(boolean hasOverlayPermissions) {
-            this.hasOverlayPermissions = hasOverlayPermissions;
             return this;
         }
 
@@ -324,7 +306,6 @@ class CallState {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
             messagesNotSeen = callState.messagesNotSeen;
-            hasOverlayPermissions = callState.hasOverlayPermissions;
             callStatus = callState.callStatus;
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
             isMuted = callState.isMuted;
@@ -337,7 +318,6 @@ class CallState {
                     integratorCallStarted,
                     isVisible,
                     messagesNotSeen,
-                    hasOverlayPermissions,
                     callStatus,
                     landscapeLayoutControlsVisible,
                     isMuted,

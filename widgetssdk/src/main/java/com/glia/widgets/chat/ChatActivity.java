@@ -8,11 +8,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.glia.widgets.Constants;
-import com.glia.widgets.Dependencies;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.di.Dependencies;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -52,8 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnNavigateToCallListener(onNavigateToCallListener);
-        chatView.startChatActivityChat(
-                this,
+        chatView.startChat(
                 companyName,
                 queueId,
                 contextUrl,

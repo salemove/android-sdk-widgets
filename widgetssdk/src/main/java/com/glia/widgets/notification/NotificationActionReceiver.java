@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.glia.widgets.Dependencies;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.screensharing.MediaProjectionService;
 import com.glia.widgets.screensharing.ScreenSharingController;
 

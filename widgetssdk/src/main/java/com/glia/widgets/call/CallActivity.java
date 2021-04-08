@@ -8,11 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.widgets.Constants;
-import com.glia.widgets.Dependencies;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 public class CallActivity extends Activity {

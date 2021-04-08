@@ -12,9 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 
-import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.view.ViewHelpers;
@@ -37,7 +37,9 @@ public class ChatHeadLayout extends FrameLayout {
                             chatHeadView.setTheme(chatHeadState.theme);
                         }
                         chatHeadView.setVisibility(
-                                chatHeadState.areIntegratedViewsVisible ? VISIBLE : GONE
+                                chatHeadState.useChatHeads &&
+                                        chatHeadState.areIntegratedViewsVisible
+                                        ? VISIBLE : GONE
                         );
                         returnDestination = chatHeadState.returnDestination;
                     });

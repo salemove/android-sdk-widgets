@@ -1,10 +1,9 @@
-package com.glia.widgets;
+package com.glia.widgets.di;
 
 import android.app.Application;
 import android.content.Intent;
 
-import com.glia.widgets.di.ControllerFactory;
-import com.glia.widgets.di.RepositoryFactory;
+import com.glia.widgets.Constants;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;

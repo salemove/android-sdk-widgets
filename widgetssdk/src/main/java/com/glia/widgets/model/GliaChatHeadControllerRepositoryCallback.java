@@ -8,4 +8,6 @@ public interface GliaChatHeadControllerRepositoryCallback {
     void operatorDataLoaded(Operator operator);
 
     void newOperatorMediaState(OperatorMediaState operatorMediaState);
+
+    void engagementEndedByOperator();
 }

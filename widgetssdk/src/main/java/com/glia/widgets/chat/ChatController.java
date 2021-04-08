@@ -21,6 +21,7 @@ import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItem;
 import com.glia.widgets.chat.adapter.ReceiveMessageItemMessage;
 import com.glia.widgets.chat.adapter.SendMessageItem;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -31,7 +32,6 @@ import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.dialog.DialogController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,12 +99,14 @@ public class ChatController {
     public void initChat(String companyName,
                          String queueId,
                          String contextUrl,
+                         boolean enableChatHeads,
                          boolean useOverlays,
                          boolean isConfigurationChange,
                          UiTheme uiTheme,
                          boolean hasOverlayPermissions
     ) {
         chatHeadsController.setHasOverlayPermissions(hasOverlayPermissions);
+        chatHeadsController.setEnableChatHeads(enableChatHeads);
         if (!isConfigurationChange) {
             chatHeadsController.onNavigatedToChat(
                     new ChatHeadInput(
@@ -247,10 +249,11 @@ public class ChatController {
 
     public void onResume(boolean hasOverlaysPermission) {
         Logger.d(TAG, "onResume: " + hasOverlaysPermission);
-        if (!hasOverlaysPermission && !chatState.overlaysPermissionDialogShown) {
+        chatHeadsController.setHasOverlayPermissions(hasOverlaysPermission);
+        if (chatHeadsController.showOverlayPermissionsDialog()
+                && !chatState.overlaysPermissionDialogShown) {
             dialogController.showOverlayPermissionsDialog();
         }
-        chatHeadsController.setHasOverlayPermissions(hasOverlaysPermission);
         emitViewState(chatState.changeVisibility(chatState.integratorChatStarted));
     }
 

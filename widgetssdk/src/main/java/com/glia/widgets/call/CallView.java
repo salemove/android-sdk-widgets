@@ -33,9 +33,9 @@ import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.Constants;
-import com.glia.widgets.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
@@ -390,8 +390,8 @@ public class CallView extends ConstraintLayout {
                     theme,
                     resources.getText(R.string.dialog_screen_sharing_offer_title).toString(),
                     resources.getText(R.string.dialog_screen_sharing_offer_message).toString(),
-                    R.string.chat_dialog_accept,
-                    R.string.chat_dialog_decline,
+                    R.string.dialog_accept,
+                    R.string.dialog_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
@@ -404,8 +404,8 @@ public class CallView extends ConstraintLayout {
                     theme,
                     resources.getString(R.string.dialog_screen_sharing_end_title),
                     resources.getString(R.string.dialog_screen_sharing_end_message),
-                    R.string.chat_dialog_cancel,
-                    R.string.chat_dialog_end_sharing,
+                    R.string.dialog_cancel,
+                    R.string.dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),
                     view -> screenSharingController.onEndScreenSharing(getContext())
             );
@@ -659,10 +659,10 @@ public class CallView extends ConstraintLayout {
 
     private void showEndEngagementDialog(String operatorName) {
         showOptionsDialog(
-                resources.getString(R.string.chat_dialog_end_engagement_title),
-                resources.getString(R.string.chat_dialog_end_engagement_message, operatorName),
-                resources.getString(R.string.chat_dialog_yes),
-                resources.getString(R.string.chat_dialog_no),
+                resources.getString(R.string.dialog_end_engagement_title),
+                resources.getString(R.string.dialog_end_engagement_message, operatorName),
+                resources.getString(R.string.dialog_yes),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -745,8 +745,8 @@ public class CallView extends ConstraintLayout {
 
     private void showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
-                R.string.chat_dialog_operators_unavailable_title,
-                R.string.chat_dialog_operators_unavailable_message,
+                R.string.dialog_operators_unavailable_title,
+                R.string.dialog_operators_unavailable_message,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -762,8 +762,8 @@ public class CallView extends ConstraintLayout {
 
     private void showUnexpectedErrorDialog() {
         showAlertDialog(
-                R.string.chat_dialog_unexpected_error_title,
-                R.string.chat_dialog_unexpected_error_message,
+                R.string.dialog_unexpected_error_title,
+                R.string.dialog_unexpected_error_message,
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -777,10 +777,10 @@ public class CallView extends ConstraintLayout {
     }
 
     private void showOverlayPermissionsDialog() {
-        showOptionsDialog(resources.getString(R.string.chat_dialog_overlay_permissions_title),
-                resources.getString(R.string.chat_dialog_overlay_permissions_message),
-                resources.getString(R.string.chat_dialog_ok),
-                resources.getString(R.string.chat_dialog_no),
+        showOptionsDialog(resources.getString(R.string.dialog_overlay_permissions_title),
+                resources.getString(R.string.dialog_overlay_permissions_message),
+                resources.getString(R.string.dialog_ok),
+                resources.getString(R.string.dialog_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {

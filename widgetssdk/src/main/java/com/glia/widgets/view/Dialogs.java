@@ -159,17 +159,17 @@ public class Dialogs {
 
         if (type instanceof DialogOfferType.AudioUpgradeOffer) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_audio_title, type.getOperatorName())
+                    context.getString(R.string.dialog_upgrade_audio_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeAudioDialog());
         } else if (type instanceof DialogOfferType.VideoUpgradeOffer2Way) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_video_2_way_title, type.getOperatorName())
+                    context.getString(R.string.dialog_upgrade_video_2_way_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
         } else if (type instanceof DialogOfferType.VideoUpgradeOffer1Way) {
             titleView.setText(
-                    context.getString(R.string.chat_dialog_upgrade_video_1_way_title, type.getOperatorName())
+                    context.getString(R.string.dialog_upgrade_video_1_way_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
         }

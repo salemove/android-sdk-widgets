@@ -17,23 +17,25 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Logger;
@@ -44,11 +46,15 @@ import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.SingleChoiceCardView;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.shape.MarkerEdgeTreatment;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.util.List;
 
-public class ChatView extends LinearLayout {
+public class ChatView extends ConstraintLayout {
 
     private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
@@ -68,6 +74,10 @@ public class ChatView extends LinearLayout {
     private ChatAdapter adapter;
     private AppBarView appBar;
     private View dividerView;
+    private RelativeLayout newMessagesLayout;
+    private MaterialCardView newMessagesCardView;
+    private ShapeableImageView newMessagesImageView;
+    private TextView newMessagesCountBadgeView;
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
@@ -470,7 +480,6 @@ public class ChatView extends LinearLayout {
     }
 
     private void initConfigurations() {
-        setOrientation(VERTICAL);
         setVisibility(INVISIBLE);
         // needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f);
@@ -483,6 +492,10 @@ public class ChatView extends LinearLayout {
         chatEditText = view.findViewById(R.id.chat_edit_text);
         appBar = view.findViewById(R.id.app_bar_view);
         dividerView = view.findViewById(R.id.divider_view);
+        newMessagesLayout = view.findViewById(R.id.new_messages_indicator_layout);
+        newMessagesCardView = view.findViewById(R.id.new_messages_indicator_card);
+        newMessagesImageView = view.findViewById(R.id.new_messages_indicator_image);
+        newMessagesCountBadgeView = view.findViewById(R.id.new_messages_badge_view);
     }
 
     private void setupViewAppearance() {
@@ -496,6 +509,28 @@ public class ChatView extends LinearLayout {
         //icons
         sendButton.setImageResource(this.theme.getIconSendMessage());
 
+        // new messages indicator shape
+        ShapeAppearanceModel shapeAppearanceModel = newMessagesCardView.getShapeAppearanceModel()
+                .toBuilder()
+                .setBottomEdge(new MarkerEdgeTreatment(
+                        resources.getDimension(R.dimen.chat_new_messages_bottom_edge_radius)
+                ))
+                .build();
+        newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
+        newMessagesCountBadgeView.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                        this.getContext(), theme.getBrandPrimaryColor()
+                )
+        );
+        newMessagesImageView.setBackgroundColor(
+                ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor())
+        );
+        newMessagesImageView.setImageTintList(
+                ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor())
+        );
+        newMessagesCountBadgeView.setTextColor(
+                ContextCompat.getColor(this.getContext(), theme.getBaseLightColor())
+        );
 
         // colors
         dividerView.setBackgroundColor(ContextCompat.getColor(

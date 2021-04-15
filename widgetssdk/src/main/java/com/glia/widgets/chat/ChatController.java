@@ -32,6 +32,9 @@ import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
+import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +59,10 @@ public class ChatController {
 
     private final DialogController dialogController;
 
+    private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
+    private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
+    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
+
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
@@ -68,7 +75,10 @@ public class ChatController {
                           MinimizeHandler minimizeHandler,
                           ChatHeadsController chatHeadsController,
                           DialogController dialogController,
-                          MessagesNotSeenHandler messagesNotSeenHandler
+                          MessagesNotSeenHandler messagesNotSeenHandler,
+                          ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
+                          ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
+                          RemoveCallNotificationUseCase removeCallNotificationUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -94,6 +104,10 @@ public class ChatController {
         this.dialogController = dialogController;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
         isNavigationPending = false;
+
+        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
+        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
+        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
     }
 
     public void initChat(String companyName,
@@ -154,6 +168,7 @@ public class ChatController {
         destroyView();
         viewCallback = null;
         if (!retain) {
+            removeCallNotificationUseCase.execute();
             repository.onDestroy();
             gliaCallback = null;
             mediaUpgradeOfferRepository.stopAll();
@@ -342,6 +357,13 @@ public class ChatController {
             @Override
             public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
                 Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
+                if (operatorMediaState.getVideo() != null) {
+                    onOperatorMediaStateVideo(operatorMediaState);
+                } else if (operatorMediaState.getAudio() != null) {
+                    onOperatorMediaStateAudio(operatorMediaState);
+                } else {
+                    onOperatorMediaStateUnknown();
+                }
             }
 
             @Override
@@ -407,6 +429,21 @@ public class ChatController {
                 emitViewState(chatState.changeVisibility(false));
             }
         };
+    }
+
+    private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: video");
+        showVideoCallNotificationUseCase.execute();
+    }
+
+    private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: audio");
+        showAudioCallNotificationUseCase.execute();
+    }
+
+    private void onOperatorMediaStateUnknown() {
+        Logger.d(TAG, "newOperatorMediaState: null");
+        removeCallNotificationUseCase.execute();
     }
 
     private void initMediaUpgradeCallback() {

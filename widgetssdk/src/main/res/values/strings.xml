@@ -52,9 +52,14 @@
     <string name="call_connecting_with">Connecting with %1$s</string>
 
     <!--    statusbar notifications-->
+    <string name="notification_screen_sharing_channel_name">Screen Sharing notification channel</string>
     <string name="notification_screen_sharing_title">You are currently Sharing Your screen</string>
     <string name="notification_screen_sharing_message">To end sharing push \"END SHARING\" button</string>
+    <string name="notification_call_channel_name">Call notification channel</string>
+    <string name="notification_audio_call_title">Audio call ongoing</string>
+    <string name="notification_audio_call_message">Operator can hear You through the mic</string>
+    <string name="notification_video_call_title">Video call ongoing</string>
+    <string name="notification_video_call_message">Operator might see and hear You</string>
     <string name="notification_action_end_sharing">END SHARING</string>
-    <string name="notification_screen_sharing_channel_name">Screen Sharing notification channel</string>
 
 </resources>

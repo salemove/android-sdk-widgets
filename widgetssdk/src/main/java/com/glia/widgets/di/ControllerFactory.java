@@ -53,7 +53,11 @@ public class ControllerFactory {
                     minimizeHandler,
                     chatHeadsController,
                     dialogController,
-                    messagesNotSeenHandler);
+                    messagesNotSeenHandler,
+                    UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager())
+            );
         }
 
         if (retainedChatController == null) {
@@ -66,7 +70,11 @@ public class ControllerFactory {
                     minimizeHandler,
                     chatHeadsController,
                     dialogController,
-                    messagesNotSeenHandler);
+                    messagesNotSeenHandler,
+                    UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager())
+            );
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -86,7 +94,10 @@ public class ControllerFactory {
                     minimizeHandler,
                     chatHeadsController,
                     dialogController,
-                    messagesNotSeenHandler
+                    messagesNotSeenHandler,
+                    UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager())
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -102,6 +113,8 @@ public class ControllerFactory {
                 retainedScreenSharingController = new ScreenSharingController(
                         repositoryFactory.getGliaScreenSharingRepository(),
                         dialogController,
+                        UseCaseFactory.createShowScreenSharingNotificationUseCase(Dependencies.getNotificationManager()),
+                        UseCaseFactory.createRemoveScreenSharingNotificationUseCase(Dependencies.getNotificationManager()),
                         gliaScreenSharingCallback
                 );
             } else {

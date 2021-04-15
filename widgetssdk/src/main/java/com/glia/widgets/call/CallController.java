@@ -18,6 +18,9 @@ import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
 import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
 
 public class CallController {
 
@@ -39,6 +42,10 @@ public class CallController {
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
     private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
 
+    private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
+    private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
+    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
+
     private final DialogController dialogController;
 
     private final String TAG = "CallController";
@@ -53,7 +60,10 @@ public class CallController {
             MinimizeHandler minimizeHandler,
             ChatHeadsController chatHeadsController,
             DialogController dialogController,
-            MessagesNotSeenHandler messagesNotSeenHandler
+            MessagesNotSeenHandler messagesNotSeenHandler,
+            ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
+            ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
+            RemoveCallNotificationUseCase removeCallNotificationUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -74,6 +84,10 @@ public class CallController {
         this.minimizeHandler = minimizeHandler;
         this.chatHeadsController = chatHeadsController;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
+
+        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
+        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
+        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
     }
 
     public void initCall() {
@@ -160,21 +174,11 @@ public class CallController {
             public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
                 Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
                 if (operatorMediaState.getVideo() != null) {
-                    Logger.d(TAG, "newOperatorMediaState: video");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState));
-                    }
-                    startOperatorVideo(operatorMediaState);
+                    onOperatorMediaStateVideo(operatorMediaState);
                 } else if (operatorMediaState.getAudio() != null) {
-                    Logger.d(TAG, "newOperatorMediaState: audio");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.audioCallStarted(operatorMediaState));
-                    }
+                    onOperatorMediaStateAudio(operatorMediaState);
                 } else {
-                    Logger.d(TAG, "newOperatorMediaState: null");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.backToOngoing());
-                    }
+                    onOperatorMediaStateUnknown();
                 }
             }
 
@@ -242,6 +246,31 @@ public class CallController {
         };
     }
 
+    private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: video");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState));
+        }
+        startOperatorVideo(operatorMediaState);
+        showVideoCallNotificationUseCase.execute();
+    }
+
+    private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: audio");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.audioCallStarted(operatorMediaState));
+        }
+        showAudioCallNotificationUseCase.execute();
+    }
+
+    private void onOperatorMediaStateUnknown() {
+        Logger.d(TAG, "newOperatorMediaState: null");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.backToOngoing());
+        }
+        removeCallNotificationUseCase.execute();
+    }
+
     private synchronized void emitViewState(CallState state) {
         if (setState(state) && viewCallback != null) {
             Logger.d(TAG, "Emit state:\n" + state.toString());
@@ -289,6 +318,7 @@ public class CallController {
         stop();
         chatHeadsController.chatEndedByUser();
         dialogController.dismissDialogs();
+        removeCallNotificationUseCase.execute();
     }
 
     public void endEngagementDialogDismissed() {

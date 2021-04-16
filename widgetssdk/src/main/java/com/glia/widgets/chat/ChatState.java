@@ -75,7 +75,7 @@ public class ChatState {
     }
 
     public boolean showMessagesUnseenIndicator() {
-        return isChatInBottom && messagesNotSeen != null && messagesNotSeen > 0;
+        return !isChatInBottom && messagesNotSeen != null && messagesNotSeen > 0;
     }
 
     public static class Builder {

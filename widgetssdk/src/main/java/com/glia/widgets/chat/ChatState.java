@@ -74,6 +74,10 @@ public class ChatState {
         return mediaUpgradeStartedTimerItem != null;
     }
 
+    public boolean showMessagesUnseenIndicator() {
+        return isChatInBottom && messagesNotSeen != null && messagesNotSeen > 0;
+    }
+
     public static class Builder {
         private String queueTicketId;
         private boolean historyLoaded;

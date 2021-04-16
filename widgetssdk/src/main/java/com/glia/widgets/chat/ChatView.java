@@ -351,9 +351,7 @@ public class ChatView extends ConstraintLayout {
                     }
 
                     newMessagesLayout.setVisibility(
-                            !chatState.isChatInBottom && chatState.messagesNotSeen > 0 ?
-                                    VISIBLE :
-                                    GONE
+                            chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
                     );
                     if (chatState.operatorProfileImgUrl != null) {
                         Picasso.with(getContext()).load(chatState.operatorProfileImgUrl).into(newMessagesImageView);

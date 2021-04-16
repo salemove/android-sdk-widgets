@@ -12,6 +12,8 @@ import java.util.Objects;
 public class ChatState {
     public final boolean integratorChatStarted;
     public final boolean isVisible;
+    public final boolean isChatInBottom;
+    public final Integer messagesNotSeen;
     public final String queueTicketId;
     public final boolean historyLoaded;
     public final String operatorName;
@@ -39,7 +41,9 @@ public class ChatState {
             MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem,
             List<ChatItem> chatItems,
             ChatInputMode chatInputMode,
-            String lastTypedText) {
+            String lastTypedText,
+            boolean isChatInBottom,
+            int messagesNotSeen) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -54,6 +58,8 @@ public class ChatState {
         this.chatItems = Collections.unmodifiableList(chatItems);
         this.chatInputMode = chatInputMode;
         this.lastTypedText = lastTypedText;
+        this.isChatInBottom = isChatInBottom;
+        this.messagesNotSeen = messagesNotSeen;
     }
 
     public boolean isOperatorOnline() {
@@ -71,6 +77,7 @@ public class ChatState {
     public static class Builder {
         private String queueTicketId;
         private boolean historyLoaded;
+        private boolean isChatInBottom;
         private String operatorName;
         private String operatorProfileImgUrl;
         private String companyName;
@@ -83,10 +90,12 @@ public class ChatState {
         private List<ChatItem> chatItems;
         private ChatInputMode chatInputMode;
         private String lastTypedText;
+        private Integer messagesNotSeen;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
             historyLoaded = chatState.historyLoaded;
+            isChatInBottom = chatState.isChatInBottom;
             operatorName = chatState.operatorName;
             operatorProfileImgUrl = chatState.operatorProfileImgUrl;
             companyName = chatState.companyName;
@@ -99,6 +108,7 @@ public class ChatState {
             chatItems = chatState.chatItems;
             chatInputMode = chatState.chatInputMode;
             lastTypedText = chatState.lastTypedText;
+            messagesNotSeen = chatState.messagesNotSeen;
             return this;
         }
 
@@ -172,8 +182,18 @@ public class ChatState {
             return this;
         }
 
+        public Builder setIsChatInBottom(boolean isChatInBottom) {
+            this.isChatInBottom = isChatInBottom;
+            return this;
+        }
+
+        public Builder setMessagesNotSeen(Integer messagesNotSeen) {
+            this.messagesNotSeen = messagesNotSeen;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen);
         }
     }
 
@@ -289,6 +309,20 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState isInBottomChanged(boolean isChatInBottom) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsChatInBottom(isChatInBottom)
+                .createChatState();
+    }
+
+    public ChatState messagesNotSeenChanged(int messagesNotSeen) {
+        return new Builder()
+                .copyFrom(this)
+                .setMessagesNotSeen(messagesNotSeen)
+                .createChatState();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -307,12 +341,14 @@ public class ChatState {
                 Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
                 Objects.equals(chatItems, chatState.chatItems) &&
                 Objects.equals(chatInputMode, chatState.chatInputMode) &&
-                Objects.equals(lastTypedText, chatState.lastTypedText);
+                Objects.equals(lastTypedText, chatState.lastTypedText) &&
+                isChatInBottom == chatState.isChatInBottom &&
+                Objects.equals(messagesNotSeen, chatState.messagesNotSeen);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen);
     }
 
     @Override
@@ -332,6 +368,8 @@ public class ChatState {
                 ", chatItems=" + chatItems +
                 ", chatInputMode=" + chatInputMode +
                 ", lastTypedText: " + lastTypedText +
+                ", messagesNotSeen: " + messagesNotSeen +
+                ", isChatInBottom: " + isChatInBottom +
                 '}';
     }
 }

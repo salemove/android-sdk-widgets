@@ -43,11 +43,9 @@
                 android:layout_width="@dimen/chat_new_messages_image_size"
                 android:layout_height="@dimen/chat_new_messages_image_size"
                 android:layout_gravity="center"
-                android:background="?attr/gliaBrandPrimaryColor"
-                android:scaleType="fitCenter"
-                android:src="?attr/gliaIconPlaceholder"
-                android:tint="?attr/gliaBaseLightColor"
-                app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView" />
+                android:scaleType="centerCrop"
+                app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+                app:srcCompat="?attr/gliaIconPlaceholder" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -59,6 +57,7 @@
             android:layout_alignEnd="@id/new_messages_indicator_card"
             android:background="@drawable/bg_badge"
             android:elevation="@dimen/chat_new_messages_elevation"
+            android:gravity="center"
             android:textAppearance="?attr/textAppearanceCaption"
             android:textColor="?attr/gliaBaseLightColor" />
 

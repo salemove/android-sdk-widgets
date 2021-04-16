@@ -95,6 +95,8 @@ public class ChatController {
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.DISABLED)
+                .setIsChatInBottom(true)
+                .setMessagesNotSeen(0)
                 .createChatState();
         this.repository = gliaChatRepository;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -253,6 +255,7 @@ public class ChatController {
 
     public void setViewCallback(ChatViewCallback chatViewCallback) {
         Logger.d(TAG, "setViewCallback");
+        emitViewState(chatState.isInBottomChanged(true));
         this.viewCallback = chatViewCallback;
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
@@ -546,7 +549,7 @@ public class ChatController {
         if (message.getSender() == Chat.Participant.VISITOR) {
             currentChatItems.add(new SendMessageItem(SendMessageItem.HISTORY_ID, false, message.getContent()));
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
-            changeLastOperatorMessages(currentChatItems, message);
+            changeLastOperatorMessages(currentChatItems, message, true);
         }
     }
 
@@ -554,7 +557,7 @@ public class ChatController {
         if (message.getSender() == Chat.Participant.VISITOR) {
             appendSentMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
-            changeLastOperatorMessages(currentChatItems, message);
+            changeLastOperatorMessages(currentChatItems, message, false);
             if (message.getAttachment() instanceof SingleChoiceAttachment) {
                 SingleChoiceAttachment attachment =
                         ((SingleChoiceAttachment) message.getAttachment());
@@ -577,6 +580,10 @@ public class ChatController {
             return;
         }
         items.add(new SendMessageItem(message.getId(), false, message.getContent()));
+    }
+
+    private void appendMessagesNotSeen() {
+        emitViewState(chatState.messagesNotSeenChanged(chatState.messagesNotSeen + 1));
     }
 
     private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
@@ -602,7 +609,7 @@ public class ChatController {
         }
     }
 
-    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
+    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message, boolean isHistoryItem) {
         MessageAttachment attachment = message.getAttachment();
         List<ReceiveMessageItemMessage> messages;
         if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
@@ -632,6 +639,9 @@ public class ChatController {
                 messages,
                 chatState.operatorProfileImgUrl
         ));
+        if (!isHistoryItem) {
+            appendMessagesNotSeen();
+        }
     }
 
     private boolean isMessageValid(String message) {
@@ -736,6 +746,21 @@ public class ChatController {
             modifiedItems.remove(indexInList);
             modifiedItems.add(indexInList, choiceCardItemWithSelected);
             emitChatItems(chatState.changeItems(modifiedItems));
+        }
+    }
+
+    public void onRecyclerviewPositionChanged(boolean isBottom) {
+        emitViewState(chatState.isInBottomChanged(isBottom));
+        if (isBottom) {
+            Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom!");
+            emitViewState(chatState.messagesNotSeenChanged(0));
+        }
+    }
+
+    public void newMessagesIndicatorClicked() {
+        Logger.d(TAG, "newMessagesIndicatorClicked");
+        if (viewCallback != null) {
+            viewCallback.scrollToBottom();
         }
     }
 }

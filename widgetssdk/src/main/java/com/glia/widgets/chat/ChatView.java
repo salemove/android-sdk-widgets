@@ -21,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -51,6 +52,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.MarkerEdgeTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -79,13 +81,15 @@ public class ChatView extends ConstraintLayout {
     private ShapeableImageView newMessagesImageView;
     private TextView newMessagesCountBadgeView;
 
+    private boolean isInBottom = true;
+
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
     private Integer defaultStatusbarColor;
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToCallListener onNavigateToCallListener;
-    private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
+    private SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
         public void onClicked(
                 String id,
@@ -110,6 +114,15 @@ public class ChatView extends ConstraintLayout {
             chatRecyclerView.smoothScrollToPosition(adapter.getItemCount());
         }
     };
+    private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (controller != null) {
+                controller.onRecyclerviewPositionChanged(!recyclerView.canScrollVertically(1));
+            }
+        }
+    };
 
     private final Resources resources;
 
@@ -119,7 +132,7 @@ public class ChatView extends ConstraintLayout {
             super.onItemRangeInserted(positionStart, itemCount);
             int totalItemCount = adapter.getItemCount();
             int lastIndex = totalItemCount - 1;
-            boolean scrollToBottom = positionStart + itemCount >= lastIndex;
+            boolean scrollToBottom = isInBottom && positionStart + itemCount >= lastIndex;
             if (scrollToBottom) {
                 chatRecyclerView.scrollToPosition(lastIndex);
             }
@@ -298,6 +311,7 @@ public class ChatView extends ConstraintLayout {
         callback = null;
         adapter.unregisterAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(null);
+        chatRecyclerView.removeOnScrollListener(onScrollListener);
 
         if (screenSharingController != null) {
             screenSharingController.onDestroy(true);
@@ -336,6 +350,18 @@ public class ChatView extends ConstraintLayout {
                         appBar.showXButton();
                     }
 
+                    newMessagesLayout.setVisibility(
+                            !chatState.isChatInBottom && chatState.messagesNotSeen > 0 ?
+                                    VISIBLE :
+                                    GONE
+                    );
+                    if (chatState.operatorProfileImgUrl != null) {
+                        Picasso.with(getContext()).load(chatState.operatorProfileImgUrl).into(newMessagesImageView);
+                    } else {
+                        newMessagesImageView.setImageResource(theme.getIconPlaceholder());
+                    }
+                    isInBottom = chatState.isChatInBottom;
+                    newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
                     if (chatState.isVisible) {
                         showChat();
                     } else {
@@ -366,6 +392,11 @@ public class ChatView extends ConstraintLayout {
             @Override
             public void setLastTypedText(String lastTypedText) {
                 post(() -> chatEditText.setText(lastTypedText));
+            }
+
+            @Override
+            public void scrollToBottom() {
+                post(() -> chatRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1));
             }
         };
 
@@ -499,10 +530,13 @@ public class ChatView extends ConstraintLayout {
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme, onOptionClickedListener, this.onImageLoadedListener);
+        adapter = new ChatAdapter(
+                this.theme, this.onOptionClickedListener, this.onImageLoadedListener
+        );
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
+        chatRecyclerView.addOnScrollListener(onScrollListener);
 
         appBar.setTheme(this.theme);
 
@@ -524,9 +558,6 @@ public class ChatView extends ConstraintLayout {
         );
         newMessagesImageView.setBackgroundColor(
                 ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor())
-        );
-        newMessagesImageView.setImageTintList(
-                ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor())
         );
         newMessagesCountBadgeView.setTextColor(
                 ContextCompat.getColor(this.getContext(), theme.getBaseLightColor())
@@ -619,6 +650,15 @@ public class ChatView extends ConstraintLayout {
         appBar.setOnXClickedListener(() -> {
             if (controller != null) {
                 controller.leaveChatQueueClicked();
+            }
+        });
+
+        newMessagesCardView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (controller != null) {
+                    controller.newMessagesIndicatorClicked();
+                }
             }
         });
     }

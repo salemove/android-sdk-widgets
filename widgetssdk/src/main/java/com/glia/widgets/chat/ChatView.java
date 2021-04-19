@@ -77,7 +77,7 @@ public class ChatView extends ConstraintLayout {
     private View dividerView;
     private RelativeLayout newMessagesLayout;
     private MaterialCardView newMessagesCardView;
-    private OperatorStatusView newMessagesImageView;
+    private OperatorStatusView newMessagesOperatorStatusView;
     private TextView newMessagesCountBadgeView;
 
     private boolean isInBottom = true;
@@ -88,7 +88,7 @@ public class ChatView extends ConstraintLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToCallListener onNavigateToCallListener;
-    private SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
+    private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
         public void onClicked(
                 String id,
@@ -352,11 +352,11 @@ public class ChatView extends ConstraintLayout {
                     newMessagesLayout.setVisibility(
                             chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
                     );
-                    newMessagesImageView.showPlaceHolder();
+                    newMessagesOperatorStatusView.showPlaceHolder();
                     if (chatState.operatorProfileImgUrl != null) {
-                        newMessagesImageView.showProfileImage(chatState.operatorProfileImgUrl);
+                        newMessagesOperatorStatusView.showProfileImage(chatState.operatorProfileImgUrl);
                     } else {
-                        newMessagesImageView.showPlaceHolder();
+                        newMessagesOperatorStatusView.showPlaceHolder();
                     }
                     isInBottom = chatState.isChatInBottom;
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
@@ -528,7 +528,7 @@ public class ChatView extends ConstraintLayout {
         dividerView = view.findViewById(R.id.divider_view);
         newMessagesLayout = view.findViewById(R.id.new_messages_indicator_layout);
         newMessagesCardView = view.findViewById(R.id.new_messages_indicator_card);
-        newMessagesImageView = view.findViewById(R.id.new_messages_indicator_image);
+        newMessagesOperatorStatusView = view.findViewById(R.id.new_messages_indicator_image);
         newMessagesCountBadgeView = view.findViewById(R.id.new_messages_badge_view);
     }
 
@@ -553,7 +553,7 @@ public class ChatView extends ConstraintLayout {
                         resources.getDimension(R.dimen.chat_new_messages_bottom_edge_radius)
                 ))
                 .build();
-        newMessagesImageView.isRippleAnimationShowing(false);
+        newMessagesOperatorStatusView.isRippleAnimationShowing(false);
         newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
         newMessagesCountBadgeView.setBackgroundTintList(
                 ContextCompat.getColorStateList(
@@ -654,12 +654,9 @@ public class ChatView extends ConstraintLayout {
             }
         });
 
-        newMessagesCardView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (controller != null) {
-                    controller.newMessagesIndicatorClicked();
-                }
+        newMessagesCardView.setOnClickListener(v -> {
+            if (controller != null) {
+                controller.newMessagesIndicatorClicked();
             }
         });
     }

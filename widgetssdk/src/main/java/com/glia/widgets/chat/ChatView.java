@@ -46,13 +46,12 @@ import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.MarkerEdgeTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -78,7 +77,7 @@ public class ChatView extends ConstraintLayout {
     private View dividerView;
     private RelativeLayout newMessagesLayout;
     private MaterialCardView newMessagesCardView;
-    private ShapeableImageView newMessagesImageView;
+    private OperatorStatusView newMessagesImageView;
     private TextView newMessagesCountBadgeView;
 
     private boolean isInBottom = true;
@@ -353,10 +352,11 @@ public class ChatView extends ConstraintLayout {
                     newMessagesLayout.setVisibility(
                             chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
                     );
+                    newMessagesImageView.showPlaceHolder();
                     if (chatState.operatorProfileImgUrl != null) {
-                        Picasso.with(getContext()).load(chatState.operatorProfileImgUrl).into(newMessagesImageView);
+                        newMessagesImageView.showProfileImage(chatState.operatorProfileImgUrl);
                     } else {
-                        newMessagesImageView.setImageResource(theme.getIconPlaceholder());
+                        newMessagesImageView.showPlaceHolder();
                     }
                     isInBottom = chatState.isChatInBottom;
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
@@ -393,8 +393,13 @@ public class ChatView extends ConstraintLayout {
             }
 
             @Override
-            public void scrollToBottom() {
+            public void smoothScrollToBottom() {
                 post(() -> chatRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1));
+            }
+
+            @Override
+            public void scrollToBottomImmediate() {
+                post(() -> chatRecyclerView.scrollToPosition(adapter.getItemCount() - 1));
             }
         };
 
@@ -548,14 +553,12 @@ public class ChatView extends ConstraintLayout {
                         resources.getDimension(R.dimen.chat_new_messages_bottom_edge_radius)
                 ))
                 .build();
+        newMessagesImageView.isRippleAnimationShowing(false);
         newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
         newMessagesCountBadgeView.setBackgroundTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(), theme.getBrandPrimaryColor()
                 )
-        );
-        newMessagesImageView.setBackgroundColor(
-                ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor())
         );
         newMessagesCountBadgeView.setTextColor(
                 ContextCompat.getColor(this.getContext(), theme.getBaseLightColor())

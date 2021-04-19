@@ -18,7 +18,7 @@
     <dimen name="chat_send_margin_end">16dp</dimen>
     <dimen name="chat_receive_margin_start">44dp</dimen>
     <dimen name="chat_receive_message_end">60dp</dimen>
-    <dimen name="chat_new_messages_image_size">38dp</dimen>
+    <dimen name="chat_new_messages_image_size">36dp</dimen>
     <dimen name="chat_new_messages_card_size">42dp</dimen>
     <dimen name="chat_new_messages_bottom_edge_radius">17dp</dimen>
     <dimen name="chat_new_messages_card_corner_radius">21dp</dimen>

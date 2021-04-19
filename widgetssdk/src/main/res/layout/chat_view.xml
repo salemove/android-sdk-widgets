@@ -38,13 +38,13 @@
             app:cardCornerRadius="@dimen/chat_new_messages_card_corner_radius"
             app:cardElevation="@dimen/chat_new_messages_elevation">
 
-            <com.google.android.material.imageview.ShapeableImageView
+            <com.glia.widgets.view.OperatorStatusView
                 android:id="@+id/new_messages_indicator_image"
-                android:layout_width="@dimen/chat_new_messages_image_size"
-                android:layout_height="@dimen/chat_new_messages_image_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipChildren="true"
+                app:imageSize="@dimen/chat_new_messages_image_size"
                 android:layout_gravity="center"
-                android:scaleType="centerCrop"
-                app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
                 app:srcCompat="?attr/gliaIconPlaceholder" />
 
         </com.google.android.material.card.MaterialCardView>

@@ -17,5 +17,7 @@ public interface ChatViewCallback {
 
     void setLastTypedText(String lastTypedText);
 
-    void scrollToBottom();
+    void smoothScrollToBottom();
+
+    void scrollToBottomImmediate();
 }

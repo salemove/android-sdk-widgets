@@ -255,11 +255,15 @@ public class ChatController {
 
     public void setViewCallback(ChatViewCallback chatViewCallback) {
         Logger.d(TAG, "setViewCallback");
-        emitViewState(chatState.isInBottomChanged(true));
         this.viewCallback = chatViewCallback;
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
         viewCallback.setLastTypedText(chatState.lastTypedText);
+
+        // always start in bottom
+        emitViewState(chatState.isInBottomChanged(true));
+        viewCallback.scrollToBottomImmediate();
+
         if (isNavigationPending) {
             viewCallback.navigateToCall();
         }
@@ -549,7 +553,7 @@ public class ChatController {
         if (message.getSender() == Chat.Participant.VISITOR) {
             currentChatItems.add(new SendMessageItem(SendMessageItem.HISTORY_ID, false, message.getContent()));
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
-            changeLastOperatorMessages(currentChatItems, message, true);
+            changeLastOperatorMessages(currentChatItems, message);
         }
     }
 
@@ -557,7 +561,8 @@ public class ChatController {
         if (message.getSender() == Chat.Participant.VISITOR) {
             appendSentMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
-            changeLastOperatorMessages(currentChatItems, message, false);
+            changeLastOperatorMessages(currentChatItems, message);
+            appendMessagesNotSeen();
             if (message.getAttachment() instanceof SingleChoiceAttachment) {
                 SingleChoiceAttachment attachment =
                         ((SingleChoiceAttachment) message.getAttachment());
@@ -583,7 +588,10 @@ public class ChatController {
     }
 
     private void appendMessagesNotSeen() {
-        emitViewState(chatState.messagesNotSeenChanged(chatState.messagesNotSeen + 1));
+        emitViewState(chatState.messagesNotSeenChanged(
+                chatState.isChatInBottom ?
+                        0 :
+                        chatState.messagesNotSeen + 1));
     }
 
     private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
@@ -609,7 +617,7 @@ public class ChatController {
         }
     }
 
-    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message, boolean isHistoryItem) {
+    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
         MessageAttachment attachment = message.getAttachment();
         List<ReceiveMessageItemMessage> messages;
         if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
@@ -639,9 +647,6 @@ public class ChatController {
                 messages,
                 chatState.operatorProfileImgUrl
         ));
-        if (!isHistoryItem) {
-            appendMessagesNotSeen();
-        }
     }
 
     private boolean isMessageValid(String message) {
@@ -760,7 +765,7 @@ public class ChatController {
     public void newMessagesIndicatorClicked() {
         Logger.d(TAG, "newMessagesIndicatorClicked");
         if (viewCallback != null) {
-            viewCallback.scrollToBottom();
+            viewCallback.smoothScrollToBottom();
         }
     }
 }

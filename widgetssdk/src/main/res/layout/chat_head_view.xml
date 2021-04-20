@@ -35,10 +35,10 @@
 
     <TextView
         android:id="@+id/chat_bubble_badge"
-        android:layout_width="@dimen/call_floating_button_badge_size"
-        android:layout_height="@dimen/call_floating_button_badge_size"
+        android:layout_width="@dimen/chat_head_badge_size"
+        android:layout_height="@dimen/chat_head_badge_size"
         android:background="@drawable/bg_badge"
-        android:elevation="@dimen/call_floating_button_badge_elevation"
+        android:elevation="@dimen/chat_head_badge_elevation"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="@color/glia_base_light_color"

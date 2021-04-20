@@ -16,16 +16,21 @@
 
     <dimen name="chat_send_margin_start">88dp</dimen>
     <dimen name="chat_send_margin_end">16dp</dimen>
-
     <dimen name="chat_receive_margin_start">44dp</dimen>
     <dimen name="chat_receive_message_end">60dp</dimen>
+    <dimen name="chat_new_messages_image_size">36dp</dimen>
+    <dimen name="chat_new_messages_card_size">42dp</dimen>
+    <dimen name="chat_new_messages_bottom_edge_radius">17dp</dimen>
+    <dimen name="chat_new_messages_card_corner_radius">21dp</dimen>
+    <dimen name="chat_new_messages_elevation">15dp</dimen>
 
     <dimen name="chat_head_size">64dp</dimen>
     <dimen name="chat_head_placeholder_size">32dp</dimen>
 
+    <dimen name="chat_head_badge_size">18sp</dimen>
+    <dimen name="chat_head_badge_elevation">6dp</dimen>
+
     <dimen name="call_bottom_margin">44dp</dimen>
-    <dimen name="call_floating_button_badge_size">18sp</dimen>
-    <dimen name="call_floating_button_badge_elevation">6dp</dimen>
     <dimen name="call_buttons_max_width">375dp</dimen>
     <dimen name="call_operator_status_image_margin_top">64dp</dimen>
     <dimen name="call_operator_status_image_size">124dp</dimen>

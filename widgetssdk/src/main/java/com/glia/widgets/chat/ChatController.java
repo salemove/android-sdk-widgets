@@ -95,6 +95,8 @@ public class ChatController {
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.DISABLED)
+                .setIsChatInBottom(true)
+                .setMessagesNotSeen(0)
                 .createChatState();
         this.repository = gliaChatRepository;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -257,6 +259,11 @@ public class ChatController {
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
         viewCallback.setLastTypedText(chatState.lastTypedText);
+
+        // always start in bottom
+        emitViewState(chatState.isInBottomChanged(true));
+        viewCallback.scrollToBottomImmediate();
+
         if (isNavigationPending) {
             viewCallback.navigateToCall();
         }
@@ -555,6 +562,7 @@ public class ChatController {
             appendSentMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
+            appendMessagesNotSeen();
             if (message.getAttachment() instanceof SingleChoiceAttachment) {
                 SingleChoiceAttachment attachment =
                         ((SingleChoiceAttachment) message.getAttachment());
@@ -577,6 +585,13 @@ public class ChatController {
             return;
         }
         items.add(new SendMessageItem(message.getId(), false, message.getContent()));
+    }
+
+    private void appendMessagesNotSeen() {
+        emitViewState(chatState.messagesNotSeenChanged(
+                chatState.isChatInBottom ?
+                        0 :
+                        chatState.messagesNotSeen + 1));
     }
 
     private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
@@ -736,6 +751,21 @@ public class ChatController {
             modifiedItems.remove(indexInList);
             modifiedItems.add(indexInList, choiceCardItemWithSelected);
             emitChatItems(chatState.changeItems(modifiedItems));
+        }
+    }
+
+    public void onRecyclerviewPositionChanged(boolean isBottom) {
+        emitViewState(chatState.isInBottomChanged(isBottom));
+        if (isBottom) {
+            Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom!");
+            emitViewState(chatState.messagesNotSeenChanged(0));
+        }
+    }
+
+    public void newMessagesIndicatorClicked() {
+        Logger.d(TAG, "newMessagesIndicatorClicked");
+        if (viewCallback != null) {
+            viewCallback.smoothScrollToBottom();
         }
     }
 }

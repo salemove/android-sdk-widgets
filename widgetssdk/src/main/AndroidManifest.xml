@@ -10,6 +10,7 @@
 
         <activity
             android:name=".chat.ChatActivity"
+            android:windowSoftInputMode="adjustPan"
             android:launchMode="singleTask" />
 
         <activity

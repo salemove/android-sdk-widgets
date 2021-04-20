@@ -1,32 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.widget.LinearLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <com.glia.widgets.view.AppBarView
         android:id="@+id/app_bar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/divider_view"
+        app:layout_constraintTop_toBottomOf="@id/app_bar_view" />
+
+    <RelativeLayout
+        android:id="@+id/new_messages_indicator_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="@dimen/large"
+        app:layout_constraintBottom_toTopOf="@id/divider_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/new_messages_indicator_card"
+            android:layout_width="@dimen/chat_new_messages_card_size"
+            android:layout_height="@dimen/chat_new_messages_card_size"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="?attr/gliaBaseLightColor"
+            app:cardCornerRadius="@dimen/chat_new_messages_card_corner_radius"
+            app:cardElevation="@dimen/chat_new_messages_elevation">
+
+            <com.glia.widgets.view.OperatorStatusView
+                android:id="@+id/new_messages_indicator_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipChildren="true"
+                app:imageSize="@dimen/chat_new_messages_image_size"
+                android:layout_gravity="center"
+                app:srcCompat="?attr/gliaIconPlaceholder" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/new_messages_badge_view"
+            android:layout_width="@dimen/chat_head_badge_size"
+            android:layout_height="@dimen/chat_head_badge_size"
+            android:layout_alignTop="@id/new_messages_indicator_card"
+            android:layout_alignEnd="@id/new_messages_indicator_card"
+            android:background="@drawable/bg_badge"
+            android:elevation="@dimen/chat_new_messages_elevation"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:textColor="?attr/gliaBaseLightColor" />
+
+    </RelativeLayout>
 
     <View
         android:id="@+id/divider_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="@dimen/medium"
-        android:background="?attr/gliaBaseNormalColor" />
+        android:background="?attr/gliaBaseNormalColor"
+        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />
 
     <LinearLayout
         android:id="@+id/chat_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider_view">
 
         <EditText
             android:id="@+id/chat_edit_text"
@@ -40,7 +91,7 @@
             android:enabled="false"
             android:hint="@string/chat_enter_message"
             android:importantForAutofill="no"
-            android:textColor="@color/glia_base_dark_color"
+            android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor" />
 
         <ImageButton

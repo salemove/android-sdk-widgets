@@ -588,6 +588,9 @@ public class CallView extends ConstraintLayout {
         Integer iconPlaceholder = uiTheme.getIconPlaceholder() != null ?
                 uiTheme.getIconPlaceholder() : this.theme.getIconPlaceholder();
 
+        Integer whiteLabel = uiTheme.getWhiteLabel() != null ?
+                uiTheme.getWhiteLabel() : this.theme.getWhiteLabel();
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setTheme(this.theme);
         builder.setFontRes(fontRes);
@@ -608,6 +611,7 @@ public class CallView extends ConstraintLayout {
         builder.setIconCallSpeakerOff(iconCallSpeakerOff);
         builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
+        builder.setWhiteLabel(whiteLabel);
         this.theme = builder.build();
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {

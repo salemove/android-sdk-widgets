@@ -32,6 +32,7 @@
     <string name="settings_other">Other</string>
     <string name="settings_company_name">Company name</string>
     <string name="settings_queue_id">Queue id</string>
+    <string name="settings_white_label">White label</string>
     <string name="settings_context_url">Context url</string>
 
     <string name="main_open_settings">Open Settings</string>

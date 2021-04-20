@@ -72,6 +72,9 @@ public class SingleChoiceCardView extends FrameLayout {
         int gliaBaseLightColor = ContextCompat.getColor(
                 this.getContext(), theme.getBaseLightColor()
         );
+        int gliaBaseShadeColor = ContextCompat.getColor(
+                this.getContext(), theme.getBaseShadeColor()
+        );
         int gliaBrandPrimaryColor = ContextCompat.getColor(
                 this.getContext(), theme.getBrandPrimaryColor()
         );
@@ -158,14 +161,25 @@ public class SingleChoiceCardView extends FrameLayout {
                     selectedIndex != null && selectedIndex == index ?
                             brandPrimaryColorStateList :
                             systemAgentBubbleColorStateList);
-            button.setTextColor(selectedIndex != null && selectedIndex == index ?
-                    gliaBaseLightColor :
-                    gliaBaseDarkColor);
+            button.setTextColor(selectedIndex == null ? gliaBaseDarkColor :
+                    selectedIndex == index ? gliaBaseLightColor : gliaBaseShadeColor
+            );
             if (theme.getFontRes() != null) {
                 button.setTypeface(
                         ResourcesCompat.getFont(
                                 this.getContext(),
                                 theme.getFontRes())
+                );
+            }
+            if (selectedIndex != null && selectedIndex != index) {
+                button.setStrokeWidth(
+                        Float.valueOf(Utils.pxFromDp(this.getContext(), 1f)).intValue()
+                );
+                button.setStrokeColor(
+                        ContextCompat.getColorStateList(
+                                this.getContext(),
+                                theme.getBaseShadeColor()
+                        )
                 );
             }
             if (onOptionClickedListener != null) {

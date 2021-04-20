@@ -369,11 +369,11 @@ public class ChatState {
                 ", contextUrl='" + contextUrl + '\'' +
                 ", overlaysPermissionDialogShown=" + overlaysPermissionDialogShown +
                 ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
-                ", chatItems=" + chatItems +
                 ", chatInputMode=" + chatInputMode +
                 ", lastTypedText: " + lastTypedText +
                 ", messagesNotSeen: " + messagesNotSeen +
                 ", isChatInBottom: " + isChatInBottom +
+                ", chatItems=" + chatItems +
                 '}';
     }
 }

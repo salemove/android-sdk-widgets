@@ -177,13 +177,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
                 singleChoiceCardView.setData(
                         item.getId(),
-                        item.imageUrl,
+                        item.choiceCardImageUrl,
                         item.content,
                         item.singleChoiceOptions,
-                        item.selectedIndex,
+                        item.selectedChoiceIndex,
                         uiTheme,
                         getAdapterPosition(),
-                        item.selectedIndex == null ? onImageLoadedListener : null
+                        item.selectedChoiceIndex == null ? onImageLoadedListener : null
                 );
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,

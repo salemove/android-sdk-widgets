@@ -29,7 +29,7 @@ public class VisitorMessageItem extends ChatItem {
 
     @Override
     public String toString() {
-        return "SendMessageItem{" +
+        return "VisitorMessageItem{" +
                 "id='" + id + '\'' +
                 ", showDelivered=" + showDelivered +
                 ", message='" + message + '\'' +

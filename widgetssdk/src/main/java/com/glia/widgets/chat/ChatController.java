@@ -628,8 +628,8 @@ public class ChatController {
                     false,
                     lastItemInView.content,
                     lastItemInView.singleChoiceOptions,
-                    lastItemInView.selectedIndex,
-                    lastItemInView.imageUrl
+                    lastItemInView.selectedChoiceIndex,
+                    lastItemInView.choiceCardImageUrl
             ));
         }
         String imageUrl = null;
@@ -739,7 +739,7 @@ public class ChatController {
                             choiceCardItem.content,
                             choiceCardItem.singleChoiceOptions,
                             optionIndex,
-                            choiceCardItem.imageUrl
+                            choiceCardItem.choiceCardImageUrl
                     );
 
             List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);

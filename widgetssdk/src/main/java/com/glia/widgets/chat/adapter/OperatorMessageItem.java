@@ -11,8 +11,8 @@ public class OperatorMessageItem extends ChatItem {
     public final boolean showChatHead;
     public final String content;
     public final List<SingleChoiceOption> singleChoiceOptions;
-    public final Integer selectedIndex;
-    public final String imageUrl;
+    public final Integer selectedChoiceIndex;
+    public final String choiceCardImageUrl;
 
     public OperatorMessageItem(
             String id,
@@ -20,16 +20,16 @@ public class OperatorMessageItem extends ChatItem {
             boolean showChatHead,
             String content,
             List<SingleChoiceOption> singleChoiceOptions,
-            Integer selectedIndex,
-            String imageUrl
+            Integer selectedChoiceIndex,
+            String choiceCardImageUrl
     ) {
         super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE);
         this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.showChatHead = showChatHead;
         this.content = content;
         this.singleChoiceOptions = singleChoiceOptions != null ? Collections.unmodifiableList(singleChoiceOptions) : null;
-        this.selectedIndex = selectedIndex;
-        this.imageUrl = imageUrl;
+        this.selectedChoiceIndex = selectedChoiceIndex;
+        this.choiceCardImageUrl = choiceCardImageUrl;
     }
 
     @Override
@@ -42,13 +42,13 @@ public class OperatorMessageItem extends ChatItem {
                 Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                 Objects.equals(content, that.content) &&
                 Objects.equals(singleChoiceOptions, that.singleChoiceOptions) &&
-                Objects.equals(selectedIndex, that.selectedIndex) &&
-                Objects.equals(imageUrl, that.imageUrl);
+                Objects.equals(selectedChoiceIndex, that.selectedChoiceIndex) &&
+                Objects.equals(choiceCardImageUrl, that.choiceCardImageUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), operatorProfileImgUrl, showChatHead, content, singleChoiceOptions, selectedIndex, imageUrl);
+        return Objects.hash(super.hashCode(), operatorProfileImgUrl, showChatHead, content, singleChoiceOptions, selectedChoiceIndex, choiceCardImageUrl);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class OperatorMessageItem extends ChatItem {
                 ", showChatHead=" + showChatHead +
                 ", content='" + content + '\'' +
                 ", singleChoiceOptions=" + singleChoiceOptions +
-                ", selectedIndex=" + selectedIndex +
-                ", imageUrl='" + imageUrl + '\'' +
+                ", selectedChoiceIndex=" + selectedChoiceIndex +
+                ", choiceCardImageUrl='" + choiceCardImageUrl + '\'' +
                 '}';
     }
 }

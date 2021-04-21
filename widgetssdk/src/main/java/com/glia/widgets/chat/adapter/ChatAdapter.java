@@ -172,7 +172,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener
         ) {
             contentLayout.removeAllViews();
-            if (item.singleChoiceOptions != null) {
+            if(item.singleChoiceOptions !=null){
                 SingleChoiceCardView singleChoiceCardView = new SingleChoiceCardView(context);
                 singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
                 singleChoiceCardView.setData(

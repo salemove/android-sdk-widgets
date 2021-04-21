@@ -6,8 +6,8 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
@@ -47,8 +47,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     };
 
     public static final int OPERATOR_STATUS_VIEW_TYPE = 0;
-    public static final int SEND_MESSAGE_VIEW_TYPE = 1;
-    public static final int RECEIVE_MESSAGE_VIEW_TYPE = 2;
+    public static final int VISITOR_MESSAGE_TYPE = 1;
+    public static final int OPERATOR_MESSAGE_VIEW_TYPE = 2;
     public static final int MEDIA_UPGRADE_ITEM_TYPE = 3;
     private final UiTheme uiTheme;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener;
@@ -124,11 +124,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    private static class SendMessageViewHolder extends RecyclerView.ViewHolder {
+    private static class VisitorMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView content;
         private final TextView deliveredView;
 
-        public SendMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
+        public VisitorMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
             super(itemView);
             this.content = itemView.findViewById(R.id.content);
             this.deliveredView = itemView.findViewById(R.id.delivered_view);
@@ -144,19 +144,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             deliveredView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
         }
 
-        public void bind(SendMessageItem item) {
+        public void bind(VisitorMessageItem item) {
             content.setText(item.getMessage());
             deliveredView.setVisibility(item.isShowDelivered() ? View.VISIBLE : View.GONE);
         }
     }
 
-    private static class ReceiveMessageViewHolder extends RecyclerView.ViewHolder {
-        private final LinearLayout contentLayout;
+    private static class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
+        private final FrameLayout contentLayout;
         private final UiTheme uiTheme;
         private final Context context;
         private final OperatorStatusView operatorStatusView;
 
-        public ReceiveMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
+        public OperatorMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
             super(itemView);
             this.contentLayout = itemView.findViewById(R.id.content_layout);
             context = itemView.getContext();
@@ -167,47 +167,44 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         public void bind(
-                ReceiveMessageItem item,
+                OperatorMessageItem item,
                 SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
                 SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener
         ) {
             contentLayout.removeAllViews();
-            for (int messageIndex = 0; messageIndex < item.getMessages().size(); messageIndex++) {
-                ReceiveMessageItemMessage message = item.getMessages().get(messageIndex);
-                if (message.attachments != null) {
-                    SingleChoiceCardView singleChoiceCardView = new SingleChoiceCardView(context);
-                    singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
-                    singleChoiceCardView.setData(
-                            item.getId(),
-                            message.imageUrl,
-                            message.content,
-                            message.attachments,
-                            message.selectedIndex,
-                            uiTheme,
-                            getAdapterPosition(),
-                            messageIndex,
-                            message.selectedIndex == null ? onImageLoadedListener : null
-                    );
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                    );
-                    params.setMargins(
-                            0,
-                            Float.valueOf(context.getResources().getDimension(R.dimen.medium))
-                                    .intValue(),
-                            0,
-                            0
-                    );
-                    contentLayout.addView(singleChoiceCardView, params);
-                } else {
-                    TextView contentView = getMessageContentView();
-                    contentView.setText(message.content);
-                    contentLayout.addView(contentView);
-                }
+            if(item.singleChoiceOptions !=null){
+                SingleChoiceCardView singleChoiceCardView = new SingleChoiceCardView(context);
+                singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
+                singleChoiceCardView.setData(
+                        item.getId(),
+                        item.imageUrl,
+                        item.content,
+                        item.singleChoiceOptions,
+                        item.selectedIndex,
+                        uiTheme,
+                        getAdapterPosition(),
+                        item.selectedIndex == null ? onImageLoadedListener : null
+                );
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(
+                        0,
+                        Float.valueOf(context.getResources().getDimension(R.dimen.medium))
+                                .intValue(),
+                        0,
+                        0
+                );
+                contentLayout.addView(singleChoiceCardView, params);
+            } else {
+                TextView contentView = getMessageContentView();
+                contentView.setText(item.content);
+                contentLayout.addView(contentView);
             }
-            if (item.getOperatorProfileImgUrl() != null) {
-                operatorStatusView.showProfileImage(item.getOperatorProfileImgUrl());
+            operatorStatusView.setVisibility(item.showChatHead ? View.VISIBLE : View.GONE);
+            if (item.operatorProfileImgUrl != null) {
+                operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
             } else {
                 operatorStatusView.showPlaceHolder();
             }
@@ -293,19 +290,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == OPERATOR_STATUS_VIEW_TYPE) {
             return new OperatorStatusViewHolder(
-                    inflater.inflate(R.layout.chat_operator_status_item, parent, false),
+                    inflater.inflate(R.layout.chat_operator_status_layout, parent, false),
                     uiTheme);
-        } else if (viewType == SEND_MESSAGE_VIEW_TYPE) {
-            return new SendMessageViewHolder(
-                    inflater.inflate(R.layout.chat_send_message_item, parent, false),
+        } else if (viewType == VISITOR_MESSAGE_TYPE) {
+            return new VisitorMessageViewHolder(
+                    inflater.inflate(R.layout.chat_visitor_message_layout, parent, false),
                     uiTheme);
-        } else if (viewType == RECEIVE_MESSAGE_VIEW_TYPE) {
-            return new ReceiveMessageViewHolder(
-                    inflater.inflate(R.layout.chat_receive_message_item, parent, false),
+        } else if (viewType == OPERATOR_MESSAGE_VIEW_TYPE) {
+            return new OperatorMessageViewHolder(
+                    inflater.inflate(R.layout.chat_operator_message_layout, parent, false),
                     uiTheme);
         } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
             return new MediaUpgradeStartedViewHolder(inflater.inflate(
-                    R.layout.chat_media_upgrade_item, parent, false),
+                    R.layout.chat_media_upgrade_layout, parent, false),
                     uiTheme);
         } else {
             throw new IllegalArgumentException("Unknown viewtype: " + viewType);
@@ -317,11 +314,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ChatItem chatItem = differ.getCurrentList().get(position);
         if (chatItem instanceof OperatorStatusItem) {
             ((OperatorStatusViewHolder) holder).bind((OperatorStatusItem) chatItem);
-        } else if (chatItem instanceof SendMessageItem) {
-            ((SendMessageViewHolder) holder).bind((SendMessageItem) chatItem);
-        } else if (chatItem instanceof ReceiveMessageItem) {
-            ((ReceiveMessageViewHolder) holder).bind(
-                    (ReceiveMessageItem) chatItem,
+        } else if (chatItem instanceof VisitorMessageItem) {
+            ((VisitorMessageViewHolder) holder).bind((VisitorMessageItem) chatItem);
+        } else if (chatItem instanceof OperatorMessageItem) {
+            ((OperatorMessageViewHolder) holder).bind(
+                    (OperatorMessageItem) chatItem,
                     onOptionClickedListener,
                     onImageLoadedListener
             );

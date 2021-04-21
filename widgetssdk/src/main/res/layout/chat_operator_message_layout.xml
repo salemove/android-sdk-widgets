@@ -9,14 +9,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/chat_receive_margin_start" />
+        app:layout_constraintGuide_begin="@dimen/chat_operator_margin_start" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/chat_receive_message_end" />
+        app:layout_constraintGuide_end="@dimen/chat_operator_message_end" />
 
     <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/chat_head_view"
@@ -24,16 +24,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small"
         android:layout_marginEnd="@dimen/small"
-        app:imageSize="@dimen/receive_message_item_chat_head_size"
+        app:imageSize="@dimen/chat_operator_item_chat_head_size"
         app:layout_constraintBottom_toBottomOf="@id/content_layout"
         app:layout_constraintEnd_toStartOf="@id/start_guideline"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/content_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="0"

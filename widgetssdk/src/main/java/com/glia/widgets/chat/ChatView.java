@@ -90,17 +90,12 @@ public class ChatView extends ConstraintLayout {
     private OnNavigateToCallListener onNavigateToCallListener;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
-        public void onClicked(
-                String id,
-                int indexInList,
-                int messageIndex,
-                int optionIndex
-        ) {
+        public void onClicked(String id, int indexInList, int optionIndex) {
+            Logger.d(TAG, "singleChoiceCardClicked");
             if (controller != null) {
                 controller.singleChoiceOptionClicked(
                         id,
                         indexInList,
-                        messageIndex,
                         optionIndex
                 );
             }

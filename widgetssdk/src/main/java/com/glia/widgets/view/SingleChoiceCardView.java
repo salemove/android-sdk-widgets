@@ -61,7 +61,6 @@ public class SingleChoiceCardView extends FrameLayout {
             Integer selectedIndex,
             UiTheme theme,
             int adapterPosition,
-            int messagePosition,
             OnImageLoadedListener onImageLoadedListener
     ) {
         this.onImageLoadedListener = onImageLoadedListener;
@@ -189,7 +188,6 @@ public class SingleChoiceCardView extends FrameLayout {
                         onOptionClickedListener.onClicked(
                                 id,
                                 adapterPosition,
-                                messagePosition,
                                 optionIndex
                         );
                     }
@@ -214,19 +212,11 @@ public class SingleChoiceCardView extends FrameLayout {
         void onClicked(
                 String id,
                 int indexInList,
-                int indexOfMessage,
                 int indexOfOption
         );
     }
 
     public interface OnImageLoadedListener {
         void onLoaded();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        onImageLoadedListener = null;
-        onOptionClickedListener = null;
-        super.onDetachedFromWindow();
     }
 }

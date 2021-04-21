@@ -92,6 +92,7 @@ public class CallController {
 
     public void initCall() {
         Logger.d(TAG, "initCall");
+        messagesNotSeenHandler.onNavigatedToCall();
         chatHeadsController.onNavigatedToCall();
         if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;

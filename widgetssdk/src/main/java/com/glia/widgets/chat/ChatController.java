@@ -619,8 +619,9 @@ public class ChatController {
     private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
         MessageAttachment attachment = message.getAttachment();
 
-        if (currentChatItems.get(currentChatItems.size() - 1) instanceof OperatorMessageItem) {
-            OperatorMessageItem lastItemInView = (OperatorMessageItem) currentChatItems.get(currentChatItems.size() - 1);
+        int itemsListSize = currentChatItems.size();
+        if (itemsListSize > 0 && currentChatItems.get(itemsListSize - 1) instanceof OperatorMessageItem) {
+            OperatorMessageItem lastItemInView = (OperatorMessageItem) currentChatItems.get(itemsListSize - 1);
             currentChatItems.remove(lastItemInView);
             currentChatItems.add(new OperatorMessageItem(
                     lastItemInView.getId(),

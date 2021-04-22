@@ -107,10 +107,6 @@ public class GliaChatRepository {
                 engagement.getChat().sendMessage(message, sendMessageCallback));
     }
 
-    public void loadHistory() {
-        Glia.getChatHistory(callback::chatHistoryLoaded);
-    }
-
     public void initMessaging() {
         messageHandler = callback::onMessage;
         Glia.getCurrentEngagement().ifPresent(engagement -> {

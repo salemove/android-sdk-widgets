@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.core.CoreGliaRepository;
+import com.glia.widgets.core.CoreLoadHistoryUseCase;
 import com.glia.widgets.notification.device.INotificationManager;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
@@ -42,5 +44,9 @@ public class UseCaseFactory {
         if (removeScreenSharingNotificationUseCase == null)
             removeScreenSharingNotificationUseCase = new RemoveScreenSharingNotificationUseCase(notificationManager);
         return removeScreenSharingNotificationUseCase;
+    }
+
+    public static CoreLoadHistoryUseCase createCoreLoadHistoryUseCase(CoreGliaRepository coreRepository){
+        return new CoreLoadHistoryUseCase(coreRepository);
     }
 }

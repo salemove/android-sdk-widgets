@@ -140,6 +140,8 @@ public class UiTheme implements Parcelable {
     private @DrawableRes
     final Integer iconPlaceholder;
 
+    private final Integer whiteLabel;
+
     private UiTheme(String appBarTitle,
                     Integer brandPrimaryColor,
                     Integer baseLightColor,
@@ -165,7 +167,9 @@ public class UiTheme implements Parcelable {
                     Integer iconCallSpeakerOn,
                     Integer iconCallSpeakerOff,
                     Integer iconCallMinimize,
-                    Integer iconPlaceholder) {
+                    Integer iconPlaceholder,
+                    Integer whiteLabel
+    ) {
         this.appBarTitle = appBarTitle;
         this.brandPrimaryColor = brandPrimaryColor;
         this.baseLightColor = baseLightColor;
@@ -192,6 +196,7 @@ public class UiTheme implements Parcelable {
         this.iconCallSpeakerOff = iconCallSpeakerOff;
         this.iconCallMinimize = iconCallMinimize;
         this.iconPlaceholder = iconPlaceholder;
+        this.whiteLabel = whiteLabel;
     }
 
     protected UiTheme(Parcel in) {
@@ -320,6 +325,11 @@ public class UiTheme implements Parcelable {
             iconPlaceholder = null;
         } else {
             iconPlaceholder = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            whiteLabel = 0;
+        } else {
+            whiteLabel = in.readInt();
         }
     }
 
@@ -476,6 +486,12 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(iconPlaceholder);
         }
+        if (whiteLabel == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(whiteLabel);
+        }
     }
 
     @Override
@@ -627,6 +643,9 @@ public class UiTheme implements Parcelable {
         private @DrawableRes
         Integer iconPlaceholder;
 
+        private
+        Integer whiteLabel;
+
         public void setAppBarTitle(String appBarTitle) {
             this.appBarTitle = appBarTitle;
         }
@@ -735,6 +754,10 @@ public class UiTheme implements Parcelable {
             this.iconPlaceholder = iconPlaceholder;
         }
 
+        public void setWhiteLabel(Integer whiteLabel) {
+            this.whiteLabel = whiteLabel;
+        }
+
         public void setTheme(UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -790,7 +813,9 @@ public class UiTheme implements Parcelable {
                     iconCallSpeakerOn,
                     iconCallSpeakerOff,
                     iconCallMinimize,
-                    iconPlaceholder);
+                    iconPlaceholder,
+                    whiteLabel
+            );
         }
     }
 
@@ -896,5 +921,9 @@ public class UiTheme implements Parcelable {
 
     public Integer getIconPlaceholder() {
         return iconPlaceholder;
+    }
+
+    public Integer getWhiteLabel() {
+        return whiteLabel;
     }
 }

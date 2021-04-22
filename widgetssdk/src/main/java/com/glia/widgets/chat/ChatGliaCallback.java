@@ -20,8 +20,6 @@ public interface ChatGliaCallback {
 
     void onMessage(ChatMessage message);
 
-    void chatHistoryLoaded(ChatMessage[] messages, Throwable error);
-
     void error(GliaException exception);
 
     void error(Throwable throwable);

@@ -27,6 +27,9 @@ public class ChatState {
     public final ChatInputMode chatInputMode;
     public final String lastTypedText;
 
+    public final boolean engagementRequested;
+    public final boolean isNavigationPending;
+
     private ChatState(
             String queueTicketId,
             boolean historyLoaded,
@@ -43,7 +46,9 @@ public class ChatState {
             ChatInputMode chatInputMode,
             String lastTypedText,
             boolean isChatInBottom,
-            int messagesNotSeen) {
+            int messagesNotSeen,
+            boolean engagementRequested,
+            boolean isNavigationPending) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -60,6 +65,8 @@ public class ChatState {
         this.lastTypedText = lastTypedText;
         this.isChatInBottom = isChatInBottom;
         this.messagesNotSeen = messagesNotSeen;
+        this.engagementRequested = engagementRequested;
+        this.isNavigationPending = isNavigationPending;
     }
 
     public boolean isOperatorOnline() {
@@ -95,6 +102,8 @@ public class ChatState {
         private ChatInputMode chatInputMode;
         private String lastTypedText;
         private Integer messagesNotSeen;
+        private boolean engagementRequested;
+        private boolean isNavigationPending;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
@@ -113,6 +122,8 @@ public class ChatState {
             chatInputMode = chatState.chatInputMode;
             lastTypedText = chatState.lastTypedText;
             messagesNotSeen = chatState.messagesNotSeen;
+            engagementRequested = chatState.engagementRequested;
+            isNavigationPending = chatState.isNavigationPending;
             return this;
         }
 
@@ -196,27 +207,43 @@ public class ChatState {
             return this;
         }
 
+        public Builder setengagementRequested(boolean engagementRequested) {
+            this.engagementRequested = engagementRequested;
+            return this;
+        }
+
+        public Builder setIsNavigationPending(boolean isNavigationPending) {
+            this.isNavigationPending = isNavigationPending;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending);
         }
     }
 
-    public ChatState queueingStarted(
-            String companyName,
-            String queueId,
-            String contextUrl
-    ) {
+    public ChatState initChat(String companyName,
+                              String queueId,
+                              String contextUrl) {
         return new Builder()
                 .copyFrom(this)
-                .setQueueTicketId(null)
-                .setHistoryLoaded(false)
-                .setOperatorName(null)
-                .setOperatorProfileImgUrl(null)
+                .setIntegratorChatStarted(true)
                 .setCompanyName(companyName)
                 .setQueueId(queueId)
                 .setContextUrl(contextUrl)
                 .setIsVisible(true)
+                .createChatState();
+    }
+
+    public ChatState queueingStarted() {
+        return new Builder()
+                .copyFrom(this)
+                .setQueueTicketId(null)
+                .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
+                .setChatInputMode(ChatInputMode.ENABLED)
                 .setIntegratorChatStarted(true)
+                .setengagementRequested(true)
                 .setChatItems(new ArrayList<>()).createChatState();
     }
 
@@ -266,6 +293,7 @@ public class ChatState {
     public ChatState historyLoaded(List<ChatItem> chatItems) {
         return new Builder()
                 .copyFrom(this)
+                .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
                 .setHistoryLoaded(true)
                 .setChatItems(chatItems)
                 .createChatState();
@@ -327,6 +355,13 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState isNavigationPendingChanged(boolean isNavigationPending) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsNavigationPending(isNavigationPending)
+                .createChatState();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -347,12 +382,14 @@ public class ChatState {
                 Objects.equals(chatInputMode, chatState.chatInputMode) &&
                 Objects.equals(lastTypedText, chatState.lastTypedText) &&
                 isChatInBottom == chatState.isChatInBottom &&
+                engagementRequested == chatState.engagementRequested &&
+                isNavigationPending == chatState.isNavigationPending &&
                 Objects.equals(messagesNotSeen, chatState.messagesNotSeen);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, isNavigationPending);
     }
 
     @Override
@@ -373,6 +410,8 @@ public class ChatState {
                 ", lastTypedText: " + lastTypedText +
                 ", messagesNotSeen: " + messagesNotSeen +
                 ", isChatInBottom: " + isChatInBottom +
+                ", engagementRequested: " + engagementRequested +
+                ", isNavigationPending: " + isNavigationPending +
                 ", chatItems=" + chatItems +
                 '}';
     }

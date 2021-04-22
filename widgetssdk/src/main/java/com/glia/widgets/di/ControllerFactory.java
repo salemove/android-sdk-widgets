@@ -56,7 +56,8 @@ public class ControllerFactory {
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager())
+                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createCoreLoadHistoryUseCase(repositoryFactory.getCoreGliaRepository())
             );
         }
 
@@ -73,7 +74,8 @@ public class ControllerFactory {
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager())
+                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    UseCaseFactory.createCoreLoadHistoryUseCase(repositoryFactory.getCoreGliaRepository())
             );
         } else {
             Logger.d(TAG, "retained chat controller");

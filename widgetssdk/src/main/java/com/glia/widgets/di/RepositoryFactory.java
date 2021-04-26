@@ -1,11 +1,12 @@
 package com.glia.widgets.di;
 
-import com.glia.widgets.core.CoreGliaRepository;
 import com.glia.widgets.model.GliaCallRepository;
 import com.glia.widgets.model.GliaChatHeadControllerRepository;
 import com.glia.widgets.model.GliaChatRepository;
+import com.glia.widgets.model.GliaMessageRepository;
 import com.glia.widgets.model.GliaMessagesNotSeenRepository;
 import com.glia.widgets.model.GliaScreenSharingRepository;
+import com.glia.widgets.model.GliaTicketRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 
 public class RepositoryFactory {
@@ -39,7 +40,11 @@ public class RepositoryFactory {
         return new GliaMessagesNotSeenRepository();
     }
 
-    public CoreGliaRepository getCoreGliaRepository() {
-        return new CoreGliaRepository();
+    public GliaMessageRepository getCoreGliaRepository() {
+        return new GliaMessageRepository();
+    }
+
+    public GliaTicketRepository getGliaTicketRepository() {
+        return new GliaTicketRepository();
     }
 }

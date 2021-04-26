@@ -4,7 +4,6 @@ import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.helper.Utils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +28,7 @@ public class ChatState {
 
     public final boolean engagementRequested;
     public final boolean isNavigationPending;
+    public final List<String> unsentMessages;
 
     private ChatState(
             String queueTicketId,
@@ -48,7 +48,8 @@ public class ChatState {
             boolean isChatInBottom,
             int messagesNotSeen,
             boolean engagementRequested,
-            boolean isNavigationPending) {
+            boolean isNavigationPending,
+            List<String> unsentMessages) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -67,6 +68,7 @@ public class ChatState {
         this.messagesNotSeen = messagesNotSeen;
         this.engagementRequested = engagementRequested;
         this.isNavigationPending = isNavigationPending;
+        this.unsentMessages = unsentMessages;
     }
 
     public boolean isOperatorOnline() {
@@ -104,6 +106,7 @@ public class ChatState {
         private Integer messagesNotSeen;
         private boolean engagementRequested;
         private boolean isNavigationPending;
+        private List<String> unsentMessages;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
@@ -124,6 +127,7 @@ public class ChatState {
             messagesNotSeen = chatState.messagesNotSeen;
             engagementRequested = chatState.engagementRequested;
             isNavigationPending = chatState.isNavigationPending;
+            unsentMessages = chatState.unsentMessages;
             return this;
         }
 
@@ -217,8 +221,13 @@ public class ChatState {
             return this;
         }
 
+        public Builder setUnsentMessages(List<String> unsentMessages) {
+            this.unsentMessages = unsentMessages;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages);
         }
     }
 
@@ -244,7 +253,7 @@ public class ChatState {
                 .setChatInputMode(ChatInputMode.ENABLED)
                 .setIntegratorChatStarted(true)
                 .setengagementRequested(true)
-                .setChatItems(new ArrayList<>()).createChatState();
+                .createChatState();
     }
 
     public ChatState queueTicketSuccess(String queueTicketId) {
@@ -362,6 +371,13 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState changeUnsentMessages(List<String> unsentMessages) {
+        return new Builder()
+                .copyFrom(this)
+                .setUnsentMessages(Collections.unmodifiableList(unsentMessages))
+                .createChatState();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -384,12 +400,13 @@ public class ChatState {
                 isChatInBottom == chatState.isChatInBottom &&
                 engagementRequested == chatState.engagementRequested &&
                 isNavigationPending == chatState.isNavigationPending &&
-                Objects.equals(messagesNotSeen, chatState.messagesNotSeen);
+                Objects.equals(messagesNotSeen, chatState.messagesNotSeen) &&
+                Objects.equals(chatItems, chatState.chatItems);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, isNavigationPending);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages);
     }
 
     @Override
@@ -412,6 +429,7 @@ public class ChatState {
                 ", isChatInBottom: " + isChatInBottom +
                 ", engagementRequested: " + engagementRequested +
                 ", isNavigationPending: " + isNavigationPending +
+                ", unsentMessages: " + unsentMessages +
                 ", chatItems=" + chatItems +
                 '}';
     }

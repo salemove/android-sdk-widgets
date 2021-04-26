@@ -20,8 +20,9 @@ import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorMessageItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.VisitorMessageItem;
-import com.glia.widgets.core.CoreLoadHistoryUseCase;
 import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.glia.GliaLoadHistoryUseCase;
+import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ChatController {
+public class ChatController implements GliaLoadHistoryUseCase.Listener, GliaQueueForEngagementUseCase.Listener {
 
     private static final int CALL_TIMER_DELAY = 1000;
     private static final int CALL_TIMER_TICKER_VALUE = 1000;
@@ -62,7 +63,8 @@ public class ChatController {
     private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
     private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
     private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
-    private final CoreLoadHistoryUseCase loadHistoryUseCase;
+    private final GliaLoadHistoryUseCase loadHistoryUseCase;
+    private final GliaQueueForEngagementUseCase queueForEngagementUseCase;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
@@ -78,7 +80,8 @@ public class ChatController {
                           ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
                           ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
                           RemoveCallNotificationUseCase removeCallNotificationUseCase,
-                          CoreLoadHistoryUseCase loadHistoryUseCase
+                          GliaLoadHistoryUseCase loadHistoryUseCase,
+                          GliaQueueForEngagementUseCase queueForEngagementUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -98,6 +101,7 @@ public class ChatController {
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
                 .setIsNavigationPending(false)
+                .setUnsentMessages(new ArrayList<>())
                 .createChatState();
         this.repository = gliaChatRepository;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -111,6 +115,7 @@ public class ChatController {
         this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
         this.removeCallNotificationUseCase = removeCallNotificationUseCase;
         this.loadHistoryUseCase = loadHistoryUseCase;
+        this.queueForEngagementUseCase = queueForEngagementUseCase;
     }
 
     public void initChat(String companyName,
@@ -138,7 +143,9 @@ public class ChatController {
             return;
         }
         emitViewState(chatState.initChat(companyName, queueId, contextUrl));
-        loadHistory();
+        loadHistoryUseCase.registerListener(this);
+        loadHistoryUseCase.execute();
+        queueForEngagementUseCase.registerListener(this);
         chatHeadsController.setUseOverlays(useOverlays);
         initControllerCallback();
         initMediaUpgradeCallback();
@@ -147,33 +154,11 @@ public class ChatController {
         minimizeHandler.addListener(minimizeCalledListener);
     }
 
-    private void loadHistory() {
-        loadHistoryUseCase.execute(new CoreLoadHistoryUseCase.Callback() {
-            @Override
-            public void success(ChatMessage[] messages) {
-                Logger.d(TAG, "chatHistoryLoaded");
-                List<ChatItem> items = new ArrayList<>(chatState.chatItems);
-                if (messages != null && messages.length > 0) {
-                    for (ChatMessage message : messages) {
-                        appendHistoryChatItem(items, message);
-                    }
-                    emitChatItems(chatState.historyLoaded(items));
-                } else {
-                    queueForEngagement();
-                }
-            }
-
-            @Override
-            public void error(Throwable error) {
-                Logger.e(TAG, "chatHistoryLoaded error");
-                this.error(error);
-            }
-        });
-    }
-
     private void queueForEngagement() {
+        Logger.d(TAG, "queueForEngagement");
         emitViewState(chatState.queueingStarted());
-        repository.init(gliaCallback, chatState.queueId, chatState.contextUrl);
+        queueForEngagementUseCase.execute(chatState.queueId, chatState.contextUrl);
+        repository.init(gliaCallback);
     }
 
     private void initMinimizeCallback() {
@@ -209,13 +194,20 @@ public class ChatController {
             callTimer.clear();
             minimizeCalledListener = null;
             minimizeHandler.clear();
+
+            loadHistoryUseCase.unregisterListener(this);
+            queueForEngagementUseCase.unregisterListener(this);
         }
     }
 
     public void sendMessagePreview(String message) {
-        Logger.d(TAG, "Send preview: " + message);
-        emitViewState(chatState.chatInputChanged(message));
-        repository.sendMessagePreview(message);
+        if (chatState.isOperatorOnline()) {
+            Logger.d(TAG, "Send preview: " + message);
+            emitViewState(chatState.chatInputChanged(message));
+            repository.sendMessagePreview(message);
+        } else {
+            Logger.d(TAG, "Send preview not sending");
+        }
     }
 
     public boolean sendMessage(String message) {
@@ -223,9 +215,24 @@ public class ChatController {
         boolean valid = isMessageValid(message);
         if (valid) {
             Logger.d(TAG, "Send MESSAGE valid! : " + message);
-            repository.sendMessage(message);
+            if (chatState.isOperatorOnline()) {
+                Logger.d(TAG, "SEND MESSAGE sending");
+                repository.sendMessage(message);
+            } else {
+                appendUnsentMessage(message);
+                if (!chatState.engagementRequested) {
+                    queueForEngagement();
+                }
+            }
         }
         return valid;
+    }
+
+    private void appendUnsentMessage(String message) {
+        Logger.d(TAG, "appendUnsentMessage: " + message);
+        List<String> unsentMessages = new ArrayList<>(chatState.unsentMessages);
+        unsentMessages.add(message);
+        chatState.changeUnsentMessages(unsentMessages);
     }
 
     public void show() {
@@ -348,18 +355,6 @@ public class ChatController {
             }
 
             @Override
-            public void queueForEngangmentSuccess() {
-                Logger.d(TAG, "queueForEngagementSuccess");
-                viewInitQueueing();
-            }
-
-            @Override
-            public void queueForTicketSuccess(String ticketId) {
-                Logger.d(TAG, "queueForTicketSuccess");
-                emitViewState(chatState.queueTicketSuccess(ticketId));
-            }
-
-            @Override
             public void engagementEndedByOperator() {
                 Logger.d(TAG, "engagementEndedByOperator");
                 stop();
@@ -427,20 +422,21 @@ public class ChatController {
 
             @Override
             public void error(GliaException exception) {
-                Logger.e(TAG, exception.toString());
-                dialogController.showUnexpectedErrorDialog();
-                emitViewState(chatState.stop());
-                emitViewState(chatState.changeVisibility(false));
+                ChatController.this.error(exception.toString());
             }
 
             @Override
             public void error(Throwable throwable) {
-                Logger.e(TAG, throwable.toString());
-                dialogController.showUnexpectedErrorDialog();
-                emitViewState(chatState.stop());
-                emitViewState(chatState.changeVisibility(false));
+                ChatController.this.error(throwable.toString());
             }
         };
+    }
+
+    private void error(String error) {
+        Logger.e(TAG, error);
+        dialogController.showUnexpectedErrorDialog();
+        emitViewState(chatState.stop());
+        emitViewState(chatState.changeVisibility(false));
     }
 
     private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
@@ -523,7 +519,7 @@ public class ChatController {
 
     private void viewInitQueueing() {
         if (!chatState.isOperatorOnline()) {
-            List<ChatItem> items = new ArrayList<>();
+            List<ChatItem> items = new ArrayList<>(chatState.chatItems);
             items.add(OperatorStatusItem.QueueingStatusItem(chatState.companyName));
             emitViewState(chatState.initQueueing());
             emitChatItems(chatState.changeItems(items));
@@ -538,8 +534,10 @@ public class ChatController {
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
-        List<ChatItem> items = new ArrayList<>();
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+        // remove previous operator status item
+        items.remove(items.size() - 1);
         items.add(OperatorStatusItem.OperatorFoundStatusItem(
                 chatState.companyName,
                 chatState.getFormattedOperatorName(),
@@ -769,5 +767,31 @@ public class ChatController {
         if (viewCallback != null) {
             viewCallback.smoothScrollToBottom();
         }
+    }
+
+    @Override
+    public void historyLoaded(ChatMessage[] messages) {
+        Logger.d(TAG, "chatHistoryLoaded");
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        if (messages != null && messages.length > 0) {
+            for (ChatMessage message : messages) {
+                appendHistoryChatItem(items, message);
+            }
+            emitChatItems(chatState.historyLoaded(items));
+        } else {
+            queueForEngagement();
+        }
+    }
+
+    @Override
+    public void ticketLoaded(String ticket) {
+        Logger.d(TAG, "ticketLoaded");
+        emitViewState(chatState.queueTicketSuccess(ticket));
+    }
+
+    @Override
+    public void error(Throwable error) {
+        Logger.e(TAG, "Error");
+        ChatController.this.error(error.toString());
     }
 }

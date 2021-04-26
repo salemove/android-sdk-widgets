@@ -57,7 +57,8 @@ public class ControllerFactory {
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createCoreLoadHistoryUseCase(repositoryFactory.getCoreGliaRepository())
+                    UseCaseFactory.createCoreLoadHistoryUseCase(repositoryFactory.getCoreGliaRepository()),
+                    UseCaseFactory.createQueueForEngagementuseCase(repositoryFactory.getGliaTicketRepository())
             );
         }
 
@@ -75,7 +76,8 @@ public class ControllerFactory {
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createCoreLoadHistoryUseCase(repositoryFactory.getCoreGliaRepository())
+                    UseCaseFactory.createCoreLoadHistoryUseCase(repositoryFactory.getCoreGliaRepository()),
+                    UseCaseFactory.createQueueForEngagementuseCase(repositoryFactory.getGliaTicketRepository())
             );
         } else {
             Logger.d(TAG, "retained chat controller");

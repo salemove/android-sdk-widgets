@@ -3,7 +3,6 @@ package com.glia.widgets.model;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.RequestCallback;
-import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
@@ -12,7 +11,6 @@ import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.widgets.chat.ChatGliaCallback;
 import com.glia.widgets.helper.Logger;
 
@@ -22,7 +20,6 @@ public class GliaChatRepository {
 
     private static final String TAG = "GliaChatRepository";
     private ChatGliaCallback callback;
-    private Consumer<QueueTicket> ticketConsumer;
     private Consumer<ChatMessage> messageHandler;
     private final Runnable engagementEndListener = () -> {
         if (callback != null) {
@@ -46,20 +43,10 @@ public class GliaChatRepository {
         }
     };
 
-    public void init(ChatGliaCallback callback, String queueId, String contextUrl) {
+    public void init(ChatGliaCallback callback) {
         this.callback = callback;
         callback.queueForEngagementStart();
-        VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
         Glia.on(Glia.Events.ENGAGEMENT, engagementHandler);
-        Glia.queueForEngagement(queueId, visitorContext, response -> {
-            if (response != null) {
-                callback.error(response);
-                return;
-            }
-            callback.queueForEngangmentSuccess();
-        });
-        ticketConsumer = ticket -> callback.queueForTicketSuccess(ticket.getId());
-        Glia.on(Glia.Events.QUEUE_TICKET, ticketConsumer);
     }
 
     public void stop(String queueTicketId) {
@@ -71,7 +58,6 @@ public class GliaChatRepository {
             });
         }
         Glia.off(Glia.Events.ENGAGEMENT, engagementHandler);
-        Glia.off(Glia.Events.QUEUE_TICKET, ticketConsumer);
         Glia.getCurrentEngagement().ifPresent(engagement -> {
             engagement.getChat().off(Chat.Events.MESSAGE, messageHandler);
             engagement.off(Engagement.Events.END, engagementEndListener);
@@ -88,7 +74,6 @@ public class GliaChatRepository {
     public void onDestroy() {
         callback = null;
         Glia.off(Glia.Events.ENGAGEMENT, engagementHandler);
-        Glia.off(Glia.Events.QUEUE_TICKET, ticketConsumer);
         Glia.getCurrentEngagement().ifPresent(engagement -> {
             engagement.getChat().off(Chat.Events.MESSAGE, messageHandler);
             engagement.off(Engagement.Events.END, engagementEndListener);

@@ -10,10 +10,6 @@ public interface ChatGliaCallback {
 
     void queueForEngagementStart();
 
-    void queueForEngangmentSuccess();
-
-    void queueForTicketSuccess(String ticketId);
-
     void engagementEndedByOperator();
 
     void engagementSuccess(OmnicoreEngagement engagement);

@@ -1,7 +1,9 @@
 package com.glia.widgets.di;
 
-import com.glia.widgets.core.CoreGliaRepository;
-import com.glia.widgets.core.CoreLoadHistoryUseCase;
+import com.glia.widgets.glia.GliaLoadHistoryUseCase;
+import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
+import com.glia.widgets.model.GliaMessageRepository;
+import com.glia.widgets.model.GliaTicketRepository;
 import com.glia.widgets.notification.device.INotificationManager;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
@@ -15,6 +17,8 @@ public class UseCaseFactory {
     private static RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
+    private static GliaLoadHistoryUseCase loadHistoryUseCase;
+    private static GliaQueueForEngagementUseCase queueForEngagementUseCase;
 
     public static ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase(INotificationManager notificationManager) {
         if (showAudioCallNotificationUseCase == null)
@@ -46,7 +50,17 @@ public class UseCaseFactory {
         return removeScreenSharingNotificationUseCase;
     }
 
-    public static CoreLoadHistoryUseCase createCoreLoadHistoryUseCase(CoreGliaRepository coreRepository){
-        return new CoreLoadHistoryUseCase(coreRepository);
+    public static GliaLoadHistoryUseCase createCoreLoadHistoryUseCase(GliaMessageRepository coreRepository) {
+        if (loadHistoryUseCase == null) {
+            loadHistoryUseCase = new GliaLoadHistoryUseCase(coreRepository);
+        }
+        return loadHistoryUseCase;
+    }
+
+    public static GliaQueueForEngagementUseCase createQueueForEngagementuseCase(GliaTicketRepository ticketRepository) {
+        if (queueForEngagementUseCase == null) {
+            queueForEngagementUseCase = new GliaQueueForEngagementUseCase(ticketRepository);
+        }
+        return queueForEngagementUseCase;
     }
 }

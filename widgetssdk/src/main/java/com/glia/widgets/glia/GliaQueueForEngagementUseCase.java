@@ -1,56 +1,37 @@
 package com.glia.widgets.glia;
 
-import com.glia.widgets.helper.BaseObservable;
+import com.glia.androidsdk.GliaException;
 import com.glia.widgets.model.GliaTicketRepository;
 
-public class GliaQueueForEngagementUseCase extends BaseObservable<GliaQueueForEngagementUseCase.Listener>
-        implements GliaTicketRepository.Listener {
+public class GliaQueueForEngagementUseCase implements GliaTicketRepository.QueueForEngagementListener {
 
     public interface Listener {
-        void ticketLoaded(String ticket);
-
-        void error(Throwable error);
+        void queueForEngagementSuccess();
+        void error(GliaException exception);
     }
 
     private final GliaTicketRepository repository;
+    private Listener listener;
 
     public GliaQueueForEngagementUseCase(GliaTicketRepository repository) {
         this.repository = repository;
     }
 
-    public void execute(String queueId, String contextUrl) {
-        repository.execute(queueId, contextUrl);
+    public void execute(String queueId, String contextUrl, Listener listener) {
+        this.listener = listener;
+        repository.startQueueingForEngagement(queueId, contextUrl, this);
     }
 
-    @Override
-    public void queueForTicketSuccess(String ticketId) {
-        notifySuccess(ticketId);
-    }
-
-    @Override
-    public void error(Throwable throwable) {
-        notifyFailure(throwable);
-    }
-
-    private void notifySuccess(String ticket) {
-        for (Listener listener : getListeners()) {
-            listener.ticketLoaded(ticket);
-        }
-    }
-
-    private void notifyFailure(Throwable error) {
-        for (Listener listener : getListeners()) {
-            listener.error(error);
+    public void unregisterListener(Listener listener) {
+        if (this.listener == listener) {
+            this.listener = null;
         }
     }
 
     @Override
-    protected void onFirstListenerRegistered() {
-        repository.registerListener(this);
-    }
-
-    @Override
-    protected void onLastListenerUnregistered() {
-        repository.unregisterListener(this);
+    public void success(GliaException exception) {
+        if (exception != null) {
+            this.listener.error(exception);
+        }
     }
 }

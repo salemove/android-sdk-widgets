@@ -1,9 +1,16 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.glia.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.glia.GliaEndEngagementUseCase;
 import com.glia.widgets.glia.GliaLoadHistoryUseCase;
+import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
+import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.glia.GliaOnMessageUseCase;
+import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
+import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
-import com.glia.widgets.model.GliaMessageRepository;
-import com.glia.widgets.model.GliaTicketRepository;
+import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
+import com.glia.widgets.glia.GliaSendMessageUseCase;
 import com.glia.widgets.notification.device.INotificationManager;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
@@ -17,8 +24,12 @@ public class UseCaseFactory {
     private static RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
-    private static GliaLoadHistoryUseCase loadHistoryUseCase;
-    private static GliaQueueForEngagementUseCase queueForEngagementUseCase;
+
+    private final RepositoryFactory repositoryFactory;
+
+    public UseCaseFactory(RepositoryFactory repositoryFactory) {
+        this.repositoryFactory = repositoryFactory;
+    }
 
     public static ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase(INotificationManager notificationManager) {
         if (showAudioCallNotificationUseCase == null)
@@ -50,17 +61,54 @@ public class UseCaseFactory {
         return removeScreenSharingNotificationUseCase;
     }
 
-    public static GliaLoadHistoryUseCase createCoreLoadHistoryUseCase(GliaMessageRepository coreRepository) {
-        if (loadHistoryUseCase == null) {
-            loadHistoryUseCase = new GliaLoadHistoryUseCase(coreRepository);
-        }
-        return loadHistoryUseCase;
+    public GliaLoadHistoryUseCase createGliaLoadHistoryUseCase() {
+        return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository());
     }
 
-    public static GliaQueueForEngagementUseCase createQueueForEngagementuseCase(GliaTicketRepository ticketRepository) {
-        if (queueForEngagementUseCase == null) {
-            queueForEngagementUseCase = new GliaQueueForEngagementUseCase(ticketRepository);
-        }
-        return queueForEngagementUseCase;
+    public GliaQueueForEngagementUseCase createQueueForEngagementuseCase() {
+        return new GliaQueueForEngagementUseCase(repositoryFactory.getGliaTicketRepository());
+    }
+
+    public GliaCancelQueueTicketUseCase createCancelQueueTicketUseCase() {
+        return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaTicketRepository());
+    }
+
+    public GliaEndEngagementUseCase createEndEngagementUseCase() {
+        return new GliaEndEngagementUseCase(repositoryFactory.getGliaEngagementRepository());
+    }
+
+    public GliaOnEngagementUseCase createOnEngagementUseCase() {
+        return new GliaOnEngagementUseCase(repositoryFactory.getGliaEngagementRepository());
+    }
+
+    public GliaOnEngagementEndUseCase createOnEngagementEndUseCase() {
+        return new GliaOnEngagementEndUseCase(
+                repositoryFactory.getGliaEngagementRepository(),
+                createOnEngagementUseCase()
+        );
+    }
+
+    public GliaOnMessageUseCase createGliaOnMessageUseCase() {
+        return new GliaOnMessageUseCase(repositoryFactory.getGliaMessageRepository());
+    }
+
+    public GliaOnOperatorMediaStateUseCase createGliaOnOperatorMediaStateUseCase() {
+        return new GliaOnOperatorMediaStateUseCase(repositoryFactory.getGliaMediaStateRepository());
+    }
+
+    public GliaQueueForEngagementUseCase createGliaQueueForEngagementUseCase() {
+        return new GliaQueueForEngagementUseCase(repositoryFactory.getGliaTicketRepository());
+    }
+
+    public GliaSendMessagePreviewUseCase createGliaSendMessagePreviewUseCase() {
+        return new GliaSendMessagePreviewUseCase(repositoryFactory.getGliaMessageRepository());
+    }
+
+    public GliaSendMessageUseCase createGliaSendMessageUseCase() {
+        return new GliaSendMessageUseCase(repositoryFactory.getGliaMessageRepository());
+    }
+
+    public GliaOnQueueTicketUseCase createGliaOnQueueTicketUseCase() {
+        return new GliaOnQueueTicketUseCase(repositoryFactory.getGliaTicketRepository());
     }
 }

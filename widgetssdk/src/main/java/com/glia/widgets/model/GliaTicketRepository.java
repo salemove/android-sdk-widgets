@@ -4,59 +4,42 @@ import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.queuing.QueueTicket;
-import com.glia.widgets.helper.BaseObservable;
 import com.glia.widgets.helper.Logger;
 
-import java.util.function.Consumer;
+public class GliaTicketRepository {
 
-public class GliaTicketRepository extends BaseObservable<GliaTicketRepository.Listener> {
+    private static final String TAG = "GliaTicketRepository";
 
-    private static String TAG = "GliaTicketRepository";
-
-    public interface Listener {
-
-        void queueForTicketSuccess(String ticketId);
-
-        void error(Throwable throwable);
+    public interface TicketChangesListener {
+        void newTicket(QueueTicket ticket);
     }
 
-    private Consumer<GliaException> queueForEngagementConsumer;
-    private Consumer<QueueTicket> ticketConsumer;
+    public interface QueueForEngagementListener {
+        void success(GliaException exception);
+    }
 
-    public void execute(String queueId, String contextUrl) {
+    public void startQueueingForEngagement(
+            String queueId,
+            String contextUrl,
+            QueueForEngagementListener listener
+    ) {
         VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
-        Glia.queueForEngagement(queueId, visitorContext, queueForEngagementConsumer);
-        Glia.on(Glia.Events.QUEUE_TICKET, ticketConsumer);
+        Glia.queueForEngagement(queueId, visitorContext, listener::success);
     }
 
-    private void notifySuccess(String ticket) {
-        for (Listener listener : getListeners()) {
-            listener.queueForTicketSuccess(ticket);
-        }
+    public void listenForQueueTicketChanges(TicketChangesListener ticketChangesListener) {
+        Glia.on(Glia.Events.QUEUE_TICKET, ticketChangesListener::newTicket);
     }
 
-    private void notifyFailure(Throwable error) {
-        for (Listener listener : getListeners()) {
-            listener.error(error);
-        }
+    public void unRegister(TicketChangesListener ticketChangesListener) {
+        Glia.off(Glia.Events.QUEUE_TICKET, ticketChangesListener::newTicket);
     }
 
-    @Override
-    protected void onFirstListenerRegistered() {
-        queueForEngagementConsumer = response -> {
-            if (response != null) {
-                notifyFailure(response);
-            } else {
-                Logger.d(TAG, "queueForEngagementSuccess");
+    public void cancelTicket(String ticketId) {
+        Glia.cancelQueueTicket(ticketId, e -> {
+            if (e != null) {
+                Logger.e(TAG, "cancelQueueTicketError: " + e.toString());
             }
-        };
-        ticketConsumer = ticket -> notifySuccess(ticket.getId());
-    }
-
-    @Override
-    protected void onLastListenerUnregistered() {
-        Glia.off(Glia.Events.QUEUE_TICKET, ticketConsumer);
-        queueForEngagementConsumer = null;
-        ticketConsumer = null;
+        });
     }
 }

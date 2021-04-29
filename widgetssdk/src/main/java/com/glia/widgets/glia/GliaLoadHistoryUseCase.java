@@ -1,10 +1,9 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.widgets.helper.BaseObservable;
 import com.glia.widgets.model.GliaMessageRepository;
 
-public class GliaLoadHistoryUseCase extends BaseObservable<GliaLoadHistoryUseCase.Listener> implements GliaMessageRepository.Listener {
+public class GliaLoadHistoryUseCase implements GliaMessageRepository.HistoryLoadedListener {
 
     public interface Listener {
         void historyLoaded(ChatMessage[] messages);
@@ -13,43 +12,31 @@ public class GliaLoadHistoryUseCase extends BaseObservable<GliaLoadHistoryUseCas
     }
 
     private final GliaMessageRepository gliaMessageRepository;
+    private Listener listener;
 
     public GliaLoadHistoryUseCase(GliaMessageRepository gliaMessageRepository) {
         this.gliaMessageRepository = gliaMessageRepository;
     }
 
-    public void execute() {
-        gliaMessageRepository.loadHistory();
+    public void execute(Listener listener) {
+        this.listener = listener;
+        gliaMessageRepository.loadHistory(this);
+    }
+
+    public void unregisterListener(Listener listener) {
+        if (this.listener == listener) {
+            this.listener = null;
+        }
     }
 
     @Override
     public void loaded(ChatMessage[] messages, Throwable error) {
-        if (error != null) {
-            notifyFailure(error);
-        } else {
-            notifySuccess(messages);
+        if (listener != null) {
+            if (error != null) {
+                listener.error(error);
+            } else {
+                listener.historyLoaded(messages);
+            }
         }
-    }
-
-    private void notifySuccess(ChatMessage[] messages) {
-        for (Listener listener : getListeners()) {
-            listener.historyLoaded(messages);
-        }
-    }
-
-    private void notifyFailure(Throwable error) {
-        for (Listener listener : getListeners()) {
-            listener.error(error);
-        }
-    }
-
-    @Override
-    protected void onFirstListenerRegistered() {
-        gliaMessageRepository.registerListener(this);
-    }
-
-    @Override
-    protected void onLastListenerUnregistered() {
-        gliaMessageRepository.unregisterListener(this);
     }
 }

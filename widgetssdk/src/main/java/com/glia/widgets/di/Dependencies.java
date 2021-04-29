@@ -21,7 +21,9 @@ public class Dependencies {
     private static INotificationManager notificationManager;
 
     public static void onAppCreate(Application application) {
-        controllerFactory = new ControllerFactory(new RepositoryFactory());
+        RepositoryFactory repositoryFactory = new RepositoryFactory();
+        UseCaseFactory useCaseFactory = new UseCaseFactory(repositoryFactory);
+        controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
         controllerFactory.getChatHeadsController().addChatHeadServiceListener(
                 new ChatHeadsController.ChatHeadServiceListener() {
                     @Override

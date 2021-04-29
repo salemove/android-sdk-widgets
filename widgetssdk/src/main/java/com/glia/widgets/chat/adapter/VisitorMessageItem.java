@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class VisitorMessageItem extends ChatItem {
     public final static String HISTORY_ID = "history_id";
+    public final static String UNSENT_MESSAGE_ID = "unsent_message_id";
     private final String id;
     private final boolean showDelivered;
     private final String message;

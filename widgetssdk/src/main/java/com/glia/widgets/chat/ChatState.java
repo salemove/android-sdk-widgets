@@ -2,6 +2,8 @@ package com.glia.widgets.chat;
 
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
+import com.glia.widgets.chat.adapter.OperatorStatusItem;
+import com.glia.widgets.chat.adapter.VisitorMessageItem;
 import com.glia.widgets.helper.Utils;
 
 import java.util.Collections;
@@ -28,7 +30,8 @@ public class ChatState {
 
     public final boolean engagementRequested;
     public final boolean isNavigationPending;
-    public final List<String> unsentMessages;
+    public final List<VisitorMessageItem> unsentMessages;
+    public final OperatorStatusItem operatorStatusItem;
 
     private ChatState(
             String queueTicketId,
@@ -49,7 +52,8 @@ public class ChatState {
             int messagesNotSeen,
             boolean engagementRequested,
             boolean isNavigationPending,
-            List<String> unsentMessages) {
+            List<VisitorMessageItem> unsentMessages,
+            OperatorStatusItem operatorStatusItem) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -69,6 +73,7 @@ public class ChatState {
         this.engagementRequested = engagementRequested;
         this.isNavigationPending = isNavigationPending;
         this.unsentMessages = unsentMessages;
+        this.operatorStatusItem = operatorStatusItem;
     }
 
     public boolean isOperatorOnline() {
@@ -106,7 +111,8 @@ public class ChatState {
         private Integer messagesNotSeen;
         private boolean engagementRequested;
         private boolean isNavigationPending;
-        private List<String> unsentMessages;
+        private List<VisitorMessageItem> unsentMessages;
+        private OperatorStatusItem operatorStatusItem;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
@@ -128,6 +134,7 @@ public class ChatState {
             engagementRequested = chatState.engagementRequested;
             isNavigationPending = chatState.isNavigationPending;
             unsentMessages = chatState.unsentMessages;
+            operatorStatusItem = chatState.operatorStatusItem;
             return this;
         }
 
@@ -211,7 +218,7 @@ public class ChatState {
             return this;
         }
 
-        public Builder setengagementRequested(boolean engagementRequested) {
+        public Builder setEngagementRequested(boolean engagementRequested) {
             this.engagementRequested = engagementRequested;
             return this;
         }
@@ -221,13 +228,18 @@ public class ChatState {
             return this;
         }
 
-        public Builder setUnsentMessages(List<String> unsentMessages) {
+        public Builder setUnsentMessages(List<VisitorMessageItem> unsentMessages) {
             this.unsentMessages = unsentMessages;
             return this;
         }
 
+        public Builder setOperatorStatusItem(OperatorStatusItem operatorStatusItem) {
+            this.operatorStatusItem = operatorStatusItem;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages, operatorStatusItem);
         }
     }
 
@@ -244,15 +256,14 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState queueingStarted() {
+    public ChatState queueingStarted(OperatorStatusItem operatorStatusItem) {
         return new Builder()
                 .copyFrom(this)
-                .setQueueTicketId(null)
                 .setOperatorName(null)
                 .setOperatorProfileImgUrl(null)
                 .setChatInputMode(ChatInputMode.ENABLED)
-                .setIntegratorChatStarted(true)
-                .setengagementRequested(true)
+                .setEngagementRequested(true)
+                .setOperatorStatusItem(operatorStatusItem)
                 .createChatState();
     }
 
@@ -260,30 +271,16 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setQueueTicketId(queueTicketId)
-                .setHistoryLoaded(false)
-                .setIntegratorChatStarted(true)
                 .createChatState();
     }
-
-    public ChatState initQueueing() {
-        return new Builder()
-                .copyFrom(this)
-                .setHistoryLoaded(false)
-                .setOperatorName(null)
-                .setOperatorProfileImgUrl(null)
-                .setIntegratorChatStarted(true)
-                .createChatState();
-    }
-
 
     public ChatState engagementStarted(String operatorName, String operatorProfileImgUrl) {
         return new Builder()
                 .copyFrom(this)
-                .setHistoryLoaded(false)
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
-                .setIntegratorChatStarted(true)
                 .setChatInputMode(ChatInputMode.ENABLED)
+                .setEngagementRequested(true)
                 .createChatState();
     }
 
@@ -371,7 +368,7 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState changeUnsentMessages(List<String> unsentMessages) {
+    public ChatState changeUnsentMessages(List<VisitorMessageItem> unsentMessages) {
         return new Builder()
                 .copyFrom(this)
                 .setUnsentMessages(Collections.unmodifiableList(unsentMessages))
@@ -401,6 +398,8 @@ public class ChatState {
                 engagementRequested == chatState.engagementRequested &&
                 isNavigationPending == chatState.isNavigationPending &&
                 Objects.equals(messagesNotSeen, chatState.messagesNotSeen) &&
+                Objects.equals(operatorStatusItem, chatState.operatorStatusItem) &&
+                Objects.equals(unsentMessages, chatState.unsentMessages) &&
                 Objects.equals(chatItems, chatState.chatItems);
     }
 
@@ -429,6 +428,7 @@ public class ChatState {
                 ", isChatInBottom: " + isChatInBottom +
                 ", engagementRequested: " + engagementRequested +
                 ", isNavigationPending: " + isNavigationPending +
+                ", operatorStatusItem: " + operatorStatusItem +
                 ", unsentMessages: " + unsentMessages +
                 ", chatItems=" + chatItems +
                 '}';

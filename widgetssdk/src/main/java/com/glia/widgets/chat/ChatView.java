@@ -126,8 +126,7 @@ public class ChatView extends ConstraintLayout {
             super.onItemRangeInserted(positionStart, itemCount);
             int totalItemCount = adapter.getItemCount();
             int lastIndex = totalItemCount - 1;
-            boolean scrollToBottom = isInBottom && positionStart + itemCount >= lastIndex;
-            if (scrollToBottom) {
+            if (isInBottom) {
                 chatRecyclerView.scrollToPosition(lastIndex);
             }
         }
@@ -337,7 +336,11 @@ public class ChatView extends ConstraintLayout {
                             chatEditText.setHint(R.string.chat_single_choice_card_hint);
                             break;
                         case ENABLED_NO_ENGAGEMENT:
-                            chatEditText.setHint(R.string.chat_not_started_hint);
+                            if (chatState.lastTypedText.isEmpty()) {
+                                chatEditText.setHint(R.string.chat_not_started_hint);
+                            } else {
+                                chatEditText.setHint("");
+                            }
                             break;
                         default:
                             chatEditText.setHint(R.string.chat_enter_message);

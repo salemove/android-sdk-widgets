@@ -2,32 +2,45 @@ package com.glia.widgets.head;
 
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.OperatorMediaState;
+import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
+import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
+import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.ChatHeadInput;
-import com.glia.widgets.model.GliaChatHeadControllerRepository;
-import com.glia.widgets.model.GliaChatHeadControllerRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatHeadsController {
+public class ChatHeadsController implements
+        GliaOnEngagementUseCase.Listener,
+        GliaOnQueueTicketUseCase.Listener,
+        GliaOnEngagementEndUseCase.Listener,
+        GliaOnOperatorMediaStateUseCase.Listener {
 
     private final static String TAG = "ChatHeadsController";
 
     private ChatHeadState chatHeadState;
-    private final GliaChatHeadControllerRepository repository;
     private ChatHeadInput lastInput = null;
     private final List<OnChatheadSettingsChangedListener> viewListeners = new ArrayList<>();
     private OnChatheadSettingsChangedListener overlayListener;
     private ChatHeadServiceListener chatHeadServiceListener;
 
+    private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
+    private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
+    private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
+    private final GliaOnOperatorMediaStateUseCase gliaOnOperatorMediaStateUseCase;
+
     public ChatHeadsController(
-            GliaChatHeadControllerRepository gliaChatHeadControllerRepository,
+            GliaOnEngagementUseCase gliaOnEngagementUseCase,
+            GliaOnQueueTicketUseCase onQueueTicketUseCase,
+            GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase,
+            GliaOnOperatorMediaStateUseCase gliaOnOperatorMediaStateUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler
     ) {
-        this.repository = gliaChatHeadControllerRepository;
         this.chatHeadState = new ChatHeadState.Builder()
                 .setMessageCount(0)
                 .createChatHeadState();
@@ -35,6 +48,10 @@ public class ChatHeadsController {
             Logger.d(TAG, "new message count received: " + count);
             emitViewState(chatHeadState.onNewMessage(count));
         });
+        this.gliaOnEngagementUseCase = gliaOnEngagementUseCase;
+        this.onQueueTicketUseCase = onQueueTicketUseCase;
+        this.gliaOnEngagementEndUseCase = gliaOnEngagementEndUseCase;
+        this.gliaOnOperatorMediaStateUseCase = gliaOnOperatorMediaStateUseCase;
     }
 
     public void addListener(OnChatheadSettingsChangedListener listener) {
@@ -61,7 +78,8 @@ public class ChatHeadsController {
 
     public void initChatObserving() {
         Logger.d(TAG, "initChatObserving");
-        repository.init(repositoryCallback);
+        gliaOnEngagementUseCase.execute(this);
+        onQueueTicketUseCase.execute(this);
     }
 
     public void setUseOverlays(boolean useOverlays) {
@@ -83,22 +101,32 @@ public class ChatHeadsController {
                 ", isChatInBackstack: " + isChatInBackstack);
         if (callingActivity.equals(Constants.CALL_ACTIVITY)) {
             emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.operatorMediaState != null,
+                    chatHeadState.engagementRequested &&
+                            chatHeadState.operatorMediaState != null,
                     callingActivity));
         } else if (callingActivity.equals(Constants.CHAT_ACTIVITY)) {
             emitViewState(chatHeadState.onNewMessage(0));
-            emitViewState(chatHeadState.changeVisibility(true, callingActivity));
+            emitViewState(chatHeadState.changeVisibility(
+                    chatHeadState.engagementRequested,
+                    callingActivity
+            ));
         }
     }
 
     public void onMinimizeButtonClicked() {
         Logger.d(TAG, "onMinimizeButtonClicked");
-        emitViewState(chatHeadState.changeVisibility(true, Constants.CALL_ACTIVITY));
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CALL_ACTIVITY
+        ));
     }
 
     public void onChatButtonClicked() {
         Logger.d(TAG, "onChatButtonClicked");
-        emitViewState(chatHeadState.changeVisibility(true, Constants.CALL_ACTIVITY));
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CALL_ACTIVITY
+        ));
     }
 
     public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
@@ -107,7 +135,7 @@ public class ChatHeadsController {
                 (chatHeadState.operatorMediaState.getAudio() != null ||
                         chatHeadState.operatorMediaState.getVideo() != null);
         emitViewState(chatHeadState.changeVisibility(
-                hasOngoingMedia,
+                chatHeadState.engagementRequested && hasOngoingMedia,
                 hasOngoingMedia ? Constants.CALL_ACTIVITY : null
         ));
         if (chatHeadInput != null && chatHeadInput.uiTheme != null) {
@@ -164,6 +192,32 @@ public class ChatHeadsController {
         return chatHeadState.useChatHeads && !chatHeadState.hasOverlayPermissions;
     }
 
+    @Override
+    public void engagementEnded() {
+        emitViewState(chatHeadState.setOperatorMediaState(null));
+        emitViewState(chatHeadState.setOperatorProfileImgUrl(null));
+        emitViewState(chatHeadState.changeEngagementRequested(false));
+    }
+
+    @Override
+    public void newEngagementLoaded(OmnicoreEngagement engagement) {
+        operatorDataLoaded(engagement.getOperator());
+        gliaOnEngagementEndUseCase.execute(this);
+        gliaOnOperatorMediaStateUseCase.execute(this);
+    }
+
+    @Override
+    public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "new operatorMediaState: " + operatorMediaState);
+        emitViewState(chatHeadState.setOperatorMediaState(operatorMediaState));
+    }
+
+    @Override
+    public void ticketLoaded(String ticket) {
+        Logger.d(TAG, "ticketLoaded: " + ticket);
+        emitViewState(chatHeadState.changeEngagementRequested(true));
+    }
+
     public interface OnChatheadSettingsChangedListener {
         void emitState(ChatHeadState chatHeadState);
     }
@@ -173,34 +227,6 @@ public class ChatHeadsController {
 
         void stopService();
     }
-
-    private final GliaChatHeadControllerRepositoryCallback repositoryCallback =
-            new GliaChatHeadControllerRepositoryCallback() {
-
-                @Override
-                public void operatorDataLoaded(Operator operator) {
-                    Logger.d(TAG, "operatorDataLoaded: " + operator.toString());
-                    String operatorProfileImgUrl = null;
-                    try {
-                        operatorProfileImgUrl = operator.getPicture().getURL().get();
-                    } catch (Exception e) {
-                        Logger.d(TAG, "operatorDataLoaded, ex: " + e.toString());
-                    }
-                    emitViewState(chatHeadState.setOperatorProfileImgUrl(operatorProfileImgUrl));
-                }
-
-                @Override
-                public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
-                    Logger.d(TAG, "new operatorMediaState: " + operatorMediaState);
-                    emitViewState(chatHeadState.setOperatorMediaState(operatorMediaState));
-                }
-
-                @Override
-                public void engagementEndedByOperator() {
-                    emitViewState(chatHeadState.setOperatorMediaState(null));
-                    emitViewState(chatHeadState.setOperatorProfileImgUrl(null));
-                }
-            };
 
     private synchronized void emitViewState(ChatHeadState state) {
         if (setState(state)) {
@@ -222,5 +248,17 @@ public class ChatHeadsController {
 
     public ChatHeadInput chatHeadClicked() {
         return lastInput;
+    }
+
+    private void operatorDataLoaded(Operator operator) {
+        Logger.d(TAG, "operatorDataLoaded: " + operator.toString());
+        String operatorProfileImgUrl = null;
+        try {
+            operatorProfileImgUrl = operator.getPicture().getURL().get();
+        } catch (Exception e) {
+            Logger.d(TAG, "operatorDataLoaded, ex: " + e.toString());
+        }
+        emitViewState(chatHeadState.setOperatorProfileImgUrl(operatorProfileImgUrl));
+        emitViewState(chatHeadState.changeEngagementRequested(true));
     }
 }

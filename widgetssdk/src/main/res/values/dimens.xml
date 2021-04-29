@@ -24,6 +24,14 @@
     <dimen name="chat_new_messages_card_corner_radius">21dp</dimen>
     <dimen name="chat_new_messages_elevation">2dp</dimen>
 
+    <dimen name="chat_attachment_corner_radius">4dp</dimen>
+    <dimen name="chat_attachment_stroke_width">1dp</dimen>
+    <dimen name="chat_attachment_type_indicator_size">52dp</dimen>
+    <dimen name="chat_attachment_progressbar_height">8dp</dimen>
+
+    <dimen name="chat_attachment_menu_corner_radius">14dp</dimen>
+    <dimen name="chat_attachment_menu_min_width">250dp</dimen>
+
     <dimen name="chat_head_size">64dp</dimen>
     <dimen name="chat_head_placeholder_size">32dp</dimen>
 

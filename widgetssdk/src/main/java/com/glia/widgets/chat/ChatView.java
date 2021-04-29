@@ -1,15 +1,18 @@
 package com.glia.widgets.chat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,7 +29,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,10 +39,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.fileupload.model.FileAttachment;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
@@ -57,6 +64,8 @@ import com.google.android.material.shape.MarkerEdgeTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class ChatView extends ConstraintLayout {
@@ -76,6 +85,9 @@ public class ChatView extends ConstraintLayout {
 
     private RecyclerView chatRecyclerView;
     private ImageButton sendButton;
+    private ImageButton addAttachmentButton;
+    private FileUploadMenuView addAttachmentMenu;
+    private RecyclerView attachmentsRecyclerView;
     private EditText chatEditText;
     private ChatAdapter adapter;
     private AppBarView appBar;
@@ -86,6 +98,13 @@ public class ChatView extends ConstraintLayout {
     private TextView newMessagesCountBadgeView;
 
     private boolean isInBottom = true;
+    // PhotoFileUri is needed because we receive empty Intent on result with extras cleared
+    private Uri photoCaptureFileUri = null;
+    private static final int OPEN_DOCUMENT_ACTION_REQUEST = 100;
+    private static final int CAPTURE_IMAGE_ACTION_REQUEST = 101;
+    private static final int CAPTURE_VIDEO_ACTION_REQUEST = 102;
+    private static final int CAMERA_PERMISSION_REQUEST = 1010;
+    private static final String FILE_PROVIDER_AUTHORITY = "com.glia.widgets.fileprovider";
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
@@ -331,6 +350,7 @@ public class ChatView extends ConstraintLayout {
         adapter.unregisterAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(null);
         chatRecyclerView.removeOnScrollListener(onScrollListener);
+        attachmentsRecyclerView.setAdapter(null);
 
         if (screenSharingController != null) {
             screenSharingController.onDestroy(true);
@@ -352,8 +372,17 @@ public class ChatView extends ConstraintLayout {
         }
     }
 
+    private UploadAttachmentAdapter uploadAttachmentAdapter;
+
     private void initControls() {
         callback = new ChatViewCallback() {
+            @Override
+            public void emitUploadAttachments(List<FileAttachment> attachments) {
+                post(() -> {
+                    uploadAttachmentAdapter.submitList(attachments);
+                });
+            }
+
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
@@ -615,6 +644,7 @@ public class ChatView extends ConstraintLayout {
         View view = View.inflate(this.getContext(), R.layout.chat_view, this);
         chatRecyclerView = view.findViewById(R.id.chat_recycler_view);
         sendButton = view.findViewById(R.id.send_button);
+        addAttachmentButton = view.findViewById(R.id.add_attachment_button);
         chatEditText = view.findViewById(R.id.chat_edit_text);
         appBar = view.findViewById(R.id.app_bar_view);
         dividerView = view.findViewById(R.id.divider_view);
@@ -622,6 +652,8 @@ public class ChatView extends ConstraintLayout {
         newMessagesCardView = view.findViewById(R.id.new_messages_indicator_card);
         newMessagesOperatorStatusView = view.findViewById(R.id.new_messages_indicator_image);
         newMessagesCountBadgeView = view.findViewById(R.id.new_messages_badge_view);
+        addAttachmentMenu = view.findViewById(R.id.add_attachment_menu);
+        attachmentsRecyclerView = view.findViewById(R.id.add_attachment_queue);
     }
 
     private void setupViewAppearance() {
@@ -632,6 +664,14 @@ public class ChatView extends ConstraintLayout {
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
         chatRecyclerView.addOnScrollListener(onScrollListener);
+
+        uploadAttachmentAdapter = new UploadAttachmentAdapter();
+        uploadAttachmentAdapter.setItemCallback(attachment -> {
+            controller.onRemoveAttachment(attachment);
+        });
+
+        attachmentsRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        attachmentsRecyclerView.setAdapter(uploadAttachmentAdapter);
 
         appBar.setTheme(this.theme);
 
@@ -726,6 +766,55 @@ public class ChatView extends ConstraintLayout {
             }
         });
 
+        addAttachmentButton.setOnClickListener(view -> {
+            if (addAttachmentMenu.getVisibility() == VISIBLE)
+                addAttachmentMenu.hide();
+            else
+                addAttachmentMenu.show();
+        });
+
+        addAttachmentMenu.setCallback(
+                new FileUploadMenuView.Callback() {
+                    @Override
+                    public void onGalleryClicked() {
+                        addAttachmentMenu.hide();
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                        Utils.getActivity(getContext()).startActivityForResult(
+                                Intent.createChooser(intent, "Select Picture"),
+                                OPEN_DOCUMENT_ACTION_REQUEST
+                        );
+                    }
+
+                    @Override
+                    public void onTakePhotoClicked() {
+                        addAttachmentMenu.hide();
+                        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                            dispatchImageCapture();
+                        } else {
+                            Utils.getActivity(getContext())
+                                    .requestPermissions(
+                                            new String[]{Manifest.permission.CAMERA},
+                                            CAMERA_PERMISSION_REQUEST
+                                    );
+                        }
+                    }
+
+                    @Override
+                    public void onBrowseClicked() {
+                        addAttachmentMenu.hide();
+                        Intent intent = new Intent();
+                        intent.setType("*/*");
+                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                        Utils.getActivity(getContext()).startActivityForResult(
+                                Intent.createChooser(intent, "Select file"),
+                                OPEN_DOCUMENT_ACTION_REQUEST
+                        );
+                    }
+                }
+        );
+
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
                 controller.onBackArrowClicked();
@@ -753,6 +842,27 @@ public class ChatView extends ConstraintLayout {
                 controller.newMessagesIndicatorClicked();
             }
         });
+    }
+
+    private void dispatchImageCapture() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File photoFile = null;
+        try {
+            photoFile = Utils.createTempPhotoFile(getContext());
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+
+        if (photoFile != null) {
+            photoCaptureFileUri = FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, photoFile);
+            if (photoCaptureFileUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoCaptureFileUri);
+                Utils.getActivity(getContext()).startActivityForResult(
+                        intent,
+                        CAPTURE_IMAGE_ACTION_REQUEST
+                );
+            }
+        }
     }
 
     private void showExitQueueDialog() {
@@ -951,6 +1061,24 @@ public class ChatView extends ConstraintLayout {
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
+        }
+    }
+
+    private static Uri chooseUriByRequestCode(int requestCode, Uri galeryImgUri, Uri cameraImgUri) {
+        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST) return galeryImgUri;
+        else if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) return cameraImgUri;
+        else return null;
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if ((requestCode == OPEN_DOCUMENT_ACTION_REQUEST || requestCode == CAPTURE_IMAGE_ACTION_REQUEST || requestCode == CAPTURE_VIDEO_ACTION_REQUEST)
+                && resultCode == Activity.RESULT_OK) {
+
+            Uri uri = chooseUriByRequestCode(requestCode, intent.getData(), photoCaptureFileUri);
+
+            if (uri != null) {
+                controller.onAttachmentReceived(uri);
+            }
         }
     }
 

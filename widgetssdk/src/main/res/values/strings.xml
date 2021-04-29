@@ -72,4 +72,20 @@
     <string name="notification_video_call_message">Operator might see and hear You</string>
     <string name="notification_action_end_sharing">END SHARING</string>
 
+    <string name="chat_attachment_upload_checking_file">Checking File…</string>
+    <string name="chat_attachment_upload_ready_to_send">Ready to send</string>
+    <string name="chat_attachment_upload_failed_upload">Upload failed</string>
+    <string name="chat_attachment_upload_uploading">Uploading File…</string>
+    <string name="chat_attachment_upload_error_network_time_out">Nework time out</string>
+    <string name="chat_attachment_upload_error_invalid_input">Invalid input</string>
+    <string name="chat_attachment_upload_error_read_access_permissions_denied">File read access permission denied</string>
+    <string name="chat_attachment_upload_error_file_type_invalid">Invalid file type</string>
+    <string name="chat_attachment_upload_error_file_size_over_limit">File size over 25mb limit</string>
+    <string name="chat_attachment_upload_error_engagement_missing">Engagement missing</string>
+    <string name="chat_attachment_upload_error_internal_error">Internal error</string>
+    <string name="chat_attachment_upload_menu_browse">Browse</string>
+    <string name="chat_attachment_upload_menu_take_photo">Take Photo</string>
+    <string name="chat_attachment_upload_menu_gallery">Photo library</string>
+    <string name="chat_attachment_download_button_label">Download</string>
+
 </resources>

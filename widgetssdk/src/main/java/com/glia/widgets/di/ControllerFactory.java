@@ -8,6 +8,10 @@ import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -77,7 +81,12 @@ public class ControllerFactory {
                     useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase()
+                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
+                    useCaseFactory.createAddFileAttachmentsObserverUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
+                    useCaseFactory.createGetFileAttachmentsUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentUseCase()
             );
         }
 
@@ -107,7 +116,12 @@ public class ControllerFactory {
                     useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase()
+                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
+                    useCaseFactory.createAddFileAttachmentsObserverUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
+                    useCaseFactory.createGetFileAttachmentsUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

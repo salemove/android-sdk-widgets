@@ -1,5 +1,8 @@
 package com.glia.widgets.chat.adapter;
 
+import com.glia.androidsdk.chat.AttachmentFile;
+
+import java.util.Arrays;
 import java.util.Objects;
 
 public class VisitorMessageItem extends ChatItem {
@@ -8,12 +11,14 @@ public class VisitorMessageItem extends ChatItem {
     private final String id;
     private final boolean showDelivered;
     private final String message;
+    private final AttachmentFile[] attachmentFiles;
 
-    public VisitorMessageItem(String id, boolean showDelivered, String message) {
+    public VisitorMessageItem(String id, boolean showDelivered, String message, AttachmentFile[] attachmentFiles) {
         super(id, ChatAdapter.VISITOR_MESSAGE_TYPE);
         this.id = id;
         this.showDelivered = showDelivered;
         this.message = message;
+        this.attachmentFiles = attachmentFiles;
     }
 
     public String getMessage() {
@@ -28,12 +33,17 @@ public class VisitorMessageItem extends ChatItem {
         return showDelivered;
     }
 
+    public AttachmentFile[] getAttachmentFiles() {
+        return attachmentFiles;
+    }
+
     @Override
     public String toString() {
         return "VisitorMessageItem{" +
                 "id='" + id + '\'' +
                 ", showDelivered=" + showDelivered +
                 ", message='" + message + '\'' +
+                ", attachmentFiles='" + attachmentFiles != null ? Arrays.toString(attachmentFiles) : "null" + '\'' +
                 '}';
     }
 

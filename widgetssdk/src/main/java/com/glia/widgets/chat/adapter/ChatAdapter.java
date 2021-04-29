@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.widgets.R;
@@ -24,6 +25,7 @@ import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -127,11 +129,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static class VisitorMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView content;
         private final TextView deliveredView;
+        private final RecyclerView attachmentsView;
 
         public VisitorMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
             super(itemView);
             this.content = itemView.findViewById(R.id.content);
             this.deliveredView = itemView.findViewById(R.id.delivered_view);
+            this.attachmentsView = itemView.findViewById(R.id.file_recycler_view);
             Context context = itemView.getContext();
             ColorStateList primaryBrandColor = ContextCompat.getColorStateList(context, uiTheme.getBrandPrimaryColor());
             content.setBackgroundTintList(primaryBrandColor);
@@ -147,6 +151,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void bind(VisitorMessageItem item) {
             content.setText(item.getMessage());
             deliveredView.setVisibility(item.isShowDelivered() ? View.VISIBLE : View.GONE);
+            bindAttachments(item);
+        }
+
+        private void bindAttachments(VisitorMessageItem item) {
+            if (item.getAttachmentFiles() != null) {
+                attachmentsView.setVisibility(View.VISIBLE);
+                attachmentsView.setLayoutManager(new LinearLayoutManager(attachmentsView.getContext()));
+                ChatVisitorMessageAttachmentAdapter attachmentAdapter = new ChatVisitorMessageAttachmentAdapter();
+                attachmentAdapter.submitList(Arrays.asList(item.getAttachmentFiles()));
+                attachmentsView.setAdapter(attachmentAdapter);
+            } else {
+                attachmentsView.setAdapter(null);
+                attachmentsView.setVisibility(View.GONE);
+            }
         }
     }
 

@@ -1,10 +1,14 @@
 package com.glia.widgets.chat;
 
+import android.net.Uri;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.FilesAttachment;
 import com.glia.androidsdk.chat.MessageAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.SingleChoiceOption;
@@ -29,6 +33,12 @@ import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
+import com.glia.widgets.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.fileupload.model.FileAttachment;
 import com.glia.widgets.glia.GliaLoadHistoryUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
@@ -54,6 +64,8 @@ import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
@@ -121,6 +133,21 @@ public class ChatController implements
     private final UpdatePermissionsUseCase updatePermissionsUseCase;
     private final ResetPermissionsUseCase resetPermissionsUseCase;
 
+    private final AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase;
+    private final RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase;
+
+    private final AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase;
+    private final GetFileAttachmentsUseCase getFileAttachmentsUseCase;
+    private final RemoveFileAttachmentUseCase removeFileAttachmentUseCase;
+
+    private final Observer fileAttachmentObserver = new Observer() {
+        @Override
+        public void update(Observable observable, Object o) {
+            if (viewCallback != null)
+                viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
+        }
+    };
+
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
@@ -147,7 +174,12 @@ public class ChatController implements
                           CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
                           UpdateDialogShownUseCase updateDialogShownUseCase,
                           UpdatePermissionsUseCase updatePermissionsUseCase,
-                          ResetPermissionsUseCase resetPermissionsUseCase
+                          ResetPermissionsUseCase resetPermissionsUseCase,
+                          AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase,
+                          AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase,
+                          RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
+                          GetFileAttachmentsUseCase getFileAttachmentsUseCase,
+                          RemoveFileAttachmentUseCase removeFileAttachmentUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -192,6 +224,11 @@ public class ChatController implements
         this.updatePermissionsUseCase = updatePermissionsUseCase;
         this.resetPermissionsUseCase = resetPermissionsUseCase;
         this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
+        this.addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase;
+        this.addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase;
+        this.removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase;
+        this.getFileAttachmentsUseCase = getFileAttachmentsUseCase;
+        this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
     }
 
     public void initChat(String companyName,
@@ -203,6 +240,7 @@ public class ChatController implements
         }
         emitViewState(chatState.initChat(companyName, queueId, contextUrl));
         loadHistoryUseCase.execute(this);
+        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver);
         initMediaUpgradeCallback();
         initMinimizeCallback();
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
@@ -239,6 +277,7 @@ public class ChatController implements
             Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
                     "\n(State): " + state.toString());
             viewCallback.emitItems(state.chatItems);
+            viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
         }
     }
 
@@ -262,6 +301,7 @@ public class ChatController implements
             onMessageUseCase.unregisterListener(this);
             sendMessageUseCase.unregisterListener(this);
             resetPermissionsUseCase.execute();
+            removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
         }
     }
 
@@ -293,10 +333,11 @@ public class ChatController implements
         return valid;
     }
 
+
     private void appendUnsentMessage(String message) {
         Logger.d(TAG, "appendUnsentMessage: " + message);
         List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
-        VisitorMessageItem unsentItem = new VisitorMessageItem(VisitorMessageItem.UNSENT_MESSAGE_ID, false, message);
+        VisitorMessageItem unsentItem = new VisitorMessageItem(VisitorMessageItem.UNSENT_MESSAGE_ID, false, message, null);
         unsentMessages.add(unsentItem);
         emitViewState(chatState.changeUnsentMessages(unsentMessages));
 
@@ -361,6 +402,7 @@ public class ChatController implements
         this.viewCallback = chatViewCallback;
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
+        viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
         viewCallback.setLastTypedText(chatState.lastTypedText);
 
         // always start in bottom
@@ -543,10 +585,14 @@ public class ChatController implements
 
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
-            currentChatItems.add(new VisitorMessageItem(VisitorMessageItem.HISTORY_ID, false, message.getContent()));
+            appendHistoryMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
         }
+    }
+
+    private void appendHistoryMessage(List<ChatItem> currentChatItems, ChatMessage message) {
+        currentChatItems.add(new VisitorMessageItem(VisitorMessageItem.HISTORY_ID, false, message.getContent(), getMessageAttachmentFileArray(message)));
     }
 
     private void appendMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
@@ -576,7 +622,14 @@ public class ChatController implements
             Logger.d(TAG, "Not adding singleChoiceAnswer");
             return;
         }
-        items.add(new VisitorMessageItem(message.getId(), false, message.getContent()));
+
+        AttachmentFile[] attachmentFiles = null;
+        if (attachment instanceof FilesAttachment) {
+            FilesAttachment filesAttachment = (FilesAttachment) attachment;
+            attachmentFiles = filesAttachment.getFiles();
+        }
+
+        items.add(new VisitorMessageItem(message.getId(), false, message.getContent(), attachmentFiles));
     }
 
     private void appendMessagesNotSeen() {
@@ -601,14 +654,12 @@ public class ChatController implements
                 } else if (item.getId().equals(message.getId())) {
                     // the visitormessage. show delivered for it.
                     currentChatItems.remove(i);
-                    currentChatItems.add(i,
-                            new VisitorMessageItem(message.getId(), true, message.getContent()));
+                    currentChatItems
+                            .add(i, new VisitorMessageItem(message.getId(), true, message.getContent(), getMessageAttachmentFileArray(message)));
                 } else if (item.isShowDelivered()) {
                     // remove all other delivered references
                     currentChatItems.remove(i);
-                    currentChatItems.add(i, new VisitorMessageItem(item.getId(),
-                            false,
-                            item.getMessage()));
+                    currentChatItems.add(i, new VisitorMessageItem(item.getId(), false, item.getMessage(), getMessageAttachmentFileArray(message)));
                 }
             }
         }
@@ -715,7 +766,6 @@ public class ChatController implements
             return;
         }
         ChatItem item = chatState.chatItems.get(indexInList);
-
         if (item.getId().equals(id)) {
             OperatorMessageItem choiceCardItem =
                     (OperatorMessageItem) chatState.chatItems.get(indexInList);
@@ -822,7 +872,7 @@ public class ChatController implements
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             int currentMessageIndex = currentChatItems.indexOf(currentMessage);
             currentChatItems.remove(currentMessage);
-            currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent()));
+            currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent(), getMessageAttachmentFileArray(message)));
 
             // emitting state because no need to change recyclerview items here
             emitViewState(chatState.changeItems(currentChatItems));
@@ -847,6 +897,17 @@ public class ChatController implements
                 Logger.d(TAG, "selectedOption: " + attachment.getSelectedOption());
             }
         }
+
+        if (message.getAttachment() != null && message.getAttachment() instanceof FilesAttachment) {
+            FilesAttachment attachment = (FilesAttachment) message.getAttachment();
+
+            if (attachment.getFiles() != null) {
+                for (AttachmentFile file : attachment.getFiles()) {
+                    Logger.d(TAG, "onMessage, file: " + file.getName());
+                }
+            }
+        }
+
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         appendMessageItem(items, message);
         emitChatItems(chatState.changeItems(items));
@@ -939,5 +1000,35 @@ public class ChatController implements
     public void queueForEngagementOngoing() {
         Logger.d(TAG, "queueForEngagementOngoing");
         viewInitQueueing();
+
+    }
+
+    public void onRemoveAttachment(FileAttachment attachment) {
+        removeFileAttachmentUseCase.execute(attachment);
+    }
+
+    private static AttachmentFile[] getMessageAttachmentFileArray(ChatMessage message) {
+        MessageAttachment attachment = message.getAttachment();
+        AttachmentFile[] attachmentFiles = null;
+        if (attachment instanceof FilesAttachment) {
+            FilesAttachment filesAttachment = (FilesAttachment) attachment;
+            attachmentFiles = filesAttachment.getFiles();
+        }
+        return attachmentFiles;
+    }
+
+    public void onAttachmentReceived(Uri uri) {
+        addFileToAttachmentAndUploadUseCase
+                .execute(uri, new AddFileToAttachmentAndUploadUseCase.Listener() {
+                    @Override
+                    public void onSuccess() {
+                        System.out.println("Success");
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
     }
 }

@@ -126,8 +126,7 @@ public class ChatView extends ConstraintLayout {
             super.onItemRangeInserted(positionStart, itemCount);
             int totalItemCount = adapter.getItemCount();
             int lastIndex = totalItemCount - 1;
-            boolean scrollToBottom = isInBottom && positionStart + itemCount >= lastIndex;
-            if (scrollToBottom) {
+            if (isInBottom) {
                 chatRecyclerView.scrollToPosition(lastIndex);
             }
         }
@@ -332,16 +331,29 @@ public class ChatView extends ConstraintLayout {
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
-                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED);
-                    chatEditText.setHint(
-                            chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD ?
-                                    R.string.chat_single_choice_card_hint :
-                                    R.string.chat_enter_message);
-
+                    switch (chatState.chatInputMode) {
+                        case SINGLE_CHOICE_CARD:
+                            chatEditText.setHint(R.string.chat_single_choice_card_hint);
+                            break;
+                        case ENABLED_NO_ENGAGEMENT:
+                            if (chatState.lastTypedText.isEmpty()) {
+                                chatEditText.setHint(R.string.chat_not_started_hint);
+                            } else {
+                                chatEditText.setHint("");
+                            }
+                            break;
+                        default:
+                            chatEditText.setHint(R.string.chat_enter_message);
+                            break;
+                    }
+                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
+                            chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
                     if (chatState.isOperatorOnline()) {
                         appBar.showEndButton();
-                    } else {
+                    } else if (chatState.engagementRequested) {
                         appBar.showXButton();
+                    } else {
+                        appBar.hideLeaveButtons();
                     }
 
                     newMessagesLayout.setVisibility(

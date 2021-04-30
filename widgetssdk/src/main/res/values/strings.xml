@@ -9,6 +9,7 @@
     <string name="chat_upgraded_to_audio_call">Upgraded to Audio call</string>
     <string name="chat_upgraded_to_video_call">Upgraded to Video call</string>
     <string name="chat_single_choice_card_hint">Tap on the answer above</string>
+    <string name="chat_not_started_hint">Enter message to start a new engagement</string>
 
     <!--    top app bar-->
     <string name="top_app_bar_close">Close</string>

@@ -1,12 +1,12 @@
 package com.glia.widgets.di;
 
 import com.glia.widgets.model.GliaCallRepository;
+import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.GliaEngagementRepository;
-import com.glia.widgets.model.GliaMediaStateRepository;
-import com.glia.widgets.model.GliaMessageRepository;
+import com.glia.widgets.model.GliaMediaRepository;
 import com.glia.widgets.model.GliaMessagesNotSeenRepository;
+import com.glia.widgets.model.GliaRepository;
 import com.glia.widgets.model.GliaScreenSharingRepository;
-import com.glia.widgets.model.GliaTicketRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 
 public class RepositoryFactory {
@@ -32,19 +32,19 @@ public class RepositoryFactory {
         return new GliaMessagesNotSeenRepository();
     }
 
-    public GliaMessageRepository getGliaMessageRepository() {
-        return new GliaMessageRepository();
+    public GliaChatRepository getGliaMessageRepository() {
+        return new GliaChatRepository();
     }
 
-    public GliaTicketRepository getGliaTicketRepository() {
-        return new GliaTicketRepository();
+    public GliaRepository getGliaRepository() {
+        return new GliaRepository();
     }
 
     public GliaEngagementRepository getGliaEngagementRepository() {
         return new GliaEngagementRepository();
     }
 
-    public GliaMediaStateRepository getGliaMediaStateRepository() {
-        return new GliaMediaStateRepository();
+    public GliaMediaRepository getGliaMediaStateRepository() {
+        return new GliaMediaRepository();
     }
 }

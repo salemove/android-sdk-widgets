@@ -5,7 +5,7 @@ import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 
-public class GliaMediaStateRepository {
+public class GliaMediaRepository {
     public interface OperatorMediaStateListener {
         void onNewState(OperatorMediaState state);
     }

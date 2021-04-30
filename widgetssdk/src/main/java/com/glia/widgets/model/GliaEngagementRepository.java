@@ -8,29 +8,13 @@ import com.glia.widgets.helper.Logger;
 public class GliaEngagementRepository {
     private final String TAG = "GliaEngagementRepository";
 
-    public interface EngagementListener {
-        void success(OmnicoreEngagement engagement);
+    public void listenForEngagementEnd(OmnicoreEngagement engagement, Runnable engagementEnded) {
+        engagement.on(Engagement.Events.END, engagementEnded);
     }
 
-    public interface EngagementEndListener {
-        void engagementEnded();
-    }
-
-    public void listenForEngagement(EngagementListener listener) {
-        Glia.on(Glia.Events.ENGAGEMENT, listener::success);
-    }
-
-    public void unregisterEngagementListener(EngagementListener listener) {
-        Glia.off(Glia.Events.ENGAGEMENT, listener::success);
-    }
-
-    public void listenForEngagementEnd(OmnicoreEngagement engagement, EngagementEndListener engagementEndListener) {
-        engagement.on(Engagement.Events.END, engagementEndListener::engagementEnded);
-    }
-
-    public void unregisterEngagementEndListener(EngagementEndListener engagementEndListener) {
+    public void unregisterEngagementEndListener(Runnable engagementEnded) {
         Glia.getCurrentEngagement().ifPresent(engagement -> {
-            engagement.off(Engagement.Events.END, engagementEndListener::engagementEnded);
+            engagement.off(Engagement.Events.END, engagementEnded);
         });
     }
 

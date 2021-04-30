@@ -1,19 +1,19 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.widgets.model.GliaMessageRepository;
+import com.glia.widgets.model.GliaChatRepository;
 
 public class GliaOnMessageUseCase implements
-        GliaMessageRepository.MessageListener {
+        GliaChatRepository.MessageListener {
 
     public interface Listener {
         void onMessage(ChatMessage message);
     }
 
-    private final GliaMessageRepository messageRepository;
+    private final GliaChatRepository messageRepository;
     private Listener listener;
 
-    public GliaOnMessageUseCase(GliaMessageRepository messageRepository) {
+    public GliaOnMessageUseCase(GliaChatRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 

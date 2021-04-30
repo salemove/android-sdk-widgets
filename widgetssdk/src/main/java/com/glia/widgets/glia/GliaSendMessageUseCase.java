@@ -4,7 +4,7 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
-import com.glia.widgets.model.GliaMessageRepository;
+import com.glia.widgets.model.GliaChatRepository;
 
 public class GliaSendMessageUseCase implements RequestCallback<VisitorMessage> {
 
@@ -12,10 +12,10 @@ public class GliaSendMessageUseCase implements RequestCallback<VisitorMessage> {
         void messageSent(VisitorMessage message, GliaException exception);
     }
 
-    private final GliaMessageRepository repository;
+    private final GliaChatRepository repository;
     private Listener listener;
 
-    public GliaSendMessageUseCase(GliaMessageRepository repository) {
+    public GliaSendMessageUseCase(GliaChatRepository repository) {
         this.repository = repository;
     }
 
@@ -24,7 +24,7 @@ public class GliaSendMessageUseCase implements RequestCallback<VisitorMessage> {
         repository.sendMessage(message, this);
     }
 
-    public void execute(SingleChoiceAttachment singleChoiceAttachment, Listener listener){
+    public void execute(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
         repository.sendMessage(singleChoiceAttachment, this);
     }
 

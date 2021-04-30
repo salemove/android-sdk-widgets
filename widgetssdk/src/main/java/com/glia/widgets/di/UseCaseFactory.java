@@ -66,11 +66,11 @@ public class UseCaseFactory {
     }
 
     public GliaQueueForEngagementUseCase createQueueForEngagementuseCase() {
-        return new GliaQueueForEngagementUseCase(repositoryFactory.getGliaTicketRepository());
+        return new GliaQueueForEngagementUseCase(repositoryFactory.getGliaRepository());
     }
 
     public GliaCancelQueueTicketUseCase createCancelQueueTicketUseCase() {
-        return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaTicketRepository());
+        return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaRepository());
     }
 
     public GliaEndEngagementUseCase createEndEngagementUseCase() {
@@ -78,7 +78,7 @@ public class UseCaseFactory {
     }
 
     public GliaOnEngagementUseCase createOnEngagementUseCase() {
-        return new GliaOnEngagementUseCase(repositoryFactory.getGliaEngagementRepository());
+        return new GliaOnEngagementUseCase(repositoryFactory.getGliaRepository());
     }
 
     public GliaOnEngagementEndUseCase createOnEngagementEndUseCase() {
@@ -96,10 +96,6 @@ public class UseCaseFactory {
         return new GliaOnOperatorMediaStateUseCase(repositoryFactory.getGliaMediaStateRepository());
     }
 
-    public GliaQueueForEngagementUseCase createGliaQueueForEngagementUseCase() {
-        return new GliaQueueForEngagementUseCase(repositoryFactory.getGliaTicketRepository());
-    }
-
     public GliaSendMessagePreviewUseCase createGliaSendMessagePreviewUseCase() {
         return new GliaSendMessagePreviewUseCase(repositoryFactory.getGliaMessageRepository());
     }
@@ -109,6 +105,6 @@ public class UseCaseFactory {
     }
 
     public GliaOnQueueTicketUseCase createGliaOnQueueTicketUseCase() {
-        return new GliaOnQueueTicketUseCase(repositoryFactory.getGliaTicketRepository());
+        return new GliaOnQueueTicketUseCase(repositoryFactory.getGliaRepository());
     }
 }

@@ -1,19 +1,22 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.widgets.model.GliaTicketRepository;
+import com.glia.widgets.model.GliaRepository;
 
-public class GliaQueueForEngagementUseCase implements GliaTicketRepository.QueueForEngagementListener {
+import java.util.function.Consumer;
+
+public class GliaQueueForEngagementUseCase implements Consumer<GliaException> {
 
     public interface Listener {
         void queueForEngagementSuccess();
+
         void error(GliaException exception);
     }
 
-    private final GliaTicketRepository repository;
+    private final GliaRepository repository;
     private Listener listener;
 
-    public GliaQueueForEngagementUseCase(GliaTicketRepository repository) {
+    public GliaQueueForEngagementUseCase(GliaRepository repository) {
         this.repository = repository;
     }
 
@@ -29,9 +32,13 @@ public class GliaQueueForEngagementUseCase implements GliaTicketRepository.Queue
     }
 
     @Override
-    public void success(GliaException exception) {
-        if (exception != null) {
-            this.listener.error(exception);
+    public void accept(GliaException exception) {
+        if (listener != null) {
+            if (exception != null) {
+                this.listener.error(exception);
+            } else {
+                this.listener.queueForEngagementSuccess();
+            }
         }
     }
 }

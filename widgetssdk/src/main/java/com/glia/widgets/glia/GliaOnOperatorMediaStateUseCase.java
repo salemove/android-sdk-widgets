@@ -1,18 +1,18 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.comms.OperatorMediaState;
-import com.glia.widgets.model.GliaMediaStateRepository;
+import com.glia.widgets.model.GliaMediaRepository;
 
-public class GliaOnOperatorMediaStateUseCase implements GliaMediaStateRepository.OperatorMediaStateListener {
+public class GliaOnOperatorMediaStateUseCase implements GliaMediaRepository.OperatorMediaStateListener {
 
     public interface Listener {
         void onNewOperatorMediaState(OperatorMediaState operatorMediaState);
     }
 
-    private final GliaMediaStateRepository repository;
+    private final GliaMediaRepository repository;
     private Listener listener;
 
-    public GliaOnOperatorMediaStateUseCase(GliaMediaStateRepository repository) {
+    public GliaOnOperatorMediaStateUseCase(GliaMediaRepository repository) {
         this.repository = repository;
     }
 

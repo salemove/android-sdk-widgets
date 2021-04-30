@@ -1,18 +1,20 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.queuing.QueueTicket;
-import com.glia.widgets.model.GliaTicketRepository;
+import com.glia.widgets.model.GliaRepository;
 
-public class GliaOnQueueTicketUseCase implements GliaTicketRepository.TicketChangesListener {
+import java.util.function.Consumer;
+
+public class GliaOnQueueTicketUseCase implements Consumer<QueueTicket> {
 
     public interface Listener {
         void ticketLoaded(String ticket);
     }
 
-    private final GliaTicketRepository repository;
+    private final GliaRepository repository;
     private Listener listener;
 
-    public GliaOnQueueTicketUseCase(GliaTicketRepository repository) {
+    public GliaOnQueueTicketUseCase(GliaRepository repository) {
         this.repository = repository;
     }
 
@@ -23,12 +25,13 @@ public class GliaOnQueueTicketUseCase implements GliaTicketRepository.TicketChan
 
     public void unregisterListener(Listener listener) {
         if (this.listener == listener) {
+            repository.unRegister(this);
             this.listener = null;
         }
     }
 
     @Override
-    public void newTicket(QueueTicket ticket) {
+    public void accept(QueueTicket ticket) {
         if (this.listener != null) {
             listener.ticketLoaded(ticket.getId());
         }

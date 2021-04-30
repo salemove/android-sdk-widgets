@@ -1,9 +1,9 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.widgets.model.GliaMessageRepository;
+import com.glia.widgets.model.GliaChatRepository;
 
-public class GliaLoadHistoryUseCase implements GliaMessageRepository.HistoryLoadedListener {
+public class GliaLoadHistoryUseCase implements GliaChatRepository.HistoryLoadedListener {
 
     public interface Listener {
         void historyLoaded(ChatMessage[] messages);
@@ -11,16 +11,16 @@ public class GliaLoadHistoryUseCase implements GliaMessageRepository.HistoryLoad
         void error(Throwable error);
     }
 
-    private final GliaMessageRepository gliaMessageRepository;
+    private final GliaChatRepository gliaChatRepository;
     private Listener listener;
 
-    public GliaLoadHistoryUseCase(GliaMessageRepository gliaMessageRepository) {
-        this.gliaMessageRepository = gliaMessageRepository;
+    public GliaLoadHistoryUseCase(GliaChatRepository gliaChatRepository) {
+        this.gliaChatRepository = gliaChatRepository;
     }
 
     public void execute(Listener listener) {
         this.listener = listener;
-        gliaMessageRepository.loadHistory(this);
+        gliaChatRepository.loadHistory(this);
     }
 
     public void unregisterListener(Listener listener) {

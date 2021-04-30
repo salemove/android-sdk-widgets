@@ -1,16 +1,16 @@
 package com.glia.widgets.glia;
 
-import com.glia.widgets.model.GliaMessageRepository;
+import com.glia.widgets.model.GliaChatRepository;
 
 public class GliaSendMessagePreviewUseCase {
 
-    private final GliaMessageRepository gliaMessageRepository;
+    private final GliaChatRepository gliaChatRepository;
 
-    public GliaSendMessagePreviewUseCase(GliaMessageRepository gliaMessageRepository) {
-        this.gliaMessageRepository = gliaMessageRepository;
+    public GliaSendMessagePreviewUseCase(GliaChatRepository gliaChatRepository) {
+        this.gliaChatRepository = gliaChatRepository;
     }
 
     public void execute(String message) {
-        gliaMessageRepository.sendMessagePreview(message);
+        gliaChatRepository.sendMessagePreview(message);
     }
 }

@@ -7,7 +7,7 @@ import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 
-public class GliaMessageRepository {
+public class GliaChatRepository {
 
     public interface HistoryLoadedListener {
         void loaded(ChatMessage[] messages, Throwable error);

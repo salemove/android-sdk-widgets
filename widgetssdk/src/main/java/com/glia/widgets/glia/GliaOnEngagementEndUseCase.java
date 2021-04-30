@@ -5,7 +5,7 @@ import com.glia.widgets.model.GliaEngagementRepository;
 
 public class GliaOnEngagementEndUseCase implements
         GliaOnEngagementUseCase.Listener,
-        GliaEngagementRepository.EngagementEndListener {
+        Runnable {
 
     public interface Listener {
         void engagementEnded();
@@ -39,7 +39,7 @@ public class GliaOnEngagementEndUseCase implements
     }
 
     @Override
-    public void engagementEnded() {
+    public void run() {
         if (this.listener != null) {
             listener.engagementEnded();
         }

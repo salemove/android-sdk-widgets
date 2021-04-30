@@ -1,12 +1,12 @@
 package com.glia.widgets.glia;
 
-import com.glia.widgets.model.GliaTicketRepository;
+import com.glia.widgets.model.GliaRepository;
 
 public class GliaCancelQueueTicketUseCase {
 
-    private final GliaTicketRepository repository;
+    private final GliaRepository repository;
 
-    public GliaCancelQueueTicketUseCase(GliaTicketRepository repository) {
+    public GliaCancelQueueTicketUseCase(GliaRepository repository) {
         this.repository = repository;
     }
 

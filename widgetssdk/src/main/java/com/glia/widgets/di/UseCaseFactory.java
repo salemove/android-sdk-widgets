@@ -18,6 +18,7 @@ import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCa
 import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.permissions.CheckIfHasPermissionsUseCase;
 import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
 import com.glia.widgets.permissions.ResetPermissionsUseCase;
 import com.glia.widgets.permissions.UpdateDialogShownUseCase;
@@ -130,5 +131,9 @@ public class UseCaseFactory {
 
     public ResetPermissionsUseCase createResetPermissionsUseCase() {
         return new ResetPermissionsUseCase(permissionsManager);
+    }
+
+    public CheckIfHasPermissionsUseCase createCheckIfHasPermissionsUseCase() {
+        return new CheckIfHasPermissionsUseCase(permissionsManager);
     }
 }

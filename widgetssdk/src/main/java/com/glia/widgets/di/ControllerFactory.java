@@ -42,6 +42,7 @@ public class ControllerFactory {
                 useCaseFactory.createGliaOnQueueTicketUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase(),
                 useCaseFactory.createGliaOnOperatorMediaStateUseCase(),
+                useCaseFactory.createCheckIfHasPermissionsUseCase(),
                 messagesNotSeenHandler
         );
         this.useCaseFactory = useCaseFactory;

@@ -15,7 +15,6 @@ class ChatHeadState {
     public final boolean areIntegratedViewsVisible;
     public final boolean isOverlayVisible;
     public final boolean useOverlays;
-    public final boolean hasOverlayPermissions;
     // if false then chat heads are off completely
     public final boolean useChatHeads;
     public final boolean engagementRequested;
@@ -29,7 +28,6 @@ class ChatHeadState {
             boolean areIntegratedViewsVisible,
             boolean isOverlayVisible,
             boolean useOverlays,
-            boolean hasOverlayPermissions,
             boolean useChatHeads,
             boolean engagementRequested) {
         this.messageCount = messageCount;
@@ -40,7 +38,6 @@ class ChatHeadState {
         this.areIntegratedViewsVisible = areIntegratedViewsVisible;
         this.isOverlayVisible = isOverlayVisible;
         this.useOverlays = useOverlays;
-        this.hasOverlayPermissions = hasOverlayPermissions;
         this.useChatHeads = useChatHeads;
         this.engagementRequested = engagementRequested;
     }
@@ -83,10 +80,6 @@ class ChatHeadState {
         return new Builder().copyFrom(this).setUseOverlays(useOverlays).createChatHeadState();
     }
 
-    public ChatHeadState setHasOverlayPermissions(boolean hasOverlayPermissions) {
-        return new Builder().copyFrom(this).setHasOverlayPermissions(hasOverlayPermissions).createChatHeadState();
-    }
-
     public ChatHeadState enableChatHeadsChanged(boolean enableChatHeads) {
         return new Builder().copyFrom(this).setUseChatHeads(enableChatHeads).createChatHeadState();
     }
@@ -107,7 +100,6 @@ class ChatHeadState {
         private boolean areIntegratedViewsVisible;
         private boolean isOverlayVisible;
         private boolean useOverlays;
-        private boolean hasOverlayPermissions;
         // if false then chat heads are off completely
         private boolean useChatHeads;
         private boolean engagementRequested;
@@ -121,7 +113,6 @@ class ChatHeadState {
             areIntegratedViewsVisible = chatHeadState.areIntegratedViewsVisible;
             isOverlayVisible = chatHeadState.isOverlayVisible;
             useOverlays = chatHeadState.useOverlays;
-            hasOverlayPermissions = chatHeadState.hasOverlayPermissions;
             useChatHeads = chatHeadState.useChatHeads;
             engagementRequested = chatHeadState.engagementRequested;
             return this;
@@ -167,11 +158,6 @@ class ChatHeadState {
             return this;
         }
 
-        public Builder setHasOverlayPermissions(boolean hasOverlayPermissions) {
-            this.hasOverlayPermissions = hasOverlayPermissions;
-            return this;
-        }
-
         public Builder setUseChatHeads(boolean useChatHeads) {
             this.useChatHeads = useChatHeads;
             return this;
@@ -192,7 +178,6 @@ class ChatHeadState {
                     areIntegratedViewsVisible,
                     isOverlayVisible,
                     useOverlays,
-                    hasOverlayPermissions,
                     useChatHeads,
                     engagementRequested
             );
@@ -210,7 +195,6 @@ class ChatHeadState {
                 ", areIntegratedViewsVisible=" + areIntegratedViewsVisible +
                 ", isOverlayVisible=" + isOverlayVisible +
                 ", useOverlays=" + useOverlays +
-                ", hasOverlayPermissions=" + hasOverlayPermissions +
                 ", useChatHeads=" + useChatHeads +
                 ", engagementRequested: " + engagementRequested +
                 '}';
@@ -225,7 +209,6 @@ class ChatHeadState {
                 areIntegratedViewsVisible == that.areIntegratedViewsVisible &&
                 isOverlayVisible == that.isOverlayVisible &&
                 useOverlays == that.useOverlays &&
-                hasOverlayPermissions == that.hasOverlayPermissions &&
                 Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                 Objects.equals(theme, that.theme) &&
                 Objects.equals(operatorMediaState, that.operatorMediaState) &&
@@ -236,6 +219,6 @@ class ChatHeadState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(messageCount, operatorProfileImgUrl, theme, operatorMediaState, returnDestination, areIntegratedViewsVisible, isOverlayVisible, useOverlays, hasOverlayPermissions, useChatHeads, engagementRequested);
+        return Objects.hash(messageCount, operatorProfileImgUrl, theme, operatorMediaState, returnDestination, areIntegratedViewsVisible, isOverlayVisible, useOverlays, useChatHeads, engagementRequested);
     }
 }

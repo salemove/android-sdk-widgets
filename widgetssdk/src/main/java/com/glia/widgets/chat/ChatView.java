@@ -222,7 +222,9 @@ public class ChatView extends ConstraintLayout {
                     activity instanceof ChatActivity && useOverlays,
                     activity instanceof ChatActivity && savedInstanceState != null,
                     this.theme,
-                    Settings.canDrawOverlays(this.getContext())
+                    Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
             );
         }
     }

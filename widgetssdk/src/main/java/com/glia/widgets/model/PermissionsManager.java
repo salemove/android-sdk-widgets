@@ -19,6 +19,18 @@ public class PermissionsManager {
         }
     }
 
+    public boolean checkIfHasPermission(PermissionType permissionType) {
+        if (permissionType == PermissionType.OVERLAY) {
+            return permissionsState.hasOverlayPermissions;
+        } else if (permissionType == PermissionType.CALL_CHANNEL) {
+            return permissionsState.isCallChannelEnabled;
+        } else if (permissionType == PermissionType.SCREEN_SHARING_CHANNEL) {
+            return permissionsState.isScreenSharingChannelEnabled;
+        } else {
+            throw new IllegalArgumentException("Unknown permission type: " + permissionType);
+        }
+    }
+
     public void setOverlayPermissions(boolean hasOverlayPermissions) {
         this.permissionsState = permissionsState.hasOverlayPermissionsChanged(hasOverlayPermissions);
     }

@@ -181,10 +181,15 @@ public class ChatController implements
                          boolean useOverlays,
                          boolean isConfigurationChange,
                          UiTheme uiTheme,
-                         boolean hasOverlayPermissions
+                         boolean hasOverlayPermissions,
+                         boolean isCallNotificationChannelEnabled,
+                         boolean isScreenSharingNotificationChannelEnabled
     ) {
-        chatHeadsController.setHasOverlayPermissions(hasOverlayPermissions);
-        chatHeadsController.setEnableChatHeads(enableChatHeads);
+        updatePermissionsUseCase.execute(
+                hasOverlayPermissions,
+                isCallNotificationChannelEnabled,
+                isScreenSharingNotificationChannelEnabled
+        );
         if (!isConfigurationChange) {
             chatHeadsController.onNavigatedToChat(
                     new ChatHeadInput(
@@ -200,7 +205,7 @@ public class ChatController implements
         }
         emitViewState(chatState.initChat(companyName, queueId, contextUrl));
         loadHistoryUseCase.execute(this);
-        chatHeadsController.setUseOverlays(useOverlays);
+        chatHeadsController.init(enableChatHeads, useOverlays);
         initMediaUpgradeCallback();
         initMinimizeCallback();
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
@@ -502,6 +507,7 @@ public class ChatController implements
     }
 
     private void viewInitQueueing() {
+        Logger.d(TAG, "viewInitQueueing");
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         if (chatState.operatorStatusItem != null) {
             items.remove(chatState.operatorStatusItem);
@@ -521,24 +527,25 @@ public class ChatController implements
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
-        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         if (chatState.operatorStatusItem != null) {
             // remove previous operator status item
             int operatorStatusItemIndex = items.indexOf(chatState.operatorStatusItem);
+            Logger.d(TAG, "operatorStatusItemIndex: " + operatorStatusItemIndex + ", size: " + items.size());
             items.remove(chatState.operatorStatusItem);
             items.add(operatorStatusItemIndex,
                     OperatorStatusItem.OperatorFoundStatusItem(
                             chatState.companyName,
-                            chatState.getFormattedOperatorName(),
+                            Utils.formatOperatorName(operatorName),
                             profileImgUrl));
         } else {
             items.add(OperatorStatusItem.OperatorFoundStatusItem(
                     chatState.companyName,
-                    chatState.getFormattedOperatorName(),
+                    Utils.formatOperatorName(operatorName),
                     profileImgUrl));
         }
         emitChatItems(chatState.changeItems(items));
+        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
     }
 
     private void stop() {

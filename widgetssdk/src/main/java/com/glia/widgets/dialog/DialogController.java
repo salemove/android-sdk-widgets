@@ -140,6 +140,20 @@ public class DialogController {
         }
     }
 
+    public void showEnableNotificationChannelDialog() {
+        if (isNoDialogShown()) {
+            Logger.d(TAG, "Show Enable Notification Channel Dialog");
+            emitDialogState(new DialogsState.EnableNotificationChannelDialog());
+        }
+    }
+
+    public void showEnableScreenSharingNotificationsAndStartSharingDialog() {
+        if (isNoDialogShown()) {
+            Logger.d(TAG, "Show Enable Notification Channel Dialog");
+            emitDialogState(new DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog());
+        }
+    }
+
     public void addCallback(Callback callback) {
         Logger.d(TAG, "addCallback");
         callback.emitDialog(dialogsState);

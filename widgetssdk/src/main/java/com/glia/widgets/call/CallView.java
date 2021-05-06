@@ -40,6 +40,8 @@ import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.notification.NotificationFactory;
+import com.glia.widgets.notification.device.NotificationManager;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -208,13 +210,18 @@ public class CallView extends ConstraintLayout {
 
     public void onResume() {
         if (controller != null) {
-            controller.onResume(Settings.canDrawOverlays(this.getContext()));
+            controller.onResume(Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID));
             if (operatorVideoView != null) {
                 operatorVideoView.resumeRendering();
             }
             if (visitorVideoView != null) {
                 visitorVideoView.resumeRendering();
             }
+        }
+        if (screenSharingController != null) {
+            screenSharingController.onResume(this.getContext());
         }
     }
 
@@ -372,6 +379,10 @@ public class CallView extends ConstraintLayout {
                     post(() -> showScreenSharingDialog());
                 } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
                     post(() -> showScreenSharingEndDialog());
+                } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
+                    post(() -> showAllowNotificationsDialog());
+                } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
+                    post(() -> showAllowScreenSharingNotificationsAndStartSharingDialog());
                 }
             }
         };
@@ -381,6 +392,60 @@ public class CallView extends ConstraintLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void showAllowScreenSharingNotificationsAndStartSharingDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showOptionsDialog(
+                    this.getContext(),
+                    this.theme,
+                    resources.getString(R.string.dialog_screen_sharing_offer_enable_notifications_title),
+                    resources.getString(R.string.dialog_screen_sharing_offer_enable_notifications_message),
+                    resources.getString(R.string.dialog_yes),
+                    resources.getString(R.string.dialog_no),
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        NotificationManager.openNotificationChannelScreen(this.getContext());
+                    },
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        screenSharingController.onScreenSharingDeclined();
+                    },
+                    dialog -> {
+                        dialog.dismiss();
+                        controller.notificationsDialogDismissed();
+                        screenSharingController.onScreenSharingDeclined();
+                    }
+            );
+        }
+    }
+
+    private void showAllowNotificationsDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showOptionsDialog(
+                    this.getContext(),
+                    this.theme,
+                    resources.getString(R.string.dialog_allow_notifications_title),
+                    resources.getString(R.string.dialog_allow_notifications_message),
+                    resources.getString(R.string.dialog_yes),
+                    resources.getString(R.string.dialog_no),
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        NotificationManager.openNotificationChannelScreen(this.getContext());
+                    },
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                    },
+                    dialog -> {
+                        dialog.dismiss();
+                        controller.notificationsDialogDismissed();
+                    }
+            );
+        }
     }
 
     private void showScreenSharingDialog() {

@@ -40,4 +40,12 @@ public interface DialogsState {
             this.type = type;
         }
     }
+
+    class EnableNotificationChannelDialog implements DialogsState {
+
+    }
+
+    class EnableScreenSharingNotificationsAndStartSharingDialog implements DialogsState {
+
+    }
 }

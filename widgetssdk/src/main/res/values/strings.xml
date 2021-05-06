@@ -40,6 +40,11 @@
     <string name="dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
     <string name="dialog_screen_sharing_end_title">End Screen Sharing?</string>
     <string name="dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
+    <string name="dialog_allow_notifications_title">Allow Notifications?</string>
+    <string name="dialog_allow_notifications_message">The engagement would like to show notifications on the status bar. Open settings to enable notifications?</string>
+    <string name="dialog_screen_sharing_offer_enable_notifications_title">Share your screen?</string>
+    <string name="dialog_screen_sharing_offer_enable_notifications_message">The operator has requested you share your screen. However this requires the app\'s notifications be switched on. Do this now?</string>
+
 
     <!--    call screen-->
     <string name="call_audio_app_bar_title">Audio call</string>

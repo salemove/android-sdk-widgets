@@ -705,7 +705,6 @@ public class ChatView extends ConstraintLayout {
             if (controller != null && controller.sendMessage(message)) {
                 chatEditText.setText("");
             }
-            Utils.hideSoftKeyboard(this.getContext(), getWindowToken());
         });
 
         appBar.setOnBackClickedListener(() -> {

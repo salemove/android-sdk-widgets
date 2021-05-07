@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    temporary fix for-->
+    <!--    https://github.com/material-components/material-components-android/issues/1388-->
+    <dimen name="chat_new_messages_elevation">2dp</dimen>
+</resources>

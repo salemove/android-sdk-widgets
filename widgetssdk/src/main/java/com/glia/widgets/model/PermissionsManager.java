@@ -43,8 +43,7 @@ public class PermissionsManager {
     }
 
     public void updateDialogShown(PermissionType permissionType) {
-        if (permissionType == PermissionType.CALL_CHANNEL ||
-                permissionType == PermissionType.SCREEN_SHARING_CHANNEL) {
+        if (permissionType == PermissionType.CALL_CHANNEL) {
             notificationsChannelDialogShown();
         } else if (permissionType == PermissionType.OVERLAY) {
             overlayPermissionsDialogShown();

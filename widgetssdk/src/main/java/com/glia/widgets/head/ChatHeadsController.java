@@ -11,6 +11,8 @@ import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.MessagesNotSeenHandler;
+import com.glia.widgets.model.PermissionType;
+import com.glia.widgets.permissions.CheckIfHasPermissionsUseCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +35,14 @@ public class ChatHeadsController implements
     private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
     private final GliaOnOperatorMediaStateUseCase gliaOnOperatorMediaStateUseCase;
+    private final CheckIfHasPermissionsUseCase checkIfHasPermissionsUseCase;
 
     public ChatHeadsController(
             GliaOnEngagementUseCase gliaOnEngagementUseCase,
             GliaOnQueueTicketUseCase onQueueTicketUseCase,
             GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase,
             GliaOnOperatorMediaStateUseCase gliaOnOperatorMediaStateUseCase,
+            CheckIfHasPermissionsUseCase checkIfHasPermissionsUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler
     ) {
         this.chatHeadState = new ChatHeadState.Builder()
@@ -52,6 +56,7 @@ public class ChatHeadsController implements
         this.onQueueTicketUseCase = onQueueTicketUseCase;
         this.gliaOnEngagementEndUseCase = gliaOnEngagementEndUseCase;
         this.gliaOnOperatorMediaStateUseCase = gliaOnOperatorMediaStateUseCase;
+        this.checkIfHasPermissionsUseCase = checkIfHasPermissionsUseCase;
     }
 
     public void addListener(OnChatheadSettingsChangedListener listener) {
@@ -82,14 +87,10 @@ public class ChatHeadsController implements
         onQueueTicketUseCase.execute(this);
     }
 
-    public void setUseOverlays(boolean useOverlays) {
-        Logger.d(TAG, "setUseOverlays: " + useOverlays);
+    public void init(boolean enableChatHeads, boolean useOverlays) {
+        Logger.d(TAG, "init");
+        emitViewState(chatHeadState.enableChatHeadsChanged(enableChatHeads));
         emitViewState(chatHeadState.setUseOverlays(useOverlays));
-    }
-
-    public void setHasOverlayPermissions(boolean hasOverlayPermissions) {
-        Logger.d(TAG, "setHasOverlayPermissions: " + hasOverlayPermissions);
-        emitViewState(chatHeadState.setHasOverlayPermissions(hasOverlayPermissions));
         handleService();
     }
 
@@ -168,7 +169,7 @@ public class ChatHeadsController implements
 
     private void handleService() {
         if (chatHeadState.useOverlays) {
-            if (chatHeadState.hasOverlayPermissions) {
+            if (checkIfHasPermissionsUseCase.execute(PermissionType.OVERLAY)) {
                 if (!isOverlayServiceStarted()) {
                     chatHeadServiceListener.startService();
                 }
@@ -184,16 +185,9 @@ public class ChatHeadsController implements
         return overlayListener != null;
     }
 
-    public void setEnableChatHeads(boolean enableChatHeads) {
-        emitViewState(chatHeadState.enableChatHeadsChanged(enableChatHeads));
-    }
-
-    public boolean showOverlayPermissionsDialog() {
-        return chatHeadState.useChatHeads && !chatHeadState.hasOverlayPermissions;
-    }
-
     @Override
     public void engagementEnded() {
+        Logger.d(TAG, "engagementEnded");
         emitViewState(chatHeadState.setOperatorMediaState(null));
         emitViewState(chatHeadState.setOperatorProfileImgUrl(null));
         emitViewState(chatHeadState.changeEngagementRequested(false));
@@ -201,6 +195,7 @@ public class ChatHeadsController implements
 
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
+        Logger.d(TAG, "newEngagementLoaded");
         operatorDataLoaded(engagement.getOperator());
         gliaOnEngagementEndUseCase.execute(this);
         gliaOnOperatorMediaStateUseCase.execute(this);

@@ -16,13 +16,13 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (ACTION_ON_SCREEN_SHARING_END_PRESSED.equals(intent.getAction())) {
-            onScreenSharingEndPressed(context);
+            onScreenSharingEndPressed();
             context.sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         }
     }
 
-    private void onScreenSharingEndPressed(Context context) {
-        controller.onScreenSharingNotificationEndPressed(context);
+    private void onScreenSharingEndPressed() {
+        controller.onScreenSharingNotificationEndPressed();
     }
 
     public static Intent getScreenSharingEndPressedActionIntent(Context context) {

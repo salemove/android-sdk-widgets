@@ -5,19 +5,24 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.screensharing.MediaProjectionService;
 
+import static com.glia.widgets.notification.NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID;
 import static com.glia.widgets.notification.NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID;
 
 public class NotificationManager implements INotificationManager {
     private final Context applicationContext;
     private final android.app.NotificationManager notificationManager;
+    private final static String TAG = "NotificationManager";
 
     private Notification callNotification;
 
@@ -37,9 +42,9 @@ public class NotificationManager implements INotificationManager {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createCallChannel() {
-        if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID) == null) {
+        if (notificationManager.getNotificationChannel(NOTIFICATION_CALL_CHANNEL_ID) == null) {
             int importance = android.app.NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID, applicationContext.getString(R.string.notification_call_channel_name), importance);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CALL_CHANNEL_ID, applicationContext.getString(R.string.notification_call_channel_name), importance);
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
@@ -56,8 +61,10 @@ public class NotificationManager implements INotificationManager {
 
     @Override
     public void showAudioCallNotification() {
-        callNotification = NotificationFactory.createCallStartedNotification(applicationContext);
-        notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, callNotification);
+        if (areNotificationsEnabled(applicationContext, NOTIFICATION_CALL_CHANNEL_ID)) {
+            callNotification = NotificationFactory.createCallStartedNotification(applicationContext);
+            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, callNotification);
+        }
     }
 
     @Override
@@ -69,10 +76,15 @@ public class NotificationManager implements INotificationManager {
 
     @Override
     public void showVideoCallNotification() {
-        callNotification = NotificationFactory.createVideoCallStartedNotification(applicationContext);
-        notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, callNotification);
+        if (areNotificationsEnabled(applicationContext, NOTIFICATION_CALL_CHANNEL_ID)) {
+            callNotification = NotificationFactory.createVideoCallStartedNotification(applicationContext);
+            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, callNotification);
+        }
     }
 
+    /**
+     * Tries showing a notification for screen sharing
+     */
     @Override
     public void showScreenSharingNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -88,6 +100,40 @@ public class NotificationManager implements INotificationManager {
             applicationContext.stopService(new Intent(applicationContext, MediaProjectionService.class));
         } else {
             notificationManager.cancel(SCREEN_SHARING_NOTIFICATION_ID);
+        }
+    }
+
+    public static boolean areNotificationsEnabled(Context context, String notificationChannelId) {
+        if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                android.app.NotificationManager notificationManager =
+                        context.getSystemService(android.app.NotificationManager.class);
+                NotificationChannel channel = notificationManager.getNotificationChannel(
+                        notificationChannelId
+                );
+                if (channel == null)
+                    return true; //channel is not yet created so return boolean
+                // by only checking whether notifications enabled or not
+                return channel.getImportance() != android.app.NotificationManager.IMPORTANCE_NONE;
+            }
+            // can not check for lower level
+            return true;
+        }
+        return false;
+    }
+
+    public static void openNotificationChannelScreen(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent settingsIntent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+            context.startActivity(settingsIntent);
+        } else {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+            intent.setData(uri);
+            context.startActivity(intent);
         }
     }
 }

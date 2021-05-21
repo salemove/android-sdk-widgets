@@ -42,6 +42,7 @@ public class ControllerFactory {
                 useCaseFactory.createGliaOnQueueTicketUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase(),
                 useCaseFactory.createGliaOnOperatorMediaStateUseCase(),
+                useCaseFactory.createCheckIfHasPermissionsUseCase(),
                 messagesNotSeenHandler
         );
         this.useCaseFactory = useCaseFactory;
@@ -71,7 +72,11 @@ public class ControllerFactory {
                     useCaseFactory.createGliaOnOperatorMediaStateUseCase(),
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createGliaOnQueueTicketUseCase()
+                    useCaseFactory.createGliaOnQueueTicketUseCase(),
+                    useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
+                    useCaseFactory.createUpdateDialogShownUseCase(),
+                    useCaseFactory.createUpdatePermissionsUseCase(),
+                    useCaseFactory.createResetPermissionsUseCase()
             );
         }
 
@@ -98,7 +103,11 @@ public class ControllerFactory {
                     useCaseFactory.createGliaOnOperatorMediaStateUseCase(),
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createGliaOnQueueTicketUseCase()
+                    useCaseFactory.createGliaOnQueueTicketUseCase(),
+                    useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
+                    useCaseFactory.createUpdateDialogShownUseCase(),
+                    useCaseFactory.createUpdatePermissionsUseCase(),
+                    useCaseFactory.createResetPermissionsUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -122,7 +131,11 @@ public class ControllerFactory {
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
                     UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager())
+                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
+                    useCaseFactory.createUpdateDialogShownUseCase(),
+                    useCaseFactory.createUpdatePermissionsUseCase(),
+                    useCaseFactory.createResetPermissionsUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -140,6 +153,8 @@ public class ControllerFactory {
                         dialogController,
                         UseCaseFactory.createShowScreenSharingNotificationUseCase(Dependencies.getNotificationManager()),
                         UseCaseFactory.createRemoveScreenSharingNotificationUseCase(Dependencies.getNotificationManager()),
+                        useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
+                        useCaseFactory.createUpdateDialogShownUseCase(),
                         gliaScreenSharingCallback
                 );
             } else {

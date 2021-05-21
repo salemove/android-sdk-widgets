@@ -11,12 +11,18 @@ import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
+import com.glia.widgets.model.PermissionsManager;
 import com.glia.widgets.notification.device.INotificationManager;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.permissions.CheckIfHasPermissionsUseCase;
+import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
+import com.glia.widgets.permissions.ResetPermissionsUseCase;
+import com.glia.widgets.permissions.UpdateDialogShownUseCase;
+import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -26,9 +32,12 @@ public class UseCaseFactory {
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
 
     private final RepositoryFactory repositoryFactory;
+    private final PermissionsManager permissionsManager;
 
-    public UseCaseFactory(RepositoryFactory repositoryFactory) {
+    public UseCaseFactory(RepositoryFactory repositoryFactory,
+                          PermissionsManager permissionsManager) {
         this.repositoryFactory = repositoryFactory;
+        this.permissionsManager = permissionsManager;
     }
 
     public static ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase(INotificationManager notificationManager) {
@@ -106,5 +115,25 @@ public class UseCaseFactory {
 
     public GliaOnQueueTicketUseCase createGliaOnQueueTicketUseCase() {
         return new GliaOnQueueTicketUseCase(repositoryFactory.getGliaRepository());
+    }
+
+    public CheckIfShowPermissionsDialogUseCase createCheckIfShowPermissionsDialogUseCase() {
+        return new CheckIfShowPermissionsDialogUseCase(permissionsManager);
+    }
+
+    public UpdateDialogShownUseCase createUpdateDialogShownUseCase() {
+        return new UpdateDialogShownUseCase(permissionsManager);
+    }
+
+    public UpdatePermissionsUseCase createUpdatePermissionsUseCase() {
+        return new UpdatePermissionsUseCase(permissionsManager);
+    }
+
+    public ResetPermissionsUseCase createResetPermissionsUseCase() {
+        return new ResetPermissionsUseCase(permissionsManager);
+    }
+
+    public CheckIfHasPermissionsUseCase createCheckIfHasPermissionsUseCase() {
+        return new CheckIfHasPermissionsUseCase(permissionsManager);
     }
 }

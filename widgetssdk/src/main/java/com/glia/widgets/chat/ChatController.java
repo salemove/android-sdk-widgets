@@ -41,9 +41,14 @@ import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
+import com.glia.widgets.model.PermissionType;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
+import com.glia.widgets.permissions.ResetPermissionsUseCase;
+import com.glia.widgets.permissions.UpdateDialogShownUseCase;
+import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,6 +93,10 @@ public class ChatController implements
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
+    private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
+    private final UpdateDialogShownUseCase updateDialogShownUseCase;
+    private final UpdatePermissionsUseCase updatePermissionsUseCase;
+    private final ResetPermissionsUseCase resetPermissionsUseCase;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
@@ -112,7 +121,11 @@ public class ChatController implements
                           GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase,
                           GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
                           GliaEndEngagementUseCase endEngagementUseCase,
-                          GliaOnQueueTicketUseCase onQueueTicketUseCase
+                          GliaOnQueueTicketUseCase onQueueTicketUseCase,
+                          CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
+                          UpdateDialogShownUseCase updateDialogShownUseCase,
+                          UpdatePermissionsUseCase updatePermissionsUseCase,
+                          ResetPermissionsUseCase resetPermissionsUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -155,6 +168,10 @@ public class ChatController implements
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
         this.onQueueTicketUseCase = onQueueTicketUseCase;
+        this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
+        this.updateDialogShownUseCase = updateDialogShownUseCase;
+        this.updatePermissionsUseCase = updatePermissionsUseCase;
+        this.resetPermissionsUseCase = resetPermissionsUseCase;
     }
 
     public void initChat(String companyName,
@@ -164,10 +181,15 @@ public class ChatController implements
                          boolean useOverlays,
                          boolean isConfigurationChange,
                          UiTheme uiTheme,
-                         boolean hasOverlayPermissions
+                         boolean hasOverlayPermissions,
+                         boolean isCallNotificationChannelEnabled,
+                         boolean isScreenSharingNotificationChannelEnabled
     ) {
-        chatHeadsController.setHasOverlayPermissions(hasOverlayPermissions);
-        chatHeadsController.setEnableChatHeads(enableChatHeads);
+        updatePermissionsUseCase.execute(
+                hasOverlayPermissions,
+                isCallNotificationChannelEnabled,
+                isScreenSharingNotificationChannelEnabled
+        );
         if (!isConfigurationChange) {
             chatHeadsController.onNavigatedToChat(
                     new ChatHeadInput(
@@ -183,7 +205,7 @@ public class ChatController implements
         }
         emitViewState(chatState.initChat(companyName, queueId, contextUrl));
         loadHistoryUseCase.execute(this);
-        chatHeadsController.setUseOverlays(useOverlays);
+        chatHeadsController.init(enableChatHeads, useOverlays);
         initMediaUpgradeCallback();
         initMinimizeCallback();
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
@@ -235,6 +257,7 @@ public class ChatController implements
             sendMessageUseCase.unregisterListener(this);
             onOperatorMediaStateUseCase.unregisterListener(this);
             onQueueTicketUseCase.unregisterListener(this);
+            resetPermissionsUseCase.execute();
         }
     }
 
@@ -350,12 +373,22 @@ public class ChatController implements
         }
     }
 
-    public void onResume(boolean hasOverlaysPermission) {
-        Logger.d(TAG, "onResume: " + hasOverlaysPermission);
-        chatHeadsController.setHasOverlayPermissions(hasOverlaysPermission);
-        if (chatHeadsController.showOverlayPermissionsDialog()
-                && !chatState.overlaysPermissionDialogShown) {
+    public void onResume(boolean hasOverlaysPermission,
+                         boolean isCallChannelEnabled,
+                         boolean isScreenSharingChannelEnabled) {
+        Logger.d(TAG, "onResume\n" +
+                "hasOverlayPermissions: " + hasOverlaysPermission +
+                ", isCallChannelEnabled:" + isCallChannelEnabled +
+                ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
+        updatePermissionsUseCase.execute(
+                hasOverlaysPermission,
+                isCallChannelEnabled,
+                isScreenSharingChannelEnabled
+        );
+        if (checkIfShowPermissionsDialogUseCase.execute(PermissionType.OVERLAY, true) &&
+                dialogController.isNoDialogShown()) {
             dialogController.showOverlayPermissionsDialog();
+            updateDialogShownUseCase.execute(PermissionType.OVERLAY);
         }
     }
 
@@ -474,6 +507,7 @@ public class ChatController implements
     }
 
     private void viewInitQueueing() {
+        Logger.d(TAG, "viewInitQueueing");
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         if (chatState.operatorStatusItem != null) {
             items.remove(chatState.operatorStatusItem);
@@ -493,24 +527,25 @@ public class ChatController implements
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
-        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         if (chatState.operatorStatusItem != null) {
             // remove previous operator status item
             int operatorStatusItemIndex = items.indexOf(chatState.operatorStatusItem);
+            Logger.d(TAG, "operatorStatusItemIndex: " + operatorStatusItemIndex + ", size: " + items.size());
             items.remove(chatState.operatorStatusItem);
             items.add(operatorStatusItemIndex,
                     OperatorStatusItem.OperatorFoundStatusItem(
                             chatState.companyName,
-                            chatState.getFormattedOperatorName(),
+                            Utils.formatOperatorName(operatorName),
                             profileImgUrl));
         } else {
             items.add(OperatorStatusItem.OperatorFoundStatusItem(
                     chatState.companyName,
-                    chatState.getFormattedOperatorName(),
+                    Utils.formatOperatorName(operatorName),
                     profileImgUrl));
         }
         emitChatItems(chatState.changeItems(items));
+        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
     }
 
     private void stop() {
@@ -889,5 +924,9 @@ public class ChatController implements
         } else {
             onOperatorMediaStateUnknown();
         }
+    }
+
+    public void notificationsDialogDismissed() {
+        dialogController.dismissDialogs();
     }
 }

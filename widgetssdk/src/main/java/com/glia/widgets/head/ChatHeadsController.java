@@ -204,12 +204,14 @@ public class ChatHeadsController implements
     @Override
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "new operatorMediaState: " + operatorMediaState);
+        handleService();
         emitViewState(chatHeadState.setOperatorMediaState(operatorMediaState));
     }
 
     @Override
     public void ticketLoaded(String ticket) {
         Logger.d(TAG, "ticketLoaded: " + ticket);
+        handleService();
         emitViewState(chatHeadState.changeEngagementRequested(true));
     }
 

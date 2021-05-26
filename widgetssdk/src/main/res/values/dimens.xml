@@ -22,7 +22,7 @@
     <dimen name="chat_new_messages_card_size">42dp</dimen>
     <dimen name="chat_new_messages_bottom_edge_radius">17dp</dimen>
     <dimen name="chat_new_messages_card_corner_radius">21dp</dimen>
-    <dimen name="chat_new_messages_elevation">15dp</dimen>
+    <dimen name="chat_new_messages_elevation">2dp</dimen>
 
     <dimen name="chat_head_size">64dp</dimen>
     <dimen name="chat_head_placeholder_size">32dp</dimen>

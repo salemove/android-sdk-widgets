@@ -242,6 +242,14 @@ public class Utils {
                         R.attr.gliaIconPlaceholder
                 )
         );
+        defaultThemeBuilder.setWhiteLabel(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_whiteLabel,
+                        R.attr.gliaWhiteLabel
+                )
+        );
         return defaultThemeBuilder.build();
     }
 
@@ -347,6 +355,8 @@ public class Utils {
         Integer iconPlaceholder = newTheme.getIconPlaceholder() != null ?
                 newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
 
+        Integer whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColorRes);
@@ -374,6 +384,7 @@ public class Utils {
         builder.setIconCallSpeakerOff(iconCallSpeakerOff);
         builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
+        builder.setWhiteLabel(whiteLabel);
         return builder.build();
     }
 

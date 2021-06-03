@@ -10,14 +10,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/chat_send_margin_start" />
+        app:layout_constraintGuide_begin="@dimen/chat_visitor_margin_start" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/chat_send_margin_end" />
+        app:layout_constraintGuide_end="@dimen/chat_visitor_margin_end" />
 
     <TextView
         android:id="@+id/content"

@@ -9,6 +9,7 @@
     <string name="chat_upgraded_to_audio_call">Upgraded to Audio call</string>
     <string name="chat_upgraded_to_video_call">Upgraded to Video call</string>
     <string name="chat_single_choice_card_hint">Tap on the answer above</string>
+    <string name="chat_not_started_hint">Enter message to start a new engagement</string>
 
     <!--    top app bar-->
     <string name="top_app_bar_close">Close</string>
@@ -39,6 +40,11 @@
     <string name="dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
     <string name="dialog_screen_sharing_end_title">End Screen Sharing?</string>
     <string name="dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
+    <string name="dialog_allow_notifications_title">Allow Notifications?</string>
+    <string name="dialog_allow_notifications_message">The engagement would like to show notifications on the status bar. Open settings to enable notifications?</string>
+    <string name="dialog_screen_sharing_offer_enable_notifications_title">Share your screen?</string>
+    <string name="dialog_screen_sharing_offer_enable_notifications_message">The operator has requested you share your screen. However this requires the app\'s notifications be switched on. Do this now?</string>
+
 
     <!--    call screen-->
     <string name="call_audio_app_bar_title">Audio call</string>
@@ -52,9 +58,14 @@
     <string name="call_connecting_with">Connecting with %1$s</string>
 
     <!--    statusbar notifications-->
+    <string name="notification_screen_sharing_channel_name">Screen Sharing notification channel</string>
     <string name="notification_screen_sharing_title">You are currently Sharing Your screen</string>
     <string name="notification_screen_sharing_message">To end sharing push \"END SHARING\" button</string>
+    <string name="notification_call_channel_name">Call notification channel</string>
+    <string name="notification_audio_call_title">Audio call ongoing</string>
+    <string name="notification_audio_call_message">Operator can hear You through the mic</string>
+    <string name="notification_video_call_title">Video call ongoing</string>
+    <string name="notification_video_call_message">Operator might see and hear You</string>
     <string name="notification_action_end_sharing">END SHARING</string>
-    <string name="notification_screen_sharing_channel_name">Screen Sharing notification channel</string>
 
 </resources>

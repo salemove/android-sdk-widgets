@@ -17,37 +17,60 @@ import com.glia.widgets.Constants;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
+import com.glia.widgets.chat.adapter.OperatorMessageItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
-import com.glia.widgets.chat.adapter.ReceiveMessageItem;
-import com.glia.widgets.chat.adapter.ReceiveMessageItemMessage;
-import com.glia.widgets.chat.adapter.SendMessageItem;
+import com.glia.widgets.chat.adapter.VisitorMessageItem;
 import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.glia.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.glia.GliaEndEngagementUseCase;
+import com.glia.widgets.glia.GliaLoadHistoryUseCase;
+import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
+import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.glia.GliaOnMessageUseCase;
+import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
+import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
+import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
+import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
+import com.glia.widgets.glia.GliaSendMessageUseCase;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.ChatHeadInput;
-import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
+import com.glia.widgets.model.PermissionType;
+import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
+import com.glia.widgets.permissions.ResetPermissionsUseCase;
+import com.glia.widgets.permissions.UpdateDialogShownUseCase;
+import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ChatController {
+public class ChatController implements
+        GliaLoadHistoryUseCase.Listener,
+        GliaQueueForEngagementUseCase.Listener,
+        GliaOnEngagementUseCase.Listener,
+        GliaOnEngagementEndUseCase.Listener,
+        GliaOnMessageUseCase.Listener,
+        GliaSendMessageUseCase.Listener,
+        GliaOnOperatorMediaStateUseCase.Listener,
+        GliaOnQueueTicketUseCase.Listener {
 
     private static final int CALL_TIMER_DELAY = 1000;
     private static final int CALL_TIMER_TICKER_VALUE = 1000;
 
     private ChatViewCallback viewCallback;
-    private ChatGliaCallback gliaCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener timerStatusListener;
     private MinimizeHandler.OnMinimizeCalledListener minimizeCalledListener;
-    private final GliaChatRepository repository;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final MinimizeHandler minimizeHandler;
@@ -56,19 +79,53 @@ public class ChatController {
 
     private final DialogController dialogController;
 
+    private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
+    private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
+    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
+    private final GliaLoadHistoryUseCase loadHistoryUseCase;
+    private final GliaQueueForEngagementUseCase queueForEngagementUseCase;
+    private final GliaOnEngagementUseCase getEngagementUseCase;
+    private final GliaOnEngagementEndUseCase engagementEndUseCase;
+    private final GliaOnMessageUseCase onMessageUseCase;
+    private final GliaSendMessagePreviewUseCase sendMessagePreviewUseCase;
+    private final GliaSendMessageUseCase sendMessageUseCase;
+    private final GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase;
+    private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
+    private final GliaEndEngagementUseCase endEngagementUseCase;
+    private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
+    private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
+    private final UpdateDialogShownUseCase updateDialogShownUseCase;
+    private final UpdatePermissionsUseCase updatePermissionsUseCase;
+    private final ResetPermissionsUseCase resetPermissionsUseCase;
+
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
-    private boolean isNavigationPending;
-
-    public ChatController(GliaChatRepository gliaChatRepository,
-                          MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
+    public ChatController(MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
                           TimeCounter callTimer,
                           ChatViewCallback viewCallback,
                           MinimizeHandler minimizeHandler,
                           ChatHeadsController chatHeadsController,
                           DialogController dialogController,
-                          MessagesNotSeenHandler messagesNotSeenHandler
+                          MessagesNotSeenHandler messagesNotSeenHandler,
+                          ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
+                          ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
+                          RemoveCallNotificationUseCase removeCallNotificationUseCase,
+                          GliaLoadHistoryUseCase loadHistoryUseCase,
+                          GliaQueueForEngagementUseCase queueForEngagementUseCase,
+                          GliaOnEngagementUseCase gliaObserveEngagementUseCase,
+                          GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase,
+                          GliaOnMessageUseCase onMessageUseCase,
+                          GliaSendMessagePreviewUseCase gliaSendMessagePreviewUseCase,
+                          GliaSendMessageUseCase sendMessageUseCase,
+                          GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase,
+                          GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
+                          GliaEndEngagementUseCase endEngagementUseCase,
+                          GliaOnQueueTicketUseCase onQueueTicketUseCase,
+                          CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
+                          UpdateDialogShownUseCase updateDialogShownUseCase,
+                          UpdatePermissionsUseCase updatePermissionsUseCase,
+                          ResetPermissionsUseCase resetPermissionsUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -84,16 +141,37 @@ public class ChatController {
                 .setOverlaysPermissionDialogShown(false)
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
-                .setChatInputMode(ChatInputMode.DISABLED)
+                .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsChatInBottom(true)
+                .setMessagesNotSeen(0)
+                .setIsNavigationPending(false)
+                .setUnsentMessages(new ArrayList<>())
                 .createChatState();
-        this.repository = gliaChatRepository;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.callTimer = callTimer;
         this.minimizeHandler = minimizeHandler;
         this.chatHeadsController = chatHeadsController;
         this.dialogController = dialogController;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
-        isNavigationPending = false;
+
+        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
+        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
+        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
+        this.loadHistoryUseCase = loadHistoryUseCase;
+        this.queueForEngagementUseCase = queueForEngagementUseCase;
+        this.getEngagementUseCase = gliaObserveEngagementUseCase;
+        this.engagementEndUseCase = gliaOnEngagementEndUseCase;
+        this.onMessageUseCase = onMessageUseCase;
+        this.sendMessagePreviewUseCase = gliaSendMessagePreviewUseCase;
+        this.sendMessageUseCase = sendMessageUseCase;
+        this.onOperatorMediaStateUseCase = onOperatorMediaStateUseCase;
+        this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
+        this.endEngagementUseCase = endEngagementUseCase;
+        this.onQueueTicketUseCase = onQueueTicketUseCase;
+        this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
+        this.updateDialogShownUseCase = updateDialogShownUseCase;
+        this.updatePermissionsUseCase = updatePermissionsUseCase;
+        this.resetPermissionsUseCase = resetPermissionsUseCase;
     }
 
     public void initChat(String companyName,
@@ -103,10 +181,15 @@ public class ChatController {
                          boolean useOverlays,
                          boolean isConfigurationChange,
                          UiTheme uiTheme,
-                         boolean hasOverlayPermissions
+                         boolean hasOverlayPermissions,
+                         boolean isCallNotificationChannelEnabled,
+                         boolean isScreenSharingNotificationChannelEnabled
     ) {
-        chatHeadsController.setHasOverlayPermissions(hasOverlayPermissions);
-        chatHeadsController.setEnableChatHeads(enableChatHeads);
+        updatePermissionsUseCase.execute(
+                hasOverlayPermissions,
+                isCallNotificationChannelEnabled,
+                isScreenSharingNotificationChannelEnabled
+        );
         if (!isConfigurationChange) {
             chatHeadsController.onNavigatedToChat(
                     new ChatHeadInput(
@@ -120,14 +203,18 @@ public class ChatController {
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
-        emitViewState(chatState.queueingStarted(companyName, queueId, contextUrl));
-        chatHeadsController.setUseOverlays(useOverlays);
-        initControllerCallback();
+        emitViewState(chatState.initChat(companyName, queueId, contextUrl));
+        loadHistoryUseCase.execute(this);
+        chatHeadsController.init(enableChatHeads, useOverlays);
         initMediaUpgradeCallback();
         initMinimizeCallback();
-        repository.init(gliaCallback, queueId, contextUrl);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         minimizeHandler.addListener(minimizeCalledListener);
+    }
+
+    private void queueForEngagement() {
+        Logger.d(TAG, "queueForEngagement");
+        queueForEngagementUseCase.execute(chatState.queueId, chatState.contextUrl, this);
     }
 
     private void initMinimizeCallback() {
@@ -154,21 +241,34 @@ public class ChatController {
         destroyView();
         viewCallback = null;
         if (!retain) {
-            repository.onDestroy();
-            gliaCallback = null;
+            removeCallNotificationUseCase.execute();
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
             timerStatusListener = null;
             callTimer.clear();
             minimizeCalledListener = null;
             minimizeHandler.clear();
+
+            loadHistoryUseCase.unregisterListener(this);
+            queueForEngagementUseCase.unregisterListener(this);
+            getEngagementUseCase.unregisterListener(this);
+            engagementEndUseCase.unregisterListener(this);
+            onMessageUseCase.unregisterListener(this);
+            sendMessageUseCase.unregisterListener(this);
+            onOperatorMediaStateUseCase.unregisterListener(this);
+            onQueueTicketUseCase.unregisterListener(this);
+            resetPermissionsUseCase.execute();
         }
     }
 
     public void sendMessagePreview(String message) {
-        Logger.d(TAG, "Send preview: " + message);
         emitViewState(chatState.chatInputChanged(message));
-        repository.sendMessagePreview(message);
+        if (chatState.isOperatorOnline()) {
+            Logger.d(TAG, "Send preview: " + message);
+            sendMessagePreviewUseCase.execute(message);
+        } else {
+            Logger.d(TAG, "Send preview not sending");
+        }
     }
 
     public boolean sendMessage(String message) {
@@ -176,9 +276,29 @@ public class ChatController {
         boolean valid = isMessageValid(message);
         if (valid) {
             Logger.d(TAG, "Send MESSAGE valid! : " + message);
-            repository.sendMessage(message);
+            if (chatState.isOperatorOnline()) {
+                Logger.d(TAG, "SEND MESSAGE sending");
+                sendMessageUseCase.execute(message, this);
+            } else {
+                appendUnsentMessage(message);
+                if (!chatState.engagementRequested) {
+                    queueForEngagement();
+                }
+            }
         }
         return valid;
+    }
+
+    private void appendUnsentMessage(String message) {
+        Logger.d(TAG, "appendUnsentMessage: " + message);
+        List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
+        VisitorMessageItem unsentItem = new VisitorMessageItem(VisitorMessageItem.UNSENT_MESSAGE_ID, false, message);
+        unsentMessages.add(unsentItem);
+        emitViewState(chatState.changeUnsentMessages(unsentMessages));
+
+        List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+        currentChatItems.add(unsentItem);
+        emitChatItems(chatState.changeItems(currentChatItems));
     }
 
     public void show() {
@@ -242,19 +362,34 @@ public class ChatController {
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
         viewCallback.setLastTypedText(chatState.lastTypedText);
-        if (isNavigationPending) {
+
+        // always start in bottom
+        emitViewState(chatState.isInBottomChanged(true));
+        emitViewState(chatState.changeVisibility(true));
+        viewCallback.scrollToBottomImmediate();
+
+        if (chatState.isNavigationPending) {
             viewCallback.navigateToCall();
         }
     }
 
-    public void onResume(boolean hasOverlaysPermission) {
-        Logger.d(TAG, "onResume: " + hasOverlaysPermission);
-        chatHeadsController.setHasOverlayPermissions(hasOverlaysPermission);
-        if (chatHeadsController.showOverlayPermissionsDialog()
-                && !chatState.overlaysPermissionDialogShown) {
+    public void onResume(boolean hasOverlaysPermission,
+                         boolean isCallChannelEnabled,
+                         boolean isScreenSharingChannelEnabled) {
+        Logger.d(TAG, "onResume\n" +
+                "hasOverlayPermissions: " + hasOverlaysPermission +
+                ", isCallChannelEnabled:" + isCallChannelEnabled +
+                ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
+        updatePermissionsUseCase.execute(
+                hasOverlaysPermission,
+                isCallChannelEnabled,
+                isScreenSharingChannelEnabled
+        );
+        if (checkIfShowPermissionsDialogUseCase.execute(PermissionType.OVERLAY, true) &&
+                dialogController.isNoDialogShown()) {
             dialogController.showOverlayPermissionsDialog();
+            updateDialogShownUseCase.execute(PermissionType.OVERLAY);
         }
-        emitViewState(chatState.changeVisibility(chatState.integratorChatStarted));
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -278,7 +413,7 @@ public class ChatController {
 
     public void navigateToCallSuccess() {
         Logger.d(TAG, "navigateToCallSuccess");
-        isNavigationPending = false;
+        emitViewState(chatState.isNavigationPendingChanged(false));
     }
 
     private synchronized boolean setState(ChatState state) {
@@ -287,126 +422,25 @@ public class ChatController {
         return true;
     }
 
-    private void initControllerCallback() {
-        if (gliaCallback != null) return;
-        gliaCallback = new ChatGliaCallback() {
-            @Override
-            public void queueForEngagementStart() {
-                Logger.d(TAG, "queueForEngagementStart");
-                viewInitQueueing();
-            }
+    private void error(String error) {
+        Logger.e(TAG, error);
+        dialogController.showUnexpectedErrorDialog();
+        emitViewState(chatState.stop());
+    }
 
-            @Override
-            public void queueForEngangmentSuccess() {
-                Logger.d(TAG, "queueForEngagementSuccess");
-                viewInitQueueing();
-            }
+    private void onOperatorMediaStateVideo() {
+        Logger.d(TAG, "newOperatorMediaState: video");
+        showVideoCallNotificationUseCase.execute();
+    }
 
-            @Override
-            public void queueForTicketSuccess(String ticketId) {
-                Logger.d(TAG, "queueForTicketSuccess");
-                emitViewState(chatState.queueTicketSuccess(ticketId));
-            }
+    private void onOperatorMediaStateAudio() {
+        Logger.d(TAG, "newOperatorMediaState: audio");
+        showAudioCallNotificationUseCase.execute();
+    }
 
-            @Override
-            public void engagementEndedByOperator() {
-                Logger.d(TAG, "engagementEndedByOperator");
-                stop();
-                emitViewState(chatState.changeVisibility(false));
-                dialogController.showNoMoreOperatorsAvailableDialog();
-            }
-
-            @Override
-            public void engagementSuccess(OmnicoreEngagement engagement) {
-                Logger.d(TAG, "engagementSuccess");
-                String operatorProfileImgUrl = null;
-                try {
-                    operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
-                } catch (Exception e) {
-                }
-                operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
-                if (!chatState.historyLoaded) {
-                    repository.loadHistory();
-                }
-            }
-
-            @Override
-            public void messageDelivered(VisitorMessage visitorMessage) {
-                Logger.d(TAG, "messageDelivered: " + visitorMessage.toString() +
-                        ", id: " + visitorMessage.getId());
-                List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
-                changeDeliveredIndex(currentChatItems, visitorMessage);
-                emitChatItems(chatState.changeItems(currentChatItems));
-            }
-
-            @Override
-            public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
-                Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
-            }
-
-            @Override
-            public void onMessage(ChatMessage message) {
-                Logger.d(TAG, "onMessage: " + message.getContent() +
-                        ", id: " + message.getId());
-                if (message.getAttachment() != null && message.getAttachment()
-                        instanceof SingleChoiceAttachment) {
-                    SingleChoiceAttachment attachment =
-                            (SingleChoiceAttachment) message.getAttachment();
-
-                    if (attachment.getOptions() != null) {
-                        for (SingleChoiceOption option : attachment.getOptions()) {
-                            Logger.d(TAG, "onMessage, option text: " + option.getText() +
-                                    ", option value: " + option.getValue());
-                        }
-                    }
-                    if (attachment.getSelectedOption() != null) {
-                        Logger.d(TAG, "selectedOption: " + attachment.getSelectedOption());
-                    }
-                }
-                List<ChatItem> items = new ArrayList<>(chatState.chatItems);
-                appendMessageItem(items, message);
-                emitChatItems(chatState.changeItems(items));
-            }
-
-            @Override
-            public synchronized void chatHistoryLoaded(ChatMessage[] messages, Throwable error) {
-                Logger.d(TAG, "chatHistoryLoaded");
-                if (error != null && (messages == null || messages.length == 0)) {
-                    Logger.e(TAG, "chatHistoryLoaded error");
-                    this.error(error);
-                }
-                List<ChatItem> items = new ArrayList<>(chatState.chatItems);
-                if (messages != null) {
-                    for (ChatMessage message : messages) {
-                        appendHistoryChatItem(items, message);
-                    }
-                    // If history added. Add name operator name after history.
-                    if (items.size() > 1) {
-                        items.add(items.get(0));
-                        items.remove(0);
-                    }
-                }
-                emitChatItems(chatState.historyLoaded(items));
-                repository.initMessaging();
-                mediaUpgradeOfferRepository.startListening();
-            }
-
-            @Override
-            public void error(GliaException exception) {
-                Logger.e(TAG, exception.toString());
-                dialogController.showUnexpectedErrorDialog();
-                emitViewState(chatState.stop());
-                emitViewState(chatState.changeVisibility(false));
-            }
-
-            @Override
-            public void error(Throwable throwable) {
-                Logger.e(TAG, throwable.toString());
-                dialogController.showUnexpectedErrorDialog();
-                emitViewState(chatState.stop());
-                emitViewState(chatState.changeVisibility(false));
-            }
-        };
+    private void onOperatorMediaStateUnknown() {
+        Logger.d(TAG, "newOperatorMediaState: null");
+        removeCallNotificationUseCase.execute();
     }
 
     private void initMediaUpgradeCallback() {
@@ -456,7 +490,7 @@ public class ChatController {
                             Logger.d(TAG, "navigateToCall");
                             viewCallback.navigateToCall();
                         }
-                        isNavigationPending = true;
+                        emitViewState(chatState.isNavigationPendingChanged(true));
                     }
                 }
                 dialogController.dismissDialogs();
@@ -473,12 +507,16 @@ public class ChatController {
     }
 
     private void viewInitQueueing() {
-        if (!chatState.isOperatorOnline()) {
-            List<ChatItem> items = new ArrayList<>();
-            items.add(OperatorStatusItem.QueueingStatusItem(chatState.companyName));
-            emitViewState(chatState.initQueueing());
-            emitChatItems(chatState.changeItems(items));
+        Logger.d(TAG, "viewInitQueueing");
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        if (chatState.operatorStatusItem != null) {
+            items.remove(chatState.operatorStatusItem);
         }
+        OperatorStatusItem operatorStatusItem =
+                OperatorStatusItem.QueueingStatusItem(chatState.companyName);
+        items.add(operatorStatusItem);
+        emitViewState(chatState.queueingStarted(operatorStatusItem));
+        emitChatItems(chatState.changeItems(items));
     }
 
     private void destroyView() {
@@ -489,25 +527,40 @@ public class ChatController {
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
-        List<ChatItem> items = new ArrayList<>();
-        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
-        items.add(OperatorStatusItem.OperatorFoundStatusItem(
-                chatState.companyName,
-                chatState.getFormattedOperatorName(),
-                profileImgUrl));
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        if (chatState.operatorStatusItem != null) {
+            // remove previous operator status item
+            int operatorStatusItemIndex = items.indexOf(chatState.operatorStatusItem);
+            Logger.d(TAG, "operatorStatusItemIndex: " + operatorStatusItemIndex + ", size: " + items.size());
+            items.remove(chatState.operatorStatusItem);
+            items.add(operatorStatusItemIndex,
+                    OperatorStatusItem.OperatorFoundStatusItem(
+                            chatState.companyName,
+                            Utils.formatOperatorName(operatorName),
+                            profileImgUrl));
+        } else {
+            items.add(OperatorStatusItem.OperatorFoundStatusItem(
+                    chatState.companyName,
+                    Utils.formatOperatorName(operatorName),
+                    profileImgUrl));
+        }
         emitChatItems(chatState.changeItems(items));
+        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
     }
 
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
-        repository.stop(chatState.queueTicketId);
+        if (chatState.queueTicketId != null) {
+            cancelQueueTicketUseCase.execute(chatState.queueTicketId);
+        }
+        endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(chatState.stop());
     }
 
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
-            currentChatItems.add(new SendMessageItem(SendMessageItem.HISTORY_ID, false, message.getContent()));
+            currentChatItems.add(new VisitorMessageItem(VisitorMessageItem.HISTORY_ID, false, message.getContent()));
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
         }
@@ -518,6 +571,7 @@ public class ChatController {
             appendSentMessage(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
+            appendMessagesNotSeen();
             if (message.getAttachment() instanceof SingleChoiceAttachment) {
                 SingleChoiceAttachment attachment =
                         ((SingleChoiceAttachment) message.getAttachment());
@@ -539,25 +593,38 @@ public class ChatController {
             Logger.d(TAG, "Not adding singleChoiceAnswer");
             return;
         }
-        items.add(new SendMessageItem(message.getId(), false, message.getContent()));
+        items.add(new VisitorMessageItem(message.getId(), false, message.getContent()));
+    }
+
+    private void appendMessagesNotSeen() {
+        emitViewState(chatState.messagesNotSeenChanged(
+                chatState.isChatInBottom ?
+                        0 :
+                        chatState.messagesNotSeen + 1));
+    }
+
+    private void initGliaEngagementObserving() {
+        onQueueTicketUseCase.execute(this);
+        getEngagementUseCase.execute(this);
+        engagementEndUseCase.execute(this);
     }
 
     private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
         for (int i = currentChatItems.size() - 1; i >= 0; i--) {
-            if (currentChatItems.get(i) instanceof SendMessageItem) {
-                SendMessageItem item = (SendMessageItem) currentChatItems.get(i);
-                if (item.getId().equals(SendMessageItem.HISTORY_ID)) {
+            if (currentChatItems.get(i) instanceof VisitorMessageItem) {
+                VisitorMessageItem item = (VisitorMessageItem) currentChatItems.get(i);
+                if (item.getId().equals(VisitorMessageItem.HISTORY_ID)) {
                     // we reached the history items no point in going searching further
                     break;
                 } else if (item.getId().equals(message.getId())) {
                     // the visitormessage. show delivered for it.
                     currentChatItems.remove(i);
                     currentChatItems.add(i,
-                            new SendMessageItem(message.getId(), true, message.getContent()));
+                            new VisitorMessageItem(message.getId(), true, message.getContent()));
                 } else if (item.isShowDelivered()) {
                     // remove all other delivered references
                     currentChatItems.remove(i);
-                    currentChatItems.add(i, new SendMessageItem(item.getId(),
+                    currentChatItems.add(i, new VisitorMessageItem(item.getId(),
                             false,
                             item.getMessage()));
                 }
@@ -567,33 +634,40 @@ public class ChatController {
 
     private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
         MessageAttachment attachment = message.getAttachment();
-        List<ReceiveMessageItemMessage> messages;
-        if (currentChatItems.get(currentChatItems.size() - 1) instanceof ReceiveMessageItem) {
-            ReceiveMessageItem lastItemInView = (ReceiveMessageItem) currentChatItems.get(currentChatItems.size() - 1);
+
+        if (!currentChatItems.isEmpty() &&
+                currentChatItems.get(currentChatItems.size() - 1) instanceof OperatorMessageItem) {
+            OperatorMessageItem lastItemInView = (OperatorMessageItem) currentChatItems.get(currentChatItems.size() - 1);
             currentChatItems.remove(lastItemInView);
-            messages = lastItemInView.getMessages();
-        } else {
-            messages = new ArrayList<>();
+            currentChatItems.add(new OperatorMessageItem(
+                    lastItemInView.getId(),
+                    lastItemInView.operatorProfileImgUrl,
+                    false,
+                    lastItemInView.content,
+                    lastItemInView.singleChoiceOptions,
+                    lastItemInView.selectedChoiceIndex,
+                    lastItemInView.choiceCardImageUrl
+            ));
         }
         String imageUrl = null;
         if (attachment instanceof SingleChoiceAttachment) {
             try {
                 imageUrl = ((SingleChoiceAttachment) attachment).getImageUrl().get();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
-        messages.add(new ReceiveMessageItemMessage(
-                message.getContent(),
-                message.getAttachment() != null &&
-                        attachment instanceof SingleChoiceAttachment ?
-                        Arrays.asList(((SingleChoiceAttachment) attachment).getOptions()) :
-                        null,
-                null,
-                imageUrl));
-        currentChatItems.add(new ReceiveMessageItem(
+
+        List<SingleChoiceOption> singleChoiceOptions = attachment instanceof SingleChoiceAttachment ?
+                Arrays.asList(((SingleChoiceAttachment) attachment).getOptions()) :
+                null;
+        currentChatItems.add(new OperatorMessageItem(
                 message.getId(),
-                messages,
-                chatState.operatorProfileImgUrl
+                chatState.operatorProfileImgUrl,
+                true,
+                message.getContent(),
+                singleChoiceOptions,
+                null,
+                imageUrl
         ));
     }
 
@@ -659,7 +733,6 @@ public class ChatController {
     public void singleChoiceOptionClicked(
             String id,
             int indexInList,
-            int messageIndex,
             int optionIndex
     ) {
         Logger.d(TAG, "singleChoiceOptionClicked, id: " + id);
@@ -667,38 +740,193 @@ public class ChatController {
             return;
         }
         ChatItem item = chatState.chatItems.get(indexInList);
-        //
+
         if (item.getId().equals(id)) {
-            ReceiveMessageItem choiceCardItem =
-                    (ReceiveMessageItem) chatState.chatItems.get(indexInList);
-            ReceiveMessageItemMessage receiveMessageItemMessage =
-                    choiceCardItem.getMessages().get(messageIndex);
+            OperatorMessageItem choiceCardItem =
+                    (OperatorMessageItem) chatState.chatItems.get(indexInList);
             SingleChoiceOption selectedOption =
-                    receiveMessageItemMessage.attachments.get(optionIndex);
+                    choiceCardItem.singleChoiceOptions.get(optionIndex);
+            sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), this);
 
-            repository.sendMessage(selectedOption.asSingleChoiceResponse());
-
-            ReceiveMessageItemMessage receiveMessageItemMessageWithSelected =
-                    new ReceiveMessageItemMessage(
-                            receiveMessageItemMessage.content,
-                            receiveMessageItemMessage.attachments,
-                            optionIndex,
-                            receiveMessageItemMessage.imageUrl
-                    );
-            List<ReceiveMessageItemMessage> messagesWithSelected =
-                    new ArrayList<>(choiceCardItem.getMessages());
-            messagesWithSelected.remove(messageIndex);
-            messagesWithSelected.add(messageIndex, receiveMessageItemMessageWithSelected);
-            ReceiveMessageItem choiceCardItemWithSelected =
-                    new ReceiveMessageItem(
+            OperatorMessageItem choiceCardItemWithSelected =
+                    new OperatorMessageItem(
                             id,
-                            messagesWithSelected,
-                            choiceCardItem.getOperatorProfileImgUrl()
+                            choiceCardItem.operatorProfileImgUrl,
+                            choiceCardItem.showChatHead,
+                            choiceCardItem.content,
+                            choiceCardItem.singleChoiceOptions,
+                            optionIndex,
+                            choiceCardItem.choiceCardImageUrl
                     );
+
             List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);
             modifiedItems.remove(indexInList);
             modifiedItems.add(indexInList, choiceCardItemWithSelected);
             emitChatItems(chatState.changeItems(modifiedItems));
         }
+    }
+
+    public void onRecyclerviewPositionChanged(boolean isBottom) {
+        emitViewState(chatState.isInBottomChanged(isBottom));
+        if (isBottom) {
+            Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom!");
+            emitViewState(chatState.messagesNotSeenChanged(0));
+        }
+    }
+
+    public void newMessagesIndicatorClicked() {
+        Logger.d(TAG, "newMessagesIndicatorClicked");
+        if (viewCallback != null) {
+            viewCallback.smoothScrollToBottom();
+        }
+    }
+
+    @Override
+    public void historyLoaded(ChatMessage[] messages) {
+        Logger.d(TAG, "historyLoaded");
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        if (messages != null && messages.length > 0) {
+            for (ChatMessage message : messages) {
+                appendHistoryChatItem(items, message);
+            }
+            emitChatItems(chatState.historyLoaded(items));
+            initGliaEngagementObserving();
+        } else {
+            initGliaEngagementObserving();
+            queueForEngagement();
+        }
+
+    }
+
+    @Override
+    public void ticketLoaded(String ticket) {
+        Logger.d(TAG, "ticketLoaded");
+        emitViewState(chatState.queueTicketSuccess(ticket));
+        if (!chatState.engagementRequested) {
+            viewInitQueueing();
+        }
+    }
+
+    @Override
+    public void queueForEngagementSuccess() {
+        Logger.d(TAG, "queueForEngagementSuccess");
+        viewInitQueueing();
+    }
+
+    @Override
+    public void error(GliaException exception) {
+        if (exception != null) {
+            error(exception.toString());
+        }
+    }
+
+    @Override
+    public void error(Throwable error) {
+        if (error != null) {
+            error(error.toString());
+        }
+    }
+
+    @Override
+    public void newEngagementLoaded(OmnicoreEngagement engagement) {
+        Logger.d(TAG, "newEngagementLoaded");
+        String operatorProfileImgUrl = null;
+        try {
+            operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
+        } catch (Exception ignored) {
+        }
+        operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
+        onMessageUseCase.execute(this);
+        onOperatorMediaStateUseCase.execute(this);
+        mediaUpgradeOfferRepository.startListening();
+        if (!chatState.unsentMessages.isEmpty()) {
+            sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), this);
+            Logger.d(TAG, "unsentMessage sent!");
+        }
+    }
+
+    @Override
+    public void engagementEnded() {
+        Logger.d(TAG, "engagementEnded");
+        stop();
+        emitViewState(chatState.changeVisibility(false));
+        dialogController.showNoMoreOperatorsAvailableDialog();
+    }
+
+    @Override
+    public void onMessage(ChatMessage message) {
+        boolean isUnsentMessage = !chatState.unsentMessages.isEmpty() &&
+                chatState.unsentMessages.get(0).getMessage().equals(message.getContent());
+        Logger.d(TAG, "onMessage: " + message.getContent() +
+                ", id: " + message.getId() +
+                ", isUnsentMessage: " + isUnsentMessage);
+        if (isUnsentMessage) {
+            List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
+            VisitorMessageItem currentMessage = unsentMessages.get(0);
+            unsentMessages.remove(currentMessage);
+            emitViewState(chatState.changeUnsentMessages(unsentMessages));
+
+            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+            int currentMessageIndex = currentChatItems.indexOf(currentMessage);
+            currentChatItems.remove(currentMessage);
+            currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent()));
+
+            // emitting state because no need to change recyclerview items here
+            emitViewState(chatState.changeItems(currentChatItems));
+            if (!chatState.unsentMessages.isEmpty()) {
+                sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), this);
+            }
+            return;
+        }
+
+        if (message.getAttachment() != null && message.getAttachment()
+                instanceof SingleChoiceAttachment) {
+            SingleChoiceAttachment attachment =
+                    (SingleChoiceAttachment) message.getAttachment();
+
+            if (attachment.getOptions() != null) {
+                for (SingleChoiceOption option : attachment.getOptions()) {
+                    Logger.d(TAG, "onMessage, option text: " + option.getText() +
+                            ", option value: " + option.getValue());
+                }
+            }
+            if (attachment.getSelectedOption() != null) {
+                Logger.d(TAG, "selectedOption: " + attachment.getSelectedOption());
+            }
+        }
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        appendMessageItem(items, message);
+        emitChatItems(chatState.changeItems(items));
+    }
+
+    @Override
+    public void messageSent(VisitorMessage message, GliaException exception) {
+        if (exception != null) {
+            Logger.d(TAG, "messageSent exception");
+            error(exception);
+        }
+        if (message != null) {
+            Logger.d(TAG, "messageSent: " + message.toString() +
+                    ", id: " + message.getId());
+            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+            changeDeliveredIndex(currentChatItems, message);
+            emitChatItems(chatState.changeItems(currentChatItems));
+        }
+    }
+
+    @Override
+    public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
+        if (operatorMediaState.getVideo() != null) {
+            onOperatorMediaStateVideo();
+        } else if (operatorMediaState.getAudio() != null) {
+            onOperatorMediaStateAudio();
+        } else {
+            onOperatorMediaStateUnknown();
+        }
+    }
+
+    public void notificationsDialogDismissed() {
+        dialogController.dismissDialogs();
     }
 }

@@ -12,8 +12,10 @@ public class NotificationFactory {
     private static final int SCREEN_SHARING_PENDING_INTENT_REQUEST_CODE = 1;
 
     public static final String NOTIFICATION_SCREEN_SHARING_CHANNEL_ID = "screensharing_channel";
+    public static final String NOTIFICATION_CALL_CHANNEL_ID = "call_channel";
 
     public static final int SCREEN_SHARING_NOTIFICATION_ID = 1;
+    public static final int CALL_NOTIFICATION_ID = 2;
 
     public static Notification createScreenSharingNotification(Context context) {
         PendingIntent pendingIntent = PendingIntent
@@ -38,4 +40,25 @@ public class NotificationFactory {
                 ).build();
     }
 
+    public static Notification createCallStartedNotification(Context context) {
+        return new NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_baseline_mic)
+                .setContentTitle(context.getString(R.string.notification_audio_call_title))
+                .setContentText(context.getString(R.string.notification_audio_call_message))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setOngoing(true)
+                .build();
+    }
+
+    public static Notification createVideoCallStartedNotification(Context context) {
+        return new NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_baseline_videocam)
+                .setContentTitle(context.getString(R.string.notification_video_call_title))
+                .setContentText(context.getString(R.string.notification_video_call_message))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setOngoing(true)
+                .build();
+    }
 }

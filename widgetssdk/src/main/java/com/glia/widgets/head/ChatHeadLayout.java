@@ -142,6 +142,7 @@ public class ChatHeadLayout extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         chatHeadsController.removeListener(chatHeadListener);
+        onChatHeadClickedListener = null;
         super.onDetachedFromWindow();
     }
 

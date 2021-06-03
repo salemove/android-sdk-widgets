@@ -40,6 +40,8 @@ import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.notification.NotificationFactory;
+import com.glia.widgets.notification.device.NotificationManager;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
@@ -208,13 +210,18 @@ public class CallView extends ConstraintLayout {
 
     public void onResume() {
         if (controller != null) {
-            controller.onResume(Settings.canDrawOverlays(this.getContext()));
+            controller.onResume(Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID));
             if (operatorVideoView != null) {
                 operatorVideoView.resumeRendering();
             }
             if (visitorVideoView != null) {
                 visitorVideoView.resumeRendering();
             }
+        }
+        if (screenSharingController != null) {
+            screenSharingController.onResume(this.getContext());
         }
     }
 
@@ -372,6 +379,10 @@ public class CallView extends ConstraintLayout {
                     post(() -> showScreenSharingDialog());
                 } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
                     post(() -> showScreenSharingEndDialog());
+                } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
+                    post(() -> showAllowNotificationsDialog());
+                } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
+                    post(() -> showAllowScreenSharingNotificationsAndStartSharingDialog());
                 }
             }
         };
@@ -381,6 +392,60 @@ public class CallView extends ConstraintLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void showAllowScreenSharingNotificationsAndStartSharingDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showOptionsDialog(
+                    this.getContext(),
+                    this.theme,
+                    resources.getString(R.string.dialog_screen_sharing_offer_enable_notifications_title),
+                    resources.getString(R.string.dialog_screen_sharing_offer_enable_notifications_message),
+                    resources.getString(R.string.dialog_yes),
+                    resources.getString(R.string.dialog_no),
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        NotificationManager.openNotificationChannelScreen(this.getContext());
+                    },
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        screenSharingController.onScreenSharingDeclined();
+                    },
+                    dialog -> {
+                        dialog.dismiss();
+                        controller.notificationsDialogDismissed();
+                        screenSharingController.onScreenSharingDeclined();
+                    }
+            );
+        }
+    }
+
+    private void showAllowNotificationsDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showOptionsDialog(
+                    this.getContext(),
+                    this.theme,
+                    resources.getString(R.string.dialog_allow_notifications_title),
+                    resources.getString(R.string.dialog_allow_notifications_message),
+                    resources.getString(R.string.dialog_yes),
+                    resources.getString(R.string.dialog_no),
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        NotificationManager.openNotificationChannelScreen(this.getContext());
+                    },
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                    },
+                    dialog -> {
+                        dialog.dismiss();
+                        controller.notificationsDialogDismissed();
+                    }
+            );
+        }
     }
 
     private void showScreenSharingDialog() {
@@ -407,7 +472,7 @@ public class CallView extends ConstraintLayout {
                     R.string.dialog_cancel,
                     R.string.dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),
-                    view -> screenSharingController.onEndScreenSharing(getContext())
+                    view -> screenSharingController.onEndScreenSharing()
             );
         }
     }
@@ -588,6 +653,9 @@ public class CallView extends ConstraintLayout {
         Integer iconPlaceholder = uiTheme.getIconPlaceholder() != null ?
                 uiTheme.getIconPlaceholder() : this.theme.getIconPlaceholder();
 
+        Integer whiteLabel = uiTheme.getWhiteLabel() != null ?
+                uiTheme.getWhiteLabel() : this.theme.getWhiteLabel();
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setTheme(this.theme);
         builder.setFontRes(fontRes);
@@ -608,6 +676,7 @@ public class CallView extends ConstraintLayout {
         builder.setIconCallSpeakerOff(iconCallSpeakerOff);
         builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
+        builder.setWhiteLabel(whiteLabel);
         this.theme = builder.build();
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {

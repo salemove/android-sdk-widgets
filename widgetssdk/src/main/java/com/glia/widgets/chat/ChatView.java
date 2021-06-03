@@ -17,38 +17,47 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.ChatItem;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.notification.NotificationFactory;
+import com.glia.widgets.notification.device.NotificationManager;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.shape.MarkerEdgeTreatment;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.util.List;
 
-public class ChatView extends LinearLayout {
+public class ChatView extends ConstraintLayout {
 
     private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
@@ -68,6 +77,12 @@ public class ChatView extends LinearLayout {
     private ChatAdapter adapter;
     private AppBarView appBar;
     private View dividerView;
+    private RelativeLayout newMessagesLayout;
+    private MaterialCardView newMessagesCardView;
+    private OperatorStatusView newMessagesOperatorStatusView;
+    private TextView newMessagesCountBadgeView;
+
+    private boolean isInBottom = true;
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
@@ -77,17 +92,12 @@ public class ChatView extends LinearLayout {
     private OnNavigateToCallListener onNavigateToCallListener;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
-        public void onClicked(
-                String id,
-                int indexInList,
-                int messageIndex,
-                int optionIndex
-        ) {
+        public void onClicked(String id, int indexInList, int optionIndex) {
+            Logger.d(TAG, "singleChoiceCardClicked");
             if (controller != null) {
                 controller.singleChoiceOptionClicked(
                         id,
                         indexInList,
-                        messageIndex,
                         optionIndex
                 );
             }
@@ -100,6 +110,15 @@ public class ChatView extends LinearLayout {
             chatRecyclerView.smoothScrollToPosition(adapter.getItemCount());
         }
     };
+    private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (controller != null) {
+                controller.onRecyclerviewPositionChanged(!recyclerView.canScrollVertically(1));
+            }
+        }
+    };
 
     private final Resources resources;
 
@@ -109,8 +128,7 @@ public class ChatView extends LinearLayout {
             super.onItemRangeInserted(positionStart, itemCount);
             int totalItemCount = adapter.getItemCount();
             int lastIndex = totalItemCount - 1;
-            boolean scrollToBottom = positionStart + itemCount >= lastIndex;
-            if (scrollToBottom) {
+            if (isInBottom) {
                 chatRecyclerView.scrollToPosition(lastIndex);
             }
         }
@@ -204,7 +222,9 @@ public class ChatView extends LinearLayout {
                     activity instanceof ChatActivity && useOverlays,
                     activity instanceof ChatActivity && savedInstanceState != null,
                     this.theme,
-                    Settings.canDrawOverlays(this.getContext())
+                    Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
             );
         }
     }
@@ -266,9 +286,14 @@ public class ChatView extends LinearLayout {
      */
     public void onResume() {
         if (controller != null) {
-            controller.onResume(Settings.canDrawOverlays(this.getContext()));
+            controller.onResume(Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
+                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID));
             if (screenSharingCallback != null)
                 screenSharingController.setGliaScreenSharingCallback(screenSharingCallback);
+        }
+        if (screenSharingController != null) {
+            screenSharingController.onResume(this.getContext());
         }
     }
 
@@ -288,6 +313,7 @@ public class ChatView extends LinearLayout {
         callback = null;
         adapter.unregisterAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(null);
+        chatRecyclerView.removeOnScrollListener(onScrollListener);
 
         if (screenSharingController != null) {
             screenSharingController.onDestroy(true);
@@ -314,18 +340,42 @@ public class ChatView extends LinearLayout {
             @Override
             public void emitState(ChatState chatState) {
                 post(() -> {
-                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED);
-                    chatEditText.setHint(
-                            chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD ?
-                                    R.string.chat_single_choice_card_hint :
-                                    R.string.chat_enter_message);
-
+                    switch (chatState.chatInputMode) {
+                        case SINGLE_CHOICE_CARD:
+                            chatEditText.setHint(R.string.chat_single_choice_card_hint);
+                            break;
+                        case ENABLED_NO_ENGAGEMENT:
+                            if (chatState.lastTypedText.isEmpty()) {
+                                chatEditText.setHint(R.string.chat_not_started_hint);
+                            } else {
+                                chatEditText.setHint("");
+                            }
+                            break;
+                        default:
+                            chatEditText.setHint(R.string.chat_enter_message);
+                            break;
+                    }
+                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
+                            chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
                     if (chatState.isOperatorOnline()) {
                         appBar.showEndButton();
-                    } else {
+                    } else if (chatState.engagementRequested) {
                         appBar.showXButton();
+                    } else {
+                        appBar.hideLeaveButtons();
                     }
 
+                    newMessagesLayout.setVisibility(
+                            chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
+                    );
+                    newMessagesOperatorStatusView.showPlaceHolder();
+                    if (chatState.operatorProfileImgUrl != null) {
+                        newMessagesOperatorStatusView.showProfileImage(chatState.operatorProfileImgUrl);
+                    } else {
+                        newMessagesOperatorStatusView.showPlaceHolder();
+                    }
+                    isInBottom = chatState.isChatInBottom;
+                    newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
                     if (chatState.isVisible) {
                         showChat();
                     } else {
@@ -356,6 +406,16 @@ public class ChatView extends LinearLayout {
             @Override
             public void setLastTypedText(String lastTypedText) {
                 post(() -> chatEditText.setText(lastTypedText));
+            }
+
+            @Override
+            public void smoothScrollToBottom() {
+                post(() -> chatRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1));
+            }
+
+            @Override
+            public void scrollToBottomImmediate() {
+                post(() -> chatRecyclerView.scrollToPosition(adapter.getItemCount() - 1));
             }
         };
 
@@ -390,6 +450,10 @@ public class ChatView extends LinearLayout {
                 post(this::showScreenSharingDialog);
             } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
                 post(this::showScreenSharingEndDialog);
+            } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
+                post(this::showAllowNotificationsDialog);
+            } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
+                post(this::showAllowScreenSharingNotificationsAndStartSharingDialog);
             }
         };
 
@@ -400,6 +464,59 @@ public class ChatView extends LinearLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void showAllowScreenSharingNotificationsAndStartSharingDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showOptionsDialog(
+                    this.getContext(),
+                    this.theme,
+                    resources.getString(R.string.dialog_screen_sharing_offer_enable_notifications_title),
+                    resources.getString(R.string.dialog_screen_sharing_offer_enable_notifications_message),
+                    resources.getString(R.string.dialog_yes),
+                    resources.getString(R.string.dialog_no),
+                    view -> {
+                        dismissAlertDialog();
+                        NotificationManager.openNotificationChannelScreen(this.getContext());
+                    },
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        screenSharingController.onScreenSharingDeclined();
+                    },
+                    dialog -> {
+                        dialog.dismiss();
+                        controller.notificationsDialogDismissed();
+                        screenSharingController.onScreenSharingDeclined();
+                    }
+            );
+        }
+    }
+
+    private void showAllowNotificationsDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            alertDialog = Dialogs.showOptionsDialog(
+                    this.getContext(),
+                    this.theme,
+                    resources.getString(R.string.dialog_allow_notifications_title),
+                    resources.getString(R.string.dialog_allow_notifications_message),
+                    resources.getString(R.string.dialog_yes),
+                    resources.getString(R.string.dialog_no),
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                        NotificationManager.openNotificationChannelScreen(this.getContext());
+                    },
+                    view -> {
+                        dismissAlertDialog();
+                        controller.notificationsDialogDismissed();
+                    },
+                    dialog -> {
+                        dialog.dismiss();
+                        controller.notificationsDialogDismissed();
+                    }
+            );
+        }
     }
 
     private void showScreenSharingDialog() {
@@ -427,7 +544,7 @@ public class ChatView extends LinearLayout {
                     R.string.dialog_cancel,
                     R.string.dialog_end_sharing,
                     view -> screenSharingController.onDismissEndScreenSharing(),
-                    view -> screenSharingController.onEndScreenSharing(getContext())
+                    view -> screenSharingController.onEndScreenSharing()
             );
         }
     }
@@ -470,7 +587,6 @@ public class ChatView extends LinearLayout {
     }
 
     private void initConfigurations() {
-        setOrientation(VERTICAL);
         setVisibility(INVISIBLE);
         // needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f);
@@ -483,19 +599,43 @@ public class ChatView extends LinearLayout {
         chatEditText = view.findViewById(R.id.chat_edit_text);
         appBar = view.findViewById(R.id.app_bar_view);
         dividerView = view.findViewById(R.id.divider_view);
+        newMessagesLayout = view.findViewById(R.id.new_messages_indicator_layout);
+        newMessagesCardView = view.findViewById(R.id.new_messages_indicator_card);
+        newMessagesOperatorStatusView = view.findViewById(R.id.new_messages_indicator_image);
+        newMessagesCountBadgeView = view.findViewById(R.id.new_messages_badge_view);
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme, onOptionClickedListener, this.onImageLoadedListener);
+        adapter = new ChatAdapter(
+                this.theme, this.onOptionClickedListener, this.onImageLoadedListener
+        );
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
+        chatRecyclerView.addOnScrollListener(onScrollListener);
 
         appBar.setTheme(this.theme);
 
         //icons
         sendButton.setImageResource(this.theme.getIconSendMessage());
 
+        // new messages indicator shape
+        ShapeAppearanceModel shapeAppearanceModel = newMessagesCardView.getShapeAppearanceModel()
+                .toBuilder()
+                .setBottomEdge(new MarkerEdgeTreatment(
+                        resources.getDimension(R.dimen.chat_new_messages_bottom_edge_radius)
+                ))
+                .build();
+        newMessagesOperatorStatusView.isRippleAnimationShowing(false);
+        newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
+        newMessagesCountBadgeView.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                        this.getContext(), theme.getBrandPrimaryColor()
+                )
+        );
+        newMessagesCountBadgeView.setTextColor(
+                ContextCompat.getColor(this.getContext(), theme.getBaseLightColor())
+        );
 
         // colors
         dividerView.setBackgroundColor(ContextCompat.getColor(
@@ -565,7 +705,6 @@ public class ChatView extends LinearLayout {
             if (controller != null && controller.sendMessage(message)) {
                 chatEditText.setText("");
             }
-            Utils.hideSoftKeyboard(this.getContext(), getWindowToken());
         });
 
         appBar.setOnBackClickedListener(() -> {
@@ -584,6 +723,12 @@ public class ChatView extends LinearLayout {
         appBar.setOnXClickedListener(() -> {
             if (controller != null) {
                 controller.leaveChatQueueClicked();
+            }
+        });
+
+        newMessagesCardView.setOnClickListener(v -> {
+            if (controller != null) {
+                controller.newMessagesIndicatorClicked();
             }
         });
     }

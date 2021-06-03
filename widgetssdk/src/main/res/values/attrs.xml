@@ -55,6 +55,8 @@
         <attr name="iconCallMinimize" format="reference" />
         <!-- The icon resId used in a chat head if an operator's profile image is absent -->
         <attr name="iconPlaceholder" format="reference" />
+
+        <attr name="whiteLabel" format="reference" />
     </declare-styleable>
 
     <attr name="gliaChatStyle" format="reference" />
@@ -108,6 +110,8 @@
     <attr name="gliaIconCallMinimize" format="reference" />
     <!-- The icon resId used in a chat head if an operator's profile image is absent -->
     <attr name="gliaIconPlaceholder" format="reference" />
+
+    <attr name="gliaWhiteLabel" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />

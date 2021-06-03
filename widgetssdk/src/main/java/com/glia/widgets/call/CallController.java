@@ -8,6 +8,7 @@ import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -17,7 +18,14 @@ import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.model.PermissionType;
+import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
+import com.glia.widgets.permissions.ResetPermissionsUseCase;
+import com.glia.widgets.permissions.UpdateDialogShownUseCase;
+import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 
 public class CallController {
 
@@ -39,6 +47,14 @@ public class CallController {
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
     private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
 
+    private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
+    private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
+    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
+    private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
+    private final UpdateDialogShownUseCase updateDialogShownUseCase;
+    private final UpdatePermissionsUseCase updatePermissionsUseCase;
+    private final ResetPermissionsUseCase resetPermissionsUseCase;
+
     private final DialogController dialogController;
 
     private final String TAG = "CallController";
@@ -53,7 +69,14 @@ public class CallController {
             MinimizeHandler minimizeHandler,
             ChatHeadsController chatHeadsController,
             DialogController dialogController,
-            MessagesNotSeenHandler messagesNotSeenHandler
+            MessagesNotSeenHandler messagesNotSeenHandler,
+            ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
+            ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
+            RemoveCallNotificationUseCase removeCallNotificationUseCase,
+            CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
+            UpdateDialogShownUseCase updateDialogShownUseCase,
+            UpdatePermissionsUseCase updatePermissionsUseCase,
+            ResetPermissionsUseCase resetPermissionsUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -74,10 +97,19 @@ public class CallController {
         this.minimizeHandler = minimizeHandler;
         this.chatHeadsController = chatHeadsController;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
+
+        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
+        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
+        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
+        this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
+        this.updateDialogShownUseCase = updateDialogShownUseCase;
+        this.updatePermissionsUseCase = updatePermissionsUseCase;
+        this.resetPermissionsUseCase = resetPermissionsUseCase;
     }
 
     public void initCall() {
         Logger.d(TAG, "initCall");
+        messagesNotSeenHandler.onNavigatedToCall();
         chatHeadsController.onNavigatedToCall();
         if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;
@@ -120,6 +152,7 @@ public class CallController {
             minimizeHandler.clear();
             messagesNotSeenHandler.removeListener(messagesNotSeenHandlerListener);
             messagesNotSeenHandlerListener = null;
+            resetPermissionsUseCase.execute();
         }
     }
 
@@ -160,21 +193,23 @@ public class CallController {
             public void newOperatorMediaState(OperatorMediaState operatorMediaState) {
                 Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
                 if (operatorMediaState.getVideo() != null) {
-                    Logger.d(TAG, "newOperatorMediaState: video");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState));
+                    if (checkIfShowPermissionsDialogUseCase
+                            .execute(PermissionType.CALL_CHANNEL, true) &&
+                            dialogController.isNoDialogShown()) {
+                        dialogController.showEnableNotificationChannelDialog();
+                        updateDialogShownUseCase.execute(PermissionType.CALL_CHANNEL);
                     }
-                    startOperatorVideo(operatorMediaState);
+                    onOperatorMediaStateVideo(operatorMediaState);
                 } else if (operatorMediaState.getAudio() != null) {
-                    Logger.d(TAG, "newOperatorMediaState: audio");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.audioCallStarted(operatorMediaState));
+                    if (checkIfShowPermissionsDialogUseCase
+                            .execute(PermissionType.CALL_CHANNEL, true) &&
+                            dialogController.isNoDialogShown()) {
+                        dialogController.showEnableNotificationChannelDialog();
+                        updateDialogShownUseCase.execute(PermissionType.CALL_CHANNEL);
                     }
+                    onOperatorMediaStateAudio(operatorMediaState);
                 } else {
-                    Logger.d(TAG, "newOperatorMediaState: null");
-                    if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.backToOngoing());
-                    }
+                    onOperatorMediaStateUnknown();
                 }
             }
 
@@ -242,6 +277,31 @@ public class CallController {
         };
     }
 
+    private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: video");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState));
+        }
+        startOperatorVideo(operatorMediaState);
+        showVideoCallNotificationUseCase.execute();
+    }
+
+    private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: audio");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.audioCallStarted(operatorMediaState));
+        }
+        showAudioCallNotificationUseCase.execute();
+    }
+
+    private void onOperatorMediaStateUnknown() {
+        Logger.d(TAG, "newOperatorMediaState: null");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.backToOngoing());
+        }
+        removeCallNotificationUseCase.execute();
+    }
+
     private synchronized void emitViewState(CallState state) {
         if (setState(state) && viewCallback != null) {
             Logger.d(TAG, "Emit state:\n" + state.toString());
@@ -289,6 +349,7 @@ public class CallController {
         stop();
         chatHeadsController.chatEndedByUser();
         dialogController.dismissDialogs();
+        removeCallNotificationUseCase.execute();
     }
 
     public void endEngagementDialogDismissed() {
@@ -357,9 +418,25 @@ public class CallController {
             );
     }
 
-    public void onResume(boolean canDrawOverlays) {
-        Logger.d(TAG, "onResume, canDrawOverlays: " + canDrawOverlays);
-        chatHeadsController.setHasOverlayPermissions(canDrawOverlays);
+    public void onResume(boolean hasOverlaysPermission,
+                         boolean isCallChannelEnabled,
+                         boolean isScreenSharingChannelEnabled) {
+        Logger.d(TAG, "onResume\n" +
+                "hasOverlayPermissions: " + hasOverlaysPermission +
+                ", isCallChannelEnabled:" + isCallChannelEnabled +
+                ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
+        updatePermissionsUseCase.execute(
+                hasOverlaysPermission,
+                isCallChannelEnabled,
+                isScreenSharingChannelEnabled
+        );
+        if (isCallChannelEnabled) {
+            if (callState.isVideoCall() || callState.is2WayVideoCall()) {
+                showVideoCallNotificationUseCase.execute();
+            } else if (callState.isAudioCall()) {
+                showAudioCallNotificationUseCase.execute();
+            }
+        }
     }
 
     public void chatButtonClicked() {
@@ -475,5 +552,9 @@ public class CallController {
             Logger.d(TAG, "startVisitorVideo");
             viewCallback.startVisitorVideoView(visitorMediaState);
         }
+    }
+
+    public void notificationsDialogDismissed() {
+        dialogController.dismissDialogs();
     }
 }

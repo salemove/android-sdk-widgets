@@ -23,6 +23,9 @@ class Utils {
         Integer systemAgentBubbleColor = getColorValueFromPrefs(R.string.pref_system_agent_bubble_color, sharedPreferences, resources);
         Integer fontFamily = getTypefaceFromPrefs(sharedPreferences, resources);
         Integer systemNegativeColor = getColorValueFromPrefs(R.string.pref_system_negative_color, sharedPreferences, resources);
+
+        Integer whiteLabel = getWhiteLabelValueFromPrefs(sharedPreferences, resources);
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
 
         builder.setAppBarTitle(title);
@@ -34,6 +37,8 @@ class Utils {
         builder.setBrandPrimaryColor(brandPrimaryColor);
         builder.setFontRes(fontFamily);
         builder.setSystemNegativeColor(systemNegativeColor);
+        builder.setWhiteLabel(whiteLabel);
+        
         return builder.build();
     }
 
@@ -81,5 +86,10 @@ class Utils {
             }
         }
         return null;
+    }
+
+    public static Integer getWhiteLabelValueFromPrefs(SharedPreferences sharedPreferences, Resources resources) {
+        boolean whiteLabel = sharedPreferences.getBoolean(resources.getString(R.string.pref_white_label), false);
+        return whiteLabel ? 1 : 0;
     }
 }

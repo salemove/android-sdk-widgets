@@ -53,6 +53,15 @@ public class MessagesNotSeenHandler {
         isCounting = false;
     }
 
+    public void onNavigatedToCall() {
+        Logger.d(TAG, "onNavigatedToCall");
+        isCounting = true;
+    }
+
+    public void chatUpgradeOfferAccepted() {
+        emitCount(0);
+    }
+
     public void addListener(MessagesNotSeenHandlerListener listener) {
         Logger.d(TAG, "addListener");
         this.listeners.add(listener);
@@ -70,11 +79,6 @@ public class MessagesNotSeenHandler {
         for (MessagesNotSeenHandlerListener listener : listeners) {
             listener.onNewCount(count);
         }
-    }
-
-    public void chatUpgradeOfferAccepted() {
-        emitCount(0);
-        isCounting = true;
     }
 
     public interface MessagesNotSeenHandlerListener {

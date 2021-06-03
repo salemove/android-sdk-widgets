@@ -165,6 +165,11 @@ public class AppBarView extends AppBarLayout {
         endButton.setOnClickListener(v -> onEndChatClickedListener.onEnd());
     }
 
+    public void hideLeaveButtons() {
+        endButton.setVisibility(GONE);
+        materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(false);
+    }
+
     public interface OnBackClickedListener {
         void onBackClicked();
     }

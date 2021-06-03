@@ -10,6 +10,7 @@
 
         <activity
             android:name=".chat.ChatActivity"
+            android:windowSoftInputMode="adjustPan"
             android:launchMode="singleTask" />
 
         <activity
@@ -26,8 +27,6 @@
             android:name=".notification.NotificationActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_ENDED" />
-                <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_START" />
                 <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED" />
             </intent-filter>
         </receiver>

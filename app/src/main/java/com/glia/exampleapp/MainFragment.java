@@ -16,6 +16,7 @@ import androidx.preference.PreferenceManager;
 
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
 
 public class MainFragment extends Fragment {
@@ -43,7 +44,13 @@ public class MainFragment extends Fragment {
             navController.navigate(R.id.chat);
         });
         view.findViewById(R.id.chat_activity_button).setOnClickListener(v -> {
-            Intent intent = getNavigationIntent(sharedPreferences);
+            Intent intent = new Intent(requireContext(), ChatActivity.class);
+            setNavigationIntentData(intent, sharedPreferences);
+            startActivity(intent);
+        });
+        view.findViewById(R.id.call_activity_button).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), CallActivity.class);
+            setNavigationIntentData(intent, sharedPreferences);
             startActivity(intent);
         });
     }
@@ -54,8 +61,7 @@ public class MainFragment extends Fragment {
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private Intent getNavigationIntent(SharedPreferences sharedPreferences) {
-        Intent intent = new Intent(requireContext(), ChatActivity.class);
+    private void setNavigationIntentData(Intent intent, SharedPreferences sharedPreferences) {
         intent.putExtra(GliaWidgets.COMPANY_NAME,
                 Utils.getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences, getResources()));
         intent.putExtra(GliaWidgets.QUEUE_ID,
@@ -66,6 +72,5 @@ public class MainFragment extends Fragment {
         intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
         // use to set the bubble functionality
         // intent.putExtra(GliaWidgets.USE_OVERLAY, false);
-        return intent;
     }
 }

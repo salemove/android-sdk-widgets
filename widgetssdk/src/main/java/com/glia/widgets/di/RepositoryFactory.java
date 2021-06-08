@@ -1,6 +1,5 @@
 package com.glia.widgets.di;
 
-import com.glia.widgets.model.GliaCallRepository;
 import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.model.GliaEngagementRepository;
 import com.glia.widgets.model.GliaMediaRepository;
@@ -18,10 +17,6 @@ public class RepositoryFactory {
             mediaUpgradeOfferRepository = new MediaUpgradeOfferRepository();
         }
         return mediaUpgradeOfferRepository;
-    }
-
-    public GliaCallRepository getGliaCallRepository() {
-        return new GliaCallRepository();
     }
 
     public GliaScreenSharingRepository getGliaScreenSharingRepository() {

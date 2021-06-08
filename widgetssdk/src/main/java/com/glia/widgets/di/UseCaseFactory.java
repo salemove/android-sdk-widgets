@@ -8,6 +8,7 @@ import com.glia.widgets.glia.GliaOnEngagementUseCase;
 import com.glia.widgets.glia.GliaOnMessageUseCase;
 import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
 import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
+import com.glia.widgets.glia.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
@@ -135,5 +136,9 @@ public class UseCaseFactory {
 
     public CheckIfHasPermissionsUseCase createCheckIfHasPermissionsUseCase() {
         return new CheckIfHasPermissionsUseCase(permissionsManager);
+    }
+
+    public GliaOnVisitorMediaStateUseCase createGliaOnVisitorMediaStateUseCase(){
+        return new GliaOnVisitorMediaStateUseCase(repositoryFactory.getGliaMediaStateRepository());
     }
 }

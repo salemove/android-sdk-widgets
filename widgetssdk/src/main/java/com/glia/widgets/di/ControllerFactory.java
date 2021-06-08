@@ -120,7 +120,6 @@ public class ControllerFactory {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
-                    repositoryFactory.getGliaCallRepository(),
                     repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
                     callViewCallback,
@@ -135,8 +134,12 @@ public class ControllerFactory {
                     useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase()
-            );
+                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createGliaOnOperatorMediaStateUseCase(),
+                    useCaseFactory.createGliaOnVisitorMediaStateUseCase(),
+                    useCaseFactory.createOnEngagementEndUseCase(),
+                    useCaseFactory.createEndEngagementUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

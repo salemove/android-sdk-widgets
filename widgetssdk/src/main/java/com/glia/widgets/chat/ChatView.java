@@ -41,6 +41,7 @@ import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;

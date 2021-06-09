@@ -102,8 +102,7 @@ public class ChatHeadsController implements
                 ", isChatInBackstack: " + isChatInBackstack);
         if (callingActivity.equals(Constants.CALL_ACTIVITY)) {
             emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested &&
-                            chatHeadState.operatorMediaState != null,
+                    chatHeadState.engagementRequested,
                     callingActivity));
         } else if (callingActivity.equals(Constants.CHAT_ACTIVITY)) {
             emitViewState(chatHeadState.onNewMessage(0));

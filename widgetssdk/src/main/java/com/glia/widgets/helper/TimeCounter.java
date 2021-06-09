@@ -76,14 +76,14 @@ public class TimeCounter {
             public void run() {
                 Logger.d(TAG, "Timer value: " + value);
                 for (RawTimerStatusListener listener : rawListeners) {
-                    listener.onNewTimerValue(value);
+                    listener.onNewRawTimerValue(value);
                 }
 
                 if (!formattedListeners.isEmpty()) {
                     String time = Utils.toMmSs(Long.valueOf(TimeUnit.MILLISECONDS.toSeconds(value)).intValue());
                     Logger.d(TAG, "Formatted timer: " + time);
                     for (FormattedTimerStatusListener listener : formattedListeners) {
-                        listener.onNewTimerValue(time);
+                        listener.onNewFormattedTimerValue(time);
                     }
                 }
                 value = value + timerIntervalMs;
@@ -92,10 +92,10 @@ public class TimeCounter {
             @Override
             public boolean cancel() {
                 for (RawTimerStatusListener listener : rawListeners) {
-                    listener.onCancel();
+                    listener.onRawTimerCancelled();
                 }
                 for (FormattedTimerStatusListener listener : formattedListeners) {
-                    listener.onCancel();
+                    listener.onFormattedTimerCancelled();
                 }
                 Logger.d(TAG, "cancel");
                 return super.cancel();
@@ -103,15 +103,19 @@ public class TimeCounter {
         };
     }
 
-    public interface FormattedTimerStatusListener {
-        void onNewTimerValue(String formatedValue);
+    public boolean isRunning() {
+        return timerTask != null;
+    }
 
-        void onCancel();
+    public interface FormattedTimerStatusListener {
+        void onNewFormattedTimerValue(String formatedValue);
+
+        void onFormattedTimerCancelled();
     }
 
     public interface RawTimerStatusListener {
-        void onNewTimerValue(int timerValue);
+        void onNewRawTimerValue(int timerValue);
 
-        void onCancel();
+        void onRawTimerCancelled();
     }
 }

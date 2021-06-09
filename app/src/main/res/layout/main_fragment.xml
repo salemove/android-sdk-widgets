@@ -66,15 +66,26 @@
         app:layout_constraintTop_toBottomOf="@id/integrator_chat" />
 
     <Button
-        android:id="@+id/call_activity_button"
+        android:id="@+id/audio_call_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
-        android:text="@string/main_start_call_flow"
+        android:text="@string/main_start_audio_call"
         app:icon="@drawable/ic_baseline_call"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/chat_activity_button" />
+
+    <Button
+        android:id="@+id/video_call_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        android:text="@string/main_start_video_call"
+        app:icon="@drawable/ic_baseline_videocam"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/audio_call_button" />
 
     <com.glia.widgets.head.ChatHeadLayout
         android:layout_width="match_parent"

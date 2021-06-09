@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -23,6 +24,7 @@ public class CallActivity extends Activity {
     private String queueId;
     private UiTheme runtimeTheme;
     private String contextUrl;
+    private boolean useOverlays;
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = () -> {
@@ -47,11 +49,12 @@ public class CallActivity extends Activity {
         queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
         runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
+        useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
         callView.setTheme(runtimeTheme);
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
-        callView.startCall();
+        callView.startCall(companyName, queueId, contextUrl, useOverlays, getMediaType(intent));
     }
 
     @Override
@@ -107,6 +110,16 @@ public class CallActivity extends Activity {
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
         newIntent.putExtra(GliaWidgets.UI_THEME, runtimeTheme);
+        newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
         startActivity(newIntent);
+    }
+
+    private Engagement.MediaType getMediaType(Intent intent) {
+        String mediaType = intent.getStringExtra(GliaWidgets.MEDIA_TYPE);
+        if (mediaType != null && mediaType.equals(GliaWidgets.MEDIA_TYPE_VIDEO)) {
+            return Engagement.MediaType.VIDEO;
+        } else {
+            return Engagement.MediaType.AUDIO;
+        }
     }
 }

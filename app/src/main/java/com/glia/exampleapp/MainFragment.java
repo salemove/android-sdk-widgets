@@ -48,9 +48,16 @@ public class MainFragment extends Fragment {
             setNavigationIntentData(intent, sharedPreferences);
             startActivity(intent);
         });
-        view.findViewById(R.id.call_activity_button).setOnClickListener(v -> {
+        view.findViewById(R.id.audio_call_button).setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), CallActivity.class);
             setNavigationIntentData(intent, sharedPreferences);
+            intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_AUDIO);
+            startActivity(intent);
+        });
+        view.findViewById(R.id.video_call_button).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), CallActivity.class);
+            setNavigationIntentData(intent, sharedPreferences);
+            intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_VIDEO);
             startActivity(intent);
         });
     }

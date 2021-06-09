@@ -19,6 +19,7 @@ public class ChatActivity extends AppCompatActivity {
     private String companyName;
     private String queueId;
     private String contextUrl;
+    private boolean useOverlays;
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         chatView.backPressed();
@@ -43,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
         queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
         UiTheme runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
-        boolean useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
+        useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
 
         chatView = findViewById(R.id.chat_view);
         if (runtimeTheme != null) {
@@ -101,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
         newIntent.putExtra(GliaWidgets.UI_THEME, theme);
+        newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
         startActivity(newIntent);
     }
 }

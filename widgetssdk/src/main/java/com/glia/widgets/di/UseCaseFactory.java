@@ -8,7 +8,9 @@ import com.glia.widgets.glia.GliaOnEngagementUseCase;
 import com.glia.widgets.glia.GliaOnMessageUseCase;
 import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
 import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
+import com.glia.widgets.glia.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
+import com.glia.widgets.glia.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
 import com.glia.widgets.model.PermissionsManager;
@@ -78,6 +80,10 @@ public class UseCaseFactory {
         return new GliaQueueForEngagementUseCase(repositoryFactory.getGliaRepository());
     }
 
+    public GliaQueueForMediaEngagementUseCase createGliaQueueForMediaEngagementUseCase() {
+        return new GliaQueueForMediaEngagementUseCase(repositoryFactory.getGliaRepository());
+    }
+
     public GliaCancelQueueTicketUseCase createCancelQueueTicketUseCase() {
         return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaRepository());
     }
@@ -98,11 +104,17 @@ public class UseCaseFactory {
     }
 
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
-        return new GliaOnMessageUseCase(repositoryFactory.getGliaMessageRepository());
+        return new GliaOnMessageUseCase(
+                repositoryFactory.getGliaMessageRepository(),
+                createOnEngagementUseCase()
+        );
     }
 
     public GliaOnOperatorMediaStateUseCase createGliaOnOperatorMediaStateUseCase() {
-        return new GliaOnOperatorMediaStateUseCase(repositoryFactory.getGliaMediaStateRepository());
+        return new GliaOnOperatorMediaStateUseCase(
+                createOnEngagementUseCase(),
+                repositoryFactory.getGliaMediaStateRepository()
+        );
     }
 
     public GliaSendMessagePreviewUseCase createGliaSendMessagePreviewUseCase() {
@@ -135,5 +147,12 @@ public class UseCaseFactory {
 
     public CheckIfHasPermissionsUseCase createCheckIfHasPermissionsUseCase() {
         return new CheckIfHasPermissionsUseCase(permissionsManager);
+    }
+
+    public GliaOnVisitorMediaStateUseCase createGliaOnVisitorMediaStateUseCase() {
+        return new GliaOnVisitorMediaStateUseCase(
+                createOnEngagementUseCase(),
+                repositoryFactory.getGliaMediaStateRepository()
+        );
     }
 }

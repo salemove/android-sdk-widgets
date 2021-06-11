@@ -26,7 +26,7 @@ class PermissionsState {
         return new PermissionsState(
                 true,
                 true,
-                true,
+                false,
                 false,
                 false
         );

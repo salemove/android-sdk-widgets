@@ -39,8 +39,10 @@ import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;
@@ -64,6 +66,7 @@ public class ChatView extends ConstraintLayout {
 
     private ChatViewCallback callback;
     private ChatController controller;
+    private ChatHeadsController chatHeadsController;
 
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
@@ -212,16 +215,28 @@ public class ChatView extends ConstraintLayout {
             String contextUrl,
             boolean useOverlays,
             Bundle savedInstanceState) {
+        Activity activity = Utils.getActivity(this.getContext());
+        boolean isConfigurationChange = activity instanceof ChatActivity &&
+                savedInstanceState != null;
+        if (!isConfigurationChange) {
+            if (chatHeadsController != null) {
+                chatHeadsController.onNavigatedToChat(
+                        new ChatHeadInput(
+                                companyName,
+                                queueId,
+                                contextUrl,
+                                this.theme
+                        ),
+                        activity instanceof ChatActivity,
+                        activity instanceof ChatActivity && useOverlays
+                );
+            }
+        }
         if (controller != null) {
-            Activity activity = Utils.getActivity(this.getContext());
             controller.initChat(
                     companyName,
                     queueId,
                     contextUrl,
-                    activity instanceof ChatActivity,
-                    activity instanceof ChatActivity && useOverlays,
-                    activity instanceof ChatActivity && savedInstanceState != null,
-                    this.theme,
                     Settings.canDrawOverlays(this.getContext()),
                     NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
                     NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
@@ -245,6 +260,9 @@ public class ChatView extends ConstraintLayout {
     public void backPressed() {
         if (controller != null) {
             controller.onBackArrowClicked();
+        }
+        if (chatHeadsController != null) {
+            chatHeadsController.onChatBackButtonPressed();
         }
     }
 
@@ -424,6 +442,8 @@ public class ChatView extends ConstraintLayout {
         controller = Dependencies
                 .getControllerFactory()
                 .getChatController(Utils.getActivity(this.getContext()), callback);
+
+        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
 
         dialogCallback = dialogsState -> {
             if (dialogsState instanceof DialogsState.NoDialog) {
@@ -711,6 +731,9 @@ public class ChatView extends ConstraintLayout {
             if (controller != null) {
                 controller.onBackArrowClicked();
             }
+            if (chatHeadsController != null) {
+                chatHeadsController.onChatBackButtonPressed();
+            }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
             }
@@ -743,6 +766,9 @@ public class ChatView extends ConstraintLayout {
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
                     }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -772,6 +798,9 @@ public class ChatView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -837,6 +866,9 @@ public class ChatView extends ConstraintLayout {
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
                     }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -869,6 +901,9 @@ public class ChatView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.unexpectedErrorDialogDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();

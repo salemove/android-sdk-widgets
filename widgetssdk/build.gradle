@@ -49,17 +49,50 @@ ext {
     picassoVersion = '2.5.2'
 }
 
+repositories {
+    flatDir {
+        dirs '../app/libs'
+    }
+}
+
 dependencies {
+    // Glia sdk aar
+    implementation(name: 'glia-core-sdk-0.19.0', ext: 'aar')
+
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "com.glia:android-sdk:$gliaSdkVersion"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
     implementation "com.airbnb.android:lottie:$lottieVersion"
-    implementation "com.squareup.picasso:picasso:$picassoVersion"
+
+
+    //implementation "com.squareup.picasso:picasso:$picassoVersion"
+
     // removed because becomes slow on Android 11. They say it is fixed, but I still have the issue.
     // https://square.github.io/leakcanary/changelog/
     // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+
+    // Glia core sdk dependencies - no need to add separate versions. Will be removed soon.
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.6'
+    implementation 'org.webrtc:google-webrtc:1.0.28032'
+    implementation 'com.github.dsrees:JavaPhoenixClient:0.1.6'
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation 'com.vanniktech:lint-rules-rxjava2:0.9.0'
+    implementation 'com.vanniktech:lint-rules-android:0.9.0'
+    implementation 'com.caverock:androidsvg-aar:1.3'
+    implementation 'com.google.guava:guava:27.0.1-android'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.twilio:voice-android:5.2.0'
 }

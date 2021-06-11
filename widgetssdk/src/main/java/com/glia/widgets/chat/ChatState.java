@@ -22,7 +22,6 @@ public class ChatState {
     public final String companyName;
     public final String queueId;
     public final String contextUrl;
-    public final boolean overlaysPermissionDialogShown;
     public final MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
     public final List<ChatItem> chatItems;
     public final ChatInputMode chatInputMode;
@@ -43,7 +42,6 @@ public class ChatState {
             String contextUrl,
             boolean isVisible,
             boolean integratorChatStarted,
-            boolean overlaysPermissionDialogShown,
             MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem,
             List<ChatItem> chatItems,
             ChatInputMode chatInputMode,
@@ -63,7 +61,6 @@ public class ChatState {
         this.contextUrl = contextUrl;
         this.isVisible = isVisible;
         this.integratorChatStarted = integratorChatStarted;
-        this.overlaysPermissionDialogShown = overlaysPermissionDialogShown;
         this.mediaUpgradeStartedTimerItem = mediaUpgradeStartedTimerItem;
         this.chatItems = Collections.unmodifiableList(chatItems);
         this.chatInputMode = chatInputMode;
@@ -88,6 +85,11 @@ public class ChatState {
         return mediaUpgradeStartedTimerItem != null;
     }
 
+    public boolean isAudioCallStarted(){
+        return isMediaUpgradeStarted() &&
+                mediaUpgradeStartedTimerItem.type == MediaUpgradeStartedTimerItem.Type.AUDIO;
+    }
+
     public boolean showMessagesUnseenIndicator() {
         return !isChatInBottom && messagesNotSeen != null && messagesNotSeen > 0;
     }
@@ -103,7 +105,6 @@ public class ChatState {
         private String contextUrl;
         private boolean isVisible;
         private boolean integratorChatStarted;
-        private boolean overlaysPermissionDialogShown;
         private MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
         private List<ChatItem> chatItems;
         private ChatInputMode chatInputMode;
@@ -125,7 +126,6 @@ public class ChatState {
             contextUrl = chatState.contextUrl;
             isVisible = chatState.isVisible;
             integratorChatStarted = chatState.integratorChatStarted;
-            overlaysPermissionDialogShown = chatState.overlaysPermissionDialogShown;
             mediaUpgradeStartedTimerItem = chatState.mediaUpgradeStartedTimerItem;
             chatItems = chatState.chatItems;
             chatInputMode = chatState.chatInputMode;
@@ -183,11 +183,6 @@ public class ChatState {
             return this;
         }
 
-        public Builder setOverlaysPermissionDialogShown(boolean overlaysPermissionDialogShown) {
-            this.overlaysPermissionDialogShown = overlaysPermissionDialogShown;
-            return this;
-        }
-
         public Builder setMediaUpgradeStartedItem(MediaUpgradeStartedTimerItem mediaUpgradeStartedItem) {
             this.mediaUpgradeStartedTimerItem = mediaUpgradeStartedItem;
             return this;
@@ -239,7 +234,7 @@ public class ChatState {
         }
 
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages, operatorStatusItem);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages, operatorStatusItem);
         }
     }
 
@@ -326,13 +321,6 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState drawOverlayPermissionsDialogShown() {
-        return new Builder()
-                .copyFrom(this)
-                .setOverlaysPermissionDialogShown(true)
-                .createChatState();
-    }
-
     public ChatState chatInputChanged(String text) {
         return new Builder()
                 .copyFrom(this)
@@ -383,7 +371,6 @@ public class ChatState {
         return integratorChatStarted == chatState.integratorChatStarted &&
                 isVisible == chatState.isVisible &&
                 historyLoaded == chatState.historyLoaded &&
-                overlaysPermissionDialogShown == chatState.overlaysPermissionDialogShown &&
                 Objects.equals(queueTicketId, chatState.queueTicketId) &&
                 Objects.equals(operatorName, chatState.operatorName) &&
                 Objects.equals(operatorProfileImgUrl, chatState.operatorProfileImgUrl) &&
@@ -391,7 +378,6 @@ public class ChatState {
                 Objects.equals(queueId, chatState.queueId) &&
                 Objects.equals(contextUrl, chatState.contextUrl) &&
                 Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
-                Objects.equals(chatItems, chatState.chatItems) &&
                 Objects.equals(chatInputMode, chatState.chatInputMode) &&
                 Objects.equals(lastTypedText, chatState.lastTypedText) &&
                 isChatInBottom == chatState.isChatInBottom &&
@@ -405,7 +391,7 @@ public class ChatState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, overlaysPermissionDialogShown, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, isNavigationPending, unsentMessages);
     }
 
     @Override
@@ -420,7 +406,6 @@ public class ChatState {
                 ", companyName='" + companyName + '\'' +
                 ", queueId='" + queueId + '\'' +
                 ", contextUrl='" + contextUrl + '\'' +
-                ", overlaysPermissionDialogShown=" + overlaysPermissionDialogShown +
                 ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
                 ", chatInputMode=" + chatInputMode +
                 ", lastTypedText: " + lastTypedText +

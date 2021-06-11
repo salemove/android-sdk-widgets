@@ -94,24 +94,20 @@ public class ChatHeadsController implements
         handleService();
     }
 
-    public void onBackButtonPressed(
-            String callingActivity,
-            boolean isChatInBackstack
-    ) {
-        Logger.d(TAG, "onBackButtonPressed, callingActivity: " + callingActivity +
-                ", isChatInBackstack: " + isChatInBackstack);
-        if (callingActivity.equals(Constants.CALL_ACTIVITY)) {
-            emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested &&
-                            chatHeadState.operatorMediaState != null,
-                    callingActivity));
-        } else if (callingActivity.equals(Constants.CHAT_ACTIVITY)) {
-            emitViewState(chatHeadState.onNewMessage(0));
-            emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested,
-                    callingActivity
-            ));
-        }
+    public void onChatBackButtonPressed() {
+        Logger.d(TAG, "onChatBackButtonPressed");
+        emitViewState(chatHeadState.onNewMessage(0));
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CHAT_ACTIVITY
+        ));
+    }
+
+    public void onCallBackButtonPressed() {
+        Logger.d(TAG, "onCallBackButtonPressed");
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CALL_ACTIVITY));
     }
 
     public void onMinimizeButtonClicked() {
@@ -130,7 +126,11 @@ public class ChatHeadsController implements
         ));
     }
 
-    public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
+    public void onNavigatedToChat(
+            ChatHeadInput chatHeadInput,
+            boolean enableChatHeads,
+            boolean useOverlays
+    ) {
         Logger.d(TAG, "onNavigatedToChat");
         boolean hasOngoingMedia = chatHeadState.operatorMediaState != null &&
                 (chatHeadState.operatorMediaState.getAudio() != null ||
@@ -145,14 +145,22 @@ public class ChatHeadsController implements
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
+        init(enableChatHeads, useOverlays);
     }
 
-    public void onNavigatedToCall() {
+    public void onNavigatedToCall(
+            ChatHeadInput chatHeadInput,
+            boolean enableChatHeads,
+            boolean useOverlays) {
         Logger.d(TAG, "onNavigatedToCall");
         emitViewState(chatHeadState.changeVisibility(
                 false,
                 null
         ));
+        if (chatHeadInput != null) {
+            lastInput = chatHeadInput;
+        }
+        init(true, useOverlays);
     }
 
     public void chatEndedByUser() {

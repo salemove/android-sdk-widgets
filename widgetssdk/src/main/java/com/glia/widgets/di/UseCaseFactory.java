@@ -104,7 +104,10 @@ public class UseCaseFactory {
     }
 
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
-        return new GliaOnMessageUseCase(repositoryFactory.getGliaMessageRepository());
+        return new GliaOnMessageUseCase(
+                repositoryFactory.getGliaMessageRepository(),
+                createOnEngagementUseCase()
+        );
     }
 
     public GliaOnOperatorMediaStateUseCase createGliaOnOperatorMediaStateUseCase() {

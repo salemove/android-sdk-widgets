@@ -113,7 +113,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/small"
         android:contentDescription="@string/call_speaker_content_description"
-        android:enabled="false"
         android:src="?attr/gliaIconCallSpeakerOff"
         app:backgroundTint="@color/call_fab_bg_color_states"
         app:layout_constraintBottom_toTopOf="@id/speaker_button_label"

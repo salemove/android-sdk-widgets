@@ -9,6 +9,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.AttributeSet;
@@ -30,6 +31,7 @@ import androidx.transition.TransitionSet;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.comms.Audio;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
@@ -39,7 +41,9 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;
@@ -60,6 +64,7 @@ public class CallView extends ConstraintLayout {
 
     private CallViewCallback callback;
     private CallController controller;
+    private ChatHeadsController chatHeadsController;
 
     private ScreenSharingController screenSharingController;
     private ScreenSharingController.ViewCallback screenSharingCallback;
@@ -101,6 +106,7 @@ public class CallView extends ConstraintLayout {
 
     private final Resources resources;
     private Integer defaultStatusbarColor;
+    private AudioManager audioManager;
 
     public CallView(Context context) {
         this(context, null);
@@ -127,7 +133,8 @@ public class CallView extends ConstraintLayout {
         );
 
         this.resources = getResources();
-
+        this.audioManager =
+                (AudioManager) this.getContext().getSystemService(Context.AUDIO_SERVICE);
         initConfigurations();
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
@@ -140,6 +147,12 @@ public class CallView extends ConstraintLayout {
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
                 controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
+            }
+            if (chatHeadsController != null) {
+                chatHeadsController.onBackButtonPressed(
+                        Constants.CALL_ACTIVITY,
+                        Dependencies.isInBackstack(Constants.CHAT_ACTIVITY)
+                );
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -159,10 +172,19 @@ public class CallView extends ConstraintLayout {
             if (controller != null) {
                 controller.chatButtonClicked();
             }
+            if (chatHeadsController != null) {
+                chatHeadsController.onChatButtonClicked();
+            }
+        });
+        speakerButton.setOnClickListener(v -> {
+            controller.onSpeakerButtonPressed();
         });
         minimizeButton.setOnClickListener(v -> {
             if (controller != null) {
                 controller.minimizeButtonClicked();
+            }
+            if (chatHeadsController != null) {
+                chatHeadsController.onMinimizeButtonClicked();
             }
             if (onEndListener != null) {
                 onEndListener.onEnd();
@@ -191,9 +213,28 @@ public class CallView extends ConstraintLayout {
                     companyName,
                     queueId,
                     contextUrl,
+                    mediaType,
+                    Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(
+                            this.getContext(),
+                            NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID
+                    ),
+                    NotificationManager.areNotificationsEnabled(
+                            this.getContext(),
+                            NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID
+                    )
+            );
+        }
+        if (chatHeadsController != null) {
+            chatHeadsController.onNavigatedToCall(
+                    new ChatHeadInput(
+                            companyName,
+                            queueId,
+                            contextUrl,
+                            this.theme
+                    ),
                     true,
-                    useOverlays,
-                    mediaType
+                    useOverlays
             );
         }
     }
@@ -314,11 +355,14 @@ public class CallView extends ConstraintLayout {
                     }
 
                     muteButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
+                    speakerButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
                     videoButton.setEnabled(callState.is2WayVideoCall());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);
                     setButtonActivated(muteButton, theme.getIconCallAudioOn(),
                             theme.getIconCallAudioOff(), callState.isMuted);
+                    setButtonActivated(speakerButton, theme.getIconCallSpeakerOn(),
+                            theme.getIconCallSpeakerOff(), callState.isSpeakerOn);
                     muteButtonLabel.setText(callState.isMuted ?
                             R.string.call_mute_button_unmute :
                             R.string.call_mute_button_mute
@@ -365,6 +409,11 @@ public class CallView extends ConstraintLayout {
             public void startVisitorVideoView(MediaState visitorMediaState) {
                 post(() -> showVisitorVideo(visitorMediaState));
             }
+
+            @Override
+            public void switchSpeakerValue(boolean isSpeakerOn) {
+                post(() -> audioManager.setSpeakerphoneOn(isSpeakerOn));
+            }
         };
 
         screenSharingCallback = new ScreenSharingController.ViewCallback() {
@@ -377,6 +426,8 @@ public class CallView extends ConstraintLayout {
         controller = Dependencies
                 .getControllerFactory()
                 .getCallController(callback);
+
+        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
 
         dialogCallback = new DialogController.Callback() {
             @Override
@@ -429,6 +480,9 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -760,6 +814,12 @@ public class CallView extends ConstraintLayout {
         if (controller != null) {
             controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
         }
+        if (chatHeadsController != null) {
+            chatHeadsController.onBackButtonPressed(
+                    Constants.CALL_ACTIVITY,
+                    Dependencies.isInBackstack(Constants.CHAT_ACTIVITY)
+            );
+        }
     }
 
     private void showCall() {
@@ -796,6 +856,9 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -881,6 +944,9 @@ public class CallView extends ConstraintLayout {
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
                     }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -897,6 +963,9 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.unexpectedErrorDialogDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();

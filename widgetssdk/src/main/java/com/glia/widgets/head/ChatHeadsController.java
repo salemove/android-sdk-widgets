@@ -129,7 +129,11 @@ public class ChatHeadsController implements
         ));
     }
 
-    public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
+    public void onNavigatedToChat(
+            ChatHeadInput chatHeadInput,
+            boolean enableChatHeads,
+            boolean useOverlays
+    ) {
         Logger.d(TAG, "onNavigatedToChat");
         boolean hasOngoingMedia = chatHeadState.operatorMediaState != null &&
                 (chatHeadState.operatorMediaState.getAudio() != null ||
@@ -144,14 +148,22 @@ public class ChatHeadsController implements
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
+        init(enableChatHeads, useOverlays);
     }
 
-    public void onNavigatedToCall() {
+    public void onNavigatedToCall(
+            ChatHeadInput chatHeadInput,
+            boolean enableChatHeads,
+            boolean useOverlays) {
         Logger.d(TAG, "onNavigatedToCall");
         emitViewState(chatHeadState.changeVisibility(
                 false,
                 null
         ));
+        if (chatHeadInput != null) {
+            lastInput = chatHeadInput;
+        }
+        init(true, useOverlays);
     }
 
     public void chatEndedByUser() {

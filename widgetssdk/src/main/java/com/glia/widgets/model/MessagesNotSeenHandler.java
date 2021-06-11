@@ -1,30 +1,39 @@
 package com.glia.widgets.model;
 
 import com.glia.androidsdk.chat.Chat;
+import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
+import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.glia.GliaOnMessageUseCase;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessagesNotSeenHandler {
+public class MessagesNotSeenHandler implements
+        GliaOnMessageUseCase.Listener,
+        GliaOnEngagementEndUseCase.Listener {
 
+    private final GliaOnMessageUseCase gliaOnMessageUseCase;
+    private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
     private final static String TAG = "MessagesNotSeenHandler";
     private int count = 0;
     private boolean isCounting = false;
     private final List<MessagesNotSeenHandlerListener> listeners = new ArrayList<>();
-    private final GliaMessagesNotSeenRepository messagesNotSeenRepository;
 
-    public MessagesNotSeenHandler(GliaMessagesNotSeenRepository messagesNotSeenRepository) {
-        this.messagesNotSeenRepository = messagesNotSeenRepository;
+    public MessagesNotSeenHandler(
+            GliaOnMessageUseCase gliaOnMessageUseCase,
+            GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase
+    ) {
+        this.gliaOnMessageUseCase = gliaOnMessageUseCase;
+        this.gliaOnEngagementEndUseCase = gliaOnEngagementEndUseCase;
     }
 
     public void init() {
         Logger.d(TAG, "init");
-        messagesNotSeenRepository.init(message -> {
-            if (isCounting && message.getSender() == Chat.Participant.OPERATOR) {
-                emitCount(count + 1);
-            }
-        });
+        gliaOnMessageUseCase.execute(this);
+        gliaOnEngagementEndUseCase.execute(this);
     }
 
     public void callOnBackClicked(boolean isChatInBackstack) {
@@ -78,6 +87,18 @@ public class MessagesNotSeenHandler {
         Logger.d(TAG, "emitCount: " + count);
         for (MessagesNotSeenHandlerListener listener : listeners) {
             listener.onNewCount(count);
+        }
+    }
+
+    @Override
+    public void engagementEnded() {
+        emitCount(0);
+    }
+
+    @Override
+    public void onMessage(ChatMessage message) {
+        if (isCounting && message.getSender() == Chat.Participant.OPERATOR) {
+            emitCount(count + 1);
         }
     }
 

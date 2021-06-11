@@ -18,7 +18,6 @@ import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
 import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.glia.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.glia.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -53,7 +52,6 @@ public class CallController implements
     private final TimeCounter callTimer;
     private final TimeCounter inactivityTimeCounter;
     private final MinimizeHandler minimizeHandler;
-    private final ChatHeadsController chatHeadsController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final static int MAX_IDLE_TIME = 3200;
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
@@ -85,7 +83,6 @@ public class CallController implements
             CallViewCallback viewCallback,
             TimeCounter inactivityTimeCounter,
             MinimizeHandler minimizeHandler,
-            ChatHeadsController chatHeadsController,
             DialogController dialogController,
             MessagesNotSeenHandler messagesNotSeenHandler,
             ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
@@ -119,7 +116,6 @@ public class CallController implements
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.inactivityTimeCounter = inactivityTimeCounter;
         this.minimizeHandler = minimizeHandler;
-        this.chatHeadsController = chatHeadsController;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
 
         this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
@@ -142,13 +138,17 @@ public class CallController implements
     public void initCall(String companyName,
                          String queueId,
                          String contextUrl,
-                         boolean enableChatHeads,
-                         boolean useOverlays,
-                         Engagement.MediaType mediaType) {
+                         Engagement.MediaType mediaType,
+                         boolean hasOverlayPermissions,
+                         boolean isCallNotificationChannelEnabled,
+                         boolean isScreenSharingNotificationChannelEnabled) {
         Logger.d(TAG, "initCall");
+        updatePermissionsUseCase.execute(
+                hasOverlayPermissions,
+                isCallNotificationChannelEnabled,
+                isScreenSharingNotificationChannelEnabled
+        );
         messagesNotSeenHandler.onNavigatedToCall();
-        chatHeadsController.init(enableChatHeads, useOverlays);
-        chatHeadsController.onNavigatedToCall();
         if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
@@ -188,6 +188,7 @@ public class CallController implements
                 callTimer.removeFormattedValueListener(callTimerStatusListener);
                 callTimerStatusListener = null;
             }
+            callTimer.clear();
             inactivityTimeCounter.clear();
             inactivityTimerStatusListener = null;
             minimizeCalledListener = null;
@@ -332,7 +333,6 @@ public class CallController implements
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
         stop();
-        chatHeadsController.chatEndedByUser();
         dialogController.dismissDialogs();
         removeCallNotificationUseCase.execute();
     }
@@ -346,14 +346,12 @@ public class CallController implements
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
         dialogController.dismissDialogs();
-        chatHeadsController.chatEndedByUser();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
         dialogController.dismissDialogs();
-        chatHeadsController.chatEndedByUser();
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -375,10 +373,6 @@ public class CallController implements
     public void onBackArrowClicked(boolean isChatInBackstack) {
         Logger.d(TAG, "onBackArrowClicked");
         messagesNotSeenHandler.callOnBackClicked(isChatInBackstack);
-        chatHeadsController.onBackButtonPressed(
-                Constants.CALL_ACTIVITY,
-                isChatInBackstack
-        );
     }
 
     private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {
@@ -415,6 +409,12 @@ public class CallController implements
                 isCallChannelEnabled,
                 isScreenSharingChannelEnabled
         );
+        if (checkIfShowPermissionsDialogUseCase
+                .execute(PermissionType.OVERLAY, true) &&
+                dialogController.isNoDialogShown()) {
+            dialogController.showOverlayPermissionsDialog();
+            updateDialogShownUseCase.execute(PermissionType.OVERLAY);
+        }
         if (isCallChannelEnabled) {
             if (callState.isVideoCall() || callState.is2WayVideoCall()) {
                 showVideoCallNotificationUseCase.execute();
@@ -431,7 +431,6 @@ public class CallController implements
         }
         onDestroy(true);
         messagesNotSeenHandler.callChatButtonClicked();
-        chatHeadsController.onChatButtonClicked();
     }
 
     private void createNewTimerStatusCallback() {
@@ -479,7 +478,6 @@ public class CallController implements
 
     public void minimizeButtonClicked() {
         Logger.d(TAG, "minimizeButtonClicked");
-        chatHeadsController.onMinimizeButtonClicked();
         minimizeHandler.minimize();
     }
 
@@ -623,6 +621,15 @@ public class CallController implements
             Logger.e(TAG, exception.debugMessage);
             dialogController.showUnexpectedErrorDialog();
             emitViewState(callState.changeVisibility(false));
+        }
+    }
+
+    public void onSpeakerButtonPressed() {
+        boolean newValue = !callState.isSpeakerOn;
+        Logger.d(TAG, "onSpeakerButtonPressed, new value: " + newValue);
+        emitViewState(callState.speakerValueChanged(newValue));
+        if (viewCallback != null) {
+            viewCallback.switchSpeakerValue(callState.isSpeakerOn);
         }
     }
 }

@@ -12,4 +12,6 @@ public interface CallViewCallback {
     void startOperatorVideoView(MediaState operatorMediaState);
 
     void startVisitorVideoView(MediaState visitorMediaState);
+
+    void switchSpeakerValue(boolean isSpeakerOn);
 }

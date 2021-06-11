@@ -35,7 +35,8 @@ public class ControllerFactory {
     public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
-                repositoryFactory.getGliaMessagesNotSeenRepository()
+                useCaseFactory.createGliaOnMessageUseCase(),
+                useCaseFactory.createOnEngagementEndUseCase()
         );
         chatHeadsController = new ChatHeadsController(
                 useCaseFactory.createOnEngagementUseCase(),
@@ -56,7 +57,6 @@ public class ControllerFactory {
                     sharedTimer,
                     chatViewCallback,
                     minimizeHandler,
-                    chatHeadsController,
                     dialogController,
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
@@ -87,7 +87,6 @@ public class ControllerFactory {
                     sharedTimer,
                     chatViewCallback,
                     minimizeHandler,
-                    chatHeadsController,
                     dialogController,
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
@@ -125,7 +124,6 @@ public class ControllerFactory {
                     callViewCallback,
                     new TimeCounter(),
                     minimizeHandler,
-                    chatHeadsController,
                     dialogController,
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),

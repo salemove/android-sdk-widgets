@@ -20,6 +20,7 @@ class CallState {
     public final String queueTicketId;
     public final String companyName;
     public final Engagement.MediaType requestedMediaType;
+    public final boolean isSpeakerOn;
 
 
     private CallState(boolean integratorCallStarted,
@@ -31,7 +32,8 @@ class CallState {
                       boolean hasVideo,
                       String queueTicketId,
                       String companyName,
-                      Engagement.MediaType requestedMediaType) {
+                      Engagement.MediaType requestedMediaType,
+                      boolean isSpeakerOn) {
         this.integratorCallStarted = integratorCallStarted;
         this.isVisible = isVisible;
         this.messagesNotSeen = messagesNotSeen;
@@ -42,6 +44,7 @@ class CallState {
         this.queueTicketId = queueTicketId;
         this.companyName = companyName;
         this.requestedMediaType = requestedMediaType;
+        this.isSpeakerOn = isSpeakerOn;
     }
 
     public boolean showOperatorStatusView() {
@@ -243,6 +246,13 @@ class CallState {
                 .createCallState();
     }
 
+    public CallState speakerValueChanged(boolean isSpeakerOn){
+        return new Builder()
+                .copyFrom(this)
+                .setIsSpeakerOn(isSpeakerOn)
+                .createCallState();
+    }
+
     @Override
     public String toString() {
         return "CallState{" +
@@ -256,6 +266,7 @@ class CallState {
                 ", queueTicketId: " + queueTicketId +
                 ", companyName: " + companyName +
                 ", requestedMediaType: " + requestedMediaType +
+                ", isSpeakerOn: " + isSpeakerOn +
                 '}';
     }
 
@@ -273,14 +284,15 @@ class CallState {
                 Objects.equals(callStatus, callState.callStatus) &&
                 Objects.equals(queueTicketId, callState.queueTicketId) &&
                 Objects.equals(companyName, callState.companyName) &&
-                Objects.equals(requestedMediaType, callState.requestedMediaType);
+                Objects.equals(requestedMediaType, callState.requestedMediaType) &&
+                isSpeakerOn == callState.isSpeakerOn;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
                 callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo, queueTicketId,
-                companyName);
+                companyName, requestedMediaType, isSpeakerOn);
     }
 
     public static class Builder {
@@ -294,6 +306,7 @@ class CallState {
         private String queueTicketId;
         private String companyName;
         private Engagement.MediaType requestedMediaType;
+        private boolean isSpeakerOn;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -345,6 +358,11 @@ class CallState {
             return this;
         }
 
+        public Builder setIsSpeakerOn(boolean isSpeakerOn) {
+            this.isSpeakerOn = isSpeakerOn;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -356,6 +374,7 @@ class CallState {
             queueTicketId = callState.queueTicketId;
             companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
+            isSpeakerOn = callState.isSpeakerOn;
             return this;
         }
 
@@ -370,7 +389,9 @@ class CallState {
                     hasVideo,
                     queueTicketId,
                     companyName,
-                    requestedMediaType);
+                    requestedMediaType,
+                    isSpeakerOn
+            );
         }
     }
 }

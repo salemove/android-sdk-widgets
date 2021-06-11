@@ -12,7 +12,7 @@ public class Constants {
     /**
      * Global media timer delay value
      */
-    public static final int CALL_TIMER_DELAY = 1000;
+    public static final int CALL_TIMER_DELAY = 0;
     /**
      * Global media timer interval value
      */

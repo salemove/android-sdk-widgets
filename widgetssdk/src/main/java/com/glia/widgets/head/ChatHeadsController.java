@@ -94,23 +94,20 @@ public class ChatHeadsController implements
         handleService();
     }
 
-    public void onBackButtonPressed(
-            String callingActivity,
-            boolean isChatInBackstack
-    ) {
-        Logger.d(TAG, "onBackButtonPressed, callingActivity: " + callingActivity +
-                ", isChatInBackstack: " + isChatInBackstack);
-        if (callingActivity.equals(Constants.CALL_ACTIVITY)) {
-            emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested,
-                    callingActivity));
-        } else if (callingActivity.equals(Constants.CHAT_ACTIVITY)) {
-            emitViewState(chatHeadState.onNewMessage(0));
-            emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested,
-                    callingActivity
-            ));
-        }
+    public void onChatBackButtonPressed() {
+        Logger.d(TAG, "onChatBackButtonPressed");
+        emitViewState(chatHeadState.onNewMessage(0));
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CHAT_ACTIVITY
+        ));
+    }
+
+    public void onCallBackButtonPressed() {
+        Logger.d(TAG, "onCallBackButtonPressed");
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CALL_ACTIVITY));
     }
 
     public void onMinimizeButtonClicked() {

@@ -16,12 +16,10 @@ class CallState {
     public final boolean landscapeLayoutControlsVisible;
     public final boolean isMuted;
     public final boolean hasVideo;
-
     public final String queueTicketId;
     public final String companyName;
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
-
 
     private CallState(boolean integratorCallStarted,
                       boolean isVisible,

@@ -108,6 +108,7 @@ public class CallController implements
                 .setMessagesNotSeen(0)
                 .setCallStatus(new CallStatus.NotOngoing())
                 .setLandscapeLayoutControlsVisible(false)
+                .setIsSpeakerOn(false)
                 .setIsMuted(false)
                 .setHasVideo(false)
                 .createCallState();

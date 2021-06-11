@@ -32,7 +32,6 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
@@ -263,7 +262,7 @@ public class ChatView extends ConstraintLayout {
             controller.onBackArrowClicked();
         }
         if (chatHeadsController != null) {
-            chatHeadsController.onBackButtonPressed(Constants.CHAT_ACTIVITY, false);
+            chatHeadsController.onChatBackButtonPressed();
         }
     }
 
@@ -733,7 +732,7 @@ public class ChatView extends ConstraintLayout {
                 controller.onBackArrowClicked();
             }
             if (chatHeadsController != null) {
-                chatHeadsController.onBackButtonPressed(Constants.CHAT_ACTIVITY, false);
+                chatHeadsController.onChatBackButtonPressed();
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();

@@ -31,7 +31,6 @@ import androidx.transition.TransitionSet;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.comms.Audio;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
@@ -149,10 +148,7 @@ public class CallView extends ConstraintLayout {
                 controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
             }
             if (chatHeadsController != null) {
-                chatHeadsController.onBackButtonPressed(
-                        Constants.CALL_ACTIVITY,
-                        Dependencies.isInBackstack(Constants.CHAT_ACTIVITY)
-                );
+                chatHeadsController.onCallBackButtonPressed();
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -375,7 +371,7 @@ public class CallView extends ConstraintLayout {
                     operatorNameView.setVisibility(callState.isMediaEngagementStarted() ? VISIBLE : GONE);
                     companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
                     msrView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
-                    callTimerView.setVisibility(callState.isMediaEngagementStarted() ? VISIBLE : GONE);
+                    callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
                     operatorVideoContainer.setVisibility(callState.isVideoCall() &&
                             callState.callStatus.getOperatorMediaState().getVideo().getStatus() ==
@@ -815,10 +811,7 @@ public class CallView extends ConstraintLayout {
             controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
         }
         if (chatHeadsController != null) {
-            chatHeadsController.onBackButtonPressed(
-                    Constants.CALL_ACTIVITY,
-                    Dependencies.isInBackstack(Constants.CHAT_ACTIVITY)
-            );
+            chatHeadsController.onCallBackButtonPressed();
         }
     }
 

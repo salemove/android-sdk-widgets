@@ -355,8 +355,8 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
-                    muteButton.setEnabled(callState.hasMedia());
-                    speakerButton.setEnabled(callState.hasMedia());
+                    muteButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
+                    speakerButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
                     videoButton.setEnabled(callState.is2WayVideoCall());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);

@@ -25,7 +25,6 @@ public class CallActivity extends Activity {
     private UiTheme runtimeTheme;
     private String contextUrl;
     private boolean useOverlays;
-    private String requestedMediaType;
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = () -> {
@@ -51,7 +50,6 @@ public class CallActivity extends Activity {
         runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
         useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
-        requestedMediaType = intent.getStringExtra(GliaWidgets.MEDIA_TYPE);
         callView.setTheme(runtimeTheme);
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);

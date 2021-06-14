@@ -79,6 +79,7 @@ public class CallView extends ConstraintLayout {
     private TextView msrView;
     private TextView callTimerView;
     private TextView connectingView;
+    private TextView continueBrowsingView;
     private FrameLayout operatorVideoContainer;
     private VideoView operatorVideoView;
     private MaterialCardView visitorVideoContainer;
@@ -311,23 +312,27 @@ public class CallView extends ConstraintLayout {
                             appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
                         }
                     }
-                    operatorStatusView.isRippleAnimationShowing(callState.isCallNotOngoing());
+                    operatorStatusView.isRippleAnimationShowing(
+                            callState.isCallNotOngoing() ||
+                                    callState.isCallOngoig()
+                    );
 
-                    if (callState.isMediaEngagementStarted() && callState.hasMedia() &&
-                            callState.callStatus.getOperatorProfileImageUrl() != null) {
+                    if (callState.hasMedia() && callState.callStatus.getOperatorProfileImageUrl() != null) {
                         operatorStatusView.showProfileImage(
                                 callState.callStatus.getOperatorProfileImageUrl());
-                    } else if (callState.isMediaEngagementStarted() && callState.isCallOngoig() &&
+                    } else if (callState.isCallOngoig() && callState.isCallOngoig() &&
                             callState.callStatus.getOperatorProfileImageUrl() != null) {
                         operatorStatusView.showDefaultSizeProfileImage(callState.callStatus.getOperatorProfileImageUrl());
                     } else {
                         operatorStatusView.showDefaultSizePlaceHolder();
                     }
-                    if (callState.callStatus.getFormattedOperatorName() != null) {
+                    if (callState.callStatus.getFormattedOperatorName() != null &&
+                            callState.isCallOngoig()) {
                         operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
                         connectingView.setText(resources.getString(
                                 R.string.call_connecting_with,
-                                callState.callStatus.getFormattedOperatorName()
+                                callState.callStatus.getFormattedOperatorName(),
+                                callState.callStatus.getTime()
                         ));
                     }
                     if (callState.companyName != null) {
@@ -350,8 +355,8 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
-                    muteButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
-                    speakerButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
+                    muteButton.setEnabled(callState.hasMedia());
+                    speakerButton.setEnabled(callState.hasMedia());
                     videoButton.setEnabled(callState.is2WayVideoCall());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);
@@ -368,11 +373,12 @@ public class CallView extends ConstraintLayout {
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
-                    operatorNameView.setVisibility(callState.isMediaEngagementStarted() ? VISIBLE : GONE);
+                    operatorNameView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
-                    msrView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
+                    msrView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
                     callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
-                    connectingView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
+                    connectingView.setVisibility(callState.isCallOngoig() ? VISIBLE : GONE);
+                    continueBrowsingView.setVisibility(callState.isCallOngoig() || callState.isCallNotOngoing() ? VISIBLE : GONE);
                     operatorVideoContainer.setVisibility(callState.isVideoCall() &&
                             callState.callStatus.getOperatorMediaState().getVideo().getStatus() ==
                                     Media.Status.PLAYING ?
@@ -663,6 +669,7 @@ public class CallView extends ConstraintLayout {
             msrView.setTypeface(fontFamily);
             callTimerView.setTypeface(fontFamily);
             connectingView.setTypeface(fontFamily);
+            continueBrowsingView.setTypeface(fontFamily);
             chatButtonLabel.setTypeface(fontFamily);
             videoButtonLabel.setTypeface(fontFamily);
             muteButtonLabel.setTypeface(fontFamily);
@@ -697,6 +704,7 @@ public class CallView extends ConstraintLayout {
         msrView = findViewById(R.id.msr_view);
         callTimerView = findViewById(R.id.call_timer_view);
         connectingView = findViewById(R.id.connecting_view);
+        continueBrowsingView = findViewById(R.id.continue_browsing_view);
         operatorVideoContainer = findViewById(R.id.operator_video_container);
         visitorVideoContainer = findViewById(R.id.visitor_video_container);
         chatButtonLabel = findViewById(R.id.chat_button_label);

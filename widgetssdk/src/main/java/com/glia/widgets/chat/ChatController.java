@@ -14,6 +14,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorMessageItem;
@@ -135,7 +136,7 @@ public class ChatController implements
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
-                .setIsNavigationPending(false)
+                .setPendingNavigationType(null)
                 .setUnsentMessages(new ArrayList<>())
                 .createChatState();
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -341,8 +342,8 @@ public class ChatController implements
         emitViewState(chatState.changeVisibility(true));
         viewCallback.scrollToBottomImmediate();
 
-        if (chatState.isNavigationPending) {
-            viewCallback.navigateToCall();
+        if (chatState.pendingNavigationType != null) {
+            viewCallback.navigateToCall(chatState.pendingNavigationType);
         }
     }
 
@@ -385,7 +386,7 @@ public class ChatController implements
 
     public void navigateToCallSuccess() {
         Logger.d(TAG, "navigateToCallSuccess");
-        emitViewState(chatState.isNavigationPendingChanged(false));
+        emitViewState(chatState.setPendingNavigationType(null));
     }
 
     private synchronized boolean setState(ChatState state) {
@@ -441,12 +442,19 @@ public class ChatController implements
                     MediaUpgradeOffer offer,
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
+                Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess");
                 if (submitter == MediaUpgradeOfferRepository.Submitter.CHAT) {
-                    if (viewCallback != null) {
-                        Logger.d(TAG, "navigateToCall");
-                        viewCallback.navigateToCall();
+                    String requestedMediaType;
+                    if (offer.video != null) {
+                        requestedMediaType = GliaWidgets.MEDIA_TYPE_VIDEO;
+                    } else {
+                        requestedMediaType = GliaWidgets.MEDIA_TYPE_AUDIO;
                     }
-                    emitViewState(chatState.isNavigationPendingChanged(true));
+                    emitViewState(chatState.setPendingNavigationType(requestedMediaType));
+                    if (viewCallback != null) {
+                        viewCallback.navigateToCall(requestedMediaType);
+                        Logger.d(TAG, "navigateToCall");
+                    }
                 }
                 dialogController.dismissDialogs();
             }

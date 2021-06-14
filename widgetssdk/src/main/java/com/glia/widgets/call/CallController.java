@@ -34,6 +34,8 @@ import com.glia.widgets.permissions.ResetPermissionsUseCase;
 import com.glia.widgets.permissions.UpdateDialogShownUseCase;
 import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 
+import java.util.concurrent.TimeUnit;
+
 public class CallController implements
         GliaQueueForMediaEngagementUseCase.Listener,
         GliaOnQueueTicketUseCase.Listener,
@@ -46,11 +48,13 @@ public class CallController implements
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
     private TimeCounter.RawTimerStatusListener inactivityTimerStatusListener;
+    private TimeCounter.RawTimerStatusListener connectingTimerStatusListener;
     private MinimizeHandler.OnMinimizeCalledListener minimizeCalledListener;
     private MessagesNotSeenHandler.MessagesNotSeenHandlerListener messagesNotSeenHandlerListener;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final TimeCounter inactivityTimeCounter;
+    private final TimeCounter connectingTimerCounter;
     private final MinimizeHandler minimizeHandler;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final static int MAX_IDLE_TIME = 3200;
@@ -82,6 +86,7 @@ public class CallController implements
             TimeCounter callTimer,
             CallViewCallback viewCallback,
             TimeCounter inactivityTimeCounter,
+            TimeCounter connectingTimerCounter,
             MinimizeHandler minimizeHandler,
             DialogController dialogController,
             MessagesNotSeenHandler messagesNotSeenHandler,
@@ -116,6 +121,7 @@ public class CallController implements
         this.callTimer = callTimer;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.inactivityTimeCounter = inactivityTimeCounter;
+        this.connectingTimerCounter = connectingTimerCounter;
         this.minimizeHandler = minimizeHandler;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
 
@@ -166,6 +172,7 @@ public class CallController implements
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
+        connectingTimerCounter.addRawValueListener(connectingTimerStatusListener);
         minimizeHandler.addListener(minimizeCalledListener);
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener);
     }
@@ -191,6 +198,7 @@ public class CallController implements
             }
             callTimer.clear();
             inactivityTimeCounter.clear();
+            connectingTimerCounter.clear();
             inactivityTimerStatusListener = null;
             minimizeCalledListener = null;
             minimizeHandler.clear();
@@ -259,23 +267,55 @@ public class CallController implements
 
             }
         };
+
+        connectingTimerStatusListener = new TimeCounter.RawTimerStatusListener() {
+
+            @Override
+            public void onNewRawTimerValue(int timerValue) {
+                if (callState.isCallOngoig()) {
+                    emitViewState(
+                            callState
+                                    .connectingTimerValueChanged(
+                                            String.valueOf(TimeUnit.MILLISECONDS.toSeconds(timerValue))
+                                    )
+                    );
+                }
+            }
+
+            @Override
+            public void onRawTimerCancelled() {
+
+            }
+        };
     }
 
     private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: video");
-        if (callState.isMediaEngagementStarted()) {
-            emitViewState(callState.videoCallOperatorVideoStarted(operatorMediaState));
+        String formatedTime = Utils.toMmSs(0L);
+        if (callState.hasMedia()) {
+            formatedTime = callState.callStatus.getTime();
         }
+        emitViewState(callState.videoCallOperatorVideoStarted(
+                operatorMediaState,
+                formatedTime
+        ));
         startOperatorVideo(operatorMediaState);
         showVideoCallNotificationUseCase.execute();
+        connectingTimerCounter.stop();
     }
 
     private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: audio");
-        if (callState.isMediaEngagementStarted()) {
-            emitViewState(callState.audioCallStarted(operatorMediaState));
+        String formatedTime = Utils.toMmSs(0L);
+        if (callState.hasMedia()) {
+            formatedTime = callState.callStatus.getTime();
         }
+        emitViewState(callState.audioCallStarted(
+                operatorMediaState,
+                formatedTime
+        ));
         showAudioCallNotificationUseCase.execute();
+        connectingTimerCounter.stop();
     }
 
     private void onOperatorMediaStateUnknown() {
@@ -284,6 +324,12 @@ public class CallController implements
             emitViewState(callState.backToOngoing());
         }
         removeCallNotificationUseCase.execute();
+        if (!connectingTimerCounter.isRunning()) {
+            connectingTimerCounter.startNew(
+                    Constants.CALL_TIMER_DELAY,
+                    Constants.CALL_TIMER_INTERVAL_VALUE
+            );
+        }
     }
 
     private synchronized void emitViewState(CallState state) {
@@ -440,7 +486,7 @@ public class CallController implements
                 @Override
                 public void onNewFormattedTimerValue(String formatedValue) {
                     if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.newTimerValue(formatedValue));
+                        emitViewState(callState.newStartedCallTimerValue(formatedValue));
                     }
                 }
 
@@ -601,8 +647,14 @@ public class CallController implements
         emitViewState(callState.engagementStarted(
                 engagement.getOperator().getName(),
                 operatorProfileImgUrl,
-                Utils.toMmSs(0))
+                String.valueOf(0))
         );
+        if (!connectingTimerCounter.isRunning()) {
+            connectingTimerCounter.startNew(
+                    Constants.CALL_TIMER_DELAY,
+                    Constants.CALL_TIMER_INTERVAL_VALUE
+            );
+        }
     }
 
     @Override

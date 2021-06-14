@@ -123,6 +123,7 @@ public class ControllerFactory {
                     sharedTimer,
                     callViewCallback,
                     new TimeCounter(),
+                    new TimeCounter(),
                     minimizeHandler,
                     dialogController,
                     messagesNotSeenHandler,

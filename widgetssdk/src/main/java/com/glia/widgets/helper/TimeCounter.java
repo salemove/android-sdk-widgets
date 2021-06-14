@@ -80,7 +80,7 @@ public class TimeCounter {
                 }
 
                 if (!formattedListeners.isEmpty()) {
-                    String time = Utils.toMmSs(Long.valueOf(TimeUnit.MILLISECONDS.toSeconds(value)).intValue());
+                    String time = Utils.toMmSs(Long.valueOf(value));
                     Logger.d(TAG, "Formatted timer: " + time);
                     for (FormattedTimerStatusListener listener : formattedListeners) {
                         listener.onNewFormattedTimerValue(time);

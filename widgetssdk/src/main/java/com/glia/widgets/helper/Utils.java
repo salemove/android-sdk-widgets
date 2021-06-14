@@ -22,6 +22,7 @@ import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.model.ChatHeadInput;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static float pxFromDp(final Context context, final float dp) {
@@ -30,6 +31,10 @@ public class Utils {
 
     public static String toMmSs(int seconds) {
         return String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
+    }
+
+    public static String toMmSs(long milliseconds) {
+        return toMmSs(Long.valueOf(TimeUnit.MILLISECONDS.toSeconds(milliseconds)).intValue());
     }
 
     public static String formatOperatorName(String operatorName) {

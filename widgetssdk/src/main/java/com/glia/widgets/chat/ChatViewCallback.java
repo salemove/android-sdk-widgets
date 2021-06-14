@@ -11,7 +11,7 @@ public interface ChatViewCallback {
 
     void emitItems(List<ChatItem> items);
 
-    void navigateToCall();
+    void navigateToCall(String requestedMediaType);
 
     void destroyView();
 

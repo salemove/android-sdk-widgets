@@ -14,6 +14,15 @@ public interface CallStatus {
 
     String getOperatorProfileImageUrl();
 
+    /**
+     * In case of {@link OngoingNoOperator} the time displays the time it takes to upgrade to
+     * {@link StartedVideoCall} or {@link StartedAudioCall}.
+     * In case of {@link StartedVideoCall} or {@link StartedAudioCall} the time is the ongoing
+     * call duration
+     *
+     * @return A string value of the time. Either 0,1,2,3 in case of {@link OngoingNoOperator}
+     * or MM:ss in case of {@link StartedAudioCall} or {@link StartedVideoCall}
+     */
     String getTime();
 
     OperatorMediaState getOperatorMediaState();
@@ -23,6 +32,11 @@ public interface CallStatus {
     void setVisitorMediaState(VisitorMediaState visitorMediaState);
 
     class NotOngoing implements CallStatus {
+        private VisitorMediaState visitorMediaState;
+
+        public NotOngoing(VisitorMediaState visitorMediaState) {
+            this.visitorMediaState = visitorMediaState;
+        }
 
         @Override
         public String getOperatorName() {
@@ -51,23 +65,50 @@ public interface CallStatus {
 
         @Override
         public VisitorMediaState getVisitorMediaState() {
-            return null;
+            return this.visitorMediaState;
         }
 
         @Override
         public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+            this.visitorMediaState = visitorMediaState;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NotOngoing that = (NotOngoing) o;
+            return Objects.equals(visitorMediaState, that.visitorMediaState);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(visitorMediaState);
+        }
+
+        @Override
+        public String toString() {
+            return "NotOngoing{" +
+                    "visitorMediaState=" + visitorMediaState +
+                    '}';
         }
     }
 
-    class Ongoing implements CallStatus {
+    class OngoingNoOperator implements CallStatus {
         private final String operatorName;
         private final String time;
         private final String operatorProfileImgUrl;
+        private VisitorMediaState visitorMediaState;
 
-        public Ongoing(String operatorName, String time, String operatorProfileImgUrl) {
+        public OngoingNoOperator(String operatorName,
+                                 String time,
+                                 String operatorProfileImgUrl,
+                                 VisitorMediaState visitorMediaState
+        ) {
             this.operatorName = operatorName;
             this.time = time;
             this.operatorProfileImgUrl = operatorProfileImgUrl;
+            this.visitorMediaState = visitorMediaState;
         }
 
         @Override
@@ -102,30 +143,32 @@ public interface CallStatus {
 
         @Override
         public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
-
+            this.visitorMediaState = visitorMediaState;
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Ongoing ongoing = (Ongoing) o;
-            return Objects.equals(operatorName, ongoing.operatorName) &&
-                    Objects.equals(time, ongoing.time) &&
-                    Objects.equals(operatorProfileImgUrl, ongoing.operatorProfileImgUrl);
+            OngoingNoOperator that = (OngoingNoOperator) o;
+            return Objects.equals(operatorName, that.operatorName) &&
+                    Objects.equals(time, that.time) &&
+                    Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
+                    Objects.equals(visitorMediaState, that.visitorMediaState);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorProfileImgUrl);
+            return Objects.hash(operatorName, time, operatorProfileImgUrl, visitorMediaState);
         }
 
         @Override
         public String toString() {
-            return "Ongoing{" +
+            return "OngoingNoOperator{" +
                     "operatorName='" + operatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
+                    ", visitorMediaState=" + visitorMediaState +
                     '}';
         }
     }

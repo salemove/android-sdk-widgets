@@ -58,7 +58,7 @@ class CallState {
     }
 
     public boolean isCallOngoig() {
-        return callStatus instanceof CallStatus.Ongoing;
+        return callStatus instanceof CallStatus.OngoingNoOperator;
     }
 
     public boolean hasMedia() {
@@ -101,7 +101,7 @@ class CallState {
                 .copyFrom(this)
                 .setIntegratorCallStarted(false)
                 .setVisible(false)
-                .setCallStatus(new CallStatus.NotOngoing())
+                .setCallStatus(new CallStatus.NotOngoing(callStatus.getVisitorMediaState()))
                 .createCallState();
     }
 
@@ -114,15 +114,15 @@ class CallState {
 
     public CallState engagementStarted(
             String operatorName,
-            String operatorProfileImgUrl,
-            String formatedConnectingTimeValue) {
+            String operatorProfileImgUrl) {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.Ongoing(
+                        new CallStatus.OngoingNoOperator(
                                 operatorName,
                                 "0",
-                                operatorProfileImgUrl)
+                                operatorProfileImgUrl,
+                                callStatus.getVisitorMediaState())
                 )
                 .setQueueTicketId(null)
                 .createCallState();
@@ -132,10 +132,11 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.Ongoing(
+                        new CallStatus.OngoingNoOperator(
                                 callStatus.getOperatorName(),
                                 "0",
-                                callStatus.getOperatorProfileImageUrl()
+                                callStatus.getOperatorProfileImageUrl(),
+                                callStatus.getVisitorMediaState()
                         )
                 )
                 .createCallState();
@@ -160,10 +161,7 @@ class CallState {
                                 formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
-                                callStatus instanceof CallStatus.StartedVideoCall ?
-                                        ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState() :
-                                        null)
-                )
+                                callStatus.getVisitorMediaState()))
                 .setLandscapeLayoutControlsVisible(false)
                 .createCallState();
     }
@@ -218,7 +216,7 @@ class CallState {
                                     formatedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
-                                    ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState()
+                                    callStatus.getVisitorMediaState()
                             )
                     )
                     .createCallState();
@@ -232,10 +230,11 @@ class CallState {
             return new Builder()
                     .copyFrom(this)
                     .setCallStatus(
-                            new CallStatus.Ongoing(
+                            new CallStatus.OngoingNoOperator(
                                     callStatus.getOperatorName(),
                                     timeValue,
-                                    callStatus.getOperatorProfileImageUrl()
+                                    callStatus.getOperatorProfileImageUrl(),
+                                    callStatus.getVisitorMediaState()
                             )
                     )
                     .createCallState();

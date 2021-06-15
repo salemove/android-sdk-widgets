@@ -41,6 +41,7 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
@@ -61,6 +62,7 @@ import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class CallView extends ConstraintLayout {
 
+    private final String TAG = "CallView";
     private CallViewCallback callback;
     private CallController controller;
     private ChatHeadsController chatHeadsController;
@@ -383,9 +385,7 @@ public class CallView extends ConstraintLayout {
                             callState.callStatus.getOperatorMediaState().getVideo().getStatus() ==
                                     Media.Status.PLAYING ?
                             VISIBLE : GONE);
-                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() &&
-                            callState.callStatus.getVisitorMediaState().getVideo().getStatus() ==
-                                    Media.Status.PLAYING ? VISIBLE : GONE);
+                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     handleControlsVisibility(callState);
                     if (callState.isVisible) {
                         showCall();
@@ -1023,6 +1023,7 @@ public class CallView extends ConstraintLayout {
             operatorVideoView = null;
         }
         if (operatorMediaState != null && operatorMediaState.getVideo() != null) {
+            Logger.d(TAG, "Starting video operator");
             operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
             operatorVideoContainer.removeAllViews();
             operatorVideoContainer.addView(operatorVideoView);
@@ -1035,6 +1036,7 @@ public class CallView extends ConstraintLayout {
             visitorVideoView = null;
         }
         if (visitorMediaState != null && visitorMediaState.getVideo() != null) {
+            Logger.d(TAG, "Starting video visitor");
             visitorVideoView = visitorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
             visitorVideoContainer.removeAllViews();
             visitorVideoContainer.addView(visitorVideoView);

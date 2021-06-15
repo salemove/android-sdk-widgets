@@ -111,7 +111,7 @@ public class CallController implements
                 .setIntegratorCallStarted(false)
                 .setVisible(false)
                 .setMessagesNotSeen(0)
-                .setCallStatus(new CallStatus.NotOngoing())
+                .setCallStatus(new CallStatus.NotOngoing(null))
                 .setLandscapeLayoutControlsVisible(false)
                 .setIsSpeakerOn(false)
                 .setIsMuted(false)
@@ -167,7 +167,6 @@ public class CallController implements
         onQueueTicketUseCase.execute(this);
         onEngagementUseCase.execute(this);
         onOperatorMediaStateUseCase.execute(this);
-        onVisitorMediaStateUseCase.execute(this);
         queueForMediaTicketUseCase.execute(queueId, contextUrl, mediaType, this);
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
@@ -223,10 +222,11 @@ public class CallController implements
                     Logger.d(TAG, "audioUpgradeRequested");
                     showUpgradeAudioDialog(offer);
                 } else if (offer.video == MediaDirection.TWO_WAY) {
-                    // video call
+                    // 2 way video call
                     Logger.d(TAG, "2 way videoUpgradeRequested");
                     showUpgradeVideoDialog2Way(offer);
                 } else if (offer.video == MediaDirection.ONE_WAY) {
+                    // 1 way video call
                     Logger.d(TAG, "1 way videoUpgradeRequested");
                     showUpgradeVideoDialog1Way(offer);
                 }
@@ -300,6 +300,9 @@ public class CallController implements
                 formatedTime
         ));
         startOperatorVideo(operatorMediaState);
+        if (callState.is2WayVideoCall()) {
+            startVisitorVideo(callState.callStatus.getVisitorMediaState());
+        }
         showVideoCallNotificationUseCase.execute();
         connectingTimerCounter.stop();
     }
@@ -368,10 +371,7 @@ public class CallController implements
         if (callState.isVideoCall()) {
             startOperatorVideo(callState.callStatus.getOperatorMediaState());
             if (callState.is2WayVideoCall()) {
-                if (viewCallback != null) {
-                    startVisitorVideo(
-                            ((CallStatus.StartedVideoCall) callState.callStatus).getVisitorMediaState());
-                }
+                startVisitorVideo(callState.callStatus.getVisitorMediaState());
             }
         }
         emitViewState(callState.landscapeControlsVisibleChanged(!callState.isVideoCall()));
@@ -600,6 +600,7 @@ public class CallController implements
                 updateDialogShownUseCase.execute(PermissionType.CALL_CHANNEL);
             }
             onOperatorMediaStateVideo(operatorMediaState);
+            onVisitorMediaStateUseCase.execute(this);
         } else if (operatorMediaState.getAudio() != null) {
             if (checkIfShowPermissionsDialogUseCase
                     .execute(PermissionType.CALL_CHANNEL, true) &&
@@ -623,10 +624,8 @@ public class CallController implements
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
         Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState.toString());
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
-        if (visitorMediaState.getVideo() != null) {
-            Logger.d(TAG, "newVisitorMediaState: video");
-            startVisitorVideo(visitorMediaState);
-        }
+        Logger.d(TAG, "newVisitorMediaState: video");
+        startVisitorVideo(visitorMediaState);
     }
 
     @Override
@@ -644,10 +643,11 @@ public class CallController implements
             operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
         } catch (Exception e) {
         }
-        emitViewState(callState.engagementStarted(
-                engagement.getOperator().getName(),
-                operatorProfileImgUrl,
-                String.valueOf(0))
+        emitViewState(
+                callState.engagementStarted(
+                        engagement.getOperator().getName(),
+                        operatorProfileImgUrl
+                )
         );
         if (!connectingTimerCounter.isRunning()) {
             connectingTimerCounter.startNew(

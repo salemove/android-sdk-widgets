@@ -134,7 +134,7 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
                     useCaseFactory.createResetPermissionsUseCase(),
-                    useCaseFactory.createGliaQueueForMediaEngagementUseCase(),
+                    useCaseFactory.createQueueForEngagementuseCase(),
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createGliaOnQueueTicketUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),

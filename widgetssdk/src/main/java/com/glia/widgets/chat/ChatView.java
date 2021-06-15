@@ -408,9 +408,9 @@ public class ChatView extends ConstraintLayout {
             }
 
             @Override
-            public void navigateToCall() {
+            public void navigateToCall(String mediaType) {
                 if (onNavigateToCallListener != null) {
-                    onNavigateToCallListener.call(theme);
+                    onNavigateToCallListener.call(theme, mediaType);
                 }
             }
 
@@ -979,6 +979,6 @@ public class ChatView extends ConstraintLayout {
          * @param theme Used to pass the finalized {@link UiTheme}
          *              to the activity which is being navigated to.
          */
-        void call(UiTheme theme);
+        void call(UiTheme theme, String mediaType);
     }
 }

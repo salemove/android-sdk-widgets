@@ -58,7 +58,7 @@ class CallState {
     }
 
     public boolean isCallOngoig() {
-        return callStatus instanceof CallStatus.Ongoing;
+        return callStatus instanceof CallStatus.OngoingNoOperator;
     }
 
     public boolean hasMedia() {
@@ -85,6 +85,7 @@ class CallState {
                 .setIntegratorCallStarted(true)
                 .setVisible(true)
                 .setCompanyName(companyName)
+                .setRequestedMediaType(requestedMediaType)
                 .createCallState();
     }
 
@@ -100,7 +101,7 @@ class CallState {
                 .copyFrom(this)
                 .setIntegratorCallStarted(false)
                 .setVisible(false)
-                .setCallStatus(new CallStatus.NotOngoing())
+                .setCallStatus(new CallStatus.NotOngoing(callStatus.getVisitorMediaState()))
                 .createCallState();
     }
 
@@ -113,15 +114,15 @@ class CallState {
 
     public CallState engagementStarted(
             String operatorName,
-            String operatorProfileImgUrl,
-            String formatedTimeValue) {
+            String operatorProfileImgUrl) {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.Ongoing(
+                        new CallStatus.OngoingNoOperator(
                                 operatorName,
-                                formatedTimeValue,
-                                operatorProfileImgUrl)
+                                "0",
+                                operatorProfileImgUrl,
+                                callStatus.getVisitorMediaState())
                 )
                 .setQueueTicketId(null)
                 .createCallState();
@@ -131,10 +132,11 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.Ongoing(
+                        new CallStatus.OngoingNoOperator(
                                 callStatus.getOperatorName(),
-                                callStatus.getTime(),
-                                callStatus.getOperatorProfileImageUrl()
+                                "0",
+                                callStatus.getOperatorProfileImageUrl(),
+                                callStatus.getVisitorMediaState()
                         )
                 )
                 .createCallState();
@@ -147,19 +149,19 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState videoCallOperatorVideoStarted(OperatorMediaState operatorMediaState) {
+    public CallState videoCallOperatorVideoStarted(
+            OperatorMediaState operatorMediaState,
+            String formattedTime
+    ) {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
                         new CallStatus.StartedVideoCall(
                                 callStatus.getOperatorName(),
-                                callStatus.getTime(),
+                                formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
-                                callStatus instanceof CallStatus.StartedVideoCall ?
-                                        ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState() :
-                                        null)
-                )
+                                callStatus.getVisitorMediaState()))
                 .setLandscapeLayoutControlsVisible(false)
                 .createCallState();
     }
@@ -176,13 +178,13 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState audioCallStarted(OperatorMediaState operatorMediaState) {
+    public CallState audioCallStarted(OperatorMediaState operatorMediaState, String formattedTime) {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
                         new CallStatus.StartedAudioCall(
                                 callStatus.getOperatorName(),
-                                callStatus.getTime(),
+                                formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
                                 callStatus.getVisitorMediaState())
@@ -191,7 +193,7 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState newTimerValue(String formatedTimeValue) {
+    public CallState newStartedCallTimerValue(String formatedTimeValue) {
         if (isAudioCall()) {
             return new Builder()
                     .copyFrom(this)
@@ -214,7 +216,25 @@ class CallState {
                                     formatedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
-                                    ((CallStatus.StartedVideoCall) callStatus).getVisitorMediaState()
+                                    callStatus.getVisitorMediaState()
+                            )
+                    )
+                    .createCallState();
+        } else {
+            return this;
+        }
+    }
+
+    public CallState connectingTimerValueChanged(String timeValue) {
+        if (isCallOngoig()) {
+            return new Builder()
+                    .copyFrom(this)
+                    .setCallStatus(
+                            new CallStatus.OngoingNoOperator(
+                                    callStatus.getOperatorName(),
+                                    timeValue,
+                                    callStatus.getOperatorProfileImageUrl(),
+                                    callStatus.getVisitorMediaState()
                             )
                     )
                     .createCallState();
@@ -244,7 +264,7 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState speakerValueChanged(boolean isSpeakerOn){
+    public CallState speakerValueChanged(boolean isSpeakerOn) {
         return new Builder()
                 .copyFrom(this)
                 .setIsSpeakerOn(isSpeakerOn)

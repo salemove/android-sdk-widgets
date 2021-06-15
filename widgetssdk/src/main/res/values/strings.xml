@@ -55,8 +55,9 @@
     <string name="call_mute_button_unmute">Unmute</string>
     <string name="call_speaker_button_label">Speaker</string>
     <string name="call_minimize_button_label">Minimize</string>
-    <string name="call_connecting_with">Connecting with %1$s</string>
+    <string name="call_connecting_with">Connecting with %1$s\n%2$s</string>
     <string name="call_in_queue_message">An MSR will be with you shortly.</string>
+    <string name="call_continue_browsing">You can continue browsing and\nwe’ll connect you automatically.</string>
 
     <!--    statusbar notifications-->
     <string name="notification_screen_sharing_channel_name">Screen Sharing notification channel</string>

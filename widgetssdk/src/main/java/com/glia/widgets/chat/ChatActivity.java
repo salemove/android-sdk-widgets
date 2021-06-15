@@ -27,8 +27,8 @@ public class ChatActivity extends AppCompatActivity {
     };
     private ChatView.OnEndListener onEndListener = this::finish;
     private ChatView.OnNavigateToCallListener onNavigateToCallListener =
-            (UiTheme theme) -> {
-                navigateToCall(theme);
+            (UiTheme theme, String mediaType) -> {
+                navigateToCall(theme, mediaType);
                 chatView.navigateToCallSuccess();
             };
 
@@ -96,13 +96,14 @@ public class ChatActivity extends AppCompatActivity {
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void navigateToCall(UiTheme theme) {
+    private void navigateToCall(UiTheme theme, String mediaType) {
         Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
         newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
         newIntent.putExtra(GliaWidgets.UI_THEME, theme);
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
+        newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
         startActivity(newIntent);
     }
 }

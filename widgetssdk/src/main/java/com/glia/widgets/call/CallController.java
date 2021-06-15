@@ -17,7 +17,7 @@ import com.glia.widgets.glia.GliaOnEngagementUseCase;
 import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
 import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.glia.GliaOnVisitorMediaStateUseCase;
-import com.glia.widgets.glia.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -37,7 +37,7 @@ import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 import java.util.concurrent.TimeUnit;
 
 public class CallController implements
-        GliaQueueForMediaEngagementUseCase.Listener,
+        GliaQueueForEngagementUseCase.Listener,
         GliaOnQueueTicketUseCase.Listener,
         GliaOnEngagementUseCase.Listener,
         GliaOnOperatorMediaStateUseCase.Listener,
@@ -68,7 +68,7 @@ public class CallController implements
     private final UpdateDialogShownUseCase updateDialogShownUseCase;
     private final UpdatePermissionsUseCase updatePermissionsUseCase;
     private final ResetPermissionsUseCase resetPermissionsUseCase;
-    private final GliaQueueForMediaEngagementUseCase queueForMediaTicketUseCase;
+    private final GliaQueueForEngagementUseCase queueForEngagementUseCase;
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
     private final GliaOnEngagementUseCase onEngagementUseCase;
@@ -97,7 +97,7 @@ public class CallController implements
             UpdateDialogShownUseCase updateDialogShownUseCase,
             UpdatePermissionsUseCase updatePermissionsUseCase,
             ResetPermissionsUseCase resetPermissionsUseCase,
-            GliaQueueForMediaEngagementUseCase queueForMediaTicketUseCase,
+            GliaQueueForEngagementUseCase queueForMediaTicketUseCase,
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
             GliaOnQueueTicketUseCase onQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
@@ -132,7 +132,7 @@ public class CallController implements
         this.updateDialogShownUseCase = updateDialogShownUseCase;
         this.updatePermissionsUseCase = updatePermissionsUseCase;
         this.resetPermissionsUseCase = resetPermissionsUseCase;
-        this.queueForMediaTicketUseCase = queueForMediaTicketUseCase;
+        this.queueForEngagementUseCase = queueForMediaTicketUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.onQueueTicketUseCase = onQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
@@ -167,7 +167,7 @@ public class CallController implements
         onQueueTicketUseCase.execute(this);
         onEngagementUseCase.execute(this);
         onOperatorMediaStateUseCase.execute(this);
-        queueForMediaTicketUseCase.execute(queueId, contextUrl, mediaType, this);
+        queueForEngagementUseCase.execute(queueId, contextUrl, mediaType, this);
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);

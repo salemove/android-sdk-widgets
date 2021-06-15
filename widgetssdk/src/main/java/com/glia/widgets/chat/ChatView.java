@@ -216,31 +216,31 @@ public class ChatView extends ConstraintLayout {
             boolean useOverlays,
             Bundle savedInstanceState) {
         Activity activity = Utils.getActivity(this.getContext());
-        boolean isConfigurationChange = activity instanceof ChatActivity &&
-                savedInstanceState != null;
-        if (!isConfigurationChange) {
-            if (chatHeadsController != null) {
-                chatHeadsController.onNavigatedToChat(
-                        new ChatHeadInput(
-                                companyName,
-                                queueId,
-                                contextUrl,
-                                this.theme
-                        ),
-                        activity instanceof ChatActivity,
-                        activity instanceof ChatActivity && useOverlays
-                );
-            }
-        }
         if (controller != null) {
-            controller.initChat(
-                    companyName,
-                    queueId,
-                    contextUrl,
+
+            controller.initChat(companyName, queueId, contextUrl);
+
+            controller.updatePermissions(
                     Settings.canDrawOverlays(this.getContext()),
                     NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
                     NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
             );
+
+            if (activity instanceof ChatActivity && savedInstanceState == null) {
+                if (chatHeadsController != null) {
+                    chatHeadsController.onNavigatedToChat(
+                            new ChatHeadInput(
+                                    companyName,
+                                    queueId,
+                                    contextUrl,
+                                    this.theme
+                            ),
+                            activity instanceof ChatActivity,
+                            activity instanceof ChatActivity && useOverlays,
+                            controller.isMediaQueueingOnGoing()
+                    );
+                }
+            }
         }
     }
 

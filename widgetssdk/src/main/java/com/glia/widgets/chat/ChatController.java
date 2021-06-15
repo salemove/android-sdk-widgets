@@ -95,6 +95,8 @@ public class ChatController implements
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
+    private boolean isMediaQueueingOnGoing = false;
+
     public ChatController(MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
                           TimeCounter callTimer,
                           ChatViewCallback viewCallback,
@@ -167,16 +169,10 @@ public class ChatController implements
 
     public void initChat(String companyName,
                          String queueId,
-                         String contextUrl,
-                         boolean hasOverlayPermissions,
-                         boolean isCallNotificationChannelEnabled,
-                         boolean isScreenSharingNotificationChannelEnabled
+                         String contextUrl
     ) {
-        updatePermissionsUseCase.execute(
-                hasOverlayPermissions,
-                isCallNotificationChannelEnabled,
-                isScreenSharingNotificationChannelEnabled
-        );
+        isMediaQueueingOnGoing = queueForEngagementUseCase.getTypeOfOngoingQueueing() ==
+                GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
@@ -192,7 +188,12 @@ public class ChatController implements
 
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
-        queueForEngagementUseCase.execute(chatState.queueId, chatState.contextUrl, this);
+        isMediaQueueingOnGoing =
+                queueForEngagementUseCase.execute(
+                        chatState.queueId,
+                        chatState.contextUrl,
+                        this
+                ) == GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
     }
 
     private void initMinimizeCallback() {
@@ -330,6 +331,10 @@ public class ChatController implements
         return chatState.isVisible;
     }
 
+    public boolean isMediaQueueingOnGoing() {
+        return isMediaQueueingOnGoing;
+    }
+
     public void setViewCallback(ChatViewCallback chatViewCallback) {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = chatViewCallback;
@@ -354,11 +359,7 @@ public class ChatController implements
                 "hasOverlayPermissions: " + hasOverlaysPermission +
                 ", isCallChannelEnabled:" + isCallChannelEnabled +
                 ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
-        updatePermissionsUseCase.execute(
-                hasOverlaysPermission,
-                isCallChannelEnabled,
-                isScreenSharingChannelEnabled
-        );
+        updatePermissions(hasOverlaysPermission, isCallChannelEnabled, isScreenSharingChannelEnabled);
         if (checkIfShowPermissionsDialogUseCase.execute(PermissionType.OVERLAY, true) &&
                 dialogController.isNoDialogShown()) {
             dialogController.showOverlayPermissionsDialog();
@@ -786,6 +787,7 @@ public class ChatController implements
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
         Logger.d(TAG, "newEngagementLoaded");
+        isMediaQueueingOnGoing = false;
         String operatorProfileImgUrl = null;
         try {
             operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
@@ -909,5 +911,13 @@ public class ChatController implements
 
     public void notificationsDialogDismissed() {
         dialogController.dismissDialogs();
+    }
+
+    public void updatePermissions(boolean hasOverlayPermissions, boolean isCallNotificationChannelEnabled, boolean isScreenSharingNotificationChannelEnabled) {
+        updatePermissionsUseCase.execute(
+                hasOverlayPermissions,
+                isCallNotificationChannelEnabled,
+                isScreenSharingNotificationChannelEnabled
+        );
     }
 }

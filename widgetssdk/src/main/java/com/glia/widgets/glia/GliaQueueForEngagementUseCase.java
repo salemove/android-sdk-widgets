@@ -36,6 +36,7 @@ public class GliaQueueForEngagementUseCase implements
         if (typeOfOngoingQueueing == TypeOfOngoingQueueing.NONE) {
             typeOfOngoingQueueing = TypeOfOngoingQueueing.CHAT;
             repository.startQueueingForEngagement(queueId, contextUrl, this);
+            onQueueTicketUseCase.execute(this);
         }
         return typeOfOngoingQueueing;
     }
@@ -50,12 +51,16 @@ public class GliaQueueForEngagementUseCase implements
         if (typeOfOngoingQueueing == TypeOfOngoingQueueing.NONE) {
             typeOfOngoingQueueing = TypeOfOngoingQueueing.MEDIA;
             repository.startQueueingForMediaEngagement(queueId, contextUrl, mediaType, this);
+            onQueueTicketUseCase.execute(this);
         }
         return typeOfOngoingQueueing;
     }
 
     public void unregisterListener(Listener listener) {
         this.listeners.remove(listener);
+        if (listeners.isEmpty()) {
+            onQueueTicketUseCase.unregisterListener(this);
+        }
     }
 
     @Override
@@ -78,7 +83,7 @@ public class GliaQueueForEngagementUseCase implements
         typeOfOngoingQueueing = TypeOfOngoingQueueing.NONE;
     }
 
-    public TypeOfOngoingQueueing getTypeOfOngoingQueueing(){
+    public TypeOfOngoingQueueing getTypeOfOngoingQueueing() {
         return typeOfOngoingQueueing;
     }
 

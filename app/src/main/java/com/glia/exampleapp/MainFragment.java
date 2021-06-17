@@ -40,9 +40,11 @@ public class MainFragment extends Fragment {
             navController.navigate(R.id.settings);
         });
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        /* https://salemove.atlassian.net/browse/MUIC-362
         view.findViewById(R.id.integrator_chat).setOnClickListener(view1 -> {
             navController.navigate(R.id.chat);
         });
+         */
         view.findViewById(R.id.chat_activity_button).setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), ChatActivity.class);
             setNavigationIntentData(intent, sharedPreferences);

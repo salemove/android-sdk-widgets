@@ -300,9 +300,6 @@ public class CallController implements
                 formatedTime
         ));
         startOperatorVideo(operatorMediaState);
-        if (callState.is2WayVideoCall()) {
-            startVisitorVideo(callState.callStatus.getVisitorMediaState());
-        }
         showVideoCallNotificationUseCase.execute();
         connectingTimerCounter.stop();
     }
@@ -310,13 +307,13 @@ public class CallController implements
     private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: audio");
         String formatedTime = Utils.toMmSs(0L);
-        if (callState.hasMedia()) {
-            formatedTime = callState.callStatus.getTime();
-        }
+        if (callState.hasMedia()) formatedTime = callState.callStatus.getTime();
+
         emitViewState(callState.audioCallStarted(
                 operatorMediaState,
                 formatedTime
         ));
+
         showAudioCallNotificationUseCase.execute();
         connectingTimerCounter.stop();
     }
@@ -370,9 +367,8 @@ public class CallController implements
 
         if (callState.isVideoCall()) {
             startOperatorVideo(callState.callStatus.getOperatorMediaState());
-            if (callState.is2WayVideoCall()) {
+            if (callState.is2WayVideoCall())
                 startVisitorVideo(callState.callStatus.getVisitorMediaState());
-            }
         }
         emitViewState(callState.landscapeControlsVisibleChanged(!callState.isVideoCall()));
     }
@@ -609,6 +605,7 @@ public class CallController implements
                 updateDialogShownUseCase.execute(PermissionType.CALL_CHANNEL);
             }
             onOperatorMediaStateAudio(operatorMediaState);
+            onVisitorMediaStateUseCase.execute(this);
         } else {
             onOperatorMediaStateUnknown();
         }
@@ -624,8 +621,10 @@ public class CallController implements
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
         Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState.toString());
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
-        Logger.d(TAG, "newVisitorMediaState: video");
-        startVisitorVideo(visitorMediaState);
+        if (callState.is2WayVideoCall()) {
+            Logger.d(TAG, "newVisitorMediaState: video");
+            startVisitorVideo(callState.callStatus.getVisitorMediaState());
+        }
     }
 
     @Override

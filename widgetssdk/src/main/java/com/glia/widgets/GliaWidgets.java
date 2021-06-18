@@ -49,6 +49,24 @@ public class GliaWidgets {
     public static final String USE_OVERLAY = "use_overlay";
 
     /**
+     * Use with {@link android.os.Bundle} to pass an input parameter to the call activity to
+     * tell it which type of engagement you would like to start. Can be one of:
+     * {@link MEDIA_TYPE_AUDIO} or {@link MEDIA_TYPE_VIDEO}.
+     * If no parameter is passed then will default to {@link MEDIA_TYPE_AUDIO}
+     */
+
+    public static final String MEDIA_TYPE = "media_type";
+    /**
+     * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
+     * {@link com.glia.widgets.call.CallActivity} to start an audio call media engagement.
+     */
+    public static final String MEDIA_TYPE_AUDIO = "media_type_audio";
+    /**
+     * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
+     * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
+     */
+    public static final String MEDIA_TYPE_VIDEO = "media_type_video";
+    /**
      * Should be called when the application is starting in {@link Application}.onCreate()
      *
      * @param application the application where it is initialized

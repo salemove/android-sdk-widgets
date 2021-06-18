@@ -41,8 +41,9 @@
         android:id="@+id/connecting_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
+        android:layout_marginTop="@dimen/medium"
         android:gravity="center"
+        android:lineSpacingExtra="@dimen/medium"
         android:textAppearance="?attr/textAppearanceHeadline2"
         android:textColor="@color/glia_base_light_color"
         android:visibility="gone"
@@ -63,6 +64,32 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_status_view"
         app:layout_goneMarginTop="@dimen/call_operator_name_gone_margin_top" />
+
+    <TextView
+        android:id="@+id/company_name_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/large"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceHeadline1"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
+
+    <TextView
+        android:id="@+id/msr_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/medium"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textColor="@color/glia_base_light_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/company_name_view" />
 
     <TextView
         android:id="@+id/call_timer_view"
@@ -110,6 +137,17 @@
         app:lightTint="@color/glia_base_light_color"
         app:negativeTint="@color/glia_system_negative_color"
         app:titleText="@string/call_audio_app_bar_title" />
+
+    <TextView
+        android:id="@+id/continue_browsing_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="@color/glia_base_light_color"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline" />
 
     <View
         android:id="@+id/buttons_layout_bg"

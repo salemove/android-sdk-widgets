@@ -1,5 +1,6 @@
 package com.glia.widgets.model;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.VisitorContext;
@@ -44,5 +45,14 @@ public class GliaRepository {
                 Logger.e(TAG, "cancelQueueTicketError: " + e.toString());
             }
         });
+    }
+
+    public void startQueueingForMediaEngagement(String queueId,
+                                        String contextUrl,
+                                        Engagement.MediaType mediaType,
+                                        Consumer<GliaException> consumer
+    ) {
+        VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
+        Glia.queueForEngagement(queueId, mediaType, visitorContext, consumer);
     }
 }

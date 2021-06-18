@@ -35,7 +35,8 @@ public class ControllerFactory {
     public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
-                repositoryFactory.getGliaMessagesNotSeenRepository()
+                useCaseFactory.createGliaOnMessageUseCase(),
+                useCaseFactory.createOnEngagementEndUseCase()
         );
         chatHeadsController = new ChatHeadsController(
                 useCaseFactory.createOnEngagementUseCase(),
@@ -56,7 +57,6 @@ public class ControllerFactory {
                     sharedTimer,
                     chatViewCallback,
                     minimizeHandler,
-                    chatHeadsController,
                     dialogController,
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
@@ -87,7 +87,6 @@ public class ControllerFactory {
                     sharedTimer,
                     chatViewCallback,
                     minimizeHandler,
-                    chatHeadsController,
                     dialogController,
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
@@ -120,13 +119,12 @@ public class ControllerFactory {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
-                    repositoryFactory.getGliaCallRepository(),
                     repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
                     callViewCallback,
                     new TimeCounter(),
+                    new TimeCounter(),
                     minimizeHandler,
-                    chatHeadsController,
                     dialogController,
                     messagesNotSeenHandler,
                     UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
@@ -135,8 +133,15 @@ public class ControllerFactory {
                     useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase()
-            );
+                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createQueueForEngagementuseCase(),
+                    useCaseFactory.createCancelQueueTicketUseCase(),
+                    useCaseFactory.createGliaOnQueueTicketUseCase(),
+                    useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createGliaOnOperatorMediaStateUseCase(),
+                    useCaseFactory.createGliaOnVisitorMediaStateUseCase(),
+                    useCaseFactory.createOnEngagementEndUseCase(),
+                    useCaseFactory.createEndEngagementUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

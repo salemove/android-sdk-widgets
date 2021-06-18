@@ -1,5 +1,6 @@
 package com.glia.widgets.model;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.Chat;
@@ -21,10 +22,8 @@ public class GliaChatRepository {
         Glia.getChatHistory(historyLoadedListener::loaded);
     }
 
-    public void listenForMessages(MessageListener listener) {
-        Glia.getCurrentEngagement().ifPresent(engagement -> {
-            engagement.getChat().on(Chat.Events.MESSAGE, listener::onMessage);
-        });
+    public void listenForMessages(MessageListener listener, Engagement engagement) {
+        engagement.getChat().on(Chat.Events.MESSAGE, listener::onMessage);
     }
 
     public void unregisterMessageListener(MessageListener listener) {

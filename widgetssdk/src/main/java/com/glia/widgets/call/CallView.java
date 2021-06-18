@@ -9,6 +9,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.AttributeSet;
@@ -28,6 +29,7 @@ import androidx.core.view.ViewCompat;
 import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
@@ -38,7 +40,10 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadService;
+import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
 import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;
@@ -57,8 +62,10 @@ import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class CallView extends ConstraintLayout {
 
+    private final String TAG = "CallView";
     private CallViewCallback callback;
     private CallController controller;
+    private ChatHeadsController chatHeadsController;
 
     private ScreenSharingController screenSharingController;
     private ScreenSharingController.ViewCallback screenSharingCallback;
@@ -70,8 +77,11 @@ public class CallView extends ConstraintLayout {
     private AppBarView appBar;
     private OperatorStatusView operatorStatusView;
     private TextView operatorNameView;
+    private TextView companyNameView;
+    private TextView msrView;
     private TextView callTimerView;
     private TextView connectingView;
+    private TextView continueBrowsingView;
     private FrameLayout operatorVideoContainer;
     private VideoView operatorVideoView;
     private MaterialCardView visitorVideoContainer;
@@ -98,6 +108,7 @@ public class CallView extends ConstraintLayout {
 
     private final Resources resources;
     private Integer defaultStatusbarColor;
+    private AudioManager audioManager;
 
     public CallView(Context context) {
         this(context, null);
@@ -124,7 +135,8 @@ public class CallView extends ConstraintLayout {
         );
 
         this.resources = getResources();
-
+        this.audioManager =
+                (AudioManager) this.getContext().getSystemService(Context.AUDIO_SERVICE);
         initConfigurations();
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
@@ -137,6 +149,9 @@ public class CallView extends ConstraintLayout {
         appBar.setOnBackClickedListener(() -> {
             if (controller != null) {
                 controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
+            }
+            if (chatHeadsController != null) {
+                chatHeadsController.onCallBackButtonPressed();
             }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
@@ -156,10 +171,19 @@ public class CallView extends ConstraintLayout {
             if (controller != null) {
                 controller.chatButtonClicked();
             }
+            if (chatHeadsController != null) {
+                chatHeadsController.onChatButtonClicked();
+            }
+        });
+        speakerButton.setOnClickListener(v -> {
+            controller.onSpeakerButtonPressed();
         });
         minimizeButton.setOnClickListener(v -> {
             if (controller != null) {
                 controller.minimizeButtonClicked();
+            }
+            if (chatHeadsController != null) {
+                chatHeadsController.onMinimizeButtonClicked();
             }
             if (onEndListener != null) {
                 onEndListener.onEnd();
@@ -178,9 +202,39 @@ public class CallView extends ConstraintLayout {
         });
     }
 
-    public void startCall() {
+    public void startCall(String companyName,
+                          String queueId,
+                          String contextUrl,
+                          boolean useOverlays,
+                          Engagement.MediaType mediaType) {
         if (controller != null) {
-            controller.initCall();
+            controller.initCall(
+                    companyName,
+                    queueId,
+                    contextUrl,
+                    mediaType,
+                    Settings.canDrawOverlays(this.getContext()),
+                    NotificationManager.areNotificationsEnabled(
+                            this.getContext(),
+                            NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID
+                    ),
+                    NotificationManager.areNotificationsEnabled(
+                            this.getContext(),
+                            NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID
+                    )
+            );
+        }
+        if (chatHeadsController != null) {
+            chatHeadsController.onNavigatedToCall(
+                    new ChatHeadInput(
+                            companyName,
+                            queueId,
+                            contextUrl,
+                            this.theme
+                    ),
+                    true,
+                    useOverlays
+            );
         }
     }
 
@@ -245,35 +299,47 @@ public class CallView extends ConstraintLayout {
             @Override
             public void emitState(CallState callState) {
                 post(() -> {
-                    if (callState.hasMedia()) {
+                    if (callState.isMediaEngagementStarted()) {
                         appBar.showEndButton();
-                        if (callState.isAudioCall()) {
-                            appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
-                        } else if (callState.isVideoCall()) {
+                        if (callState.isVideoCall()) {
                             appBar.setTitle(resources.getString(R.string.call_video_app_bar_title));
+                        } else {
+                            appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
                         }
                     } else {
                         appBar.showXButton();
-                        appBar.setTitle("");
-                    }
-                    operatorStatusView.isRippleAnimationShowing(callState.showRippleAnimation());
-                    if (callState.isMediaEngagementStarted()) {
-                        if (callState.hasMedia() &&
-                                callState.callStatus.getOperatorProfileImageUrl() != null) {
-                            operatorStatusView.showProfileImage(
-                                    callState.callStatus.getOperatorProfileImageUrl());
-                        } else if (callState.isCallOngoig() && callState.callStatus.getOperatorProfileImageUrl() != null) {
-                            operatorStatusView.showDefaultSizeProfileImage(callState.callStatus.getOperatorProfileImageUrl());
+                        if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
+                            appBar.setTitle(resources.getString(R.string.call_video_app_bar_title));
                         } else {
-                            operatorStatusView.showDefaultSizePlaceHolder();
+                            appBar.setTitle(resources.getString(R.string.call_audio_app_bar_title));
                         }
                     }
-                    if (callState.callStatus.getFormattedOperatorName() != null) {
+                    operatorStatusView.isRippleAnimationShowing(
+                            callState.isCallNotOngoing() ||
+                                    callState.isCallOngoig()
+                    );
+
+                    if (callState.hasMedia() && callState.callStatus.getOperatorProfileImageUrl() != null) {
+                        operatorStatusView.showProfileImage(
+                                callState.callStatus.getOperatorProfileImageUrl());
+                    } else if (callState.isCallOngoig() && callState.isCallOngoig() &&
+                            callState.callStatus.getOperatorProfileImageUrl() != null) {
+                        operatorStatusView.showDefaultSizeProfileImage(callState.callStatus.getOperatorProfileImageUrl());
+                    } else {
+                        operatorStatusView.showDefaultSizePlaceHolder();
+                    }
+                    if (callState.callStatus.getFormattedOperatorName() != null &&
+                            callState.isCallOngoig()) {
                         operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
                         connectingView.setText(resources.getString(
                                 R.string.call_connecting_with,
-                                callState.callStatus.getFormattedOperatorName()
+                                callState.callStatus.getFormattedOperatorName(),
+                                callState.callStatus.getTime()
                         ));
+                    }
+                    if (callState.companyName != null) {
+                        companyNameView.setText(callState.companyName);
+                        msrView.setText(R.string.call_in_queue_message);
                     }
                     if (callState.callStatus.getTime() != null) {
                         callTimerView.setText(callState.callStatus.getTime());
@@ -292,11 +358,14 @@ public class CallView extends ConstraintLayout {
                     }
 
                     muteButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
+                    speakerButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
                     videoButton.setEnabled(callState.is2WayVideoCall());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);
                     setButtonActivated(muteButton, theme.getIconCallAudioOn(),
                             theme.getIconCallAudioOff(), callState.isMuted);
+                    setButtonActivated(speakerButton, theme.getIconCallSpeakerOn(),
+                            theme.getIconCallSpeakerOff(), callState.isSpeakerOn);
                     muteButtonLabel.setText(callState.isMuted ?
                             R.string.call_mute_button_unmute :
                             R.string.call_mute_button_mute
@@ -307,15 +376,16 @@ public class CallView extends ConstraintLayout {
                     videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
                     operatorNameView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
+                    companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
+                    msrView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
                     callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
-                    connectingView.setVisibility(callState.hasMedia() ? GONE : VISIBLE);
+                    connectingView.setVisibility(callState.isCallOngoig() ? VISIBLE : GONE);
+                    continueBrowsingView.setVisibility(callState.isCallOngoig() || callState.isCallNotOngoing() ? VISIBLE : GONE);
                     operatorVideoContainer.setVisibility(callState.isVideoCall() &&
                             callState.callStatus.getOperatorMediaState().getVideo().getStatus() ==
                                     Media.Status.PLAYING ?
                             VISIBLE : GONE);
-                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() &&
-                            callState.callStatus.getVisitorMediaState().getVideo().getStatus() ==
-                                    Media.Status.PLAYING ? VISIBLE : GONE);
+                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     handleControlsVisibility(callState);
                     if (callState.isVisible) {
                         showCall();
@@ -341,6 +411,11 @@ public class CallView extends ConstraintLayout {
             public void startVisitorVideoView(MediaState visitorMediaState) {
                 post(() -> showVisitorVideo(visitorMediaState));
             }
+
+            @Override
+            public void switchSpeakerValue(boolean isSpeakerOn) {
+                post(() -> audioManager.setSpeakerphoneOn(isSpeakerOn));
+            }
         };
 
         screenSharingCallback = new ScreenSharingController.ViewCallback() {
@@ -353,6 +428,8 @@ public class CallView extends ConstraintLayout {
         controller = Dependencies
                 .getControllerFactory()
                 .getCallController(callback);
+
+        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
 
         dialogCallback = new DialogController.Callback() {
             @Override
@@ -371,6 +448,8 @@ public class CallView extends ConstraintLayout {
                 } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
                     post(() -> showEndEngagementDialog(
                             ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+                } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
+                    post(() -> showExitQueueDialog());
                 } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                     post(() -> showNoMoreOperatorsAvailableDialog());
                 } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
@@ -392,6 +471,39 @@ public class CallView extends ConstraintLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void showExitQueueDialog() {
+        showOptionsDialog(resources.getString(R.string.dialog_leave_queue_title),
+                resources.getString(R.string.dialog_leave_queue_message),
+                resources.getString(R.string.dialog_yes),
+                resources.getString(R.string.dialog_no),
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.endEngagementDialogYesClicked();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
+                    if (onEndListener != null) {
+                        onEndListener.onEnd();
+                    }
+                    callEnded();
+                },
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.endEngagementDialogDismissed();
+                    }
+                },
+                dialog -> {
+                    dialog.dismiss();
+                    if (controller != null) {
+                        controller.endEngagementDialogDismissed();
+                    }
+                }
+        );
     }
 
     private void showAllowScreenSharingNotificationsAndStartSharingDialog() {
@@ -553,8 +665,11 @@ public class CallView extends ConstraintLayout {
                     this.getContext(),
                     this.theme.getFontRes());
             operatorNameView.setTypeface(fontFamily);
+            companyNameView.setTypeface(fontFamily);
+            msrView.setTypeface(fontFamily);
             callTimerView.setTypeface(fontFamily);
             connectingView.setTypeface(fontFamily);
+            continueBrowsingView.setTypeface(fontFamily);
             chatButtonLabel.setTypeface(fontFamily);
             videoButtonLabel.setTypeface(fontFamily);
             muteButtonLabel.setTypeface(fontFamily);
@@ -585,8 +700,11 @@ public class CallView extends ConstraintLayout {
         appBar = findViewById(R.id.top_app_bar);
         operatorStatusView = findViewById(R.id.operator_status_view);
         operatorNameView = findViewById(R.id.operator_name_view);
+        companyNameView = findViewById(R.id.company_name_view);
+        msrView = findViewById(R.id.msr_view);
         callTimerView = findViewById(R.id.call_timer_view);
         connectingView = findViewById(R.id.connecting_view);
+        continueBrowsingView = findViewById(R.id.continue_browsing_view);
         operatorVideoContainer = findViewById(R.id.operator_video_container);
         visitorVideoContainer = findViewById(R.id.visitor_video_container);
         chatButtonLabel = findViewById(R.id.chat_button_label);
@@ -700,6 +818,9 @@ public class CallView extends ConstraintLayout {
         if (controller != null) {
             controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
         }
+        if (chatHeadsController != null) {
+            chatHeadsController.onCallBackButtonPressed();
+        }
     }
 
     private void showCall() {
@@ -736,6 +857,9 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -821,6 +945,9 @@ public class CallView extends ConstraintLayout {
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
                     }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -837,6 +964,9 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.unexpectedErrorDialogDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -893,6 +1023,7 @@ public class CallView extends ConstraintLayout {
             operatorVideoView = null;
         }
         if (operatorMediaState != null && operatorMediaState.getVideo() != null) {
+            Logger.d(TAG, "Starting video operator");
             operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
             operatorVideoContainer.removeAllViews();
             operatorVideoContainer.addView(operatorVideoView);
@@ -905,6 +1036,7 @@ public class CallView extends ConstraintLayout {
             visitorVideoView = null;
         }
         if (visitorMediaState != null && visitorMediaState.getVideo() != null) {
+            Logger.d(TAG, "Starting video visitor");
             visitorVideoView = visitorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
             visitorVideoContainer.removeAllViews();
             visitorVideoContainer.addView(visitorVideoView);

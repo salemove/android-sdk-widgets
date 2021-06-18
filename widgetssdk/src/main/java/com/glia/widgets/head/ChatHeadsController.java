@@ -4,6 +4,7 @@ import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
 import com.glia.widgets.glia.GliaOnEngagementUseCase;
 import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
@@ -94,24 +95,20 @@ public class ChatHeadsController implements
         handleService();
     }
 
-    public void onBackButtonPressed(
-            String callingActivity,
-            boolean isChatInBackstack
-    ) {
-        Logger.d(TAG, "onBackButtonPressed, callingActivity: " + callingActivity +
-                ", isChatInBackstack: " + isChatInBackstack);
-        if (callingActivity.equals(Constants.CALL_ACTIVITY)) {
-            emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested &&
-                            chatHeadState.operatorMediaState != null,
-                    callingActivity));
-        } else if (callingActivity.equals(Constants.CHAT_ACTIVITY)) {
-            emitViewState(chatHeadState.onNewMessage(0));
-            emitViewState(chatHeadState.changeVisibility(
-                    chatHeadState.engagementRequested,
-                    callingActivity
-            ));
-        }
+    public void onChatBackButtonPressed() {
+        Logger.d(TAG, "onChatBackButtonPressed");
+        emitViewState(chatHeadState.onNewMessage(0));
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CHAT_ACTIVITY
+        ));
+    }
+
+    public void onCallBackButtonPressed() {
+        Logger.d(TAG, "onCallBackButtonPressed");
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested,
+                Constants.CALL_ACTIVITY));
     }
 
     public void onMinimizeButtonClicked() {
@@ -130,29 +127,54 @@ public class ChatHeadsController implements
         ));
     }
 
-    public void onNavigatedToChat(ChatHeadInput chatHeadInput) {
-        Logger.d(TAG, "onNavigatedToChat");
-        boolean hasOngoingMedia = chatHeadState.operatorMediaState != null &&
-                (chatHeadState.operatorMediaState.getAudio() != null ||
-                        chatHeadState.operatorMediaState.getVideo() != null);
-        emitViewState(chatHeadState.changeVisibility(
-                chatHeadState.engagementRequested && hasOngoingMedia,
-                hasOngoingMedia ? Constants.CALL_ACTIVITY : null
-        ));
+    public void onNavigatedToChat(
+            ChatHeadInput chatHeadInput,
+            boolean enableChatHeads,
+            boolean useOverlays,
+            boolean hasOngoingMediaQueueing
+    ) {
+        Logger.d(TAG, "onNavigatedToChat, hasOngoingMediaQueueing: " + hasOngoingMediaQueueing);
+        if (hasOngoingMediaQueueing) {
+            emitViewState(chatHeadState.changeVisibility(
+                    true,
+                    Constants.CALL_ACTIVITY
+            ));
+        } else {
+            changeVisibilityByMedia();
+        }
         if (chatHeadInput != null && chatHeadInput.uiTheme != null) {
             emitViewState(chatHeadState.themeChanged(chatHeadInput.uiTheme));
         }
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
+        init(enableChatHeads, useOverlays);
     }
 
-    public void onNavigatedToCall() {
+    private void changeVisibilityByMedia() {
+        boolean hasOngoingMedia = chatHeadState.operatorMediaState != null &&
+                (chatHeadState.operatorMediaState.getAudio() != null ||
+                        chatHeadState.operatorMediaState.getVideo() != null);
+
+        emitViewState(chatHeadState.changeVisibility(
+                chatHeadState.engagementRequested && hasOngoingMedia,
+                hasOngoingMedia ? Constants.CALL_ACTIVITY : null
+        ));
+    }
+
+    public void onNavigatedToCall(
+            ChatHeadInput chatHeadInput,
+            boolean enableChatHeads,
+            boolean useOverlays) {
         Logger.d(TAG, "onNavigatedToCall");
         emitViewState(chatHeadState.changeVisibility(
                 false,
                 null
         ));
+        if (chatHeadInput != null) {
+            lastInput = chatHeadInput;
+        }
+        init(true, useOverlays);
     }
 
     public void chatEndedByUser() {
@@ -206,6 +228,7 @@ public class ChatHeadsController implements
         Logger.d(TAG, "new operatorMediaState: " + operatorMediaState);
         handleService();
         emitViewState(chatHeadState.setOperatorMediaState(operatorMediaState));
+
     }
 
     @Override

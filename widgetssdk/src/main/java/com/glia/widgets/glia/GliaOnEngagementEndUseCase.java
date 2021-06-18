@@ -2,6 +2,8 @@ package com.glia.widgets.glia;
 
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.model.GliaEngagementRepository;
+import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
 
 public class GliaOnEngagementEndUseCase implements
         GliaOnEngagementUseCase.Listener,
@@ -13,11 +15,20 @@ public class GliaOnEngagementEndUseCase implements
 
     private final GliaEngagementRepository repository;
     private final GliaOnEngagementUseCase engagementUseCase;
+    private final RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
+    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private Listener listener;
 
-    public GliaOnEngagementEndUseCase(GliaEngagementRepository repository, GliaOnEngagementUseCase engagementUseCase) {
+    public GliaOnEngagementEndUseCase(
+            GliaEngagementRepository repository,
+            GliaOnEngagementUseCase engagementUseCase,
+            RemoveCallNotificationUseCase removeCallNotificationUseCase,
+            RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase
+    ) {
         this.repository = repository;
         this.engagementUseCase = engagementUseCase;
+        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
+        this.removeScreenSharingNotificationUseCase = removeScreenSharingNotificationUseCase;
     }
 
     public void execute(Listener listener) {
@@ -43,5 +54,7 @@ public class GliaOnEngagementEndUseCase implements
         if (this.listener != null) {
             listener.engagementEnded();
         }
+        removeScreenSharingNotificationUseCase.execute();
+        removeCallNotificationUseCase.execute();
     }
 }

@@ -14,7 +14,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
-import com.glia.widgets.UiTheme;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.chat.adapter.ChatItem;
 import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorMessageItem;
@@ -32,11 +32,9 @@ import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
 import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
-import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
@@ -64,9 +62,6 @@ public class ChatController implements
         GliaOnOperatorMediaStateUseCase.Listener,
         GliaOnQueueTicketUseCase.Listener {
 
-    private static final int CALL_TIMER_DELAY = 1000;
-    private static final int CALL_TIMER_TICKER_VALUE = 1000;
-
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener timerStatusListener;
@@ -74,7 +69,6 @@ public class ChatController implements
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final MinimizeHandler minimizeHandler;
-    private final ChatHeadsController chatHeadsController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private final DialogController dialogController;
@@ -101,11 +95,12 @@ public class ChatController implements
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
+    private boolean isMediaQueueingOnGoing = false;
+
     public ChatController(MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
                           TimeCounter callTimer,
                           ChatViewCallback viewCallback,
                           MinimizeHandler minimizeHandler,
-                          ChatHeadsController chatHeadsController,
                           DialogController dialogController,
                           MessagesNotSeenHandler messagesNotSeenHandler,
                           ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
@@ -138,19 +133,17 @@ public class ChatController implements
                 .setContextUrl(null)
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
-                .setOverlaysPermissionDialogShown(false)
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
-                .setIsNavigationPending(false)
+                .setPendingNavigationType(null)
                 .setUnsentMessages(new ArrayList<>())
                 .createChatState();
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.callTimer = callTimer;
         this.minimizeHandler = minimizeHandler;
-        this.chatHeadsController = chatHeadsController;
         this.dialogController = dialogController;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
 
@@ -176,45 +169,31 @@ public class ChatController implements
 
     public void initChat(String companyName,
                          String queueId,
-                         String contextUrl,
-                         boolean enableChatHeads,
-                         boolean useOverlays,
-                         boolean isConfigurationChange,
-                         UiTheme uiTheme,
-                         boolean hasOverlayPermissions,
-                         boolean isCallNotificationChannelEnabled,
-                         boolean isScreenSharingNotificationChannelEnabled
+                         String contextUrl
     ) {
-        updatePermissionsUseCase.execute(
-                hasOverlayPermissions,
-                isCallNotificationChannelEnabled,
-                isScreenSharingNotificationChannelEnabled
-        );
-        if (!isConfigurationChange) {
-            chatHeadsController.onNavigatedToChat(
-                    new ChatHeadInput(
-                            chatState.companyName,
-                            chatState.queueId,
-                            chatState.contextUrl,
-                            uiTheme
-                    ));
-            messagesNotSeenHandler.onNavigatedToChat();
-        }
+        isMediaQueueingOnGoing = queueForEngagementUseCase.getTypeOfOngoingQueueing() ==
+                GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
         emitViewState(chatState.initChat(companyName, queueId, contextUrl));
         loadHistoryUseCase.execute(this);
-        chatHeadsController.init(enableChatHeads, useOverlays);
         initMediaUpgradeCallback();
         initMinimizeCallback();
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         minimizeHandler.addListener(minimizeCalledListener);
+        createNewTimerCallback();
+        callTimer.addFormattedValueListener(timerStatusListener);
     }
 
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
-        queueForEngagementUseCase.execute(chatState.queueId, chatState.contextUrl, this);
+        isMediaQueueingOnGoing =
+                queueForEngagementUseCase.execute(
+                        chatState.queueId,
+                        chatState.contextUrl,
+                        this
+                ) == GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
     }
 
     private void initMinimizeCallback() {
@@ -241,7 +220,6 @@ public class ChatController implements
         destroyView();
         viewCallback = null;
         if (!retain) {
-            removeCallNotificationUseCase.execute();
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
             timerStatusListener = null;
@@ -312,28 +290,24 @@ public class ChatController implements
         Logger.d(TAG, "onBackArrowClicked");
         emitViewState(chatState.changeVisibility(false));
         messagesNotSeenHandler.chatOnBackClicked();
-        chatHeadsController.onBackButtonPressed(Constants.CHAT_ACTIVITY, false);
     }
 
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
         dialogController.dismissDialogs();
-        chatHeadsController.chatEndedByUser();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
         dialogController.dismissDialogs();
-        chatHeadsController.chatEndedByUser();
     }
 
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
         stop();
         dialogController.dismissDialogs();
-        chatHeadsController.chatEndedByUser();
     }
 
     public void endEngagementDialogDismissed() {
@@ -356,6 +330,10 @@ public class ChatController implements
         return chatState.isVisible;
     }
 
+    public boolean isMediaQueueingOnGoing() {
+        return isMediaQueueingOnGoing;
+    }
+
     public void setViewCallback(ChatViewCallback chatViewCallback) {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = chatViewCallback;
@@ -368,8 +346,8 @@ public class ChatController implements
         emitViewState(chatState.changeVisibility(true));
         viewCallback.scrollToBottomImmediate();
 
-        if (chatState.isNavigationPending) {
-            viewCallback.navigateToCall();
+        if (chatState.pendingNavigationType != null) {
+            viewCallback.navigateToCall(chatState.pendingNavigationType);
         }
     }
 
@@ -380,11 +358,7 @@ public class ChatController implements
                 "hasOverlayPermissions: " + hasOverlaysPermission +
                 ", isCallChannelEnabled:" + isCallChannelEnabled +
                 ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
-        updatePermissionsUseCase.execute(
-                hasOverlaysPermission,
-                isCallChannelEnabled,
-                isScreenSharingChannelEnabled
-        );
+        updatePermissions(hasOverlaysPermission, isCallChannelEnabled, isScreenSharingChannelEnabled);
         if (checkIfShowPermissionsDialogUseCase.execute(PermissionType.OVERLAY, true) &&
                 dialogController.isNoDialogShown()) {
             dialogController.showOverlayPermissionsDialog();
@@ -394,7 +368,6 @@ public class ChatController implements
 
     public void overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed");
-        emitViewState(chatState.drawOverlayPermissionsDialogShown());
         dialogController.dismissDialogs();
     }
 
@@ -413,7 +386,7 @@ public class ChatController implements
 
     public void navigateToCallSuccess() {
         Logger.d(TAG, "navigateToCallSuccess");
-        emitViewState(chatState.isNavigationPendingChanged(false));
+        emitViewState(chatState.setPendingNavigationType(null));
     }
 
     private synchronized boolean setState(ChatState state) {
@@ -469,28 +442,18 @@ public class ChatController implements
                     MediaUpgradeOffer offer,
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
-                Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess, offer: " +
-                        offer.toString() + ", submitter: " + submitter.toString());
-                MediaUpgradeStartedTimerItem.Type type = null;
-                if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
-                    Logger.d(TAG, "audioUpgradeAcceptSuccess");
-                    type = MediaUpgradeStartedTimerItem.Type.AUDIO;
-                } else if (offer.video == MediaDirection.ONE_WAY || offer.video == MediaDirection.TWO_WAY) {
-                    Logger.d(TAG, "videoUpgradeAcceptSuccess");
-                    type = MediaUpgradeStartedTimerItem.Type.VIDEO;
-                }
-                if (type != null) {
-                    if (chatState.isMediaUpgradeStarted()) {
-                        upgradeMediaItem(type);
+                Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess");
+                if (submitter == MediaUpgradeOfferRepository.Submitter.CHAT) {
+                    String requestedMediaType;
+                    if (offer.video != null) {
+                        requestedMediaType = GliaWidgets.MEDIA_TYPE_VIDEO;
                     } else {
-                        startTimer(type);
+                        requestedMediaType = GliaWidgets.MEDIA_TYPE_AUDIO;
                     }
-                    if (submitter == MediaUpgradeOfferRepository.Submitter.CHAT) {
-                        if (viewCallback != null) {
-                            Logger.d(TAG, "navigateToCall");
-                            viewCallback.navigateToCall();
-                        }
-                        emitViewState(chatState.isNavigationPendingChanged(true));
+                    emitViewState(chatState.setPendingNavigationType(requestedMediaType));
+                    if (viewCallback != null) {
+                        viewCallback.navigateToCall(requestedMediaType);
+                        Logger.d(TAG, "navigateToCall");
                     }
                 }
                 dialogController.dismissDialogs();
@@ -675,16 +638,9 @@ public class ChatController implements
         return message.length() > 0;
     }
 
-    private void startTimer(MediaUpgradeStartedTimerItem.Type type) {
+    private void startTimer() {
         Logger.d(TAG, "startTimer");
-        List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
-        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem =
-                new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
-        newItems.add(mediaUpgradeStartedTimerItem);
-        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
-        createNewTimerCallback();
-        callTimer.addFormattedValueListener(timerStatusListener);
-        callTimer.startNew(CALL_TIMER_DELAY, CALL_TIMER_TICKER_VALUE);
+        callTimer.startNew(Constants.CALL_TIMER_DELAY, Constants.CALL_TIMER_INTERVAL_VALUE);
     }
 
     private void upgradeMediaItem(MediaUpgradeStartedTimerItem.Type type) {
@@ -703,7 +659,7 @@ public class ChatController implements
         }
         timerStatusListener = new TimeCounter.FormattedTimerStatusListener() {
             @Override
-            public void onNewTimerValue(String formatedValue) {
+            public void onNewFormattedTimerValue(String formatedValue) {
                 if (chatState.isMediaUpgradeStarted()) {
                     int index = chatState.chatItems.indexOf(chatState.mediaUpgradeStartedTimerItem);
                     if (index != -1) {
@@ -719,7 +675,7 @@ public class ChatController implements
             }
 
             @Override
-            public void onCancel() {
+            public void onFormattedTimerCancelled() {
                 if (chatState.isMediaUpgradeStarted() &&
                         chatState.chatItems.contains(chatState.mediaUpgradeStartedTimerItem)) {
                     List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
@@ -830,6 +786,7 @@ public class ChatController implements
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
         Logger.d(TAG, "newEngagementLoaded");
+        isMediaQueueingOnGoing = false;
         String operatorProfileImgUrl = null;
         try {
             operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
@@ -917,6 +874,15 @@ public class ChatController implements
     @Override
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
+
+        if (chatState.isAudioCallStarted() && operatorMediaState.getVideo() != null) {
+            upgradeMediaItem(MediaUpgradeStartedTimerItem.Type.VIDEO);
+        } else if (!chatState.isMediaUpgradeStarted()) {
+            addMediaUpgradeItemToChatItems(operatorMediaState);
+            if (!callTimer.isRunning()) {
+                startTimer();
+            }
+        }
         if (operatorMediaState.getVideo() != null) {
             onOperatorMediaStateVideo();
         } else if (operatorMediaState.getAudio() != null) {
@@ -926,7 +892,31 @@ public class ChatController implements
         }
     }
 
+    private void addMediaUpgradeItemToChatItems(OperatorMediaState operatorMediaState) {
+        MediaUpgradeStartedTimerItem.Type type = null;
+        if (operatorMediaState.getVideo() == null && operatorMediaState.getAudio() != null) {
+            Logger.d(TAG, "starting audio timer");
+            type = MediaUpgradeStartedTimerItem.Type.AUDIO;
+        } else if (operatorMediaState.getVideo() != null) {
+            Logger.d(TAG, "starting video timer");
+            type = MediaUpgradeStartedTimerItem.Type.VIDEO;
+        }
+        List<ChatItem> newItems = new ArrayList<>(chatState.chatItems);
+        MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem =
+                new MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0));
+        newItems.add(mediaUpgradeStartedTimerItem);
+        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem));
+    }
+
     public void notificationsDialogDismissed() {
         dialogController.dismissDialogs();
+    }
+
+    public void updatePermissions(boolean hasOverlayPermissions, boolean isCallNotificationChannelEnabled, boolean isScreenSharingNotificationChannelEnabled) {
+        updatePermissionsUseCase.execute(
+                hasOverlayPermissions,
+                isCallNotificationChannelEnabled,
+                isScreenSharingNotificationChannelEnabled
+        );
     }
 }

@@ -220,7 +220,6 @@ public class ChatController implements
         destroyView();
         viewCallback = null;
         if (!retain) {
-            removeCallNotificationUseCase.execute();
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
             timerStatusListener = null;

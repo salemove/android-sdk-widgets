@@ -34,12 +34,16 @@ public class UseCaseFactory {
 
     private final RepositoryFactory repositoryFactory;
     private final PermissionsManager permissionsManager;
+    private final INotificationManager notificationManager;
+
     private static GliaQueueForEngagementUseCase gliaQueueForEngagementUseCase;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
-                          PermissionsManager permissionsManager) {
+                          PermissionsManager permissionsManager,
+                          INotificationManager notificationManager) {
         this.repositoryFactory = repositoryFactory;
         this.permissionsManager = permissionsManager;
+        this.notificationManager = notificationManager;
     }
 
     public static ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase(INotificationManager notificationManager) {
@@ -101,7 +105,9 @@ public class UseCaseFactory {
     public GliaOnEngagementEndUseCase createOnEngagementEndUseCase() {
         return new GliaOnEngagementEndUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
-                createOnEngagementUseCase()
+                createOnEngagementUseCase(),
+                createRemoveCallNotificationUseCase(notificationManager),
+                createRemoveScreenSharingNotificationUseCase(notificationManager)
         );
     }
 

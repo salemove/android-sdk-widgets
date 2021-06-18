@@ -377,7 +377,6 @@ public class CallController implements
         Logger.d(TAG, "endEngagementDialogYesClicked");
         stop();
         dialogController.dismissDialogs();
-        removeCallNotificationUseCase.execute();
     }
 
     public void endEngagementDialogDismissed() {

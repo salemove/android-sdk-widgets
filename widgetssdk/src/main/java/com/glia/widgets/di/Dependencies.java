@@ -22,10 +22,15 @@ public class Dependencies {
     private static INotificationManager notificationManager;
 
     public static void onAppCreate(Application application) {
+        notificationManager = new NotificationManager(application);
+
         RepositoryFactory repositoryFactory = new RepositoryFactory();
         UseCaseFactory useCaseFactory = new UseCaseFactory(
-                repositoryFactory, new PermissionsManager()
+                repositoryFactory,
+                new PermissionsManager(),
+                notificationManager
         );
+        
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
         controllerFactory.getChatHeadsController().addChatHeadServiceListener(
                 new ChatHeadsController.ChatHeadServiceListener() {
@@ -39,8 +44,6 @@ public class Dependencies {
                         application.stopService(new Intent(application, ChatHeadService.class));
                     }
                 });
-
-        notificationManager = new NotificationManager(application);
     }
 
     public static INotificationManager getNotificationManager() {

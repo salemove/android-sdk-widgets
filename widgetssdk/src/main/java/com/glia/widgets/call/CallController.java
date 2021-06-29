@@ -636,6 +636,7 @@ public class CallController implements
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
         Logger.d(TAG, "engagementSuccess");
+        mediaUpgradeOfferRepository.startListening();
         String operatorProfileImgUrl = null;
         try {
             operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();

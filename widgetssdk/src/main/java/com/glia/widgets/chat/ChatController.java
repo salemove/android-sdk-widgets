@@ -95,8 +95,6 @@ public class ChatController implements
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
-    private boolean isMediaQueueingOnGoing = false;
-
     public ChatController(MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
                           TimeCounter callTimer,
                           ChatViewCallback viewCallback,
@@ -171,8 +169,6 @@ public class ChatController implements
                          String queueId,
                          String contextUrl
     ) {
-        isMediaQueueingOnGoing = queueForEngagementUseCase.getTypeOfOngoingQueueing() ==
-                GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
@@ -188,12 +184,11 @@ public class ChatController implements
 
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
-        isMediaQueueingOnGoing =
-                queueForEngagementUseCase.execute(
-                        chatState.queueId,
-                        chatState.contextUrl,
-                        this
-                ) == GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
+        queueForEngagementUseCase.execute(
+                chatState.queueId,
+                chatState.contextUrl,
+                this
+        );
     }
 
     private void initMinimizeCallback() {
@@ -331,7 +326,8 @@ public class ChatController implements
     }
 
     public boolean isMediaQueueingOnGoing() {
-        return isMediaQueueingOnGoing;
+        // TODO refac this usecase to not expose this data
+        return queueForEngagementUseCase.getTypeOfOngoingQueueing() == GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
     }
 
     public void setViewCallback(ChatViewCallback chatViewCallback) {
@@ -766,7 +762,6 @@ public class ChatController implements
     @Override
     public void queueForEngagementSuccess() {
         Logger.d(TAG, "queueForEngagementSuccess");
-        viewInitQueueing();
     }
 
     @Override
@@ -786,7 +781,6 @@ public class ChatController implements
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
         Logger.d(TAG, "newEngagementLoaded");
-        isMediaQueueingOnGoing = false;
         String operatorProfileImgUrl = null;
         try {
             operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();

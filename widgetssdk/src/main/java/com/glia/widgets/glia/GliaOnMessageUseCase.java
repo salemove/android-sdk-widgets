@@ -2,6 +2,7 @@ package com.glia.widgets.glia;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.model.GliaChatRepository;
 
 public class GliaOnMessageUseCase implements

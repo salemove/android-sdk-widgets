@@ -20,16 +20,19 @@ import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorMessageItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.VisitorMessageItem;
+import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
+import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.queue.QueueTicketsEventsListener;
+import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.glia.GliaCancelQueueTicketUseCase;
-import com.glia.widgets.glia.GliaEndEngagementUseCase;
+import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.glia.GliaLoadHistoryUseCase;
-import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
-import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.glia.GliaOnMessageUseCase;
-import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
-import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
-import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
 import com.glia.widgets.helper.Logger;
@@ -54,13 +57,10 @@ import java.util.List;
 
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
-        GliaQueueForEngagementUseCase.Listener,
         GliaOnEngagementUseCase.Listener,
         GliaOnEngagementEndUseCase.Listener,
         GliaOnMessageUseCase.Listener,
-        GliaSendMessageUseCase.Listener,
-        GliaOnOperatorMediaStateUseCase.Listener,
-        GliaOnQueueTicketUseCase.Listener {
+        GliaSendMessageUseCase.Listener {
 
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -71,22 +71,51 @@ public class ChatController implements
     private final MinimizeHandler minimizeHandler;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
 
+    private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
+        @Override
+        public void onTicketReceived(String ticketId) {
+            onQueueTicketReceived(ticketId);
+        }
+
+        @Override
+        public void started() {
+            queueForEngagementStarted();
+        }
+
+        @Override
+        public void ongoing() {
+            queueForEngagementOngoing();
+        }
+
+        @Override
+        public void stopped() {
+            queueForEngagementStopped();
+        }
+
+        @Override
+        public void error(GliaException exception) {
+            queueForEngagementError(exception);
+        }
+    };
+
+    private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
+
     private final DialogController dialogController;
 
     private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
     private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
     private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private final GliaLoadHistoryUseCase loadHistoryUseCase;
-    private final GliaQueueForEngagementUseCase queueForEngagementUseCase;
+    private final GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase;
     private final GliaOnEngagementUseCase getEngagementUseCase;
     private final GliaOnEngagementEndUseCase engagementEndUseCase;
     private final GliaOnMessageUseCase onMessageUseCase;
     private final GliaSendMessagePreviewUseCase sendMessagePreviewUseCase;
     private final GliaSendMessageUseCase sendMessageUseCase;
-    private final GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase;
+    private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
-    private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
+    private final GliaQueueForChatEngagementUseCase queueForChatEngagementUseCase;
     private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
     private final UpdateDialogShownUseCase updateDialogShownUseCase;
     private final UpdatePermissionsUseCase updatePermissionsUseCase;
@@ -105,16 +134,16 @@ public class ChatController implements
                           ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
                           RemoveCallNotificationUseCase removeCallNotificationUseCase,
                           GliaLoadHistoryUseCase loadHistoryUseCase,
-                          GliaQueueForEngagementUseCase queueForEngagementUseCase,
+                          GliaQueueForChatEngagementUseCase queueForChatEngagementUseCase,
                           GliaOnEngagementUseCase gliaObserveEngagementUseCase,
                           GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase,
                           GliaOnMessageUseCase onMessageUseCase,
                           GliaSendMessagePreviewUseCase gliaSendMessagePreviewUseCase,
                           GliaSendMessageUseCase sendMessageUseCase,
-                          GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase,
+                          AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
                           GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
+                          GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase,
                           GliaEndEngagementUseCase endEngagementUseCase,
-                          GliaOnQueueTicketUseCase onQueueTicketUseCase,
                           CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
                           UpdateDialogShownUseCase updateDialogShownUseCase,
                           UpdatePermissionsUseCase updatePermissionsUseCase,
@@ -149,20 +178,20 @@ public class ChatController implements
         this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
         this.removeCallNotificationUseCase = removeCallNotificationUseCase;
         this.loadHistoryUseCase = loadHistoryUseCase;
-        this.queueForEngagementUseCase = queueForEngagementUseCase;
         this.getEngagementUseCase = gliaObserveEngagementUseCase;
         this.engagementEndUseCase = gliaOnEngagementEndUseCase;
+        this.queueForChatEngagementUseCase = queueForChatEngagementUseCase;
         this.onMessageUseCase = onMessageUseCase;
         this.sendMessagePreviewUseCase = gliaSendMessagePreviewUseCase;
         this.sendMessageUseCase = sendMessageUseCase;
-        this.onOperatorMediaStateUseCase = onOperatorMediaStateUseCase;
+        this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
-        this.onQueueTicketUseCase = onQueueTicketUseCase;
         this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
         this.updateDialogShownUseCase = updateDialogShownUseCase;
         this.updatePermissionsUseCase = updatePermissionsUseCase;
         this.resetPermissionsUseCase = resetPermissionsUseCase;
+        this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
     }
 
     public void initChat(String companyName,
@@ -180,14 +209,17 @@ public class ChatController implements
         minimizeHandler.addListener(minimizeCalledListener);
         createNewTimerCallback();
         callTimer.addFormattedValueListener(timerStatusListener);
+        if (getIsQueueingOngoingUseCase.execute()) {
+            queueForEngagementOngoing();
+        }
     }
 
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
-        queueForEngagementUseCase.execute(
+        queueForChatEngagementUseCase.execute(
                 chatState.queueId,
                 chatState.contextUrl,
-                this
+                queueTicketsEventsListener
         );
     }
 
@@ -223,13 +255,12 @@ public class ChatController implements
             minimizeHandler.clear();
 
             loadHistoryUseCase.unregisterListener(this);
-            queueForEngagementUseCase.unregisterListener(this);
+
             getEngagementUseCase.unregisterListener(this);
             engagementEndUseCase.unregisterListener(this);
+
             onMessageUseCase.unregisterListener(this);
             sendMessageUseCase.unregisterListener(this);
-            onOperatorMediaStateUseCase.unregisterListener(this);
-            onQueueTicketUseCase.unregisterListener(this);
             resetPermissionsUseCase.execute();
         }
     }
@@ -323,11 +354,6 @@ public class ChatController implements
 
     public boolean isChatVisible() {
         return chatState.isVisible;
-    }
-
-    public boolean isMediaQueueingOnGoing() {
-        // TODO refac this usecase to not expose this data
-        return queueForEngagementUseCase.getTypeOfOngoingQueueing() == GliaQueueForEngagementUseCase.TypeOfOngoingQueueing.MEDIA;
     }
 
     public void setViewCallback(ChatViewCallback chatViewCallback) {
@@ -509,9 +535,7 @@ public class ChatController implements
 
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
-        if (chatState.queueTicketId != null) {
-            cancelQueueTicketUseCase.execute(chatState.queueTicketId);
-        }
+        cancelQueueTicketUseCase.execute();
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(chatState.stop());
@@ -563,7 +587,6 @@ public class ChatController implements
     }
 
     private void initGliaEngagementObserving() {
-        onQueueTicketUseCase.execute(this);
         getEngagementUseCase.execute(this);
         engagementEndUseCase.execute(this);
     }
@@ -751,27 +774,6 @@ public class ChatController implements
     }
 
     @Override
-    public void ticketLoaded(String ticket) {
-        Logger.d(TAG, "ticketLoaded");
-        emitViewState(chatState.queueTicketSuccess(ticket));
-        if (!chatState.engagementRequested) {
-            viewInitQueueing();
-        }
-    }
-
-    @Override
-    public void queueForEngagementSuccess() {
-        Logger.d(TAG, "queueForEngagementSuccess");
-    }
-
-    @Override
-    public void error(GliaException exception) {
-        if (exception != null) {
-            error(exception.toString());
-        }
-    }
-
-    @Override
     public void error(Throwable error) {
         if (error != null) {
             error(error.toString());
@@ -788,7 +790,7 @@ public class ChatController implements
         }
         operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
         onMessageUseCase.execute(this);
-        onOperatorMediaStateUseCase.execute(this);
+        addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
         mediaUpgradeOfferRepository.startListening();
         if (!chatState.unsentMessages.isEmpty()) {
             sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), this);
@@ -865,7 +867,6 @@ public class ChatController implements
         }
     }
 
-    @Override
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString());
 
@@ -912,5 +913,31 @@ public class ChatController implements
                 isCallNotificationChannelEnabled,
                 isScreenSharingNotificationChannelEnabled
         );
+    }
+
+    public void onQueueTicketReceived(String ticket) {
+        Logger.d(TAG, "ticketLoaded");
+        emitViewState(chatState.queueTicketSuccess(ticket));
+    }
+
+
+    public void queueForEngagementStarted() {
+        Logger.d(TAG, "queueForEngagementStarted");
+        viewInitQueueing();
+    }
+
+    public void queueForEngagementStopped() {
+        Logger.d(TAG, "queueForEngagementStopped");
+    }
+
+    public void queueForEngagementError(GliaException exception) {
+        if (exception != null) {
+            error(exception.toString());
+        }
+    }
+
+    public void queueForEngagementOngoing() {
+        Logger.d(TAG, "queueForEngagementOngoing");
+        viewInitQueueing();
     }
 }

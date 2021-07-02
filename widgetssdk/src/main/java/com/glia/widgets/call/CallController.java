@@ -9,6 +9,7 @@ import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
@@ -73,6 +74,7 @@ public class CallController implements
     private final GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
+    private final ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase;
     private final DialogController dialogController;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
@@ -129,7 +131,8 @@ public class CallController implements
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
             GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
-            GliaEndEngagementUseCase endEngagementUseCase) {
+            GliaEndEngagementUseCase endEngagementUseCase,
+            ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.callState = new CallState.Builder()
@@ -164,6 +167,7 @@ public class CallController implements
         this.onVisitorMediaStateUseCase = onVisitorMediaStateUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
+        this.shouldShowMediaEngagementViewUseCase = shouldShowMediaEngagementViewUseCase;
     }
 
     public void initCall(String companyName,
@@ -308,49 +312,6 @@ public class CallController implements
 
             }
         };
-    }
-
-    private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
-        Logger.d(TAG, "newOperatorMediaState: video");
-        String formatedTime = Utils.toMmSs(0L);
-        if (callState.hasMedia()) {
-            formatedTime = callState.callStatus.getTime();
-        }
-        emitViewState(callState.videoCallOperatorVideoStarted(
-                operatorMediaState,
-                formatedTime
-        ));
-        startOperatorVideo(operatorMediaState);
-        showVideoCallNotificationUseCase.execute();
-        connectingTimerCounter.stop();
-    }
-
-    private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
-        Logger.d(TAG, "newOperatorMediaState: audio");
-        String formatedTime = Utils.toMmSs(0L);
-        if (callState.hasMedia()) formatedTime = callState.callStatus.getTime();
-
-        emitViewState(callState.audioCallStarted(
-                operatorMediaState,
-                formatedTime
-        ));
-
-        showAudioCallNotificationUseCase.execute();
-        connectingTimerCounter.stop();
-    }
-
-    private void onOperatorMediaStateUnknown() {
-        Logger.d(TAG, "newOperatorMediaState: null");
-        if (callState.isMediaEngagementStarted()) {
-            emitViewState(callState.backToOngoing());
-        }
-        removeCallNotificationUseCase.execute();
-        if (!connectingTimerCounter.isRunning()) {
-            connectingTimerCounter.startNew(
-                    Constants.CALL_TIMER_DELAY,
-                    Constants.CALL_TIMER_INTERVAL_VALUE
-            );
-        }
     }
 
     private synchronized void emitViewState(CallState state) {
@@ -678,8 +639,48 @@ public class CallController implements
         boolean newValue = !callState.isSpeakerOn;
         Logger.d(TAG, "onSpeakerButtonPressed, new value: " + newValue);
         emitViewState(callState.speakerValueChanged(newValue));
-        if (viewCallback != null) {
-            viewCallback.switchSpeakerValue(callState.isSpeakerOn);
+    }
+
+    private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: video");
+        String formatedTime = Utils.toMmSs(0L);
+        if (callState.hasMedia()) {
+            formatedTime = callState.callStatus.getTime();
+        }
+        emitViewState(callState.videoCallOperatorVideoStarted(
+                operatorMediaState,
+                formatedTime
+        ));
+        startOperatorVideo(operatorMediaState);
+        showVideoCallNotificationUseCase.execute();
+        connectingTimerCounter.stop();
+    }
+
+    private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: audio");
+        String formatedTime = Utils.toMmSs(0L);
+        if (callState.hasMedia()) formatedTime = callState.callStatus.getTime();
+
+        emitViewState(callState.audioCallStarted(
+                operatorMediaState,
+                formatedTime
+        ));
+
+        showAudioCallNotificationUseCase.execute();
+        connectingTimerCounter.stop();
+    }
+
+    private void onOperatorMediaStateUnknown() {
+        Logger.d(TAG, "newOperatorMediaState: null");
+        if (callState.isMediaEngagementStarted()) {
+            emitViewState(callState.backToOngoing());
+        }
+        removeCallNotificationUseCase.execute();
+        if (!connectingTimerCounter.isRunning()) {
+            connectingTimerCounter.startNew(
+                    Constants.CALL_TIMER_DELAY,
+                    Constants.CALL_TIMER_INTERVAL_VALUE
+            );
         }
     }
 
@@ -687,7 +688,6 @@ public class CallController implements
         Logger.d(TAG, "ticketLoaded");
         emitViewState(callState.ticketLoaded(ticket));
     }
-
 
     public void queueForEngagementStarted() {
         Logger.d(TAG, "queueForEngagementStarted");
@@ -707,5 +707,9 @@ public class CallController implements
 
     public void queueForEngagementOngoing() {
         Logger.d(TAG, "queueForEngagementOngoing");
+    }
+
+    public boolean shouldShowMediaEngagementView() {
+        return shouldShowMediaEngagementViewUseCase.execute();
     }
 }

@@ -10,6 +10,6 @@ public class GetIsMediaQueueingOngoingUseCase {
     }
 
     public boolean execute() {
-        return repository.getIsMediaQueueingOngoing();
+        return repository.isMediaQueueingOngoing();
     }
 }

@@ -67,5 +67,6 @@ public class GliaOnEngagementEndUseCase implements
         removeCallNotificationUseCase.execute();
         gliaQueueRepository.cleanOnEngagementEnd();
         operatorMediaRepository.stopListening();
+        repository.clearEngagementType();
     }
 }

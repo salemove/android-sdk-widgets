@@ -1,6 +1,6 @@
-package com.glia.widgets.glia;
+package com.glia.widgets.core.engagement.domain;
 
-import com.glia.widgets.model.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementRepository;
 
 public class GliaEndEngagementUseCase {
 

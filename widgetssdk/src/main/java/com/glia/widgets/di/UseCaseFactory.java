@@ -1,15 +1,18 @@
 package com.glia.widgets.di;
 
-import com.glia.widgets.glia.GliaCancelQueueTicketUseCase;
-import com.glia.widgets.glia.GliaEndEngagementUseCase;
+import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.queue.domain.AddQueueTicketsEventsListenerUseCase;
+import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.glia.GliaLoadHistoryUseCase;
-import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
-import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.glia.GliaOnMessageUseCase;
-import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
-import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
-import com.glia.widgets.glia.GliaOnVisitorMediaStateUseCase;
-import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
+import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
 import com.glia.widgets.model.PermissionsManager;
@@ -35,8 +38,6 @@ public class UseCaseFactory {
     private final RepositoryFactory repositoryFactory;
     private final PermissionsManager permissionsManager;
     private final INotificationManager notificationManager;
-
-    private static GliaQueueForEngagementUseCase gliaQueueForEngagementUseCase;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
                           PermissionsManager permissionsManager,
@@ -80,18 +81,31 @@ public class UseCaseFactory {
         return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository());
     }
 
-    public GliaQueueForEngagementUseCase createQueueForEngagementuseCase() {
-        if (gliaQueueForEngagementUseCase == null) {
-            gliaQueueForEngagementUseCase = new GliaQueueForEngagementUseCase(
-                    repositoryFactory.getGliaRepository(),
-                    createGliaOnQueueTicketUseCase()
+    private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
+    private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
+
+    public GliaQueueForChatEngagementUseCase createQueueForChatEngagementUseCase() {
+        if (gliaQueueForChatEngagementUseCase == null) {
+            gliaQueueForChatEngagementUseCase = new GliaQueueForChatEngagementUseCase(
+                    repositoryFactory.getGliaQueueRepository(),
+                    repositoryFactory.getGliaEngagementRepository()
             );
         }
-        return gliaQueueForEngagementUseCase;
+        return gliaQueueForChatEngagementUseCase;
+    }
+
+    public GliaQueueForMediaEngagementUseCase createQueueForMediaEngagementUseCase() {
+        if (gliaQueueForMediaEngagementUseCase == null) {
+            gliaQueueForMediaEngagementUseCase = new GliaQueueForMediaEngagementUseCase(
+                    repositoryFactory.getGliaQueueRepository(),
+                    repositoryFactory.getGliaEngagementRepository()
+            );
+        }
+        return gliaQueueForMediaEngagementUseCase;
     }
 
     public GliaCancelQueueTicketUseCase createCancelQueueTicketUseCase() {
-        return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaRepository());
+        return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaQueueRepository());
     }
 
     public GliaEndEngagementUseCase createEndEngagementUseCase() {
@@ -99,12 +113,18 @@ public class UseCaseFactory {
     }
 
     public GliaOnEngagementUseCase createOnEngagementUseCase() {
-        return new GliaOnEngagementUseCase(repositoryFactory.getGliaRepository());
+        return new GliaOnEngagementUseCase(
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaOperatorMediaRepository(),
+                repositoryFactory.getGliaQueueRepository()
+        );
     }
 
     public GliaOnEngagementEndUseCase createOnEngagementEndUseCase() {
         return new GliaOnEngagementEndUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaQueueRepository(),
+                repositoryFactory.getGliaOperatorMediaRepository(),
                 createOnEngagementUseCase(),
                 createRemoveCallNotificationUseCase(notificationManager),
                 createRemoveScreenSharingNotificationUseCase(notificationManager)
@@ -118,23 +138,12 @@ public class UseCaseFactory {
         );
     }
 
-    public GliaOnOperatorMediaStateUseCase createGliaOnOperatorMediaStateUseCase() {
-        return new GliaOnOperatorMediaStateUseCase(
-                createOnEngagementUseCase(),
-                repositoryFactory.getGliaMediaStateRepository()
-        );
-    }
-
     public GliaSendMessagePreviewUseCase createGliaSendMessagePreviewUseCase() {
         return new GliaSendMessagePreviewUseCase(repositoryFactory.getGliaMessageRepository());
     }
 
     public GliaSendMessageUseCase createGliaSendMessageUseCase() {
         return new GliaSendMessageUseCase(repositoryFactory.getGliaMessageRepository());
-    }
-
-    public GliaOnQueueTicketUseCase createGliaOnQueueTicketUseCase() {
-        return new GliaOnQueueTicketUseCase(repositoryFactory.getGliaRepository());
     }
 
     public CheckIfShowPermissionsDialogUseCase createCheckIfShowPermissionsDialogUseCase() {
@@ -160,7 +169,31 @@ public class UseCaseFactory {
     public GliaOnVisitorMediaStateUseCase createGliaOnVisitorMediaStateUseCase() {
         return new GliaOnVisitorMediaStateUseCase(
                 createOnEngagementUseCase(),
-                repositoryFactory.getGliaMediaStateRepository()
+                repositoryFactory.getGliaVisitorMediaRepository()
+        );
+    }
+
+    public GetIsMediaQueueingOngoingUseCase createGetIsMediaEngagementOngoingUseCase() {
+        return new GetIsMediaQueueingOngoingUseCase(
+                repositoryFactory.getGliaQueueRepository()
+        );
+    }
+
+    public GetIsQueueingOngoingUseCase createGetIsQueueingOngoingUseCase() {
+        return new GetIsQueueingOngoingUseCase(
+                repositoryFactory.getGliaQueueRepository()
+        );
+    }
+
+    public AddOperatorMediaStateListenerUseCase createAddOperatorMediaStateListenerUseCase() {
+        return new AddOperatorMediaStateListenerUseCase(
+                repositoryFactory.getGliaOperatorMediaRepository()
+        );
+    }
+
+    public AddQueueTicketsEventsListenerUseCase createAddQueueTicketsEventsListenerUseCase() {
+        return new AddQueueTicketsEventsListenerUseCase(
+                repositoryFactory.getGliaQueueRepository()
         );
     }
 }

@@ -1,7 +1,9 @@
-package com.glia.widgets.glia;
+package com.glia.widgets.core.engagement.domain;
 
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.model.GliaRepository;
+import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
+import com.glia.widgets.core.queue.GliaQueueRepository;
 
 import java.util.function.Consumer;
 
@@ -11,11 +13,19 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
         void newEngagementLoaded(OmnicoreEngagement engagement);
     }
 
-    private final GliaRepository gliaRepository;
+    private final GliaEngagementRepository gliaRepository;
+    private final GliaOperatorMediaRepository operatorMediaRepository;
+    private final GliaQueueRepository gliaQueueRepository;
     private Listener listener;
 
-    public GliaOnEngagementUseCase(GliaRepository gliaRepository) {
+    public GliaOnEngagementUseCase(
+            GliaEngagementRepository gliaRepository,
+            GliaOperatorMediaRepository operatorMediaRepository,
+            GliaQueueRepository gliaQueueRepository
+    ) {
         this.gliaRepository = gliaRepository;
+        this.operatorMediaRepository = operatorMediaRepository;
+        this.gliaQueueRepository = gliaQueueRepository;
     }
 
     public void execute(Listener listener) {
@@ -28,6 +38,8 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
         if (this.listener != null) {
             listener.newEngagementLoaded(engagement);
         }
+        operatorMediaRepository.startListening();
+        gliaQueueRepository.onEngagementStarted();
     }
 
     public void unregisterListener(Listener listener) {

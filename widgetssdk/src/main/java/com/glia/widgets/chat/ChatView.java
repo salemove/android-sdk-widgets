@@ -236,8 +236,7 @@ public class ChatView extends ConstraintLayout {
                                     this.theme
                             ),
                             activity instanceof ChatActivity,
-                            activity instanceof ChatActivity && useOverlays,
-                            controller.isMediaQueueingOnGoing()
+                            activity instanceof ChatActivity && useOverlays
                     );
                 }
             }

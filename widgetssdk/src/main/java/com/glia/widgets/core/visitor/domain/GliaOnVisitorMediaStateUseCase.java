@@ -1,12 +1,13 @@
-package com.glia.widgets.glia;
+package com.glia.widgets.core.visitor.domain;
 
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.model.GliaMediaRepository;
 
 public class GliaOnVisitorMediaStateUseCase implements
-        GliaMediaRepository.VisitorMediaStateListener,
+        GliaVisitorMediaRepository.VisitorMediaStateListener,
         GliaOnEngagementUseCase.Listener {
     private final static String TAG = "GliaOnVisitorMediaStateUseCase";
 
@@ -15,11 +16,11 @@ public class GliaOnVisitorMediaStateUseCase implements
     }
 
     private final GliaOnEngagementUseCase onEngagementUseCase;
-    private final GliaMediaRepository repository;
+    private final GliaVisitorMediaRepository repository;
     private Listener listener;
 
     public GliaOnVisitorMediaStateUseCase(GliaOnEngagementUseCase onEngagementUseCase,
-                                          GliaMediaRepository repository) {
+                                          GliaVisitorMediaRepository repository) {
         this.onEngagementUseCase = onEngagementUseCase;
         this.repository = repository;
     }

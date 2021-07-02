@@ -9,15 +9,16 @@ import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
+import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.queue.QueueTicketsEventsListener;
+import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.glia.GliaCancelQueueTicketUseCase;
-import com.glia.widgets.glia.GliaEndEngagementUseCase;
-import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
-import com.glia.widgets.glia.GliaOnEngagementUseCase;
-import com.glia.widgets.glia.GliaOnOperatorMediaStateUseCase;
-import com.glia.widgets.glia.GliaOnQueueTicketUseCase;
-import com.glia.widgets.glia.GliaOnVisitorMediaStateUseCase;
-import com.glia.widgets.glia.GliaQueueForEngagementUseCase;
+import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -37,10 +38,7 @@ import com.glia.widgets.permissions.UpdatePermissionsUseCase;
 import java.util.concurrent.TimeUnit;
 
 public class CallController implements
-        GliaQueueForEngagementUseCase.Listener,
-        GliaOnQueueTicketUseCase.Listener,
         GliaOnEngagementUseCase.Listener,
-        GliaOnOperatorMediaStateUseCase.Listener,
         GliaOnVisitorMediaStateUseCase.Listener,
         GliaOnEngagementEndUseCase.Listener {
 
@@ -68,15 +66,43 @@ public class CallController implements
     private final UpdateDialogShownUseCase updateDialogShownUseCase;
     private final UpdatePermissionsUseCase updatePermissionsUseCase;
     private final ResetPermissionsUseCase resetPermissionsUseCase;
-    private final GliaQueueForEngagementUseCase queueForEngagementUseCase;
+    private final GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
-    private final GliaOnQueueTicketUseCase onQueueTicketUseCase;
     private final GliaOnEngagementUseCase onEngagementUseCase;
-    private final GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase;
+    private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
     private final GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final DialogController dialogController;
+
+    private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
+        @Override
+        public void onTicketReceived(String ticketId) {
+            onQueueTicketReceived(ticketId);
+        }
+
+        @Override
+        public void started() {
+            queueForEngagementStarted();
+        }
+
+        @Override
+        public void ongoing() {
+            queueForEngagementOngoing();
+        }
+
+        @Override
+        public void stopped() {
+            queueForEngagementStopped();
+        }
+
+        @Override
+        public void error(GliaException exception) {
+            queueForEngagementError(exception);
+        }
+    };
+
+    private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
     private final String TAG = "CallController";
     private volatile CallState callState;
@@ -97,11 +123,10 @@ public class CallController implements
             UpdateDialogShownUseCase updateDialogShownUseCase,
             UpdatePermissionsUseCase updatePermissionsUseCase,
             ResetPermissionsUseCase resetPermissionsUseCase,
-            GliaQueueForEngagementUseCase queueForMediaTicketUseCase,
+            GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase,
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
-            GliaOnQueueTicketUseCase onQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
-            GliaOnOperatorMediaStateUseCase onOperatorMediaStateUseCase,
+            AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
             GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             GliaEndEngagementUseCase endEngagementUseCase) {
@@ -132,11 +157,10 @@ public class CallController implements
         this.updateDialogShownUseCase = updateDialogShownUseCase;
         this.updatePermissionsUseCase = updatePermissionsUseCase;
         this.resetPermissionsUseCase = resetPermissionsUseCase;
-        this.queueForEngagementUseCase = queueForMediaTicketUseCase;
+        this.gliaQueueForMediaEngagementUseCase = gliaQueueForMediaEngagementUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
-        this.onQueueTicketUseCase = onQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
-        this.onOperatorMediaStateUseCase = onOperatorMediaStateUseCase;
+        this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
         this.onVisitorMediaStateUseCase = onVisitorMediaStateUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
@@ -164,10 +188,9 @@ public class CallController implements
         initControllerCallbacks();
         initMinimizeCallback();
         initMessagesNotSeenCallback();
-        onQueueTicketUseCase.execute(this);
         onEngagementUseCase.execute(this);
-        onOperatorMediaStateUseCase.execute(this);
-        queueForEngagementUseCase.execute(queueId, contextUrl, mediaType, this);
+        addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
+        gliaQueueForMediaEngagementUseCase.execute(queueId, contextUrl, mediaType, queueTicketsEventsListener);
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
@@ -205,9 +228,7 @@ public class CallController implements
             messagesNotSeenHandlerListener = null;
             resetPermissionsUseCase.execute();
 
-            onQueueTicketUseCase.unregisterListener(this);
             onEngagementUseCase.unregisterListener(this);
-            onOperatorMediaStateUseCase.unregisterListener(this);
             onVisitorMediaStateUseCase.unregisterListener(this);
             onEngagementEndUseCase.unregisterListener(this);
         }
@@ -347,9 +368,7 @@ public class CallController implements
 
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
-        if (callState.queueTicketId != null) {
-            cancelQueueTicketUseCase.execute(callState.queueTicketId);
-        }
+        cancelQueueTicketUseCase.execute();
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(callState.stop());
@@ -583,7 +602,6 @@ public class CallController implements
         dialogController.dismissDialogs();
     }
 
-    @Override
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString() +
                 ", timertaskrunning: " + callTimer.isRunning());
@@ -656,26 +674,6 @@ public class CallController implements
         }
     }
 
-    @Override
-    public void ticketLoaded(String ticket) {
-        Logger.d(TAG, "ticketLoaded");
-        emitViewState(callState.ticketLoaded(ticket));
-    }
-
-    @Override
-    public void queueForEngagementSuccess() {
-        Logger.d(TAG, "queueForEngagementSuccess");
-    }
-
-    @Override
-    public void error(GliaException exception) {
-        if (exception != null) {
-            Logger.e(TAG, exception.debugMessage);
-            dialogController.showUnexpectedErrorDialog();
-            emitViewState(callState.changeVisibility(false));
-        }
-    }
-
     public void onSpeakerButtonPressed() {
         boolean newValue = !callState.isSpeakerOn;
         Logger.d(TAG, "onSpeakerButtonPressed, new value: " + newValue);
@@ -683,5 +681,31 @@ public class CallController implements
         if (viewCallback != null) {
             viewCallback.switchSpeakerValue(callState.isSpeakerOn);
         }
+    }
+
+    public void onQueueTicketReceived(String ticket) {
+        Logger.d(TAG, "ticketLoaded");
+        emitViewState(callState.ticketLoaded(ticket));
+    }
+
+
+    public void queueForEngagementStarted() {
+        Logger.d(TAG, "queueForEngagementStarted");
+    }
+
+    public void queueForEngagementStopped() {
+        Logger.d(TAG, "queueForEngagementStopped");
+    }
+
+    public void queueForEngagementError(GliaException exception) {
+        if (exception != null) {
+            Logger.e(TAG, exception.debugMessage);
+            dialogController.showUnexpectedErrorDialog();
+            emitViewState(callState.changeVisibility(false));
+        }
+    }
+
+    public void queueForEngagementOngoing() {
+        Logger.d(TAG, "queueForEngagementOngoing");
     }
 }

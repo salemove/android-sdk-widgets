@@ -48,10 +48,11 @@ public class GliaRepository {
         });
     }
 
-    public void startQueueingForMediaEngagement(String queueId,
-                                        String contextUrl,
-                                        Engagement.MediaType mediaType,
-                                        Consumer<GliaException> consumer
+    public void startQueueingForMediaEngagement(
+            String queueId,
+            String contextUrl,
+            Engagement.MediaType mediaType,
+            Consumer<GliaException> consumer
     ) {
         VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
         Glia.queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, consumer);

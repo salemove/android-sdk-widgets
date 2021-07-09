@@ -1,11 +1,15 @@
 package com.glia.widgets.call;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.widgets.Constants;
@@ -16,7 +20,16 @@ import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
-public class CallActivity extends Activity {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
+
+public class CallActivity extends AppCompatActivity {
+    private static final int MEDIA_PERMISSION_REQUEST_CODE = 2001;
 
     private static final String TAG = "CallActivity";
 
@@ -36,6 +49,8 @@ public class CallActivity extends Activity {
         navigateToChat();
         finish();
     };
+    private PublishSubject<Pair<Integer, Integer[]>> permissionSubject = PublishSubject.create();
+    private Disposable permissionSubjectDisposable;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +69,61 @@ public class CallActivity extends Activity {
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
-        callView.startCall(companyName, queueId, contextUrl, useOverlays, getMediaType(intent));
+
+        startCallWithPermissions(companyName, queueId, contextUrl, useOverlays, getMediaType(intent));
+    }
+
+
+    private void startCallWithPermissions(String companyName,
+                                          String queueId,
+                                          String contextUrl,
+                                          boolean useOverlays,
+                                          Engagement.MediaType mediaType) {
+
+        List<String> missingPermissions = new ArrayList<>();
+        if (mediaType == Engagement.MediaType.VIDEO && !hasPermission(Manifest.permission.CAMERA)) {
+            missingPermissions.add(Manifest.permission.CAMERA);
+        }
+        if ((mediaType == Engagement.MediaType.VIDEO || mediaType == Engagement.MediaType.AUDIO) && !hasPermission(Manifest.permission.RECORD_AUDIO)) {
+            missingPermissions.add(Manifest.permission.RECORD_AUDIO);
+        }
+        if (missingPermissions.size() > 0) {
+            permissionSubjectDisposable = permissionSubject
+                    .filter(permissionData -> permissionData.first == MEDIA_PERMISSION_REQUEST_CODE)
+                    .firstOrError()
+                    .map(permissionData -> permissionData.second)
+                    .map(permissionResultCodeArray -> Arrays
+                            .stream(permissionResultCodeArray)
+                            .allMatch(code -> code == PackageManager.PERMISSION_GRANTED))
+                    .subscribe(
+                            (isPermissionRequestSuccessful) -> {
+                                if (isPermissionRequestSuccessful) {
+                                    onCallPermissionsAvailable(companyName, queueId, contextUrl, useOverlays, mediaType);
+                                } else {
+                                    callView.showMissingPermissionsDialog();
+                                }
+                            },
+                            error -> callView.showMissingPermissionsDialog()
+                    );
+            requestPermissions(
+                    missingPermissions.toArray(new String[0]),
+                    MEDIA_PERMISSION_REQUEST_CODE
+            );
+        } else {
+            onCallPermissionsAvailable(companyName, queueId, contextUrl, useOverlays, mediaType);
+        }
+    }
+
+    private boolean hasPermission(String permission) {
+        return ContextCompat.checkSelfPermission(getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void onCallPermissionsAvailable(String companyName,
+                                            String queueId,
+                                            String contextUrl,
+                                            boolean useOverlays,
+                                            Engagement.MediaType mediaType) {
+        callView.startCall(companyName, queueId, contextUrl, useOverlays, mediaType);
     }
 
     @Override
@@ -77,6 +146,9 @@ public class CallActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (permissionSubjectDisposable != null) {
+            permissionSubjectDisposable.dispose();
+        }
         onBackClickedListener = null;
         onEndListener = null;
         onNavigateToChatListener = null;
@@ -95,6 +167,8 @@ public class CallActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Integer[] convertedGrantResults = IntStream.of( grantResults ).boxed().toArray( Integer[]::new );
+        permissionSubject.onNext(new Pair<>(requestCode, convertedGrantResults));
     }
 
     @Override

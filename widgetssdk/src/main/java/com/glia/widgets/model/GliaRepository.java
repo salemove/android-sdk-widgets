@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 public class GliaRepository {
 
     private static final String TAG = "GliaTicketRepository";
+    private static final int MEDIA_PERMISSION_REQUEST_CODE = 1001;
 
     public void listenForEngagement(Consumer<OmnicoreEngagement> engagementConsumer) {
         Glia.on(Glia.Events.ENGAGEMENT, engagementConsumer);
@@ -47,12 +48,13 @@ public class GliaRepository {
         });
     }
 
-    public void startQueueingForMediaEngagement(String queueId,
-                                        String contextUrl,
-                                        Engagement.MediaType mediaType,
-                                        Consumer<GliaException> consumer
+    public void startQueueingForMediaEngagement(
+            String queueId,
+            String contextUrl,
+            Engagement.MediaType mediaType,
+            Consumer<GliaException> consumer
     ) {
         VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
-        Glia.queueForEngagement(queueId, mediaType, visitorContext, consumer);
+        Glia.queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, consumer);
     }
 }

@@ -14,6 +14,8 @@ import java.util.function.Consumer;
 public class GliaQueueRepository {
     private static final String TAG = GliaQueueRepository.class.getSimpleName();
 
+    private static final int MEDIA_PERMISSION_REQUEST_CODE = 1001;
+
     public enum TypeOfOngoingQueueing {
         NONE, CHAT, MEDIA
     }
@@ -104,7 +106,7 @@ public class GliaQueueRepository {
         typeOfOngoingQueueing = TypeOfOngoingQueueing.MEDIA;
         VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
         Glia.on(Glia.Events.QUEUE_TICKET, ticketConsumer);
-        Glia.queueForEngagement(queueId, mediaType, visitorContext, startQueueingExceptionConsumer);
+        Glia.queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, startQueueingExceptionConsumer);
     }
 
     public String getQueueTicket() {

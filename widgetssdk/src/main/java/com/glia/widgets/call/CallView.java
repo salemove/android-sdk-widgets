@@ -975,6 +975,25 @@ public class CallView extends ConstraintLayout {
         );
     }
 
+    void showMissingPermissionsDialog() {
+        showAlertDialog(
+                R.string.dialog_permission_error_title,
+                R.string.dialog_permission_error_message,
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.unexpectedErrorDialogDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
+                    if (onEndListener != null) {
+                        onEndListener.onEnd();
+                    }
+                }
+        );
+    }
+
     private void showOverlayPermissionsDialog() {
         showOptionsDialog(resources.getString(R.string.dialog_overlay_permissions_title),
                 resources.getString(R.string.dialog_overlay_permissions_message),

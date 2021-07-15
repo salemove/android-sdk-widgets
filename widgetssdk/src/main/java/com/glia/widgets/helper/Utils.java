@@ -38,6 +38,7 @@ public class Utils {
     }
 
     public static String formatOperatorName(String operatorName) {
+        if (operatorName == null) return "";
         int i = operatorName.indexOf(' ');
         if (i != -1) {
             return operatorName.substring(0, i);

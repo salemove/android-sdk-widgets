@@ -10,6 +10,36 @@ import java.util.function.Consumer;
 public class GliaEngagementRepository {
     private final String TAG = GliaEngagementRepository.class.getSimpleName();
 
+    enum EngagementType {NONE, CHAT, MEDIA}
+
+    private EngagementType engagementType = EngagementType.NONE;
+
+    public GliaEngagementRepository() { }
+
+    private void setEngagementType(EngagementType type) {
+        engagementType = type;
+    }
+
+    public void clearEngagementType() {
+        setEngagementType(EngagementType.NONE);
+    }
+
+    public void onChatEngagement() {
+        setEngagementType(EngagementType.CHAT);
+    }
+
+    public void onMediaEngagement() {
+        setEngagementType(EngagementType.MEDIA);
+    }
+
+    public void onUpgradeToMediaEngagement() {
+        setEngagementType(EngagementType.MEDIA);
+    }
+
+    public boolean isMediaEngagement() {
+        return engagementType == EngagementType.MEDIA;
+    }
+
     public void listenForEngagementEnd(OmnicoreEngagement engagement, Runnable engagementEnded) {
         engagement.on(Engagement.Events.END, engagementEnded);
     }

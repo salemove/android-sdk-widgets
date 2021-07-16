@@ -76,7 +76,7 @@ public class GliaQueueRepository {
         return typeOfOngoingQueueing == TypeOfOngoingQueueing.NONE;
     }
 
-    public boolean getIsMediaQueueingOngoing() {
+    public boolean isMediaQueueingOngoing() {
         return typeOfOngoingQueueing == TypeOfOngoingQueueing.MEDIA;
     }
 

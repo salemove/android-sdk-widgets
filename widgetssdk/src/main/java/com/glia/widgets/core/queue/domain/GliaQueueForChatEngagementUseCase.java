@@ -20,10 +20,12 @@ public class GliaQueueForChatEngagementUseCase {
     public void execute(String queueId, String contextUrl, QueueTicketsEventsListener listener) {
         if (engagementRepository.hasOngoingEngagement()) {
             listener.onTicketReceived(repository.getQueueTicket());
+            return;
         } else if (repository.isNoQueueingOngoing()) {
             repository.startQueueingForEngagement(queueId, contextUrl, listener);
         } else {
             repository.addOngoingQueueingEventListener(listener);
         }
+        engagementRepository.onChatEngagement();
     }
 }

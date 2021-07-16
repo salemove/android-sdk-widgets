@@ -31,7 +31,7 @@ import io.reactivex.subjects.PublishSubject;
 public class CallActivity extends AppCompatActivity {
     private static final int MEDIA_PERMISSION_REQUEST_CODE = 2001;
 
-    private static final String TAG = "CallActivity";
+    private static final String TAG = CallActivity.class.getSimpleName();
 
     private String companyName;
     private String queueId;
@@ -49,7 +49,7 @@ public class CallActivity extends AppCompatActivity {
         navigateToChat();
         finish();
     };
-    private PublishSubject<Pair<Integer, Integer[]>> permissionSubject = PublishSubject.create();
+    private final PublishSubject<Pair<Integer, Integer[]>> permissionSubject = PublishSubject.create();
     private Disposable permissionSubjectDisposable;
 
     @Override
@@ -58,6 +58,10 @@ public class CallActivity extends AppCompatActivity {
         Dependencies.addActivityToBackStack(Constants.CALL_ACTIVITY);
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
+        if (!callView.shouldShowMediaEngagementView()) {
+            finish();
+            return;
+        }
 
         Intent intent = getIntent();
         companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
@@ -89,7 +93,7 @@ public class CallActivity extends AppCompatActivity {
         }
         if (missingPermissions.size() > 0) {
             permissionSubjectDisposable = permissionSubject
-                    .filter(permissionData -> permissionData.first == MEDIA_PERMISSION_REQUEST_CODE)
+                    .filter(this::isPermissionDataMediaRequestCode)
                     .firstOrError()
                     .map(permissionData -> permissionData.second)
                     .map(permissionResultCodeArray -> Arrays
@@ -112,6 +116,10 @@ public class CallActivity extends AppCompatActivity {
         } else {
             onCallPermissionsAvailable(companyName, queueId, contextUrl, useOverlays, mediaType);
         }
+    }
+
+    private boolean isPermissionDataMediaRequestCode(Pair<Integer, Integer[]> permissionData) {
+        return permissionData != null && permissionData.first != null && permissionData.first == MEDIA_PERMISSION_REQUEST_CODE;
     }
 
     private boolean hasPermission(String permission) {
@@ -167,7 +175,7 @@ public class CallActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Integer[] convertedGrantResults = IntStream.of( grantResults ).boxed().toArray( Integer[]::new );
+        Integer[] convertedGrantResults = IntStream.of(grantResults).boxed().toArray(Integer[]::new);
         permissionSubject.onNext(new Pair<>(requestCode, convertedGrantResults));
     }
 

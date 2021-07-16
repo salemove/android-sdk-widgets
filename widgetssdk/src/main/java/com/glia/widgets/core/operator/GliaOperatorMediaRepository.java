@@ -25,6 +25,7 @@ public class GliaOperatorMediaRepository {
 
     public void addMediaStateListener(OperatorMediaStateListener listener) {
         eventListeners.add(listener);
+        if (operatorMediaState != null) listener.onNewState(operatorMediaState);
     }
 
     public void startListening() {

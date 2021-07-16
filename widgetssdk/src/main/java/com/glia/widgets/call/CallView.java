@@ -30,7 +30,6 @@ import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
@@ -61,14 +60,13 @@ import com.google.android.material.transition.SlideDistanceProvider;
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class CallView extends ConstraintLayout {
+    private final String TAG = CallView.class.getSimpleName();
 
-    private final String TAG = "CallView";
     private CallViewCallback callback;
     private CallController controller;
     private ChatHeadsController chatHeadsController;
 
     private ScreenSharingController screenSharingController;
-    private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
@@ -108,7 +106,7 @@ public class CallView extends ConstraintLayout {
 
     private final Resources resources;
     private Integer defaultStatusbarColor;
-    private AudioManager audioManager;
+    private final AudioManager audioManager;
 
     public CallView(Context context) {
         this(context, null);
@@ -175,9 +173,7 @@ public class CallView extends ConstraintLayout {
                 chatHeadsController.onChatButtonClicked();
             }
         });
-        speakerButton.setOnClickListener(v -> {
-            controller.onSpeakerButtonPressed();
-        });
+        speakerButton.setOnClickListener(v -> controller.onSpeakerButtonPressed());
         minimizeButton.setOnClickListener(v -> {
             if (controller != null) {
                 controller.minimizeButtonClicked();
@@ -364,8 +360,6 @@ public class CallView extends ConstraintLayout {
                             theme.getIconCallVideoOff(), callState.hasVideo);
                     setButtonActivated(muteButton, theme.getIconCallAudioOn(),
                             theme.getIconCallAudioOff(), callState.isMuted);
-                    setButtonActivated(speakerButton, theme.getIconCallSpeakerOn(),
-                            theme.getIconCallSpeakerOff(), callState.isSpeakerOn);
                     muteButtonLabel.setText(callState.isMuted ?
                             R.string.call_mute_button_unmute :
                             R.string.call_mute_button_mute
@@ -392,6 +386,7 @@ public class CallView extends ConstraintLayout {
                     } else {
                         hideCall();
                     }
+                    onIsSpeakerOnStateChanged(callState.isSpeakerOn);
                 });
             }
 
@@ -411,19 +406,9 @@ public class CallView extends ConstraintLayout {
             public void startVisitorVideoView(MediaState visitorMediaState) {
                 post(() -> showVisitorVideo(visitorMediaState));
             }
-
-            @Override
-            public void switchSpeakerValue(boolean isSpeakerOn) {
-                post(() -> audioManager.setSpeakerphoneOn(isSpeakerOn));
-            }
         };
 
-        screenSharingCallback = new ScreenSharingController.ViewCallback() {
-            @Override
-            public void onScreenSharingRequestError(GliaException exception) {
-                Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
-            }
-        };
+        ScreenSharingController.ViewCallback screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
 
         controller = Dependencies
                 .getControllerFactory()
@@ -431,38 +416,35 @@ public class CallView extends ConstraintLayout {
 
         chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
 
-        dialogCallback = new DialogController.Callback() {
-            @Override
-            public void emitDialog(DialogsState dialogsState) {
-                if (dialogsState instanceof DialogsState.NoDialog) {
-                    post(() -> {
-                        if (alertDialog != null) {
-                            alertDialog.dismiss();
-                            alertDialog = null;
-                        }
-                    });
-                } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
-                    post(() -> showUnexpectedErrorDialog());
-                } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
-                    post(() -> showOverlayPermissionsDialog());
-                } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                    post(() -> showEndEngagementDialog(
-                            ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
-                } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
-                    post(() -> showExitQueueDialog());
-                } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
-                    post(() -> showNoMoreOperatorsAvailableDialog());
-                } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                    post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
-                } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
-                    post(() -> showScreenSharingDialog());
-                } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
-                    post(() -> showScreenSharingEndDialog());
-                } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
-                    post(() -> showAllowNotificationsDialog());
-                } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
-                    post(() -> showAllowScreenSharingNotificationsAndStartSharingDialog());
-                }
+        dialogCallback = dialogsState -> {
+            if (dialogsState instanceof DialogsState.NoDialog) {
+                post(() -> {
+                    if (alertDialog != null) {
+                        alertDialog.dismiss();
+                        alertDialog = null;
+                    }
+                });
+            } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
+                post(this::showUnexpectedErrorDialog);
+            } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
+                post(this::showOverlayPermissionsDialog);
+            } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
+                post(() -> showEndEngagementDialog(
+                        ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+            } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
+                post(this::showExitQueueDialog);
+            } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
+                post(this::showNoMoreOperatorsAvailableDialog);
+            } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
+                post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
+            } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
+                post(this::showScreenSharingDialog);
+            } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
+                post(this::showScreenSharingEndDialog);
+            } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
+                post(this::showAllowNotificationsDialog);
+            } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
+                post(this::showAllowScreenSharingNotificationsAndStartSharingDialog);
             }
         };
 
@@ -471,6 +453,14 @@ public class CallView extends ConstraintLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void onIsSpeakerOnStateChanged(boolean isSpeakerOn) {
+        if (isSpeakerOn != audioManager.isSpeakerphoneOn()) {
+            post(() -> audioManager.setSpeakerphoneOn(isSpeakerOn));
+        }
+        setButtonActivated(speakerButton, theme.getIconCallSpeakerOn(),
+                theme.getIconCallSpeakerOff(), isSpeakerOn);
     }
 
     private void showExitQueueDialog() {
@@ -1078,5 +1068,10 @@ public class CallView extends ConstraintLayout {
 
     public interface OnNavigateToChatListener {
         void call();
+    }
+
+    public boolean shouldShowMediaEngagementView() {
+        if (controller != null) return controller.shouldShowMediaEngagementView();
+        return false;
     }
 }

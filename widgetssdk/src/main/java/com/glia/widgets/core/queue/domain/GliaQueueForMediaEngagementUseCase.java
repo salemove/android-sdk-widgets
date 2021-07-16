@@ -26,10 +26,12 @@ public class GliaQueueForMediaEngagementUseCase {
     ) {
         if (engagementRepository.hasOngoingEngagement()) {
             listener.onTicketReceived(repository.getQueueTicket());
+            return;
         } else if (repository.isNoQueueingOngoing()) {
             repository.startQueueingForMediaEngagement(queueId, contextUrl, mediaType, listener);
         } else {
             repository.addOngoingQueueingEventListener(listener);
         }
+        engagementRepository.onMediaEngagement();
     }
 }

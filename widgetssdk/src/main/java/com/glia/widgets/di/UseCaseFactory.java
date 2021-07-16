@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
+import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.domain.AddQueueTicketsEventsListenerUseCase;
 import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
@@ -105,7 +107,10 @@ public class UseCaseFactory {
     }
 
     public GliaCancelQueueTicketUseCase createCancelQueueTicketUseCase() {
-        return new GliaCancelQueueTicketUseCase(repositoryFactory.getGliaQueueRepository());
+        return new GliaCancelQueueTicketUseCase(
+                repositoryFactory.getGliaQueueRepository(),
+                repositoryFactory.getGliaEngagementRepository()
+        );
     }
 
     public GliaEndEngagementUseCase createEndEngagementUseCase() {
@@ -193,6 +198,20 @@ public class UseCaseFactory {
 
     public AddQueueTicketsEventsListenerUseCase createAddQueueTicketsEventsListenerUseCase() {
         return new AddQueueTicketsEventsListenerUseCase(
+                repositoryFactory.getGliaQueueRepository()
+        );
+    }
+
+    public OnUpgradeToMediaEngagementUseCase createOnUpgradeToMediaEngagementUseCase() {
+        return new OnUpgradeToMediaEngagementUseCase(
+                repositoryFactory.getGliaEngagementRepository()
+        );
+    }
+
+    public ShouldShowMediaEngagementViewUseCase createShouldShowMediaEngagementViewUseCase() {
+        return new ShouldShowMediaEngagementViewUseCase(
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaOperatorMediaRepository(),
                 repositoryFactory.getGliaQueueRepository()
         );
     }

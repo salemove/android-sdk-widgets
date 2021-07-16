@@ -77,7 +77,8 @@ public class ControllerFactory {
                     useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase()
+                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase()
             );
         }
 
@@ -107,7 +108,8 @@ public class ControllerFactory {
                     useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase()
+                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -141,7 +143,8 @@ public class ControllerFactory {
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
                     useCaseFactory.createGliaOnVisitorMediaStateUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
-                    useCaseFactory.createEndEngagementUseCase());
+                    useCaseFactory.createEndEngagementUseCase(),
+                    useCaseFactory.createShouldShowMediaEngagementViewUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

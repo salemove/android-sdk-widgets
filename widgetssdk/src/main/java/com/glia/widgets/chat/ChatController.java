@@ -20,10 +20,10 @@ import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.adapter.OperatorMessageItem;
 import com.glia.widgets.chat.adapter.OperatorStatusItem;
 import com.glia.widgets.chat.adapter.VisitorMessageItem;
+import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
-import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.dialog.DialogController;
@@ -120,6 +120,7 @@ public class ChatController implements
     private final UpdateDialogShownUseCase updateDialogShownUseCase;
     private final UpdatePermissionsUseCase updatePermissionsUseCase;
     private final ResetPermissionsUseCase resetPermissionsUseCase;
+    private final OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase;
 
     private final String TAG = "ChatController";
     private volatile ChatState chatState;
@@ -147,7 +148,8 @@ public class ChatController implements
                           CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
                           UpdateDialogShownUseCase updateDialogShownUseCase,
                           UpdatePermissionsUseCase updatePermissionsUseCase,
-                          ResetPermissionsUseCase resetPermissionsUseCase
+                          ResetPermissionsUseCase resetPermissionsUseCase,
+                          OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -192,6 +194,7 @@ public class ChatController implements
         this.updatePermissionsUseCase = updatePermissionsUseCase;
         this.resetPermissionsUseCase = resetPermissionsUseCase;
         this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
+        this.onUpgradeToMediaEngagementUseCase = onUpgradeToMediaEngagementUseCase;
     }
 
     public void initChat(String companyName,
@@ -395,6 +398,7 @@ public class ChatController implements
 
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "upgradeToAudioClicked");
+        onUpgradeToMediaEngagementUseCase.execute();
         messagesNotSeenHandler.chatUpgradeOfferAccepted();
         mediaUpgradeOfferRepository.acceptOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
         dialogController.dismissDialogs();

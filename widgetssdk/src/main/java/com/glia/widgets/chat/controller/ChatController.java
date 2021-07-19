@@ -30,6 +30,7 @@ import com.glia.widgets.chat.model.history.OperatorMessageItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorMessageItem;
+import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
@@ -73,13 +74,12 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
         GliaOnEngagementUseCase.Listener,
-        GliaOnEngagementEndUseCase.Listener,
-        GliaOnMessageUseCase.Listener,
-        GliaSendMessageUseCase.Listener {
+        GliaOnEngagementEndUseCase.Listener {
 
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -119,6 +119,33 @@ public class ChatController implements
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
+    private final GliaSendMessageUseCase.Listener sendMessageCallback = new GliaSendMessageUseCase.Listener() {
+        @Override
+        public void messageSent(VisitorMessage message) {
+            onMessageSent(message);
+        }
+
+        @Override
+        public void onMessageValidated() {
+            emitViewState(chatState.chatInputChanged(""));
+        }
+
+        @Override
+        public void errorOperatorNotOnline(String message) {
+            onSendMessageOperatorOffline(message);
+        }
+
+        @Override
+        public void errorMessageInvalid() {
+
+        }
+
+        @Override
+        public void error(GliaException ex) {
+            onMessageSendError(ex);
+        }
+    };
+
     private final DialogController dialogController;
 
     private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -140,19 +167,31 @@ public class ChatController implements
     private final UpdatePermissionsUseCase updatePermissionsUseCase;
     private final ResetPermissionsUseCase resetPermissionsUseCase;
     private final OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase;
-
     private final AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase;
     private final RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase;
-
     private final AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase;
     private final GetFileAttachmentsUseCase getFileAttachmentsUseCase;
     private final RemoveFileAttachmentUseCase removeFileAttachmentUseCase;
+    private final IsShowSendButtonUseCase isShowSendButtonUseCase;
+
+    // pending photoCaptureFileUri - need to move some place better
+    private Uri photoCaptureFileUri = null;
+
+    public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
+        this.photoCaptureFileUri = photoCaptureFileUri;
+    }
+
+    public Uri getPhotoCaptureFileUri() {
+        return this.photoCaptureFileUri;
+    }
 
     private final Observer fileAttachmentObserver = new Observer() {
         @Override
         public void update(Observable observable, Object o) {
-            if (viewCallback != null)
+            if (viewCallback != null) {
                 viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
+                emitViewState(chatState.setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText)));
+            }
         }
     };
 
@@ -188,7 +227,8 @@ public class ChatController implements
                           AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase,
                           RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
                           GetFileAttachmentsUseCase getFileAttachmentsUseCase,
-                          RemoveFileAttachmentUseCase removeFileAttachmentUseCase
+                          RemoveFileAttachmentUseCase removeFileAttachmentUseCase,
+                          IsShowSendButtonUseCase isShowSendButtonUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -239,6 +279,7 @@ public class ChatController implements
         this.removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase;
         this.getFileAttachmentsUseCase = getFileAttachmentsUseCase;
         this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
+        this.isShowSendButtonUseCase = isShowSendButtonUseCase;
     }
 
     public void initChat(String companyName,
@@ -308,15 +349,17 @@ public class ChatController implements
             getEngagementUseCase.unregisterListener(this);
             engagementEndUseCase.unregisterListener(this);
 
-            onMessageUseCase.unregisterListener(this);
-            sendMessageUseCase.unregisterListener(this);
+            onMessageUseCase.unregisterListener();
             resetPermissionsUseCase.execute();
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
         }
     }
 
     public void sendMessagePreview(String message) {
-        emitViewState(chatState.chatInputChanged(message));
+        emitViewState(chatState
+                .chatInputChanged(message)
+                .setShowSendButton(isShowSendButtonUseCase.execute(message))
+        );
         if (chatState.isOperatorOnline()) {
             Logger.d(TAG, "Send preview: " + message);
             sendMessagePreviewUseCase.execute(message);
@@ -325,22 +368,60 @@ public class ChatController implements
         }
     }
 
-    public boolean sendMessage(String message, int numOfAttachment) {
+    public void sendMessage(String message) {
         Logger.d(TAG, "Send MESSAGE: " + message);
-        boolean valid = isMessageValid(message, numOfAttachment);
-        if (valid) {
-            Logger.d(TAG, "Send MESSAGE valid! : " + message);
-            if (chatState.isOperatorOnline()) {
-                Logger.d(TAG, "SEND MESSAGE sending");
-                sendMessageUseCase.execute(message, this);
-            } else {
-                appendUnsentMessage(message);
-                if (!chatState.engagementRequested) {
-                    queueForEngagement();
-                }
+        Logger.d(TAG, "SEND MESSAGE sending");
+        sendMessageUseCase.execute(message, sendMessageCallback);
+    }
+
+    private void onMessage(ChatMessage message) {
+        boolean isUnsentMessage = !chatState.unsentMessages.isEmpty() && chatState.unsentMessages.get(0).getMessage().equals(message.getContent());
+        Logger.d(TAG, "onMessage: " + message.getContent() + ", id: " + message.getId() + ", isUnsentMessage: " + isUnsentMessage);
+        if (isUnsentMessage) {
+            List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
+            VisitorMessageItem currentMessage = unsentMessages.get(0);
+            unsentMessages.remove(currentMessage);
+            emitViewState(chatState.changeUnsentMessages(unsentMessages));
+
+            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+            int currentMessageIndex = currentChatItems.indexOf(currentMessage);
+            currentChatItems.remove(currentMessage);
+            currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent()));
+
+            // emitting state because no need to change recyclerview items here
+            emitViewState(chatState.changeItems(currentChatItems));
+            if (!chatState.unsentMessages.isEmpty()) {
+                sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
             }
+            return;
         }
-        return valid;
+
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        appendMessageItem(items, message);
+        emitChatItems(chatState.changeItems(items));
+    }
+
+    private void onMessageSent(VisitorMessage message) {
+        if (message != null) {
+            Logger.d(TAG, "messageSent: " + message.toString() + ", id: " + message.getId());
+            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+            changeDeliveredIndex(currentChatItems, message);
+            emitChatItems(chatState.changeItems(currentChatItems));
+        }
+    }
+
+    private void onMessageSendError(GliaException ex) {
+        if (ex != null) {
+            Logger.d(TAG, "messageSent exception");
+            error(ex);
+        }
+    }
+
+    private void onSendMessageOperatorOffline(String message) {
+        appendUnsentMessage(message);
+        if (!chatState.engagementRequested) {
+            queueForEngagement();
+        }
     }
 
     private void appendUnsentMessage(String message) {
@@ -412,7 +493,6 @@ public class ChatController implements
         viewCallback.emitState(chatState);
         viewCallback.emitItems(chatState.chatItems);
         viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
-        viewCallback.setLastTypedText(chatState.lastTypedText);
 
         // always start in bottom
         emitViewState(chatState.isInBottomChanged(true));
@@ -810,14 +890,13 @@ public class ChatController implements
         List<SingleChoiceOption> singleChoiceOptions = null;
 
         if (attachment instanceof SingleChoiceAttachment) {
-            singleChoiceOptions = Arrays.asList(((SingleChoiceAttachment) attachment).getOptions());
+            SingleChoiceAttachment singleChoiceAttachment = (SingleChoiceAttachment) attachment;
+            singleChoiceOptions =
+                    Arrays.stream(singleChoiceAttachment.getOptions())
+                            .collect(Collectors.toList());
         }
 
         return singleChoiceOptions;
-    }
-
-    private boolean isMessageValid(String message, int numOfAttachment) {
-        return message.length() > 0 || numOfAttachment > 0;
     }
 
     private void startTimer() {
@@ -883,7 +962,7 @@ public class ChatController implements
                     (OperatorMessageItem) chatState.chatItems.get(indexInList);
             SingleChoiceOption selectedOption =
                     choiceCardItem.singleChoiceOptions.get(optionIndex);
-            sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), this);
+            sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback);
 
             OperatorMessageItem choiceCardItemWithSelected =
                     new OperatorMessageItem(
@@ -951,11 +1030,11 @@ public class ChatController implements
         } catch (Exception ignored) {
         }
         operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
-        onMessageUseCase.execute(this);
+        onMessageUseCase.execute(this::onMessage);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
         mediaUpgradeOfferRepository.startListening();
         if (!chatState.unsentMessages.isEmpty()) {
-            sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), this);
+            sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
             Logger.d(TAG, "unsentMessage sent!");
         }
     }
@@ -966,48 +1045,6 @@ public class ChatController implements
         stop();
         emitViewState(chatState.changeVisibility(false));
         dialogController.showNoMoreOperatorsAvailableDialog();
-    }
-
-    @Override
-    public void onMessage(ChatMessage message) {
-        boolean isUnsentMessage = !chatState.unsentMessages.isEmpty() && chatState.unsentMessages.get(0).getMessage().equals(message.getContent());
-        Logger.d(TAG, "onMessage: " + message.getContent() + ", id: " + message.getId() + ", isUnsentMessage: " + isUnsentMessage);
-        if (isUnsentMessage) {
-            List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
-            VisitorMessageItem currentMessage = unsentMessages.get(0);
-            unsentMessages.remove(currentMessage);
-            emitViewState(chatState.changeUnsentMessages(unsentMessages));
-
-            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
-            int currentMessageIndex = currentChatItems.indexOf(currentMessage);
-            currentChatItems.remove(currentMessage);
-            currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent()));
-
-            // emitting state because no need to change recyclerview items here
-            emitViewState(chatState.changeItems(currentChatItems));
-            if (!chatState.unsentMessages.isEmpty()) {
-                sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), this);
-            }
-            return;
-        }
-
-        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
-        appendMessageItem(items, message);
-        emitChatItems(chatState.changeItems(items));
-    }
-
-    @Override
-    public void messageSent(VisitorMessage message, GliaException exception) {
-        if (exception != null) {
-            Logger.d(TAG, "messageSent exception");
-            error(exception);
-        }
-        if (message != null) {
-            Logger.d(TAG, "messageSent: " + message.toString() + ", id: " + message.getId());
-            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
-            changeDeliveredIndex(currentChatItems, message);
-            emitChatItems(chatState.changeItems(currentChatItems));
-        }
     }
 
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {

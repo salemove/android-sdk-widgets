@@ -2,6 +2,7 @@ package com.glia.widgets.core.engagement;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
+import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.helper.Logger;
 
@@ -14,7 +15,8 @@ public class GliaEngagementRepository {
 
     private EngagementType engagementType = EngagementType.NONE;
 
-    public GliaEngagementRepository() { }
+    public GliaEngagementRepository() {
+    }
 
     private void setEngagementType(EngagementType type) {
         engagementType = type;
@@ -70,5 +72,14 @@ public class GliaEngagementRepository {
 
     public boolean hasOngoingEngagement() {
         return Glia.getCurrentEngagement().isPresent();
+    }
+
+    public boolean isOperatorOnline() {
+        if (Glia.getCurrentEngagement().isPresent()) {
+            Engagement engagement = Glia.getCurrentEngagement().get();
+            Operator operator = engagement.getOperator();
+            return operator != null && operator.getName() != null;
+        }
+        return false;
     }
 }

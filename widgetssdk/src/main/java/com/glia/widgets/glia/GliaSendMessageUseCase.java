@@ -1,73 +1,94 @@
 package com.glia.widgets.glia;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.FilesAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.engagement.EngagementFile;
+import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.fileupload.FileAttachmentRepository;
 import com.glia.widgets.fileupload.model.FileAttachment;
 import com.glia.widgets.model.GliaChatRepository;
 
 import java.util.List;
 
-public class GliaSendMessageUseCase implements RequestCallback<VisitorMessage> {
-
+public class GliaSendMessageUseCase {
     public interface Listener {
-        void messageSent(VisitorMessage message, GliaException exception);
+        void messageSent(VisitorMessage message);
+
+        void onMessageValidated();
+
+        void errorOperatorNotOnline(String message);
+
+        void errorMessageInvalid();
+
+        void error(GliaException ex);
     }
 
-    private final GliaChatRepository repository;
+    private final GliaChatRepository chatRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
-    private Listener listener;
+    private final GliaEngagementRepository engagementRepository;
 
-    public GliaSendMessageUseCase(GliaChatRepository repository, FileAttachmentRepository fileAttachmentRepository) {
-        this.repository = repository;
+    public GliaSendMessageUseCase(
+            GliaChatRepository chatRepository,
+            FileAttachmentRepository fileAttachmentRepository,
+            GliaEngagementRepository engagementRepository
+    ) {
+        this.chatRepository = chatRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
+        this.engagementRepository = engagementRepository;
+    }
+
+    private boolean hasFileAttachments(List<FileAttachment> fileAttachments) {
+        return fileAttachments.size() > 0;
+    }
+
+    private void sendMessageWithAttachments(String message, List<FileAttachment> fileAttachments, Listener listener) {
+        EngagementFile[] engagementFiles =
+                fileAttachments
+                        .stream()
+                        .map(FileAttachment::getEngagementFile)
+                        .toArray(EngagementFile[]::new);
+
+        if (!message.isEmpty()) {
+            chatRepository.sendMessage(message, FilesAttachment.from(engagementFiles), listener);
+        } else {
+            chatRepository.sendMessage(FilesAttachment.from(engagementFiles), listener);
+        }
+        fileAttachmentRepository.detachFiles(fileAttachments);
+    }
+
+    private void sendMessage(String message, Listener listener) {
+        chatRepository.sendMessage(message, listener);
     }
 
     public void execute(String message, Listener listener) {
-        this.listener = listener;
         List<FileAttachment> fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments();
-
-        if (fileAttachments.size() > 0) {
-            EngagementFile[] engagementFiles =
-                    fileAttachments
-                            .stream()
-                            .map(FileAttachment::getEngagementFile)
-                            .toArray(EngagementFile[]::new);
-            fileAttachmentRepository.detachFiles(fileAttachments);
-            repository.sendMessage(message, FilesAttachment.from(engagementFiles), this);
+        if (canSendMessage(message, fileAttachments.size())) {
+            listener.onMessageValidated();
+            if (isOperatorOnline()) {
+                if (hasFileAttachments(fileAttachments)) {
+                    sendMessageWithAttachments(message, fileAttachments, listener);
+                } else {
+                    sendMessage(message, listener);
+                }
+            } else {
+                listener.errorOperatorNotOnline(message);
+            }
         } else {
-            repository.sendMessage(message, this);
+            listener.errorMessageInvalid();
         }
     }
 
     public void execute(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
-        repository.sendMessage(singleChoiceAttachment, this);
+        chatRepository.sendMessage(singleChoiceAttachment, listener);
     }
 
-    public void execute(FilesAttachment filesAttachment, Listener listener) {
-        this.listener = listener;
-        repository.sendMessage(filesAttachment, this);
+    private boolean isOperatorOnline() {
+        return engagementRepository.isOperatorOnline();
     }
 
-    public void execute(String message, FilesAttachment filesAttachment, Listener listener) {
-        this.listener = listener;
-        repository.sendMessage(message, filesAttachment, this);
-    }
-
-    public void unregisterListener(Listener listener) {
-        if (this.listener == listener) {
-            this.listener = null;
-        }
-    }
-
-    @Override
-    public void onResult(VisitorMessage visitorMessage, GliaException e) {
-        if (this.listener != null) {
-            listener.messageSent(visitorMessage, e);
-        }
+    private boolean canSendMessage(String message, int numOfAttachment) {
+        return message.length() > 0 || numOfAttachment > 0;
     }
 }

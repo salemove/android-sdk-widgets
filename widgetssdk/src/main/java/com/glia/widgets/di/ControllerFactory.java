@@ -83,7 +83,8 @@ public class ControllerFactory {
                     useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                     useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                     useCaseFactory.createGetFileAttachmentsUseCase(),
-                    useCaseFactory.createRemoveFileAttachmentUseCase()
+                    useCaseFactory.createRemoveFileAttachmentUseCase(),
+                    useCaseFactory.createIsShowSendButtonUseCase()
             );
         }
 
@@ -119,7 +120,8 @@ public class ControllerFactory {
                     useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                     useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                     useCaseFactory.createGetFileAttachmentsUseCase(),
-                    useCaseFactory.createRemoveFileAttachmentUseCase()
+                    useCaseFactory.createRemoveFileAttachmentUseCase(),
+                    useCaseFactory.createIsShowSendButtonUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

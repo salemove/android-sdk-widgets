@@ -31,6 +31,7 @@ public class ChatState {
     public final String pendingNavigationType;
     public final List<VisitorMessageItem> unsentMessages;
     public final OperatorStatusItem operatorStatusItem;
+    public boolean showSendButton;
 
     private ChatState(
             String queueTicketId,
@@ -51,7 +52,8 @@ public class ChatState {
             boolean engagementRequested,
             String pendingNavigationType,
             List<VisitorMessageItem> unsentMessages,
-            OperatorStatusItem operatorStatusItem) {
+            OperatorStatusItem operatorStatusItem,
+            boolean showSendButton) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -71,6 +73,7 @@ public class ChatState {
         this.pendingNavigationType = pendingNavigationType;
         this.unsentMessages = unsentMessages;
         this.operatorStatusItem = operatorStatusItem;
+        this.showSendButton = showSendButton;
     }
 
     public boolean isOperatorOnline() {
@@ -114,6 +117,7 @@ public class ChatState {
         private String pendingNavigationType;
         private List<VisitorMessageItem> unsentMessages;
         private OperatorStatusItem operatorStatusItem;
+        private boolean showSendButton;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
@@ -135,6 +139,7 @@ public class ChatState {
             pendingNavigationType = chatState.pendingNavigationType;
             unsentMessages = chatState.unsentMessages;
             operatorStatusItem = chatState.operatorStatusItem;
+            showSendButton = chatState.showSendButton;
             return this;
         }
 
@@ -233,8 +238,13 @@ public class ChatState {
             return this;
         }
 
+        public Builder setShowSendButton(boolean isShow) {
+            this.showSendButton = isShow;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, operatorStatusItem);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, operatorStatusItem, showSendButton);
         }
     }
 
@@ -248,6 +258,7 @@ public class ChatState {
                 .setQueueId(queueId)
                 .setContextUrl(contextUrl)
                 .setIsVisible(true)
+                .setShowSendButton(false)
                 .createChatState();
     }
 
@@ -363,6 +374,13 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState setShowSendButton(boolean isShow) {
+        return new Builder()
+                .copyFrom(this)
+                .setShowSendButton(isShow)
+                .createChatState();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -386,12 +404,13 @@ public class ChatState {
                 Objects.equals(messagesNotSeen, chatState.messagesNotSeen) &&
                 Objects.equals(operatorStatusItem, chatState.operatorStatusItem) &&
                 Objects.equals(unsentMessages, chatState.unsentMessages) &&
-                Objects.equals(chatItems, chatState.chatItems);
+                Objects.equals(chatItems, chatState.chatItems) &&
+                showSendButton == chatState.showSendButton;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton);
     }
 
     @Override
@@ -416,6 +435,7 @@ public class ChatState {
                 ", operatorStatusItem: " + operatorStatusItem +
                 ", unsentMessages: " + unsentMessages +
                 ", chatItems=" + chatItems +
+                ", showSendButton=" + showSendButton +
                 '}';
     }
 }

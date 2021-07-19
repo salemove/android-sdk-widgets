@@ -10,4 +10,8 @@
 
     <color name="transparent_black_bg">#B3000000</color>
     <color name="transparent_black_buttons_bg">#000000</color>
+
+    <color name="stroke_gray">#4D6C7683</color>
+    <color name="separator_gray">#5C3C3C43</color>
+    <color name="attachment_menu_bg">#F2F2F2</color>
 </resources>

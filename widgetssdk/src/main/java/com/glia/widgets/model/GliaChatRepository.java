@@ -5,11 +5,11 @@ import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.MessageAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 
 public class GliaChatRepository {
-
     public interface HistoryLoadedListener {
         void loaded(ChatMessage[] messages, Throwable error);
     }
@@ -45,5 +45,17 @@ public class GliaChatRepository {
     public void sendMessage(SingleChoiceAttachment singleChoiceAttachment, RequestCallback<VisitorMessage> listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
                 engagement.getChat().sendMessage(singleChoiceAttachment, listener));
+    }
+
+    public void sendMessage(String message, MessageAttachment attachment, RequestCallback<VisitorMessage> listener) {
+        Glia.getCurrentEngagement().ifPresent(engagement ->
+                engagement.getChat().sendMessage(message, attachment, listener)
+        );
+    }
+
+    public void sendMessage(MessageAttachment attachment, RequestCallback<VisitorMessage> listener) {
+        Glia.getCurrentEngagement().ifPresent(engagement ->
+                engagement.getChat().sendMessage(attachment, listener)
+        );
     }
 }

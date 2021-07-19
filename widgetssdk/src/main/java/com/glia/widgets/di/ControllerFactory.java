@@ -78,7 +78,12 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
                     useCaseFactory.createResetPermissionsUseCase(),
-                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase()
+                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase(),
+                    useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
+                    useCaseFactory.createAddFileAttachmentsObserverUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
+                    useCaseFactory.createGetFileAttachmentsUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentUseCase()
             );
         }
 
@@ -109,7 +114,12 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateDialogShownUseCase(),
                     useCaseFactory.createUpdatePermissionsUseCase(),
                     useCaseFactory.createResetPermissionsUseCase(),
-                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase()
+                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase(),
+                    useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
+                    useCaseFactory.createAddFileAttachmentsObserverUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
+                    useCaseFactory.createGetFileAttachmentsUseCase(),
+                    useCaseFactory.createRemoveFileAttachmentUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

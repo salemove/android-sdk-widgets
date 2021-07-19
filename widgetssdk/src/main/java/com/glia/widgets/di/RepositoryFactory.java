@@ -3,6 +3,7 @@ package com.glia.widgets.di;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
+import com.glia.widgets.fileupload.FileAttachmentRepository;
 import com.glia.widgets.model.GliaChatRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.model.GliaScreenSharingRepository;
@@ -15,6 +16,7 @@ public class RepositoryFactory {
     private static GliaVisitorMediaRepository gliaVisitorMediaRepository;
     private static GliaOperatorMediaRepository gliaOperatorMediaRepository;
     private static GliaQueueRepository gliaQueueRepository;
+    private FileAttachmentRepository fileAttachmentRepository;
 
     public MediaUpgradeOfferRepository getMediaUpgradeOfferRepository() {
         if (mediaUpgradeOfferRepository == null) {
@@ -57,5 +59,12 @@ public class RepositoryFactory {
             gliaQueueRepository = new GliaQueueRepository();
         }
         return gliaQueueRepository;
+    }
+
+    public FileAttachmentRepository getGliaFileAttachmentRepository() {
+        if (fileAttachmentRepository == null) {
+            fileAttachmentRepository = new FileAttachmentRepository();
+        }
+        return fileAttachmentRepository;
     }
 }

@@ -1,11 +1,13 @@
 package com.glia.widgets.chat;
 
 import com.glia.widgets.chat.adapter.ChatItem;
-import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.fileupload.model.FileAttachment;
 
 import java.util.List;
 
 public interface ChatViewCallback {
+
+    void emitUploadAttachments(List<FileAttachment> attachments);
 
     void emitState(ChatState chatState);
 

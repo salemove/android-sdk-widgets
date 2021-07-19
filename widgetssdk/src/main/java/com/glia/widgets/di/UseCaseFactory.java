@@ -10,6 +10,11 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.glia.GliaLoadHistoryUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
@@ -148,7 +153,7 @@ public class UseCaseFactory {
     }
 
     public GliaSendMessageUseCase createGliaSendMessageUseCase() {
-        return new GliaSendMessageUseCase(repositoryFactory.getGliaMessageRepository());
+        return new GliaSendMessageUseCase(repositoryFactory.getGliaMessageRepository(), repositoryFactory.getGliaFileAttachmentRepository());
     }
 
     public CheckIfShowPermissionsDialogUseCase createCheckIfShowPermissionsDialogUseCase() {
@@ -214,5 +219,25 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaOperatorMediaRepository(),
                 repositoryFactory.getGliaQueueRepository()
         );
+    }
+
+    public AddFileAttachmentsObserverUseCase createAddFileAttachmentsObserverUseCase() {
+        return new AddFileAttachmentsObserverUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+    }
+
+    public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
+        return new AddFileToAttachmentAndUploadUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+    }
+
+    public GetFileAttachmentsUseCase createGetFileAttachmentsUseCase() {
+        return new GetFileAttachmentsUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+    }
+
+    public RemoveFileAttachmentObserverUseCase createRemoveFileAttachmentObserverUseCase() {
+        return new RemoveFileAttachmentObserverUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+    }
+
+    public RemoveFileAttachmentUseCase createRemoveFileAttachmentUseCase() {
+        return new RemoveFileAttachmentUseCase(repositoryFactory.getGliaFileAttachmentRepository());
     }
 }

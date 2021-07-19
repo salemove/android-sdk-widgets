@@ -86,7 +86,7 @@ public class SingleChoiceCardView extends FrameLayout {
         materialCardView.setBackgroundColor(gliaBaseLightColor);
 
         if (imageUrl != null) {
-            Picasso.with(this.getContext()).load(imageUrl).into(imageView, new Callback() {
+            Picasso.get().load(imageUrl).into(imageView, new Callback() {
                 @Override
                 public void onSuccess() {
                     if (SingleChoiceCardView.this.onImageLoadedListener != null) {
@@ -95,8 +95,8 @@ public class SingleChoiceCardView extends FrameLayout {
                 }
 
                 @Override
-                public void onError() {
-                    // do nothing
+                public void onError(Exception e) {
+
                 }
             });
         }

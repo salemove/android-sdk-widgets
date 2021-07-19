@@ -102,7 +102,7 @@ public class ChatHeadView extends ConstraintLayout {
         post(() -> {
             if (placeholderView != null && profilePictureView != null) {
                 if (operatorProfileImgUrl != null) {
-                    Picasso.with(this.getContext()).load(operatorProfileImgUrl).into(profilePictureView);
+                    Picasso.get().load(operatorProfileImgUrl).into(profilePictureView);
                     placeholderView.setVisibility(View.GONE);
                 } else {
                     int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());

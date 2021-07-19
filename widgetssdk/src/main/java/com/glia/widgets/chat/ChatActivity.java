@@ -87,6 +87,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         GliaWidgets.onActivityResult(requestCode, resultCode, data);
+        chatView.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -105,5 +106,17 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
         newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
         startActivity(newIntent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        chatView.onStartView();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        chatView.onStopView();
     }
 }

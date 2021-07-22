@@ -381,12 +381,12 @@ public class CallView extends ConstraintLayout {
                             VISIBLE : GONE);
                     visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     handleControlsVisibility(callState);
-                    if (callState.isVisible) {
-                        showCall();
-                    } else {
-                        hideCall();
-                    }
                     onIsSpeakerOnStateChanged(callState.isSpeakerOn);
+                    if (callState.isVisible) {
+                        showUIOnCallOngoing();
+                    } else {
+                        hideUIOnCallEnd();
+                    }
                 });
             }
 
@@ -813,14 +813,16 @@ public class CallView extends ConstraintLayout {
         }
     }
 
-    private void showCall() {
+    private void showUIOnCallOngoing() {
         setVisibility(VISIBLE);
         handleStatusbarColor();
     }
 
-    private void hideCall() {
+    private void hideUIOnCallEnd() {
         setVisibility(INVISIBLE);
         Activity activity = Utils.getActivity(this.getContext());
+        hideOperatorVideo();
+        hideVisitorVideo();
         if (defaultStatusbarColor != null && activity != null) {
             activity.getWindow().setStatusBarColor(defaultStatusbarColor);
             defaultStatusbarColor = null;
@@ -1036,6 +1038,7 @@ public class CallView extends ConstraintLayout {
             operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
             operatorVideoContainer.removeAllViews();
             operatorVideoContainer.addView(operatorVideoView);
+            operatorVideoContainer.invalidate();
         }
     }
 
@@ -1049,6 +1052,25 @@ public class CallView extends ConstraintLayout {
             visitorVideoView = visitorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
             visitorVideoContainer.removeAllViews();
             visitorVideoContainer.addView(visitorVideoView);
+            visitorVideoContainer.invalidate();
+        }
+    }
+
+    private void hideVisitorVideo() {
+        visitorVideoContainer.removeAllViews();
+        visitorVideoContainer.invalidate();
+        if (visitorVideoView != null) {
+            visitorVideoView.release();
+            visitorVideoView = null;
+        }
+    }
+
+    private void hideOperatorVideo() {
+        operatorVideoContainer.removeAllViews();
+        operatorVideoContainer.invalidate();
+        if (operatorVideoView != null) {
+            operatorVideoView.release();
+            operatorVideoView = null;
         }
     }
 

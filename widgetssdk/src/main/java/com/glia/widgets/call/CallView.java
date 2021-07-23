@@ -631,7 +631,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewAppearance() {
         setAppBarTheme();
         // icons
-        operatorStatusView.setPlaceHolderIcon(theme);
+        operatorStatusView.setTheme(this.theme);
         chatButton.setImageResource(this.theme.getIconCallChat());
         videoButton.setImageResource(this.theme.getIconCallVideoOn());
         muteButton.setImageResource(this.theme.getIconCallAudioOn());
@@ -663,7 +663,7 @@ public class CallView extends ConstraintLayout {
         builder.setIconLeaveQueue(theme.getIconLeaveQueue());
         builder.setSystemNegativeColor(R.color.glia_system_negative_color);
         builder.setBaseLightColor(R.color.glia_base_light_color);
-        builder.setBrandPrimaryColor(R.color.transparent_black_bg);
+        builder.setBrandPrimaryColor(android.R.color.transparent);
         appBar.setTheme(builder.build());
     }
 
@@ -714,67 +714,7 @@ public class CallView extends ConstraintLayout {
 
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
-        Integer fontRes = uiTheme.getFontRes() != null ? uiTheme.getFontRes() : this.theme.getFontRes();
-        Integer iconAppBarBack = uiTheme.getIconAppBarBack() != null ?
-                uiTheme.getIconAppBarBack() : this.theme.getIconAppBarBack();
-        Integer iconLeaveQueue = uiTheme.getIconLeaveQueue() != null ?
-                uiTheme.getIconLeaveQueue() : this.theme.getIconLeaveQueue();
-        Integer iconSendMessage = uiTheme.getIconSendMessage() != null ?
-                uiTheme.getIconSendMessage() : this.theme.getIconSendMessage();
-        Integer iconChatAudioUpgrade = uiTheme.getIconChatAudioUpgrade() != null ?
-                uiTheme.getIconChatAudioUpgrade() : this.theme.getIconChatAudioUpgrade();
-        Integer iconUpgradeAudioDialog = uiTheme.getIconUpgradeAudioDialog() != null ?
-                uiTheme.getIconUpgradeAudioDialog() : this.theme.getIconUpgradeAudioDialog();
-        Integer iconCallAudioOn = uiTheme.getIconCallAudioOn() != null ?
-                uiTheme.getIconCallAudioOn() : this.theme.getIconCallAudioOn();
-        Integer iconChatVideoUpgrade = uiTheme.getIconChatVideoUpgrade() != null ?
-                uiTheme.getIconChatVideoUpgrade() : this.theme.getIconChatVideoUpgrade();
-        Integer iconUpgradeVideoDialog = uiTheme.getIconUpgradeVideoDialog() != null ?
-                uiTheme.getIconUpgradeVideoDialog() : this.theme.getIconUpgradeVideoDialog();
-        Integer iconScreenSharingDialog = uiTheme.getIconScreenSharingDialog() != null ?
-                uiTheme.getIconScreenSharingDialog() : this.theme.getIconScreenSharingDialog();
-        Integer iconCallVideoOn = uiTheme.getIconCallVideoOn() != null ?
-                uiTheme.getIconCallVideoOn() : this.theme.getIconCallVideoOn();
-        Integer iconCallAudioOff = uiTheme.getIconCallAudioOff() != null ?
-                uiTheme.getIconCallAudioOff() : this.theme.getIconCallAudioOff();
-        Integer iconCallVideoOff = uiTheme.getIconCallVideoOff() != null ?
-                uiTheme.getIconCallVideoOff() : this.theme.getIconCallVideoOff();
-        Integer iconCallChat = uiTheme.getIconCallChat() != null ?
-                uiTheme.getIconCallChat() : this.theme.getIconCallChat();
-        Integer iconCallSpeakerOn = uiTheme.getIconCallSpeakerOn() != null ?
-                uiTheme.getIconCallSpeakerOn() : this.theme.getIconCallSpeakerOn();
-        Integer iconCallSpeakerOff = uiTheme.getIconCallSpeakerOff() != null ?
-                uiTheme.getIconCallSpeakerOff() : this.theme.getIconCallSpeakerOff();
-        Integer iconCallMinimize = uiTheme.getIconCallMinimize() != null ?
-                uiTheme.getIconCallMinimize() : this.theme.getIconCallMinimize();
-        Integer iconPlaceholder = uiTheme.getIconPlaceholder() != null ?
-                uiTheme.getIconPlaceholder() : this.theme.getIconPlaceholder();
-
-        Integer whiteLabel = uiTheme.getWhiteLabel() != null ?
-                uiTheme.getWhiteLabel() : this.theme.getWhiteLabel();
-
-        UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
-        builder.setTheme(this.theme);
-        builder.setFontRes(fontRes);
-        builder.setIconAppBarBack(iconAppBarBack);
-        builder.setIconLeaveQueue(iconLeaveQueue);
-        builder.setIconSendMessage(iconSendMessage);
-        builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
-        builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
-        builder.setIconCallAudioOn(iconCallAudioOn);
-        builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
-        builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
-        builder.setIconScreenSharingDialog(iconScreenSharingDialog);
-        builder.setIconCallVideoOn(iconCallVideoOn);
-        builder.setIconCallAudioOff(iconCallAudioOff);
-        builder.setIconCallVideoOff(iconCallVideoOff);
-        builder.setIconCallChat(iconCallChat);
-        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
-        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
-        builder.setIconCallMinimize(iconCallMinimize);
-        builder.setIconPlaceholder(iconPlaceholder);
-        builder.setWhiteLabel(whiteLabel);
-        this.theme = builder.build();
+        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {
             handleStatusbarColor();

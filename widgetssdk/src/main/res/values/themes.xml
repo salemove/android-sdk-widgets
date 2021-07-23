@@ -31,7 +31,15 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
     </style>
 
-    <style name="Application.Glia.Call.Activity" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
+    </style>
+
+    <style name="Application.Glia.Chat.Activity" parent="Application.Glia.Activity.Style">
+
+    </style>
+
+    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>

@@ -1,4 +1,4 @@
-package com.glia.widgets.chat.adapter;
+package com.glia.widgets.chat.model.history;
 
 import java.util.Objects;
 

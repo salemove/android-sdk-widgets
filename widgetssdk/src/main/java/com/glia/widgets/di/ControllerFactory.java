@@ -5,7 +5,7 @@ import android.app.Activity;
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatActivity;
-import com.glia.widgets.chat.ChatController;
+import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.head.ChatHeadsController;

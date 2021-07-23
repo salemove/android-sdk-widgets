@@ -20,21 +20,19 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/chat_visitor_margin_end" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/incoming_image_attachment"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="@dimen/chat_attachment_corner_radius"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        android:scaleType="fitXY"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/ic_screensharing" />
 
-        <ImageView
-            android:id="@+id/incoming_image_attachment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="ContentDescription"
-            tools:src="@drawable/ic_screensharing" />
-    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

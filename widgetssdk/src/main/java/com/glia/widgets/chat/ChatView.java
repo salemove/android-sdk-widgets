@@ -42,11 +42,14 @@ import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.chat.adapter.ChatItem;
-import com.glia.widgets.chat.adapter.InAppFileCache;
-import com.glia.widgets.chat.adapter.OperatorAttachmentItem;
+import com.glia.widgets.chat.controller.ChatController;
+import com.glia.widgets.chat.helper.InAppBitmapCache;
+import com.glia.widgets.chat.model.ChatInputMode;
+import com.glia.widgets.chat.model.ChatState;
+import com.glia.widgets.chat.model.history.ChatItem;
+import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
+import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.fileupload.model.FileAttachment;
@@ -350,9 +353,11 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     public void onStopView() {
-        mainHandler.removeCallbacks(runnable);
-        runnable = null;
-        mainHandler = null;
+        if (mainHandler != null) {
+            mainHandler.removeCallbacks(runnable);
+            runnable = null;
+            mainHandler = null;
+        }
     }
 
     /**
@@ -383,7 +388,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             dialogController = null;
         }
 
-        InAppFileCache.getInstance().clear();
+        InAppBitmapCache.getInstance().clear();
     }
 
     /**

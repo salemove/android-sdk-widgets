@@ -1,24 +1,24 @@
-package com.glia.widgets.chat.adapter;
+package com.glia.widgets.chat.helper;
 
 import android.graphics.Bitmap;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class InAppFileCache {
+public class InAppBitmapCache {
 
-    private static InAppFileCache instance;
+    private static InAppBitmapCache instance;
 
-    private InAppFileCache() {
+    private InAppBitmapCache() {
     }
 
     private final Map<String, Bitmap> bitmapsById = new HashMap<>();
 
-    public static InAppFileCache getInstance() {
+    public static InAppBitmapCache getInstance() {
         if (instance == null) {
-            synchronized (InAppFileCache.class) {
+            synchronized (InAppBitmapCache.class) {
                 if (instance == null) {
-                    instance = new InAppFileCache();
+                    instance = new InAppBitmapCache();
                 }
             }
         }

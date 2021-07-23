@@ -1,7 +1,6 @@
 package com.glia.widgets.chat;
 
-import static com.glia.widgets.helper.PicassoUtils.PNG_EXTENSION;
-import static com.glia.widgets.helper.PicassoUtils.loadImageFromDownloadsFolder;
+import static com.glia.widgets.chat.helper.FileHelper.loadImageFromDownloadsFolder;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,16 +20,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import com.glia.widgets.R;
-import com.glia.widgets.chat.adapter.InAppFileCache;
+import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.chat.helper.InAppBitmapCache;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.helper.PicassoUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
-public class FilePreviewActivity extends AppCompatActivity implements PicassoUtils.PicassoCallback {
+public class FilePreviewActivity extends AppCompatActivity implements FileHelper.PicassoCallback {
 
     private static final String TAG = FilePreviewActivity.class.getSimpleName();
 
@@ -68,9 +67,12 @@ public class FilePreviewActivity extends AppCompatActivity implements PicassoUti
     @Override
     protected void onStop() {
         super.onStop();
-        mainHandler.removeCallbacks(runnable);
-        runnable = null;
-        mainHandler = null;
+
+        if (mainHandler != null) {
+            mainHandler.removeCallbacks(runnable);
+            runnable = null;
+            mainHandler = null;
+        }
     }
 
     @Override
@@ -90,13 +92,12 @@ public class FilePreviewActivity extends AppCompatActivity implements PicassoUti
             return;
         }
 
-        String bitmapFullName = bitmapName + PNG_EXTENSION;
-        loadImageFromDownloadsFolder(getApplicationContext(), bitmapFullName, previewImageView, this);
+        loadImageFromDownloadsFolder(getApplicationContext(), bitmapName, previewImageView, this);
     }
 
     private Bitmap getBitmapFromInAppCache() {
         String bitmapId = getInAppCacheBitmapIdFromIntent();
-        return InAppFileCache.getInstance().getBitmapById(bitmapId);
+        return InAppBitmapCache.getInstance().getBitmapById(bitmapId);
     }
 
     private String getInAppCacheBitmapIdFromIntent() {
@@ -126,7 +127,7 @@ public class FilePreviewActivity extends AppCompatActivity implements PicassoUti
             return;
         }
 
-        File file = new File(getApplicationContext().getFilesDir(), imageName + PNG_EXTENSION);
+        File file = new File(getApplicationContext().getFilesDir(), imageName);
         Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.glia.widgets.fileprovider", file);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -145,7 +146,7 @@ public class FilePreviewActivity extends AppCompatActivity implements PicassoUti
         }
 
         new Thread(() -> {
-            final File imageFile = new File(getApplicationContext().getFilesDir(), imageName + PNG_EXTENSION);
+            final File imageFile = new File(getApplicationContext().getFilesDir(), imageName);
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(imageFile);

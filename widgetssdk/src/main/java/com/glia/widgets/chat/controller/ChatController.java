@@ -1,4 +1,4 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.chat.controller;
 
 import android.net.Uri;
 
@@ -19,14 +19,17 @@ import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.chat.model.ChatInputMode;
+import com.glia.widgets.chat.model.ChatState;
+import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.chat.adapter.ChatItem;
-import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
-import com.glia.widgets.chat.adapter.OperatorAttachmentItem;
-import com.glia.widgets.chat.adapter.OperatorMessageItem;
-import com.glia.widgets.chat.adapter.OperatorStatusItem;
-import com.glia.widgets.chat.adapter.VisitorAttachmentItem;
-import com.glia.widgets.chat.adapter.VisitorMessageItem;
+import com.glia.widgets.chat.model.history.ChatItem;
+import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
+import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
+import com.glia.widgets.chat.model.history.OperatorMessageItem;
+import com.glia.widgets.chat.model.history.OperatorStatusItem;
+import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
+import com.glia.widgets.chat.model.history.VisitorMessageItem;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
@@ -755,7 +758,7 @@ public class ChatController implements
                 String mimeType = file.getContentType();
                 if (mimeType.startsWith("image")) {
                     currentChatItems.add(new OperatorAttachmentItem(
-                            message.getId(),
+                            file.getId(),
                             ChatAdapter.OPERATOR_IMAGE_VIEW_TYPE,
                             showChatHead,
                             file,
@@ -764,7 +767,7 @@ public class ChatController implements
 
                 } else {
                     currentChatItems.add(new OperatorAttachmentItem(
-                            message.getId(),
+                            file.getId(),
                             ChatAdapter.OPERATOR_FILE_VIEW_TYPE,
                             showChatHead,
                             file,

@@ -18,8 +18,6 @@ public interface ChatViewCallback {
 
     void destroyView();
 
-    void setLastTypedText(String lastTypedText);
-
     void smoothScrollToBottom();
 
     void scrollToBottomImmediate();

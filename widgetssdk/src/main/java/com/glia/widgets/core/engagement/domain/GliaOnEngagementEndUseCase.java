@@ -63,10 +63,10 @@ public class GliaOnEngagementEndUseCase implements
         if (this.listener != null) {
             listener.engagementEnded();
         }
-        removeScreenSharingNotificationUseCase.execute();
-        removeCallNotificationUseCase.execute();
         gliaQueueRepository.cleanOnEngagementEnd();
         operatorMediaRepository.stopListening();
         repository.clearEngagementType();
+        removeScreenSharingNotificationUseCase.execute();
+        removeCallNotificationUseCase.execute();
     }
 }

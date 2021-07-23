@@ -1,5 +1,6 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
@@ -153,7 +154,11 @@ public class UseCaseFactory {
     }
 
     public GliaSendMessageUseCase createGliaSendMessageUseCase() {
-        return new GliaSendMessageUseCase(repositoryFactory.getGliaMessageRepository(), repositoryFactory.getGliaFileAttachmentRepository());
+        return new GliaSendMessageUseCase(
+                repositoryFactory.getGliaMessageRepository(),
+                repositoryFactory.getGliaFileAttachmentRepository(),
+                repositoryFactory.getGliaEngagementRepository()
+        );
     }
 
     public CheckIfShowPermissionsDialogUseCase createCheckIfShowPermissionsDialogUseCase() {
@@ -239,5 +244,12 @@ public class UseCaseFactory {
 
     public RemoveFileAttachmentUseCase createRemoveFileAttachmentUseCase() {
         return new RemoveFileAttachmentUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+    }
+
+    public IsShowSendButtonUseCase createIsShowSendButtonUseCase() {
+        return new IsShowSendButtonUseCase(
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaFileAttachmentRepository()
+        );
     }
 }

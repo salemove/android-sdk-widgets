@@ -439,4 +439,10 @@ public class Utils {
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1).toUpperCase());
     }
+
+    public static boolean compareStringWithTrim(String a, String b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.trim().equals(b.trim());
+    }
 }

@@ -30,8 +30,8 @@ public class GliaOnMessageUseCase implements
         this.onEngagementUseCase.execute(this);
     }
 
-    public void unregisterListener(Listener listener) {
-        if (this.listener == listener) {
+    public void unregisterListener() {
+        if (this.listener != null) {
             messageRepository.unregisterMessageListener(this);
             onEngagementUseCase.unregisterListener(this);
             this.listener = null;

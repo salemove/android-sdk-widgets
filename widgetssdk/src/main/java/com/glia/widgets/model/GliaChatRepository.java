@@ -2,12 +2,13 @@ package com.glia.widgets.model;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
-import com.glia.androidsdk.RequestCallback;
+import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.MessageAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
+import com.glia.widgets.glia.GliaSendMessageUseCase.Listener;
 
 public class GliaChatRepository {
     public interface HistoryLoadedListener {
@@ -37,25 +38,32 @@ public class GliaChatRepository {
                 value.getChat().sendMessagePreview(message));
     }
 
-    public void sendMessage(String message, RequestCallback<VisitorMessage> listener) {
+    public void sendMessage(String message, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, listener));
+                engagement.getChat().sendMessage(message, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
     }
 
-    public void sendMessage(SingleChoiceAttachment singleChoiceAttachment, RequestCallback<VisitorMessage> listener) {
+    public void sendMessage(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(singleChoiceAttachment, listener));
+                engagement.getChat().sendMessage(singleChoiceAttachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
     }
 
-    public void sendMessage(String message, MessageAttachment attachment, RequestCallback<VisitorMessage> listener) {
+    public void sendMessage(String message, MessageAttachment attachment, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, attachment, listener)
+                engagement.getChat().sendMessage(message, attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
         );
     }
 
-    public void sendMessage(MessageAttachment attachment, RequestCallback<VisitorMessage> listener) {
+    public void sendMessage(MessageAttachment attachment, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(attachment, listener)
+                engagement.getChat().sendMessage(attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
         );
+    }
+
+    private void onMessageReceived(VisitorMessage visitorMessage, GliaException ex, Listener listener) {
+        if (listener != null) {
+            if (ex != null) listener.error(ex);
+            else listener.messageSent(visitorMessage);
+        }
     }
 }

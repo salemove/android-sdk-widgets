@@ -99,6 +99,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ImageButton addAttachmentButton;
     private FileUploadMenuView addAttachmentMenu;
     private RecyclerView attachmentsRecyclerView;
+    private UploadAttachmentAdapter uploadAttachmentAdapter;
     private EditText chatEditText;
     private ChatAdapter adapter;
     private AppBarView appBar;
@@ -109,8 +110,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private TextView newMessagesCountBadgeView;
 
     private boolean isInBottom = true;
-    // PhotoFileUri is needed because we receive empty Intent on result with extras cleared
-    private Uri photoCaptureFileUri = null;
+
     private static final int OPEN_DOCUMENT_ACTION_REQUEST = 100;
     private static final int CAPTURE_IMAGE_ACTION_REQUEST = 101;
     private static final int CAPTURE_VIDEO_ACTION_REQUEST = 102;
@@ -401,20 +401,11 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    private UploadAttachmentAdapter uploadAttachmentAdapter;
-
     private void initControls() {
         callback = new ChatViewCallback() {
             @Override
             public void emitUploadAttachments(List<FileAttachment> attachments) {
-                post(() -> {
-                    if (attachments.size() > 0) {
-                        sendButton.setVisibility(VISIBLE);
-                    } else {
-                        sendButton.setVisibility(GONE);
-                    }
-                    uploadAttachmentAdapter.submitList(attachments);
-                });
+                post(() -> uploadAttachmentAdapter.submitList(attachments));
             }
 
             @Override
@@ -456,6 +447,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     }
                     isInBottom = chatState.isChatInBottom;
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
+
+                    updateShowSendButton(chatState);
+                    updateChatEditText(chatState);
+
                     if (chatState.isVisible) {
                         showChat();
                     } else {
@@ -521,11 +516,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             }
 
             @Override
-            public void setLastTypedText(String lastTypedText) {
-                post(() -> chatEditText.setText(lastTypedText));
-            }
-
-            @Override
             public void smoothScrollToBottom() {
                 post(() -> chatRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1));
             }
@@ -583,6 +573,21 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void updateChatEditText(ChatState chatState) {
+        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText))
+            chatEditText.setText(chatState.lastTypedText);
+    }
+
+    private void updateShowSendButton(ChatState chatState) {
+        if (chatState.showSendButton && sendButton.getVisibility() != VISIBLE) {
+            sendButton.setVisibility(VISIBLE);
+        }
+
+        if (!chatState.showSendButton && sendButton.getVisibility() == VISIBLE) {
+            sendButton.setVisibility(GONE);
+        }
     }
 
     private void showAllowScreenSharingNotificationsAndStartSharingDialog() {
@@ -810,11 +815,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().trim().length() > 0) {
-                    sendButton.setVisibility(VISIBLE);
-                } else {
-                    sendButton.setVisibility(GONE);
-                }
+
             }
 
             @Override
@@ -828,8 +829,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
         sendButton.setOnClickListener(view -> {
             String message = chatEditText.getText().toString().trim();
-            if (controller != null && controller.sendMessage(message, uploadAttachmentAdapter.getItemCount())) {
-                chatEditText.setText("");
+            if (controller != null) {
+                controller.sendMessage(message);
             }
         });
 
@@ -921,9 +922,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
 
         if (photoFile != null) {
-            photoCaptureFileUri = FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, photoFile);
-            if (photoCaptureFileUri != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoCaptureFileUri);
+            controller.setPhotoCaptureFileUri(FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, photoFile));
+            if (controller.getPhotoCaptureFileUri() != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, controller.getPhotoCaptureFileUri());
                 Utils.getActivity(getContext()).startActivityForResult(
                         intent,
                         CAPTURE_IMAGE_ACTION_REQUEST
@@ -1141,7 +1142,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if ((requestCode == OPEN_DOCUMENT_ACTION_REQUEST || requestCode == CAPTURE_IMAGE_ACTION_REQUEST || requestCode == CAPTURE_VIDEO_ACTION_REQUEST)
                 && resultCode == Activity.RESULT_OK) {
             Uri dataUri = intent != null ? intent.getData() : null;
-            Uri uri = chooseUriByRequestCode(requestCode, dataUri, photoCaptureFileUri);
+            Uri uri = chooseUriByRequestCode(requestCode, dataUri, controller.getPhotoCaptureFileUri());
+            controller.setPhotoCaptureFileUri(null);
             if (uri != null) {
                 controller.onAttachmentReceived(uri);
             }

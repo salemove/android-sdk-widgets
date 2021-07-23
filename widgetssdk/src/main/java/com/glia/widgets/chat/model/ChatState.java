@@ -1,9 +1,9 @@
-package com.glia.widgets.chat;
+package com.glia.widgets.chat.model;
 
-import com.glia.widgets.chat.adapter.ChatItem;
-import com.glia.widgets.chat.adapter.MediaUpgradeStartedTimerItem;
-import com.glia.widgets.chat.adapter.OperatorStatusItem;
-import com.glia.widgets.chat.adapter.VisitorMessageItem;
+import com.glia.widgets.chat.model.history.ChatItem;
+import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
+import com.glia.widgets.chat.model.history.OperatorStatusItem;
+import com.glia.widgets.chat.model.history.VisitorMessageItem;
 import com.glia.widgets.helper.Utils;
 
 import java.util.Collections;

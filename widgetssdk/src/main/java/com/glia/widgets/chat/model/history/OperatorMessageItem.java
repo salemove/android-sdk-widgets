@@ -1,6 +1,7 @@
-package com.glia.widgets.chat.adapter;
+package com.glia.widgets.chat.model.history;
 
 import com.glia.androidsdk.chat.SingleChoiceOption;
+import com.glia.widgets.chat.adapter.ChatAdapter;
 
 import java.util.Collections;
 import java.util.List;

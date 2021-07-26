@@ -410,6 +410,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
             @Override
             public void emitState(ChatState chatState) {
+                updateShowSendButton(chatState);
+                updateChatEditText(chatState);
+
                 post(() -> {
                     switch (chatState.chatInputMode) {
                         case SINGLE_CHOICE_CARD:
@@ -447,9 +450,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     }
                     isInBottom = chatState.isChatInBottom;
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
-
-                    updateShowSendButton(chatState);
-                    updateChatEditText(chatState);
 
                     if (chatState.isVisible) {
                         showChat();
@@ -820,9 +820,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String message = editable.toString().trim();
                 if (controller != null) {
-                    controller.sendMessagePreview(message);
+                    controller.sendMessagePreview(editable.toString().trim());
                 }
             }
         });

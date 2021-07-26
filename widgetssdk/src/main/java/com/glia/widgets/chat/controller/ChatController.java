@@ -127,7 +127,11 @@ public class ChatController implements
 
         @Override
         public void onMessageValidated() {
-            emitViewState(chatState.chatInputChanged(""));
+            emitViewState(
+                    chatState
+                            .chatInputChanged("")
+                            .setShowSendButton(isShowSendButtonUseCase.execute(""))
+            );
         }
 
         @Override
@@ -356,9 +360,10 @@ public class ChatController implements
     }
 
     public void sendMessagePreview(String message) {
-        emitViewState(chatState
-                .chatInputChanged(message)
-                .setShowSendButton(isShowSendButtonUseCase.execute(message))
+        emitViewState(
+                chatState
+                        .chatInputChanged(message)
+                        .setShowSendButton(isShowSendButtonUseCase.execute(message))
         );
         if (chatState.isOperatorOnline()) {
             Logger.d(TAG, "Send preview: " + message);
@@ -381,7 +386,6 @@ public class ChatController implements
             List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
             VisitorMessageItem currentMessage = unsentMessages.get(0);
             unsentMessages.remove(currentMessage);
-            emitViewState(chatState.changeUnsentMessages(unsentMessages));
 
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             int currentMessageIndex = currentChatItems.indexOf(currentMessage);
@@ -389,7 +393,10 @@ public class ChatController implements
             currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent()));
 
             // emitting state because no need to change recyclerview items here
-            emitViewState(chatState.changeItems(currentChatItems));
+            emitViewState(chatState
+                    .changeItems(currentChatItems)
+                    .changeUnsentMessages(unsentMessages)
+            );
             if (!chatState.unsentMessages.isEmpty()) {
                 sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
             }
@@ -429,11 +436,14 @@ public class ChatController implements
         List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
         VisitorMessageItem unsentItem = new VisitorMessageItem(VisitorMessageItem.UNSENT_MESSAGE_ID, false, message);
         unsentMessages.add(unsentItem);
-        emitViewState(chatState.changeUnsentMessages(unsentMessages));
 
         List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
         currentChatItems.add(unsentItem);
-        emitChatItems(chatState.changeItems(currentChatItems));
+
+        emitChatItems(chatState
+                .changeUnsentMessages(unsentMessages)
+                .changeItems(currentChatItems)
+        );
     }
 
     public void show() {
@@ -495,8 +505,11 @@ public class ChatController implements
         viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
 
         // always start in bottom
-        emitViewState(chatState.isInBottomChanged(true));
-        emitViewState(chatState.changeVisibility(true));
+        emitViewState(chatState
+                .isInBottomChanged(true)
+                .changeVisibility(true)
+        );
+
         viewCallback.scrollToBottomImmediate();
 
         if (chatState.pendingNavigationType != null) {
@@ -632,8 +645,10 @@ public class ChatController implements
         OperatorStatusItem operatorStatusItem =
                 OperatorStatusItem.QueueingStatusItem(chatState.companyName);
         items.add(operatorStatusItem);
-        emitViewState(chatState.queueingStarted(operatorStatusItem));
-        emitChatItems(chatState.changeItems(items));
+        emitChatItems(chatState
+                .queueingStarted(operatorStatusItem)
+                .changeItems(items)
+        );
     }
 
     private void destroyView() {
@@ -661,8 +676,10 @@ public class ChatController implements
                     Utils.formatOperatorName(operatorName),
                     profileImgUrl));
         }
-        emitChatItems(chatState.changeItems(items));
-        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+        emitChatItems(chatState
+                .changeItems(items)
+                .engagementStarted(operatorName, profileImgUrl)
+        );
     }
 
     private void stop() {
@@ -983,10 +1000,12 @@ public class ChatController implements
     }
 
     public void onRecyclerviewPositionChanged(boolean isBottom) {
-        emitViewState(chatState.isInBottomChanged(isBottom));
         if (isBottom) {
-            Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom!");
-            emitViewState(chatState.messagesNotSeenChanged(0));
+            Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom = true");
+            emitViewState(chatState.isInBottomChanged(true).messagesNotSeenChanged(0));
+        } else {
+            Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom = false");
+            emitViewState(chatState.isInBottomChanged(false));
         }
     }
 
@@ -1043,7 +1062,6 @@ public class ChatController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEnded");
         stop();
-        emitViewState(chatState.changeVisibility(false));
         dialogController.showNoMoreOperatorsAvailableDialog();
     }
 

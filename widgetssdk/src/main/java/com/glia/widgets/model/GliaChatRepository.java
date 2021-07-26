@@ -43,20 +43,20 @@ public class GliaChatRepository {
                 engagement.getChat().sendMessage(message, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
     }
 
-    public void sendMessage(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
+    public void sendMessageSingleChoice(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
                 engagement.getChat().sendMessage(singleChoiceAttachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
     }
 
-    public void sendMessage(String message, MessageAttachment attachment, Listener listener) {
+    public void sendMessageWithAttachment(String message, MessageAttachment attachment, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
                 engagement.getChat().sendMessage(message, attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
         );
     }
 
-    public void sendMessage(MessageAttachment attachment, Listener listener) {
+    public void sendMessageAttachment(MessageAttachment attachment, Listener listener) {
         Glia.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
+                engagement.getChat().sendMessage("", attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
         );
     }
 

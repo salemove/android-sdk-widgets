@@ -93,7 +93,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ScreenSharingController screenSharingController;
     private ScreenSharingController.ViewCallback screenSharingCallback;
 
-    private RecyclerView chatRecyclerView;
+    private ChatRecyclerView chatRecyclerView;
     private ImageButton sendButton;
     private ImageButton addAttachmentButton;
     private FileUploadMenuView addAttachmentMenu;
@@ -732,6 +732,13 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
         uploadAttachmentAdapter = new UploadAttachmentAdapter();
         uploadAttachmentAdapter.setItemCallback(attachment -> controller.onRemoveAttachment(attachment));
+        uploadAttachmentAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                attachmentsRecyclerView.smoothScrollToPosition(uploadAttachmentAdapter.getItemCount());
+            }
+        });
 
         attachmentsRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         attachmentsRecyclerView.setAdapter(uploadAttachmentAdapter);

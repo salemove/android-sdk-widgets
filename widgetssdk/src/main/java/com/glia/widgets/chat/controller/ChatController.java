@@ -440,10 +440,8 @@ public class ChatController implements
         List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
         currentChatItems.add(unsentItem);
 
-        emitChatItems(chatState
-                .changeUnsentMessages(unsentMessages)
-                .changeItems(currentChatItems)
-        );
+        emitViewState(chatState.changeUnsentMessages(unsentMessages));
+        emitChatItems(chatState.changeItems(currentChatItems));
     }
 
     public void show() {
@@ -645,10 +643,8 @@ public class ChatController implements
         OperatorStatusItem operatorStatusItem =
                 OperatorStatusItem.QueueingStatusItem(chatState.companyName);
         items.add(operatorStatusItem);
-        emitChatItems(chatState
-                .queueingStarted(operatorStatusItem)
-                .changeItems(items)
-        );
+        emitViewState(chatState.queueingStarted(operatorStatusItem));
+        emitChatItems(chatState.changeItems(items));
     }
 
     private void destroyView() {
@@ -676,10 +672,8 @@ public class ChatController implements
                     Utils.formatOperatorName(operatorName),
                     profileImgUrl));
         }
-        emitChatItems(chatState
-                .changeItems(items)
-                .engagementStarted(operatorName, profileImgUrl)
-        );
+        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+        emitChatItems(chatState.changeItems(items));
     }
 
     private void stop() {

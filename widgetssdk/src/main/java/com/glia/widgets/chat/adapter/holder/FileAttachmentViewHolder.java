@@ -20,7 +20,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
 
-    private OperatorStatusView operatorStatusView;
+    private final OperatorStatusView operatorStatusView;
 
     public FileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme) {
         super(itemView);

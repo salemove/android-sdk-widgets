@@ -23,18 +23,21 @@ import com.glia.widgets.glia.GliaOnMessageUseCase;
 import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.glia.GliaSendMessageUseCase;
-import com.glia.widgets.model.PermissionsManager;
+import com.glia.widgets.dialog.PermissionDialogManager;
 import com.glia.widgets.notification.device.INotificationManager;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.permissions.CheckIfHasPermissionsUseCase;
-import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
-import com.glia.widgets.permissions.ResetPermissionsUseCase;
-import com.glia.widgets.permissions.UpdateDialogShownUseCase;
-import com.glia.widgets.permissions.UpdatePermissionsUseCase;
+import com.glia.widgets.permissions.PermissionManager;
+import com.glia.widgets.permissions.domain.HasCallNotificationChannelEnabledUseCase;
+import com.glia.widgets.permissions.domain.HasOverlayEnabledUseCase;
+import com.glia.widgets.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
+import com.glia.widgets.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
+import com.glia.widgets.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -44,42 +47,45 @@ public class UseCaseFactory {
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
 
     private final RepositoryFactory repositoryFactory;
-    private final PermissionsManager permissionsManager;
+    private final PermissionManager permissionManager;
+    private final PermissionDialogManager permissionDialogManager;
     private final INotificationManager notificationManager;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
-                          PermissionsManager permissionsManager,
+                          PermissionManager permissionManager,
+                          PermissionDialogManager permissionDialogManager,
                           INotificationManager notificationManager) {
         this.repositoryFactory = repositoryFactory;
-        this.permissionsManager = permissionsManager;
+        this.permissionManager = permissionManager;
+        this.permissionDialogManager = permissionDialogManager;
         this.notificationManager = notificationManager;
     }
 
-    public static ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase(INotificationManager notificationManager) {
+    public ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase() {
         if (showAudioCallNotificationUseCase == null)
             showAudioCallNotificationUseCase = new ShowAudioCallNotificationUseCase(notificationManager);
         return showAudioCallNotificationUseCase;
     }
 
-    public static ShowVideoCallNotificationUseCase createShowVideoCallNotificationUseCase(INotificationManager notificationManager) {
+    public ShowVideoCallNotificationUseCase createShowVideoCallNotificationUseCase() {
         if (showVideoCallNotificationUseCase == null)
             showVideoCallNotificationUseCase = new ShowVideoCallNotificationUseCase(notificationManager);
         return showVideoCallNotificationUseCase;
     }
 
-    public static RemoveCallNotificationUseCase createRemoveCallNotificationUseCase(INotificationManager notificationManager) {
+    public RemoveCallNotificationUseCase createRemoveCallNotificationUseCase() {
         if (removeCallNotificationUseCase == null)
             removeCallNotificationUseCase = new RemoveCallNotificationUseCase(notificationManager);
         return removeCallNotificationUseCase;
     }
 
-    public static ShowScreenSharingNotificationUseCase createShowScreenSharingNotificationUseCase(INotificationManager notificationManager) {
+    public ShowScreenSharingNotificationUseCase createShowScreenSharingNotificationUseCase() {
         if (showScreenSharingNotificationUseCase == null)
             showScreenSharingNotificationUseCase = new ShowScreenSharingNotificationUseCase(notificationManager);
         return showScreenSharingNotificationUseCase;
     }
 
-    public static RemoveScreenSharingNotificationUseCase createRemoveScreenSharingNotificationUseCase(INotificationManager notificationManager) {
+    public RemoveScreenSharingNotificationUseCase createRemoveScreenSharingNotificationUseCase() {
         if (removeScreenSharingNotificationUseCase == null)
             removeScreenSharingNotificationUseCase = new RemoveScreenSharingNotificationUseCase(notificationManager);
         return removeScreenSharingNotificationUseCase;
@@ -137,8 +143,8 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaQueueRepository(),
                 repositoryFactory.getGliaOperatorMediaRepository(),
                 createOnEngagementUseCase(),
-                createRemoveCallNotificationUseCase(notificationManager),
-                createRemoveScreenSharingNotificationUseCase(notificationManager)
+                createRemoveCallNotificationUseCase(),
+                createRemoveScreenSharingNotificationUseCase()
         );
     }
 
@@ -159,26 +165,6 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaFileAttachmentRepository(),
                 repositoryFactory.getGliaEngagementRepository()
         );
-    }
-
-    public CheckIfShowPermissionsDialogUseCase createCheckIfShowPermissionsDialogUseCase() {
-        return new CheckIfShowPermissionsDialogUseCase(permissionsManager);
-    }
-
-    public UpdateDialogShownUseCase createUpdateDialogShownUseCase() {
-        return new UpdateDialogShownUseCase(permissionsManager);
-    }
-
-    public UpdatePermissionsUseCase createUpdatePermissionsUseCase() {
-        return new UpdatePermissionsUseCase(permissionsManager);
-    }
-
-    public ResetPermissionsUseCase createResetPermissionsUseCase() {
-        return new ResetPermissionsUseCase(permissionsManager);
-    }
-
-    public CheckIfHasPermissionsUseCase createCheckIfHasPermissionsUseCase() {
-        return new CheckIfHasPermissionsUseCase(permissionsManager);
     }
 
     public GliaOnVisitorMediaStateUseCase createGliaOnVisitorMediaStateUseCase() {
@@ -251,5 +237,33 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaEngagementRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository()
         );
+    }
+
+    public HasOverlayEnabledUseCase createHasOverlayEnabledUseCase() {
+        return new HasOverlayEnabledUseCase(permissionManager);
+    }
+
+    public HasScreenSharingNotificationChannelEnabledUseCase createHasScreenSharingNotificationChannelEnabledUseCase() {
+        return new HasScreenSharingNotificationChannelEnabledUseCase(permissionManager);
+    }
+
+    public IsShowOverlayPermissionRequestDialogUseCase createIsShowOverlayPermissionRequestDialogUseCase() {
+        return new IsShowOverlayPermissionRequestDialogUseCase(permissionManager, permissionDialogManager);
+    }
+
+    public HasCallNotificationChannelEnabledUseCase createHasCallNotificationChannelEnabledUseCase() {
+        return new HasCallNotificationChannelEnabledUseCase(permissionManager);
+    }
+
+    public IsShowEnableCallNotificationChannelDialogUseCase createIsShowEnableCallNotificationChannelDialogUseCase() {
+        return new IsShowEnableCallNotificationChannelDialogUseCase(permissionManager, permissionDialogManager);
+    }
+
+    public SetOverlayPermissionRequestDialogShownUseCase createSetOverlayPermissionRequestDialogShownUseCase() {
+        return new SetOverlayPermissionRequestDialogShownUseCase(permissionDialogManager);
+    }
+
+    public SetEnableCallNotificationChannelDialogShownUseCase createSetEnableCallNotificationChannelDialogShownUseCase() {
+        return new SetEnableCallNotificationChannelDialogShownUseCase(permissionDialogManager);
     }
 }

@@ -77,6 +77,8 @@ public class Dialogs {
 
         builder.setView(customLayout);
 
+        builder.setCancelable(false);
+
         AlertDialog dialog = builder.show();
         dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
                 context, theme.getBaseLightColor()));
@@ -114,6 +116,8 @@ public class Dialogs {
         messageView.setText(message);
         closeImageButton.setOnClickListener(buttonClickListener);
         builder.setView(customLayout);
+
+        builder.setCancelable(false);
 
         AlertDialog dialog = builder.show();
 
@@ -182,6 +186,8 @@ public class Dialogs {
         negativeButton.setOnClickListener(onCloseClickListener);
         builder.setView(customLayout);
 
+        builder.setCancelable(false);
+
         AlertDialog dialog = builder.show();
 
         dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
@@ -243,6 +249,8 @@ public class Dialogs {
         positiveButton.setText(positiveButtonText);
 
         builder.setView(customLayout);
+
+        builder.setCancelable(false);
 
         AlertDialog dialog = builder.show();
         negativeButton.setOnClickListener(view -> {

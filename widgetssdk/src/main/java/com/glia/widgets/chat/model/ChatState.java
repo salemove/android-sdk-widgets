@@ -31,7 +31,7 @@ public class ChatState {
     public final String pendingNavigationType;
     public final List<VisitorMessageItem> unsentMessages;
     public final OperatorStatusItem operatorStatusItem;
-    public boolean showSendButton;
+    public final boolean showSendButton;
 
     private ChatState(
             String queueTicketId,

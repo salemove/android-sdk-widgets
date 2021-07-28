@@ -27,14 +27,12 @@ import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.model.PermissionType;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
-import com.glia.widgets.permissions.ResetPermissionsUseCase;
-import com.glia.widgets.permissions.UpdateDialogShownUseCase;
-import com.glia.widgets.permissions.UpdatePermissionsUseCase;
+import com.glia.widgets.permissions.domain.HasCallNotificationChannelEnabledUseCase;
+import com.glia.widgets.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -63,10 +61,6 @@ public class CallController implements
     private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
     private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
     private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
-    private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
-    private final UpdateDialogShownUseCase updateDialogShownUseCase;
-    private final UpdatePermissionsUseCase updatePermissionsUseCase;
-    private final ResetPermissionsUseCase resetPermissionsUseCase;
     private final GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaOnEngagementUseCase onEngagementUseCase;
@@ -75,6 +69,9 @@ public class CallController implements
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase;
+    private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
+    private final HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase;
+    private final IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase;
     private final DialogController dialogController;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
@@ -121,10 +118,6 @@ public class CallController implements
             ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
             ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
             RemoveCallNotificationUseCase removeCallNotificationUseCase,
-            CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
-            UpdateDialogShownUseCase updateDialogShownUseCase,
-            UpdatePermissionsUseCase updatePermissionsUseCase,
-            ResetPermissionsUseCase resetPermissionsUseCase,
             GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase,
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
@@ -132,7 +125,11 @@ public class CallController implements
             GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             GliaEndEngagementUseCase endEngagementUseCase,
-            ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase) {
+            ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
+            IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
+            HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
+            IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase
+    ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
         this.callState = new CallState.Builder()
@@ -156,10 +153,6 @@ public class CallController implements
         this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
         this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
         this.removeCallNotificationUseCase = removeCallNotificationUseCase;
-        this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
-        this.updateDialogShownUseCase = updateDialogShownUseCase;
-        this.updatePermissionsUseCase = updatePermissionsUseCase;
-        this.resetPermissionsUseCase = resetPermissionsUseCase;
         this.gliaQueueForMediaEngagementUseCase = gliaQueueForMediaEngagementUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
@@ -168,21 +161,16 @@ public class CallController implements
         this.onEngagementEndUseCase = onEngagementEndUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
         this.shouldShowMediaEngagementViewUseCase = shouldShowMediaEngagementViewUseCase;
+        this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
+        this.hasCallNotificationChannelEnabledUseCase = hasCallNotificationChannelEnabledUseCase;
+        this.isShowEnableCallNotificationChannelDialogUseCase = isShowEnableCallNotificationChannelDialogUseCase;
     }
 
     public void initCall(String companyName,
                          String queueId,
                          String contextUrl,
-                         Engagement.MediaType mediaType,
-                         boolean hasOverlayPermissions,
-                         boolean isCallNotificationChannelEnabled,
-                         boolean isScreenSharingNotificationChannelEnabled) {
+                         Engagement.MediaType mediaType) {
         Logger.d(TAG, "initCall");
-        updatePermissionsUseCase.execute(
-                hasOverlayPermissions,
-                isCallNotificationChannelEnabled,
-                isScreenSharingNotificationChannelEnabled
-        );
         messagesNotSeenHandler.onNavigatedToCall();
         if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;
@@ -230,7 +218,6 @@ public class CallController implements
             minimizeHandler.clear();
             messagesNotSeenHandler.removeListener(messagesNotSeenHandlerListener);
             messagesNotSeenHandlerListener = null;
-            resetPermissionsUseCase.execute();
 
             onEngagementUseCase.unregisterListener(this);
             onVisitorMediaStateUseCase.unregisterListener(this);
@@ -419,25 +406,14 @@ public class CallController implements
             );
     }
 
-    public void onResume(boolean hasOverlaysPermission,
-                         boolean isCallChannelEnabled,
-                         boolean isScreenSharingChannelEnabled) {
-        Logger.d(TAG, "onResume\n" +
-                "hasOverlayPermissions: " + hasOverlaysPermission +
-                ", isCallChannelEnabled:" + isCallChannelEnabled +
-                ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
-        updatePermissionsUseCase.execute(
-                hasOverlaysPermission,
-                isCallChannelEnabled,
-                isScreenSharingChannelEnabled
-        );
-        if (checkIfShowPermissionsDialogUseCase
-                .execute(PermissionType.OVERLAY, true) &&
-                dialogController.isNoDialogShown()) {
+    public void onResume() {
+        Logger.d(TAG, "onResume\n");
+
+        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog();
-            updateDialogShownUseCase.execute(PermissionType.OVERLAY);
         }
-        if (isCallChannelEnabled) {
+
+        if (hasCallNotificationChannelEnabledUseCase.execute()) {
             if (callState.isVideoCall() || callState.is2WayVideoCall()) {
                 showVideoCallNotificationUseCase.execute();
             } else if (callState.isAudioCall()) {
@@ -567,21 +543,17 @@ public class CallController implements
         Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString() +
                 ", timertaskrunning: " + callTimer.isRunning());
         if (operatorMediaState.getVideo() != null) {
-            if (checkIfShowPermissionsDialogUseCase
-                    .execute(PermissionType.CALL_CHANNEL, true) &&
-                    dialogController.isNoDialogShown()) {
-                dialogController.showEnableNotificationChannelDialog();
-                updateDialogShownUseCase.execute(PermissionType.CALL_CHANNEL);
+            if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
+                dialogController.showEnableCallNotificationChannelDialog();
             }
+
             onOperatorMediaStateVideo(operatorMediaState);
             onVisitorMediaStateUseCase.execute(this);
         } else if (operatorMediaState.getAudio() != null) {
-            if (checkIfShowPermissionsDialogUseCase
-                    .execute(PermissionType.CALL_CHANNEL, true) &&
-                    dialogController.isNoDialogShown()) {
-                dialogController.showEnableNotificationChannelDialog();
-                updateDialogShownUseCase.execute(PermissionType.CALL_CHANNEL);
+            if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
+                dialogController.showEnableCallNotificationChannelDialog();
             }
+
             onOperatorMediaStateAudio(operatorMediaState);
             onVisitorMediaStateUseCase.execute(this);
         } else {

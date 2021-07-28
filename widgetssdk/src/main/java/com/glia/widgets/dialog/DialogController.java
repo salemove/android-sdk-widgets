@@ -3,6 +3,8 @@ package com.glia.widgets.dialog;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.DialogsState;
+import com.glia.widgets.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
+import com.glia.widgets.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
 import com.glia.widgets.view.DialogOfferType;
 
 import java.util.ArrayList;
@@ -15,8 +17,16 @@ public class DialogController {
 
     private final List<Callback> viewCallbacks = new ArrayList<>();
 
-    public DialogController() {
+    private final SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase;
+    private final SetEnableCallNotificationChannelDialogShownUseCase setEnableCallNotificationChannelDialogShownUseCase;
+
+    public DialogController(
+            SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase,
+            SetEnableCallNotificationChannelDialogShownUseCase setEnableCallNotificationChannelDialogShownUseCase
+    ) {
         this.dialogsState = new DialogsState.NoDialog();
+        this.setOverlayPermissionRequestDialogShownUseCase = setOverlayPermissionRequestDialogShownUseCase;
+        this.setEnableCallNotificationChannelDialogShownUseCase = setEnableCallNotificationChannelDialogShownUseCase;
     }
 
     private synchronized boolean setDialogState(DialogsState dialogsState) {
@@ -113,15 +123,15 @@ public class DialogController {
     }
 
     public void showUnexpectedErrorDialog() {
-        if (isNoDialogShown()) {
-            Logger.d(TAG, "Show Unexpected error Dialog");
-            emitDialogState(new DialogsState.UnexpectedErrorDialog());
-        }
+        // PRIORITISE THIS ERROR AS IT IS ENGAGEMENT FATAL ERROR INDICATOR (eg. GliaException:{"details":"Queue is closed","error":"Unprocessable entity"}) for example
+        Logger.d(TAG, "Show Unexpected error Dialog");
+        emitDialogState(new DialogsState.UnexpectedErrorDialog());
     }
 
     public void showOverlayPermissionsDialog() {
         if (isNoDialogShown()) {
             Logger.d(TAG, "Show Overlay permissions Dialog");
+            setOverlayPermissionRequestDialogShownUseCase.execute();
             emitDialogState(new DialogsState.OverlayPermissionsDialog());
         }
     }
@@ -140,9 +150,10 @@ public class DialogController {
         }
     }
 
-    public void showEnableNotificationChannelDialog() {
+    public void showEnableCallNotificationChannelDialog() {
         if (isNoDialogShown()) {
             Logger.d(TAG, "Show Enable Notification Channel Dialog");
+            setEnableCallNotificationChannelDialogShownUseCase.execute();
             emitDialogState(new DialogsState.EnableNotificationChannelDialog());
         }
     }

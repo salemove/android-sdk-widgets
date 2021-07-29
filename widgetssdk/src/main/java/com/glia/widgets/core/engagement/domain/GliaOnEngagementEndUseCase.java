@@ -38,7 +38,7 @@ public class GliaOnEngagementEndUseCase implements
             if (listener != null) {
                 listener.engagementEnded();
             }
-            gliaQueueRepository.cleanOnEngagementEnd();
+            gliaQueueRepository.onEngagementEnd();
             operatorMediaRepository.stopListening(engagement);
             repository.clearEngagementType();
             fileAttachmentRepository.clearObservers();

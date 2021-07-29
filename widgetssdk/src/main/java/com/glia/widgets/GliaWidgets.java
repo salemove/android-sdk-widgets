@@ -10,7 +10,6 @@ import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.view.head.ChatHeadsController;
 
 import java.util.function.Consumer;
 

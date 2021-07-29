@@ -38,7 +38,6 @@ public class CallActivity extends AppCompatActivity {
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = () -> {
-        callView.backPressed();
         finish();
     };
     private CallView.OnEndListener onEndListener = this::finish;
@@ -52,7 +51,6 @@ public class CallActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Dependencies.addActivityToBackStack(Constants.CALL_ACTIVITY);
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
         if (!callView.shouldShowMediaEngagementView()) {
@@ -61,7 +59,7 @@ public class CallActivity extends AppCompatActivity {
         }
 
         buildConfiguration();
-
+        callView.setConfiguration(configuration);
         callView.setTheme(configuration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);
@@ -155,13 +153,7 @@ public class CallActivity extends AppCompatActivity {
         callView.onPause();
         super.onPause();
     }
-
-    @Override
-    public void onBackPressed() {
-        callView.backPressed();
-        super.onBackPressed();
-    }
-
+    
     @Override
     protected void onDestroy() {
         if (permissionSubjectDisposable != null) {
@@ -170,8 +162,7 @@ public class CallActivity extends AppCompatActivity {
         onBackClickedListener = null;
         onEndListener = null;
         onNavigateToChatListener = null;
-        callView.onDestroy();
-        Dependencies.removeActivityFromBackStack(Constants.CALL_ACTIVITY);
+        callView.onDestroy(isFinishing());
         super.onDestroy();
     }
 

@@ -55,6 +55,15 @@
         <item name="android:backgroundTint">?attr/systemAgentBubbleColor</item>
     </style>
 
+    <style name="Application.Glia.Chat.ChatHead">
+        <item name="badgeBackgroundTintList">?attr/gliaBrandPrimaryColor</item>
+        <item name="badgeTextColor">?attr/baseLightColor</item>
+        <item name="backgroundTintList">?attr/baseLightColor</item>
+        <item name="operatorPlaceholderIcon">?attr/gliaIconPlaceholder</item>
+        <item name="operatorPlaceholderBackgroundColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="operatorPlaceholderIconTintList">?attr/baseLightColor</item>
+    </style>
+
     <style name="Application.Glia.Header1" parent="TextAppearance.MaterialComponents.Headline1">
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>

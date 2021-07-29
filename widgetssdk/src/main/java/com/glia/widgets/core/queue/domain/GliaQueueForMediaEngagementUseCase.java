@@ -21,17 +21,20 @@ public class GliaQueueForMediaEngagementUseCase {
     public void execute(
             String queueId,
             String contextUrl,
-            Engagement.MediaType mediaType,
-            QueueTicketsEventsListener listener
+            Engagement.MediaType mediaType
     ) {
         if (engagementRepository.hasOngoingEngagement()) {
-            listener.onTicketReceived(repository.getQueueTicket());
-            return;
-        } else if (repository.isNoQueueingOngoing()) {
-            repository.startQueueingForMediaEngagement(queueId, contextUrl, mediaType, listener);
+            repository.onTicketReceived(repository.getQueueTicket());
         } else {
-            repository.addOngoingQueueingEventListener(listener);
+            startQueueing(queueId, contextUrl, mediaType);
         }
+    }
+
+    private void startQueueing(String queueId,
+                               String contextUrl,
+                               Engagement.MediaType mediaType
+    ) {
         engagementRepository.onMediaEngagement();
+        repository.startQueueingForMediaEngagement(queueId, contextUrl, mediaType);
     }
 }

@@ -1,60 +1,64 @@
 package com.glia.widgets.di;
 
 import android.app.Application;
-import android.content.Intent;
 
 import androidx.annotation.VisibleForTesting;
 
-import com.glia.widgets.Constants;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
-import com.glia.widgets.view.head.ChatHeadService;
-import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.glia.widgets.helper.ApplicationLifecycleManager;
+import com.glia.widgets.core.chathead.ChatHeadManager;
 
 public class Dependencies {
 
     private final static String TAG = "Dependencies";
     private static ControllerFactory controllerFactory;
-    private static final List<String> activitiesInBackstack = new ArrayList<>();
     private static INotificationManager notificationManager;
     private static GliaSdkConfigurationManager sdkConfigurationManager;
+    private static ChatHeadManager chatHeadManager;
     private static UseCaseFactory useCaseFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
+    private static ApplicationLifecycleManager lifecycleManager;
+    private static final LifecycleEventObserver lifecycleEventObserver = (source, event) -> {
+        if (event == Lifecycle.Event.ON_STOP) {
+            useCaseFactory
+                    .getToggleChatBubbleServiceUseCase()
+                    .execute(null);
+        } else if (event == Lifecycle.Event.ON_DESTROY) {
+            chatHeadManager
+                    .stopChatHeadService();
+            lifecycleManager.onDestroy();
+        }
+    };
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
         sdkConfigurationManager = new GliaSdkConfigurationManager();
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
+
+        chatHeadManager = new ChatHeadManager(application);
+        lifecycleManager = new ApplicationLifecycleManager();
+        lifecycleManager.addObserver(lifecycleEventObserver);
+
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
                 new PermissionDialogManager(application),
                 notificationManager,
-                sdkConfigurationManager
+                sdkConfigurationManager,
+                chatHeadManager
         );
 
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
-        controllerFactory.getChatHeadsController().addChatHeadServiceListener(
-                new ChatHeadsController.ChatHeadServiceListener() {
-                    @Override
-                    public void startService() {
-                        application.startService(new Intent(application, ChatHeadService.class));
-                    }
-
-                    @Override
-                    public void stopService() {
-                        application.stopService(new Intent(application, ChatHeadService.class));
-                    }
-                });
     }
 
     public static UseCaseFactory getUseCaseFactory() {
@@ -76,32 +80,6 @@ public class Dependencies {
     public static ControllerFactory getControllerFactory() {
         Logger.d(TAG, "getControllerFactory");
         return controllerFactory;
-    }
-
-    /**
-     * Needed because CallActivity uses translucent window. And this flag messes with any background
-     * activity lifecycles. Used to know what activities are in the current backstack.
-     *
-     * @param activity 1 of either {@link com.glia.widgets.Constants#CALL_ACTIVITY}
-     *                 or {@link com.glia.widgets.Constants#CHAT_ACTIVITY}
-     */
-    public static void addActivityToBackStack(String activity) {
-        Logger.d(TAG, "addActivityToBackStack");
-        if (activity.equals(Constants.CALL_ACTIVITY) || activity.equals(Constants.CHAT_ACTIVITY) || activity.equals(Constants.IMAGE_PREVIEW_ACTIVITY)) {
-            if (!activitiesInBackstack.contains(activity)) {
-                activitiesInBackstack.add(activity);
-            }
-        }
-    }
-
-    public static void removeActivityFromBackStack(String activity) {
-        Logger.d(TAG, "removeActivityFromBackStack");
-        activitiesInBackstack.remove(activity);
-    }
-
-    public static boolean isInBackstack(String activity) {
-        Logger.d(TAG, "isInBackstack");
-        return activitiesInBackstack.contains(activity);
     }
 
     public static GliaCore glia() {

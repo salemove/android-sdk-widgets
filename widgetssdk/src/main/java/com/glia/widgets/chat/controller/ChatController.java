@@ -62,6 +62,8 @@ import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
+import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
+import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -185,6 +187,8 @@ public class ChatController implements
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final DownloadFileUseCase downloadFileUseCase;
     private final IsEnableChatEditTextUseCase isEnableChatEditTextUseCase;
+    private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
+    private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
 
     private Disposable disposable = null;
 
@@ -223,7 +227,9 @@ public class ChatController implements
             IsShowSendButtonUseCase isShowSendButtonUseCase,
             IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
             DownloadFileUseCase downloadFileUseCase,
-            IsEnableChatEditTextUseCase isEnableChatEditTextUseCase
+            IsEnableChatEditTextUseCase isEnableChatEditTextUseCase,
+            SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
     ) {
         Logger.d(TAG, "constructor");
 
@@ -284,6 +290,8 @@ public class ChatController implements
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.downloadFileUseCase = downloadFileUseCase;
         this.isEnableChatEditTextUseCase = isEnableChatEditTextUseCase;
+        this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
+        this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -299,8 +307,11 @@ public class ChatController implements
         public void update(Observable observable, Object o) {
             if (viewCallback != null) {
                 viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
-                emitViewState(chatState.setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText)));
-                emitViewState(chatState.setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute()));
+                emitViewState(
+                        chatState
+                                .setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText))
+                                .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute())
+                );
             }
         }
     };
@@ -325,6 +336,7 @@ public class ChatController implements
         minimizeHandler.addListener(minimizeCalledListener);
         createNewTimerCallback();
         callTimer.addFormattedValueListener(timerStatusListener);
+        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         if (getIsQueueingOngoingUseCase.execute()) {
             queueForEngagementOngoing();
         }
@@ -334,8 +346,7 @@ public class ChatController implements
         Logger.d(TAG, "queueForEngagement");
         queueForChatEngagementUseCase.execute(
                 chatState.queueId,
-                chatState.contextUrl,
-                queueTicketsEventsListener
+                chatState.contextUrl
         );
     }
 
@@ -386,6 +397,7 @@ public class ChatController implements
             onMessageUseCase.unregisterListener();
             onOperatorTypingUseCase.unregisterListener();
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
+            unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         }
     }
 

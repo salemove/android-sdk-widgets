@@ -17,7 +17,6 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -58,6 +57,7 @@ import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
@@ -71,9 +71,7 @@ import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
-import com.glia.widgets.view.head.ChatHeadService;
-import com.glia.widgets.view.head.ChatHeadsController;
-import com.glia.widgets.view.head.model.ChatHeadInput;
+import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
 import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.shape.MarkerEdgeTreatment;
@@ -92,13 +90,15 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     private ChatViewCallback callback;
     private ChatController controller;
-    private ChatHeadsController chatHeadsController;
 
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
 
     private ScreenSharingController screenSharingController;
     private ScreenSharingController.ViewCallback screenSharingCallback;
+
+    private ServiceChatBubbleController serviceChatBubbleController;
+    private GliaSdkConfiguration sdkConfiguration;
 
     private ChatRecyclerView chatRecyclerView;
     private ImageButton sendButton;
@@ -246,46 +246,32 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             String companyName,
             String queueId,
             String contextUrl) {
-        startChat(companyName, queueId, contextUrl, false, null);
+        startChat(companyName, queueId, contextUrl, false);
     }
 
     /**
-     * @param companyName        Text shown in the chat while waiting in a queue.
-     * @param queueId            The queue id to which you would like to queue to and speak to operators from.
-     * @param contextUrl         Provide some context as to from where are you initiating the chat from.
-     * @param useOverlays        Used to set if the user opted to use overlays or not.
-     *                           See {@link com.glia.widgets.GliaWidgets}.USE_OVERLAY to see its full
-     *                           usage description.
-     *                           Important! This parameter is ignored if the view is not used in the sdk's
-     *                           ChatActivity
-     * @param savedInstanceState Used to see if the activity is being created for the first time.
+     * @param companyName Text shown in the chat while waiting in a queue.
+     * @param queueId     The queue id to which you would like to queue to and speak to operators from.
+     * @param contextUrl  Provide some context as to from where are you initiating the chat from.
+     * @param useOverlays Used to set if the user opted to use overlays or not.
+     *                    See {@link com.glia.widgets.GliaWidgets}.USE_OVERLAY to see its full
+     *                    usage description.
+     *                    Important! This parameter is ignored if the view is not used in the sdk's
+     *                    ChatActivity
      */
     public void startChat(
             String companyName,
             String queueId,
             String contextUrl,
-            boolean useOverlays,
-            Bundle savedInstanceState) {
+            boolean useOverlays
+    ) {
         Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
-        Activity activity = Utils.getActivity(this.getContext());
+
         if (controller != null) {
-
             controller.initChat(companyName, queueId, contextUrl);
-
-            if (activity instanceof ChatActivity && savedInstanceState == null) {
-                if (chatHeadsController != null) {
-                    chatHeadsController.onNavigatedToChat(
-                            new ChatHeadInput(
-                                    companyName,
-                                    queueId,
-                                    contextUrl,
-                                    this.theme
-                            ),
-                            true,
-                            useOverlays
-                    );
-                }
-            }
+        }
+        if (serviceChatBubbleController != null) {
+            serviceChatBubbleController.init();
         }
     }
 
@@ -304,7 +290,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
      */
     public boolean backPressed() {
         if (controller != null) controller.onBackArrowClicked();
-        if (chatHeadsController != null) chatHeadsController.onChatBackButtonPressed();
         return true;
     }
 
@@ -353,13 +338,18 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (screenSharingController != null) {
             screenSharingController.onResume(this.getContext());
         }
+        if (serviceChatBubbleController != null) {
+            serviceChatBubbleController.onResume(this);
+        }
     }
 
     /**
      * Use this method to notify the view that your activity or fragment's view is being destroyed.
      * Used to dispose of any loose resources.
+     *
+     * @param isFinishing - indicates if activity is being recreated - "isFinishing = false" or is being completely destroyed - "isFinishing = true"
      */
-    public void onDestroyView() {
+    public void onDestroyView(boolean isFinishing) {
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
@@ -373,6 +363,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         chatRecyclerView.setAdapter(null);
         chatRecyclerView.removeOnScrollListener(onScrollListener);
         attachmentsRecyclerView.setAdapter(null);
+        if (isFinishing) serviceChatBubbleController.onDestroy();
 
         if (screenSharingController != null) {
             screenSharingController.onDestroy(true);
@@ -405,9 +396,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
         controller = Dependencies
                 .getControllerFactory()
-                .getChatController(Utils.getActivity(this.getContext()), callback);
-
-        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
+                .getChatController(callback);
 
         setupDialogCallback();
 
@@ -418,6 +407,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+
+        serviceChatBubbleController = Dependencies
+                .getControllerFactory()
+                .getChatHeadController();
     }
 
     private void setupChatStateCallback() {
@@ -852,8 +845,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             showToolbar(this.theme.getAppBarTitle());
         }
 
-        if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
-
         operatorTypingAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
@@ -986,9 +977,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
                     }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
-                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -1018,9 +1006,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -1090,9 +1075,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
                     }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
-                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -1108,9 +1090,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -1144,9 +1123,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.unexpectedErrorDialogDismissed();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -1187,7 +1163,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void chatEnded() {
-        this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
         Dependencies.getControllerFactory().destroyControllers();
     }
 
@@ -1355,6 +1330,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     break;
             }
         }
+    }
+
+    public void setConfiguration(GliaSdkConfiguration configuration) {
+        sdkConfiguration = configuration;
+        serviceChatBubbleController.setBuildTimeTheme(theme);
+        serviceChatBubbleController.setSdkConfiguration(sdkConfiguration);
     }
 
     public interface OnBackClickedListener {

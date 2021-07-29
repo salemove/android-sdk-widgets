@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -19,16 +18,12 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.StyleableRes;
 
 import com.glia.androidsdk.chat.AttachmentFile;
-import com.glia.widgets.Constants;
-import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.call.CallActivity;
-import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
-import com.glia.widgets.view.head.model.ChatHeadInput;
 
 import java.io.File;
 import java.io.IOException;
@@ -596,6 +591,12 @@ public class Utils {
                         oldTheme.getGliaChoiceCardContentTextConfiguration()
                 );
 
+        ChatHeadConfiguration chatHeadConfiguration =
+                getConfiguration(
+                        newTheme.getChatHeadConfiguration(),
+                        oldTheme.getChatHeadConfiguration()
+                );
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColorRes);
@@ -646,29 +647,8 @@ public class Utils {
         builder.setNegativeButtonConfiguration(negativeButtonConfiguration);
         builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
         builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
+        builder.setChatHeadConfiguration(chatHeadConfiguration);
         return builder.build();
-    }
-
-    public static Intent getReturnToEngagementIntent(
-            Context context,
-            ChatHeadInput chatHeadInput,
-            String returnDestination
-    ) {
-        if (returnDestination.equals(Constants.CHAT_ACTIVITY)) {
-            return getNavigationIntent(context, ChatActivity.class, chatHeadInput);
-        } else {
-            return getNavigationIntent(context, CallActivity.class, chatHeadInput);
-        }
-    }
-
-    private static Intent getNavigationIntent(Context context, Class<?> cls, ChatHeadInput chatHeadInput) {
-        Intent newIntent = new Intent(context, cls);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, chatHeadInput.companyName);
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, chatHeadInput.queueId);
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, chatHeadInput.contextUrl);
-        newIntent.putExtra(GliaWidgets.UI_THEME, chatHeadInput.uiTheme);
-        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        return newIntent;
     }
 
     public static File createTempPhotoFile(Context context) throws IOException {

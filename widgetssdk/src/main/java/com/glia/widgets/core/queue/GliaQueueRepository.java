@@ -33,7 +33,6 @@ public class GliaQueueRepository {
     private final Consumer<GliaException> startQueueingExceptionConsumer = exception -> {
         if (exception != null) {
             if (exception.cause == GliaException.Cause.ALREADY_QUEUED) {
-
                 for (QueueTicketsEventsListener listener : eventsListeners) {
                     listener.started();
                 }
@@ -51,7 +50,7 @@ public class GliaQueueRepository {
 
     private final Consumer<GliaException> stopQueueingExceptionConsumer = exception -> {
         if (exception != null) {
-            Logger.e(TAG, "cancelQueueTicketError: " + exception.toString());
+            Logger.e(TAG, "cancelQueueTicketError: " + exception);
         } else {
             Logger.d(TAG, "cancelQueueTicketSuccess");
             for (QueueTicketsEventsListener listener : eventsListeners) {
@@ -60,15 +59,21 @@ public class GliaQueueRepository {
         }
     };
 
-    public void cleanOnEngagementEnd() {
+    public void onEngagementEnd() {
         Dependencies.glia().off(Glia.Events.QUEUE_TICKET, ticketConsumer);
         cancelTicket();
         typeOfOngoingQueueing = TypeOfOngoingQueueing.NONE;
-        eventsListeners.clear();
+    }
+
+    public void onTicketReceived(String queueTicket) {
+        for (QueueTicketsEventsListener listener : eventsListeners) {
+            listener.onTicketReceived(queueTicket);
+        }
     }
 
     public void cancelTicket() {
-        if (queueTicket != null) Dependencies.glia().cancelQueueTicket(queueTicket, stopQueueingExceptionConsumer);
+        if (queueTicket != null)
+            Dependencies.glia().cancelQueueTicket(queueTicket, stopQueueingExceptionConsumer);
         typeOfOngoingQueueing = TypeOfOngoingQueueing.NONE;
     }
 
@@ -80,33 +85,53 @@ public class GliaQueueRepository {
         return typeOfOngoingQueueing == TypeOfOngoingQueueing.MEDIA;
     }
 
-    public void addOngoingQueueingEventListener(QueueTicketsEventsListener listener) {
-        eventsListeners.add(listener);
-        listener.ongoing();
+    public boolean isChatQueueingOngoing() {
+        return typeOfOngoingQueueing == TypeOfOngoingQueueing.CHAT;
     }
 
     public void startQueueingForEngagement(
             String queueId,
-            String contextUrl,
-            QueueTicketsEventsListener listener
+            String contextUrl
     ) {
-        eventsListeners.add(listener);
-        typeOfOngoingQueueing = TypeOfOngoingQueueing.CHAT;
-        VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
-        Dependencies.glia().on(Glia.Events.QUEUE_TICKET, ticketConsumer);
-        Dependencies.glia().queueForEngagement(queueId, visitorContext, startQueueingExceptionConsumer);
+        if (isNoQueueingOngoing()) {
+            typeOfOngoingQueueing = TypeOfOngoingQueueing.CHAT;
+            VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
+            Dependencies.glia().on(Glia.Events.QUEUE_TICKET, ticketConsumer);
+            Dependencies.glia().queueForEngagement(queueId, visitorContext, startQueueingExceptionConsumer);
+        } else {
+            for (QueueTicketsEventsListener listener : eventsListeners) {
+                listener.ongoing();
+            }
+        }
     }
 
     public void startQueueingForMediaEngagement(String queueId,
                                                 String contextUrl,
-                                                Engagement.MediaType mediaType,
-                                                QueueTicketsEventsListener listener
+                                                Engagement.MediaType mediaType
     ) {
-        eventsListeners.add(listener);
-        typeOfOngoingQueueing = TypeOfOngoingQueueing.MEDIA;
-        VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
-        Dependencies.glia().on(Glia.Events.QUEUE_TICKET, ticketConsumer);
-        Dependencies.glia().queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, startQueueingExceptionConsumer);
+        if (isNoQueueingOngoing()) {
+            typeOfOngoingQueueing = TypeOfOngoingQueueing.MEDIA;
+            VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
+            Dependencies.glia().on(Glia.Events.QUEUE_TICKET, ticketConsumer);
+            Dependencies.glia().queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, startQueueingExceptionConsumer);
+        } else {
+            for (QueueTicketsEventsListener listener : eventsListeners) {
+                listener.ongoing();
+            }
+        }
+    }
+
+    public void addEventListener(QueueTicketsEventsListener listener) {
+        if (!eventsListeners.contains(listener)) {
+            eventsListeners.add(listener);
+        }
+        if (!isNoQueueingOngoing()) {
+            listener.ongoing();
+        }
+    }
+
+    public void removeEventListener(QueueTicketsEventsListener listener) {
+        eventsListeners.remove(listener);
     }
 
     public String getQueueTicket() {

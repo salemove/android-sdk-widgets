@@ -71,7 +71,7 @@ public class ChatFragment extends Fragment {
         onEndListener = null;
         navController.removeOnDestinationChangedListener(onDestinationChangedListener);
         onBackClickedListener = null;
-        chatView.onDestroyView();
+        chatView.onDestroyView(true);
         super.onDestroyView();
     }
 

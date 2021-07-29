@@ -34,14 +34,6 @@ public class MessagesNotSeenHandler implements
         gliaOnEngagementEndUseCase.execute(this);
     }
 
-    public void callOnBackClicked(boolean isChatInBackstack) {
-        Logger.d(TAG, "callOnBackClicked");
-        if (isChatInBackstack) {
-            emitCount(0);
-            isCounting = false;
-        }
-    }
-
     public void chatOnBackClicked() {
         Logger.d(TAG, "chatOnBackClicked");
         emitCount(0);

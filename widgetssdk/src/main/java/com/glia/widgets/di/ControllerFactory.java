@@ -1,7 +1,5 @@
 package com.glia.widgets.di;
 
-import android.app.Activity;
-
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatViewCallback;
@@ -13,14 +11,15 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
-import com.glia.widgets.view.head.ChatHeadsController;
+import com.glia.widgets.view.head.ChatHeadLayoutContract;
+import com.glia.widgets.view.head.controller.ApplicationChatBubbleLayoutController;
+import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
 
 public class ControllerFactory {
 
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
-    private final ChatHeadsController chatHeadsController;
     private final DialogController dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
@@ -32,21 +31,13 @@ public class ControllerFactory {
     private ScreenSharingController retainedScreenSharingController;
     private final FilePreviewController filePreviewController;
 
+    private static ServiceChatBubbleController serviceChatBubbleController;
 
     public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
                 useCaseFactory.createGliaOnMessageUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase()
-        );
-        chatHeadsController = new ChatHeadsController(
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
-                useCaseFactory.createAddQueueTicketsEventsListenerUseCase(),
-                messagesNotSeenHandler,
-                useCaseFactory.createGetIsMediaEngagementOngoingUseCase(),
-                useCaseFactory.createHasOverlayEnabledUseCase()
         );
 
         this.useCaseFactory = useCaseFactory;
@@ -62,7 +53,7 @@ public class ControllerFactory {
         );
     }
 
-    public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
+    public ChatController getChatController(ChatViewCallback chatViewCallback) {
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
@@ -97,7 +88,9 @@ public class ControllerFactory {
                     useCaseFactory.createIsShowSendButtonUseCase(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createDownloadFileUseCase(),
-                    useCaseFactory.createIsEnableChatEditTextUseCase()
+                    useCaseFactory.createIsEnableChatEditTextUseCase(),
+                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -131,7 +124,9 @@ public class ControllerFactory {
                     useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
-                    useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase()
+                    useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
+                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -160,15 +155,11 @@ public class ControllerFactory {
         return retainedScreenSharingController;
     }
 
-    public ChatHeadsController getChatHeadsController() {
-        return chatHeadsController;
-    }
-
     public void destroyControllers() {
         destroyCallController(false);
         destroyScreenSharingController(false);
         destroyChatController();
-        chatHeadsController.stopService();
+        serviceChatBubbleController.onDestroy();
     }
 
     public void destroyCallController(boolean retain) {
@@ -205,11 +196,37 @@ public class ControllerFactory {
     }
 
     public void init() {
-        chatHeadsController.initChatObserving();
         messagesNotSeenHandler.init();
     }
 
     public FilePreviewController getImagePreviewController() {
         return filePreviewController;
+    }
+
+    public ServiceChatBubbleController getChatHeadController() {
+        if (serviceChatBubbleController == null) {
+            serviceChatBubbleController = new ServiceChatBubbleController(
+                    useCaseFactory.getToggleChatBubbleServiceUseCase(),
+                    useCaseFactory.getResolveChatBubbleNavigationUseCase(),
+                    useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createOnEngagementEndUseCase(),
+                    messagesNotSeenHandler,
+                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+            );
+        }
+        return serviceChatBubbleController;
+    }
+
+    public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
+        return new ApplicationChatBubbleLayoutController(
+                useCaseFactory.getIsDisplayApplicationChatBubbleUseCase(),
+                useCaseFactory.getResolveChatBubbleNavigationUseCase(),
+                useCaseFactory.createOnEngagementUseCase(),
+                useCaseFactory.createOnEngagementEndUseCase(),
+                messagesNotSeenHandler,
+                useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+        );
     }
 }

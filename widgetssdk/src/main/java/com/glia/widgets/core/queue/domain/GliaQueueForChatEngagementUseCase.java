@@ -2,7 +2,6 @@ package com.glia.widgets.core.queue.domain;
 
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
-import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 
 public class GliaQueueForChatEngagementUseCase {
 
@@ -17,15 +16,16 @@ public class GliaQueueForChatEngagementUseCase {
         this.engagementRepository = engagementRepository;
     }
 
-    public void execute(String queueId, String contextUrl, QueueTicketsEventsListener listener) {
+    public void execute(String queueId, String contextUrl) {
         if (engagementRepository.hasOngoingEngagement()) {
-            listener.onTicketReceived(repository.getQueueTicket());
-            return;
-        } else if (repository.isNoQueueingOngoing()) {
-            repository.startQueueingForEngagement(queueId, contextUrl, listener);
+            repository.onTicketReceived(repository.getQueueTicket());
         } else {
-            repository.addOngoingQueueingEventListener(listener);
+            startQueueing(queueId, contextUrl);
         }
+    }
+
+    private void startQueueing(String queueId, String contextUrl) {
         engagementRepository.onChatEngagement();
+        repository.startQueueingForEngagement(queueId, contextUrl);
     }
 }

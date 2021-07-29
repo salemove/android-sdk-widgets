@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -29,7 +28,6 @@ public class FilePreviewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_preview_activity);
-        Dependencies.addActivityToBackStack(Constants.IMAGE_PREVIEW_ACTIVITY);
 
         filePreviewView = findViewById(R.id.file_preview_view);
 
@@ -60,9 +58,8 @@ public class FilePreviewActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        Dependencies.removeActivityFromBackStack(Constants.IMAGE_PREVIEW_ACTIVITY);
         filePreviewView.onDestroyView();
+        super.onDestroy();
     }
 
     @Override

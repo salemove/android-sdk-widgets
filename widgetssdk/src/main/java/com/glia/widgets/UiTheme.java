@@ -8,8 +8,8 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.FontRes;
 
 import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
-
 
 public class UiTheme implements Parcelable {
     /**
@@ -237,6 +237,8 @@ public class UiTheme implements Parcelable {
     private final ButtonConfiguration negativeButtonConfiguration;
     private final ButtonConfiguration neutralButtonConfiguration;
 
+    private final ChatHeadConfiguration chatHeadConfiguration;
+
     private UiTheme(UiThemeBuilder builder) {
         this.appBarTitle = builder.appBarTitle;
         this.brandPrimaryColor = builder.brandPrimaryColor;
@@ -287,6 +289,7 @@ public class UiTheme implements Parcelable {
         this.chatStartedCaptionTextColor = builder.chatStartedCaptionTextColor;
         this.chatStartedHeadingTextColor = builder.chatStartedHeadingTextColor;
         this.choiceCardContentTextConfiguration = builder.choiceCardContentTextConfiguration;
+        this.chatHeadConfiguration = builder.chatHeadConfiguration;
     }
 
     public static class UiThemeBuilder {
@@ -526,6 +529,9 @@ public class UiTheme implements Parcelable {
         private
         TextConfiguration choiceCardContentTextConfiguration;
 
+        private
+        ChatHeadConfiguration chatHeadConfiguration;
+
         public void setAppBarTitle(String appBarTitle) {
             this.appBarTitle = appBarTitle;
         }
@@ -726,6 +732,10 @@ public class UiTheme implements Parcelable {
             this.choiceCardContentTextConfiguration = textConfiguration;
         }
 
+        public void setChatHeadConfiguration(ChatHeadConfiguration chatHeadConfiguration) {
+            this.chatHeadConfiguration = chatHeadConfiguration;
+        }
+
         public void setTheme(UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -775,6 +785,7 @@ public class UiTheme implements Parcelable {
             this.chatStartedCaptionTextColor = theme.chatStartedCaptionTextColor;
             this.chatStartedHeadingTextColor = theme.chatStartedHeadingTextColor;
             this.choiceCardContentTextConfiguration = theme.choiceCardContentTextConfiguration;
+            this.chatHeadConfiguration = theme.chatHeadConfiguration;
         }
 
         public UiTheme build() {
@@ -998,6 +1009,7 @@ public class UiTheme implements Parcelable {
         positiveButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         negativeButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         neutralButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
+        chatHeadConfiguration = in.readParcelable(ChatHeadConfiguration.class.getClassLoader());
     }
 
     @Override
@@ -1256,6 +1268,7 @@ public class UiTheme implements Parcelable {
         dest.writeParcelable(positiveButtonConfiguration, flags);
         dest.writeParcelable(negativeButtonConfiguration, flags);
         dest.writeParcelable(neutralButtonConfiguration, flags);
+        dest.writeParcelable(chatHeadConfiguration, flags);
     }
 
     @Override
@@ -1469,5 +1482,9 @@ public class UiTheme implements Parcelable {
 
     public Integer getGliaChatStartedCaptionTextColor() {
         return chatStartedCaptionTextColor;
+    }
+
+    public ChatHeadConfiguration getChatHeadConfiguration() {
+        return chatHeadConfiguration;
     }
 }

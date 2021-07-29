@@ -29,7 +29,7 @@
             android:theme="@style/Application.Glia.Call.Activity" />
 
         <service
-            android:name=".view.head.ChatHeadService"
+            android:name=".core.chathead.ChatHeadService"
             android:enabled="true"
             android:stopWithTask="true" />
 

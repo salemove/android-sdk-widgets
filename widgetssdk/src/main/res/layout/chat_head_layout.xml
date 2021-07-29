@@ -6,7 +6,5 @@
     <com.glia.widgets.view.head.ChatHeadView
         android:id="@+id/chat_head_view"
         android:layout_width="wrap_content"
-        android:visibility="gone"
         android:layout_height="wrap_content" />
-
 </merge>

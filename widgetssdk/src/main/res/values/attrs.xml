@@ -179,6 +179,7 @@
     <attr name="buttonBarNegativeButtonStyle" format="reference" />
     <attr name="buttonBarNeutralButtonStyle" format="reference" />
     <attr name="choiceCardContentTextStyle" format="reference" />
+    <attr name="chatHeadStyle" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />
@@ -197,6 +198,15 @@
     <declare-styleable name="OperatorStatusView">
         <attr name="imageSize" format="dimension" />
         <attr name="rippleTint" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="ChatHeadView">
+        <attr name="operatorPlaceholderBackgroundColor" format="reference" />
+        <attr name="operatorPlaceholderIcon" format="reference" />
+        <attr name="operatorPlaceholderIconTintList" format="reference" />
+        <attr name="badgeBackgroundTintList" format="reference" />
+        <attr name="badgeTextColor" />
+        <attr name="backgroundTintList" format="reference" />
     </declare-styleable>
 
 </resources>

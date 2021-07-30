@@ -208,16 +208,7 @@ public class CallView extends ConstraintLayout {
                     companyName,
                     queueId,
                     contextUrl,
-                    mediaType,
-                    Settings.canDrawOverlays(this.getContext()),
-                    NotificationManager.areNotificationsEnabled(
-                            this.getContext(),
-                            NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID
-                    ),
-                    NotificationManager.areNotificationsEnabled(
-                            this.getContext(),
-                            NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID
-                    )
+                    mediaType
             );
         }
         if (chatHeadsController != null) {
@@ -260,9 +251,7 @@ public class CallView extends ConstraintLayout {
 
     public void onResume() {
         if (controller != null) {
-            controller.onResume(Settings.canDrawOverlays(this.getContext()),
-                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
-                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID));
+            controller.onResume();
             if (operatorVideoView != null) {
                 operatorVideoView.resumeRendering();
             }

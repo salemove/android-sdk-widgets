@@ -15,8 +15,7 @@ import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.MessagesNotSeenHandler;
-import com.glia.widgets.model.PermissionType;
-import com.glia.widgets.permissions.CheckIfHasPermissionsUseCase;
+import com.glia.widgets.permissions.domain.HasOverlayEnabledUseCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +36,8 @@ public class ChatHeadsController implements
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
     private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
     private final AddQueueTicketsEventsListenerUseCase addQueueTicketsEventsListenerUseCase;
-    private final CheckIfHasPermissionsUseCase checkIfHasPermissionsUseCase;
     private final GetIsMediaQueueingOngoingUseCase getIsMediaQueueingOngoingUseCase;
+    private final HasOverlayEnabledUseCase hasOverlayEnabledUseCase;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
@@ -75,9 +74,9 @@ public class ChatHeadsController implements
             GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase,
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
             AddQueueTicketsEventsListenerUseCase addQueueTicketsEventsListenerUseCase,
-            CheckIfHasPermissionsUseCase checkIfHasPermissionsUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler,
-            GetIsMediaQueueingOngoingUseCase isMediaQueueingOngoingUseCase
+            GetIsMediaQueueingOngoingUseCase isMediaQueueingOngoingUseCase,
+            HasOverlayEnabledUseCase hasOverlayEnabledUseCase
     ) {
         this.chatHeadState = new ChatHeadState.Builder()
                 .setMessageCount(0)
@@ -90,8 +89,8 @@ public class ChatHeadsController implements
         this.gliaOnEngagementEndUseCase = gliaOnEngagementEndUseCase;
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
         this.addQueueTicketsEventsListenerUseCase = addQueueTicketsEventsListenerUseCase;
-        this.checkIfHasPermissionsUseCase = checkIfHasPermissionsUseCase;
         this.getIsMediaQueueingOngoingUseCase = isMediaQueueingOngoingUseCase;
+        this.hasOverlayEnabledUseCase = hasOverlayEnabledUseCase;
     }
 
     public void addListener(OnChatheadSettingsChangedListener listener) {
@@ -121,10 +120,12 @@ public class ChatHeadsController implements
         gliaOnEngagementUseCase.execute(this);
     }
 
-    public void init(boolean enableChatHeads, boolean useOverlays) {
+    public void init(boolean enableChatHeads) {
         Logger.d(TAG, "init");
-        emitViewState(chatHeadState.enableChatHeadsChanged(enableChatHeads));
-        emitViewState(chatHeadState.setUseOverlays(useOverlays));
+        emitViewState(chatHeadState
+                .enableChatHeadsChanged(enableChatHeads)
+                .setUseOverlays(hasOverlayEnabledUseCase.execute())
+        );
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
         addQueueTicketsEventsListenerUseCase.execute(queueTicketsEventsListener);
         handleService();
@@ -132,8 +133,7 @@ public class ChatHeadsController implements
 
     public void onChatBackButtonPressed() {
         Logger.d(TAG, "onChatBackButtonPressed");
-        emitViewState(chatHeadState.onNewMessage(0));
-        emitViewState(chatHeadState.changeVisibility(
+        emitViewState(chatHeadState.onNewMessage(0).changeVisibility(
                 chatHeadState.engagementRequested,
                 Constants.CHAT_ACTIVITY
         ));
@@ -167,6 +167,7 @@ public class ChatHeadsController implements
             boolean enableChatHeads,
             boolean useOverlays
     ) {
+        emitViewState(chatHeadState.setUseOverlays(useOverlays));
         boolean hasOngoingMediaQueueing = getIsMediaQueueingOngoingUseCase.execute();
         Logger.d(TAG, "onNavigatedToChat, hasOngoingMediaQueueing: " + hasOngoingMediaQueueing);
         if (hasOngoingMediaQueueing) {
@@ -183,7 +184,7 @@ public class ChatHeadsController implements
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
-        init(enableChatHeads, useOverlays);
+        init(enableChatHeads);
     }
 
     private void changeVisibilityByMedia() {
@@ -202,21 +203,25 @@ public class ChatHeadsController implements
             boolean enableChatHeads,
             boolean useOverlays) {
         Logger.d(TAG, "onNavigatedToCall");
-        emitViewState(chatHeadState.changeVisibility(
-                false,
-                null
-        ));
+        emitViewState(
+                chatHeadState.changeVisibility(
+                        false,
+                        null)
+                        .setUseOverlays(useOverlays)
+        );
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
         }
-        init(true, useOverlays);
+        init(enableChatHeads);
     }
 
     public void chatEndedByUser() {
         Logger.d(TAG, "chatEndedByUser");
-        emitViewState(chatHeadState.onNewMessage(0));
-        emitViewState(chatHeadState.changeVisibility(false, null));
-        emitViewState(chatHeadState.setOperatorMediaState(null));
+        emitViewState(
+                chatHeadState.onNewMessage(0)
+                        .changeVisibility(false, null).
+                        setOperatorMediaState(null)
+        );
     }
 
     public void addChatHeadServiceListener(ChatHeadServiceListener chatHeadServiceListener) {
@@ -226,7 +231,7 @@ public class ChatHeadsController implements
 
     private void handleService() {
         if (chatHeadState.useOverlays) {
-            if (checkIfHasPermissionsUseCase.execute(PermissionType.OVERLAY)) {
+            if (hasOverlayEnabledUseCase.execute()) {
                 if (!isOverlayServiceStarted()) {
                     chatHeadServiceListener.startService();
                 }
@@ -245,9 +250,12 @@ public class ChatHeadsController implements
     @Override
     public void engagementEnded() {
         Logger.d(TAG, "engagementEnded");
-        emitViewState(chatHeadState.setOperatorMediaState(null));
-        emitViewState(chatHeadState.setOperatorProfileImgUrl(null));
-        emitViewState(chatHeadState.changeEngagementRequested(false));
+        emitViewState(
+                chatHeadState
+                        .setOperatorMediaState(null)
+                        .setOperatorProfileImgUrl(null)
+                        .changeEngagementRequested(false)
+        );
     }
 
     @Override
@@ -310,7 +318,9 @@ public class ChatHeadsController implements
         } catch (Exception e) {
             Logger.d(TAG, "operatorDataLoaded, ex: " + e.toString());
         }
-        emitViewState(chatHeadState.setOperatorProfileImgUrl(operatorProfileImgUrl));
-        emitViewState(chatHeadState.changeEngagementRequested(true));
+        emitViewState(chatHeadState
+                .setOperatorProfileImgUrl(operatorProfileImgUrl)
+                .changeEngagementRequested(true)
+        );
     }
 }

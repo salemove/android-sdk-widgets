@@ -59,14 +59,10 @@ import com.glia.widgets.model.MediaUpgradeOfferRepository;
 import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.model.MessagesNotSeenHandler;
 import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.model.PermissionType;
 import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
-import com.glia.widgets.permissions.ResetPermissionsUseCase;
-import com.glia.widgets.permissions.UpdateDialogShownUseCase;
-import com.glia.widgets.permissions.UpdatePermissionsUseCase;
+import com.glia.widgets.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,10 +162,6 @@ public class ChatController implements
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final GliaQueueForChatEngagementUseCase queueForChatEngagementUseCase;
-    private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
-    private final UpdateDialogShownUseCase updateDialogShownUseCase;
-    private final UpdatePermissionsUseCase updatePermissionsUseCase;
-    private final ResetPermissionsUseCase resetPermissionsUseCase;
     private final OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase;
     private final AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase;
     private final RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase;
@@ -177,6 +169,7 @@ public class ChatController implements
     private final GetFileAttachmentsUseCase getFileAttachmentsUseCase;
     private final RemoveFileAttachmentUseCase removeFileAttachmentUseCase;
     private final IsShowSendButtonUseCase isShowSendButtonUseCase;
+    private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
 
     // pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
@@ -222,17 +215,14 @@ public class ChatController implements
                           GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
                           GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase,
                           GliaEndEngagementUseCase endEngagementUseCase,
-                          CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
-                          UpdateDialogShownUseCase updateDialogShownUseCase,
-                          UpdatePermissionsUseCase updatePermissionsUseCase,
-                          ResetPermissionsUseCase resetPermissionsUseCase,
                           OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase,
                           AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase,
                           AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase,
                           RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
                           GetFileAttachmentsUseCase getFileAttachmentsUseCase,
                           RemoveFileAttachmentUseCase removeFileAttachmentUseCase,
-                          IsShowSendButtonUseCase isShowSendButtonUseCase
+                          IsShowSendButtonUseCase isShowSendButtonUseCase,
+                          IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = viewCallback;
@@ -272,10 +262,6 @@ public class ChatController implements
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
-        this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
-        this.updateDialogShownUseCase = updateDialogShownUseCase;
-        this.updatePermissionsUseCase = updatePermissionsUseCase;
-        this.resetPermissionsUseCase = resetPermissionsUseCase;
         this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
         this.onUpgradeToMediaEngagementUseCase = onUpgradeToMediaEngagementUseCase;
         this.addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase;
@@ -284,6 +270,7 @@ public class ChatController implements
         this.getFileAttachmentsUseCase = getFileAttachmentsUseCase;
         this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
         this.isShowSendButtonUseCase = isShowSendButtonUseCase;
+        this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
     }
 
     public void initChat(String companyName,
@@ -354,7 +341,6 @@ public class ChatController implements
             engagementEndUseCase.unregisterListener(this);
 
             onMessageUseCase.unregisterListener();
-            resetPermissionsUseCase.execute();
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
         }
     }
@@ -515,24 +501,18 @@ public class ChatController implements
         }
     }
 
-    public void onResume(boolean hasOverlaysPermission,
-                         boolean isCallChannelEnabled,
-                         boolean isScreenSharingChannelEnabled) {
-        Logger.d(TAG, "onResume\n" +
-                "hasOverlayPermissions: " + hasOverlaysPermission +
-                ", isCallChannelEnabled:" + isCallChannelEnabled +
-                ", isScreenSharingChannelEnabled: " + isScreenSharingChannelEnabled);
-        updatePermissions(hasOverlaysPermission, isCallChannelEnabled, isScreenSharingChannelEnabled);
-        if (checkIfShowPermissionsDialogUseCase.execute(PermissionType.OVERLAY, true) &&
-                dialogController.isNoDialogShown()) {
+    public void onResume() {
+        Logger.d(TAG, "onResume\n");
+
+        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog();
-            updateDialogShownUseCase.execute(PermissionType.OVERLAY);
         }
     }
 
     public void overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed");
         dialogController.dismissDialogs();
+        emitViewState(chatState);
     }
 
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer offer) {
@@ -1099,19 +1079,10 @@ public class ChatController implements
         dialogController.dismissDialogs();
     }
 
-    public void updatePermissions(boolean hasOverlayPermissions, boolean isCallNotificationChannelEnabled, boolean isScreenSharingNotificationChannelEnabled) {
-        updatePermissionsUseCase.execute(
-                hasOverlayPermissions,
-                isCallNotificationChannelEnabled,
-                isScreenSharingNotificationChannelEnabled
-        );
-    }
-
     public void onQueueTicketReceived(String ticket) {
         Logger.d(TAG, "ticketLoaded");
         emitViewState(chatState.queueTicketSuccess(ticket));
     }
-
 
     public void queueForEngagementStarted() {
         Logger.d(TAG, "queueForEngagementStarted");

@@ -27,7 +27,6 @@ public class ChatHeadView extends ConstraintLayout {
     private ShapeableImageView placeholderView;
     private TextView chatBubbleBadge;
 
-    private final Resources resources;
     private UiTheme theme;
 
     public ChatHeadView(@NonNull Context context) {
@@ -53,8 +52,6 @@ public class ChatHeadView extends ConstraintLayout {
                 defStyleAttr,
                 defStyleRes
         );
-        this.resources = getResources();
-
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
         setupViewAppearance();

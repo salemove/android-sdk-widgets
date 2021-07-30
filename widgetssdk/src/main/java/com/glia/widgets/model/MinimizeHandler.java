@@ -8,7 +8,7 @@ import java.util.List;
 public class MinimizeHandler {
     private final static String TAG = "MinimizeHandler";
 
-    List<OnMinimizeCalledListener> listeners = new ArrayList<>();
+    private final List<OnMinimizeCalledListener> listeners = new ArrayList<>();
 
     public void addListener(OnMinimizeCalledListener listener) {
         Logger.d(TAG, "addListener");

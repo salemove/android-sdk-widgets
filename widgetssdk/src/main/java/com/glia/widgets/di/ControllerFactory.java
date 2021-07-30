@@ -21,7 +21,7 @@ public class ControllerFactory {
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
     private final ChatHeadsController chatHeadsController;
-    private final DialogController dialogController = new DialogController();
+    private final DialogController dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
 
@@ -43,11 +43,16 @@ public class ControllerFactory {
                 useCaseFactory.createOnEngagementEndUseCase(),
                 useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
                 useCaseFactory.createAddQueueTicketsEventsListenerUseCase(),
-                useCaseFactory.createCheckIfHasPermissionsUseCase(),
                 messagesNotSeenHandler,
-                useCaseFactory.createGetIsMediaEngagementOngoingUseCase()
+                useCaseFactory.createGetIsMediaEngagementOngoingUseCase(),
+                useCaseFactory.createHasOverlayEnabledUseCase()
         );
+
         this.useCaseFactory = useCaseFactory;
+        this.dialogController = new DialogController(
+                useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
+                useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
+        );
     }
 
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
@@ -60,9 +65,9 @@ public class ControllerFactory {
                     minimizeHandler,
                     dialogController,
                     messagesNotSeenHandler,
-                    UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    useCaseFactory.createShowAudioCallNotificationUseCase(),
+                    useCaseFactory.createShowVideoCallNotificationUseCase(),
+                    useCaseFactory.createRemoveCallNotificationUseCase(),
                     useCaseFactory.createGliaLoadHistoryUseCase(),
                     useCaseFactory.createQueueForChatEngagementUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
@@ -74,17 +79,14 @@ public class ControllerFactory {
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createGetIsQueueingOngoingUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
-                    useCaseFactory.createUpdateDialogShownUseCase(),
-                    useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase(),
                     useCaseFactory.createOnUpgradeToMediaEngagementUseCase(),
                     useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                     useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                     useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                     useCaseFactory.createGetFileAttachmentsUseCase(),
                     useCaseFactory.createRemoveFileAttachmentUseCase(),
-                    useCaseFactory.createIsShowSendButtonUseCase()
+                    useCaseFactory.createIsShowSendButtonUseCase(),
+                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase()
             );
         }
 
@@ -97,9 +99,9 @@ public class ControllerFactory {
                     minimizeHandler,
                     dialogController,
                     messagesNotSeenHandler,
-                    UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
+                    useCaseFactory.createShowAudioCallNotificationUseCase(),
+                    useCaseFactory.createShowVideoCallNotificationUseCase(),
+                    useCaseFactory.createRemoveCallNotificationUseCase(),
                     useCaseFactory.createGliaLoadHistoryUseCase(),
                     useCaseFactory.createQueueForChatEngagementUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
@@ -111,17 +113,14 @@ public class ControllerFactory {
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createGetIsQueueingOngoingUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
-                    useCaseFactory.createUpdateDialogShownUseCase(),
-                    useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase(),
                     useCaseFactory.createOnUpgradeToMediaEngagementUseCase(),
                     useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                     useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                     useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                     useCaseFactory.createGetFileAttachmentsUseCase(),
                     useCaseFactory.createRemoveFileAttachmentUseCase(),
-                    useCaseFactory.createIsShowSendButtonUseCase()
+                    useCaseFactory.createIsShowSendButtonUseCase(),
+                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -142,13 +141,9 @@ public class ControllerFactory {
                     minimizeHandler,
                     dialogController,
                     messagesNotSeenHandler,
-                    UseCaseFactory.createShowAudioCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createShowVideoCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    UseCaseFactory.createRemoveCallNotificationUseCase(Dependencies.getNotificationManager()),
-                    useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
-                    useCaseFactory.createUpdateDialogShownUseCase(),
-                    useCaseFactory.createUpdatePermissionsUseCase(),
-                    useCaseFactory.createResetPermissionsUseCase(),
+                    useCaseFactory.createShowAudioCallNotificationUseCase(),
+                    useCaseFactory.createShowVideoCallNotificationUseCase(),
+                    useCaseFactory.createRemoveCallNotificationUseCase(),
                     useCaseFactory.createQueueForMediaEngagementUseCase(),
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
@@ -156,7 +151,11 @@ public class ControllerFactory {
                     useCaseFactory.createGliaOnVisitorMediaStateUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createShouldShowMediaEngagementViewUseCase());
+                    useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
+                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
+                    useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
+                    useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase()
+            );
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);
@@ -171,10 +170,9 @@ public class ControllerFactory {
                 retainedScreenSharingController = new ScreenSharingController(
                         repositoryFactory.getGliaScreenSharingRepository(),
                         dialogController,
-                        UseCaseFactory.createShowScreenSharingNotificationUseCase(Dependencies.getNotificationManager()),
-                        UseCaseFactory.createRemoveScreenSharingNotificationUseCase(Dependencies.getNotificationManager()),
-                        useCaseFactory.createCheckIfShowPermissionsDialogUseCase(),
-                        useCaseFactory.createUpdateDialogShownUseCase(),
+                        useCaseFactory.createShowScreenSharingNotificationUseCase(),
+                        useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
+                        useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
                         gliaScreenSharingCallback
                 );
             } else {

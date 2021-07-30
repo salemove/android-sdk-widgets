@@ -59,7 +59,6 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
@@ -253,12 +252,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
             controller.initChat(companyName, queueId, contextUrl);
 
-            controller.updatePermissions(
-                    Settings.canDrawOverlays(this.getContext()),
-                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
-                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
-            );
-
             if (activity instanceof ChatActivity && savedInstanceState == null) {
                 if (chatHeadsController != null) {
                     chatHeadsController.onNavigatedToChat(
@@ -335,9 +328,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
      */
     public void onResume() {
         if (controller != null) {
-            controller.onResume(Settings.canDrawOverlays(this.getContext()),
-                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID),
-                    NotificationManager.areNotificationsEnabled(this.getContext(), NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID));
+            controller.onResume();
             if (screenSharingCallback != null)
                 screenSharingController.setGliaScreenSharingCallback(screenSharingCallback);
         }

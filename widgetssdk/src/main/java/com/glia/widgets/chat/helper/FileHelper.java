@@ -24,7 +24,6 @@ public class FileHelper {
         File imageFile = new File(context.getFilesDir(), attachmentFile.getName());
         Picasso.get()
                 .load(imageFile)
-                .resize(0, 720)
                 .into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -43,7 +42,6 @@ public class FileHelper {
         File imageFile = new File(context.getFilesDir(), imageName);
         Picasso.get()
                 .load(imageFile)
-                .resize(0, 720)
                 .into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {

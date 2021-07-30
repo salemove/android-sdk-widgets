@@ -17,6 +17,7 @@ import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.chat.helper.InAppBitmapCache;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.helper.Logger;
+import com.google.android.material.imageview.ShapeableImageView;
 
 public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
 
@@ -25,7 +26,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
     private Handler mainHandler;
     private Runnable runnable = null;
 
-    private final ImageView imageView;
+    private final ShapeableImageView imageView;
 
     public ImageAttachmentViewHolder(@NonNull View itemView) {
         super(itemView);

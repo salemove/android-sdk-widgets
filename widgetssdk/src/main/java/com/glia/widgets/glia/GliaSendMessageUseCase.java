@@ -51,9 +51,9 @@ public class GliaSendMessageUseCase {
                         .toArray(EngagementFile[]::new);
 
         if (!message.isEmpty()) {
-            chatRepository.sendMessage(message, FilesAttachment.from(engagementFiles), listener);
+            chatRepository.sendMessageWithAttachment(message, FilesAttachment.from(engagementFiles), listener);
         } else {
-            chatRepository.sendMessage(FilesAttachment.from(engagementFiles), listener);
+            chatRepository.sendMessageAttachment(FilesAttachment.from(engagementFiles), listener);
         }
         fileAttachmentRepository.detachFiles(fileAttachments);
     }
@@ -81,7 +81,7 @@ public class GliaSendMessageUseCase {
     }
 
     public void execute(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
-        chatRepository.sendMessage(singleChoiceAttachment, listener);
+        chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener);
     }
 
     private boolean isOperatorOnline() {

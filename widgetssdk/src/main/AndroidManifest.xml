@@ -17,7 +17,7 @@
         <activity
             android:name=".chat.ChatActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".call.CallActivity"
             android:launchMode="singleTask"

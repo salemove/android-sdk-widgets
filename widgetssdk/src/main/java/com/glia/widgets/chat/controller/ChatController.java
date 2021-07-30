@@ -674,7 +674,16 @@ public class ChatController implements
     }
 
     private void appendHistoryMessage(List<ChatItem> currentChatItems, ChatMessage message) {
-        currentChatItems.add(new VisitorMessageItem(VisitorMessageItem.HISTORY_ID, false, message.getContent()));
+        MessageAttachment attachment = message.getAttachment();
+        if (attachment instanceof SingleChoiceAttachment &&
+                ((SingleChoiceAttachment) attachment).getSelectedOption() != null) {
+            Logger.d(TAG, "Not adding singleChoiceAnswer");
+            return;
+        }
+
+        if (message.getContent() != null && !message.getContent().isEmpty()) {
+            currentChatItems.add(new VisitorMessageItem(VisitorMessageItem.HISTORY_ID, false, message.getContent()));
+        }
     }
 
     private void appendMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
@@ -741,11 +750,9 @@ public class ChatController implements
             return;
         }
 
-        if (message.getContent().isEmpty() || message.getContent() == null) {
-            return;
+        if (message.getContent() != null && !message.getContent().isEmpty()) {
+            items.add(new VisitorMessageItem(message.getId(), false, message.getContent()));
         }
-
-        items.add(new VisitorMessageItem(message.getId(), false, message.getContent()));
     }
 
     private void appendMessagesNotSeen() {
@@ -785,7 +792,7 @@ public class ChatController implements
         MessageAttachment attachment = message.getAttachment();
 
         replaceLastChatHeadItem(currentChatItems);
-        addOperatorDownloadableItems(currentChatItems, message, attachment);
+        addOperatorDownloadableItems(currentChatItems, attachment);
         addLastMessageItem(currentChatItems, message, attachment);
     }
 
@@ -818,7 +825,7 @@ public class ChatController implements
         }
     }
 
-    private void addOperatorDownloadableItems(List<ChatItem> currentChatItems, ChatMessage message, MessageAttachment attachment) {
+    private void addOperatorDownloadableItems(List<ChatItem> currentChatItems, MessageAttachment attachment) {
         if (attachment instanceof FilesAttachment) {
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
@@ -853,7 +860,7 @@ public class ChatController implements
         if (!message.getContent().equals("")) {
             currentChatItems.add(new OperatorMessageItem(
                     message.getId(),
-                    null,
+                    chatState.operatorProfileImgUrl,
                     true,
                     message.getContent(),
                     getSingleChoiceAttachmentOptions(attachment),

@@ -20,16 +20,17 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/chat_operator_message_end" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/incoming_image_attachment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="240dp"
+        android:layout_height="155dp"
         android:adjustViewBounds="true"
-        android:cropToPadding="true"
         android:scaleType="fitXY"
+        android:cropToPadding="true"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.CircularBorder"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription"

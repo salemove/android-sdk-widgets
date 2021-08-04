@@ -330,13 +330,6 @@ public class CallController implements
     public void setViewCallback(CallViewCallback callViewCallback) {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = callViewCallback;
-        viewCallback.emitState(callState);
-
-        if (callState.isVideoCall()) {
-            startOperatorVideo(callState.callStatus.getOperatorMediaState());
-            if (callState.is2WayVideoCall())
-                startVisitorVideo(callState.callStatus.getVisitorMediaState());
-        }
         emitViewState(callState.landscapeControlsVisibleChanged(!callState.isVideoCall()));
     }
 
@@ -521,20 +514,6 @@ public class CallController implements
         inactivityTimeCounter.startNew(INACTIVITY_TIMER_DELAY_VALUE, INACTIVITY_TIMER_TICKER_VALUE);
     }
 
-    private void startOperatorVideo(OperatorMediaState operatorMediaState) {
-        if (viewCallback != null) {
-            Logger.d(TAG, "startOperatorVideo");
-            viewCallback.startOperatorVideoView(operatorMediaState);
-        }
-    }
-
-    private void startVisitorVideo(VisitorMediaState visitorMediaState) {
-        if (viewCallback != null) {
-            Logger.d(TAG, "startVisitorVideo");
-            viewCallback.startVisitorVideoView(visitorMediaState);
-        }
-    }
-
     public void notificationsDialogDismissed() {
         dialogController.dismissDialogs();
     }
@@ -571,10 +550,7 @@ public class CallController implements
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
         Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState.toString());
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
-        if (callState.is2WayVideoCall()) {
-            Logger.d(TAG, "newVisitorMediaState: video");
-            startVisitorVideo(callState.callStatus.getVisitorMediaState());
-        }
+        Logger.d(TAG, "newVisitorMediaState- is2WayVideo:" + callState.is2WayVideoCall());
     }
 
     @Override
@@ -623,7 +599,6 @@ public class CallController implements
                 operatorMediaState,
                 formatedTime
         ));
-        startOperatorVideo(operatorMediaState);
         showVideoCallNotificationUseCase.execute();
         connectingTimerCounter.stop();
     }

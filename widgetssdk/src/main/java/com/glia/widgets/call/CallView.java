@@ -44,7 +44,6 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
@@ -364,11 +363,8 @@ public class CallView extends ConstraintLayout {
                     callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.isCallOngoig() ? VISIBLE : GONE);
                     continueBrowsingView.setVisibility(callState.isCallOngoig() || callState.isCallNotOngoing() ? VISIBLE : GONE);
-                    operatorVideoContainer.setVisibility(callState.isVideoCall() &&
-                            callState.callStatus.getOperatorMediaState().getVideo().getStatus() ==
-                                    Media.Status.PLAYING ?
-                            VISIBLE : GONE);
-                    visitorVideoContainer.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
+                    handleOperatorVideoState(callState);
+                    handleVisitorVideoState(callState);
                     handleControlsVisibility(callState);
                     onIsSpeakerOnStateChanged(callState.isSpeakerOn);
                     if (callState.isVisible) {
@@ -384,16 +380,6 @@ public class CallView extends ConstraintLayout {
                 if (onNavigateToChatListener != null) {
                     onNavigateToChatListener.call();
                 }
-            }
-
-            @Override
-            public void startOperatorVideoView(MediaState operatorMediaState) {
-                post(() -> showOperatorVideo(operatorMediaState));
-            }
-
-            @Override
-            public void startVisitorVideoView(MediaState visitorMediaState) {
-                post(() -> showVisitorVideo(visitorMediaState));
             }
         };
 
@@ -442,6 +428,26 @@ public class CallView extends ConstraintLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void handleVisitorVideoState(CallState state) {
+        if (state.is2WayVideoCallAndVisitorVideoIsConnected() && visitorVideoContainer.getVisibility() == GONE) {
+            visitorVideoContainer.setVisibility(VISIBLE);
+            showVisitorVideo(state.callStatus.getVisitorMediaState());
+        } else if (!state.is2WayVideoCall() && visitorVideoContainer.getVisibility() == VISIBLE) {
+            visitorVideoContainer.setVisibility(GONE);
+            hideVisitorVideo();
+        }
+    }
+
+    private void handleOperatorVideoState(CallState state) {
+        if (state.isVideoCallAndOperatorVideoIsConnected() && operatorVideoContainer.getVisibility() == GONE) {
+            operatorVideoContainer.setVisibility(VISIBLE);
+            showOperatorVideo(state.callStatus.getOperatorMediaState());
+        } else if (!state.isVideoCall() && operatorVideoContainer.getVisibility() == VISIBLE) {
+            operatorVideoContainer.setVisibility(GONE);
+            hideOperatorVideo();
+        }
     }
 
     private void onIsSpeakerOnStateChanged(boolean isSpeakerOn) {

@@ -1,5 +1,6 @@
 package com.glia.widgets.core.operator;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -28,22 +29,15 @@ public class GliaOperatorMediaRepository {
         if (operatorMediaState != null) listener.onNewState(operatorMediaState);
     }
 
-    public void startListening() {
-        Glia.getCurrentEngagement()
-                .ifPresent(engagement ->
-                        engagement.getMedia()
-                                .on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer)
-                );
+    public void startListening(Engagement engagement) {
+        engagement.getMedia()
+                .on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
-    public void stopListening() {
+    public void stopListening(Engagement engagement) {
         operatorMediaState = null;
         eventListeners.clear();
-        Glia.getCurrentEngagement()
-                .ifPresent(engagement ->
-                        engagement.getMedia()
-                                .off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer)
-                );
+        engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
     public boolean isOperatorMediaState() {

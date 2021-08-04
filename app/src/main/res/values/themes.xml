@@ -4,14 +4,14 @@
     <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
-        <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button
-        </item>
+        <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button</item>
     </style>
 
-    <!--        example usage of compile time styling-->
-    <!--style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar"-->
+    <!-- Must be included for dialog styling -->
+    <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- example usage of compile time styling -->
         <!--item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item -->
-    <!--/style-->
+    </style>
 
     <style name="Theme.GliaAndroidSdkWidgetsExample.Chat" parent="Application.Glia.Chat">
         <item name="materialThemeOverlay">@style/ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat

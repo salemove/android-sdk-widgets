@@ -217,7 +217,10 @@ public class UseCaseFactory {
     }
 
     public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
-        return new AddFileToAttachmentAndUploadUseCase(repositoryFactory.getGliaFileAttachmentRepository());
+        return new AddFileToAttachmentAndUploadUseCase(
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaFileAttachmentRepository()
+        );
     }
 
     public GetFileAttachmentsUseCase createGetFileAttachmentsUseCase() {

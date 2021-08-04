@@ -2,9 +2,12 @@ package com.glia.widgets.fileupload;
 
 import android.net.Uri;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.engagement.EngagementFile;
+import com.glia.widgets.core.engagement.exception.EngagementMissingException;
+import com.glia.widgets.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.fileupload.model.FileAttachment;
 
 import java.util.ArrayList;
@@ -15,6 +18,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileAttachmentRepository {
+    public long getAttachedFilesCount() {
+        return observable
+                .fileAttachments
+                .size();
+    }
+
     private static class ObservableFileAttachmentList extends Observable {
         public List<FileAttachment> fileAttachments = new ArrayList<>();
 
@@ -41,24 +50,33 @@ public class FileAttachmentRepository {
                 ).collect(Collectors.toList()));
     }
 
-    public void uploadFile(Uri uri) {
-        if (Glia.getCurrentEngagement().isPresent()) {
-            Glia.getCurrentEngagement()
-                    .ifPresent(engagement ->
-                            engagement.uploadFile(uri, (engagementFile, e) -> {
-                                if (engagementFile != null) {
-                                    onEngagementFileReceived(uri, engagementFile);
-                                } else if (e != null) {
-                                    onUploadFileError(uri, e);
-                                }
-                            })
-                    );
+    public void uploadFile(Uri uri, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        Engagement engagement = Glia.getCurrentEngagement().orElse(null);
+        if (engagement != null) {
+            engagement.uploadFile(uri, (engagementFile, e) -> {
+                if (engagementFile != null) {
+                    onEngagementFileReceived(uri, engagementFile);
+                    listener.onSuccess();
+                } else if (e != null) {
+                    onUploadFileError(uri, e);
+                    listener.onError(e);
+                }
+            });
         } else {
             setFileAttachmentEngagementMissing(uri);
+            listener.onError(new EngagementMissingException());
         }
     }
 
-    private void setFileAttachmentEngagementMissing(Uri uri) {
+    public void setSupportedFileAttachmentCountExceeded(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED) : fileAttachment
+                ).collect(Collectors.toList()));
+    }
+
+    public void setFileAttachmentEngagementMissing(Uri uri) {
         observable.notifyUpdate(observable.fileAttachments
                 .stream()
                 .map(fileAttachment ->

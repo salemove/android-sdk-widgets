@@ -1121,7 +1121,12 @@ public class ChatController implements
                 .execute(uri, new AddFileToAttachmentAndUploadUseCase.Listener() {
                     @Override
                     public void onSuccess() {
-                        System.out.println("Success");
+                        Logger.d(TAG, "fileUploadSuccess");
+                    }
+
+                    @Override
+                    public void onStarted() {
+                        Logger.d(TAG, "fileUploadStarted");
                     }
 
                     @Override

@@ -330,6 +330,7 @@ public class CallController implements
     public void setViewCallback(CallViewCallback callViewCallback) {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = callViewCallback;
+        viewCallback.emitState(callState);
         emitViewState(callState.landscapeControlsVisibleChanged(!callState.isVideoCall()));
     }
 

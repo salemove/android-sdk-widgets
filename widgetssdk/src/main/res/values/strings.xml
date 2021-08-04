@@ -10,6 +10,10 @@
     <string name="chat_upgraded_to_video_call">Upgraded to Video call</string>
     <string name="chat_single_choice_card_hint">Tap on the answer above</string>
     <string name="chat_not_started_hint">Enter message to start a new engagement</string>
+    <string name="chat_file_download_success_message">File is downloaded successfully.</string>
+    <string name="chat_file_download_fail_message">"File download is failed."</string>
+    <string name="chat_file_open_file_title">"Open File"</string>
+    <string name="chat_file_download_failed_msg">Unable to download the file at the moment, please try again later.</string>
 
     <!--    top app bar-->
     <string name="top_app_bar_close">Close</string>
@@ -71,5 +75,33 @@
     <string name="notification_video_call_title">Video call ongoing</string>
     <string name="notification_video_call_message">Operator might see and hear You</string>
     <string name="notification_action_end_sharing">END SHARING</string>
+
+    <string name="chat_attachment_upload_checking_file">Checking File…</string>
+    <string name="chat_attachment_upload_ready_to_send">Ready to send</string>
+    <string name="chat_attachment_upload_failed_upload">Upload failed</string>
+    <string name="chat_attachment_upload_uploading">Uploading File…</string>
+    <string name="chat_attachment_upload_error_network_time_out">Nework time out</string>
+    <string name="chat_attachment_upload_error_invalid_input">Invalid input</string>
+    <string name="chat_attachment_upload_error_read_access_permissions_denied">File read access permission denied</string>
+    <string name="chat_attachment_upload_error_file_type_invalid">Invalid file type</string>
+    <string name="chat_attachment_upload_error_file_size_over_limit">File size over 25mb limit</string>
+    <string name="chat_attachment_upload_error_engagement_missing">Engagement missing</string>
+    <string name="chat_attachment_upload_error_file_count_limit_reached">Cannot upload more than 25 files</string>
+    <string name="chat_attachment_upload_error_internal_error">Internal error</string>
+    <string name="chat_attachment_upload_menu_browse">Browse</string>
+    <string name="chat_attachment_upload_menu_take_photo">Take Photo</string>
+    <string name="chat_attachment_upload_menu_gallery">Photo library</string>
+    <string name="chat_attachment_download_button_label">Download</string>
+    <string name="chat_attachment_open_button_label">Open</string>
+    <string name="chat_attachment_downloading_label">Downloading file…</string>
+
+    <!--FilePreviewActivity-->
+    <string name="preview_activity_preview_failed_msg">Unable to preview image at the moment, please try again later.</string>
+    <string name="preview_activity_image_save_success_msg">Image is saved successfully.</string>
+    <string name="preview_activity_image_save_fail_msg">Failed to save image.</string>
+    <string name="preview_activity_image_share_fail_msg">Unable to share the image at the moment, please try again later.</string>
+    <string name="preview_activity_image_share_title">Share Image</string>
+    <string name="preview_activity_toolbar_title">Preview</string>
+    <string name="preview_activity_img_fetch_fail_msg">Unable to fetch image at the moment, please try again later.</string>
 
 </resources>

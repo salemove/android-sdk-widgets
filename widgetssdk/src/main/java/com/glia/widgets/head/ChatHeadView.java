@@ -27,7 +27,6 @@ public class ChatHeadView extends ConstraintLayout {
     private ShapeableImageView placeholderView;
     private TextView chatBubbleBadge;
 
-    private final Resources resources;
     private UiTheme theme;
 
     public ChatHeadView(@NonNull Context context) {
@@ -53,8 +52,6 @@ public class ChatHeadView extends ConstraintLayout {
                 defStyleAttr,
                 defStyleRes
         );
-        this.resources = getResources();
-
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
         setupViewAppearance();
@@ -102,7 +99,7 @@ public class ChatHeadView extends ConstraintLayout {
         post(() -> {
             if (placeholderView != null && profilePictureView != null) {
                 if (operatorProfileImgUrl != null) {
-                    Picasso.with(this.getContext()).load(operatorProfileImgUrl).into(profilePictureView);
+                    Picasso.get().load(operatorProfileImgUrl).into(profilePictureView);
                     placeholderView.setVisibility(View.GONE);
                 } else {
                     int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());

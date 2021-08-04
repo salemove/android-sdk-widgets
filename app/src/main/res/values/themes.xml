@@ -4,18 +4,21 @@
     <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
-        <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button
-        </item>
-        <!--        example usage of compile time styling-->
-        <!--        <item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item>-->
+        <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button</item>
+    </style>
+
+    <!-- Must be included for dialog styling -->
+    <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- example usage of compile time styling -->
+        <!--item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item -->
     </style>
 
     <style name="Theme.GliaAndroidSdkWidgetsExample.Chat" parent="Application.Glia.Chat">
-        <item name="materialThemeOverlay">@style/ThemeOVerlay.GliaAndroidSDKWidgetsExample.Chat
+        <item name="materialThemeOverlay">@style/ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat
         </item>
     </style>
 
-    <style name="ThemeOVerlay.GliaAndroidSDKWidgetsExample.Chat" parent="ThemeOverlay.Glia.Chat">
+    <style name="ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat" parent="ThemeOverlay.Glia.Chat">
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_person</item>
     </style>

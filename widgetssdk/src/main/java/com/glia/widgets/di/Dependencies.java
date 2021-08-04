@@ -7,9 +7,10 @@ import com.glia.widgets.Constants;
 import com.glia.widgets.head.ChatHeadService;
 import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.model.PermissionsManager;
+import com.glia.widgets.dialog.PermissionDialogManager;
 import com.glia.widgets.notification.device.INotificationManager;
 import com.glia.widgets.notification.device.NotificationManager;
+import com.glia.widgets.permissions.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +24,14 @@ public class Dependencies {
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
-
         RepositoryFactory repositoryFactory = new RepositoryFactory();
         UseCaseFactory useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
-                new PermissionsManager(),
+                new PermissionManager(application),
+                new PermissionDialogManager(application),
                 notificationManager
         );
-        
+
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
         controllerFactory.getChatHeadsController().addChatHeadServiceListener(
                 new ChatHeadsController.ChatHeadServiceListener() {

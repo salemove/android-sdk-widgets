@@ -26,7 +26,7 @@ public class ChatFragment extends Fragment {
         navController.popBackStack();
     };
     private ChatView.OnEndListener onEndListener = () -> navController.popBackStack();
-    private NavController.OnDestinationChangedListener onDestinationChangedListener =
+    private final NavController.OnDestinationChangedListener onDestinationChangedListener =
             (controller, destination, arguments) -> {
                 if (destination.getId() == R.id.main_fragment && chatView != null) {
                     chatView.backPressed();

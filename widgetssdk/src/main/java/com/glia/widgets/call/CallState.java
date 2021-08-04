@@ -3,6 +3,7 @@ package com.glia.widgets.call;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
+import com.glia.androidsdk.comms.Video;
 import com.glia.androidsdk.comms.VisitorMediaState;
 
 import java.util.Objects;
@@ -70,9 +71,35 @@ class CallState {
     }
 
     public boolean is2WayVideoCall() {
-        return callStatus instanceof CallStatus.StartedVideoCall &&
-                callStatus.getVisitorMediaState() != null &&
+        return callStatus instanceof CallStatus.StartedVideoCall && isVisitorVideoAvailable();
+    }
+
+    private boolean isVisitorVideoAvailable() {
+        return callStatus.getVisitorMediaState() != null &&
                 callStatus.getVisitorMediaState().getVideo() != null;
+    }
+
+    public boolean is2WayVideoCallAndVisitorVideoIsConnected() {
+        if (is2WayVideoCall()) {
+            Video visitorVideo = callStatus.getVisitorMediaState().getVideo();
+            return visitorVideo.getStatus() == Media.Status.PLAYING || visitorVideo.getStatus() == Media.Status.PAUSED;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isOperatorVideoAvailable() {
+        return callStatus.getOperatorMediaState() != null &&
+                callStatus.getOperatorMediaState().getVideo() != null;
+    }
+
+    public boolean isVideoCallAndOperatorVideoIsConnected() {
+        if (isVideoCall() && isOperatorVideoAvailable()) {
+            Video operatorVideo = callStatus.getOperatorMediaState().getVideo();
+            return operatorVideo.getStatus() == Media.Status.PLAYING || operatorVideo.getStatus() == Media.Status.PAUSED;
+        } else {
+            return false;
+        }
     }
 
     public boolean isAudioCall() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Application.Glia.Call.Activity" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>

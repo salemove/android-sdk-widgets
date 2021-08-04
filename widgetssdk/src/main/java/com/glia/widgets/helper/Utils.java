@@ -6,6 +6,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
@@ -21,8 +22,13 @@ import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.model.ChatHeadInput;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
 public class Utils {
     public static float pxFromDp(final Context context, final float dp) {
@@ -38,6 +44,7 @@ public class Utils {
     }
 
     public static String formatOperatorName(String operatorName) {
+        if (operatorName == null) return "";
         int i = operatorName.indexOf(' ');
         if (i != -1) {
             return operatorName.substring(0, i);
@@ -413,5 +420,29 @@ public class Utils {
         newIntent.putExtra(GliaWidgets.UI_THEME, chatHeadInput.uiTheme);
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return newIntent;
+    }
+
+    public static File createTempPhotoFile(Context context) throws IOException {
+        File directoryStorage = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        directoryStorage.deleteOnExit();
+        return File.createTempFile(generatePhotoFileName(), ".jpg", directoryStorage);
+    }
+
+    private static String generatePhotoFileName() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss_", Locale.getDefault());
+        Date date = new Date(System.currentTimeMillis());
+        return "IMG_" + formatter.format(date);
+    }
+
+    public static Optional<String> getExtensionByStringHandling(String filename) {
+        return Optional.ofNullable(filename)
+                .filter(f -> f.contains("."))
+                .map(f -> f.substring(filename.lastIndexOf(".") + 1).toUpperCase());
+    }
+
+    public static boolean compareStringWithTrim(String a, String b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.trim().equals(b.trim());
     }
 }

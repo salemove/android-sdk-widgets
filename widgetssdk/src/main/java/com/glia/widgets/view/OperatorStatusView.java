@@ -127,7 +127,7 @@ public class OperatorStatusView extends ConstraintLayout {
     }
 
     private void showProfilePictureView(String profileImgUrl) {
-        Picasso.with(this.getContext()).load(profileImgUrl).into(profilePictureView);
+        Picasso.get().load(profileImgUrl).into(profilePictureView);
         placeholderView.setVisibility(GONE);
     }
 

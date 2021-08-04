@@ -3,15 +3,23 @@
     package="com.glia.widgets">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.CAMERA"
+        android:required="true" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application>
+        <activity
+            android:name=".chat.FilePreviewActivity"
+            android:exported="true"
+            android:launchMode="singleTop" />
 
         <activity
             android:name=".chat.ChatActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:theme="@style/Application.Glia.Chat.Activity"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".call.CallActivity"
@@ -19,7 +27,7 @@
             android:theme="@style/Application.Glia.Call.Activity" />
 
         <service
-            android:name="com.glia.widgets.head.ChatHeadService"
+            android:name=".head.ChatHeadService"
             android:enabled="true"
             android:stopWithTask="true" />
 
@@ -36,6 +44,15 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.glia.widgets.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider" />
+        </provider>
     </application>
 
 </manifest>

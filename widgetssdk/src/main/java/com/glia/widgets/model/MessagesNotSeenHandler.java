@@ -2,9 +2,7 @@ package com.glia.widgets.model;
 
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.glia.GliaOnEngagementEndUseCase;
-import com.glia.widgets.glia.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.glia.GliaOnMessageUseCase;
 import com.glia.widgets.helper.Logger;
 

@@ -7,11 +7,9 @@ import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.GliaScreenSharingRepository;
-import com.glia.widgets.model.PermissionType;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.notification.domain.ShowScreenSharingNotificationUseCase;
-import com.glia.widgets.permissions.CheckIfShowPermissionsDialogUseCase;
-import com.glia.widgets.permissions.UpdateDialogShownUseCase;
+import com.glia.widgets.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
 
 public class ScreenSharingController {
     private static final String TAG = "GliaScreenSharingController";
@@ -19,8 +17,7 @@ public class ScreenSharingController {
     private final DialogController dialogController;
     private final ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private final RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
-    private final CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase;
-    private final UpdateDialogShownUseCase updateDialogShownUseCase;
+    private final HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase;
 
     private boolean hasPendingScreenSharingRequest = false;
 
@@ -31,8 +28,7 @@ public class ScreenSharingController {
             DialogController gliaDialogController,
             ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase,
             RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase,
-            CheckIfShowPermissionsDialogUseCase checkIfShowPermissionsDialogUseCase,
-            UpdateDialogShownUseCase updateDialogShownUseCase,
+            HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase,
             ViewCallback callback
     ) {
         Logger.d(TAG, "init");
@@ -40,8 +36,7 @@ public class ScreenSharingController {
         dialogController = gliaDialogController;
         this.showScreenSharingNotificationUseCase = showScreenSharingNotificationUseCase;
         this.removeScreenSharingNotificationUseCase = removeScreenSharingNotificationUseCase;
-        this.checkIfShowPermissionsDialogUseCase = checkIfShowPermissionsDialogUseCase;
-        this.updateDialogShownUseCase = updateDialogShownUseCase;
+        this.hasScreenSharingNotificationChannelEnabledUseCase = hasScreenSharingNotificationChannelEnabledUseCase;
         viewCallback = callback;
         initControllerCallback();
     }
@@ -51,12 +46,9 @@ public class ScreenSharingController {
             @Override
             public void onScreenSharingRequest() {
                 if (viewCallback != null) {
-                    if (checkIfShowPermissionsDialogUseCase.execute(
-                            PermissionType.SCREEN_SHARING_CHANNEL, false)
-                    ) {
+                    if (!hasScreenSharingNotificationChannelEnabledUseCase.execute()) {
                         hasPendingScreenSharingRequest = true;
                         dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog();
-                        updateDialogShownUseCase.execute(PermissionType.SCREEN_SHARING_CHANNEL);
                     } else {
                         dialogController.showStartScreenSharingDialog();
                     }
@@ -119,10 +111,8 @@ public class ScreenSharingController {
     public void onResume(Context context) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
-            boolean showDialog = checkIfShowPermissionsDialogUseCase
-                    .execute(PermissionType.SCREEN_SHARING_CHANNEL, false);
-            if (showDialog && dialogController.isNoDialogShown()) {
-                dialogController.showEnableNotificationChannelDialog();
+            if (!hasScreenSharingNotificationChannelEnabledUseCase.execute()) {
+                dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog();
             } else {
                 onScreenSharingAccepted(context);
             }

@@ -11,7 +11,7 @@
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.glia.widgets.chat.ChatRecyclerView
         android:id="@+id/chat_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -42,9 +42,9 @@
                 android:id="@+id/new_messages_indicator_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:clipChildren="true"
                 app:imageSize="@dimen/chat_new_messages_image_size"
-                android:layout_gravity="center"
                 app:srcCompat="?attr/gliaIconPlaceholder" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -63,6 +63,15 @@
 
     </RelativeLayout>
 
+    <com.glia.widgets.chat.FileUploadMenuView
+        android:id="@+id/add_attachment_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="21dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/divider_view"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <View
         android:id="@+id/divider_view"
         android:layout_width="match_parent"
@@ -71,13 +80,25 @@
         android:background="?attr/gliaBaseNormalColor"
         app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/add_attachment_queue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="216dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider_view"
+        tools:itemCount="6"
+        tools:listitem="@layout/chat_attachment_uploaded_item" />
+
     <LinearLayout
         android:id="@+id/chat_message_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_view">
+        app:layout_constraintTop_toBottomOf="@id/add_attachment_queue">
 
         <EditText
             android:id="@+id/chat_edit_text"
@@ -93,6 +114,18 @@
             android:importantForAutofill="no"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor" />
+
+        <ImageButton
+            android:id="@+id/add_attachment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/chat_send_content_description"
+            android:paddingVertical="@dimen/large"
+            android:paddingStart="@dimen/medium"
+            android:paddingEnd="@dimen/large"
+            android:src="@drawable/ic_add_attachment" />
 
         <ImageButton
             android:id="@+id/send_button"

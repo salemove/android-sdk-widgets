@@ -1,7 +1,6 @@
 package com.glia.widgets.notification.device;
 
 import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +23,6 @@ public class NotificationManager implements INotificationManager {
     private final android.app.NotificationManager notificationManager;
     private final static String TAG = "NotificationManager";
 
-    private Notification callNotification;
 
     public NotificationManager(Application application) {
         this.applicationContext = application;
@@ -62,23 +60,19 @@ public class NotificationManager implements INotificationManager {
     @Override
     public void showAudioCallNotification() {
         if (areNotificationsEnabled(applicationContext, NOTIFICATION_CALL_CHANNEL_ID)) {
-            callNotification = NotificationFactory.createCallStartedNotification(applicationContext);
-            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, callNotification);
+            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, NotificationFactory.createCallStartedNotification(applicationContext));
         }
     }
 
     @Override
     public void removeCallNotification() {
-        if (callNotification != null) {
-            notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID);
-        }
+        notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID);
     }
 
     @Override
     public void showVideoCallNotification() {
         if (areNotificationsEnabled(applicationContext, NOTIFICATION_CALL_CHANNEL_ID)) {
-            callNotification = NotificationFactory.createVideoCallStartedNotification(applicationContext);
-            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, callNotification);
+            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, NotificationFactory.createVideoCallStartedNotification(applicationContext));
         }
     }
 

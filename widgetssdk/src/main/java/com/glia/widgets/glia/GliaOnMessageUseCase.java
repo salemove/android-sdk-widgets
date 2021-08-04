@@ -2,6 +2,7 @@ package com.glia.widgets.glia;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.model.GliaChatRepository;
 
 public class GliaOnMessageUseCase implements
@@ -29,8 +30,8 @@ public class GliaOnMessageUseCase implements
         this.onEngagementUseCase.execute(this);
     }
 
-    public void unregisterListener(Listener listener) {
-        if (this.listener == listener) {
+    public void unregisterListener() {
+        if (this.listener != null) {
             messageRepository.unregisterMessageListener(this);
             onEngagementUseCase.unregisterListener(this);
             this.listener = null;

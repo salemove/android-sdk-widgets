@@ -38,7 +38,7 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
         if (this.listener != null) {
             listener.newEngagementLoaded(engagement);
         }
-        operatorMediaRepository.startListening();
+        operatorMediaRepository.startListening(engagement);
         gliaQueueRepository.onEngagementStarted();
     }
 

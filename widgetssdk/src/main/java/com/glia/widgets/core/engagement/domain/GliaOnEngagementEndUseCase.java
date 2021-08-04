@@ -1,5 +1,6 @@
 package com.glia.widgets.core.engagement.domain;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
@@ -8,8 +9,7 @@ import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
 
 public class GliaOnEngagementEndUseCase implements
-        GliaOnEngagementUseCase.Listener,
-        Runnable {
+        GliaOnEngagementUseCase.Listener {
 
     public interface Listener {
         void engagementEnded();
@@ -23,6 +23,28 @@ public class GliaOnEngagementEndUseCase implements
     private final GliaOperatorMediaRepository operatorMediaRepository;
 
     private Listener listener;
+
+    private class EndEngagementRunnable implements Runnable {
+        private final Engagement engagement;
+
+        public EndEngagementRunnable(Engagement engagement) {
+            this.engagement = engagement;
+        }
+
+        @Override
+        public void run() {
+            if (listener != null) {
+                listener.engagementEnded();
+            }
+            gliaQueueRepository.cleanOnEngagementEnd();
+            operatorMediaRepository.stopListening(engagement);
+            repository.clearEngagementType();
+            removeScreenSharingNotificationUseCase.execute();
+            removeCallNotificationUseCase.execute();
+        }
+    }
+
+    private EndEngagementRunnable endEngagementRunnable = null;
 
     public GliaOnEngagementEndUseCase(
             GliaEngagementRepository repository,
@@ -47,26 +69,16 @@ public class GliaOnEngagementEndUseCase implements
 
     public void unregisterListener(Listener listener) {
         if (this.listener == listener) {
-            repository.unregisterEngagementEndListener(this);
+            repository.unregisterEngagementEndListener(endEngagementRunnable);
             engagementUseCase.unregisterListener(this);
+            endEngagementRunnable = null;
             this.listener = null;
         }
     }
 
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
-        repository.listenForEngagementEnd(engagement, this);
-    }
-
-    @Override
-    public void run() {
-        if (this.listener != null) {
-            listener.engagementEnded();
-        }
-        gliaQueueRepository.cleanOnEngagementEnd();
-        operatorMediaRepository.stopListening();
-        repository.clearEngagementType();
-        removeScreenSharingNotificationUseCase.execute();
-        removeCallNotificationUseCase.execute();
+        endEngagementRunnable = new EndEngagementRunnable(engagement);
+        repository.listenForEngagementEnd(engagement, endEngagementRunnable);
     }
 }

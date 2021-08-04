@@ -550,9 +550,7 @@ public class CallController implements
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
         Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState.toString());
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
-        if (callState.is2WayVideoCall()) {
-            Logger.d(TAG, "newVisitorMediaState: video");
-        }
+        Logger.d(TAG, "newVisitorMediaState- is2WayVideo:" + callState.is2WayVideoCall());
     }
 
     @Override

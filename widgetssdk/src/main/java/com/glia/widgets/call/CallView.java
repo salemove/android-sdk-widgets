@@ -44,7 +44,6 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.model.ChatHeadInput;
 import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.notification.NotificationFactory;
 import com.glia.widgets.notification.device.NotificationManager;
 import com.glia.widgets.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
@@ -364,8 +363,8 @@ public class CallView extends ConstraintLayout {
                     callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.isCallOngoig() ? VISIBLE : GONE);
                     continueBrowsingView.setVisibility(callState.isCallOngoig() || callState.isCallNotOngoing() ? VISIBLE : GONE);
-                    shouldShowOperatorVideo(callState);
-                    shouldShowVisitorVideo(callState);
+                    handleOperatorVideoState(callState);
+                    handleVisitorVideoState(callState);
                     handleControlsVisibility(callState);
                     onIsSpeakerOnStateChanged(callState.isSpeakerOn);
                     if (callState.isVisible) {
@@ -431,35 +430,21 @@ public class CallView extends ConstraintLayout {
                 .getScreenSharingController(screenSharingCallback);
     }
 
-    private void shouldShowVisitorVideo(CallState state) {
-        if (
-                state.is2WayVideoCall() &&
-                        state.callStatus
-                                .getVisitorMediaState()
-                                .getVideo()
-                                .getStatus() == Media.Status.PLAYING &&
-                        visitorVideoContainer.getVisibility() == GONE
-        ) {
+    private void handleVisitorVideoState(CallState state) {
+        if (state.is2WayVideoCallAndVisitorVideoIsConnected() && visitorVideoContainer.getVisibility() == GONE) {
             visitorVideoContainer.setVisibility(VISIBLE);
             showVisitorVideo(state.callStatus.getVisitorMediaState());
-        }
-        if (!state.is2WayVideoCall() && visitorVideoContainer.getVisibility() == VISIBLE) {
+        } else if (!state.is2WayVideoCall() && visitorVideoContainer.getVisibility() == VISIBLE) {
             visitorVideoContainer.setVisibility(GONE);
             hideVisitorVideo();
         }
     }
 
-    private void shouldShowOperatorVideo(CallState state) {
-        if (
-                state.isVideoCall() && operatorVideoContainer.getVisibility() == GONE &&
-                        state.callStatus.getOperatorMediaState() != null &&
-                        state.callStatus.getOperatorMediaState().getVideo() != null &&
-                        state.callStatus.getOperatorMediaState().getVideo().getStatus() == Media.Status.PLAYING
-        ) {
+    private void handleOperatorVideoState(CallState state) {
+        if (state.isVideoCallAndOperatorVideoIsConnected() && operatorVideoContainer.getVisibility() == GONE) {
             operatorVideoContainer.setVisibility(VISIBLE);
             showOperatorVideo(state.callStatus.getOperatorMediaState());
-        }
-        if (!state.isVideoCall() && operatorVideoContainer.getVisibility() == VISIBLE) {
+        } else if (!state.isVideoCall() && operatorVideoContainer.getVisibility() == VISIBLE) {
             operatorVideoContainer.setVisibility(GONE);
             hideOperatorVideo();
         }

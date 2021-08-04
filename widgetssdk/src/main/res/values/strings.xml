@@ -86,6 +86,7 @@
     <string name="chat_attachment_upload_error_file_type_invalid">Invalid file type</string>
     <string name="chat_attachment_upload_error_file_size_over_limit">File size over 25mb limit</string>
     <string name="chat_attachment_upload_error_engagement_missing">Engagement missing</string>
+    <string name="chat_attachment_upload_error_file_count_limit_reached">Cannot upload more than 25 files</string>
     <string name="chat_attachment_upload_error_internal_error">Internal error</string>
     <string name="chat_attachment_upload_menu_browse">Browse</string>
     <string name="chat_attachment_upload_menu_take_photo">Take Photo</string>

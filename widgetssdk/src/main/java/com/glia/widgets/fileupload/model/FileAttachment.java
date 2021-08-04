@@ -63,6 +63,8 @@ final public class FileAttachment {
         ERROR_FORMAT_UNSUPPORTED,
         ERROR_FILE_TOO_LARGE,
         ERROR_ENGAGEMENT_MISSING,
-        ERROR_UNKNOWN
+        ERROR_UNKNOWN,
+
+        ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED
     }
 }

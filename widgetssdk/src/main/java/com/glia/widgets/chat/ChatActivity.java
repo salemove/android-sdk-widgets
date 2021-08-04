@@ -47,9 +47,7 @@ public class ChatActivity extends AppCompatActivity {
         useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
 
         chatView = findViewById(R.id.chat_view);
-        if (runtimeTheme != null) {
-            chatView.setTheme(runtimeTheme);
-        }
+        chatView.setTheme(runtimeTheme);
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnNavigateToCallListener(onNavigateToCallListener);

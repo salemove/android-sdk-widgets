@@ -14,10 +14,13 @@
             android:name=".chat.FilePreviewActivity"
             android:exported="true"
             android:launchMode="singleTop" />
+
         <activity
             android:name=".chat.ChatActivity"
             android:launchMode="singleTask"
+            android:theme="@style/Application.Glia.Chat.Activity"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".call.CallActivity"
             android:launchMode="singleTask"

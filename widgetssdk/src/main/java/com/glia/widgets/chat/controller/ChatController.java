@@ -1132,7 +1132,7 @@ public class ChatController implements
 
                     @Override
                     public void onError(Exception ex) {
-                        ex.printStackTrace();
+                        Logger.e(TAG, "Upload file failed: " + ex.getMessage());
                     }
 
                     @Override

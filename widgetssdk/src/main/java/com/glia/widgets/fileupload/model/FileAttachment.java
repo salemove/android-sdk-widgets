@@ -64,6 +64,7 @@ final public class FileAttachment {
         ERROR_FILE_TOO_LARGE,
         ERROR_ENGAGEMENT_MISSING,
         ERROR_UNKNOWN,
+        ERROR_SECURITY_SCAN_FAILED,
 
         ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED
     }

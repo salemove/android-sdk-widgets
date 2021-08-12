@@ -16,6 +16,7 @@ import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
+import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
@@ -1120,8 +1121,8 @@ public class ChatController implements
         addFileToAttachmentAndUploadUseCase
                 .execute(uri, new AddFileToAttachmentAndUploadUseCase.Listener() {
                     @Override
-                    public void onSuccess() {
-                        Logger.d(TAG, "fileUploadSuccess");
+                    public void onFinished() {
+                        Logger.d(TAG, "fileUploadFinished");
                     }
 
                     @Override
@@ -1132,6 +1133,16 @@ public class ChatController implements
                     @Override
                     public void onError(Exception ex) {
                         ex.printStackTrace();
+                    }
+
+                    @Override
+                    public void onSecurityCheckStarted() {
+                        Logger.d(TAG, "fileUploadSecurityCheckStarted");
+                    }
+
+                    @Override
+                    public void onSecurityCheckFinished(EngagementFile.ScanResult scanResult) {
+                        Logger.d(TAG, "fileUploadSecurityCheckFinished result=" + scanResult);
                     }
                 });
     }

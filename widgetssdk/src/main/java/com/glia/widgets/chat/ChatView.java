@@ -401,10 +401,11 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
             @Override
             public void emitState(ChatState chatState) {
-                updateShowSendButton(chatState);
-                updateChatEditText(chatState);
-
+                // some state updates on core-sdk are coming from the computation thread
+                // need to update state on uiThread
                 post(() -> {
+                    updateShowSendButton(chatState);
+                    updateChatEditText(chatState);
                     switch (chatState.chatInputMode) {
                         case SINGLE_CHOICE_CARD:
                             chatEditText.setHint(R.string.chat_single_choice_card_hint);

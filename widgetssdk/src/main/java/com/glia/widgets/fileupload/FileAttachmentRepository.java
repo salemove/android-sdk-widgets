@@ -14,8 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import io.reactivex.exceptions.UndeliverableException;
 
 public class FileAttachmentRepository {
     public long getAttachedFilesCount() {
@@ -55,8 +58,11 @@ public class FileAttachmentRepository {
         if (engagement != null) {
             engagement.uploadFile(uri, (engagementFile, e) -> {
                 if (engagementFile != null) {
-                    onEngagementFileReceived(uri, engagementFile);
-                    listener.onSuccess();
+                    if (!engagementFile.isSecurityScanRequired()) {
+                        onUploadFileSuccess(uri, engagementFile, listener);
+                    } else {
+                        onUploadFileSecurityScanRequired(uri, engagementFile, listener);
+                    }
                 } else if (e != null) {
                     onUploadFileError(uri, e);
                     listener.onError(e);
@@ -66,6 +72,49 @@ public class FileAttachmentRepository {
             setFileAttachmentEngagementMissing(uri);
             listener.onError(new EngagementMissingException());
         }
+    }
+
+    private void onUploadFileSecurityScanRequired(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        setFileAttachmentSecurityCheckInProgress(uri);
+        listener.onSecurityCheckStarted();
+
+        engagementFile.on(EngagementFile.Events.SCAN_RESULT, scanResult -> {
+            engagementFile.off(EngagementFile.Events.SCAN_RESULT);
+            listener.onSecurityCheckFinished(scanResult);
+            onUploadFileSecurityScanReceived(uri, engagementFile, scanResult, listener);
+        });
+    }
+
+    private void onUploadFileSecurityScanReceived(Uri uri, EngagementFile engagementFile, EngagementFile.ScanResult scanResult, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        if (scanResult == EngagementFile.ScanResult.CLEAN && engagementFile != null) {
+            onUploadFileSuccess(uri, engagementFile, listener);
+        } else {
+            setFileAttachmentSecurityCheckFailed(uri);
+            listener.onFinished();
+        }
+    }
+
+    private void onUploadFileSuccess(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        onEngagementFileReceived(uri, engagementFile);
+        listener.onFinished();
+    }
+
+    private void setFileAttachmentSecurityCheckInProgress(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.SECURITY_SCAN) : fileAttachment
+                ).collect(Collectors.toList())
+        );
+    }
+
+    private void setFileAttachmentSecurityCheckFailed(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED) : fileAttachment
+                ).collect(Collectors.toList())
+        );
     }
 
     public void setSupportedFileAttachmentCountExceeded(Uri uri) {

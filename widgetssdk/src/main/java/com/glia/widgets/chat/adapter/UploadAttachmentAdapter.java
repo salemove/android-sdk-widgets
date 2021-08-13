@@ -130,8 +130,9 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_FORMAT_UNSUPPORTED:
                 case ERROR_FILE_TOO_LARGE:
                 case ERROR_ENGAGEMENT_MISSING:
-                case ERROR_UNKNOWN:
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
+                case ERROR_SECURITY_SCAN_FAILED:
+                case ERROR_UNKNOWN:
                     return true;
                 default:
                     return false;
@@ -174,6 +175,10 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
                     titleText.setText(R.string.chat_attachment_upload_error_file_count_limit_reached);
                     break;
+                case ERROR_SECURITY_SCAN_FAILED:
+                    titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
+                    titleText.setText(R.string.chat_attachment_upload_error_failed_to_check_safety);
+                    break;
                 case ERROR_UNKNOWN:
                 case ERROR_INTERNAL:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
@@ -206,8 +211,9 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_FORMAT_UNSUPPORTED:
                 case ERROR_FILE_TOO_LARGE:
                 case ERROR_ENGAGEMENT_MISSING:
-                case ERROR_UNKNOWN:
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
+                case ERROR_SECURITY_SCAN_FAILED:
+                case ERROR_UNKNOWN:
                     progressIndicator.setIndeterminate(false);
                     progressIndicator.setProgress(100);
                     progressIndicator.setIndicatorColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
@@ -229,6 +235,7 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_FILE_TOO_LARGE:
                 case ERROR_ENGAGEMENT_MISSING:
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
+                case ERROR_SECURITY_SCAN_FAILED:
                 case ERROR_UNKNOWN:
                     return context.getString(R.string.chat_attachment_upload_failed_upload);
                 case UPLOADING:

@@ -3,6 +3,7 @@ package com.glia.widgets.fileupload.domain;
 import android.net.Uri;
 
 import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.fileupload.FileAttachmentRepository;
@@ -60,10 +61,14 @@ public class AddFileToAttachmentAndUploadUseCase {
     }
 
     public interface Listener {
-        void onSuccess();
+        void onFinished();
 
         void onStarted();
 
         void onError(Exception ex);
+
+        void onSecurityCheckStarted();
+
+        void onSecurityCheckFinished(EngagementFile.ScanResult scanResult);
     }
 }

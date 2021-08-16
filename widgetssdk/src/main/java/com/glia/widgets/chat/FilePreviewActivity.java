@@ -2,13 +2,18 @@ package com.glia.widgets.chat;
 
 import static com.glia.widgets.chat.helper.FileHelper.loadImageFromDownloadsFolder;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +30,7 @@ import com.glia.widgets.chat.helper.InAppBitmapCache;
 import com.glia.widgets.helper.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
@@ -34,6 +40,7 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
     private static final String TAG = FilePreviewActivity.class.getSimpleName();
 
     private static final String IMAGE_ID_KEY = "image_id";
+    private static final String IMAGE_ID_NAME = "image_name";
 
     private ImageView previewImageView;
     private MenuItem saveItem;
@@ -86,23 +93,23 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
     }
 
     private void setPreviewImage() {
-        String bitmapName = getInAppCacheBitmapIdFromIntent().split("\\.")[1];
-        if (bitmapName == null || bitmapName.isEmpty()) {
-            Toast.makeText(this, getString(R.string.preview_activity_preview_failed_msg), Toast.LENGTH_LONG).show();
-            return;
-        }
-
+        String bitmapName = getInAppCacheBitmapIdFromIntent() + "." + getInAppCacheBitmapNameFromIntent();
         loadImageFromDownloadsFolder(getApplicationContext(), bitmapName, previewImageView, this);
     }
 
     private Bitmap getBitmapFromInAppCache() {
-        String bitmapId = getInAppCacheBitmapIdFromIntent();
+        String bitmapId = getInAppCacheBitmapIdFromIntent() + "." + getInAppCacheBitmapNameFromIntent();
         return InAppBitmapCache.getInstance().getBitmapById(bitmapId);
     }
 
     private String getInAppCacheBitmapIdFromIntent() {
         Intent incoming = getIntent();
         return incoming.getStringExtra(IMAGE_ID_KEY);
+    }
+
+    private String getInAppCacheBitmapNameFromIntent() {
+        Intent incoming = getIntent();
+        return incoming.getStringExtra(IMAGE_ID_NAME);
     }
 
     @Override
@@ -120,12 +127,7 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
     }
 
     private void shareImage() {
-        String imageName = getInAppCacheBitmapIdFromIntent().split("\\.")[1];
-
-        if (imageName == null || imageName.isEmpty()) {
-            Toast.makeText(this, getString(R.string.preview_activity_image_share_fail_msg), Toast.LENGTH_SHORT).show();
-            return;
-        }
+        String imageName = getInAppCacheBitmapIdFromIntent() + "." + getInAppCacheBitmapNameFromIntent();
 
         File file = new File(getApplicationContext().getFilesDir(), imageName);
         Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.glia.widgets.fileprovider", file);
@@ -138,32 +140,42 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
 
     private void saveFileToDownloadsFolder() {
         Bitmap bitmap = getBitmapFromInAppCache();
-        String imageName = getInAppCacheBitmapIdFromIntent().split("\\.")[1];
-
-        if (bitmap == null || imageName == null || imageName.isEmpty()) {
-            onImageSaveFail();
-            return;
-        }
+        String imageName = getInAppCacheBitmapIdFromIntent() + "." + getInAppCacheBitmapNameFromIntent();
 
         new Thread(() -> {
-            final File imageFile = new File(getApplicationContext().getFilesDir(), imageName);
             FileOutputStream fos = null;
             try {
-                fos = new FileOutputStream(imageFile);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ContentResolver contentResolver = getApplicationContext().getContentResolver();
+                    if (contentResolver != null) {
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.MediaColumns.DISPLAY_NAME, imageName);
+                        values.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
+                        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                        Uri imageUri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                        fos = (FileOutputStream) contentResolver.openOutputStream(imageUri);
+                    }
+                } else {
+                    File downloadsDir = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                    File image = new File(downloadsDir, imageName);
+                    fos = new FileOutputStream(image);
+                }
+
+                if (fos != null) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                }
                 onImageSaveSuccess();
-            } catch (IOException e) {
-                Logger.e(TAG, "Image saving to downloads folder failed: " + e.getMessage());
-                e.printStackTrace();
+            } catch (FileNotFoundException ex) {
+                Logger.e(TAG, "Image saving to downloads folder failed: " + ex.getMessage());
                 onImageSaveFail();
             } finally {
-                try {
-                    if (fos != null) {
+                if (fos != null) {
+                    try {
+                        fos.flush();
                         fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    Logger.e(TAG, "Closing FileOutputStream failed: " + e.getMessage());
-                    e.printStackTrace();
                 }
             }
         }).start();
@@ -193,9 +205,10 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
         return true;
     }
 
-    protected static Intent intent(Context context, String itemId) {
+    protected static Intent intent(Context context, String itemId, String itemName) {
         Intent intent = new Intent(context, FilePreviewActivity.class);
         intent.putExtra(IMAGE_ID_KEY, itemId);
+        intent.putExtra(IMAGE_ID_NAME, itemName);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         return intent;

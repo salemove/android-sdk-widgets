@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="8dp">
 
     <androidx.constraintlayout.widget.Guideline
@@ -20,20 +20,28 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/chat_visitor_margin_end" />
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/incoming_image_attachment"
-        android:layout_width="240dp"
-        android:layout_height="155dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:cropToPadding="true"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.CircularBorder"
+    <com.glia.widgets.view.OperatorStatusView
+        android:id="@+id/chat_head_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small"
+        android:layout_marginEnd="@dimen/small"
+        android:visibility="gone"
+        app:imageSize="@dimen/chat_operator_item_chat_head_size"
+        app:layout_constraintBottom_toBottomOf="@id/attachment_file_view"
+        app:layout_constraintEnd_toStartOf="@id/start_guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <include
+        android:id="@+id/attachment_file_view"
+        layout="@layout/chat_attachment_file_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"
-        tools:src="@drawable/ic_screensharing" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

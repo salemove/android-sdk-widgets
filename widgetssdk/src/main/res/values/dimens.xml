@@ -28,6 +28,8 @@
     <dimen name="chat_attachment_stroke_width">1dp</dimen>
     <dimen name="chat_attachment_type_indicator_size">52dp</dimen>
     <dimen name="chat_attachment_progressbar_height">8dp</dimen>
+    <dimen name="chat_attachment_image_width">240dp</dimen>
+    <dimen name="chat_attachment_image_height">155dp</dimen>
 
     <dimen name="chat_attachment_menu_corner_radius">14dp</dimen>
     <dimen name="chat_attachment_menu_min_width">250dp</dimen>

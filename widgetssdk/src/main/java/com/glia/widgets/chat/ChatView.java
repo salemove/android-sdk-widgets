@@ -50,6 +50,7 @@ import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.dialog.DialogController;
 import com.glia.widgets.fileupload.model.FileAttachment;
@@ -378,8 +379,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             dialogController.removeCallback(dialogCallback);
             dialogController = null;
         }
-
-        InAppBitmapCache.getInstance().clear();
     }
 
     /**
@@ -462,14 +461,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
             private ChatItem updateChatItem(ChatItem item) {
                 if (item instanceof OperatorAttachmentItem) {
-                    AttachmentFile clickedFile = ((OperatorAttachmentItem) item).attachmentFile;
-                    File file = new File(ChatView.this.getContext().getFilesDir(), clickedFile.getName());
-
+                    AttachmentFile attachmentFile = ((OperatorAttachmentItem) item).attachmentFile;
+                    File file = new File(ChatView.this.getContext().getFilesDir(), attachmentFile.getName());
                     OperatorAttachmentItem newItem;
-
                     if (file.exists()) {
                         newItem = new OperatorAttachmentItem(
-                                item.getId(),
+                                attachmentFile.getId(),
                                 item.getViewType(),
                                 ((OperatorAttachmentItem) item).showChatHead,
                                 ((OperatorAttachmentItem) item).attachmentFile,
@@ -478,7 +475,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                                 ((OperatorAttachmentItem) item).isDownloading);
                     } else {
                         newItem = new OperatorAttachmentItem(
-                                item.getId(),
+                                attachmentFile.getId(),
                                 item.getViewType(),
                                 ((OperatorAttachmentItem) item).showChatHead,
                                 ((OperatorAttachmentItem) item).attachmentFile,
@@ -487,6 +484,26 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                                 ((OperatorAttachmentItem) item).isDownloading);
                     }
 
+                    return newItem;
+                } else if (item instanceof VisitorAttachmentItem) {
+                    AttachmentFile attachmentFile = ((VisitorAttachmentItem) item).attachmentFile;
+                    File file = new File(ChatView.this.getContext().getFilesDir(), attachmentFile.getName());
+                    VisitorAttachmentItem newItem;
+                    if (file.exists()) {
+                        newItem = new VisitorAttachmentItem(
+                                attachmentFile.getId(),
+                                item.getViewType(),
+                                ((VisitorAttachmentItem) item).attachmentFile,
+                                true,
+                                ((VisitorAttachmentItem) item).isDownloading);
+                    } else {
+                        newItem = new VisitorAttachmentItem(
+                                attachmentFile.getId(),
+                                item.getViewType(),
+                                ((VisitorAttachmentItem) item).attachmentFile,
+                                false,
+                                ((VisitorAttachmentItem) item).isDownloading);
+                    }
                     return newItem;
                 } else {
                     return item;
@@ -1149,22 +1166,20 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     @Override
-    public void onFileDownloadClick(OperatorAttachmentItem clickedItem) {
-        submitUpdatedItems(clickedItem, true, false);
-
+    public void onFileDownloadClick(AttachmentFile attachmentFile) {
+        submitUpdatedItems(attachmentFile, true, false);
         Context context = this.getContext();
-        AttachmentFile clickedFile = clickedItem.attachmentFile;
-        File file = new File(context.getFilesDir(), clickedFile.getName());
-        downloadFile(clickedItem, file);
+        File file = new File(context.getFilesDir(), attachmentFile.getName());
+        downloadFile(attachmentFile, file);
     }
 
-    private void downloadFile(OperatorAttachmentItem clickedItem, File file) {
-        if (clickedItem.attachmentFile.isDeleted()) {
+    private void downloadFile(AttachmentFile attachmentFile, File file) {
+        if (attachmentFile.isDeleted()) {
             Toast.makeText(this.getContext(), this.getContext().getString(R.string.chat_file_download_failed_msg), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Glia.fetchFile(clickedItem.attachmentFile, (fileInputStream, gliaException) -> new Thread(() -> {
+        Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> new Thread(() -> {
             try {
                 try (OutputStream output = new FileOutputStream(file)) {
                     byte[] buffer = new byte[4 * 1024]; // or other buffer size
@@ -1176,12 +1191,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
                     output.flush();
 
-                    onFileSaveSuccess(clickedItem);
+                    onFileSaveSuccess(attachmentFile);
                     Logger.d(TAG, "File is saved to downloads folder");
                 } catch (IOException e) {
                     Logger.e(TAG, "File saving failed: " + e.getMessage());
                     e.printStackTrace();
-                    onFileSaveFail(clickedItem);
+                    onFileSaveFail(attachmentFile);
                 }
             } finally {
                 try {
@@ -1194,52 +1209,61 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }).start());
     }
 
-    private void onFileSaveSuccess(OperatorAttachmentItem clickedItem) {
-        runnable = createRunnable(getContext().getString(R.string.chat_file_download_success_message), clickedItem, true);
+    private void onFileSaveSuccess(AttachmentFile attachment) {
+        runnable = createRunnable(getContext().getString(R.string.chat_file_download_success_message), attachment, true);
         mainHandler.post(runnable);
     }
 
-    private void onFileSaveFail(OperatorAttachmentItem clickedItem) {
-        runnable = createRunnable(getContext().getString(R.string.chat_file_download_fail_message), clickedItem, false);
+    private void onFileSaveFail(AttachmentFile attachment) {
+        runnable = createRunnable(getContext().getString(R.string.chat_file_download_fail_message), attachment, false);
         mainHandler.post(runnable);
     }
 
-    private Runnable createRunnable(String message, OperatorAttachmentItem clickedItem, boolean isFileExists) {
+    private Runnable createRunnable(String message, AttachmentFile attachment, boolean isFileExists) {
         return () -> {
-            submitUpdatedItems(clickedItem, false, isFileExists);
+            submitUpdatedItems(attachment, false, isFileExists);
             Toast.makeText(this.getContext(), message, Toast.LENGTH_LONG).show();
         };
     }
 
-    private void submitUpdatedItems(OperatorAttachmentItem clickedItem, boolean isDownloading, boolean isFileExists) {
+    private void submitUpdatedItems(AttachmentFile attachmentFile, boolean isDownloading, boolean isFileExists) {
         List<ChatItem> updatedItems = adapter.getCurrentList()
                 .stream()
-                .map(currentItem -> updatedDownloadingItemState(clickedItem, currentItem, isDownloading, isFileExists))
+                .map(currentItem -> updatedDownloadingItemState(attachmentFile, currentItem, isDownloading, isFileExists))
                 .collect(Collectors.toList());
 
         adapter.submitList(updatedItems);
     }
 
     @NonNull
-    private ChatItem updatedDownloadingItemState(OperatorAttachmentItem clickedItem, ChatItem currentItem, boolean isDownloading, boolean isFileExists) {
-        if (currentItem.getId().equals(clickedItem.getId())) {
-            return new OperatorAttachmentItem(
-                    currentItem.getId(),
-                    currentItem.getViewType(),
-                    ((OperatorAttachmentItem) currentItem).showChatHead,
-                    ((OperatorAttachmentItem) currentItem).attachmentFile,
-                    ((OperatorAttachmentItem) currentItem).operatorProfileImgUrl,
-                    isFileExists,
-                    isDownloading);
-        } else {
-            return currentItem;
+    private ChatItem updatedDownloadingItemState(AttachmentFile attachmentFile, ChatItem currentItem, boolean isDownloading, boolean isFileExists) {
+        if (currentItem.getId().equals(attachmentFile.getId())) {
+            if (currentItem instanceof VisitorAttachmentItem) {
+                return new VisitorAttachmentItem(
+                        currentItem.getId(),
+                        currentItem.getViewType(),
+                        ((VisitorAttachmentItem) currentItem).attachmentFile,
+                        isFileExists,
+                        isDownloading
+                );
+            } else if (currentItem instanceof OperatorAttachmentItem) {
+                return new OperatorAttachmentItem(
+                        currentItem.getId(),
+                        currentItem.getViewType(),
+                        ((OperatorAttachmentItem) currentItem).showChatHead,
+                        ((OperatorAttachmentItem) currentItem).attachmentFile,
+                        ((OperatorAttachmentItem) currentItem).operatorProfileImgUrl,
+                        isFileExists,
+                        isDownloading);
+            }
         }
+        return currentItem;
     }
 
     @Override
-    public void onFileOpenClick(OperatorAttachmentItem item) {
+    public void onFileOpenClick(AttachmentFile attachment) {
         Context context = this.getContext();
-        File file = new File(context.getFilesDir(), item.attachmentFile.getName());
+        File file = new File(context.getFilesDir(), attachment.getName());
         Uri contentUri = FileProvider.getUriForFile(context, "com.glia.widgets.fileprovider", file);
         String mime = context.getContentResolver().getType(contentUri);
 
@@ -1250,9 +1274,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     @Override
-    public void onImageItemClick(OperatorAttachmentItem item) {
-        String itemId = item.attachmentFile.getId() + "." + item.attachmentFile.getName();
-        this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), itemId));
+    public void onImageItemClick(AttachmentFile file) {
+        this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName()));
     }
 
     public interface OnBackClickedListener {

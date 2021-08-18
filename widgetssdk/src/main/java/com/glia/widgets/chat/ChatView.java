@@ -1160,7 +1160,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             Uri uri = chooseUriByRequestCode(requestCode, dataUri, controller.getPhotoCaptureFileUri());
             controller.setPhotoCaptureFileUri(null);
             if (uri != null) {
-                controller.onAttachmentReceived(uri);
+                controller.onAttachmentReceived(Utils.mapUriToFileAttachment(getContext().getContentResolver(), uri));
             }
         }
     }

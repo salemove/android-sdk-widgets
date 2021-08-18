@@ -1117,9 +1117,9 @@ public class ChatController implements
         removeFileAttachmentUseCase.execute(attachment);
     }
 
-    public void onAttachmentReceived(Uri uri) {
+    public void onAttachmentReceived(FileAttachment file) {
         addFileToAttachmentAndUploadUseCase
-                .execute(uri, new AddFileToAttachmentAndUploadUseCase.Listener() {
+                .execute(file, new AddFileToAttachmentAndUploadUseCase.Listener() {
                     @Override
                     public void onFinished() {
                         Logger.d(TAG, "fileUploadFinished");

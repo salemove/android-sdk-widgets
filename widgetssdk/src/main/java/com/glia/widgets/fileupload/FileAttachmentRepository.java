@@ -45,31 +45,31 @@ public class FileAttachmentRepository {
                 .anyMatch(fileAttachment -> fileAttachment.getUri().equals(uri));
     }
 
-    public void attachFile(Uri uri) {
+    public void attachFile(FileAttachment file) {
         observable.notifyUpdate(
                 Stream.concat(
                         observable.fileAttachments.stream(),
-                        Stream.of(new FileAttachment(uri))
+                        Stream.of(file)
                 ).collect(Collectors.toList()));
     }
 
-    public void uploadFile(Uri uri, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+    public void uploadFile(FileAttachment file, AddFileToAttachmentAndUploadUseCase.Listener listener) {
         Engagement engagement = Glia.getCurrentEngagement().orElse(null);
         if (engagement != null) {
-            engagement.uploadFile(uri, (engagementFile, e) -> {
+            engagement.uploadFile(file.getUri(), (engagementFile, e) -> {
                 if (engagementFile != null) {
                     if (!engagementFile.isSecurityScanRequired()) {
-                        onUploadFileSuccess(uri, engagementFile, listener);
+                        onUploadFileSuccess(file.getUri(), engagementFile, listener);
                     } else {
-                        onUploadFileSecurityScanRequired(uri, engagementFile, listener);
+                        onUploadFileSecurityScanRequired(file.getUri(), engagementFile, listener);
                     }
                 } else if (e != null) {
-                    onUploadFileError(uri, e);
+                    onUploadFileError(file.getUri(), e);
                     listener.onError(e);
                 }
             });
         } else {
-            setFileAttachmentEngagementMissing(uri);
+            setFileAttachmentEngagementMissing(file.getUri());
             listener.onError(new EngagementMissingException());
         }
     }
@@ -97,6 +97,16 @@ public class FileAttachmentRepository {
     private void onUploadFileSuccess(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
         onEngagementFileReceived(uri, engagementFile);
         listener.onFinished();
+    }
+
+    public void setFileAttachmentTooLarge(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.ERROR_FILE_TOO_LARGE) : fileAttachment
+                )
+                .collect(Collectors.toList())
+        );
     }
 
     private void setFileAttachmentSecurityCheckInProgress(Uri uri) {

@@ -30,7 +30,6 @@ import androidx.transition.TransitionManager;
 import androidx.transition.TransitionSet;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.Constants;
@@ -300,27 +299,23 @@ public class CallView extends ConstraintLayout {
                     }
                     operatorStatusView.isRippleAnimationShowing(
                             callState.isCallNotOngoing() ||
-                                    callState.isCallOngoig()
+                                    callState.isCallOngoingAndOperatorIsConnecting()
                     );
 
-                    if (callState.hasMedia() && callState.callStatus.getOperatorProfileImageUrl() != null) {
+                    if (callState.isCallOngoingAndOperatorConnected() && callState.callStatus.getOperatorProfileImageUrl() != null) {
                         operatorStatusView.showProfileImage(
                                 callState.callStatus.getOperatorProfileImageUrl());
-                    } else if (callState.isCallOngoig() && callState.isCallOngoig() &&
-                            callState.callStatus.getOperatorProfileImageUrl() != null) {
+                    } else if (callState.isCallOngoingAndOperatorIsConnecting() && callState.callStatus.getOperatorProfileImageUrl() != null) {
                         operatorStatusView.showDefaultSizeProfileImage(callState.callStatus.getOperatorProfileImageUrl());
                     } else {
                         operatorStatusView.showDefaultSizePlaceHolder();
                     }
-                    if (callState.callStatus.getFormattedOperatorName() != null &&
-                            callState.isCallOngoig()) {
-                        operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
-                        connectingView.setText(resources.getString(
-                                R.string.call_connecting_with,
-                                callState.callStatus.getFormattedOperatorName(),
-                                callState.callStatus.getTime()
-                        ));
-                    }
+                    operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
+                    connectingView.setText(resources.getString(
+                            R.string.call_connecting_with,
+                            callState.callStatus.getFormattedOperatorName(),
+                            callState.callStatus.getTime()
+                    ));
                     if (callState.companyName != null) {
                         companyNameView.setText(callState.companyName);
                         msrView.setText(R.string.call_in_queue_message);
@@ -357,12 +352,12 @@ public class CallView extends ConstraintLayout {
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
-                    operatorNameView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
+                    operatorNameView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
                     companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
                     msrView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
-                    callTimerView.setVisibility(callState.hasMedia() ? VISIBLE : GONE);
-                    connectingView.setVisibility(callState.isCallOngoig() ? VISIBLE : GONE);
-                    continueBrowsingView.setVisibility(callState.isCallOngoig() || callState.isCallNotOngoing() ? VISIBLE : GONE);
+                    callTimerView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
+                    connectingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() ? VISIBLE : GONE);
+                    continueBrowsingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() || callState.isCallNotOngoing() ? VISIBLE : GONE);
                     handleOperatorVideoState(callState);
                     handleVisitorVideoState(callState);
                     handleControlsVisibility(callState);

@@ -47,22 +47,22 @@ class CallState {
     }
 
     public boolean showOperatorStatusView() {
-        return isCallNotOngoing() || isCallOngoig() || isAudioCall();
+        return isCallNotOngoing() || isCallOngoingAndOperatorIsConnecting() || isAudioCall();
     }
 
     public boolean isMediaEngagementStarted() {
-        return isCallOngoig() || hasMedia();
+        return isCallOngoingAndOperatorIsConnecting() || isCallOngoingAndOperatorConnected();
     }
 
     public boolean isCallNotOngoing() {
         return callStatus instanceof CallStatus.NotOngoing;
     }
 
-    public boolean isCallOngoig() {
+    public boolean isCallOngoingAndOperatorIsConnecting() {
         return callStatus instanceof CallStatus.OngoingNoOperator;
     }
 
-    public boolean hasMedia() {
+    public boolean isCallOngoingAndOperatorConnected() {
         return isAudioCall() || isVideoCall();
     }
 
@@ -253,7 +253,7 @@ class CallState {
     }
 
     public CallState connectingTimerValueChanged(String timeValue) {
-        if (isCallOngoig()) {
+        if (isCallOngoingAndOperatorIsConnecting()) {
             return new Builder()
                     .copyFrom(this)
                     .setCallStatus(

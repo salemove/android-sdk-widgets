@@ -284,7 +284,7 @@ public class CallController implements
 
             @Override
             public void onNewRawTimerValue(int timerValue) {
-                if (callState.isCallOngoig()) {
+                if (callState.isCallOngoingAndOperatorIsConnecting()) {
                     emitViewState(
                             callState
                                     .connectingTimerValueChanged(
@@ -494,7 +494,7 @@ public class CallController implements
 
     public void videoButtonClicked() {
         Logger.d(TAG, "videoButtonClicked");
-        if (callState.hasMedia()) {
+        if (callState.isCallOngoingAndOperatorConnected()) {
             VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
             Logger.d(TAG, "videoButton status:" + currentMediaState.getAudio().getStatus().toString());
             if (currentMediaState.getVideo().getStatus() == Media.Status.PAUSED) {
@@ -593,7 +593,7 @@ public class CallController implements
     private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: video");
         String formatedTime = Utils.toMmSs(0L);
-        if (callState.hasMedia()) {
+        if (callState.isCallOngoingAndOperatorConnected()) {
             formatedTime = callState.callStatus.getTime();
         }
         emitViewState(callState.videoCallOperatorVideoStarted(
@@ -607,7 +607,7 @@ public class CallController implements
     private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: audio");
         String formatedTime = Utils.toMmSs(0L);
-        if (callState.hasMedia()) formatedTime = callState.callStatus.getTime();
+        if (callState.isCallOngoingAndOperatorConnected()) formatedTime = callState.callStatus.getTime();
 
         emitViewState(callState.audioCallStarted(
                 operatorMediaState,

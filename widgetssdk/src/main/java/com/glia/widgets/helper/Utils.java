@@ -1,13 +1,17 @@
 package com.glia.widgets.helper;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
+import android.provider.OpenableColumns;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
@@ -20,6 +24,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.fileupload.model.FileAttachment;
 import com.glia.widgets.model.ChatHeadInput;
 
 import java.io.File;
@@ -432,6 +437,18 @@ public class Utils {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss_", Locale.getDefault());
         Date date = new Date(System.currentTimeMillis());
         return "IMG_" + formatter.format(date);
+    }
+
+    public static FileAttachment mapUriToFileAttachment(ContentResolver contentResolver, Uri uri) {
+        Cursor returnCursor = contentResolver.query(uri, null, null, null, null);
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+        returnCursor.moveToFirst();
+        String displayName = returnCursor.getString(nameIndex);
+        String mimeType = contentResolver.getType(uri);
+        long size = returnCursor.getLong(sizeIndex);
+        returnCursor.close();
+        return new FileAttachment(uri, displayName, size, mimeType);
     }
 
     public static Optional<String> getExtensionByStringHandling(String filename) {

@@ -6,25 +6,37 @@ import com.glia.androidsdk.engagement.EngagementFile;
 
 final public class FileAttachment {
     private final Uri uri;
+    private final String mimeType;
+    private final String displayName;
+    private final long size;
     private final EngagementFile engagementFile;
     private final FileAttachment.Status attachmentStatus;
 
-    public FileAttachment(Uri uri) {
+    public FileAttachment(Uri uri, String displayName, long size, String mimeType) {
+        this.attachmentStatus = FileAttachment.Status.UPLOADING;
         this.uri = uri;
         this.engagementFile = null;
-        this.attachmentStatus = FileAttachment.Status.UPLOADING;
+        this.displayName = displayName;
+        this.size = size;
+        this.mimeType = mimeType;
     }
 
     public FileAttachment(FileAttachment attachment, FileAttachment.Status status) {
         this.uri = attachment.uri;
-        this.attachmentStatus = status;
         this.engagementFile = attachment.engagementFile;
+        this.displayName = attachment.displayName;
+        this.size = attachment.size;
+        this.attachmentStatus = status;
+        this.mimeType = attachment.mimeType;
     }
 
     public FileAttachment(FileAttachment attachment, EngagementFile engagementFile) {
         this.uri = attachment.uri;
         this.attachmentStatus = attachment.attachmentStatus;
+        this.displayName = attachment.displayName;
+        this.size = attachment.size;
         this.engagementFile = engagementFile;
+        this.mimeType = attachment.mimeType;
     }
 
     public FileAttachment setEngagementFile(EngagementFile engagementFile) {
@@ -49,6 +61,18 @@ final public class FileAttachment {
 
     public boolean isReadyToSend() {
         return this.attachmentStatus == FileAttachment.Status.READY_TO_SEND;
+    }
+
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    public long getSize() {
+        return this.size;
+    }
+
+    public String getMimeType() {
+        return this.mimeType;
     }
 
     public enum Status {

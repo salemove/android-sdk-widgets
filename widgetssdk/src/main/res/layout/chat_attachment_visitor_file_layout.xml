@@ -11,23 +11,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/chat_visitor_margin_start" />
+        app:layout_constraintGuide_begin="@dimen/glia_chat_visitor_margin_start" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/chat_visitor_margin_end" />
+        app:layout_constraintGuide_end="@dimen/glia_chat_visitor_margin_end" />
 
     <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/chat_head_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/small"
-        android:layout_marginEnd="@dimen/small"
+        android:layout_marginStart="@dimen/glia_small"
+        android:layout_marginEnd="@dimen/glia_small"
         android:visibility="gone"
-        app:imageSize="@dimen/chat_operator_item_chat_head_size"
+        app:imageSize="@dimen/glia_chat_operator_item_chat_head_size"
         app:layout_constraintBottom_toBottomOf="@id/attachment_file_view"
         app:layout_constraintEnd_toStartOf="@id/start_guideline"
         app:layout_constraintStart_toStartOf="parent"

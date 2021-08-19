@@ -3,18 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/medium">
+    android:layout_marginTop="@dimen/glia_medium">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/chat_operator_margin_start"
-        android:layout_marginEnd="@dimen/chat_operator_message_end"
+        android:layout_marginStart="@dimen/glia_chat_operator_margin_start"
+        android:layout_marginEnd="@dimen/glia_chat_operator_message_end"
         app:cardBackgroundColor="?attr/gliaBaseLightColor"
-        app:cardCornerRadius="@dimen/medium"
+        app:cardCornerRadius="@dimen/glia_medium"
         app:strokeColor="?attr/gliaBaseShadeColor"
-        app:strokeWidth="@dimen/px">
+        app:strokeWidth="@dimen/glia_px">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -25,21 +25,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_begin="@dimen/large" />
+                app:layout_constraintGuide_begin="@dimen/glia_large" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/end_guideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_end="@dimen/large" />
+                app:layout_constraintGuide_end="@dimen/glia_large" />
 
             <ImageView
                 android:id="@+id/icon_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/large"
-                android:contentDescription="@string/chat_media_upgrade_item_mic_content_description"
+                android:layout_marginTop="@dimen/glia_large"
+                android:contentDescription="@string/glia_chat_media_upgrade_item_mic_content_description"
                 android:src="?attr/gliaIconChatAudioUpgrade"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
@@ -50,7 +50,7 @@
                 android:id="@+id/title_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/medium"
+                android:layout_marginTop="@dimen/glia_medium"
                 android:textAppearance="?attr/textAppearanceBody1"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"
@@ -60,8 +60,8 @@
                 android:id="@+id/timer_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/medium"
-                android:layout_marginBottom="@dimen/large"
+                android:layout_marginTop="@dimen/glia_medium"
+                android:layout_marginBottom="@dimen/glia_large"
                 android:textAppearance="?attr/textAppearanceBody1"
                 android:textColor="?attr/gliaBaseNormalColor"
                 app:layout_constraintBottom_toBottomOf="parent"

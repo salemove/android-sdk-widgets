@@ -64,10 +64,10 @@ public class MediaUpgradeStartedViewHolder extends RecyclerView.ViewHolder {
     public void bind(MediaUpgradeStartedTimerItem chatItem) {
         if (chatItem.type == MediaUpgradeStartedTimerItem.Type.AUDIO) {
             iconView.setImageResource(upgradeAudioIcon);
-            titleView.setText(context.getString(R.string.chat_upgraded_to_audio_call));
+            titleView.setText(context.getString(R.string.glia_chat_upgraded_to_audio_call));
         } else {
             iconView.setImageResource(upgradeVideoIcon);
-            titleView.setText(context.getString(R.string.chat_upgraded_to_video_call));
+            titleView.setText(context.getString(R.string.glia_chat_upgraded_to_video_call));
         }
         timerView.setText(chatItem.time);
     }

@@ -7,9 +7,9 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profile_picture_view"
-        android:layout_width="@dimen/chat_head_size"
-        android:layout_height="@dimen/chat_head_size"
-        android:elevation="@dimen/small"
+        android:layout_width="@dimen/glia_chat_head_size"
+        android:layout_height="@dimen/glia_chat_head_size"
+        android:elevation="@dimen/glia_small"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,10 +19,10 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/placeholder_view"
-        android:layout_width="@dimen/chat_head_placeholder_size"
-        android:layout_height="@dimen/chat_head_placeholder_size"
+        android:layout_width="@dimen/glia_hat_head_placeholder_size"
+        android:layout_height="@dimen/glia_hat_head_placeholder_size"
         android:layout_gravity="center"
-        android:elevation="@dimen/small"
+        android:elevation="@dimen/glia_small"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"

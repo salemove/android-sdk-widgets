@@ -61,7 +61,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
             );
             params.setMargins(
                     0,
-                    Float.valueOf(context.getResources().getDimension(R.dimen.medium))
+                    Float.valueOf(context.getResources().getDimension(R.dimen.glia_medium))
                             .intValue(),
                     0,
                     0

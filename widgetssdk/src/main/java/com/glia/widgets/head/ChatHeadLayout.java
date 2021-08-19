@@ -148,7 +148,7 @@ public class ChatHeadLayout extends FrameLayout {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        float floatingViewX = w - getResources().getDimension(R.dimen.chat_head_size)
+        float floatingViewX = w - getResources().getDimension(R.dimen.glia_chat_head_size)
                 - Utils.pxFromDp(this.getContext(), 16);
         float floatingViewY = h / 10f * 8f;
         chatHeadView.setX(floatingViewX);

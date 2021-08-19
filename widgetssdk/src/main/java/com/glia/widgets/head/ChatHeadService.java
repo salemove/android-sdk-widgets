@@ -79,7 +79,7 @@ public class ChatHeadService extends Service {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = width - ((int) getResources().getDimension(R.dimen.chat_head_size))
+        params.x = width - ((int) getResources().getDimension(R.dimen.glia_chat_head_size))
                 - Float.valueOf(Utils.pxFromDp(this, 16)).intValue();
         params.y = height / 10 * 8;
 

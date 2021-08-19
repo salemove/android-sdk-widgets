@@ -7,8 +7,8 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/ripple_animation"
-        android:layout_width="@dimen/ripple_animation_size"
-        android:layout_height="@dimen/ripple_animation_size"
+        android:layout_width="@dimen/glia_ripple_animation_size"
+        android:layout_height="@dimen/glia_ripple_animation_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -10,21 +10,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/medium" />
+        app:layout_constraintGuide_begin="@dimen/glia_medium" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/medium" />
+        app:layout_constraintGuide_end="@dimen/glia_medium" />
 
     <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/status_picture_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
-        app:imageSize="@dimen/chat_profile_picture_size"
+        android:layout_marginTop="@dimen/glia_medium"
+        app:imageSize="@dimen/glia_chat_profile_picture_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,9 +45,9 @@
         android:id="@+id/chat_starting_caption_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
-        android:text="@string/chat_in_queue_message"
+        android:text="@string/glia_chat_in_queue_message"
         android:textAppearance="?attr/textAppearanceSubtitle2"
         android:textColor="?attr/gliaBaseNormalColor"
         android:visibility="gone"
@@ -71,7 +71,7 @@
         android:id="@+id/chat_started_caption_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceSubtitle2"
         android:textColor="?attr/gliaBrandPrimaryColor"

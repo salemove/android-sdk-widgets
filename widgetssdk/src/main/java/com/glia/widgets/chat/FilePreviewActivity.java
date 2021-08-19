@@ -135,7 +135,7 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
         shareIntent.setType("text/plain");
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.preview_activity_image_share_title)));
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.glia_preview_activity_image_share_title)));
     }
 
     private void saveFileToDownloadsFolder() {
@@ -182,12 +182,12 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
     }
 
     private void onImageSaveSuccess() {
-        runnable = createRunnable(getString(R.string.preview_activity_image_save_success_msg), false, true);
+        runnable = createRunnable(getString(R.string.glia_preview_activity_image_save_success_msg), false, true);
         mainHandler.post(runnable);
     }
 
     private void onImageSaveFail() {
-        runnable = createRunnable(getString(R.string.preview_activity_image_save_fail_msg), true, false);
+        runnable = createRunnable(getString(R.string.glia_preview_activity_image_save_fail_msg), true, false);
         mainHandler.post(runnable);
     }
 
@@ -230,7 +230,7 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
             saveItem.setVisible(true);
             shareItem.setVisible(false);
         } else {
-            Toast.makeText(this, getString(R.string.preview_activity_preview_failed_msg), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.glia_preview_activity_preview_failed_msg), Toast.LENGTH_LONG).show();
             finish();
         }
     }

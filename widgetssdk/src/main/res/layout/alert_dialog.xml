@@ -9,20 +9,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/large_x_large" />
+        app:layout_constraintGuide_begin="@dimen/glia_large_x_large" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/large_x_large" />
+        app:layout_constraintGuide_end="@dimen/glia_large_x_large" />
 
     <TextView
         android:id="@+id/dialog_title_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
+        android:layout_marginTop="@dimen/glia_large"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline2"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
@@ -33,7 +33,7 @@
         android:id="@+id/dialog_message_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceBody1"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
@@ -44,10 +44,10 @@
         android:id="@+id/close_dialog_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small"
-        android:layout_marginBottom="@dimen/large_x_large"
+        android:layout_marginTop="@dimen/glia_small"
+        android:layout_marginBottom="@dimen/glia_large_x_large"
         android:background="?attr/selectableItemBackground"
-        android:contentDescription="@string/chat_alert_dialog_close_content_description"
+        android:contentDescription="@string/glia_chat_alert_dialog_close_content_description"
         android:src="?attr/gliaIconLeaveQueue"
         android:tint="?attr/gliaBaseNormalColor"
         app:layout_constraintBottom_toBottomOf="parent"

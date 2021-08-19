@@ -668,7 +668,7 @@ public class ChatController implements
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
             appendHistoryMessage(currentChatItems, message);
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getId(), message.getAttachment());
+            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getAttachment());
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
         }
@@ -692,7 +692,7 @@ public class ChatController implements
             appendSentMessage(currentChatItems, message);
 
             MessageAttachment attachment = message.getAttachment();
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getId(), attachment);
+            addVisitorAttachmentItemsToChatItems(currentChatItems, attachment);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
             appendMessagesNotSeen();
@@ -709,7 +709,7 @@ public class ChatController implements
         }
     }
 
-    private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, String messageId, MessageAttachment attachment) {
+    private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, MessageAttachment attachment) {
         if (attachment instanceof FilesAttachment) {
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
@@ -719,7 +719,7 @@ public class ChatController implements
                 if (mimeType.startsWith("image")) {
                     currentChatItems.add(
                             new VisitorAttachmentItem(
-                                    messageId,
+                                    file.getId(),
                                     ChatAdapter.VISITOR_IMAGE_VIEW_TYPE,
                                     file,
                                     false,
@@ -729,7 +729,7 @@ public class ChatController implements
                 } else {
                     currentChatItems.add(
                             new VisitorAttachmentItem(
-                                    messageId,
+                                    file.getId(),
                                     ChatAdapter.VISITOR_FILE_VIEW_TYPE,
                                     file,
                                     false,
@@ -819,7 +819,7 @@ public class ChatController implements
                 currentChatItems.add(new OperatorAttachmentItem(
                         lastItemInView.getId(),
                         lastItemInView.getViewType(),
-                        false,
+                        true,
                         lastItemInView.attachmentFile,
                         lastItemInView.operatorProfileImgUrl, false, false));
             }

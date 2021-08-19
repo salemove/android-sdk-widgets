@@ -21,7 +21,7 @@ public class FileHelper {
     private static final int DESIRED_IMAGE_SIZE = 640;
 
     public static void loadImageFromDownloadsFolder(Context context, AttachmentFile attachmentFile, ImageView imageView, BitmapCallback bitmapCallback) {
-        File imageFile = new File(context.getFilesDir(), attachmentFile.getName());
+        File imageFile = new File(context.getFilesDir(), attachmentFile.getId() + "." + attachmentFile.getName());
         Picasso.get()
                 .load(imageFile)
                 .into(imageView, new Callback() {

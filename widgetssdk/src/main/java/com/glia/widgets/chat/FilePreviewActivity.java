@@ -130,7 +130,7 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
         String imageName = getInAppCacheBitmapIdFromIntent() + "." + getInAppCacheBitmapNameFromIntent();
 
         File file = new File(getApplicationContext().getFilesDir(), imageName);
-        Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), "com.glia.widgets.fileprovider", file);
+        Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), FileHelper.getFileProviderAuthority(getApplicationContext()), file);
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);

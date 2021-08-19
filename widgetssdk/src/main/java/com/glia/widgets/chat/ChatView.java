@@ -43,7 +43,7 @@ import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.controller.ChatController;
-import com.glia.widgets.chat.helper.InAppBitmapCache;
+import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
@@ -115,7 +115,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private static final int CAPTURE_IMAGE_ACTION_REQUEST = 101;
     private static final int CAPTURE_VIDEO_ACTION_REQUEST = 102;
     private static final int CAMERA_PERMISSION_REQUEST = 1010;
-    private static final String FILE_PROVIDER_AUTHORITY = "com.glia.widgets.fileprovider";
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
@@ -937,7 +936,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
 
         if (photoFile != null) {
-            controller.setPhotoCaptureFileUri(FileProvider.getUriForFile(getContext(), FILE_PROVIDER_AUTHORITY, photoFile));
+            controller.setPhotoCaptureFileUri(
+                    FileProvider.getUriForFile(
+                            getContext(),
+                            FileHelper.getFileProviderAuthority(getContext()),
+                            photoFile)
+            );
             if (controller.getPhotoCaptureFileUri() != null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, controller.getPhotoCaptureFileUri());
                 Utils.getActivity(getContext()).startActivityForResult(

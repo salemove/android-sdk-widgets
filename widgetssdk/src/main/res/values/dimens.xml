@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="px">1dp</dimen>
-    <dimen name="x_small">2dp</dimen>
-    <dimen name="small">4dp</dimen>
-    <dimen name="medium">8dp</dimen>
-    <dimen name="large">16dp</dimen>
-    <dimen name="large_x_large">24dp</dimen>
-    <dimen name="x_large">32dp</dimen>
-    <dimen name="xx_large">64dp</dimen>
+    <dimen name="glia_px">1dp</dimen>
+    <dimen name="glia_x_small">2dp</dimen>
+    <dimen name="glia_small">4dp</dimen>
+    <dimen name="glia_medium">8dp</dimen>
+    <dimen name="glia_large">16dp</dimen>
+    <dimen name="glia_large_x_large">24dp</dimen>
+    <dimen name="glia_x_large">32dp</dimen>
+    <dimen name="glia_xx_large">64dp</dimen>
 
-    <dimen name="ripple_animation_size">142dp</dimen>
-    <dimen name="chat_profile_picture_size">80dp</dimen>
+    <dimen name="glia_ripple_animation_size">142dp</dimen>
+    <dimen name="glia_chat_profile_picture_size">80dp</dimen>
 
-    <dimen name="app_bar_end_button_width">60dp</dimen>
+    <dimen name="glia_app_bar_end_button_width">60dp</dimen>
 
-    <dimen name="chat_visitor_margin_start">88dp</dimen>
-    <dimen name="chat_visitor_margin_end">16dp</dimen>
-    <dimen name="chat_operator_margin_start">44dp</dimen>
-    <dimen name="chat_operator_message_end">60dp</dimen>
-    <dimen name="chat_new_messages_image_size">36dp</dimen>
-    <dimen name="chat_new_messages_card_size">42dp</dimen>
-    <dimen name="chat_new_messages_bottom_edge_radius">17dp</dimen>
-    <dimen name="chat_new_messages_card_corner_radius">21dp</dimen>
-    <dimen name="chat_new_messages_elevation">2dp</dimen>
+    <dimen name="glia_chat_visitor_margin_start">88dp</dimen>
+    <dimen name="glia_chat_visitor_margin_end">16dp</dimen>
+    <dimen name="glia_chat_operator_margin_start">44dp</dimen>
+    <dimen name="glia_chat_operator_message_end">60dp</dimen>
+    <dimen name="glia_chat_new_messages_image_size">36dp</dimen>
+    <dimen name="glia_chat_new_messages_card_size">42dp</dimen>
+    <dimen name="glia_chat_new_messages_bottom_edge_radius">17dp</dimen>
+    <dimen name="glia_chat_new_messages_card_corner_radius">21dp</dimen>
+    <dimen name="glia_chat_new_messages_elevation">2dp</dimen>
 
-    <dimen name="chat_attachment_corner_radius">4dp</dimen>
-    <dimen name="chat_attachment_stroke_width">1dp</dimen>
-    <dimen name="chat_attachment_type_indicator_size">52dp</dimen>
-    <dimen name="chat_attachment_progressbar_height">8dp</dimen>
-    <dimen name="chat_attachment_image_width">240dp</dimen>
-    <dimen name="chat_attachment_image_height">155dp</dimen>
+    <dimen name="glia_chat_attachment_corner_radius">4dp</dimen>
+    <dimen name="glia_chat_attachment_stroke_width">1dp</dimen>
+    <dimen name="glia_chat_attachment_type_indicator_size">52dp</dimen>
+    <dimen name="glia_chat_attachment_progressbar_height">8dp</dimen>
+    <dimen name="glia_chat_attachment_image_width">240dp</dimen>
+    <dimen name="glia_chat_attachment_image_height">155dp</dimen>
 
-    <dimen name="chat_attachment_menu_corner_radius">14dp</dimen>
-    <dimen name="chat_attachment_menu_min_width">250dp</dimen>
+    <dimen name="glia_chat_attachment_menu_corner_radius">14dp</dimen>
+    <dimen name="glia_chat_attachment_menu_min_width">250dp</dimen>
 
-    <dimen name="chat_head_size">64dp</dimen>
-    <dimen name="chat_head_placeholder_size">32dp</dimen>
+    <dimen name="glia_chat_head_size">64dp</dimen>
+    <dimen name="glia_hat_head_placeholder_size">32dp</dimen>
 
-    <dimen name="chat_head_badge_size">18sp</dimen>
-    <dimen name="chat_head_badge_elevation">6dp</dimen>
+    <dimen name="glia_chat_head_badge_size">18sp</dimen>
+    <dimen name="glia_chat_head_badge_elevation">6dp</dimen>
 
-    <dimen name="call_bottom_margin">44dp</dimen>
-    <dimen name="call_buttons_max_width">375dp</dimen>
-    <dimen name="call_operator_status_image_margin_top">64dp</dimen>
-    <dimen name="call_operator_status_image_size">124dp</dimen>
-    <dimen name="call_operator_name_gone_margin_top">66dp</dimen>
-    <dimen name="call_video_height">250dp</dimen>
-    <dimen name="chat_operator_item_chat_head_size">36dp</dimen>
+    <dimen name="glia_call_bottom_margin">44dp</dimen>
+    <dimen name="glia_call_buttons_max_width">375dp</dimen>
+    <dimen name="glia_call_operator_status_image_margin_top">64dp</dimen>
+    <dimen name="glia_call_operator_status_image_size">124dp</dimen>
+    <dimen name="glia_call_operator_name_gone_margin_top">66dp</dimen>
+    <dimen name="glia_call_video_height">250dp</dimen>
+    <dimen name="glia_chat_operator_item_chat_head_size">36dp</dimen>
 
 </resources>

@@ -140,40 +140,40 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                     break;
                 case ERROR_NETWORK_TIMEOUT:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_network_time_out);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_network_time_out);
                     break;
                 case ERROR_INVALID_INPUT:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_invalid_input);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_invalid_input);
                     break;
                 case ERROR_PERMISSIONS_DENIED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_read_access_permissions_denied);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_read_access_permissions_denied);
                     break;
                 case ERROR_FORMAT_UNSUPPORTED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_file_type_invalid);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_file_type_invalid);
                     break;
                 case ERROR_FILE_TOO_LARGE:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_file_size_over_limit);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_file_size_over_limit);
                     break;
                 case ERROR_ENGAGEMENT_MISSING:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_engagement_missing);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_engagement_missing);
                     break;
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_file_count_limit_reached);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_file_count_limit_reached);
                     break;
                 case ERROR_SECURITY_SCAN_FAILED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_failed_to_check_safety);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_failed_to_check_safety);
                     break;
                 case ERROR_UNKNOWN:
                 case ERROR_INTERNAL:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_internal_error);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_internal_error);
                     break;
             }
         }
@@ -215,9 +215,9 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
         private String getStatusIndicatorText(Context context, FileAttachment.Status status) {
             switch (status) {
                 case SECURITY_SCAN:
-                    return context.getString(R.string.chat_attachment_upload_checking_file);
+                    return context.getString(R.string.glia_chat_attachment_upload_checking_file);
                 case READY_TO_SEND:
-                    return context.getString(R.string.chat_attachment_upload_ready_to_send);
+                    return context.getString(R.string.glia_chat_attachment_upload_ready_to_send);
                 case ERROR_NETWORK_TIMEOUT:
                 case ERROR_INTERNAL:
                 case ERROR_INVALID_INPUT:
@@ -228,10 +228,10 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
                 case ERROR_SECURITY_SCAN_FAILED:
                 case ERROR_UNKNOWN:
-                    return context.getString(R.string.chat_attachment_upload_failed_upload);
+                    return context.getString(R.string.glia_chat_attachment_upload_failed_upload);
                 case UPLOADING:
                 default:
-                    return context.getString(R.string.chat_attachment_upload_uploading);
+                    return context.getString(R.string.glia_chat_attachment_upload_uploading);
             }
         }
     }

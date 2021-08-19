@@ -9,7 +9,7 @@
         <item name="baseNormalColor">?attr/gliaBaseNormalColor</item>
         <item name="baseShadeColor">?attr/gliaBaseShadeColor</item>
         <item name="android:fontFamily">?attr/fontFamily</item>
-        <item name="appBarTitle">@string/chat_title</item>
+        <item name="appBarTitle">@string/glia_chat_title</item>
         <item name="systemNegativeColor">?attr/gliaSystemNegativeColor</item>
         <item name="iconAppBarBack">?attr/gliaIconAppBarBack</item>
         <item name="iconLeaveQueue">?attr/gliaIconLeaveQueue</item>

@@ -63,7 +63,7 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
                 statusPictureView.showPlaceHolder();
             }
             chatStartedNameView.setText(item.getOperatorName());
-            chatStartedCaptionView.setText(context.getString(R.string.chat_operator_has_joined, item.getOperatorName()));
+            chatStartedCaptionView.setText(context.getString(R.string.glia_chat_operator_has_joined, item.getOperatorName()));
 
             chatStartingHeadingView.setVisibility(View.GONE);
             chatStartingCaptionView.setVisibility(View.GONE);

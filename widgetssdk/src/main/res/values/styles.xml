@@ -18,12 +18,12 @@
 
     <style name="Application.Glia.Chat.ShapeAppearance.Dialog" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/x_large</item>
+        <item name="cornerSize">@dimen/glia_x_large</item>
     </style>
 
     <style name="Application.Glia.Chat.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/small</item>
+        <item name="cornerSize">@dimen/glia_small</item>
     </style>
 
     <style name="Application.Glia.Chat.Button" parent="Widget.MaterialComponents.Button">

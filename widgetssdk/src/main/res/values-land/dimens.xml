@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <dimen name="call_bottom_margin">20dp</dimen>
-    <dimen name="call_operator_status_image_margin_top">0dp</dimen>
+    <dimen name="glia_call_bottom_margin">20dp</dimen>
+    <dimen name="glia_call_operator_status_image_margin_top">0dp</dimen>
 
 </resources>

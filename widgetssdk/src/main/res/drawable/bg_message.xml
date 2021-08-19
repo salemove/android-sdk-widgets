@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <padding
-        android:bottom="@dimen/medium"
-        android:left="@dimen/large"
-        android:right="@dimen/large"
-        android:top="@dimen/medium" />
-    <corners android:radius="@dimen/large" />
+        android:bottom="@dimen/glia_medium"
+        android:left="@dimen/glia_large"
+        android:right="@dimen/glia_large"
+        android:top="@dimen/glia_medium" />
+    <corners android:radius="@dimen/glia_large" />
 </shape>

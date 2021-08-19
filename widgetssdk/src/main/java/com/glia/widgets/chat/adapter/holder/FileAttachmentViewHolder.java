@@ -46,20 +46,20 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         TextView statusIndicator = itemView.findViewById(R.id.status_indicator);
 
         if (isFileExists) {
-            statusIndicator.setText(R.string.chat_attachment_open_button_label);
+            statusIndicator.setText(R.string.glia_chat_attachment_open_button_label);
         } else {
-            statusIndicator.setText(R.string.chat_attachment_download_button_label);
+            statusIndicator.setText(R.string.glia_chat_attachment_download_button_label);
         }
 
         if (isDownloading) {
-            statusIndicator.setText(R.string.chat_attachment_downloading_label);
+            statusIndicator.setText(R.string.glia_chat_attachment_downloading_label);
             progressIndicator.setVisibility(View.VISIBLE);
         } else {
             progressIndicator.setVisibility(View.GONE);
             if (isFileExists) {
-                statusIndicator.setText(R.string.chat_attachment_open_button_label);
+                statusIndicator.setText(R.string.glia_chat_attachment_open_button_label);
             } else {
-                statusIndicator.setText(R.string.chat_attachment_download_button_label);
+                statusIndicator.setText(R.string.glia_chat_attachment_download_button_label);
             }
         }
 

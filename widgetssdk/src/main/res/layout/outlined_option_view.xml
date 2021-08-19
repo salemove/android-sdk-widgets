@@ -8,9 +8,9 @@
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardCornerRadius="@dimen/small"
+        app:cardCornerRadius="@dimen/glia_small"
         app:strokeColor="?attr/gliaBrandPrimaryColor"
-        app:strokeWidth="@dimen/px">
+        app:strokeWidth="@dimen/glia_px">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -21,15 +21,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_end="@dimen/medium" />
+                app:layout_constraintGuide_end="@dimen/glia_medium" />
 
             <ImageView
                 android:id="@+id/icon_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/large"
-                android:layout_marginStart="@dimen/large"
-                android:contentDescription="@string/outlined_options_icon_content_description"
+                android:layout_marginVertical="@dimen/glia_large"
+                android:layout_marginStart="@dimen/glia_large"
+                android:contentDescription="@string/glia_outlined_options_icon_content_description"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -39,9 +39,9 @@
                 android:id="@+id/title_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/large"
-                android:layout_marginTop="@dimen/medium"
-                android:layout_marginBottom="@dimen/px"
+                android:layout_marginStart="@dimen/glia_large"
+                android:layout_marginTop="@dimen/glia_medium"
+                android:layout_marginBottom="@dimen/glia_px"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textAppearance="?attr/textAppearanceHeadline3"
@@ -56,8 +56,8 @@
                 android:id="@+id/caption_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/px"
-                android:layout_marginBottom="@dimen/medium"
+                android:layout_marginTop="@dimen/glia_px"
+                android:layout_marginBottom="@dimen/glia_medium"
                 android:textAppearance="?attr/textAppearanceSubtitle2"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -12,13 +12,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven {
-            url "https://glia.bintray.com/maven"
-            credentials {
-                username 'mobile-integrators'
-                password 'a7b6a5a7cafd899f2c486e8b3dc4d3563e133788'
-            }
-        }
         flatDir {
             dirs '../libs'
         }

@@ -1268,7 +1268,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     public void onFileOpenClick(AttachmentFile attachment) {
         Context context = this.getContext();
         File file = new File(context.getFilesDir(), attachment.getName());
-        Uri contentUri = FileProvider.getUriForFile(context, "com.glia.widgets.fileprovider", file);
+        Uri contentUri = FileProvider.getUriForFile(context, FileHelper.getFileProviderAuthority(context), file);
         String mime = context.getContentResolver().getType(contentUri);
 
         Intent openIntent = new Intent(Intent.ACTION_VIEW);

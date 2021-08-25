@@ -14,11 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.reactivex.exceptions.UndeliverableException;
+import io.reactivex.Emitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class FileAttachmentRepository {
     public long getAttachedFilesCount() {
@@ -61,7 +65,8 @@ public class FileAttachmentRepository {
                     if (!engagementFile.isSecurityScanRequired()) {
                         onUploadFileSuccess(file.getUri(), engagementFile, listener);
                     } else {
-                        onUploadFileSecurityScanRequired(file.getUri(), engagementFile, listener);
+                        // onUploadFileSecurityScanRequired(file.getUri(), engagementFile, listener);   // https://salemove.atlassian.net/browse/MUIC-453
+                        onUploadFileSecurityScanRequiredHack(file.getUri(), engagementFile, listener);
                     }
                 } else if (e != null) {
                     onUploadFileError(file.getUri(), e);
@@ -73,6 +78,28 @@ public class FileAttachmentRepository {
             listener.onError(new EngagementMissingException());
         }
     }
+
+    // region https://salemove.atlassian.net/browse/MUIC-454 - remove this region
+    private Disposable hackTimerDisposable;
+    private void onUploadFileSecurityScanRequiredHack(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        setFileAttachmentSecurityCheckInProgress(uri);
+        listener.onSecurityCheckStarted();
+
+        hackTimerDisposable = io.reactivex.Observable.timer(10, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        success -> {
+                            listener.onSecurityCheckFinished(EngagementFile.ScanResult.CLEAN);
+                            onUploadFileSecurityScanReceived(uri, engagementFile, EngagementFile.ScanResult.CLEAN, listener);
+                        },
+                        error -> {
+                            listener.onSecurityCheckFinished(EngagementFile.ScanResult.UNKNOWN);
+                            onUploadFileSecurityScanReceived(uri, engagementFile, EngagementFile.ScanResult.UNKNOWN, listener);
+                        }
+                );
+    }
+    // endregion
 
     private void onUploadFileSecurityScanRequired(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
         setFileAttachmentSecurityCheckInProgress(uri);
@@ -221,6 +248,7 @@ public class FileAttachmentRepository {
 
     public void clearObservers() {
         observable.deleteObservers();
+        if (hackTimerDisposable != null) hackTimerDisposable.dispose();
     }
 }
 

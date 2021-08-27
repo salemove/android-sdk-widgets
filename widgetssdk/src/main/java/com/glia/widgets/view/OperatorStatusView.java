@@ -58,7 +58,7 @@ public class OperatorStatusView extends ConstraintLayout {
         placeholderBackgroundSize =
                 typedArray.getDimensionPixelSize(
                         R.styleable.OperatorStatusView_imageSize,
-                        (int) getResources().getDimension(R.dimen.chat_profile_picture_size)
+                        (int) getResources().getDimension(R.dimen.glia_chat_profile_picture_size)
                 );
         placeHolderSize = placeholderBackgroundSize / 2;
         connectedImageSize =
@@ -105,14 +105,14 @@ public class OperatorStatusView extends ConstraintLayout {
     }
 
     public void showDefaultSizeProfileImage(String profileImgUrl) {
-        int backgroundSize = (int) getResources().getDimension(R.dimen.chat_profile_picture_size);
+        int backgroundSize = (int) getResources().getDimension(R.dimen.glia_chat_profile_picture_size);
         profilePictureView.getLayoutParams().width = backgroundSize;
         profilePictureView.getLayoutParams().height = backgroundSize;
         showProfilePictureView(profileImgUrl);
     }
 
     public void showDefaultSizePlaceHolder() {
-        int backgroundSize = (int) getResources().getDimension(R.dimen.chat_profile_picture_size);
+        int backgroundSize = (int) getResources().getDimension(R.dimen.glia_chat_profile_picture_size);
         profilePictureView.getLayoutParams().width = backgroundSize;
         profilePictureView.getLayoutParams().height = backgroundSize;
         placeholderView.getLayoutParams().width = backgroundSize / 2;

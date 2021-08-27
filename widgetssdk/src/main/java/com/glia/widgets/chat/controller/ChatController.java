@@ -16,6 +16,7 @@ import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
+import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
@@ -667,7 +668,7 @@ public class ChatController implements
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
             appendHistoryMessage(currentChatItems, message);
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getId(), message.getAttachment());
+            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getAttachment());
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
         }
@@ -691,7 +692,7 @@ public class ChatController implements
             appendSentMessage(currentChatItems, message);
 
             MessageAttachment attachment = message.getAttachment();
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getId(), attachment);
+            addVisitorAttachmentItemsToChatItems(currentChatItems, attachment);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
             appendMessagesNotSeen();
@@ -708,7 +709,7 @@ public class ChatController implements
         }
     }
 
-    private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, String messageId, MessageAttachment attachment) {
+    private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, MessageAttachment attachment) {
         if (attachment instanceof FilesAttachment) {
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
@@ -718,7 +719,7 @@ public class ChatController implements
                 if (mimeType.startsWith("image")) {
                     currentChatItems.add(
                             new VisitorAttachmentItem(
-                                    messageId,
+                                    file.getId(),
                                     ChatAdapter.VISITOR_IMAGE_VIEW_TYPE,
                                     file,
                                     false,
@@ -728,7 +729,7 @@ public class ChatController implements
                 } else {
                     currentChatItems.add(
                             new VisitorAttachmentItem(
-                                    messageId,
+                                    file.getId(),
                                     ChatAdapter.VISITOR_FILE_VIEW_TYPE,
                                     file,
                                     false,
@@ -818,7 +819,7 @@ public class ChatController implements
                 currentChatItems.add(new OperatorAttachmentItem(
                         lastItemInView.getId(),
                         lastItemInView.getViewType(),
-                        false,
+                        true,
                         lastItemInView.attachmentFile,
                         lastItemInView.operatorProfileImgUrl, false, false));
             }
@@ -1116,12 +1117,12 @@ public class ChatController implements
         removeFileAttachmentUseCase.execute(attachment);
     }
 
-    public void onAttachmentReceived(Uri uri) {
+    public void onAttachmentReceived(FileAttachment file) {
         addFileToAttachmentAndUploadUseCase
-                .execute(uri, new AddFileToAttachmentAndUploadUseCase.Listener() {
+                .execute(file, new AddFileToAttachmentAndUploadUseCase.Listener() {
                     @Override
-                    public void onSuccess() {
-                        Logger.d(TAG, "fileUploadSuccess");
+                    public void onFinished() {
+                        Logger.d(TAG, "fileUploadFinished");
                     }
 
                     @Override
@@ -1132,6 +1133,16 @@ public class ChatController implements
                     @Override
                     public void onError(Exception ex) {
                         ex.printStackTrace();
+                    }
+
+                    @Override
+                    public void onSecurityCheckStarted() {
+                        Logger.d(TAG, "fileUploadSecurityCheckStarted");
+                    }
+
+                    @Override
+                    public void onSecurityCheckFinished(EngagementFile.ScanResult scanResult) {
+                        Logger.d(TAG, "fileUploadSecurityCheckFinished result=" + scanResult);
                     }
                 });
     }

@@ -11,29 +11,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/chat_operator_margin_start" />
+        app:layout_constraintGuide_begin="@dimen/glia_chat_visitor_margin_start" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="@dimen/chat_operator_message_end" />
+        app:layout_constraintGuide_end="@dimen/glia_chat_visitor_margin_end" />
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/incoming_image_attachment"
-        android:layout_width="240dp"
-        android:layout_height="155dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        android:cropToPadding="true"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.CircularBorder"
+    <include
+        layout="@layout/chat_attachment_image_item"
+        android:layout_width="@dimen/glia_chat_attachment_image_width"
+        android:layout_height="@dimen/glia_chat_attachment_image_height"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"
-        tools:src="@drawable/ic_screensharing" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

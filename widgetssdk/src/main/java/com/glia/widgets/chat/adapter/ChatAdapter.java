@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.ChatItem;
@@ -92,25 +93,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (viewType == OPERATOR_STATUS_VIEW_TYPE) {
             return new OperatorStatusViewHolder(inflater.inflate(R.layout.chat_operator_status_layout, parent, false), uiTheme);
         } else if (viewType == VISITOR_FILE_VIEW_TYPE) {
-            View view = inflater.inflate(R.layout.visitor_file_attachment_layout, parent, false);
+            View view = inflater.inflate(R.layout.chat_attachment_visitor_file_layout, parent, false);
             return new FileAttachmentViewHolder(view, uiTheme);
         } else if (viewType == VISITOR_IMAGE_VIEW_TYPE) {
-            View view = inflater.inflate(R.layout.visitor_image_attachment_layout, parent, false);
-            return new ImageAttachmentViewHolder(view);
+            return new ImageAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_visitor_image_layout, parent, false));
         } else if (viewType == VISITOR_MESSAGE_TYPE) {
             return new VisitorMessageViewHolder(inflater.inflate(R.layout.chat_visitor_message_layout, parent, false), uiTheme);
         } else if (viewType == OPERATOR_IMAGE_VIEW_TYPE) {
-            View view = inflater.inflate(R.layout.chat_operator_image_attachment_layout, parent, false);
-            ImageAttachmentViewHolder viewHolder = new ImageAttachmentViewHolder(view);
-            addImageItemClickListener(viewHolder);
-
-            return viewHolder;
+            return new ImageAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false));
         } else if (viewType == OPERATOR_FILE_VIEW_TYPE) {
-            View view = inflater.inflate(R.layout.chat_operator_file_attachment_layout, parent, false);
-            FileAttachmentViewHolder viewHolder = new FileAttachmentViewHolder(view, uiTheme);
-            addFileItemClickListener(viewHolder);
-
-            return viewHolder;
+            return new FileAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_file_layout, parent, false), uiTheme);
         } else if (viewType == OPERATOR_MESSAGE_VIEW_TYPE) {
             return new OperatorMessageViewHolder(inflater.inflate(R.layout.chat_operator_message_layout, parent, false), uiTheme);
         } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
@@ -118,36 +110,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else {
             throw new IllegalArgumentException("Unknown view type: " + viewType);
         }
-    }
-
-    private void addImageItemClickListener(RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setOnClickListener(v -> {
-            int pos = viewHolder.getAdapterPosition();
-            ChatItem item = differ.getCurrentList().get(pos);
-
-            if (!(item instanceof OperatorAttachmentItem) || pos == -1) {
-                return;
-            }
-
-            onImageItemClickListener.onImageItemClick((OperatorAttachmentItem) item);
-        });
-    }
-
-    private void addFileItemClickListener(RecyclerView.ViewHolder viewHolder) {
-        viewHolder.itemView.setOnClickListener(v -> {
-            int pos = viewHolder.getAdapterPosition();
-            ChatItem item = differ.getCurrentList().get(pos);
-
-            if (!(item instanceof OperatorAttachmentItem) || pos == -1) {
-                return;
-            }
-
-            if (((OperatorAttachmentItem) item).isFileExists) {
-                onFileItemClickListener.onFileOpenClick((OperatorAttachmentItem) item);
-            } else {
-                onFileItemClickListener.onFileDownloadClick((OperatorAttachmentItem) item);
-            }
-        });
     }
 
     @Override
@@ -163,17 +125,41 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);
         } else if (chatItem instanceof OperatorAttachmentItem) {
             if (chatItem.getViewType() == OPERATOR_FILE_VIEW_TYPE) {
-                ((FileAttachmentViewHolder) holder).bind((OperatorAttachmentItem) chatItem);
+                FileAttachmentViewHolder viewHolder = (FileAttachmentViewHolder) holder;
+                OperatorAttachmentItem item = (OperatorAttachmentItem) chatItem;
+                viewHolder.bind(item);
+                viewHolder.itemView.setOnClickListener(v -> {
+                    if (item.isFileExists) {
+                        onFileItemClickListener.onFileOpenClick(item.attachmentFile);
+                    } else {
+                        onFileItemClickListener.onFileDownloadClick(item.attachmentFile);
+                    }
+                });
             } else {
                 //holder.setIsRecyclable(false);
-                ((ImageAttachmentViewHolder) holder).bind(((OperatorAttachmentItem) chatItem).attachmentFile);
+                ImageAttachmentViewHolder viewHolder = (ImageAttachmentViewHolder) holder;
+                AttachmentFile file = ((OperatorAttachmentItem) chatItem).attachmentFile;
+                viewHolder.bind(file);
+                viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(file));
             }
         } else if (chatItem instanceof VisitorAttachmentItem) {
             if (chatItem.getViewType() == VISITOR_FILE_VIEW_TYPE) {
-                ((FileAttachmentViewHolder) holder).bind((VisitorAttachmentItem) chatItem);
+                FileAttachmentViewHolder viewHolder = (FileAttachmentViewHolder) holder;
+                VisitorAttachmentItem item = (VisitorAttachmentItem) chatItem;
+                viewHolder.bind(item);
+                viewHolder.itemView.setOnClickListener(v -> {
+                    if (item.isFileExists) {
+                        onFileItemClickListener.onFileOpenClick(item.attachmentFile);
+                    } else {
+                        onFileItemClickListener.onFileDownloadClick(item.attachmentFile);
+                    }
+                });
             } else {
                 //holder.setIsRecyclable(false);
-                ((ImageAttachmentViewHolder) holder).bind(((VisitorAttachmentItem) chatItem).attachmentFile);
+                ImageAttachmentViewHolder viewHolder = (ImageAttachmentViewHolder) holder;
+                AttachmentFile file = ((VisitorAttachmentItem) chatItem).attachmentFile;
+                viewHolder.bind(file);
+                viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(file));
             }
         }
     }
@@ -211,12 +197,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public interface OnFileItemClickListener {
-        void onFileOpenClick(OperatorAttachmentItem item);
+        void onFileOpenClick(AttachmentFile file);
 
-        void onFileDownloadClick(OperatorAttachmentItem item);
+        void onFileDownloadClick(AttachmentFile file);
     }
 
     public interface OnImageItemClickListener {
-        void onImageItemClick(OperatorAttachmentItem item);
+        void onImageItemClick(AttachmentFile item);
     }
 }

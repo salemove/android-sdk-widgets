@@ -26,9 +26,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/large"
-            android:minWidth="@dimen/app_bar_end_button_width"
-            android:text="@string/top_app_bar_chat_end"
+            android:layout_marginEnd="@dimen/glia_large"
+            android:minWidth="@dimen/glia_app_bar_end_button_width"
+            android:text="@string/glia_top_app_bar_chat_end"
             android:visibility="gone" />
 
     </com.google.android.material.appbar.MaterialToolbar>

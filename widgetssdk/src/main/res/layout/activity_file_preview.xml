@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="@string/preview_activity_toolbar_title"
+        app:title="@string/glia_preview_activity_toolbar_title"
         app:titleTextColor="?attr/colorOnPrimary" />
 
     <ImageView

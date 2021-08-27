@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="@dimen/call_bottom_margin" />
+        app:layout_constraintGuide_end="@dimen/glia_call_bottom_margin" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
@@ -29,9 +29,9 @@
         android:id="@+id/operator_status_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/call_operator_status_image_margin_top"
+        android:layout_marginTop="@dimen/glia_call_operator_status_image_margin_top"
         android:visibility="gone"
-        app:imageSize="@dimen/call_operator_status_image_size"
+        app:imageSize="@dimen/glia_call_operator_status_image_size"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/top_app_bar"
@@ -41,9 +41,9 @@
         android:id="@+id/connecting_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
-        android:lineSpacingExtra="@dimen/medium"
+        android:lineSpacingExtra="@dimen/glia_medium"
         android:textAppearance="?attr/textAppearanceHeadline2"
         android:textColor="@color/glia_base_light_color"
         android:visibility="gone"
@@ -55,7 +55,7 @@
         android:id="@+id/operator_name_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
+        android:layout_marginTop="@dimen/glia_large"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline1"
         android:textColor="@color/glia_base_light_color"
@@ -63,13 +63,13 @@
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_status_view"
-        app:layout_goneMarginTop="@dimen/call_operator_name_gone_margin_top" />
+        app:layout_goneMarginTop="@dimen/glia_call_operator_name_gone_margin_top" />
 
     <TextView
         android:id="@+id/company_name_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/large"
+        android:layout_marginTop="@dimen/glia_large"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline1"
         android:textColor="@color/glia_base_light_color"
@@ -82,7 +82,7 @@
         android:id="@+id/msr_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textColor="@color/glia_base_light_color"
@@ -95,7 +95,7 @@
         android:id="@+id/call_timer_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceBody1"
         android:textColor="@color/glia_base_light_color"
@@ -118,10 +118,10 @@
         android:id="@+id/visitor_video_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/large_x_large"
-        android:layout_marginEnd="@dimen/large_x_large"
+        android:layout_marginTop="@dimen/glia_large_x_large"
+        android:layout_marginEnd="@dimen/glia_large_x_large"
         android:visibility="gone"
-        app:cardCornerRadius="@dimen/medium"
+        app:cardCornerRadius="@dimen/glia_medium"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHeight_percent="0.45"
         app:layout_constraintTop_toTopOf="parent"
@@ -131,13 +131,13 @@
         android:id="@+id/top_app_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/transparent_black_bg"
+        android:backgroundTint="@color/glia_transparent_black_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lightTint="@color/glia_base_light_color"
         app:negativeTint="@color/glia_system_negative_color"
-        app:titleText="@string/call_audio_app_bar_title" />
+        app:titleText="@string/glia_call_audio_app_bar_title" />
 
     <TextView
         android:id="@+id/continue_browsing_view"
@@ -154,7 +154,7 @@
         android:id="@+id/buttons_layout_bg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/transparent_black_bg"
+        android:background="@color/glia_transparent_black_bg"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -165,7 +165,7 @@
         android:id="@+id/buttons_top_space"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/small"
+        android:layout_marginBottom="@dimen/glia_small"
         app:layout_constraintBottom_toTopOf="@id/buttons_layout" />
 
     <include
@@ -177,6 +177,6 @@
         app:layout_constraintBottom_toBottomOf="@id/bottom_guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintWidth_max="@dimen/call_buttons_max_width" />
+        app:layout_constraintWidth_max="@dimen/glia_call_buttons_max_width" />
 
 </merge>

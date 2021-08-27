@@ -24,7 +24,7 @@ public class VisitorAttachmentItem extends ChatItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        OperatorAttachmentItem that = (OperatorAttachmentItem) o;
+        VisitorAttachmentItem that = (VisitorAttachmentItem) o;
         return Objects.equals(attachmentFile, that.attachmentFile) &&
                 Objects.equals(isFileExists, that.isFileExists) &&
                 Objects.equals(isDownloading, that.isDownloading);
@@ -38,7 +38,7 @@ public class VisitorAttachmentItem extends ChatItem {
     @NonNull
     @Override
     public String toString() {
-        return "OperatorAttachmentItem{" +
+        return "VisitorAttachmentItem{" +
                 ", attachmentFile='" + attachmentFile + '\'' +
                 ", isFileExists='" + isFileExists + '\'' +
                 ", isDownloading='" + isDownloading + '\'' +

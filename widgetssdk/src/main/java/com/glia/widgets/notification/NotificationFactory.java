@@ -28,14 +28,14 @@ public class NotificationFactory {
 
         return new NotificationCompat.Builder(context, NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_screensharing)
-                .setContentTitle(context.getString(R.string.notification_screen_sharing_title))
-                .setContentText(context.getString(R.string.notification_screen_sharing_message))
+                .setContentTitle(context.getString(R.string.glia_notification_screen_sharing_title))
+                .setContentText(context.getString(R.string.glia_notification_screen_sharing_message))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setOngoing(true)
                 .addAction(
                         R.drawable.ic_baseline_close,
-                        context.getString(R.string.notification_action_end_sharing),
+                        context.getString(R.string.glia_notification_action_end_sharing),
                         pendingIntent
                 ).build();
     }
@@ -43,8 +43,8 @@ public class NotificationFactory {
     public static Notification createCallStartedNotification(Context context) {
         return new NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_mic)
-                .setContentTitle(context.getString(R.string.notification_audio_call_title))
-                .setContentText(context.getString(R.string.notification_audio_call_message))
+                .setContentTitle(context.getString(R.string.glia_notification_audio_call_title))
+                .setContentText(context.getString(R.string.glia_notification_audio_call_message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setOngoing(true)
@@ -54,8 +54,8 @@ public class NotificationFactory {
     public static Notification createVideoCallStartedNotification(Context context) {
         return new NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_videocam)
-                .setContentTitle(context.getString(R.string.notification_video_call_title))
-                .setContentText(context.getString(R.string.notification_video_call_message))
+                .setContentTitle(context.getString(R.string.glia_notification_video_call_title))
+                .setContentText(context.getString(R.string.glia_notification_video_call_message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setOngoing(true)

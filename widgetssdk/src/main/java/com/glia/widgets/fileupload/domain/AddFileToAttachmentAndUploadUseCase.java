@@ -1,16 +1,17 @@
 package com.glia.widgets.fileupload.domain;
 
-import android.net.Uri;
-
-import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.fileupload.FileAttachmentRepository;
 import com.glia.widgets.fileupload.exception.RemoveBeforeReUploadingException;
 import com.glia.widgets.fileupload.exception.SupportedFileCountExceededException;
+import com.glia.widgets.fileupload.exception.SupportedFileSizeExceededException;
+import com.glia.widgets.fileupload.model.FileAttachment;
 
 public class AddFileToAttachmentAndUploadUseCase {
     private final static long SUPPORTED_FILE_COUNT = 25;
+    private final static long SUPPORTED_FILE_SIZE_25MB = 26214400L;
 
     private final GliaEngagementRepository gliaEngagementRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
@@ -23,32 +24,43 @@ public class AddFileToAttachmentAndUploadUseCase {
         this.gliaEngagementRepository = gliaEngagementRepository;
     }
 
-    public void execute(Uri fileUri, Listener listener) {
-        if (fileAttachmentRepository.isFileAttached(fileUri)) {
+    public void execute(FileAttachment file, Listener listener) {
+        if (fileAttachmentRepository.isFileAttached(file.getUri())) {
             listener.onError(new RemoveBeforeReUploadingException());
         } else {
-            onFileNotAttached(fileUri, listener);
+            onFileNotAttached(file, listener);
         }
     }
 
-    private void onFileNotAttached(Uri fileUri, Listener listener) {
-        fileAttachmentRepository.attachFile(fileUri);
+    private void onFileNotAttached(FileAttachment file, Listener listener) {
+        fileAttachmentRepository.attachFile(file);
         if (hasNoOngoingEngagement()) {
-            fileAttachmentRepository.setFileAttachmentEngagementMissing(fileUri);
+            fileAttachmentRepository.setFileAttachmentEngagementMissing(file.getUri());
             listener.onError(new EngagementMissingException());
         } else {
-            onHasOngoingEngagement(fileUri, listener);
+            onHasOngoingEngagement(file, listener);
         }
     }
 
-    private void onHasOngoingEngagement(Uri fileUri, Listener listener) {
+    private void onHasOngoingEngagement(FileAttachment file, Listener listener) {
         if (isSupportedFileCountExceeded()) {
-            fileAttachmentRepository.setSupportedFileAttachmentCountExceeded(fileUri);
+            fileAttachmentRepository.setSupportedFileAttachmentCountExceeded(file.getUri());
             listener.onError(new SupportedFileCountExceededException());
+        } else if (isSupportedFileSizeExceeded(file)) {
+            fileAttachmentRepository.setFileAttachmentTooLarge(file.getUri());
+            listener.onError(new SupportedFileSizeExceededException());
         } else {
             listener.onStarted();
-            fileAttachmentRepository.uploadFile(fileUri, listener);
+            fileAttachmentRepository.uploadFile(file, listener);
         }
+    }
+
+    private boolean isSupportedFileSizeExceeded(FileAttachment file) {
+        return isSupportedFileSizeLargerThen25MB(file);
+    }
+
+    private boolean isSupportedFileSizeLargerThen25MB(FileAttachment file) {
+        return file.getSize() >= SUPPORTED_FILE_SIZE_25MB;
     }
 
     private boolean isSupportedFileCountExceeded() {
@@ -60,10 +72,14 @@ public class AddFileToAttachmentAndUploadUseCase {
     }
 
     public interface Listener {
-        void onSuccess();
+        void onFinished();
 
         void onStarted();
 
         void onError(Exception ex);
+
+        void onSecurityCheckStarted();
+
+        void onSecurityCheckFinished(EngagementFile.ScanResult scanResult);
     }
 }

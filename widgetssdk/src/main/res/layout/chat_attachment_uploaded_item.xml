@@ -8,13 +8,13 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/type_indicator_view"
-        android:layout_width="@dimen/chat_attachment_type_indicator_size"
-        android:layout_height="@dimen/chat_attachment_type_indicator_size"
-        android:layout_marginStart="@dimen/medium"
-        android:layout_marginTop="@dimen/medium"
-        android:layout_marginBottom="@dimen/large"
+        android:layout_width="@dimen/glia_chat_attachment_type_indicator_size"
+        android:layout_height="@dimen/glia_chat_attachment_type_indicator_size"
+        android:layout_marginStart="@dimen/glia_medium"
+        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginBottom="@dimen/glia_large"
         app:cardBackgroundColor="@color/glia_brand_primary_color"
-        app:cardCornerRadius="@dimen/chat_attachment_corner_radius"
+        app:cardCornerRadius="@dimen/glia_chat_attachment_corner_radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
-        android:textColor="@color/transparent_black_bg"
+        android:textColor="@color/glia_transparent_black_bg"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/remove_item_button"
@@ -88,7 +88,7 @@
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progress_indicator"
         android:layout_width="0dp"
-        android:layout_height="@dimen/chat_attachment_progressbar_height"
+        android:layout_height="@dimen/glia_chat_attachment_progressbar_height"
         android:layout_marginStart="12dp"
         android:indeterminate="true"
         android:max="100"

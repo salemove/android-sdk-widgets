@@ -42,7 +42,7 @@ public class NotificationManager implements INotificationManager {
     private void createCallChannel() {
         if (notificationManager.getNotificationChannel(NOTIFICATION_CALL_CHANNEL_ID) == null) {
             int importance = android.app.NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CALL_CHANNEL_ID, applicationContext.getString(R.string.notification_call_channel_name), importance);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CALL_CHANNEL_ID, applicationContext.getString(R.string.glia_notification_call_channel_name), importance);
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
@@ -51,7 +51,7 @@ public class NotificationManager implements INotificationManager {
     private void createScreenSharingChannel() {
         if (notificationManager.getNotificationChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID) == null) {
             int importance = android.app.NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID, applicationContext.getString(R.string.notification_screen_sharing_channel_name), importance);
+            NotificationChannel notificationChannel = new NotificationChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID, applicationContext.getString(R.string.glia_notification_screen_sharing_channel_name), importance);
             notificationManager.createNotificationChannel(notificationChannel);
         }
 

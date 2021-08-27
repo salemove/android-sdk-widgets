@@ -24,19 +24,19 @@
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:padding="@dimen/large"
+        android:padding="@dimen/glia_large"
         app:layout_constraintBottom_toTopOf="@id/divider_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/new_messages_indicator_card"
-            android:layout_width="@dimen/chat_new_messages_card_size"
-            android:layout_height="@dimen/chat_new_messages_card_size"
+            android:layout_width="@dimen/glia_chat_new_messages_card_size"
+            android:layout_height="@dimen/glia_chat_new_messages_card_size"
             android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="?attr/gliaBaseLightColor"
-            app:cardCornerRadius="@dimen/chat_new_messages_card_corner_radius"
-            app:cardElevation="@dimen/chat_new_messages_elevation">
+            app:cardCornerRadius="@dimen/glia_chat_new_messages_card_corner_radius"
+            app:cardElevation="@dimen/glia_chat_new_messages_elevation">
 
             <com.glia.widgets.view.OperatorStatusView
                 android:id="@+id/new_messages_indicator_image"
@@ -44,19 +44,19 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:clipChildren="true"
-                app:imageSize="@dimen/chat_new_messages_image_size"
+                app:imageSize="@dimen/glia_chat_new_messages_image_size"
                 app:srcCompat="?attr/gliaIconPlaceholder" />
 
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/new_messages_badge_view"
-            android:layout_width="@dimen/chat_head_badge_size"
-            android:layout_height="@dimen/chat_head_badge_size"
+            android:layout_width="@dimen/glia_chat_head_badge_size"
+            android:layout_height="@dimen/glia_chat_head_badge_size"
             android:layout_alignTop="@id/new_messages_indicator_card"
             android:layout_alignEnd="@id/new_messages_indicator_card"
             android:background="@drawable/bg_badge"
-            android:elevation="@dimen/chat_new_messages_elevation"
+            android:elevation="@dimen/glia_chat_new_messages_elevation"
             android:gravity="center"
             android:textAppearance="?attr/textAppearanceCaption"
             android:textColor="?attr/gliaBaseLightColor" />
@@ -76,7 +76,7 @@
         android:id="@+id/divider_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/medium"
+        android:layout_marginTop="@dimen/glia_medium"
         android:background="?attr/gliaBaseNormalColor"
         app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />
 
@@ -105,12 +105,12 @@
             style="@style/Application.Glia.Chat.Edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/medium"
-            android:layout_marginStart="@dimen/medium"
-            android:layout_marginEnd="@dimen/medium"
+            android:layout_marginVertical="@dimen/glia_medium"
+            android:layout_marginStart="@dimen/glia_medium"
+            android:layout_marginEnd="@dimen/glia_medium"
             android:layout_weight="1"
             android:enabled="false"
-            android:hint="@string/chat_enter_message"
+            android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor" />
@@ -121,10 +121,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/chat_send_content_description"
-            android:paddingVertical="@dimen/large"
-            android:paddingStart="@dimen/medium"
-            android:paddingEnd="@dimen/large"
+            android:contentDescription="@string/glia_chat_send_content_description"
+            android:paddingVertical="@dimen/glia_large"
+            android:paddingStart="@dimen/glia_medium"
+            android:paddingEnd="@dimen/glia_large"
             android:src="@drawable/ic_add_attachment" />
 
         <ImageButton
@@ -133,10 +133,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/chat_send_content_description"
-            android:paddingVertical="@dimen/large"
-            android:paddingStart="@dimen/medium"
-            android:paddingEnd="@dimen/large"
+            android:contentDescription="@string/glia_chat_send_content_description"
+            android:paddingVertical="@dimen/glia_large"
+            android:paddingStart="@dimen/glia_medium"
+            android:paddingEnd="@dimen/glia_large"
             android:src="?attr/gliaIconSendMessage"
             android:tint="?attr/gliaBrandPrimaryColor"
             android:visibility="gone" />

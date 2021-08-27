@@ -1,9 +1,6 @@
 package com.glia.widgets.chat.adapter;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
-import android.provider.OpenableColumns;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,51 +69,45 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
             CardView extensionContainerView = itemView.findViewById(R.id.type_indicator_view);
             TextView extensionTypeText = itemView.findViewById(R.id.type_indicator_text);
             ImageView extensionTypeImage = itemView.findViewById(R.id.type_indicator_image);
-
             TextView titleText = itemView.findViewById(R.id.item_title);
             TextView statusIndicator = itemView.findViewById(R.id.status_indicator);
             LinearProgressIndicator progressIndicator = itemView.findViewById(R.id.progress_indicator);
-
             ImageButton removeItemButton = itemView.findViewById(R.id.remove_item_button);
             removeItemButton.setOnClickListener(view -> {
                 if (callback != null) callback.onRemoveItemClicked(attachment);
             });
 
+            String diplayName = attachment.getDisplayName();
+            long size = attachment.getSize();
+            String mimeType = attachment.getMimeType();
+
             setProgressIndicatorState(progressIndicator, attachment.getAttachmentStatus());
             statusIndicator.setText(getStatusIndicatorText(itemView.getContext(), attachment.getAttachmentStatus()));
+            setTitleText(titleText, diplayName, size, attachment.getAttachmentStatus());
 
-            ContentResolver contentResolver = itemView.getContext().getContentResolver();
-
-            try (Cursor returnCursor = contentResolver.query(attachment.getUri(), null, null, null, null)) {
-                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                returnCursor.moveToFirst();
-
-                String name = returnCursor.getString(nameIndex);
-                long byteSize = returnCursor.getLong(sizeIndex);
-
-                setTitleText(titleText, name, byteSize, attachment.getAttachmentStatus());
-
-                if (isError(attachment.getAttachmentStatus())) {
-                    extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_system_agent_bubble_color));
-                    extensionTypeImage.setVisibility(View.VISIBLE);
+            if (isError(attachment.getAttachmentStatus())) {
+                extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_system_agent_bubble_color));
+                extensionTypeImage.setVisibility(View.VISIBLE);
+                extensionTypeText.setVisibility(View.GONE);
+                extensionTypeImage.setImageResource(R.drawable.ic_info);
+                extensionTypeImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            } else {
+                extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_brand_primary_color));
+                extensionTypeImage.setScaleType(ImageView.ScaleType.FIT_XY);
+                if (mimeType.startsWith("image")) {
                     extensionTypeText.setVisibility(View.GONE);
-                    extensionTypeImage.setImageResource(R.drawable.ic_info);
-                    extensionTypeImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                    extensionTypeImage.setVisibility(View.VISIBLE);
+                    Picasso
+                            .get()
+                            .load(attachment.getUri())
+                            .resize(1024, 1024)
+                            .onlyScaleDown()
+                            .into(extensionTypeImage);
                 } else {
-                    extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_brand_primary_color));
-                    String mimeType = contentResolver.getType(attachment.getUri());
-                    extensionTypeImage.setScaleType(ImageView.ScaleType.FIT_XY);
-                    if (mimeType.startsWith("image")) {
-                        extensionTypeText.setVisibility(View.GONE);
-                        extensionTypeImage.setVisibility(View.VISIBLE);
-                        Picasso.get().load(attachment.getUri()).into(extensionTypeImage);
-                    } else {
-                        extensionTypeImage.setVisibility(View.GONE);
-                        extensionTypeText.setVisibility(View.VISIBLE);
-                        String extension = Utils.getExtensionByStringHandling(name).orElse("");
-                        extensionTypeText.setText(extension);
-                    }
+                    extensionTypeImage.setVisibility(View.GONE);
+                    extensionTypeText.setVisibility(View.VISIBLE);
+                    String extension = Utils.getExtensionByStringHandling(diplayName).orElse("");
+                    extensionTypeText.setText(extension);
                 }
             }
         }
@@ -130,8 +121,9 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_FORMAT_UNSUPPORTED:
                 case ERROR_FILE_TOO_LARGE:
                 case ERROR_ENGAGEMENT_MISSING:
-                case ERROR_UNKNOWN:
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
+                case ERROR_SECURITY_SCAN_FAILED:
+                case ERROR_UNKNOWN:
                     return true;
                 default:
                     return false;
@@ -148,36 +140,40 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                     break;
                 case ERROR_NETWORK_TIMEOUT:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_network_time_out);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_network_time_out);
                     break;
                 case ERROR_INVALID_INPUT:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_invalid_input);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_invalid_input);
                     break;
                 case ERROR_PERMISSIONS_DENIED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_read_access_permissions_denied);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_read_access_permissions_denied);
                     break;
                 case ERROR_FORMAT_UNSUPPORTED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_file_type_invalid);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_file_type_invalid);
                     break;
                 case ERROR_FILE_TOO_LARGE:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_file_size_over_limit);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_file_size_over_limit);
                     break;
                 case ERROR_ENGAGEMENT_MISSING:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_engagement_missing);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_engagement_missing);
                     break;
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_file_count_limit_reached);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_file_count_limit_reached);
+                    break;
+                case ERROR_SECURITY_SCAN_FAILED:
+                    titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_failed_to_check_safety);
                     break;
                 case ERROR_UNKNOWN:
                 case ERROR_INTERNAL:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
-                    titleText.setText(R.string.chat_attachment_upload_error_internal_error);
+                    titleText.setText(R.string.glia_chat_attachment_upload_error_internal_error);
                     break;
             }
         }
@@ -206,8 +202,9 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_FORMAT_UNSUPPORTED:
                 case ERROR_FILE_TOO_LARGE:
                 case ERROR_ENGAGEMENT_MISSING:
-                case ERROR_UNKNOWN:
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
+                case ERROR_SECURITY_SCAN_FAILED:
+                case ERROR_UNKNOWN:
                     progressIndicator.setIndeterminate(false);
                     progressIndicator.setProgress(100);
                     progressIndicator.setIndicatorColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));
@@ -218,9 +215,9 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
         private String getStatusIndicatorText(Context context, FileAttachment.Status status) {
             switch (status) {
                 case SECURITY_SCAN:
-                    return context.getString(R.string.chat_attachment_upload_checking_file);
+                    return context.getString(R.string.glia_chat_attachment_upload_checking_file);
                 case READY_TO_SEND:
-                    return context.getString(R.string.chat_attachment_upload_ready_to_send);
+                    return context.getString(R.string.glia_chat_attachment_upload_ready_to_send);
                 case ERROR_NETWORK_TIMEOUT:
                 case ERROR_INTERNAL:
                 case ERROR_INVALID_INPUT:
@@ -229,11 +226,12 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                 case ERROR_FILE_TOO_LARGE:
                 case ERROR_ENGAGEMENT_MISSING:
                 case ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED:
+                case ERROR_SECURITY_SCAN_FAILED:
                 case ERROR_UNKNOWN:
-                    return context.getString(R.string.chat_attachment_upload_failed_upload);
+                    return context.getString(R.string.glia_chat_attachment_upload_failed_upload);
                 case UPLOADING:
                 default:
-                    return context.getString(R.string.chat_attachment_upload_uploading);
+                    return context.getString(R.string.glia_chat_attachment_upload_uploading);
             }
         }
     }

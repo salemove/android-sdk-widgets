@@ -14,8 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class FileAttachmentRepository {
     public long getAttachedFilesCount() {
@@ -42,30 +47,109 @@ public class FileAttachmentRepository {
                 .anyMatch(fileAttachment -> fileAttachment.getUri().equals(uri));
     }
 
-    public void attachFile(Uri uri) {
+    public void attachFile(FileAttachment file) {
         observable.notifyUpdate(
                 Stream.concat(
                         observable.fileAttachments.stream(),
-                        Stream.of(new FileAttachment(uri))
+                        Stream.of(file)
                 ).collect(Collectors.toList()));
     }
 
-    public void uploadFile(Uri uri, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+    public void uploadFile(FileAttachment file, AddFileToAttachmentAndUploadUseCase.Listener listener) {
         Engagement engagement = Glia.getCurrentEngagement().orElse(null);
         if (engagement != null) {
-            engagement.uploadFile(uri, (engagementFile, e) -> {
+            engagement.uploadFile(file.getUri(), (engagementFile, e) -> {
                 if (engagementFile != null) {
-                    onEngagementFileReceived(uri, engagementFile);
-                    listener.onSuccess();
+                    if (!engagementFile.isSecurityScanRequired()) {
+                        onUploadFileSuccess(file.getUri(), engagementFile, listener);
+                    } else {
+                        // onUploadFileSecurityScanRequired(file.getUri(), engagementFile, listener);   // https://salemove.atlassian.net/browse/MUIC-453
+                        onUploadFileSecurityScanRequiredHack(file.getUri(), engagementFile, listener);
+                    }
                 } else if (e != null) {
-                    onUploadFileError(uri, e);
+                    onUploadFileError(file.getUri(), e);
                     listener.onError(e);
                 }
             });
         } else {
-            setFileAttachmentEngagementMissing(uri);
+            setFileAttachmentEngagementMissing(file.getUri());
             listener.onError(new EngagementMissingException());
         }
+    }
+
+    // region https://salemove.atlassian.net/browse/MUIC-454 - remove this region
+    private Disposable hackTimerDisposable;
+    private void onUploadFileSecurityScanRequiredHack(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        setFileAttachmentSecurityCheckInProgress(uri);
+        listener.onSecurityCheckStarted();
+
+        hackTimerDisposable = io.reactivex.Observable.timer(10, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        success -> {
+                            listener.onSecurityCheckFinished(EngagementFile.ScanResult.CLEAN);
+                            onUploadFileSecurityScanReceived(uri, engagementFile, EngagementFile.ScanResult.CLEAN, listener);
+                        },
+                        error -> {
+                            listener.onSecurityCheckFinished(EngagementFile.ScanResult.UNKNOWN);
+                            onUploadFileSecurityScanReceived(uri, engagementFile, EngagementFile.ScanResult.UNKNOWN, listener);
+                        }
+                );
+    }
+    // endregion
+
+    private void onUploadFileSecurityScanRequired(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        setFileAttachmentSecurityCheckInProgress(uri);
+        listener.onSecurityCheckStarted();
+
+        engagementFile.on(EngagementFile.Events.SCAN_RESULT, scanResult -> {
+            engagementFile.off(EngagementFile.Events.SCAN_RESULT);
+            listener.onSecurityCheckFinished(scanResult);
+            onUploadFileSecurityScanReceived(uri, engagementFile, scanResult, listener);
+        });
+    }
+
+    private void onUploadFileSecurityScanReceived(Uri uri, EngagementFile engagementFile, EngagementFile.ScanResult scanResult, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        if (scanResult == EngagementFile.ScanResult.CLEAN && engagementFile != null) {
+            onUploadFileSuccess(uri, engagementFile, listener);
+        } else {
+            setFileAttachmentSecurityCheckFailed(uri);
+            listener.onFinished();
+        }
+    }
+
+    private void onUploadFileSuccess(Uri uri, EngagementFile engagementFile, AddFileToAttachmentAndUploadUseCase.Listener listener) {
+        onEngagementFileReceived(uri, engagementFile);
+        listener.onFinished();
+    }
+
+    public void setFileAttachmentTooLarge(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.ERROR_FILE_TOO_LARGE) : fileAttachment
+                )
+                .collect(Collectors.toList())
+        );
+    }
+
+    private void setFileAttachmentSecurityCheckInProgress(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.SECURITY_SCAN) : fileAttachment
+                ).collect(Collectors.toList())
+        );
+    }
+
+    private void setFileAttachmentSecurityCheckFailed(Uri uri) {
+        observable.notifyUpdate(observable.fileAttachments
+                .stream()
+                .map(fileAttachment ->
+                        fileAttachment.getUri() == uri ? fileAttachment.setAttachmentStatus(FileAttachment.Status.ERROR_SECURITY_SCAN_FAILED) : fileAttachment
+                ).collect(Collectors.toList())
+        );
     }
 
     public void setSupportedFileAttachmentCountExceeded(Uri uri) {
@@ -162,6 +246,7 @@ public class FileAttachmentRepository {
 
     public void clearObservers() {
         observable.deleteObservers();
+        if (hackTimerDisposable != null) hackTimerDisposable.dispose();
     }
 }
 

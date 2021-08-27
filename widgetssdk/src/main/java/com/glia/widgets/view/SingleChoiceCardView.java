@@ -124,7 +124,7 @@ public class SingleChoiceCardView extends FrameLayout {
             );
             params.setMargins(
                     0,
-                    Float.valueOf(getResources().getDimension(R.dimen.medium)).intValue(),
+                    Float.valueOf(getResources().getDimension(R.dimen.glia_medium)).intValue(),
                     0,
                     0
             );

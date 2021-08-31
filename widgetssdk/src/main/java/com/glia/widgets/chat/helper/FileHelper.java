@@ -4,10 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.os.Environment;
 import android.widget.ImageView;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.helper.Logger;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -21,8 +23,8 @@ public class FileHelper {
     private static final String FILE_PROVIDER_AUTHORITY = "com.glia.widgets.fileprovider";
     private static final int DESIRED_IMAGE_SIZE = 640;
 
-    public static void loadImageFromDownloadsFolder(Context context, AttachmentFile attachmentFile, ImageView imageView, BitmapCallback bitmapCallback) {
-        File imageFile = new File(context.getFilesDir(), attachmentFile.getId() + "." + attachmentFile.getName());
+    public static void loadImageFromDownloadsFolder(AttachmentFile attachmentFile, ImageView imageView, BitmapCallback bitmapCallback) {
+        File imageFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), attachmentFile.getId() + "." + attachmentFile.getName());
         Picasso.get()
                 .load(imageFile)
                 .into(imageView, new Callback() {
@@ -35,23 +37,6 @@ public class FileHelper {
                     public void onError(Exception e) {
                         Logger.e(TAG, "Image load from the downloads folder failed, trying network load: " + e.getMessage());
                         LoadImageFromNetwork(attachmentFile, bitmapCallback);
-                    }
-                });
-    }
-
-    public static void loadImageFromDownloadsFolder(Context context, String imageName, ImageView imageView, PicassoCallback picassoCallback) {
-        File imageFile = new File(context.getFilesDir(), imageName);
-        Picasso.get()
-                .load(imageFile)
-                .into(imageView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        picassoCallback.onImageLoadSuccess();
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        picassoCallback.onImageLoadFail();
                     }
                 });
     }

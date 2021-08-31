@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain;
 
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 
 public class IsShowSendButtonUseCase {
     private final GliaEngagementRepository engagementRepository;

@@ -6,7 +6,7 @@ import android.content.Intent;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 
 /**
@@ -41,8 +41,8 @@ public class GliaWidgets {
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
      * If set to true then the chat head will appear in the overlay and the sdk will ask for
      * overlay permissions. If false, then the {@link ChatHeadsController} will notify any
-     * listening {@link com.glia.widgets.head.ChatHeadLayout} of any visibility changes.
-     * It is up to the integrator to integrate {@link com.glia.widgets.head.ChatHeadLayout} in their
+     * listening {@link com.glia.widgets.view.head.ChatHeadLayout} of any visibility changes.
+     * It is up to the integrator to integrate {@link com.glia.widgets.view.head.ChatHeadLayout} in their
      * application.
      * When this value is not passed then by default this value is true.
      */
@@ -66,6 +66,7 @@ public class GliaWidgets {
      * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
      */
     public static final String MEDIA_TYPE_VIDEO = "media_type_video";
+
     /**
      * Should be called when the application is starting in {@link Application}.onCreate()
      *

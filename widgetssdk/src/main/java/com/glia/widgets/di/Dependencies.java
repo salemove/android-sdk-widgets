@@ -4,13 +4,14 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.glia.widgets.Constants;
-import com.glia.widgets.head.ChatHeadService;
-import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
+import com.glia.widgets.view.head.ChatHeadService;
+import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.dialog.PermissionDialogManager;
-import com.glia.widgets.notification.device.INotificationManager;
-import com.glia.widgets.notification.device.NotificationManager;
-import com.glia.widgets.permissions.PermissionManager;
+import com.glia.widgets.core.dialog.PermissionDialogManager;
+import com.glia.widgets.core.notification.device.INotificationManager;
+import com.glia.widgets.core.notification.device.NotificationManager;
+import com.glia.widgets.core.permissions.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +22,11 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static final List<String> activitiesInBackstack = new ArrayList<>();
     private static INotificationManager notificationManager;
+    private static DownloadsFolderDataSource downloadsFolderDataSource;
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
+        downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory();
         UseCaseFactory useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
@@ -51,6 +54,10 @@ public class Dependencies {
         return notificationManager;
     }
 
+    public static DownloadsFolderDataSource getDownloadsFolderDataSource() {
+        return downloadsFolderDataSource;
+    }
+
     public static void init() {
         controllerFactory.init();
     }
@@ -69,7 +76,7 @@ public class Dependencies {
      */
     public static void addActivityToBackStack(String activity) {
         Logger.d(TAG, "addActivityToBackStack");
-        if (activity.equals(Constants.CALL_ACTIVITY) || activity.equals(Constants.CHAT_ACTIVITY)) {
+        if (activity.equals(Constants.CALL_ACTIVITY) || activity.equals(Constants.CHAT_ACTIVITY) || activity.equals(Constants.IMAGE_PREVIEW_ACTIVITY)) {
             if (!activitiesInBackstack.contains(activity)) {
                 activitiesInBackstack.add(activity);
             }

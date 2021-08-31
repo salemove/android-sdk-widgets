@@ -1,7 +1,5 @@
 package com.glia.widgets.chat.adapter.holder;
 
-import static com.glia.widgets.chat.helper.FileHelper.loadImageFromDownloadsFolder;
-
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.helper.FileHelper;
-import com.glia.widgets.chat.helper.InAppBitmapCache;
+import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.helper.Logger;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -43,7 +41,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
             Logger.d(TAG, "Image loaded from the in app file cache.");
         } else {
             Logger.d(TAG, "Image load from in app file cache failed, trying downloads folder.");
-            loadImageFromDownloadsFolder(imageView.getContext(), attachmentFile, imageView, new FileHelper.BitmapCallback() {
+            FileHelper.loadImageFromDownloadsFolder(attachmentFile, imageView, new FileHelper.BitmapCallback() {
                 @Override
                 public void onBitmapSuccess(Bitmap bitmap) {
                     onFileSaveSuccess(bitmap, imageView);

@@ -1,13 +1,16 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
-import com.glia.widgets.fileupload.FileAttachmentRepository;
-import com.glia.widgets.model.GliaChatRepository;
+import com.glia.widgets.filepreview.data.GliaFileRepository;
+import com.glia.widgets.filepreview.data.GliaFileRepositoryImpl;
+import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.model.GliaScreenSharingRepository;
-import com.glia.widgets.model.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 
 public class RepositoryFactory {
 
@@ -16,6 +19,7 @@ public class RepositoryFactory {
     private static GliaVisitorMediaRepository gliaVisitorMediaRepository;
     private static GliaOperatorMediaRepository gliaOperatorMediaRepository;
     private static GliaQueueRepository gliaQueueRepository;
+    private static GliaFileRepository gliaFileRepository;
     private FileAttachmentRepository fileAttachmentRepository;
 
     public MediaUpgradeOfferRepository getMediaUpgradeOfferRepository() {
@@ -66,5 +70,12 @@ public class RepositoryFactory {
             fileAttachmentRepository = new FileAttachmentRepository();
         }
         return fileAttachmentRepository;
+    }
+
+    public GliaFileRepository getGliaFileRepository() {
+        if (gliaFileRepository == null) {
+            gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), Dependencies.getDownloadsFolderDataSource());
+        }
+        return gliaFileRepository;
     }
 }

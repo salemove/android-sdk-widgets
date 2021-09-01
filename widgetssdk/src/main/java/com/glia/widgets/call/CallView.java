@@ -74,7 +74,7 @@ public class CallView extends ConstraintLayout {
     private OperatorStatusView operatorStatusView;
     private TextView operatorNameView;
     private TextView companyNameView;
-    private TextView msrView;
+    private TextView agentView;
     private TextView callTimerView;
     private TextView connectingView;
     private TextView continueBrowsingView;
@@ -318,7 +318,7 @@ public class CallView extends ConstraintLayout {
                     ));
                     if (callState.companyName != null) {
                         companyNameView.setText(callState.companyName);
-                        msrView.setText(R.string.glia_call_in_queue_message);
+                        agentView.setText(R.string.glia_call_in_queue_message);
                     }
                     if (callState.callStatus.getTime() != null) {
                         callTimerView.setText(callState.callStatus.getTime());
@@ -354,7 +354,7 @@ public class CallView extends ConstraintLayout {
                     operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
                     operatorNameView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
                     companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
-                    msrView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
+                    agentView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
                     callTimerView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() ? VISIBLE : GONE);
                     continueBrowsingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() || callState.isCallNotOngoing() ? VISIBLE : GONE);
@@ -646,7 +646,7 @@ public class CallView extends ConstraintLayout {
                     this.theme.getFontRes());
             operatorNameView.setTypeface(fontFamily);
             companyNameView.setTypeface(fontFamily);
-            msrView.setTypeface(fontFamily);
+            agentView.setTypeface(fontFamily);
             callTimerView.setTypeface(fontFamily);
             connectingView.setTypeface(fontFamily);
             continueBrowsingView.setTypeface(fontFamily);
@@ -681,7 +681,7 @@ public class CallView extends ConstraintLayout {
         operatorStatusView = findViewById(R.id.operator_status_view);
         operatorNameView = findViewById(R.id.operator_name_view);
         companyNameView = findViewById(R.id.company_name_view);
-        msrView = findViewById(R.id.msr_view);
+        agentView = findViewById(R.id.agent_view);
         callTimerView = findViewById(R.id.call_timer_view);
         connectingView = findViewById(R.id.connecting_view);
         continueBrowsingView = findViewById(R.id.continue_browsing_view);

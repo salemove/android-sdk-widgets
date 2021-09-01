@@ -79,7 +79,7 @@
         app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
 
     <TextView
-        android:id="@+id/msr_view"
+        android:id="@+id/agent_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"

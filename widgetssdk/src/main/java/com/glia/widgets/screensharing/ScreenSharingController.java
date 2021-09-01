@@ -69,8 +69,7 @@ public class ScreenSharingController {
             @Override
             public void onScreenSharingRequestError(GliaException exception) {
                 if (viewCallback != null) viewCallback.onScreenSharingRequestError(exception);
-                Logger.e(TAG, "screen sharing request error");
-                exception.printStackTrace();
+                Logger.e(TAG, "screen sharing request error: " + exception.getMessage());
                 hideScreenSharingEnabledNotification();
             }
 

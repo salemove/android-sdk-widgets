@@ -65,7 +65,6 @@ public class FileHelper {
         Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
             if (gliaException != null) {
                 Logger.e(TAG, "Image loaded from the network failed." + gliaException.getMessage());
-                gliaException.printStackTrace();
                 return;
             }
 
@@ -76,7 +75,7 @@ public class FileHelper {
                     bitmapCallback.onBitmapSuccess(bitmap);
                 } catch (Exception e) {
                     bitmapCallback.onBitmapFail();
-                    e.printStackTrace();
+                    Logger.e(TAG, "Image decode failed: " + e.getMessage());
                 }
             }).start();
         });

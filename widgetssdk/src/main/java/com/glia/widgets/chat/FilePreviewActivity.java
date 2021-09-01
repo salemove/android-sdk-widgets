@@ -174,7 +174,7 @@ public class FilePreviewActivity extends AppCompatActivity implements FileHelper
                         fos.flush();
                         fos.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.e(TAG, "Closing FileOutputStream failed: " + e.getMessage());
                     }
                 }
             }

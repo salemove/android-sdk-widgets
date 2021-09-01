@@ -932,7 +932,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         try {
             photoFile = Utils.createTempPhotoFile(getContext());
         } catch (IOException exception) {
-            exception.printStackTrace();
+            Logger.e(TAG, "Create photo file failed: " + exception.getMessage());
         }
 
         if (photoFile != null) {
@@ -1199,7 +1199,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     Logger.d(TAG, "File is saved to downloads folder");
                 } catch (IOException e) {
                     Logger.e(TAG, "File saving failed: " + e.getMessage());
-                    e.printStackTrace();
                     onFileSaveFail(attachmentFile);
                 }
             } finally {
@@ -1207,7 +1206,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     fileInputStream.close();
                 } catch (IOException e) {
                     Logger.e(TAG, "Closing fileInputStream failed: " + e.getMessage());
-                    e.printStackTrace();
                 }
             }
         }).start());

@@ -14,7 +14,7 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.dialog.DialogController;
+import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
@@ -23,16 +23,16 @@ import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.MediaUpgradeOfferRepository;
-import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
-import com.glia.widgets.model.MessagesNotSeenHandler;
-import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.permissions.domain.HasCallNotificationChannelEnabledUseCase;
-import com.glia.widgets.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
-import com.glia.widgets.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.view.MessagesNotSeenHandler;
+import com.glia.widgets.view.MinimizeHandler;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -108,8 +108,8 @@ public class CallController implements
 
     public CallController(
             MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
-            TimeCounter callTimer,
-            CallViewCallback viewCallback,
+            TimeCounter sharedTimer,
+            CallViewCallback callViewCallback,
             TimeCounter inactivityTimeCounter,
             TimeCounter connectingTimerCounter,
             MinimizeHandler minimizeHandler,
@@ -118,11 +118,11 @@ public class CallController implements
             ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
             ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
             RemoveCallNotificationUseCase removeCallNotificationUseCase,
-            GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase,
+            GliaQueueForMediaEngagementUseCase queueForMediaEngagementUseCase,
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
-            GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase,
+            GliaOnVisitorMediaStateUseCase gliaOnVisitorMediaStateUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             GliaEndEngagementUseCase endEngagementUseCase,
             ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
@@ -131,7 +131,7 @@ public class CallController implements
             IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase
     ) {
         Logger.d(TAG, "constructor");
-        this.viewCallback = viewCallback;
+        this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
                 .setIntegratorCallStarted(false)
                 .setVisible(false)
@@ -143,7 +143,7 @@ public class CallController implements
                 .setHasVideo(false)
                 .createCallState();
         this.dialogController = dialogController;
-        this.callTimer = callTimer;
+        this.callTimer = sharedTimer;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.inactivityTimeCounter = inactivityTimeCounter;
         this.connectingTimerCounter = connectingTimerCounter;
@@ -153,11 +153,11 @@ public class CallController implements
         this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
         this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
         this.removeCallNotificationUseCase = removeCallNotificationUseCase;
-        this.gliaQueueForMediaEngagementUseCase = gliaQueueForMediaEngagementUseCase;
+        this.gliaQueueForMediaEngagementUseCase = queueForMediaEngagementUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
-        this.onVisitorMediaStateUseCase = onVisitorMediaStateUseCase;
+        this.onVisitorMediaStateUseCase = gliaOnVisitorMediaStateUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
         this.shouldShowMediaEngagementViewUseCase = shouldShowMediaEngagementViewUseCase;
@@ -607,7 +607,8 @@ public class CallController implements
     private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: audio");
         String formatedTime = Utils.toMmSs(0L);
-        if (callState.isCallOngoingAndOperatorConnected()) formatedTime = callState.callStatus.getTime();
+        if (callState.isCallOngoingAndOperatorConnected())
+            formatedTime = callState.callStatus.getTime();
 
         emitViewState(callState.audioCallStarted(
                 operatorMediaState,

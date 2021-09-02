@@ -51,17 +51,19 @@ import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
+import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.fileupload.model.FileAttachment;
-import com.glia.widgets.head.ChatHeadService;
-import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.di.UseCaseFactory;
+import com.glia.widgets.filepreview.ui.FilePreviewActivity;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.view.head.ChatHeadService;
+import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.ChatHeadInput;
-import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.notification.device.NotificationManager;
-import com.glia.widgets.screensharing.ScreenSharingController;
+import com.glia.widgets.view.head.model.ChatHeadInput;
+import com.glia.widgets.core.notification.device.NotificationManager;
+import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
@@ -281,13 +283,15 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
      * Used to tell the view that the user has pressed the back button so that the view can
      * set its state accordingly.
      */
-    public void backPressed() {
-        if (controller != null) {
-            controller.onBackArrowClicked();
+    public boolean backPressed() {
+        if (addAttachmentMenu.getVisibility() == VISIBLE) {
+            addAttachmentMenu.hide();
+            return false;
         }
-        if (chatHeadsController != null) {
-            chatHeadsController.onChatBackButtonPressed();
-        }
+
+        if (controller != null) controller.onBackArrowClicked();
+        if (chatHeadsController != null) chatHeadsController.onChatBackButtonPressed();
+        return true;
     }
 
     /**
@@ -741,7 +745,16 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme, this.onOptionClickedListener, this.onImageLoadedListener, this, this);
+        adapter = new ChatAdapter(
+                this.theme,
+                this.onOptionClickedListener,
+                this.onImageLoadedListener,
+                this,
+                this,
+                Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
+                Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
+                Dependencies.getUseCaseFactory().createGetImageFileFromNetworkUseCase()
+        );
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
@@ -898,12 +911,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         );
 
         appBar.setOnBackClickedListener(() -> {
-            if (controller != null) {
-                controller.onBackArrowClicked();
-            }
-            if (chatHeadsController != null) {
-                chatHeadsController.onChatBackButtonPressed();
-            }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
             }
@@ -1277,7 +1284,13 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onImageItemClick(AttachmentFile file) {
-        this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName()));
+        this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName(), theme));
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            dispatchImageCapture();
+        }
     }
 
     public interface OnBackClickedListener {

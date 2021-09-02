@@ -1,74 +1,70 @@
 package com.glia.widgets.chat.adapter.holder;
 
-import static com.glia.widgets.chat.helper.FileHelper.loadImageFromDownloadsFolder;
-
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
+import android.graphics.Color;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
-import com.glia.widgets.chat.helper.FileHelper;
-import com.glia.widgets.chat.helper.InAppBitmapCache;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.helper.Logger;
 import com.google.android.material.imageview.ShapeableImageView;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
 
     private static final String TAG = ChatAdapter.class.getSimpleName();
 
-    private Handler mainHandler;
-    private Runnable runnable = null;
-
     private final ShapeableImageView imageView;
 
-    public ImageAttachmentViewHolder(@NonNull View itemView) {
-        super(itemView);
+    private final GetImageFileFromCacheUseCase getImageFileFromCacheUseCase;
+    private final GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase;
+    private final GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase;
 
-        mainHandler = new Handler(Looper.getMainLooper());
+    private Disposable disposable = null;
+
+    public ImageAttachmentViewHolder(
+            @NonNull View itemView,
+            GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
+            GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
+            GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
+    ) {
+        super(itemView);
         imageView = itemView.findViewById(R.id.incoming_image_attachment);
+        this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
+        this.getImageFileFromDownloadsUseCase = getImageFileFromDownloadsUseCase;
+        this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
     }
 
     public void bind(AttachmentFile attachmentFile) {
-        Bitmap cachedBitmap = InAppBitmapCache.getInstance().getBitmapById(attachmentFile.getId() + "." + attachmentFile.getName());
-
-        if (cachedBitmap != null) {
-            imageView.setImageBitmap(cachedBitmap);
-            Logger.d(TAG, "Image loaded from the in app file cache.");
-        } else {
-            Logger.d(TAG, "Image load from in app file cache failed, trying downloads folder.");
-            loadImageFromDownloadsFolder(imageView.getContext(), attachmentFile, imageView, new FileHelper.BitmapCallback() {
-                @Override
-                public void onBitmapSuccess(Bitmap bitmap) {
-                    onFileSaveSuccess(bitmap, imageView);
-                }
-
-                @Override
-                public void onBitmapFail() {
-
-                }
-            });
-        }
-    }
-
-    private void onFileSaveSuccess(Bitmap bitmap, ImageView imageView) {
-        if (mainHandler != null) {
-            runnable = () -> imageView.setImageBitmap(bitmap);
-            mainHandler.post(runnable);
-        }
+        String imageName = attachmentFile.getId() + "." + attachmentFile.getName();
+        disposable = getImageFileFromCacheUseCase.execute(imageName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> Logger.e(TAG, "failed loading from cache: " + imageName + " reason: " + error.getMessage()))
+                .doOnSuccess(_b -> Logger.d(TAG, "loaded from cache: " + imageName))
+                .onErrorResumeNext(getImageFileFromDownloadsUseCase.execute(imageName))
+                .doOnError(error -> Logger.e(TAG, imageName + "failed loading from downloads: " + error.getMessage()))
+                .doOnSuccess(_b -> Logger.d(TAG, "loaded from downloads: " + imageName))
+                .onErrorResumeNext(getImageFileFromNetworkUseCase.execute(attachmentFile))
+                .doOnError(error -> Logger.e(TAG, imageName + "failed loading from network: " + error.getMessage()))
+                .doOnSuccess(_b -> Logger.d(TAG, "loaded from network: " + imageName))
+                .subscribe(imageView::setImageBitmap, error -> {
+                            Logger.e(TAG, error.getMessage());
+                            imageView.setBackgroundColor(Color.BLACK);
+                        }
+                );
     }
 
     public void onStopView() {
-        if (mainHandler != null) {
-            mainHandler.removeCallbacks(runnable);
-            runnable = null;
-            mainHandler = null;
-        }
+        if (disposable != null) disposable.dispose();
     }
 }

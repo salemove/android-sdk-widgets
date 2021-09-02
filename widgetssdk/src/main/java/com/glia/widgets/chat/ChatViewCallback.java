@@ -2,7 +2,7 @@ package com.glia.widgets.chat;
 
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.ChatState;
-import com.glia.widgets.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
 
 import java.util.List;
 

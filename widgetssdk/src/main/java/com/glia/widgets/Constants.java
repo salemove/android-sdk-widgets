@@ -2,13 +2,17 @@ package com.glia.widgets;
 
 public class Constants {
     /**
-     * Used by the sdk to differentiate between CHAT and CALL activities.
+     * Used by the sdk to differentiate between CHAT and CALL and CALL and IMAGE_PREVIEW activities.
      */
     public static final String CHAT_ACTIVITY = "chat_activity";
     /**
-     * Used by the sdk to differentiate between CHAT and CALL activities.
+     * Used by the sdk to differentiate between CHAT and CALL and CALL and IMAGE_PREVIEW activities.
      */
     public static final String CALL_ACTIVITY = "call_activity";
+    /**
+     * Used by the sdk to differentiate between CHAT and CALL and IMAGE_PREVIEW activities.
+     */
+    public static final String IMAGE_PREVIEW_ACTIVITY = "image_preview_activity";
     /**
      * Global media timer delay value
      */

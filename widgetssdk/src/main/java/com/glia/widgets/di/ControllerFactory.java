@@ -4,16 +4,16 @@ import android.app.Activity;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
-import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
-import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.screensharing.ScreenSharingController;
+import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
-import com.glia.widgets.model.MessagesNotSeenHandler;
-import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.screensharing.ScreenSharingController;
+import com.glia.widgets.view.MessagesNotSeenHandler;
+import com.glia.widgets.view.MinimizeHandler;
+import com.glia.widgets.view.head.ChatHeadsController;
 
 public class ControllerFactory {
 
@@ -30,6 +30,7 @@ public class ControllerFactory {
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
+    private final FilePreviewController filePreviewController;
 
 
     public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
@@ -53,43 +54,15 @@ public class ControllerFactory {
                 useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
                 useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
         );
+        this.filePreviewController = new FilePreviewController(
+                useCaseFactory.createGetImageFileFromDownloadsUseCase(),
+                useCaseFactory.createGetImageFileFromCacheUseCase(),
+                useCaseFactory.createPutImageFileToDownloadsUseCase(),
+                useCaseFactory.createOnEngagementEndUseCase()
+        );
     }
 
     public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
-        if (!(activity instanceof ChatActivity)) {
-            Logger.d(TAG, "new");
-            return new ChatController(
-                    repositoryFactory.getMediaUpgradeOfferRepository(),
-                    sharedTimer,
-                    chatViewCallback,
-                    minimizeHandler,
-                    dialogController,
-                    messagesNotSeenHandler,
-                    useCaseFactory.createShowAudioCallNotificationUseCase(),
-                    useCaseFactory.createShowVideoCallNotificationUseCase(),
-                    useCaseFactory.createRemoveCallNotificationUseCase(),
-                    useCaseFactory.createGliaLoadHistoryUseCase(),
-                    useCaseFactory.createQueueForChatEngagementUseCase(),
-                    useCaseFactory.createOnEngagementUseCase(),
-                    useCaseFactory.createOnEngagementEndUseCase(),
-                    useCaseFactory.createGliaOnMessageUseCase(),
-                    useCaseFactory.createGliaSendMessagePreviewUseCase(),
-                    useCaseFactory.createGliaSendMessageUseCase(),
-                    useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
-                    useCaseFactory.createCancelQueueTicketUseCase(),
-                    useCaseFactory.createGetIsQueueingOngoingUseCase(),
-                    useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase(),
-                    useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
-                    useCaseFactory.createAddFileAttachmentsObserverUseCase(),
-                    useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
-                    useCaseFactory.createGetFileAttachmentsUseCase(),
-                    useCaseFactory.createRemoveFileAttachmentUseCase(),
-                    useCaseFactory.createIsShowSendButtonUseCase(),
-                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase()
-            );
-        }
-
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
@@ -229,5 +202,9 @@ public class ControllerFactory {
     public void init() {
         chatHeadsController.initChatObserving();
         messagesNotSeenHandler.init();
+    }
+
+    public FilePreviewController getImagePreviewController() {
+        return filePreviewController;
     }
 }

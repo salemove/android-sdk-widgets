@@ -25,6 +25,9 @@ import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder;
 import com.glia.widgets.chat.adapter.holder.VisitorMessageViewHolder;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.view.SingleChoiceCardView;
 
 import java.util.List;
@@ -74,16 +77,28 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final OnFileItemClickListener onFileItemClickListener;
     private final OnImageItemClickListener onImageItemClickListener;
 
+    private final GetImageFileFromCacheUseCase getImageFileFromCacheUseCase;
+    private final GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase;
+    private final GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase;
+
     public ChatAdapter(
             UiTheme uiTheme,
             SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
             SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener,
-            OnFileItemClickListener onFileItemClickListener, OnImageItemClickListener onImageItemClickListener) {
+            OnFileItemClickListener onFileItemClickListener,
+            OnImageItemClickListener onImageItemClickListener,
+            GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
+            GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
+            GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
+    ) {
         this.uiTheme = uiTheme;
         this.onOptionClickedListener = onOptionClickedListener;
         this.onImageLoadedListener = onImageLoadedListener;
         this.onFileItemClickListener = onFileItemClickListener;
         this.onImageItemClickListener = onImageItemClickListener;
+        this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
+        this.getImageFileFromDownloadsUseCase = getImageFileFromDownloadsUseCase;
+        this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
     }
 
     @NonNull
@@ -96,11 +111,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View view = inflater.inflate(R.layout.chat_attachment_visitor_file_layout, parent, false);
             return new FileAttachmentViewHolder(view, uiTheme);
         } else if (viewType == VISITOR_IMAGE_VIEW_TYPE) {
-            return new ImageAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_visitor_image_layout, parent, false));
+            return new ImageAttachmentViewHolder(
+                    inflater.inflate(R.layout.chat_attachment_visitor_image_layout, parent, false),
+                    getImageFileFromCacheUseCase,
+                    getImageFileFromDownloadsUseCase,
+                    getImageFileFromNetworkUseCase
+            );
         } else if (viewType == VISITOR_MESSAGE_TYPE) {
             return new VisitorMessageViewHolder(inflater.inflate(R.layout.chat_visitor_message_layout, parent, false), uiTheme);
         } else if (viewType == OPERATOR_IMAGE_VIEW_TYPE) {
-            return new ImageAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false));
+            return new ImageAttachmentViewHolder(
+                    inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false),
+                    getImageFileFromCacheUseCase,
+                    getImageFileFromDownloadsUseCase,
+                    getImageFileFromNetworkUseCase
+            );
         } else if (viewType == OPERATOR_FILE_VIEW_TYPE) {
             return new FileAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_file_layout, parent, false), uiTheme);
         } else if (viewType == OPERATOR_MESSAGE_VIEW_TYPE) {

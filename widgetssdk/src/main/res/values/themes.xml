@@ -45,10 +45,6 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
-    <style name="Application.Glia.FilePreview.Activity" parent="Application.Glia.Activity.Style">
-
-    </style>
-
     <style name="ThemeOverlay.Glia.Chat" parent="">
         <item name="gliaBrandPrimaryColor">@color/glia_brand_primary_color</item>
         <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>

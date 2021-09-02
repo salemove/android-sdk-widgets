@@ -1,5 +1,6 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
@@ -21,6 +22,12 @@ public class RepositoryFactory {
     private static GliaQueueRepository gliaQueueRepository;
     private static GliaFileRepository gliaFileRepository;
     private FileAttachmentRepository fileAttachmentRepository;
+
+    private final DownloadsFolderDataSource downloadsFolderDataSource;
+
+    public RepositoryFactory(DownloadsFolderDataSource downloadsFolderDataSource) {
+        this.downloadsFolderDataSource = downloadsFolderDataSource;
+    }
 
     public MediaUpgradeOfferRepository getMediaUpgradeOfferRepository() {
         if (mediaUpgradeOfferRepository == null) {
@@ -74,7 +81,7 @@ public class RepositoryFactory {
 
     public GliaFileRepository getGliaFileRepository() {
         if (gliaFileRepository == null) {
-            gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), Dependencies.getDownloadsFolderDataSource());
+            gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), downloadsFolderDataSource);
         }
         return gliaFileRepository;
     }

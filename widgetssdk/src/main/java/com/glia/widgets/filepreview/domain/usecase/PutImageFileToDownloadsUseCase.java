@@ -7,7 +7,6 @@ import com.glia.widgets.filepreview.domain.exception.FileNameMissingException;
 
 import io.reactivex.Completable;
 
-
 public class PutImageFileToDownloadsUseCase {
     private final GliaFileRepository gliaFileRepository;
 

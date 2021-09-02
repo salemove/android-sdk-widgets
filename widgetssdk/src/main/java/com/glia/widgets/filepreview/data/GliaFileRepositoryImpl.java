@@ -2,14 +2,20 @@ package com.glia.widgets.filepreview.data;
 
 import android.graphics.Bitmap;
 
+import com.glia.androidsdk.Glia;
+import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException;
+import com.glia.widgets.helper.Logger;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
 public class GliaFileRepositoryImpl implements GliaFileRepository {
+    private static final String TAG = GliaFileRepositoryImpl.class.getSimpleName();
+
     private final InAppBitmapCache bitmapCache;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
 
@@ -20,7 +26,7 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
 
     @Override
     public Maybe<Bitmap> loadFromDownloads(String fileName) {
-        return downloadsFolderDataSource.getImageFromDownloads(fileName);
+        return downloadsFolderDataSource.getImageFromDownloadsFolder(fileName);
     }
 
     @Override
@@ -33,13 +39,34 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
     }
 
     @Override
-    public Maybe<Bitmap> loadFromNetwork(String fileName) {
-        return Maybe.error(new RuntimeException("Load from network failed"));
+    public Maybe<Bitmap> loadFromNetwork(AttachmentFile attachmentFile) {
+        return Maybe.create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
+            if (gliaException != null) {
+                emitter.onError(gliaException);
+            } else {
+                try {
+                    Logger.d(TAG, "Image decode starting");
+                    Bitmap bitmap = FileHelper.decodeSampledBitmapFromInputStream(fileInputStream);
+                    Logger.d(TAG, "Image decode success");
+                    emitter.onSuccess(bitmap);
+                } catch (Exception e) {
+                    Logger.e(TAG, "Image decode failed: " + e.getMessage());
+                    emitter.onError(e);
+                }
+            }
+        }));
     }
 
     @Override
     public Completable putToCache(String fileName, Bitmap bitmap) {
-        return Completable.error(new RuntimeException("Save to cache failed"));
+        return Completable.create(emitter -> {
+            try {
+                bitmapCache.putBitmap(fileName, bitmap);
+                emitter.onComplete();
+            } catch (Exception ex) {
+                emitter.onError(ex);
+            }
+        });
     }
 
     @Override

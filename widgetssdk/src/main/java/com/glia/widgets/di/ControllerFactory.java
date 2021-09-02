@@ -57,7 +57,6 @@ public class ControllerFactory {
         this.filePreviewController = new FilePreviewController(
                 useCaseFactory.createGetImageFileFromDownloadsUseCase(),
                 useCaseFactory.createGetImageFileFromCacheUseCase(),
-                useCaseFactory.createGetImageFileFromNetworkUseCase(),
                 useCaseFactory.createPutImageFileToDownloadsUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase()
         );

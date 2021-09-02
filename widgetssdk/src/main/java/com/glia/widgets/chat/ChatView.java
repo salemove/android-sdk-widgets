@@ -54,6 +54,7 @@ import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.di.UseCaseFactory;
 import com.glia.widgets.filepreview.ui.FilePreviewActivity;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.head.ChatHeadService;
@@ -744,7 +745,16 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme, this.onOptionClickedListener, this.onImageLoadedListener, this, this);
+        adapter = new ChatAdapter(
+                this.theme,
+                this.onOptionClickedListener,
+                this.onImageLoadedListener,
+                this,
+                this,
+                Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
+                Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
+                Dependencies.getUseCaseFactory().createGetImageFileFromNetworkUseCase()
+        );
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);

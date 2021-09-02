@@ -78,6 +78,8 @@ public class ChatController implements
         GliaOnEngagementUseCase.Listener,
         GliaOnEngagementEndUseCase.Listener {
 
+    private final static String TAG = ChatController.class.getSimpleName();
+
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener timerStatusListener;
@@ -272,7 +274,6 @@ public class ChatController implements
         }
     };
 
-    private final String TAG = "ChatController";
     private volatile ChatState chatState;
 
     public void initChat(String companyName,

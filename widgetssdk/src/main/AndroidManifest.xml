@@ -23,7 +23,7 @@
             android:name=".filepreview.ui.FilePreviewActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Application.Glia.FilePreview.Activity" />
+            android:theme="@style/Application.Glia.Chat.Activity" />
 
         <activity
             android:name=".call.CallActivity"
@@ -39,7 +39,7 @@
             android:name=".core.notification.NotificationActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.glia.widgets.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED" />
+                <action android:name="com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED" />
             </intent-filter>
         </receiver>
 

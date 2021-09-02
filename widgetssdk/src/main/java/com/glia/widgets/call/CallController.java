@@ -166,7 +166,6 @@ public class CallController implements
         this.isShowEnableCallNotificationChannelDialogUseCase = isShowEnableCallNotificationChannelDialogUseCase;
     }
 
-
     public void initCall(String companyName,
                          String queueId,
                          String contextUrl,

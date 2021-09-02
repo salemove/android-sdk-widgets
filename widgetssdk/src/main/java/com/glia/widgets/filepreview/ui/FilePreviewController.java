@@ -3,7 +3,6 @@ package com.glia.widgets.filepreview.ui;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.Logger;
 
@@ -17,7 +16,6 @@ public class FilePreviewController implements FilePreviewContract.Controller, Gl
 
     private final GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase;
     private final GetImageFileFromCacheUseCase getImageFileFromCacheUseCase;
-    private final GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase;
     private final PutImageFileToDownloadsUseCase putImageFileToDownloadsUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
 
@@ -26,13 +24,11 @@ public class FilePreviewController implements FilePreviewContract.Controller, Gl
     public FilePreviewController(
             GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
             GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
-            GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase,
             PutImageFileToDownloadsUseCase putImageFileToDownloadsUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase
     ) {
         this.getImageFileFromDownloadsUseCase = getImageFileFromDownloadsUseCase;
         this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
-        this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
         this.putImageFileToDownloadsUseCase = putImageFileToDownloadsUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
     }
@@ -55,7 +51,7 @@ public class FilePreviewController implements FilePreviewContract.Controller, Gl
         disposable = getImageFileFromDownloadsUseCase.execute(state.getImageIdName())
                 .subscribe(
                         image -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom downloads success" + state.getImageIdName());
+                            Logger.d(TAG, "onImageRequested - loadFrom downloads success: " + state.getImageIdName());
                             setState(state.setImageLoadedFromDownloads().setLoadedImage(image));
                         },
                         error -> {
@@ -76,22 +72,6 @@ public class FilePreviewController implements FilePreviewContract.Controller, Gl
                         },
                         error -> {
                             Logger.d(TAG, "onImageRequested - loadFrom cache failed: " + state.getImageIdName());
-                            onRequestImageFromNetwork();
-                        }
-                );
-    }
-
-    private void onRequestImageFromNetwork() {
-        Logger.d(TAG, "onImageRequested - loadFrom network: " + state.getImageIdName());
-        setState(state.setImageLoadingFromNetwork());
-        disposable = getImageFileFromNetworkUseCase.execute(state.getImageIdName())
-                .subscribe(
-                        image -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom network success: " + state.getImageIdName());
-                            setState(state.setImageLoadedFromNetwork().setLoadedImage(image));
-                        },
-                        error -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom network failed: " + state.getImageIdName());
                             view.showOnImageLoadingFailed();
                             setState(state.setImageLoadingFailure());
                         }
@@ -102,7 +82,6 @@ public class FilePreviewController implements FilePreviewContract.Controller, Gl
     public void onImageDataReceived(String bitmapId, String bitmapName) {
         setState(state.setImageData(bitmapId, bitmapName));
     }
-
 
     @Override
     public void onSharePressed() {
@@ -126,6 +105,7 @@ public class FilePreviewController implements FilePreviewContract.Controller, Gl
     public void onDestroy() {
         if (disposable != null) disposable.dispose();
         onEngagementEndUseCase.unregisterListener(this);
+        state.reset();
     }
 
     @Override

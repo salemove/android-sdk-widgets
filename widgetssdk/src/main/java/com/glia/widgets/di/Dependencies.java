@@ -22,13 +22,13 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static final List<String> activitiesInBackstack = new ArrayList<>();
     private static INotificationManager notificationManager;
-    private static DownloadsFolderDataSource downloadsFolderDataSource;
+    private static UseCaseFactory useCaseFactory;
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
-        downloadsFolderDataSource = new DownloadsFolderDataSource(application);
-        RepositoryFactory repositoryFactory = new RepositoryFactory();
-        UseCaseFactory useCaseFactory = new UseCaseFactory(
+        DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
+        RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
+        useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
                 new PermissionDialogManager(application),
@@ -50,12 +50,12 @@ public class Dependencies {
                 });
     }
 
-    public static INotificationManager getNotificationManager() {
-        return notificationManager;
+    public static UseCaseFactory getUseCaseFactory() {
+        return useCaseFactory;
     }
 
-    public static DownloadsFolderDataSource getDownloadsFolderDataSource() {
-        return downloadsFolderDataSource;
+    public static INotificationManager getNotificationManager() {
+        return notificationManager;
     }
 
     public static void init() {

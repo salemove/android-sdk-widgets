@@ -7,9 +7,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ImageDecoder;
-import android.graphics.drawable.Drawable;
-import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -20,14 +17,12 @@ import androidx.core.content.FileProvider;
 
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.helper.Logger;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
@@ -155,6 +150,84 @@ public class DownloadsFolderDataSource {
             return putImageToDownloadsAPI29(fileName, bitmap);
         } else {
             return putImageToDownloadsOld(fileName, bitmap);
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private Completable downloadFileToDownloadsAPI29(String fileName, String contentType, InputStream inputStream) {
+        return Completable.create(emitter -> {
+            OutputStream fos = null;
+            try {
+                ContentResolver resolver = context.getContentResolver();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, contentType);
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+                Uri fileUri = resolver.insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL), contentValues);
+                fos = resolver.openOutputStream(Objects.requireNonNull(fileUri));
+
+                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                int read;
+
+                while ((read = inputStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, read);
+                }
+
+                fos.flush();
+                emitter.onComplete();
+            } catch (FileNotFoundException ex) {
+                Logger.e(TAG, "File saving to downloads folder failed: " + ex.getMessage());
+                emitter.onError(ex);
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.flush();
+                        fos.close();
+                    } catch (IOException e) {
+                        Logger.e(TAG, e.getMessage());
+                    }
+                }
+            }
+            emitter.onComplete();
+        });
+    }
+
+    private Completable downloadFileToDownloadsOld(String fileName, InputStream inputStream) {
+        return Completable.create(emitter -> {
+            OutputStream fos = null;
+            try {
+                String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+                File file = new File(imagesDir, fileName);
+                fos = new FileOutputStream(file);
+                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                int read;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, read);
+                }
+                fos.flush();
+                emitter.onComplete();
+            } catch (FileNotFoundException ex) {
+                Logger.e(TAG, "File saving to downloads folder failed: " + ex.getMessage());
+                emitter.onError(ex);
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.flush();
+                        fos.close();
+                    } catch (IOException e) {
+                        Logger.e(TAG, e.getMessage());
+                    }
+                }
+            }
+            emitter.onComplete();
+        });
+    }
+
+    public Completable downloadFileToDownloads(String fileName, String contentType, InputStream inputStream) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return downloadFileToDownloadsAPI29(fileName, contentType, inputStream);
+        } else {
+            return downloadFileToDownloadsOld(fileName, inputStream);
         }
     }
 }

@@ -148,7 +148,6 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
 
     @Override
     public void shareImageFile(String fileName) {
-
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), fileName);
         Uri contentUri = FileProvider.getUriForFile(getContext(), FileHelper.getFileProviderAuthority(getContext()), file);
 

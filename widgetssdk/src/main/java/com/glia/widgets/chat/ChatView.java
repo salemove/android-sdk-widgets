@@ -12,8 +12,7 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
@@ -38,7 +37,6 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -54,7 +52,6 @@ import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.di.UseCaseFactory;
 import com.glia.widgets.filepreview.ui.FilePreviewActivity;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.head.ChatHeadService;
@@ -75,9 +72,7 @@ import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -167,9 +162,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             }
         }
     };
-
-    private Handler mainHandler = null;
-    private Runnable runnable = null;
 
     public ChatView(Context context) {
         this(context, null);
@@ -341,20 +333,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    public void onStartView() {
-        if (mainHandler == null) {
-            mainHandler = new Handler(Looper.getMainLooper());
-        }
-    }
-
-    public void onStopView() {
-        if (mainHandler != null) {
-            mainHandler.removeCallbacks(runnable);
-            runnable = null;
-            mainHandler = null;
-        }
-    }
-
     /**
      * Use this method to notify the view that your activity or fragment's view is being destroyed.
      * Used to dispose of any loose resources.
@@ -465,9 +443,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             private ChatItem updateChatItem(ChatItem item) {
                 if (item instanceof OperatorAttachmentItem) {
                     AttachmentFile attachmentFile = ((OperatorAttachmentItem) item).attachmentFile;
-                    File file = new File(ChatView.this.getContext().getFilesDir(), attachmentFile.getName());
                     OperatorAttachmentItem newItem;
-                    if (file.exists()) {
+                    if (FileHelper.isFileDownloaded(attachmentFile)) {
                         newItem = new OperatorAttachmentItem(
                                 attachmentFile.getId(),
                                 item.getViewType(),
@@ -490,9 +467,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     return newItem;
                 } else if (item instanceof VisitorAttachmentItem) {
                     AttachmentFile attachmentFile = ((VisitorAttachmentItem) item).attachmentFile;
-                    File file = new File(ChatView.this.getContext().getFilesDir(), attachmentFile.getName());
                     VisitorAttachmentItem newItem;
-                    if (file.exists()) {
+                    if (FileHelper.isFileDownloaded(attachmentFile)) {
                         newItem = new VisitorAttachmentItem(
                                 attachmentFile.getId(),
                                 item.getViewType(),
@@ -535,6 +511,16 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             @Override
             public void scrollToBottomImmediate() {
                 post(() -> chatRecyclerView.scrollToPosition(adapter.getItemCount() - 1));
+            }
+
+            @Override
+            public void fileDownloadError(AttachmentFile attachmentFile, Throwable error) {
+                fileDownloadFailed(attachmentFile);
+            }
+
+            @Override
+            public void fileDownloadSuccess(AttachmentFile attachmentFile) {
+                fileDownloadCompleted(attachmentFile);
             }
         };
 
@@ -1179,60 +1165,17 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     @Override
     public void onFileDownloadClick(AttachmentFile attachmentFile) {
         submitUpdatedItems(attachmentFile, true, false);
-        Context context = this.getContext();
-        File file = new File(context.getFilesDir(), attachmentFile.getName());
-        downloadFile(attachmentFile, file);
+        controller.onFileDownloadClicked(attachmentFile);
     }
 
-    private void downloadFile(AttachmentFile attachmentFile, File file) {
-        if (attachmentFile.isDeleted()) {
-            Toast.makeText(this.getContext(), this.getContext().getString(R.string.glia_chat_file_download_failed_msg), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> new Thread(() -> {
-            try {
-                try (OutputStream output = new FileOutputStream(file)) {
-                    byte[] buffer = new byte[4 * 1024]; // or other buffer size
-                    int read;
-
-                    while ((read = fileInputStream.read(buffer)) != -1) {
-                        output.write(buffer, 0, read);
-                    }
-
-                    output.flush();
-
-                    onFileSaveSuccess(attachmentFile);
-                    Logger.d(TAG, "File is saved to downloads folder");
-                } catch (IOException e) {
-                    Logger.e(TAG, "File saving failed: " + e.getMessage());
-                    onFileSaveFail(attachmentFile);
-                }
-            } finally {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    Logger.e(TAG, "Closing fileInputStream failed: " + e.getMessage());
-                }
-            }
-        }).start());
+    public void fileDownloadFailed(AttachmentFile file) {
+        submitUpdatedItems(file, false, false);
+        Toast.makeText(this.getContext(), this.getContext().getString(R.string.glia_chat_file_download_failed_msg), Toast.LENGTH_SHORT).show();
     }
 
-    private void onFileSaveSuccess(AttachmentFile attachment) {
-        runnable = createRunnable(getContext().getString(R.string.glia_chat_file_download_success_message), attachment, true);
-        mainHandler.post(runnable);
-    }
-
-    private void onFileSaveFail(AttachmentFile attachment) {
-        runnable = createRunnable(getContext().getString(R.string.glia_chat_file_download_fail_message), attachment, false);
-        mainHandler.post(runnable);
-    }
-
-    private Runnable createRunnable(String message, AttachmentFile attachment, boolean isFileExists) {
-        return () -> {
-            submitUpdatedItems(attachment, false, isFileExists);
-            Toast.makeText(this.getContext(), message, Toast.LENGTH_LONG).show();
-        };
+    public void fileDownloadCompleted(AttachmentFile file) {
+        submitUpdatedItems(file, false, true);
+        Toast.makeText(this.getContext(), getContext().getString(R.string.glia_chat_file_download_success_message), Toast.LENGTH_LONG).show();
     }
 
     private void submitUpdatedItems(AttachmentFile attachmentFile, boolean isDownloading, boolean isFileExists) {
@@ -1271,15 +1214,11 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileOpenClick(AttachmentFile attachment) {
-        Context context = this.getContext();
-        File file = new File(context.getFilesDir(), attachment.getName());
-        Uri contentUri = FileProvider.getUriForFile(context, FileHelper.getFileProviderAuthority(context), file);
-        String mime = context.getContentResolver().getType(contentUri);
-
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), FileHelper.getFileName(attachment));
+        Uri contentUri = FileProvider.getUriForFile(getContext(), FileHelper.getFileProviderAuthority(getContext()), file);
         Intent openIntent = new Intent(Intent.ACTION_VIEW);
-        openIntent.setDataAndType(contentUri, mime);
-        openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(openIntent, context.getString(R.string.glia_chat_file_open_file_title)));
+        openIntent.setDataAndType(contentUri, attachment.getContentType());
+        getContext().startActivity(openIntent);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.glia.widgets.filepreview.data;
 
-
 import android.graphics.Bitmap;
 
 import com.glia.androidsdk.chat.AttachmentFile;
@@ -9,13 +8,15 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
 public interface GliaFileRepository {
-    Maybe<Bitmap> loadFromDownloads(String fileName);
+    Maybe<Bitmap> loadImageFromCache(String fileName);
 
-    Maybe<Bitmap> loadFromCache(String fileName);
+    Completable putImageToCache(String fileName, Bitmap bitmap);
 
-    Maybe<Bitmap> loadFromNetwork(AttachmentFile file);
+    Maybe<Bitmap> loadImageFromDownloads(String fileName);
 
-    Completable putToCache(String fileName, Bitmap bitmap);
+    Completable putImageToDownloads(String fileName, Bitmap bitmap);
 
-    Completable putToDownloads(String fileName, Bitmap bitmap);
+    Maybe<Bitmap> loadImageFileFromNetwork(AttachmentFile file);
+
+    Completable downloadFileFromNetwork(AttachmentFile file);
 }

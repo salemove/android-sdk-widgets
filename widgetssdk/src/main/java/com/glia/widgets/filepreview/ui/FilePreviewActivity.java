@@ -12,7 +12,6 @@ import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.call.CallView;
 import com.glia.widgets.di.Dependencies;
 
 public class FilePreviewActivity extends AppCompatActivity {

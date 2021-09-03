@@ -11,6 +11,7 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
@@ -288,5 +289,9 @@ public class UseCaseFactory {
 
     public PutImageFileToDownloadsUseCase createPutImageFileToDownloadsUseCase() {
         return new PutImageFileToDownloadsUseCase(repositoryFactory.getGliaFileRepository());
+    }
+
+    public DownloadFileUseCase createDownloadFileUseCase() {
+        return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository());
     }
 }

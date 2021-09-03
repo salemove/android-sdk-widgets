@@ -10,6 +10,8 @@ import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException;
 import com.glia.widgets.helper.Logger;
 
+import java.io.InputStream;
+
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 
@@ -25,12 +27,12 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
     }
 
     @Override
-    public Maybe<Bitmap> loadFromDownloads(String fileName) {
+    public Maybe<Bitmap> loadImageFromDownloads(String fileName) {
         return downloadsFolderDataSource.getImageFromDownloadsFolder(fileName);
     }
 
     @Override
-    public Maybe<Bitmap> loadFromCache(String fileName) {
+    public Maybe<Bitmap> loadImageFromCache(String fileName) {
         return Maybe.create(emitter -> {
             Bitmap bitmap = bitmapCache.getBitmapById(fileName);
             if (bitmap != null) emitter.onSuccess(bitmap);
@@ -39,7 +41,7 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
     }
 
     @Override
-    public Maybe<Bitmap> loadFromNetwork(AttachmentFile attachmentFile) {
+    public Maybe<Bitmap> loadImageFileFromNetwork(AttachmentFile attachmentFile) {
         return Maybe.create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
             if (gliaException != null) {
                 emitter.onError(gliaException);
@@ -58,7 +60,24 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
     }
 
     @Override
-    public Completable putToCache(String fileName, Bitmap bitmap) {
+    public Completable downloadFileFromNetwork(AttachmentFile attachmentFile) {
+        return
+                Maybe.<InputStream>create(emitter -> {
+                    Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
+                        if (gliaException != null) emitter.onError(gliaException);
+                        else emitter.onSuccess(fileInputStream);
+                    });
+                }).flatMapCompletable(inputStream ->
+                        downloadsFolderDataSource.downloadFileToDownloads(
+                                FileHelper.getFileName(attachmentFile),
+                                attachmentFile.getContentType(),
+                                inputStream
+                        ).doOnComplete(inputStream::close)
+                );
+    }
+
+    @Override
+    public Completable putImageToCache(String fileName, Bitmap bitmap) {
         return Completable.create(emitter -> {
             try {
                 bitmapCache.putBitmap(fileName, bitmap);
@@ -70,7 +89,7 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
     }
 
     @Override
-    public Completable putToDownloads(String fileName, Bitmap bitmap) {
+    public Completable putImageToDownloads(String fileName, Bitmap bitmap) {
         return downloadsFolderDataSource.putImageToDownloads(fileName, bitmap);
     }
 }

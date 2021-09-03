@@ -104,16 +104,4 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
         startActivity(newIntent);
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        chatView.onStartView();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        chatView.onStopView();
-    }
 }

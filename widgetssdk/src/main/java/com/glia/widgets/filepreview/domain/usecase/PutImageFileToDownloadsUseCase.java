@@ -18,6 +18,6 @@ public class PutImageFileToDownloadsUseCase {
         if (fileName == null || fileName.isEmpty())
             return Completable.error(new FileNameMissingException());
         return gliaFileRepository
-                .putToDownloads(fileName, bitmap);
+                .putImageToDownloads(fileName, bitmap);
     }
 }

@@ -19,6 +19,6 @@ public class GetImageFileFromDownloadsUseCase {
             return Maybe.error(new FileNameMissingException());
 
         return gliaFileRepository
-                .loadFromDownloads(fileName);
+                .loadImageFromDownloads(fileName);
     }
 }

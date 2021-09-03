@@ -93,7 +93,8 @@ public class ControllerFactory {
                     useCaseFactory.createGetFileAttachmentsUseCase(),
                     useCaseFactory.createRemoveFileAttachmentUseCase(),
                     useCaseFactory.createIsShowSendButtonUseCase(),
-                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase()
+                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
+                    useCaseFactory.createDownloadFileUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

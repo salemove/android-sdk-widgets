@@ -53,6 +53,7 @@ import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -72,6 +73,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import io.reactivex.disposables.Disposable;
 
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
@@ -173,6 +176,9 @@ public class ChatController implements
     private final RemoveFileAttachmentUseCase removeFileAttachmentUseCase;
     private final IsShowSendButtonUseCase isShowSendButtonUseCase;
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
+    private final DownloadFileUseCase downloadFileUseCase;
+
+    private Disposable disposable = null;
 
     // pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
@@ -205,7 +211,8 @@ public class ChatController implements
             GetFileAttachmentsUseCase getFileAttachmentsUseCase,
             RemoveFileAttachmentUseCase removeFileAttachmentUseCase,
             IsShowSendButtonUseCase isShowSendButtonUseCase,
-            IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase
+            IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
+            DownloadFileUseCase downloadFileUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = chatViewCallback;
@@ -254,6 +261,7 @@ public class ChatController implements
         this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
         this.isShowSendButtonUseCase = isShowSendButtonUseCase;
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
+        this.downloadFileUseCase = downloadFileUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -330,6 +338,7 @@ public class ChatController implements
         Logger.d(TAG, "onDestroy, retain:" + retain);
         destroyView();
         viewCallback = null;
+        if (disposable != null) disposable.dispose();
         if (!retain) {
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
@@ -1147,5 +1156,22 @@ public class ChatController implements
                         Logger.d(TAG, "fileUploadSecurityCheckFinished result=" + scanResult);
                     }
                 });
+    }
+
+    public void onFileDownloadClicked(AttachmentFile attachmentFile) {
+        disposable = downloadFileUseCase
+                .execute(attachmentFile)
+                .subscribe(
+                        () -> fileDownloadSuccess(attachmentFile),
+                        error -> fileDownloadError(attachmentFile, error)
+                );
+    }
+
+    private void fileDownloadError(AttachmentFile attachmentFile, Throwable error) {
+        if (viewCallback != null) viewCallback.fileDownloadError(attachmentFile, error);
+    }
+
+    private void fileDownloadSuccess(AttachmentFile attachmentFile) {
+        if (viewCallback != null) viewCallback.fileDownloadSuccess(attachmentFile);
     }
 }

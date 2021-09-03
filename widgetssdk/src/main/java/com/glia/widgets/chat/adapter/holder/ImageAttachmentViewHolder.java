@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
@@ -45,7 +46,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(AttachmentFile attachmentFile) {
-        String imageName = attachmentFile.getId() + "." + attachmentFile.getName();
+        String imageName = FileHelper.getFileName(attachmentFile);
         disposable = getImageFileFromCacheUseCase.execute(imageName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

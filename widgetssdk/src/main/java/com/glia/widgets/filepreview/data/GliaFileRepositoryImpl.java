@@ -8,12 +8,13 @@ import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException;
-import com.glia.widgets.helper.Logger;
 
 import java.io.InputStream;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class GliaFileRepositoryImpl implements GliaFileRepository {
     private static final String TAG = GliaFileRepositoryImpl.class.getSimpleName();
@@ -42,38 +43,32 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
 
     @Override
     public Maybe<Bitmap> loadImageFileFromNetwork(AttachmentFile attachmentFile) {
-        return Maybe.create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
-            if (gliaException != null) {
-                emitter.onError(gliaException);
-            } else {
-                try {
-                    Logger.d(TAG, "Image decode starting");
-                    Bitmap bitmap = FileHelper.decodeSampledBitmapFromInputStream(fileInputStream);
-                    Logger.d(TAG, "Image decode success");
-                    emitter.onSuccess(bitmap);
-                } catch (Exception e) {
-                    Logger.e(TAG, "Image decode failed: " + e.getMessage());
-                    emitter.onError(e);
-                }
-            }
-        }));
+        return Maybe.<InputStream>create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
+            if (gliaException != null) emitter.onError(gliaException);
+            else emitter.onSuccess(fileInputStream);
+        }))
+                .flatMap(inputStream -> FileHelper.decodeSampledBitmapFromInputStream(inputStream)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()));
     }
 
     @Override
     public Completable downloadFileFromNetwork(AttachmentFile attachmentFile) {
         return
-                Maybe.<InputStream>create(emitter -> {
-                    Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
-                        if (gliaException != null) emitter.onError(gliaException);
-                        else emitter.onSuccess(fileInputStream);
-                    });
-                }).flatMapCompletable(inputStream ->
-                        downloadsFolderDataSource.downloadFileToDownloads(
-                                FileHelper.getFileName(attachmentFile),
-                                attachmentFile.getContentType(),
-                                inputStream
-                        ).doOnComplete(inputStream::close)
-                );
+                Maybe.<InputStream>create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
+                    if (gliaException != null) emitter.onError(gliaException);
+                    else emitter.onSuccess(fileInputStream);
+                }))
+                        .flatMapCompletable(inputStream ->
+                                downloadsFolderDataSource.downloadFileToDownloads(
+                                        FileHelper.getFileName(attachmentFile),
+                                        attachmentFile.getContentType(),
+                                        inputStream
+                                )
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .doOnComplete(inputStream::close)
+                        );
     }
 
     @Override

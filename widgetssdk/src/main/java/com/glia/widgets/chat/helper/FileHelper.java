@@ -7,23 +7,33 @@ import android.os.Build;
 import android.os.Environment;
 
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.helper.Logger;
 
 import java.io.File;
 import java.io.InputStream;
+
+import io.reactivex.Maybe;
 
 public class FileHelper {
     private static final String TAG = FileHelper.class.getSimpleName();
     private static final String FILE_PROVIDER_AUTHORITY = "com.glia.widgets.fileprovider";
     private static final int DESIRED_IMAGE_SIZE = 640;
 
-    public static Bitmap decodeSampledBitmapFromInputStream(InputStream inputStream) {
-        Bitmap rawBitmap = BitmapFactory.decodeStream(inputStream);
-        int rawHeight = rawBitmap.getHeight();
-        int rawWidth = rawBitmap.getWidth();
+    public static Maybe<Bitmap> decodeSampledBitmapFromInputStream(InputStream inputStream) {
+        return Maybe.create(emitter -> {
+                    Bitmap rawBitmap = BitmapFactory.decodeStream(inputStream);
+                    int rawHeight = rawBitmap.getHeight();
+                    int rawWidth = rawBitmap.getWidth();
 
-        double ratio = ((double) rawWidth) / ((double) rawHeight);
-
-        return Bitmap.createScaledBitmap(rawBitmap, (int) (DESIRED_IMAGE_SIZE * ratio), DESIRED_IMAGE_SIZE, false);
+                    double ratio = ((double) rawWidth) / ((double) rawHeight);
+                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawBitmap, (int) (DESIRED_IMAGE_SIZE * ratio), DESIRED_IMAGE_SIZE, false);
+                    if (scaledBitmap != null)
+                        emitter.onSuccess(scaledBitmap);
+                    else {
+                        emitter.onError(new Exception());
+                    }
+                }
+        );
     }
 
     public static String getFileProviderAuthority(Context context) {
@@ -41,6 +51,10 @@ public class FileHelper {
     }
 
     public static String getFileName(AttachmentFile attachmentFile) {
-        return attachmentFile.getId() + "." + attachmentFile.getName();
+        return getFileName(attachmentFile.getId(), attachmentFile.getName());
+    }
+
+    public static String getFileName(String fileId, String fileName) {
+        return fileId + "." + fileName;
     }
 }

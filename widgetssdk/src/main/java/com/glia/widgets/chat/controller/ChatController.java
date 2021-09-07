@@ -74,7 +74,9 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
@@ -1121,7 +1123,6 @@ public class ChatController implements
     public void queueForEngagementOngoing() {
         Logger.d(TAG, "queueForEngagementOngoing");
         viewInitQueueing();
-
     }
 
     public void onRemoveAttachment(FileAttachment attachment) {
@@ -1161,6 +1162,8 @@ public class ChatController implements
     public void onFileDownloadClicked(AttachmentFile attachmentFile) {
         disposable = downloadFileUseCase
                 .execute(attachmentFile)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         () -> fileDownloadSuccess(attachmentFile),
                         error -> fileDownloadError(attachmentFile, error)

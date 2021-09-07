@@ -2,6 +2,8 @@ package com.glia.widgets.filepreview.ui;
 
 import android.graphics.Bitmap;
 
+import com.glia.widgets.chat.helper.FileHelper;
+
 class State {
     private final ImageLoadingState imageLoadingState;
     private final boolean isShowShareButton;
@@ -127,7 +129,7 @@ class State {
                 .copyFrom(this)
                 .setImageName(id)
                 .setImageId(name)
-                .setImageIdName(id + "." + name)
+                .setImageIdName(FileHelper.getFileName(id, name))
                 .build();
     }
 

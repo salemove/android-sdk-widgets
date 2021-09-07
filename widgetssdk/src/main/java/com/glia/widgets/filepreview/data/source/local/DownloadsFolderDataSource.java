@@ -166,7 +166,7 @@ public class DownloadsFolderDataSource {
                 Uri fileUri = resolver.insert(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL), contentValues);
                 fos = resolver.openOutputStream(Objects.requireNonNull(fileUri));
 
-                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                byte[] buffer = new byte[10 * 1024]; // or other buffer size
                 int read;
 
                 while ((read = inputStream.read(buffer)) != -1) {
@@ -199,7 +199,7 @@ public class DownloadsFolderDataSource {
                 String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
                 File file = new File(imagesDir, fileName);
                 fos = new FileOutputStream(file);
-                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                byte[] buffer = new byte[10 * 1024]; // or other buffer size
                 int read;
                 while ((read = inputStream.read(buffer)) != -1) {
                     fos.write(buffer, 0, read);

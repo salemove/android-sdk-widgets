@@ -3,14 +3,18 @@ package com.glia.widgets.chat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -112,6 +116,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private static final int CAPTURE_IMAGE_ACTION_REQUEST = 101;
     private static final int CAPTURE_VIDEO_ACTION_REQUEST = 102;
     private static final int CAMERA_PERMISSION_REQUEST = 1010;
+    private static final int WRITE_PERMISSION_REQUEST = 1001001;
+
+    private AttachmentFile downloadFileHolder = null;
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
@@ -1164,6 +1171,15 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileDownloadClick(AttachmentFile attachmentFile) {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            onFileDownload(attachmentFile);
+        } else {
+            Utils.getActivity(getContext()).requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+            downloadFileHolder = attachmentFile;
+        }
+    }
+
+    private void onFileDownload(AttachmentFile attachmentFile) {
         submitUpdatedItems(attachmentFile, true, false);
         controller.onFileDownloadClicked(attachmentFile);
     }
@@ -1214,11 +1230,45 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileOpenClick(AttachmentFile attachment) {
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), FileHelper.getFileName(attachment));
-        Uri contentUri = FileProvider.getUriForFile(getContext(), FileHelper.getFileProviderAuthority(getContext()), file);
+        Uri contentUri = null;
+        Context context = getContext();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Uri downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            String[] projection = new String[]{
+                    MediaStore.Downloads._ID,
+                    MediaStore.Downloads.DISPLAY_NAME,
+                    MediaStore.Downloads.SIZE
+            };
+            String selection = MediaStore.Downloads.DISPLAY_NAME +
+                    " == ?";
+            String[] selectionArgs = new String[]{FileHelper.getFileName(attachment)};
+            String sortOrder = MediaStore.Downloads.DISPLAY_NAME + " ASC";
+            try (Cursor cursor = context.getContentResolver().query(
+                    downloadsContentUri,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+            )) {
+                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID);
+                cursor.moveToFirst();
+                long id = cursor.getLong(idColumn);
+                cursor.close();
+                contentUri = ContentUris.withAppendedId(downloadsContentUri, id);
+            }
+        } else {
+            File file = new File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),
+                    FileHelper.getFileName(attachment)
+            );
+            contentUri = FileProvider.getUriForFile(getContext(), FileHelper.getFileProviderAuthority(context), file);
+        }
+
         Intent openIntent = new Intent(Intent.ACTION_VIEW);
+        openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         openIntent.setDataAndType(contentUri, attachment.getContentType());
-        getContext().startActivity(openIntent);
+        openIntent.setClipData(ClipData.newRawUri("", contentUri));
+        context.startActivity(openIntent);
     }
 
     @Override
@@ -1229,6 +1279,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             dispatchImageCapture();
+        }
+        if (requestCode == WRITE_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (downloadFileHolder != null) onFileDownload(downloadFileHolder);
         }
     }
 

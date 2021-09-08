@@ -5,6 +5,7 @@ import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
@@ -170,16 +171,11 @@ public class ChatHeadsController implements
         emitViewState(chatHeadState.setUseOverlays(useOverlays));
         boolean hasOngoingMediaQueueing = getIsMediaQueueingOngoingUseCase.execute();
         Logger.d(TAG, "onNavigatedToChat, hasOngoingMediaQueueing: " + hasOngoingMediaQueueing);
+
         if (hasOngoingMediaQueueing) {
-            emitViewState(chatHeadState.changeVisibility(
-                    true,
-                    Constants.CALL_ACTIVITY
-            ));
+            emitViewState(chatHeadState.changeVisibility(true, Constants.CALL_ACTIVITY));
         } else {
             changeVisibilityByMedia();
-        }
-        if (chatHeadInput != null && chatHeadInput.uiTheme != null) {
-            emitViewState(chatHeadState.themeChanged(chatHeadInput.uiTheme));
         }
         if (chatHeadInput != null) {
             lastInput = chatHeadInput;
@@ -187,15 +183,13 @@ public class ChatHeadsController implements
         init(enableChatHeads);
     }
 
-    private void changeVisibilityByMedia() {
-        boolean hasOngoingMedia = chatHeadState.operatorMediaState != null &&
-                (chatHeadState.operatorMediaState.getAudio() != null ||
-                        chatHeadState.operatorMediaState.getVideo() != null);
+    public void onSetupViewAppearance(UiTheme theme) {
+        emitViewState(chatHeadState.themeChanged(theme));
+    }
 
-        emitViewState(chatHeadState.changeVisibility(
-                chatHeadState.engagementRequested && hasOngoingMedia,
-                hasOngoingMedia ? Constants.CALL_ACTIVITY : null
-        ));
+    private void changeVisibilityByMedia() {
+        boolean hasOngoingMedia = chatHeadState.operatorMediaState != null && (chatHeadState.operatorMediaState.getAudio() != null || chatHeadState.operatorMediaState.getVideo() != null);
+        emitViewState(chatHeadState.changeVisibility(chatHeadState.engagementRequested && hasOngoingMedia, hasOngoingMedia ? Constants.CALL_ACTIVITY : null));
     }
 
     public void onNavigatedToCall(

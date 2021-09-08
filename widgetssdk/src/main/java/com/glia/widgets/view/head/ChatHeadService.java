@@ -32,9 +32,7 @@ public class ChatHeadService extends Service {
 
                 @Override
                 public void emitState(ChatHeadState chatHeadState) {
-                    if (chatHeadState.theme != null) {
-                        chatHeadView.setTheme(chatHeadState.theme);
-                    }
+                    if (chatHeadState.theme != null) chatHeadView.setTheme(chatHeadState.theme);
                     chatHeadView.setMessageBadgeCount(chatHeadState.messageCount);
                     chatHeadView.updateImage(chatHeadState.operatorProfileImgUrl);
                     chatHeadView.setVisibility(

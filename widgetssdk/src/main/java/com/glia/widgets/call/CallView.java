@@ -656,6 +656,7 @@ public class CallView extends ConstraintLayout {
             speakerButtonLabel.setTypeface(fontFamily);
             minimizeButtonLabel.setTypeface(fontFamily);
         }
+        if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
     }
 
     private void setAppBarTheme() {

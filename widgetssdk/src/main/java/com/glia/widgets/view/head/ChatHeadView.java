@@ -75,8 +75,8 @@ public class ChatHeadView extends ConstraintLayout {
 
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
-        this.theme = Utils.getFullHybridTheme(this.theme, theme);
-        post(this::setupViewAppearance);
+        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+        setupViewAppearance();
     }
 
     private void setupViewAppearance() {
@@ -85,8 +85,7 @@ public class ChatHeadView extends ConstraintLayout {
         ColorStateList backgroundColor =
                 ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor());
         int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
-        ColorStateList primaryColorStateList = ContextCompat.getColorStateList(
-                this.getContext(), theme.getBrandPrimaryColor());
+        ColorStateList primaryColorStateList = ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor());
         profilePictureView.setBackgroundColor(primaryColor);
         placeholderView.setBackgroundColor(primaryColor);
         placeholderView.setImageTintList(backgroundColor);

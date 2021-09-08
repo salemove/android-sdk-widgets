@@ -33,9 +33,7 @@ public class ChatHeadLayout extends FrameLayout {
                     post(() -> {
                         chatHeadView.setMessageBadgeCount(chatHeadState.messageCount);
                         chatHeadView.updateImage(chatHeadState.operatorProfileImgUrl);
-                        if (chatHeadState.theme != null) {
-                            chatHeadView.setTheme(chatHeadState.theme);
-                        }
+                        if (chatHeadState.theme != null) chatHeadView.setTheme(chatHeadState.theme);
                         chatHeadView.setVisibility(
                                 chatHeadState.useChatHeads &&
                                         chatHeadState.areIntegratedViewsVisible
@@ -78,12 +76,12 @@ public class ChatHeadLayout extends FrameLayout {
                 defStyleAttr,
                 defStyleRes
         );
+        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
+        chatHeadsController.addListener(chatHeadListener);
         initConfigurations();
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
         setupViewActions();
-        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
-        chatHeadsController.addListener(chatHeadListener);
     }
 
     /**
@@ -116,7 +114,7 @@ public class ChatHeadLayout extends FrameLayout {
     private void setDefaultTheme(TypedArray typedArray) {
         UiTheme theme = Utils.getThemeFromTypedArray(typedArray, this.getContext());
         // forwarding call to chat head view. Always using same attrs and attributeSet
-        chatHeadView.setTheme(theme);
+        chatHeadsController.onSetupViewAppearance(theme);
     }
 
     @SuppressLint("ClickableViewAccessibility")

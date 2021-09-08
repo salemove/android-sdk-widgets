@@ -814,6 +814,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (this.theme.getAppBarTitle() != null) {
             showToolbar(this.theme.getAppBarTitle());
         }
+
+        if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
     }
 
     private void handleStatusbarColor() {

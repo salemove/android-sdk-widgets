@@ -638,6 +638,7 @@ public class CallView extends ConstraintLayout {
         muteButton.setImageResource(this.theme.getIconCallAudioOn());
         speakerButton.setImageResource(this.theme.getIconCallSpeakerOn());
         minimizeButton.setImageResource(this.theme.getIconCallMinimize());
+        chatButtonBadgeView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), this.theme.getBrandPrimaryColor()));
         // fonts
         if (this.theme.getFontRes() != null) {
             appBar.changeFontFamily(this.theme.getFontRes());

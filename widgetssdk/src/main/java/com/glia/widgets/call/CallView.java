@@ -35,16 +35,16 @@ import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.dialog.DialogsState;
+import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.head.ChatHeadService;
-import com.glia.widgets.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.ChatHeadInput;
-import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.notification.device.NotificationManager;
-import com.glia.widgets.screensharing.ScreenSharingController;
+import com.glia.widgets.view.head.ChatHeadService;
+import com.glia.widgets.view.head.ChatHeadsController;
+import com.glia.widgets.view.head.model.ChatHeadInput;
+import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
@@ -656,6 +656,7 @@ public class CallView extends ConstraintLayout {
             speakerButtonLabel.setTypeface(fontFamily);
             minimizeButtonLabel.setTypeface(fontFamily);
         }
+        if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
     }
 
     private void setAppBarTheme() {

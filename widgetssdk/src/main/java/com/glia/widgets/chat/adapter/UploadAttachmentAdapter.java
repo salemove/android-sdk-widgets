@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.widgets.R;
-import com.glia.widgets.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.squareup.picasso.Picasso;

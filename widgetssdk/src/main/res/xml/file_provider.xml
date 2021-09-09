@@ -8,5 +8,8 @@
         path="Downloads" />
     <files-path
         name="files"
-        path="." />
+        path="/" />
+    <root-path
+        name="external_files"
+        path="/storage/" />
 </paths>

@@ -11,33 +11,38 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.fileupload.domain.AddFileAttachmentsObserverUseCase;
-import com.glia.widgets.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.fileupload.domain.RemoveFileAttachmentObserverUseCase;
-import com.glia.widgets.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.glia.GliaLoadHistoryUseCase;
+import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
+import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.glia.GliaOnMessageUseCase;
+import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
-import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
-import com.glia.widgets.glia.GliaSendMessageUseCase;
-import com.glia.widgets.dialog.PermissionDialogManager;
-import com.glia.widgets.notification.device.INotificationManager;
-import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowScreenSharingNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.permissions.PermissionManager;
-import com.glia.widgets.permissions.domain.HasCallNotificationChannelEnabledUseCase;
-import com.glia.widgets.permissions.domain.HasOverlayEnabledUseCase;
-import com.glia.widgets.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
-import com.glia.widgets.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
-import com.glia.widgets.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
-import com.glia.widgets.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
-import com.glia.widgets.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.core.dialog.PermissionDialogManager;
+import com.glia.widgets.core.notification.device.INotificationManager;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.permissions.PermissionManager;
+import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
+import com.glia.widgets.core.permissions.domain.HasOverlayEnabledUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
+import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
+import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -269,5 +274,25 @@ public class UseCaseFactory {
 
     public SetEnableCallNotificationChannelDialogShownUseCase createSetEnableCallNotificationChannelDialogShownUseCase() {
         return new SetEnableCallNotificationChannelDialogShownUseCase(permissionDialogManager);
+    }
+
+    public GetImageFileFromDownloadsUseCase createGetImageFileFromDownloadsUseCase() {
+        return new GetImageFileFromDownloadsUseCase(repositoryFactory.getGliaFileRepository());
+    }
+
+    public GetImageFileFromCacheUseCase createGetImageFileFromCacheUseCase() {
+        return new GetImageFileFromCacheUseCase(repositoryFactory.getGliaFileRepository());
+    }
+
+    public GetImageFileFromNetworkUseCase createGetImageFileFromNetworkUseCase() {
+        return new GetImageFileFromNetworkUseCase(repositoryFactory.getGliaFileRepository());
+    }
+
+    public PutImageFileToDownloadsUseCase createPutImageFileToDownloadsUseCase() {
+        return new PutImageFileToDownloadsUseCase(repositoryFactory.getGliaFileRepository());
+    }
+
+    public DownloadFileUseCase createDownloadFileUseCase() {
+        return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository());
     }
 }

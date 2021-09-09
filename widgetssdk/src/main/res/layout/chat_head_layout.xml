@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="android.widget.FrameLayout">
 
-    <com.glia.widgets.head.ChatHeadView
+    <com.glia.widgets.view.head.ChatHeadView
         android:id="@+id/chat_head_view"
         android:layout_width="wrap_content"
         android:visibility="gone"

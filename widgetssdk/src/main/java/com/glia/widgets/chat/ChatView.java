@@ -3,17 +3,20 @@ package com.glia.widgets.chat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
@@ -38,7 +41,6 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -51,17 +53,18 @@ import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
+import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.fileupload.model.FileAttachment;
-import com.glia.widgets.head.ChatHeadService;
-import com.glia.widgets.head.ChatHeadsController;
+import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.filepreview.ui.FilePreviewActivity;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.view.head.ChatHeadService;
+import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.ChatHeadInput;
-import com.glia.widgets.model.DialogsState;
-import com.glia.widgets.notification.device.NotificationManager;
-import com.glia.widgets.screensharing.ScreenSharingController;
+import com.glia.widgets.view.head.model.ChatHeadInput;
+import com.glia.widgets.core.notification.device.NotificationManager;
+import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
@@ -73,9 +76,7 @@ import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -115,6 +116,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private static final int CAPTURE_IMAGE_ACTION_REQUEST = 101;
     private static final int CAPTURE_VIDEO_ACTION_REQUEST = 102;
     private static final int CAMERA_PERMISSION_REQUEST = 1010;
+    private static final int WRITE_PERMISSION_REQUEST = 1001001;
+
+    private AttachmentFile downloadFileHolder = null;
 
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
@@ -165,9 +169,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             }
         }
     };
-
-    private Handler mainHandler = null;
-    private Runnable runnable = null;
 
     public ChatView(Context context) {
         this(context, null);
@@ -281,13 +282,15 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
      * Used to tell the view that the user has pressed the back button so that the view can
      * set its state accordingly.
      */
-    public void backPressed() {
-        if (controller != null) {
-            controller.onBackArrowClicked();
+    public boolean backPressed() {
+        if (addAttachmentMenu.getVisibility() == VISIBLE) {
+            addAttachmentMenu.hide();
+            return false;
         }
-        if (chatHeadsController != null) {
-            chatHeadsController.onChatBackButtonPressed();
-        }
+
+        if (controller != null) controller.onBackArrowClicked();
+        if (chatHeadsController != null) chatHeadsController.onChatBackButtonPressed();
+        return true;
     }
 
     /**
@@ -334,20 +337,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
         if (screenSharingController != null) {
             screenSharingController.onResume(this.getContext());
-        }
-    }
-
-    public void onStartView() {
-        if (mainHandler == null) {
-            mainHandler = new Handler(Looper.getMainLooper());
-        }
-    }
-
-    public void onStopView() {
-        if (mainHandler != null) {
-            mainHandler.removeCallbacks(runnable);
-            runnable = null;
-            mainHandler = null;
         }
     }
 
@@ -461,9 +450,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             private ChatItem updateChatItem(ChatItem item) {
                 if (item instanceof OperatorAttachmentItem) {
                     AttachmentFile attachmentFile = ((OperatorAttachmentItem) item).attachmentFile;
-                    File file = new File(ChatView.this.getContext().getFilesDir(), attachmentFile.getName());
                     OperatorAttachmentItem newItem;
-                    if (file.exists()) {
+                    if (FileHelper.isFileDownloaded(attachmentFile)) {
                         newItem = new OperatorAttachmentItem(
                                 attachmentFile.getId(),
                                 item.getViewType(),
@@ -486,9 +474,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     return newItem;
                 } else if (item instanceof VisitorAttachmentItem) {
                     AttachmentFile attachmentFile = ((VisitorAttachmentItem) item).attachmentFile;
-                    File file = new File(ChatView.this.getContext().getFilesDir(), attachmentFile.getName());
                     VisitorAttachmentItem newItem;
-                    if (file.exists()) {
+                    if (FileHelper.isFileDownloaded(attachmentFile)) {
                         newItem = new VisitorAttachmentItem(
                                 attachmentFile.getId(),
                                 item.getViewType(),
@@ -531,6 +518,16 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             @Override
             public void scrollToBottomImmediate() {
                 post(() -> chatRecyclerView.scrollToPosition(adapter.getItemCount() - 1));
+            }
+
+            @Override
+            public void fileDownloadError(AttachmentFile attachmentFile, Throwable error) {
+                fileDownloadFailed(attachmentFile);
+            }
+
+            @Override
+            public void fileDownloadSuccess(AttachmentFile attachmentFile) {
+                fileDownloadCompleted(attachmentFile);
             }
         };
 
@@ -741,7 +738,16 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupViewAppearance() {
-        adapter = new ChatAdapter(this.theme, this.onOptionClickedListener, this.onImageLoadedListener, this, this);
+        adapter = new ChatAdapter(
+                this.theme,
+                this.onOptionClickedListener,
+                this.onImageLoadedListener,
+                this,
+                this,
+                Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
+                Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
+                Dependencies.getUseCaseFactory().createGetImageFileFromNetworkUseCase()
+        );
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         adapter.registerAdapterDataObserver(dataObserver);
         chatRecyclerView.setAdapter(adapter);
@@ -808,6 +814,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (this.theme.getAppBarTitle() != null) {
             showToolbar(this.theme.getAppBarTitle());
         }
+
+        if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
     }
 
     private void handleStatusbarColor() {
@@ -898,12 +906,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         );
 
         appBar.setOnBackClickedListener(() -> {
-            if (controller != null) {
-                controller.onBackArrowClicked();
-            }
-            if (chatHeadsController != null) {
-                chatHeadsController.onChatBackButtonPressed();
-            }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
             }
@@ -932,7 +934,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         try {
             photoFile = Utils.createTempPhotoFile(getContext());
         } catch (IOException exception) {
-            exception.printStackTrace();
+            Logger.e(TAG, "Create photo file failed: " + exception.getMessage());
         }
 
         if (photoFile != null) {
@@ -1171,63 +1173,27 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileDownloadClick(AttachmentFile attachmentFile) {
-        submitUpdatedItems(attachmentFile, true, false);
-        Context context = this.getContext();
-        File file = new File(context.getFilesDir(), attachmentFile.getName());
-        downloadFile(attachmentFile, file);
-    }
-
-    private void downloadFile(AttachmentFile attachmentFile, File file) {
-        if (attachmentFile.isDeleted()) {
-            Toast.makeText(this.getContext(), this.getContext().getString(R.string.glia_chat_file_download_failed_msg), Toast.LENGTH_SHORT).show();
-            return;
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            onFileDownload(attachmentFile);
+        } else {
+            Utils.getActivity(getContext()).requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+            downloadFileHolder = attachmentFile;
         }
-
-        Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> new Thread(() -> {
-            try {
-                try (OutputStream output = new FileOutputStream(file)) {
-                    byte[] buffer = new byte[4 * 1024]; // or other buffer size
-                    int read;
-
-                    while ((read = fileInputStream.read(buffer)) != -1) {
-                        output.write(buffer, 0, read);
-                    }
-
-                    output.flush();
-
-                    onFileSaveSuccess(attachmentFile);
-                    Logger.d(TAG, "File is saved to downloads folder");
-                } catch (IOException e) {
-                    Logger.e(TAG, "File saving failed: " + e.getMessage());
-                    e.printStackTrace();
-                    onFileSaveFail(attachmentFile);
-                }
-            } finally {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    Logger.e(TAG, "Closing fileInputStream failed: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }).start());
     }
 
-    private void onFileSaveSuccess(AttachmentFile attachment) {
-        runnable = createRunnable(getContext().getString(R.string.glia_chat_file_download_success_message), attachment, true);
-        mainHandler.post(runnable);
+    private void onFileDownload(AttachmentFile attachmentFile) {
+        submitUpdatedItems(attachmentFile, true, false);
+        controller.onFileDownloadClicked(attachmentFile);
     }
 
-    private void onFileSaveFail(AttachmentFile attachment) {
-        runnable = createRunnable(getContext().getString(R.string.glia_chat_file_download_fail_message), attachment, false);
-        mainHandler.post(runnable);
+    public void fileDownloadFailed(AttachmentFile file) {
+        submitUpdatedItems(file, false, false);
+        Toast.makeText(this.getContext(), this.getContext().getString(R.string.glia_chat_file_download_failed_msg), Toast.LENGTH_SHORT).show();
     }
 
-    private Runnable createRunnable(String message, AttachmentFile attachment, boolean isFileExists) {
-        return () -> {
-            submitUpdatedItems(attachment, false, isFileExists);
-            Toast.makeText(this.getContext(), message, Toast.LENGTH_LONG).show();
-        };
+    public void fileDownloadCompleted(AttachmentFile file) {
+        submitUpdatedItems(file, false, true);
+        Toast.makeText(this.getContext(), getContext().getString(R.string.glia_chat_file_download_success_message), Toast.LENGTH_LONG).show();
     }
 
     private void submitUpdatedItems(AttachmentFile attachmentFile, boolean isDownloading, boolean isFileExists) {
@@ -1266,20 +1232,59 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileOpenClick(AttachmentFile attachment) {
-        Context context = this.getContext();
-        File file = new File(context.getFilesDir(), attachment.getName());
-        Uri contentUri = FileProvider.getUriForFile(context, FileHelper.getFileProviderAuthority(context), file);
-        String mime = context.getContentResolver().getType(contentUri);
+        Uri contentUri = null;
+        Context context = getContext();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Uri downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            String[] projection = new String[]{
+                    MediaStore.Downloads._ID,
+                    MediaStore.Downloads.DISPLAY_NAME,
+                    MediaStore.Downloads.SIZE
+            };
+            String selection = MediaStore.Downloads.DISPLAY_NAME +
+                    " == ?";
+            String[] selectionArgs = new String[]{FileHelper.getFileName(attachment)};
+            String sortOrder = MediaStore.Downloads.DISPLAY_NAME + " ASC";
+            try (Cursor cursor = context.getContentResolver().query(
+                    downloadsContentUri,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+            )) {
+                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID);
+                cursor.moveToFirst();
+                long id = cursor.getLong(idColumn);
+                cursor.close();
+                contentUri = ContentUris.withAppendedId(downloadsContentUri, id);
+            }
+        } else {
+            File file = new File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),
+                    FileHelper.getFileName(attachment)
+            );
+            contentUri = FileProvider.getUriForFile(getContext(), FileHelper.getFileProviderAuthority(context), file);
+        }
 
         Intent openIntent = new Intent(Intent.ACTION_VIEW);
-        openIntent.setDataAndType(contentUri, mime);
-        openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(openIntent, context.getString(R.string.glia_chat_file_open_file_title)));
+        openIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        openIntent.setDataAndType(contentUri, attachment.getContentType());
+        openIntent.setClipData(ClipData.newRawUri("", contentUri));
+        context.startActivity(openIntent);
     }
 
     @Override
     public void onImageItemClick(AttachmentFile file) {
-        this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName()));
+        this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName(), theme));
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            dispatchImageCapture();
+        }
+        if (requestCode == WRITE_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (downloadFileHolder != null) onFileDownload(downloadFileHolder);
+        }
     }
 
     public interface OnBackClickedListener {

@@ -51,7 +51,6 @@
     <string name="glia_dialog_screen_sharing_offer_enable_notifications_title">Share your screen?</string>
     <string name="glia_dialog_screen_sharing_offer_enable_notifications_message">The operator has requested you share your screen. However this requires the app\'s notifications be switched on. Do this now?</string>
 
-
     <!--    call screen-->
     <string name="glia_call_audio_app_bar_title">Audio call</string>
     <string name="glia_call_video_app_bar_title">Video call</string>
@@ -96,7 +95,7 @@
     <string name="glia_chat_attachment_open_button_label">Open</string>
     <string name="glia_chat_attachment_downloading_label">Downloading file…</string>
 
-    <!--FilePreviewActivity-->
+    <!--    FilePreviewActivity-->
     <string name="glia_preview_activity_preview_failed_msg">Unable to preview image at the moment, please try again later.</string>
     <string name="glia_preview_activity_image_save_success_msg">Image is saved successfully.</string>
     <string name="glia_preview_activity_image_save_fail_msg">Failed to save image.</string>
@@ -104,5 +103,4 @@
     <string name="glia_preview_activity_image_share_title">Share Image</string>
     <string name="glia_preview_activity_toolbar_title">Preview</string>
     <string name="glia_preview_activity_img_fetch_fail_msg">Unable to fetch image at the moment, please try again later.</string>
-
 </resources>

@@ -42,28 +42,29 @@ import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
-import com.glia.widgets.dialog.DialogController;
-import com.glia.widgets.fileupload.domain.AddFileAttachmentsObserverUseCase;
-import com.glia.widgets.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.fileupload.domain.RemoveFileAttachmentObserverUseCase;
-import com.glia.widgets.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.fileupload.model.FileAttachment;
-import com.glia.widgets.glia.GliaLoadHistoryUseCase;
-import com.glia.widgets.glia.GliaOnMessageUseCase;
-import com.glia.widgets.glia.GliaSendMessagePreviewUseCase;
-import com.glia.widgets.glia.GliaSendMessageUseCase;
+import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
+import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.model.MediaUpgradeOfferRepository;
-import com.glia.widgets.model.MediaUpgradeOfferRepositoryCallback;
-import com.glia.widgets.model.MessagesNotSeenHandler;
-import com.glia.widgets.model.MinimizeHandler;
-import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.view.MessagesNotSeenHandler;
+import com.glia.widgets.view.MinimizeHandler;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,10 +74,16 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
         GliaOnEngagementUseCase.Listener,
         GliaOnEngagementEndUseCase.Listener {
+
+    private final static String TAG = ChatController.class.getSimpleName();
 
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -171,9 +178,93 @@ public class ChatController implements
     private final RemoveFileAttachmentUseCase removeFileAttachmentUseCase;
     private final IsShowSendButtonUseCase isShowSendButtonUseCase;
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
+    private final DownloadFileUseCase downloadFileUseCase;
+
+    private Disposable disposable = null;
 
     // pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
+
+    public ChatController(
+            MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
+            TimeCounter sharedTimer,
+            ChatViewCallback chatViewCallback,
+            MinimizeHandler minimizeHandler,
+            DialogController dialogController,
+            MessagesNotSeenHandler messagesNotSeenHandler,
+            ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
+            ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
+            RemoveCallNotificationUseCase removeCallNotificationUseCase,
+            GliaLoadHistoryUseCase gliaLoadHistoryUseCase,
+            GliaQueueForChatEngagementUseCase queueForChatEngagementUseCase,
+            GliaOnEngagementUseCase onEngagementUseCase,
+            GliaOnEngagementEndUseCase onEngagementEndUseCase,
+            GliaOnMessageUseCase gliaOnMessageUseCase,
+            GliaSendMessagePreviewUseCase gliaSendMessagePreviewUseCase,
+            GliaSendMessageUseCase gliaSendMessageUseCase,
+            AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
+            GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
+            GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase,
+            GliaEndEngagementUseCase endEngagementUseCase,
+            OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase,
+            AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase,
+            AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase,
+            RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
+            GetFileAttachmentsUseCase getFileAttachmentsUseCase,
+            RemoveFileAttachmentUseCase removeFileAttachmentUseCase,
+            IsShowSendButtonUseCase isShowSendButtonUseCase,
+            IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
+            DownloadFileUseCase downloadFileUseCase
+    ) {
+        Logger.d(TAG, "constructor");
+        this.viewCallback = chatViewCallback;
+        this.chatState = new ChatState.Builder()
+                .setQueueTicketId(null)
+                .setHistoryLoaded(false)
+                .setOperatorName(null)
+                .setCompanyName(null)
+                .setQueueId(null)
+                .setContextUrl(null)
+                .setIsVisible(false)
+                .setIntegratorChatStarted(false)
+                .setChatItems(new ArrayList<>())
+                .setLastTypedText("")
+                .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsChatInBottom(true)
+                .setMessagesNotSeen(0)
+                .setPendingNavigationType(null)
+                .setUnsentMessages(new ArrayList<>())
+                .createChatState();
+        this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
+        this.callTimer = sharedTimer;
+        this.minimizeHandler = minimizeHandler;
+        this.dialogController = dialogController;
+        this.messagesNotSeenHandler = messagesNotSeenHandler;
+
+        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
+        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
+        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
+        this.loadHistoryUseCase = gliaLoadHistoryUseCase;
+        this.getEngagementUseCase = onEngagementUseCase;
+        this.engagementEndUseCase = onEngagementEndUseCase;
+        this.queueForChatEngagementUseCase = queueForChatEngagementUseCase;
+        this.onMessageUseCase = gliaOnMessageUseCase;
+        this.sendMessagePreviewUseCase = gliaSendMessagePreviewUseCase;
+        this.sendMessageUseCase = gliaSendMessageUseCase;
+        this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
+        this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
+        this.endEngagementUseCase = endEngagementUseCase;
+        this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
+        this.onUpgradeToMediaEngagementUseCase = onUpgradeToMediaEngagementUseCase;
+        this.addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase;
+        this.addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase;
+        this.removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase;
+        this.getFileAttachmentsUseCase = getFileAttachmentsUseCase;
+        this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
+        this.isShowSendButtonUseCase = isShowSendButtonUseCase;
+        this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
+        this.downloadFileUseCase = downloadFileUseCase;
+    }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
         this.photoCaptureFileUri = photoCaptureFileUri;
@@ -193,86 +284,7 @@ public class ChatController implements
         }
     };
 
-    private final String TAG = "ChatController";
     private volatile ChatState chatState;
-
-    public ChatController(MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
-                          TimeCounter callTimer,
-                          ChatViewCallback viewCallback,
-                          MinimizeHandler minimizeHandler,
-                          DialogController dialogController,
-                          MessagesNotSeenHandler messagesNotSeenHandler,
-                          ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
-                          ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
-                          RemoveCallNotificationUseCase removeCallNotificationUseCase,
-                          GliaLoadHistoryUseCase loadHistoryUseCase,
-                          GliaQueueForChatEngagementUseCase queueForChatEngagementUseCase,
-                          GliaOnEngagementUseCase gliaObserveEngagementUseCase,
-                          GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase,
-                          GliaOnMessageUseCase onMessageUseCase,
-                          GliaSendMessagePreviewUseCase gliaSendMessagePreviewUseCase,
-                          GliaSendMessageUseCase sendMessageUseCase,
-                          AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
-                          GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
-                          GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase,
-                          GliaEndEngagementUseCase endEngagementUseCase,
-                          OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase,
-                          AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase,
-                          AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase,
-                          RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
-                          GetFileAttachmentsUseCase getFileAttachmentsUseCase,
-                          RemoveFileAttachmentUseCase removeFileAttachmentUseCase,
-                          IsShowSendButtonUseCase isShowSendButtonUseCase,
-                          IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase
-    ) {
-        Logger.d(TAG, "constructor");
-        this.viewCallback = viewCallback;
-        this.chatState = new ChatState.Builder()
-                .setQueueTicketId(null)
-                .setHistoryLoaded(false)
-                .setOperatorName(null)
-                .setCompanyName(null)
-                .setQueueId(null)
-                .setContextUrl(null)
-                .setIsVisible(false)
-                .setIntegratorChatStarted(false)
-                .setChatItems(new ArrayList<>())
-                .setLastTypedText("")
-                .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
-                .setIsChatInBottom(true)
-                .setMessagesNotSeen(0)
-                .setPendingNavigationType(null)
-                .setUnsentMessages(new ArrayList<>())
-                .createChatState();
-        this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
-        this.callTimer = callTimer;
-        this.minimizeHandler = minimizeHandler;
-        this.dialogController = dialogController;
-        this.messagesNotSeenHandler = messagesNotSeenHandler;
-
-        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
-        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
-        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
-        this.loadHistoryUseCase = loadHistoryUseCase;
-        this.getEngagementUseCase = gliaObserveEngagementUseCase;
-        this.engagementEndUseCase = gliaOnEngagementEndUseCase;
-        this.queueForChatEngagementUseCase = queueForChatEngagementUseCase;
-        this.onMessageUseCase = onMessageUseCase;
-        this.sendMessagePreviewUseCase = gliaSendMessagePreviewUseCase;
-        this.sendMessageUseCase = sendMessageUseCase;
-        this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
-        this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
-        this.endEngagementUseCase = endEngagementUseCase;
-        this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
-        this.onUpgradeToMediaEngagementUseCase = onUpgradeToMediaEngagementUseCase;
-        this.addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase;
-        this.addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase;
-        this.removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase;
-        this.getFileAttachmentsUseCase = getFileAttachmentsUseCase;
-        this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
-        this.isShowSendButtonUseCase = isShowSendButtonUseCase;
-        this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
-    }
 
     public void initChat(String companyName,
                          String queueId,
@@ -328,6 +340,7 @@ public class ChatController implements
         Logger.d(TAG, "onDestroy, retain:" + retain);
         destroyView();
         viewCallback = null;
+        if (disposable != null) disposable.dispose();
         if (!retain) {
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
@@ -1110,7 +1123,6 @@ public class ChatController implements
     public void queueForEngagementOngoing() {
         Logger.d(TAG, "queueForEngagementOngoing");
         viewInitQueueing();
-
     }
 
     public void onRemoveAttachment(FileAttachment attachment) {
@@ -1132,7 +1144,7 @@ public class ChatController implements
 
                     @Override
                     public void onError(Exception ex) {
-                        ex.printStackTrace();
+                        Logger.e(TAG, "Upload file failed: " + ex.getMessage());
                     }
 
                     @Override
@@ -1145,5 +1157,24 @@ public class ChatController implements
                         Logger.d(TAG, "fileUploadSecurityCheckFinished result=" + scanResult);
                     }
                 });
+    }
+
+    public void onFileDownloadClicked(AttachmentFile attachmentFile) {
+        disposable = downloadFileUseCase
+                .execute(attachmentFile)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> fileDownloadSuccess(attachmentFile),
+                        error -> fileDownloadError(attachmentFile, error)
+                );
+    }
+
+    private void fileDownloadError(AttachmentFile attachmentFile, Throwable error) {
+        if (viewCallback != null) viewCallback.fileDownloadError(attachmentFile, error);
+    }
+
+    private void fileDownloadSuccess(AttachmentFile attachmentFile) {
+        if (viewCallback != null) viewCallback.fileDownloadSuccess(attachmentFile);
     }
 }

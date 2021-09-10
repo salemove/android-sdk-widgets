@@ -24,8 +24,8 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
-import com.glia.widgets.fileupload.model.FileAttachment;
-import com.glia.widgets.model.ChatHeadInput;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.view.head.model.ChatHeadInput;
 
 import java.io.File;
 import java.io.IOException;

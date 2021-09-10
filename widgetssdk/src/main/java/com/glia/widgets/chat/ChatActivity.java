@@ -22,8 +22,7 @@ public class ChatActivity extends AppCompatActivity {
     private boolean useOverlays;
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
-        chatView.backPressed();
-        finish();
+        if (chatView.backPressed()) finish();
     };
     private ChatView.OnEndListener onEndListener = this::finish;
     private ChatView.OnNavigateToCallListener onNavigateToCallListener =
@@ -78,8 +77,7 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        chatView.backPressed();
-        super.onBackPressed();
+        if (chatView.backPressed()) super.onBackPressed();
     }
 
     @Override
@@ -93,6 +91,7 @@ public class ChatActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        chatView.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void navigateToCall(UiTheme theme, String mediaType) {
@@ -104,17 +103,5 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
         newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
         startActivity(newIntent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        chatView.onStartView();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        chatView.onStopView();
     }
 }

@@ -3,11 +3,11 @@ package com.glia.widgets.core.engagement.domain;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
-import com.glia.widgets.fileupload.FileAttachmentRepository;
-import com.glia.widgets.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.notification.domain.RemoveScreenSharingNotificationUseCase;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 
 public class GliaOnEngagementEndUseCase implements
         GliaOnEngagementUseCase.Listener {

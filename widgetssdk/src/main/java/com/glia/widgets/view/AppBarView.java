@@ -5,6 +5,8 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -168,6 +171,39 @@ public class AppBarView extends AppBarLayout {
     public void hideLeaveButtons() {
         endButton.setVisibility(GONE);
         materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(false);
+    }
+
+    private MenuItem saveItem;
+    private MenuItem shareItem;
+
+    public void setMenuImagePreview() {
+        materialToolbar.inflateMenu(R.menu.menu_file_preview);
+        Menu menu = materialToolbar.getMenu();
+        saveItem = menu.findItem(R.id.save_item);
+        shareItem = menu.findItem(R.id.share_item);
+    }
+
+    public void setImagePreviewButtonListener(OnImagePreviewMenuListener listener) {
+        materialToolbar.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.share_item) {
+                listener.onShareClicked();
+            } else if (itemId == R.id.save_item) {
+                listener.onDownloadClicked();
+            }
+            return true;
+        });
+    }
+
+    public void setImagePreviewButtonsVisible(boolean saveItem, boolean shareItem) {
+        this.saveItem.setVisible(saveItem);
+        this.shareItem.setVisible(shareItem);
+    }
+
+    public interface OnImagePreviewMenuListener {
+        void onShareClicked();
+
+        void onDownloadClicked();
     }
 
     public interface OnBackClickedListener {

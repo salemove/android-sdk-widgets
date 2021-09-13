@@ -147,6 +147,7 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaEngagementRepository(),
                 repositoryFactory.getGliaQueueRepository(),
                 repositoryFactory.getGliaOperatorMediaRepository(),
+                repositoryFactory.getGliaFileAttachmentRepository(),
                 createOnEngagementUseCase(),
                 createRemoveCallNotificationUseCase(),
                 createRemoveScreenSharingNotificationUseCase()

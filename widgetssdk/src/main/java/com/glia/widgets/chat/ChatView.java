@@ -369,6 +369,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
+    public void onStop() {
+        controller.onStop();
+    }
+
     /**
      * Use this method together with {@link #setOnNavigateToCallListener(OnNavigateToCallListener)}
      * to notify the view that you have finished navigating.

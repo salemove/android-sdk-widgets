@@ -359,6 +359,10 @@ public class ChatController implements
         }
     }
 
+    public void onStop() {
+        messagesNotSeenHandler.onChatWentBackground();
+    }
+
     public void sendMessagePreview(String message) {
         emitViewState(
                 chatState
@@ -521,6 +525,8 @@ public class ChatController implements
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog();
         }
+
+        messagesNotSeenHandler.callChatButtonClicked();
     }
 
     public void overlayPermissionsDialogDismissed() {

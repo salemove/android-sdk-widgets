@@ -54,10 +54,9 @@ public class MessagesNotSeenHandler implements
         isCounting = false;
     }
 
-    public void onNavigatedToChat() {
-        Logger.d(TAG, "onNavigatedToChat");
-        emitCount(0);
-        isCounting = false;
+    public void onChatWentBackground() {
+        Logger.d(TAG, "onChatWentBackground");
+        isCounting = true;
     }
 
     public void onNavigatedToCall() {

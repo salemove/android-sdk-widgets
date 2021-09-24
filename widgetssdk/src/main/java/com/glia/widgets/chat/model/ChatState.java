@@ -32,6 +32,7 @@ public class ChatState {
     public final List<VisitorMessageItem> unsentMessages;
     public final OperatorStatusItem operatorStatusItem;
     public final boolean showSendButton;
+    public final boolean isOperatorTyping;
 
     private ChatState(
             String queueTicketId,
@@ -53,7 +54,7 @@ public class ChatState {
             String pendingNavigationType,
             List<VisitorMessageItem> unsentMessages,
             OperatorStatusItem operatorStatusItem,
-            boolean showSendButton) {
+            boolean showSendButton, boolean isOperatorTyping) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -74,6 +75,7 @@ public class ChatState {
         this.unsentMessages = unsentMessages;
         this.operatorStatusItem = operatorStatusItem;
         this.showSendButton = showSendButton;
+        this.isOperatorTyping = isOperatorTyping;
     }
 
     public boolean isOperatorOnline() {
@@ -118,6 +120,7 @@ public class ChatState {
         private List<VisitorMessageItem> unsentMessages;
         private OperatorStatusItem operatorStatusItem;
         private boolean showSendButton;
+        public boolean isOperatorTyping;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
@@ -140,6 +143,7 @@ public class ChatState {
             unsentMessages = chatState.unsentMessages;
             operatorStatusItem = chatState.operatorStatusItem;
             showSendButton = chatState.showSendButton;
+            isOperatorTyping = chatState.isOperatorTyping;
             return this;
         }
 
@@ -243,8 +247,13 @@ public class ChatState {
             return this;
         }
 
+        public Builder setIsOperatorTyping(boolean isOperatorTyping) {
+            this.isOperatorTyping = isOperatorTyping;
+            return this;
+        }
+
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, operatorStatusItem, showSendButton);
+            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, operatorStatusItem, showSendButton, isOperatorTyping);
         }
     }
 
@@ -381,6 +390,13 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState setIsOperatorTyping(boolean isOperatorTyping) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsOperatorTyping(isOperatorTyping)
+                .createChatState();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -405,12 +421,13 @@ public class ChatState {
                 Objects.equals(operatorStatusItem, chatState.operatorStatusItem) &&
                 Objects.equals(unsentMessages, chatState.unsentMessages) &&
                 Objects.equals(chatItems, chatState.chatItems) &&
-                showSendButton == chatState.showSendButton;
+                showSendButton == chatState.showSendButton &&
+                isOperatorTyping == chatState.isOperatorTyping;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping);
     }
 
     @Override
@@ -436,6 +453,7 @@ public class ChatState {
                 ", unsentMessages: " + unsentMessages +
                 ", chatItems=" + chatItems +
                 ", showSendButton=" + showSendButton +
+                ", isOperatorTyping=" + isOperatorTyping +
                 '}';
     }
 }

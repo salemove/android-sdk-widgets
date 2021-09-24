@@ -1,48 +1,49 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
+import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
+import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
-import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
-import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
-import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
-import com.glia.widgets.core.queue.domain.AddQueueTicketsEventsListenerUseCase;
-import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
-import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.dialog.PermissionDialogManager;
+import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
+import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
-import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
-import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
-import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
-import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
-import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
-import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
-import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasOverlayEnabledUseCase;
-import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
-import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
-import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
-import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
+import com.glia.widgets.core.queue.domain.AddQueueTicketsEventsListenerUseCase;
+import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
+import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
+import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
+import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -156,6 +157,13 @@ public class UseCaseFactory {
 
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
         return new GliaOnMessageUseCase(
+                repositoryFactory.getGliaMessageRepository(),
+                createOnEngagementUseCase()
+        );
+    }
+
+    public GliaOnOperatorTypingUseCase createGliaOnOperatorTypingUseCase() {
+        return new GliaOnOperatorTypingUseCase(
                 repositoryFactory.getGliaMessageRepository(),
                 createOnEngagementUseCase()
         );

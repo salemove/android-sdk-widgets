@@ -20,10 +20,16 @@ import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
-import com.glia.widgets.chat.model.ChatInputMode;
-import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
+import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
+import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
+import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.model.ChatInputMode;
+import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
@@ -31,40 +37,35 @@ import com.glia.widgets.chat.model.history.OperatorMessageItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorMessageItem;
-import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
-import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
-import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
-import com.glia.widgets.core.queue.QueueTicketsEventsListener;
-import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
-import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
-import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
-import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
-import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
-import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
+import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.queue.QueueTicketsEventsListener;
+import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
+import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -164,6 +165,7 @@ public class ChatController implements
     private final GliaOnEngagementUseCase getEngagementUseCase;
     private final GliaOnEngagementEndUseCase engagementEndUseCase;
     private final GliaOnMessageUseCase onMessageUseCase;
+    private final GliaOnOperatorTypingUseCase onOperatorTypingUseCase;
     private final GliaSendMessagePreviewUseCase sendMessagePreviewUseCase;
     private final GliaSendMessageUseCase sendMessageUseCase;
     private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
@@ -200,6 +202,7 @@ public class ChatController implements
             GliaOnEngagementUseCase onEngagementUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             GliaOnMessageUseCase gliaOnMessageUseCase,
+            GliaOnOperatorTypingUseCase gliaOnOperatorTypingUseCase,
             GliaSendMessagePreviewUseCase gliaSendMessagePreviewUseCase,
             GliaSendMessageUseCase gliaSendMessageUseCase,
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
@@ -234,6 +237,7 @@ public class ChatController implements
                 .setMessagesNotSeen(0)
                 .setPendingNavigationType(null)
                 .setUnsentMessages(new ArrayList<>())
+                .setIsOperatorTyping(false)
                 .createChatState();
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
         this.callTimer = sharedTimer;
@@ -249,6 +253,7 @@ public class ChatController implements
         this.engagementEndUseCase = onEngagementEndUseCase;
         this.queueForChatEngagementUseCase = queueForChatEngagementUseCase;
         this.onMessageUseCase = gliaOnMessageUseCase;
+        this.onOperatorTypingUseCase = gliaOnOperatorTypingUseCase;
         this.sendMessagePreviewUseCase = gliaSendMessagePreviewUseCase;
         this.sendMessageUseCase = gliaSendMessageUseCase;
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
@@ -355,6 +360,7 @@ public class ChatController implements
             engagementEndUseCase.unregisterListener(this);
 
             onMessageUseCase.unregisterListener();
+            onOperatorTypingUseCase.unregisterListener();
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
         }
     }
@@ -446,6 +452,10 @@ public class ChatController implements
 
         emitViewState(chatState.changeUnsentMessages(unsentMessages));
         emitChatItems(chatState.changeItems(currentChatItems));
+    }
+
+    private void onOperatorTyping(boolean isOperatorTyping) {
+        emitViewState(chatState.setIsOperatorTyping(isOperatorTyping));
     }
 
     public void show() {
@@ -1051,6 +1061,7 @@ public class ChatController implements
         }
         operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
         onMessageUseCase.execute(this::onMessage);
+        onOperatorTypingUseCase.execute(this::onOperatorTyping);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
         mediaUpgradeOfferRepository.startListening();
         if (!chatState.unsentMessages.isEmpty()) {

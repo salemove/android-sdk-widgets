@@ -1,5 +1,7 @@
 package com.glia.widgets.call;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +13,8 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -37,25 +41,23 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.DialogsState;
+import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.head.ChatHeadService;
-import com.glia.widgets.view.head.ChatHeadsController;
-import com.glia.widgets.view.head.model.ChatHeadInput;
-import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.head.ChatHeadService;
+import com.glia.widgets.view.head.ChatHeadsController;
+import com.glia.widgets.view.head.model.ChatHeadInput;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import com.google.android.material.transition.MaterialFade;
 import com.google.android.material.transition.SlideDistanceProvider;
-
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class CallView extends ConstraintLayout {
     private final String TAG = CallView.class.getSimpleName();
@@ -367,6 +369,7 @@ public class CallView extends ConstraintLayout {
                     } else {
                         hideUIOnCallEnd();
                     }
+                    chatButton.setEnabled(callState.isAudioCall() || callState.isVideoCall() || callState.is2WayVideoCall());
                 });
             }
 

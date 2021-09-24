@@ -155,6 +155,10 @@ public class FileAttachmentRepository {
                         .collect(Collectors.toList()));
     }
 
+    public void detachAllFiles() {
+        observable.notifyUpdate(new ArrayList<>());
+    }
+
     private void onUploadFileError(Uri uri, GliaException exception) {
         observable.notifyUpdate(
                 observable.fileAttachments.stream()

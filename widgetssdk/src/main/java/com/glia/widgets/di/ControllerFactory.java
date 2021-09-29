@@ -93,6 +93,7 @@ public class ControllerFactory {
                     useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
                     useCaseFactory.createGetFileAttachmentsUseCase(),
                     useCaseFactory.createRemoveFileAttachmentUseCase(),
+                    useCaseFactory.createSupportedFileCountCheckUseCase(),
                     useCaseFactory.createIsShowSendButtonUseCase(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createDownloadFileUseCase()

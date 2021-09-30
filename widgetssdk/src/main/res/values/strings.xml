@@ -9,7 +9,7 @@
     <string name="glia_chat_upgraded_to_audio_call">Upgraded to Audio call</string>
     <string name="glia_chat_upgraded_to_video_call">Upgraded to Video call</string>
     <string name="glia_chat_single_choice_card_hint">Tap on the answer above</string>
-    <string name="glia_chat_not_started_hint">Enter message to start a new engagement</string>
+    <string name="glia_chat_not_started_hint">Send a message to start chatting</string>
     <string name="glia_chat_file_download_success_message">File is downloaded successfully.</string>
     <string name="glia_chat_file_download_fail_message">"File download is failed."</string>
     <string name="glia_chat_file_open_file_title">"Open File"</string>

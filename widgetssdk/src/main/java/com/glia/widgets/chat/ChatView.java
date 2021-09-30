@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
@@ -1224,10 +1225,22 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    private static Uri chooseUriByRequestCode(int requestCode, Uri galeryImgUri, Uri cameraImgUri) {
-        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST) return galeryImgUri;
-        else if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) return cameraImgUri;
-        else return null;
+    private Uri chooseUriByRequestCode(int requestCode, Uri galleryImgUri, Uri cameraImgUri) {
+        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST) return galleryImgUri;
+        else if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) {
+            Bitmap capturedImage = null;
+            try {
+                capturedImage = FileHelper.handleSamplingAndRotationBitmap(getContext(), cameraImgUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (capturedImage == null) {
+                return cameraImgUri;
+            } else {
+                return FileHelper.getImageUri(getContext(), capturedImage);
+            }
+        } else return null;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {

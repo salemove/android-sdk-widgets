@@ -17,7 +17,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (ACTION_ON_SCREEN_SHARING_END_PRESSED.equals(intent.getAction())) {
             onScreenSharingEndPressed();
-            context.sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         }
     }
 

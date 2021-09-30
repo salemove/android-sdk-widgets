@@ -4,8 +4,8 @@ import android.app.Activity;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
-import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.ChatViewCallback;
+import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
@@ -80,6 +80,7 @@ public class ControllerFactory {
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     useCaseFactory.createGliaOnMessageUseCase(),
+                    useCaseFactory.createGliaOnOperatorTypingUseCase(),
                     useCaseFactory.createGliaSendMessagePreviewUseCase(),
                     useCaseFactory.createGliaSendMessageUseCase(),
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),

@@ -85,7 +85,6 @@ public class GliaWidgets {
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         GliaConfig gliaConfig = new GliaConfig.Builder()
-                .setApiToken(gliaWidgetsConfig.getApiToken())
                 .setAppToken(gliaWidgetsConfig.getAppToken())
                 .setSiteId(gliaWidgetsConfig.getSiteId())
                 .setRegion(gliaWidgetsConfig.getRegion())

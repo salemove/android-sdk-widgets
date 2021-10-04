@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Environment;
 
 import com.glia.androidsdk.chat.AttachmentFile;
-import com.glia.widgets.helper.Logger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -55,6 +54,13 @@ public class FileHelper {
     }
 
     public static String getFileName(String fileId, String fileName) {
-        return fileId + "." + fileName;
+        return fileId + getFileExtension(fileName);
+    }
+
+    public static String getFileExtension(String fullName) {
+        if (fullName == null) return "";
+        String fileName = new File(fullName).getName();
+        int dotIndex = fileName.lastIndexOf('.');
+        return (dotIndex == -1) ? "" : fileName.substring(dotIndex);
     }
 }

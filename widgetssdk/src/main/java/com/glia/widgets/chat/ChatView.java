@@ -12,6 +12,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -41,36 +44,40 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
-import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
-import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
-import com.glia.widgets.core.dialog.DialogsState;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.filepreview.ui.FilePreviewActivity;
+import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.view.head.ChatHeadService;
-import com.glia.widgets.view.head.ChatHeadsController;
-import com.glia.widgets.helper.Logger;
-import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.head.model.ChatHeadInput;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.filepreview.ui.FilePreviewActivity;
+import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
+import com.glia.widgets.view.head.ChatHeadService;
+import com.glia.widgets.view.head.ChatHeadsController;
+import com.glia.widgets.view.head.model.ChatHeadInput;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.shape.MarkerEdgeTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -102,6 +109,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private RecyclerView attachmentsRecyclerView;
     private UploadAttachmentAdapter uploadAttachmentAdapter;
     private EditText chatEditText;
+    private LottieAnimationView operatorTypingAnimation;
     private ChatAdapter adapter;
     private AppBarView appBar;
     private View dividerView;
@@ -369,6 +377,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
+    public void onStop() {
+        controller.onStop();
+    }
+
     /**
      * Use this method together with {@link #setOnNavigateToCallListener(OnNavigateToCallListener)}
      * to notify the view that you have finished navigating.
@@ -434,6 +446,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                         showChat();
                     } else {
                         hideChat();
+                    }
+
+                    if (chatState.isOperatorTyping) {
+                        operatorTypingAnimation.setVisibility(VISIBLE);
+                    } else {
+                        operatorTypingAnimation.setVisibility(GONE);
                     }
                 });
             }
@@ -735,6 +753,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         newMessagesCountBadgeView = view.findViewById(R.id.new_messages_badge_view);
         addAttachmentMenu = view.findViewById(R.id.add_attachment_menu);
         attachmentsRecyclerView = view.findViewById(R.id.add_attachment_queue);
+        operatorTypingAnimation = view.findViewById(R.id.operator_typing_animation_view);
     }
 
     private void setupViewAppearance() {
@@ -816,6 +835,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
 
         if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
+
+        operatorTypingAnimation.addValueCallback(
+                new KeyPath("**"),
+                LottieProperty.COLOR_FILTER,
+                frameInfo -> new PorterDuffColorFilter(ContextCompat.getColor(this.getContext(), this.theme.getBrandPrimaryColor()), PorterDuff.Mode.SRC_ATOP)
+        );
     }
 
     private void handleStatusbarColor() {

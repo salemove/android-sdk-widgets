@@ -6,6 +6,7 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.MessageAttachment;
+import com.glia.androidsdk.chat.OperatorTypingStatus;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase.Listener;
@@ -19,6 +20,10 @@ public class GliaChatRepository {
         void onMessage(ChatMessage chatMessage);
     }
 
+    public interface OperatorTypingListener {
+        void onOperatorTyping(OperatorTypingStatus operatorTypingStatus);
+    }
+
     public void loadHistory(HistoryLoadedListener historyLoadedListener) {
         Glia.getChatHistory(historyLoadedListener::loaded);
     }
@@ -27,10 +32,16 @@ public class GliaChatRepository {
         engagement.getChat().on(Chat.Events.MESSAGE, listener::onMessage);
     }
 
+    public void listenForOperatorTyping(OperatorTypingListener listener, Engagement engagement) {
+        engagement.getChat().on(Chat.Events.OPERATOR_TYPING_STATUS, listener::onOperatorTyping);
+    }
+
     public void unregisterMessageListener(MessageListener listener) {
-        Glia.getCurrentEngagement().ifPresent(engagement -> {
-            engagement.getChat().off(Chat.Events.MESSAGE, listener::onMessage);
-        });
+        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.getChat().off(Chat.Events.MESSAGE, listener::onMessage));
+    }
+
+    public void unregisterOperatorTypingListener(OperatorTypingListener listener) {
+        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.getChat().off(Chat.Events.OPERATOR_TYPING_STATUS, listener::onOperatorTyping));
     }
 
     public void sendMessagePreview(String message) {

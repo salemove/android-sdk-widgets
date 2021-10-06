@@ -10,7 +10,7 @@ import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededExcep
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
 public class AddFileToAttachmentAndUploadUseCase {
-    protected final static long SUPPORTED_FILE_COUNT = 3;
+    protected final static long SUPPORTED_FILE_COUNT = 25;
     private final static long SUPPORTED_FILE_SIZE_25MB = 26214400L;
 
     private final GliaEngagementRepository gliaEngagementRepository;

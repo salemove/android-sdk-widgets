@@ -42,11 +42,22 @@ public class FileHelper {
         );
     }
 
+    public static Bitmap getBitmapFromUri(Uri cameraImgUri, Context context) {
+        Bitmap capturedImage = null;
+
+        try {
+            capturedImage = FileHelper.handleSamplingAndRotationBitmap(context, cameraImgUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return capturedImage;
+    }
+
     /*
      Refer to the related question on Stackoverflow if necessary
      https://stackoverflow.com/questions/14066038/why-does-an-image-captured-using-camera-intent-gets-rotated-on-some-devices-on-a
     */
-    public static Bitmap handleSamplingAndRotationBitmap(Context context, Uri selectedImage) throws IOException {
+    private static Bitmap handleSamplingAndRotationBitmap(Context context, Uri selectedImage) throws IOException {
         int MAX_HEIGHT = 1024;
         int MAX_WIDTH = 1024;
 
@@ -116,7 +127,7 @@ public class FileHelper {
         return rotatedImg;
     }
 
-    public static Uri getImageUri(Context inContext, Bitmap inImage) {
+    public static Uri getUriFromBitmap(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);

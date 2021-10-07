@@ -9,15 +9,25 @@ import android.content.Context;
  */
 public class GliaWidgetsConfig {
     private final String appToken;
-    private final String apiToken;
     private final String siteId;
     private final Context context;
     private final String region;
     private final int requestCode;
 
+    /**
+     * Deprecated since SDK version 1.6.5. Please use {@link GliaWidgetsConfig#GliaWidgetsConfig(String, String, Context, String, int)} instead.
+     */
+    @Deprecated
     public GliaWidgetsConfig(String appToken, String apiToken, String siteId, Context context, String region, int requestCode) {
         this.appToken = appToken;
-        this.apiToken = apiToken;
+        this.siteId = siteId;
+        this.context = context;
+        this.region = region;
+        this.requestCode = requestCode;
+    }
+
+    public GliaWidgetsConfig(String appToken, String siteId, Context context, String region, int requestCode) {
+        this.appToken = appToken;
         this.siteId = siteId;
         this.context = context;
         this.region = region;
@@ -41,7 +51,7 @@ public class GliaWidgetsConfig {
     }
 
     public String getApiToken() {
-        return apiToken;
+        return null;
     }
 
     public Context getContext() {
@@ -102,13 +112,11 @@ public class GliaWidgetsConfig {
         }
 
         /**
-         * @param apiToken - your API token
-         * @return Builder instance
+         * API token is no longer needed for SDK to function correctly.
+         * Deprecated since SDK version 1.6.5
          */
-        public Builder setApiToken(String apiToken) {
-            this.apiToken = apiToken;
-            return this;
-        }
+        @Deprecated
+        public Builder setApiToken(String apiToken) { return this; }
 
         /**
          * @param siteId - your site ID
@@ -144,7 +152,7 @@ public class GliaWidgetsConfig {
          * @return Glia SDK configurations
          */
         public GliaWidgetsConfig build() {
-            return new GliaWidgetsConfig(appToken, apiToken, siteId, context, region, requestCode);
+            return new GliaWidgetsConfig(appToken, siteId, context, region, requestCode);
         }
     }
 }

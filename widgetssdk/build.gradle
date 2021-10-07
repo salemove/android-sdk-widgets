@@ -43,7 +43,6 @@ ext {
     junitVersion = '4.13.1'
     androidXTestVersion = '1.1.2'
     espresso = '3.3.0'
-    lottieVersion = '3.5.0'
     leakCanaryVersion = '2.6'
     picassoVersion = '2.71828'
     lottieVersion = "4.1.0"
@@ -57,7 +56,6 @@ dependencies {
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
-    implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
 
     // Used for audio and video permissions by CallActivity

@@ -1228,7 +1228,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private Uri chooseUriByRequestCode(int requestCode, Uri galleryImgUri, Uri cameraImgUri) {
         if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST) return galleryImgUri;
         else if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) {
-            Bitmap capturedImage = FileHelper.getBitmapFromUri(cameraImgUri, getContext());
+            Bitmap capturedImage = FileHelper.getRotatedBitmapFromUri(cameraImgUri, getContext());
 
             if (capturedImage == null) {
                 return cameraImgUri;

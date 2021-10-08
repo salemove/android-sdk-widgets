@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static float pxFromDp(final Context context, final float dp) {
@@ -433,7 +433,7 @@ public class Utils {
         return File.createTempFile(generatePhotoFileName(), ".jpg", directoryStorage);
     }
 
-    private static String generatePhotoFileName() {
+    public static String generatePhotoFileName() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss_", Locale.getDefault());
         Date date = new Date(System.currentTimeMillis());
         return "IMG_" + formatter.format(date);

@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import androidx.exifinterface.media.ExifInterface;
 
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.helper.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,7 +43,7 @@ public class FileHelper {
         );
     }
 
-    public static Bitmap getBitmapFromUri(Uri cameraImgUri, Context context) {
+    public static Bitmap getRotatedBitmapFromUri(Uri cameraImgUri, Context context) {
         Bitmap capturedImage = null;
 
         try {
@@ -130,7 +131,7 @@ public class FileHelper {
     public static Uri getUriFromBitmap(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, Utils.generatePhotoFileName(), null);
         return Uri.parse(path);
     }
 

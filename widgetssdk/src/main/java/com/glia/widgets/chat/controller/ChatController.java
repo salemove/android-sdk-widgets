@@ -1138,7 +1138,16 @@ public class ChatController implements
 
     public void queueForEngagementError(GliaException exception) {
         if (exception != null) {
-            error(exception.toString());
+            Logger.e(TAG, exception.toString());
+            switch (exception.cause) {
+                case QUEUE_CLOSED:
+                case QUEUE_FULL:
+                    dialogController.showNoMoreOperatorsAvailableDialog();
+                    break;
+                default:
+                    dialogController.showUnexpectedErrorDialog();
+            }
+            emitViewState(chatState.stop());
         }
     }
 

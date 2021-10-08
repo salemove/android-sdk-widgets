@@ -648,8 +648,15 @@ public class CallController implements
 
     public void queueForEngagementError(GliaException exception) {
         if (exception != null) {
-            Logger.e(TAG, exception.debugMessage);
-            dialogController.showUnexpectedErrorDialog();
+            Logger.e(TAG, exception.toString());
+            switch (exception.cause) {
+                case QUEUE_CLOSED:
+                case QUEUE_FULL:
+                    dialogController.showNoMoreOperatorsAvailableDialog();
+                    break;
+                default:
+                    dialogController.showUnexpectedErrorDialog();
+            }
             emitViewState(callState.changeVisibility(false));
         }
     }

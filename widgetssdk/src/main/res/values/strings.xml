@@ -103,4 +103,7 @@
     <string name="glia_preview_activity_image_share_title">Share Image</string>
     <string name="glia_preview_activity_toolbar_title">Preview</string>
     <string name="glia_preview_activity_img_fetch_fail_msg">Unable to fetch image at the moment, please try again later.</string>
+
+    <!--    OperatorLinkActivity-->
+    <string name="operator_link_title">Operator Link</string>
 </resources>

@@ -12,6 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.chat.adapter.holder.FileAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.ImageAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder;
+import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder;
+import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder;
+import com.glia.widgets.chat.adapter.holder.VisitorMessageViewHolder;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
@@ -19,12 +25,6 @@ import com.glia.widgets.chat.model.history.OperatorMessageItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorMessageItem;
-import com.glia.widgets.chat.adapter.holder.FileAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.ImageAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder;
-import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder;
-import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder;
-import com.glia.widgets.chat.adapter.holder.VisitorMessageViewHolder;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
@@ -76,6 +76,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener;
     private final OnFileItemClickListener onFileItemClickListener;
     private final OnImageItemClickListener onImageItemClickListener;
+    private final OnTextClickListener onTextClickListener;
 
     private final GetImageFileFromCacheUseCase getImageFileFromCacheUseCase;
     private final GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase;
@@ -87,6 +88,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener,
             OnFileItemClickListener onFileItemClickListener,
             OnImageItemClickListener onImageItemClickListener,
+            OnTextClickListener onTextClickListener,
             GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
             GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
             GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
@@ -96,6 +98,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.onImageLoadedListener = onImageLoadedListener;
         this.onFileItemClickListener = onFileItemClickListener;
         this.onImageItemClickListener = onImageItemClickListener;
+        this.onTextClickListener = onTextClickListener;
         this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
         this.getImageFileFromDownloadsUseCase = getImageFileFromDownloadsUseCase;
         this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
@@ -145,7 +148,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (chatItem instanceof VisitorMessageItem) {
             ((VisitorMessageViewHolder) holder).bind((VisitorMessageItem) chatItem);
         } else if (chatItem instanceof OperatorMessageItem) {
-            ((OperatorMessageViewHolder) holder).bind((OperatorMessageItem) chatItem, onOptionClickedListener, onImageLoadedListener);
+            OperatorMessageViewHolder viewHolder = (OperatorMessageViewHolder) holder;
+            OperatorMessageItem operatorMessageItem = ((OperatorMessageItem) chatItem);
+            viewHolder.bind(operatorMessageItem, onOptionClickedListener, onImageLoadedListener);
+            viewHolder.itemView.setOnClickListener(v -> onTextClickListener.onTextClick(operatorMessageItem.content));
         } else if (chatItem instanceof MediaUpgradeStartedTimerItem) {
             ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);
         } else if (chatItem instanceof OperatorAttachmentItem) {
@@ -229,5 +235,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface OnImageItemClickListener {
         void onImageItemClick(AttachmentFile item);
+    }
+
+    public interface OnTextClickListener {
+        void onTextClick(String text);
     }
 }

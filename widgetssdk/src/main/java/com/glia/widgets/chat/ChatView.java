@@ -24,6 +24,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Patterns;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.EditText;
@@ -1328,7 +1329,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onTextClick(String text) {
-        if (URLUtil.isValidUrl(text)) {
+        if (Patterns.WEB_URL.matcher(text).matches()) {
             if (CustomTabActivityHelper.hasSupportedBrowser((Utils.getActivity(this.getContext())))) {
                 CustomTabActivityHelper.openCustomTab((Utils.getActivity(this.getContext())), text, theme.getBrandPrimaryColor(), theme.getBaseLightColor());
             } else {

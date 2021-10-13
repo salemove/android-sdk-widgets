@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
@@ -26,6 +25,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -53,6 +53,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.controller.ChatController;
+import com.glia.widgets.chat.helper.CustomTabActivityHelper;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
@@ -68,6 +69,7 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.ui.FilePreviewActivity;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.urlwebview.OperatorLinksActivity;
 import com.glia.widgets.view.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
@@ -77,7 +79,6 @@ import com.glia.widgets.view.head.ChatHeadService;
 import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.view.head.model.ChatHeadInput;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.color.MaterialColors;
 import com.google.android.material.shape.MarkerEdgeTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -87,7 +88,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItemClickListener, ChatAdapter.OnImageItemClickListener {
+public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItemClickListener, ChatAdapter.OnImageItemClickListener, ChatAdapter.OnTextClickListener {
 
     private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
@@ -95,6 +96,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ChatViewCallback callback;
     private ChatController controller;
     private ChatHeadsController chatHeadsController;
+    private CustomTabActivityHelper customTabActivityHelper;
 
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
@@ -377,8 +379,13 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
+    public void onStart() {
+        customTabActivityHelper.bindCustomTabsService((Utils.getActivity(this.getContext())));
+    }
+
     public void onStop() {
         controller.onStop();
+        customTabActivityHelper.unbindCustomTabsService((Utils.getActivity(this.getContext())));
     }
 
     /**
@@ -598,6 +605,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+
+        if (customTabActivityHelper == null) {
+            customTabActivityHelper = new CustomTabActivityHelper();
+        }
     }
 
     private void updateChatEditText(ChatState chatState) {
@@ -763,6 +774,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 this.theme,
                 this.onOptionClickedListener,
                 this.onImageLoadedListener,
+                this,
                 this,
                 this,
                 Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
@@ -1311,6 +1323,17 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
         if (requestCode == WRITE_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (downloadFileHolder != null) onFileDownload(downloadFileHolder);
+        }
+    }
+
+    @Override
+    public void onTextClick(String text) {
+        if (URLUtil.isValidUrl(text)) {
+            if (CustomTabActivityHelper.hasSupportedBrowser((Utils.getActivity(this.getContext())))) {
+                CustomTabActivityHelper.openCustomTab((Utils.getActivity(this.getContext())), text, theme.getBrandPrimaryColor(), theme.getBaseLightColor());
+            } else {
+                this.getContext().startActivity(OperatorLinksActivity.intent(this.getContext(), text, theme));
+            }
         }
     }
 

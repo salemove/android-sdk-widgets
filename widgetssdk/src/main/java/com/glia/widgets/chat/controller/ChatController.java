@@ -43,17 +43,18 @@ import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
-import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
-import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
@@ -178,6 +179,7 @@ public class ChatController implements
     private final AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase;
     private final GetFileAttachmentsUseCase getFileAttachmentsUseCase;
     private final RemoveFileAttachmentUseCase removeFileAttachmentUseCase;
+    private final SupportedFileCountCheckUseCase supportedFileCountCheckUseCase;
     private final IsShowSendButtonUseCase isShowSendButtonUseCase;
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final DownloadFileUseCase downloadFileUseCase;
@@ -215,6 +217,7 @@ public class ChatController implements
             RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
             GetFileAttachmentsUseCase getFileAttachmentsUseCase,
             RemoveFileAttachmentUseCase removeFileAttachmentUseCase,
+            SupportedFileCountCheckUseCase supportedFileCountCheckUseCase,
             IsShowSendButtonUseCase isShowSendButtonUseCase,
             IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
             DownloadFileUseCase downloadFileUseCase
@@ -266,6 +269,7 @@ public class ChatController implements
         this.removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase;
         this.getFileAttachmentsUseCase = getFileAttachmentsUseCase;
         this.removeFileAttachmentUseCase = removeFileAttachmentUseCase;
+        this.supportedFileCountCheckUseCase = supportedFileCountCheckUseCase;
         this.isShowSendButtonUseCase = isShowSendButtonUseCase;
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.downloadFileUseCase = downloadFileUseCase;
@@ -285,6 +289,7 @@ public class ChatController implements
             if (viewCallback != null) {
                 viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
                 emitViewState(chatState.setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText)));
+                emitViewState(chatState.setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute()));
             }
         }
     };
@@ -1133,7 +1138,16 @@ public class ChatController implements
 
     public void queueForEngagementError(GliaException exception) {
         if (exception != null) {
-            error(exception.toString());
+            Logger.e(TAG, exception.toString());
+            switch (exception.cause) {
+                case QUEUE_CLOSED:
+                case QUEUE_FULL:
+                    dialogController.showNoMoreOperatorsAvailableDialog();
+                    break;
+                default:
+                    dialogController.showUnexpectedErrorDialog();
+            }
+            emitViewState(chatState.stop());
         }
     }
 

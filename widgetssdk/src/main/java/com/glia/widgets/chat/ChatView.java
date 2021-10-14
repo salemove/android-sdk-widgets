@@ -1336,8 +1336,19 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             } else {
                 this.getContext().startActivity(OperatorLinksActivity.intent(this.getContext(), text, theme));
             }
+        } else if (Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
+            composeEmail(text);
         } else if (Pattern.matches(Constants.PHONE_NUMBER_REGEX, text)) {
             composeCall(text);
+        }
+    }
+
+    public void composeEmail(String email) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:"));
+        intent.putExtra(Intent.EXTRA_EMAIL, email);
+        if (intent.resolveActivity((Utils.getActivity(this.getContext())).getPackageManager()) != null) {
+            (Utils.getActivity(this.getContext())).startActivity(intent);
         }
     }
 

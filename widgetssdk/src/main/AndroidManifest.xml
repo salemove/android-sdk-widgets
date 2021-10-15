@@ -14,17 +14,20 @@
 
     <application>
         <activity
+            android:name=".urlwebview.OperatorLinksActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Application.Glia.Chat.Activity" />
+        <activity
             android:name=".chat.ChatActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Chat.Activity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".filepreview.ui.FilePreviewActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Application.Glia.Chat.Activity" />
-
         <activity
             android:name=".call.CallActivity"
             android:launchMode="singleTask"
@@ -58,5 +61,11 @@
                 android:resource="@xml/file_provider" />
         </provider>
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+    </queries>
 
 </manifest>

@@ -14,6 +14,10 @@ public class Constants {
      */
     public static final String IMAGE_PREVIEW_ACTIVITY = "image_preview_activity";
     /**
+     * Used by the sdk to differentiate between CHAT and CALL and URL_WEB_VIEW_ACTIVITY activities.
+     */
+    public static final String URL_WEB_VIEW_ACTIVITY = "url_web_view";
+    /**
      * Global media timer delay value
      */
     public static final int CALL_TIMER_DELAY = 0;

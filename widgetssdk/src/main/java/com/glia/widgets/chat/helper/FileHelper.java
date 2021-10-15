@@ -3,6 +3,7 @@ package com.glia.widgets.chat.helper;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Environment;
 
@@ -27,12 +28,18 @@ public class FileHelper {
                     double ratio = ((double) rawWidth) / ((double) rawHeight);
                     Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawBitmap, (int) (DESIRED_IMAGE_SIZE * ratio), DESIRED_IMAGE_SIZE, false);
                     if (scaledBitmap != null)
-                        emitter.onSuccess(scaledBitmap);
+                        emitter.onSuccess(rotateImage(scaledBitmap, 90));
                     else {
                         emitter.onError(new Exception());
                     }
                 }
         );
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     public static String getFileProviderAuthority(Context context) {

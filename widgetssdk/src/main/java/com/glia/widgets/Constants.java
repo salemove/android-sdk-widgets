@@ -25,4 +25,6 @@ public class Constants {
      * Global media timer interval value
      */
     public static final int CALL_TIMER_INTERVAL_VALUE = 1000;
+
+    public static final String PHONE_NUMBER_REGEX = "^[+]\\s*?[0-9]{10,13}$";
 }

@@ -43,18 +43,18 @@ import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
-import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
-import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
-import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
+import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
@@ -1079,7 +1079,7 @@ public class ChatController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEnded");
         stop();
-        dialogController.showNoMoreOperatorsAvailableDialog();
+        dialogController.showEngagementEndedDialog();
     }
 
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {

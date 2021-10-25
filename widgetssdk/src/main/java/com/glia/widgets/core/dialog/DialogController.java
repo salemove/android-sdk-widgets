@@ -1,9 +1,9 @@
 package com.glia.widgets.core.dialog;
 
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
-import com.glia.widgets.helper.Logger;
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.DialogOfferType;
 
 import java.util.ArrayList;
@@ -118,6 +118,13 @@ public class DialogController {
         if (isNoDialogShown()) {
             Logger.d(TAG, "Show No More Operators Dialog");
             emitDialogState(new DialogsState.NoMoreOperatorsDialog());
+        }
+    }
+
+    public void showEngagementEndedDialog() {
+        if (isNoDialogShown()) {
+            Logger.d(TAG, "Show Engagement Ended Dialog");
+            emitDialogState(new DialogsState.EngagementEndedDialog());
         }
     }
 

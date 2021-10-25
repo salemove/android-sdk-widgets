@@ -16,6 +16,9 @@ public interface DialogsState {
     class NoMoreOperatorsDialog implements DialogsState {
     }
 
+    class EngagementEndedDialog implements DialogsState {
+    }
+
     class ExitQueueDialog implements DialogsState {
     }
 

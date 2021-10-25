@@ -13,8 +13,6 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -408,6 +406,8 @@ public class CallView extends ConstraintLayout {
                 post(this::showExitQueueDialog);
             } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                 post(this::showNoMoreOperatorsAvailableDialog);
+            } else if (dialogsState instanceof DialogsState.EngagementEndedDialog) {
+                post(this::showEngagementEndedDialog);
             } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
                 post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
             } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
@@ -861,6 +861,29 @@ public class CallView extends ConstraintLayout {
                 title,
                 message,
                 buttonClickListener);
+    }
+
+    private void showEngagementEndedDialog() {
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+            alertDialog = null;
+        }
+        alertDialog = Dialogs.showOperatorEndedEngagementDialog(
+                this.getContext(),
+                this.theme,
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.noMoreOperatorsAvailableDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
+                    if (onEndListener != null) {
+                        onEndListener.onEnd();
+                    }
+                    callEnded();
+                });
     }
 
     private void showNoMoreOperatorsAvailableDialog() {

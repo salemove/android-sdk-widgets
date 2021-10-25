@@ -583,12 +583,13 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
                 post(this::showOverlayPermissionsDialog);
             } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                post(() -> showEndEngagementDialog(
-                        ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+                post(() -> showEndEngagementDialog(((DialogsState.EndEngagementDialog) dialogsState).operatorName));
             } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
                 post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
             } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                 post(this::showNoMoreOperatorsAvailableDialog);
+            } else if (dialogsState instanceof DialogsState.EngagementEndedDialog) {
+                post(this::showEngagementEndedDialog);
             } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
                 post(this::showScreenSharingDialog);
             } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
@@ -1094,6 +1095,29 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 title,
                 message,
                 buttonClickListener);
+    }
+
+    private void showEngagementEndedDialog() {
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+            alertDialog = null;
+        }
+        alertDialog = Dialogs.showOperatorEndedEngagementDialog(
+                this.getContext(),
+                this.theme,
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.noMoreOperatorsAvailableDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
+                    if (onEndListener != null) {
+                        onEndListener.onEnd();
+                    }
+                    chatEnded();
+                });
     }
 
     private void showNoMoreOperatorsAvailableDialog() {

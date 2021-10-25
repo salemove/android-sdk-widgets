@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -123,6 +124,44 @@ public class Dialogs {
 
         dialog.getWindow().getDecorView().getBackground().setTint(
                 ContextCompat.getColor(context, theme.getBaseLightColor()));
+        return dialog;
+    }
+
+    public static AlertDialog showOperatorEndedEngagementDialog(Context context, UiTheme theme, View.OnClickListener buttonClickListener) {
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        builder.setCancelable(false);
+        View customLayout = LayoutInflater.from(context).inflate(R.layout.operator_ended_engagement_dialog, null, false);
+        TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
+        TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
+        Button okButton = customLayout.findViewById(R.id.ok_button);
+
+        int baseDarkColor = ContextCompat.getColor(context, theme.getBaseNormalColor());
+        ColorStateList brandPrimaryColorStateList = ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
+
+        titleView.setTextColor(baseDarkColor);
+        messageView.setTextColor(baseDarkColor);
+        okButton.setBackgroundTintList(brandPrimaryColorStateList);
+
+        if (theme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(context, theme.getFontRes());
+
+            titleView.setTypeface(fontFamily);
+            messageView.setTypeface(fontFamily);
+        }
+
+        okButton.setOnClickListener(buttonClickListener);
+        builder.setView(customLayout);
+
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.show();
+
+        dialog.getWindow()
+                .getDecorView()
+                .getBackground()
+                .setTint(ContextCompat.getColor(context, theme.getBaseLightColor()));
+
         return dialog;
     }
 

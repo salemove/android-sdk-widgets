@@ -87,6 +87,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 ContextCompat.getColorStateList(context, uiTheme.getSystemAgentBubbleColor());
         contentView.setBackgroundTintList(operatorBgColor);
         contentView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
+        contentView.setLinkTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
             contentView.setTypeface(fontFamily);

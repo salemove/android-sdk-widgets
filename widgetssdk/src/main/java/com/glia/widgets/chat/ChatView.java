@@ -1354,32 +1354,40 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onTextClick(String text) {
+        Activity activity = Utils.getActivity(this.getContext());
+
         if (Patterns.WEB_URL.matcher(text).matches()) {
-            if (CustomTabActivityHelper.hasSupportedBrowser((Utils.getActivity(this.getContext())))) {
-                CustomTabActivityHelper.openCustomTab((Utils.getActivity(this.getContext())), text, theme.getBrandPrimaryColor(), theme.getBaseLightColor());
+            if (CustomTabActivityHelper.hasSupportedBrowser(activity)) {
+                int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
+                int baseLightColor = ContextCompat.getColor(this.getContext(), theme.getBaseLightColor());
+
+                CustomTabActivityHelper.openCustomTab(activity, text, primaryColor, baseLightColor);
             } else {
-                this.getContext().startActivity(OperatorLinksActivity.intent(this.getContext(), text, theme));
+                activity.startActivity(OperatorLinksActivity.intent(activity, text, theme));
             }
         } else if (Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
-            composeEmail(text);
+            composeEmail(text, activity);
         } else if (Pattern.matches(Constants.PHONE_NUMBER_REGEX, text)) {
-            composeCall(text);
+            composeCall(text, activity);
         }
     }
 
-    public void composeEmail(String email) {
+    public void composeEmail(String email, Activity activity) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email.trim()});
         intent.setData(Uri.parse("mailto:"));
-        intent.putExtra(Intent.EXTRA_EMAIL, email);
-        if (intent.resolveActivity((Utils.getActivity(this.getContext())).getPackageManager()) != null) {
-            (Utils.getActivity(this.getContext())).startActivity(intent);
+
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivity(intent);
+        } else {
+            Toast.makeText(activity, activity.getString(R.string.glia_chat_no_email_app_msg), Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void composeCall(String phoneNumber) {
+    public void composeCall(String phoneNumber, Activity activity) {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + phoneNumber));
-        (Utils.getActivity(this.getContext())).startActivity(intent);
+        activity.startActivity(intent);
     }
 
     public interface OnBackClickedListener {

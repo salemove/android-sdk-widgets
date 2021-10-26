@@ -14,18 +14,6 @@ public class GliaWidgetsConfig {
     private final String region;
     private final int requestCode;
 
-    /**
-     * Deprecated since SDK version 1.6.5. Please use {@link GliaWidgetsConfig#GliaWidgetsConfig(String, String, Context, String, int)} instead.
-     */
-    @Deprecated
-    public GliaWidgetsConfig(String appToken, String apiToken, String siteId, Context context, String region, int requestCode) {
-        this.appToken = appToken;
-        this.siteId = siteId;
-        this.context = context;
-        this.region = region;
-        this.requestCode = requestCode;
-    }
-
     public GliaWidgetsConfig(String appToken, String siteId, Context context, String region, int requestCode) {
         this.appToken = appToken;
         this.siteId = siteId;
@@ -50,10 +38,6 @@ public class GliaWidgetsConfig {
         return appToken;
     }
 
-    public String getApiToken() {
-        return null;
-    }
-
     public Context getContext() {
         return context;
     }
@@ -75,7 +59,7 @@ public class GliaWidgetsConfig {
      * <p>
      * Required information is:
      * <ul>
-     * <li>API token</li>
+     * <li>APP token</li>
      * <li>Site ID</li>
      * <li>Region</li>
      * <li>Context</li>
@@ -85,8 +69,8 @@ public class GliaWidgetsConfig {
      * <b>Usage example:</b>
      * <pre>
      * <code>
-     * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder()
-     *   .setAppToken("API_TOKEN")
+     * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
+     *   .setAppToken("APP_TOKEN")
      *   .setSiteId("SITE_ID")
      *   .setRegion(Regions.US)
      *   .setContext(getApplicationContext())
@@ -96,7 +80,6 @@ public class GliaWidgetsConfig {
      */
     public static class Builder {
         String appToken;
-        String apiToken;
         String siteId;
         Context context;
         String region;
@@ -110,13 +93,6 @@ public class GliaWidgetsConfig {
             this.appToken = appToken;
             return this;
         }
-
-        /**
-         * API token is no longer needed for SDK to function correctly.
-         * Deprecated since SDK version 1.6.5
-         */
-        @Deprecated
-        public Builder setApiToken(String apiToken) { return this; }
 
         /**
          * @param siteId - your site ID

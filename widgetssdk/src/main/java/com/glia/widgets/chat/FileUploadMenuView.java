@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.glia.widgets.R;
+import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class FileUploadMenuView extends ConstraintLayout {
     private Callback callback;
@@ -60,11 +61,25 @@ public class FileUploadMenuView extends ConstraintLayout {
     }
 
     public FileUploadMenuView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, R.attr.gliaChatStyle);
     }
 
     public FileUploadMenuView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat);
+    }
+
+    public FileUploadMenuView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(
+                MaterialThemeOverlay.wrap(
+                        context,
+                        attrs,
+                        defStyleAttr,
+                        defStyleRes
+                ),
+                attrs,
+                defStyleAttr,
+                defStyleRes
+        );
 
         View view = inflate(context, R.layout.chat_attachment_select_item_menu, this);
 

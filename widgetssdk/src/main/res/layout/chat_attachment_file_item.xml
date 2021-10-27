@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="@android:color/transparent"
     app:cardCornerRadius="4dp"
+    app:cardElevation="0dp"
     app:strokeColor="@color/glia_stroke_gray"
     app:strokeWidth="@dimen/glia_chat_attachment_stroke_width">
 
@@ -46,7 +48,7 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="@color/glia_base_normal_color"
-            android:textSize="12sp"
+            android:textAppearance="?attr/textAppearanceCaption"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/type_indicator_view"

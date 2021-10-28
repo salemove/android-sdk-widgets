@@ -464,6 +464,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     }
 
                     addAttachmentButton.setEnabled(chatState.isAttachmentButtonEnabled);
+
+                    if (chatState.isAttachmentButtonVisible) {
+                        addAttachmentButton.setVisibility(VISIBLE);
+                    } else {
+                        addAttachmentButton.setVisibility(GONE);
+                    }
                 });
             }
 

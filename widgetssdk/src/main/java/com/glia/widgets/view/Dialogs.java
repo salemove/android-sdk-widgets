@@ -99,8 +99,7 @@ public class Dialogs {
         ImageButton closeImageButton = customLayout.findViewById(R.id.close_dialog_button);
 
         int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
-        ColorStateList baseNormalColorStateList =
-                ContextCompat.getColorStateList(context, theme.getBaseNormalColor());
+        ColorStateList baseNormalColorStateList = ContextCompat.getColorStateList(context, theme.getBaseNormalColor());
 
         titleView.setTextColor(baseDarkColor);
         messageView.setTextColor(baseDarkColor);
@@ -122,8 +121,7 @@ public class Dialogs {
 
         AlertDialog dialog = builder.show();
 
-        dialog.getWindow().getDecorView().getBackground().setTint(
-                ContextCompat.getColor(context, theme.getBaseLightColor()));
+        dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(context, theme.getBaseLightColor()));
         return dialog;
     }
 
@@ -136,7 +134,7 @@ public class Dialogs {
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
         Button okButton = customLayout.findViewById(R.id.ok_button);
 
-        int baseDarkColor = ContextCompat.getColor(context, theme.getBaseNormalColor());
+        int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
         ColorStateList brandPrimaryColorStateList = ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
 
         titleView.setTextColor(baseDarkColor);

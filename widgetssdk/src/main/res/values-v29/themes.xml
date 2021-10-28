@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Application.Glia.Chat.Activity" parent="Application.Glia.Activity.Style">
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+</resources>

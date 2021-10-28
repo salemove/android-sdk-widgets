@@ -26,5 +26,5 @@ public class Constants {
      */
     public static final int CALL_TIMER_INTERVAL_VALUE = 1000;
 
-    public static final String PHONE_NUMBER_REGEX = "^[+]\\s*?[0-9]{10,13}$";
+    public static final String PHONE_NUMBER_REGEX = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$";
 }

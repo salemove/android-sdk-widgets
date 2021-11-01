@@ -5,12 +5,6 @@
     <PreferenceCategory app:title="@string/settings_sdk_title">
 
         <EditTextPreference
-            app:defaultValue="@string/api_token"
-            app:key="@string/pref_api_token"
-            app:title="@string/settings_api_token"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
             app:defaultValue="@string/app_token"
             app:key="@string/pref_app_token"
             app:title="@string/settings_app_token"

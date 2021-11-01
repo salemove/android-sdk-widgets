@@ -22,7 +22,6 @@
     <string name="settings_chat_system_agent_bubble_color">System agent bubble color</string>
     <string name="settings_chat_font_family">Chat message font family</string>
     <string name="settings_header_title">Title</string>
-    <string name="settings_api_token">Api token</string>
     <string name="settings_app_token">App token</string>
     <string name="settings_site_id">Site id</string>
     <string name="settings_chat_negative_color">Negative color</string>

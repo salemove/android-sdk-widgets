@@ -54,6 +54,15 @@ public class GliaWidgetsConfig {
         return region;
     }
 
+    /**
+     * @deprecated API token is no longer needed for SDK to function correctly.
+     * Deprecated since SDK version 1.6.5
+     */
+    @Deprecated
+    public String getApiToken() {
+        return null;
+    }
+
     public int getRequestCode() {
         return requestCode;
     }

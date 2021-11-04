@@ -2,6 +2,7 @@ package com.glia.widgets.chat.helper;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.webkit.URLUtil;
 
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsClient;
@@ -25,7 +26,16 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
         builder.setDefaultColorSchemeParams(defaultColors);
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.intent.setPackage(packageName);
-        customTabsIntent.launchUrl(activity, Uri.parse(url));
+
+        String finalUrl;
+
+        if (URLUtil.isHttpsUrl(url) || URLUtil.isHttpUrl(url)) {
+            finalUrl = url;
+        } else {
+            finalUrl = "https://" + url;
+        }
+
+        customTabsIntent.launchUrl(activity, Uri.parse(finalUrl));
     }
 
     public static boolean hasSupportedBrowser(Activity activity) {

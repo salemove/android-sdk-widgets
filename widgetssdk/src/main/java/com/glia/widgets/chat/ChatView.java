@@ -24,8 +24,8 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Patterns;
 import android.view.View;
-import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -48,6 +48,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
@@ -86,6 +87,7 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItemClickListener, ChatAdapter.OnImageItemClickListener, ChatAdapter.OnTextClickListener {
@@ -462,6 +464,12 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     }
 
                     addAttachmentButton.setEnabled(chatState.isAttachmentButtonEnabled);
+
+                    if (chatState.isAttachmentButtonVisible) {
+                        addAttachmentButton.setVisibility(VISIBLE);
+                    } else {
+                        addAttachmentButton.setVisibility(GONE);
+                    }
                 });
             }
 
@@ -581,12 +589,13 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
                 post(this::showOverlayPermissionsDialog);
             } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                post(() -> showEndEngagementDialog(
-                        ((DialogsState.EndEngagementDialog) dialogsState).operatorName));
+                post(() -> showEndEngagementDialog(((DialogsState.EndEngagementDialog) dialogsState).operatorName));
             } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
                 post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
             } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
                 post(this::showNoMoreOperatorsAvailableDialog);
+            } else if (dialogsState instanceof DialogsState.EngagementEndedDialog) {
+                post(this::showEngagementEndedDialog);
             } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
                 post(this::showScreenSharingDialog);
             } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
@@ -1094,6 +1103,29 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 buttonClickListener);
     }
 
+    private void showEngagementEndedDialog() {
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+            alertDialog = null;
+        }
+        alertDialog = Dialogs.showOperatorEndedEngagementDialog(
+                this.getContext(),
+                this.theme,
+                v -> {
+                    dismissAlertDialog();
+                    if (controller != null) {
+                        controller.noMoreOperatorsAvailableDismissed();
+                    }
+                    if (chatHeadsController != null) {
+                        chatHeadsController.chatEndedByUser();
+                    }
+                    if (onEndListener != null) {
+                        onEndListener.onEnd();
+                    }
+                    chatEnded();
+                });
+    }
+
     private void showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
                 R.string.glia_dialog_operators_unavailable_title,
@@ -1328,13 +1360,40 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onTextClick(String text) {
-        if (URLUtil.isValidUrl(text)) {
-            if (CustomTabActivityHelper.hasSupportedBrowser((Utils.getActivity(this.getContext())))) {
-                CustomTabActivityHelper.openCustomTab((Utils.getActivity(this.getContext())), text, theme.getBrandPrimaryColor(), theme.getBaseLightColor());
+        Activity activity = Utils.getActivity(this.getContext());
+
+        if (Patterns.WEB_URL.matcher(text).matches()) {
+            if (CustomTabActivityHelper.hasSupportedBrowser(activity)) {
+                int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
+                int baseLightColor = ContextCompat.getColor(this.getContext(), theme.getBaseLightColor());
+
+                CustomTabActivityHelper.openCustomTab(activity, text, primaryColor, baseLightColor);
             } else {
-                this.getContext().startActivity(OperatorLinksActivity.intent(this.getContext(), text, theme));
+                activity.startActivity(OperatorLinksActivity.intent(activity, text, theme));
             }
+        } else if (Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
+            composeEmail(text, activity);
+        } else if (Pattern.matches(Constants.PHONE_NUMBER_REGEX, text)) {
+            composeCall(text, activity);
         }
+    }
+
+    public void composeEmail(String email, Activity activity) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email.trim()});
+        intent.setData(Uri.parse("mailto:"));
+
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivity(intent);
+        } else {
+            Toast.makeText(activity, activity.getString(R.string.glia_chat_no_email_app_msg), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void composeCall(String phoneNumber, Activity activity) {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        activity.startActivity(intent);
     }
 
     public interface OnBackClickedListener {

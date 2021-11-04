@@ -16,10 +16,8 @@ public class Application extends android.app.Application {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String appToken = sharedPreferences.getString(getString(R.string.pref_app_token), getString(R.string.app_token));
-        String apiToken = sharedPreferences.getString(getString(R.string.pref_api_token), getString(R.string.api_token));
         String siteId = sharedPreferences.getString(getString(R.string.pref_site_id), getString(R.string.site_id));
         GliaWidgetsConfig gliaConfig = new GliaWidgetsConfig.Builder()
-                .setApiToken(apiToken)
                 .setAppToken(appToken)
                 .setSiteId(siteId)
                 .setRegion("beta")

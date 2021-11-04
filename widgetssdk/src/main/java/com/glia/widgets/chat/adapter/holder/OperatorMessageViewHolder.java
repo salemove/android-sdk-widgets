@@ -3,6 +3,7 @@ package com.glia.widgets.chat.adapter.holder;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +15,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.OperatorMessageItem;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
+
+import java.util.regex.Pattern;
 
 public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
     private final FrameLayout contentLayout;
@@ -69,6 +73,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
             contentLayout.addView(singleChoiceCardView, params);
         } else {
             TextView contentView = getMessageContentView();
+            contentView.getPaint().setUnderlineText(isOperatorMessageUnderLined(item.content));
             contentView.setText(item.content);
             contentLayout.addView(contentView);
         }
@@ -87,10 +92,19 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 ContextCompat.getColorStateList(context, uiTheme.getSystemAgentBubbleColor());
         contentView.setBackgroundTintList(operatorBgColor);
         contentView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
+        contentView.setLinkTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
             contentView.setTypeface(fontFamily);
         }
         return contentView;
+    }
+
+    private boolean isOperatorMessageUnderLined(String message) {
+        if (Patterns.WEB_URL.matcher(message).matches()) {
+            return true;
+        } else if (Patterns.EMAIL_ADDRESS.matcher(message).matches()) {
+            return true;
+        } else return Pattern.matches(Constants.PHONE_NUMBER_REGEX, message);
     }
 }

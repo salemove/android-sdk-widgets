@@ -14,6 +14,14 @@ public class GliaWidgetsConfig {
     private final String region;
     private final int requestCode;
 
+    /**
+     * @deprecated Deprecated since SDK version 1.6.5. Please use {@link GliaWidgetsConfig#GliaWidgetsConfig(String, String, Context, String, int)} instead.
+     */
+    @Deprecated
+    public GliaWidgetsConfig(String appToken, String apiToken, String siteId, Context context, String region, int requestCode) {
+        this(appToken, siteId, context, region, requestCode);
+    }
+
     public GliaWidgetsConfig(String appToken, String siteId, Context context, String region, int requestCode) {
         this.appToken = appToken;
         this.siteId = siteId;
@@ -91,6 +99,15 @@ public class GliaWidgetsConfig {
          */
         public Builder setAppToken(String appToken) {
             this.appToken = appToken;
+            return this;
+        }
+
+        /**
+         * @deprecated API token is no longer needed for SDK to function correctly.
+         * Deprecated since SDK version 1.6.5
+         */
+        @Deprecated
+        public Builder setApiToken(String apiToken) {
             return this;
         }
 

@@ -30,7 +30,7 @@ public class NotificationFactory {
                 .setSmallIcon(R.drawable.ic_screensharing)
                 .setContentTitle(context.getString(R.string.glia_notification_screen_sharing_title))
                 .setContentText(context.getString(R.string.glia_notification_screen_sharing_message))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setOngoing(true)
                 .addAction(

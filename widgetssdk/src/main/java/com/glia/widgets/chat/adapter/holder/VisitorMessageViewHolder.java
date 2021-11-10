@@ -24,9 +24,9 @@ public class VisitorMessageViewHolder extends RecyclerView.ViewHolder {
         this.content = itemView.findViewById(R.id.content);
         this.deliveredView = itemView.findViewById(R.id.delivered_view);
         Context context = itemView.getContext();
-        ColorStateList primaryBrandColor = ContextCompat.getColorStateList(context, uiTheme.getBrandPrimaryColor());
-        content.setBackgroundTintList(primaryBrandColor);
-        content.setTextColor(context.getColor(uiTheme.getBaseLightColor()));
+
+        content.setBackgroundTintList(ContextCompat.getColorStateList(context, uiTheme.getVisitorMessageBackgroundColor()));
+        content.setTextColor(context.getColor(uiTheme.getVisitorMessageTextColor()));
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
             content.setTypeface(fontFamily);

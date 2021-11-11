@@ -77,10 +77,6 @@ public class SingleChoiceCardView extends FrameLayout {
         int gliaBrandPrimaryColor = ContextCompat.getColor(
                 this.getContext(), theme.getBrandPrimaryColor()
         );
-        ColorStateList systemAgentBubbleColorStateList =
-                ContextCompat.getColorStateList(this.getContext(), theme.getSystemAgentBubbleColor());
-        ColorStateList brandPrimaryColorStateList =
-                ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor());
 
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
         materialCardView.setBackgroundColor(gliaBaseLightColor);
@@ -156,13 +152,23 @@ public class SingleChoiceCardView extends FrameLayout {
 
             topViewId = button.getId();
 
-            button.setBackgroundTintList(
-                    selectedIndex != null && selectedIndex == index ?
-                            brandPrimaryColorStateList :
-                            systemAgentBubbleColorStateList);
-            button.setTextColor(selectedIndex == null ? gliaBaseDarkColor :
-                    selectedIndex == index ? gliaBaseLightColor : gliaBaseShadeColor
-            );
+            boolean isSelected = selectedIndex != null && selectedIndex == index;
+
+            ColorStateList actionButtonBackgroundColor =
+                    isSelected ?
+                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonSelectedBackgroundColor()) :
+                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonBackgroundColor());
+
+
+            ColorStateList actionButtonTextColor =
+                    isSelected ?
+                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonSelectedTextColor()) :
+                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonTextColor());
+
+
+            button.setBackgroundTintList(actionButtonBackgroundColor);
+            button.setTextColor(actionButtonTextColor);
+
             if (theme.getFontRes() != null) {
                 button.setTypeface(
                         ResourcesCompat.getFont(
@@ -170,15 +176,14 @@ public class SingleChoiceCardView extends FrameLayout {
                                 theme.getFontRes())
                 );
             }
+
+
             if (selectedIndex != null && selectedIndex != index) {
                 button.setStrokeWidth(
                         Float.valueOf(Utils.pxFromDp(this.getContext(), 1f)).intValue()
                 );
                 button.setStrokeColor(
-                        ContextCompat.getColorStateList(
-                                this.getContext(),
-                                theme.getBaseShadeColor()
-                        )
+                        ContextCompat.getColorStateList(this.getContext(), theme.getBaseShadeColor())
                 );
             }
             if (onOptionClickedListener != null) {

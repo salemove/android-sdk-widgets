@@ -115,6 +115,70 @@ public class Utils {
                         R.attr.gliaSystemNegativeColor
                 )
         );
+        defaultThemeBuilder.setVisitorMessageBackgroundColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_visitorMessageBackgroundColor,
+                        R.attr.gliaVisitorMessageBackgroundColor
+                )
+        );
+        defaultThemeBuilder.setVisitorMessageTextColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_visitorMessageTextColor,
+                        R.attr.gliaVisitorMessageTextColor
+                )
+        );
+        defaultThemeBuilder.setOperatorMessageBackgroundColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_operatorMessageBackgroundColor,
+                        R.attr.gliaOperatorMessageBackgroundColor
+                )
+        );
+        defaultThemeBuilder.setOperatorMessageTextColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_operatorMessageTextColor,
+                        R.attr.operatorMessageTextColor
+                )
+        );
+        defaultThemeBuilder.setBotActionButtonBackgroundColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_botActionButtonBackgroundColor,
+                        R.attr.gliaBotActionButtonBackgroundColor
+                )
+        );
+        defaultThemeBuilder.setBotActionButtonTextColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_botActionButtonTextColor,
+                        R.attr.gliaBotActionButtonTextColor
+                )
+        );
+        defaultThemeBuilder.setBotActionButtonSelectedBackgroundColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_botActionButtonSelectedBackgroundColor,
+                        R.attr.gliaBotActionButtonSelectedBackgroundColor
+                )
+        );
+        defaultThemeBuilder.setBotActionButtonSelectedTextColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_botActionButtonSelectedTextColor,
+                        R.attr.gliaBotActionButtonSelectedTextColor
+                )
+        );
         defaultThemeBuilder.setFontRes(
                 getTypedArrayIntegerValue(
                         typedArray,
@@ -337,6 +401,22 @@ public class Utils {
         Integer fontRes = newTheme.getFontRes() != null ? newTheme.getFontRes() : oldTheme.getFontRes();
         Integer systemNegativeColorRes = newTheme.getSystemNegativeColor() != null ?
                 newTheme.getSystemNegativeColor() : oldTheme.getSystemNegativeColor();
+        Integer visitorMessageBackgroundColorRes = newTheme.getVisitorMessageBackgroundColor() != null ?
+                newTheme.getVisitorMessageBackgroundColor() : oldTheme.getVisitorMessageBackgroundColor();
+        Integer visitorMessageTextColorRes = newTheme.getVisitorMessageTextColor() != null ?
+                newTheme.getVisitorMessageTextColor() : oldTheme.getVisitorMessageTextColor();
+        Integer operatorMessageBackgroundColorRes = newTheme.getOperatorMessageBackgroundColor() != null ?
+                newTheme.getOperatorMessageBackgroundColor() : oldTheme.getOperatorMessageBackgroundColor();
+        Integer operatorMessageTextColorRes = newTheme.getOperatorMessageTextColor() != null ?
+                newTheme.getOperatorMessageTextColor() : oldTheme.getOperatorMessageTextColor();
+        Integer botActionButtonBackgroundColorRes = newTheme.getBotActionButtonBackgroundColor() != null ?
+                newTheme.getBotActionButtonBackgroundColor() : oldTheme.getBotActionButtonBackgroundColor();
+        Integer botActionButtonTextColorRes = newTheme.getBotActionButtonTextColor() != null ?
+                newTheme.getBotActionButtonTextColor() : oldTheme.getBotActionButtonTextColor();
+        Integer botActionButtonSelectedBackgroundColorRes = newTheme.getBotActionButtonSelectedBackgroundColor() != null ?
+                newTheme.getBotActionButtonSelectedBackgroundColor() : oldTheme.getBotActionButtonSelectedBackgroundColor();
+        Integer botActionButtonSelectedTextColorRes = newTheme.getBotActionButtonSelectedTextColor() != null ?
+                newTheme.getBotActionButtonSelectedTextColor() : oldTheme.getBotActionButtonSelectedTextColor();
         Integer iconAppBarBack = newTheme.getIconAppBarBack() != null ?
                 newTheme.getIconAppBarBack() : oldTheme.getIconAppBarBack();
         Integer iconLeaveQueue = newTheme.getIconLeaveQueue() != null ?
@@ -384,6 +464,14 @@ public class Utils {
         builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
         builder.setFontRes(fontRes);
         builder.setSystemNegativeColor(systemNegativeColorRes);
+        builder.setVisitorMessageBackgroundColor(visitorMessageBackgroundColorRes);
+        builder.setVisitorMessageTextColor(visitorMessageTextColorRes);
+        builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColorRes);
+        builder.setOperatorMessageTextColor(operatorMessageTextColorRes);
+        builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColorRes);
+        builder.setBotActionButtonTextColor(botActionButtonTextColorRes);
+        builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColorRes);
+        builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColorRes);
         builder.setIconAppBarBack(iconAppBarBack);
         builder.setIconLeaveQueue(iconLeaveQueue);
         builder.setIconSendMessage(iconSendMessage);

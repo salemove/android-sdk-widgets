@@ -23,6 +23,14 @@ class Utils {
         Integer systemAgentBubbleColor = getColorValueFromPrefs(R.string.pref_system_agent_bubble_color, sharedPreferences, resources);
         Integer fontFamily = getTypefaceFromPrefs(sharedPreferences, resources);
         Integer systemNegativeColor = getColorValueFromPrefs(R.string.pref_system_negative_color, sharedPreferences, resources);
+        Integer visitorMessageBackgroundColor = getColorValueFromPrefs(R.string.pref_visitor_message_bg_color, sharedPreferences, resources);
+        Integer visitorMessageTextColor = getColorValueFromPrefs(R.string.pref_visitor_message_txt_color, sharedPreferences, resources);
+        Integer operatorMessageBackgroundColor = getColorValueFromPrefs(R.string.pref_operator_message_bg_color, sharedPreferences, resources);
+        Integer operatorMessageTextColor = getColorValueFromPrefs(R.string.pref_operator_message_txt_color, sharedPreferences, resources);
+        Integer botActionButtonBackgroundColor = getColorValueFromPrefs(R.string.pref_bot_action_button_bg_color, sharedPreferences, resources);
+        Integer botActionButtonTextColor = getColorValueFromPrefs(R.string.pref_bot_action_button_txt_color, sharedPreferences, resources);
+        Integer botActionButtonSelectedBackgroundColor = getColorValueFromPrefs(R.string.pref_bot_action_button_selected_bg_color, sharedPreferences, resources);
+        Integer botActionButtonSelectedTextColor = getColorValueFromPrefs(R.string.pref_bot_action_button_selected_txt_color, sharedPreferences, resources);
 
         Integer whiteLabel = getWhiteLabelValueFromPrefs(sharedPreferences, resources);
 
@@ -37,6 +45,14 @@ class Utils {
         builder.setBrandPrimaryColor(brandPrimaryColor);
         builder.setFontRes(fontFamily);
         builder.setSystemNegativeColor(systemNegativeColor);
+        builder.setVisitorMessageBackgroundColor(visitorMessageBackgroundColor);
+        builder.setVisitorMessageTextColor(visitorMessageTextColor);
+        builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColor);
+        builder.setOperatorMessageTextColor(operatorMessageTextColor);
+        builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColor);
+        builder.setBotActionButtonTextColor(botActionButtonTextColor);
+        builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColor);
+        builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColor);
         builder.setWhiteLabel(whiteLabel);
         
         return builder.build();
@@ -48,6 +64,13 @@ class Utils {
         String colorBlue = resources.getString(R.string.color_blue_value);
         String colorWhite = resources.getString(R.string.color_white_value);
         String colorBlack = resources.getString(R.string.color_black_value);
+        String colorDarkGrayishBlue = resources.getString(R.string.color_dark_grayish_blue);
+        String colorPureYellow = resources.getString(R.string.color_pure_yellow);
+        String colorDarkCyan = resources.getString(R.string.color_dark_cyan);
+        String colorVeryDarkBlue = resources.getString(R.string.color_very_dark_blue);
+        String colorVeryDarkGrayishBlue = resources.getString(R.string.color_very_dark_grayish_blue);
+        String colorVeryLightGray = resources.getString(R.string.color_very_light_gray);
+
         String defaultPrefValue = resources.getString(R.string.settings_value_default);
 
         String colorValue = sharedPreferences.getString(resources.getString(keyValue), defaultPrefValue);
@@ -63,6 +86,18 @@ class Utils {
                 return R.color.color_white;
             } else if (colorValue.equals(colorBlack)) {
                 return R.color.color_black;
+            } else if (colorValue.equals(colorDarkGrayishBlue)) {
+                return R.color.color_dark_grayish_blue;
+            } else if (colorValue.equals(colorPureYellow)) {
+                return R.color.color_pure_yellow;
+            } else if (colorValue.equals(colorDarkCyan)) {
+                return R.color.color_dark_cyan;
+            } else if (colorValue.equals(colorVeryDarkBlue)) {
+                return R.color.color_very_dark_blue;
+            } else if (colorValue.equals(colorVeryDarkGrayishBlue)) {
+                return R.color.color_very_dark_grayish_blue;
+            } else if (colorValue.equals(colorVeryLightGray)) {
+                return R.color.color_very_light_gray;
             }
         }
         return null;

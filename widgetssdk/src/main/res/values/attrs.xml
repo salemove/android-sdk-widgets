@@ -55,6 +55,22 @@
         <attr name="iconCallMinimize" format="reference" />
         <!-- The icon resId used in a chat head if an operator's profile image is absent -->
         <attr name="iconPlaceholder" format="reference" />
+        <!-- Visitor message background color -->
+        <attr name="visitorMessageBackgroundColor" format="reference" />
+        <!-- Visitor message text color -->
+        <attr name="visitorMessageTextColor" format="reference" />
+        <!-- Operator message background color -->
+        <attr name="operatorMessageBackgroundColor" format="reference" />
+        <!-- Operator message text color -->
+        <attr name="operatorMessageTextColor" format="reference" />
+        <!-- Bot message action button background color -->
+        <attr name="botActionButtonBackgroundColor" format="reference" />
+        <!-- Bot message action button text color -->
+        <attr name="botActionButtonTextColor" format="reference" />
+        <!-- Bot message action button background color -->
+        <attr name="botActionButtonSelectedBackgroundColor" format="reference" />
+        <!-- Bot message action button text color -->
+        <attr name="botActionButtonSelectedTextColor" format="reference" />
 
         <attr name="whiteLabel" format="reference" />
     </declare-styleable>
@@ -110,6 +126,23 @@
     <attr name="gliaIconCallMinimize" format="reference" />
     <!-- The icon resId used in a chat head if an operator's profile image is absent -->
     <attr name="gliaIconPlaceholder" format="reference" />
+
+    <!-- Visitor message background color -->
+    <attr name="gliaVisitorMessageBackgroundColor" format="reference" />
+    <!-- Visitor message text color -->
+    <attr name="gliaVisitorMessageTextColor" format="reference" />
+    <!-- Operator message background color -->
+    <attr name="gliaOperatorMessageBackgroundColor" format="reference" />
+    <!-- Operator message text color -->
+    <attr name="gliaOperatorMessageTextColor" format="reference" />
+    <!-- Bot message action button background color -->
+    <attr name="gliaBotActionButtonBackgroundColor" format="reference" />
+    <!-- Bot message action button text color -->
+    <attr name="gliaBotActionButtonTextColor" format="reference" />
+    <!-- Bot message action button background color -->
+    <attr name="gliaBotActionButtonSelectedBackgroundColor" format="reference" />
+    <!-- Bot message action button text color -->
+    <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
 
     <attr name="gliaWhiteLabel" format="reference" />
 

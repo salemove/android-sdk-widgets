@@ -17,6 +17,14 @@
     <string name="pref_queue_id">queue_id</string>
     <string name="pref_context_url">context_url</string>
     <string name="pref_white_label">white_label_toggle</string>
+    <string name="pref_visitor_message_bg_color">visitor_message_bg_color</string>
+    <string name="pref_visitor_message_txt_color">visitor_message_txt_color</string>
+    <string name="pref_operator_message_bg_color">operator_message_bg_color</string>
+    <string name="pref_operator_message_txt_color">operator_message_txt_color</string>
+    <string name="pref_bot_action_button_bg_color">bot_action_button_bg_color</string>
+    <string name="pref_bot_action_button_txt_color">bot_action_button_txt_color</string>
+    <string name="pref_bot_action_button_selected_bg_color">bot_action_button_selected_bg_color</string>
+    <string name="pref_bot_action_button_selected_txt_color">bot_action_button_selected_txt_color</string>
 
     <string name="default_value">default</string>
     <string name="color_blue_value">blue</string>
@@ -24,6 +32,12 @@
     <string name="color_red_value">red</string>
     <string name="color_black_value">black</string>
     <string name="color_white_value">white</string>
+    <string name="color_dark_grayish_blue">dark_grayish_blue</string>
+    <string name="color_pure_yellow">pure_yellow</string>
+    <string name="color_dark_cyan">dark_cyan</string>
+    <string name="color_very_dark_blue">very_dark_blue</string>
+    <string name="color_very_dark_grayish_blue">very_dark_grayish_blue</string>
+    <string name="color_very_light_gray">very_light_gray</string>
     <string name="font_delius_value">delius</string>
     <string name="font_expletus_value">expletus</string>
     <string name="font_tangerine_value">tangerine</string>
@@ -37,6 +51,12 @@
         <item>@string/settings_color_red</item>
         <item>@string/settings_color_black</item>
         <item>@string/settings_color_white</item>
+        <item>@string/settings_color_dark_grayish_blue</item>
+        <item>@string/settings_color_pure_yellow</item>
+        <item>@string/settings_color_dark_cyan</item>
+        <item>@string/settings_color_very_dark_blue</item>
+        <item>@string/settings_color_very_dark_grayish_blue</item>
+        <item>@string/settings_color_very_light_gray</item>
     </array>
     <array name="color_values">
         <item>@string/default_value</item>
@@ -45,6 +65,12 @@
         <item>@string/color_red_value</item>
         <item>@string/color_black_value</item>
         <item>@string/color_white_value</item>
+        <item>@string/color_dark_grayish_blue</item>
+        <item>@string/color_pure_yellow</item>
+        <item>@string/color_dark_cyan</item>
+        <item>@string/color_very_dark_blue</item>
+        <item>@string/color_very_dark_grayish_blue</item>
+        <item>@string/color_very_light_gray</item>
     </array>
     <array name="fonts">
         <item>@string/settings_value_default_restart</item>

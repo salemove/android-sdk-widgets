@@ -28,6 +28,18 @@
         <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
         <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
 
+        <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
+        <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
+        <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
+        <item name="operatorMessageTextColor">?attr/gliaOperatorMessageTextColor</item>
+        <item name="botActionButtonBackgroundColor">?attr/gliaBotActionButtonBackgroundColor</item>
+        <item name="botActionButtonTextColor">?attr/gliaBotActionButtonTextColor</item>
+        <item name="botActionButtonSelectedBackgroundColor">
+            ?attr/gliaBotActionButtonSelectedBackgroundColor
+        </item>
+        <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor
+        </item>
+
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
     </style>
 
@@ -69,6 +81,15 @@
         <item name="gliaIconCallSpeakerOff">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
+
+        <item name="gliaVisitorMessageBackgroundColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaVisitorMessageTextColor">?attr/gliaBaseLightColor</item>
+        <item name="gliaOperatorMessageBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
+        <item name="gliaOperatorMessageTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaBotActionButtonBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
+        <item name="gliaBotActionButtonTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaBotActionButtonSelectedBackgroundColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaBotActionButtonSelectedTextColor">?attr/gliaBaseShadeColor</item>
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>

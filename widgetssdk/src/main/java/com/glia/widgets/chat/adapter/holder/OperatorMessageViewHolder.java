@@ -89,10 +89,10 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
         TextView contentView = (TextView) LayoutInflater.from(context)
                 .inflate(R.layout.chat_receive_message_content, contentLayout, false);
         ColorStateList operatorBgColor =
-                ContextCompat.getColorStateList(context, uiTheme.getSystemAgentBubbleColor());
+                ContextCompat.getColorStateList(context, uiTheme.getOperatorMessageBackgroundColor());
         contentView.setBackgroundTintList(operatorBgColor);
-        contentView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
-        contentView.setLinkTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
+        contentView.setTextColor(ContextCompat.getColor(context, uiTheme.getOperatorMessageTextColor()));
+        contentView.setLinkTextColor(ContextCompat.getColor(context, uiTheme.getOperatorMessageTextColor()));
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
             contentView.setTypeface(fontFamily);

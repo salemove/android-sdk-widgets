@@ -50,6 +50,47 @@ public class UiTheme implements Parcelable {
     private @ColorRes
     final Integer systemNegativeColor;
     /**
+     * Color for visitor message background
+     */
+    private @ColorRes
+    final Integer visitorMessageBackgroundColor;
+    /**
+     * Color for visitor message text
+     */
+    private @ColorRes
+    final Integer visitorMessageTextColor;
+    /**
+     * Color for operator message background
+     */
+    private @ColorRes
+    final Integer operatorMessageBackgroundColor;
+    /**
+     * Color for operator message text
+     */
+    private @ColorRes
+    final Integer operatorMessageTextColor;
+    /**
+     * Color for bot action button background color
+     */
+    private @ColorRes
+    final Integer botActionButtonBackgroundColor;
+    /**
+     * Color for bot action button text color
+     */
+    private @ColorRes
+    final Integer botActionButtonTextColor;
+    /**
+     * Color for bot action button background color
+     */
+    private @ColorRes
+    final Integer botActionButtonSelectedBackgroundColor;
+    /**
+     * Color for bot action button text color
+     */
+    private @ColorRes
+    final Integer botActionButtonSelectedTextColor;
+
+    /**
      * Allow overriding the view's fontFamily
      */
     private @FontRes
@@ -151,6 +192,14 @@ public class UiTheme implements Parcelable {
                     Integer systemAgentBubbleColor,
                     Integer fontRes,
                     Integer systemNegativeColor,
+                    Integer visitorMessageBackgroundColor,
+                    Integer visitorMessageTextColor,
+                    Integer operatorMessageBackgroundColor,
+                    Integer operatorMessageTextColor,
+                    Integer botActionButtonBackgroundColor,
+                    Integer botActionButtonTextColor,
+                    Integer botActionButtonSelectedBackgroundColor,
+                    Integer botActionButtonSelectedTextColor,
                     Integer iconAppBarBack,
                     Integer iconLeaveQueue,
                     Integer iconSendMessage,
@@ -179,6 +228,14 @@ public class UiTheme implements Parcelable {
         this.systemAgentBubbleColor = systemAgentBubbleColor;
         this.fontRes = fontRes;
         this.systemNegativeColor = systemNegativeColor;
+        this.visitorMessageBackgroundColor = visitorMessageBackgroundColor;
+        this.visitorMessageTextColor = visitorMessageTextColor;
+        this.operatorMessageBackgroundColor = operatorMessageBackgroundColor;
+        this.operatorMessageTextColor = operatorMessageTextColor;
+        this.botActionButtonBackgroundColor = botActionButtonBackgroundColor;
+        this.botActionButtonTextColor = botActionButtonTextColor;
+        this.botActionButtonSelectedBackgroundColor = botActionButtonSelectedBackgroundColor;
+        this.botActionButtonSelectedTextColor = botActionButtonSelectedTextColor;
         this.iconAppBarBack = iconAppBarBack;
         this.iconLeaveQueue = iconLeaveQueue;
         this.iconSendMessage = iconSendMessage;
@@ -240,6 +297,46 @@ public class UiTheme implements Parcelable {
             systemNegativeColor = null;
         } else {
             systemNegativeColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            visitorMessageBackgroundColor = null;
+        } else {
+            visitorMessageBackgroundColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            visitorMessageTextColor = null;
+        } else {
+            visitorMessageTextColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            operatorMessageBackgroundColor = null;
+        } else {
+            operatorMessageBackgroundColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            operatorMessageTextColor = null;
+        } else {
+            operatorMessageTextColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            botActionButtonBackgroundColor = null;
+        } else {
+            botActionButtonBackgroundColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            botActionButtonTextColor = null;
+        } else {
+            botActionButtonTextColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            botActionButtonSelectedBackgroundColor = null;
+        } else {
+            botActionButtonSelectedBackgroundColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            botActionButtonSelectedTextColor = null;
+        } else {
+            botActionButtonSelectedTextColor = in.readInt();
         }
         if (in.readByte() == 0) {
             iconAppBarBack = null;
@@ -383,6 +480,54 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(systemNegativeColor);
+        }
+        if (visitorMessageBackgroundColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(visitorMessageBackgroundColor);
+        }
+        if (visitorMessageTextColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(visitorMessageTextColor);
+        }
+        if (operatorMessageBackgroundColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(operatorMessageBackgroundColor);
+        }
+        if (operatorMessageTextColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(operatorMessageTextColor);
+        }
+        if (botActionButtonBackgroundColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(botActionButtonBackgroundColor);
+        }
+        if (botActionButtonTextColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(botActionButtonTextColor);
+        }
+        if (botActionButtonSelectedBackgroundColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(botActionButtonSelectedBackgroundColor);
+        }
+        if (botActionButtonSelectedTextColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(botActionButtonSelectedTextColor);
         }
         if (iconAppBarBack == null) {
             dest.writeByte((byte) 0);
@@ -553,6 +698,46 @@ public class UiTheme implements Parcelable {
         private @ColorRes
         Integer systemNegativeColor;
         /**
+         * Color for visitor message background
+         */
+        private @ColorRes
+        Integer visitorMessageBackgroundColor;
+        /**
+         * Color for visitor message text
+         */
+        private @ColorRes
+        Integer visitorMessageTextColor;
+        /**
+         * Color for operator message background
+         */
+        private @ColorRes
+        Integer operatorMessageBackgroundColor;
+        /**
+         * Color for operator message text
+         */
+        private @ColorRes
+        Integer operatorMessageTextColor;
+        /**
+         * Color for bot action button background color
+         */
+        private @ColorRes
+        Integer botActionButtonBackgroundColor;
+        /**
+         * Color for bot action button text color
+         */
+        private @ColorRes
+        Integer botActionButtonTextColor;
+        /**
+         * Color for bot action button background color
+         */
+        private @ColorRes
+        Integer botActionButtonSelectedBackgroundColor;
+        /**
+         * Color for bot action button text color
+         */
+        private @ColorRes
+        Integer botActionButtonSelectedTextColor;
+        /**
          * Allow overriding the view's fontFamily
          */
         private @FontRes
@@ -686,6 +871,38 @@ public class UiTheme implements Parcelable {
             this.systemNegativeColor = systemNegativeColor;
         }
 
+        public void setVisitorMessageBackgroundColor(@ColorRes Integer color) {
+            this.visitorMessageBackgroundColor = color;
+        }
+
+        public void setVisitorMessageTextColor(@ColorRes Integer color) {
+            this.visitorMessageTextColor = color;
+        }
+
+        public void setOperatorMessageBackgroundColor(@ColorRes Integer color) {
+            this.operatorMessageBackgroundColor = color;
+        }
+
+        public void setOperatorMessageTextColor(@ColorRes Integer color) {
+            this.operatorMessageTextColor = color;
+        }
+
+        public void setBotActionButtonBackgroundColor(@ColorRes Integer color) {
+            this.botActionButtonBackgroundColor = color;
+        }
+
+        public void setBotActionButtonTextColor(@ColorRes Integer color) {
+            this.botActionButtonTextColor = color;
+        }
+
+        public void setBotActionButtonSelectedBackgroundColor(@ColorRes Integer color) {
+            this.botActionButtonSelectedBackgroundColor = color;
+        }
+
+        public void setBotActionButtonSelectedTextColor(@ColorRes Integer color) {
+            this.botActionButtonSelectedTextColor = color;
+        }
+
         public void setIconAppBarBack(@DrawableRes Integer iconAppBarBack) {
             this.iconAppBarBack = iconAppBarBack;
         }
@@ -768,6 +985,14 @@ public class UiTheme implements Parcelable {
             this.systemAgentBubbleColor = theme.systemAgentBubbleColor;
             this.fontRes = theme.fontRes;
             this.systemNegativeColor = theme.systemNegativeColor;
+            this.visitorMessageBackgroundColor = theme.visitorMessageBackgroundColor;
+            this.visitorMessageTextColor = theme.visitorMessageTextColor;
+            this.operatorMessageBackgroundColor = theme.operatorMessageBackgroundColor;
+            this.operatorMessageTextColor = theme.operatorMessageTextColor;
+            this.botActionButtonBackgroundColor = theme.botActionButtonBackgroundColor;
+            this.botActionButtonTextColor = theme.botActionButtonTextColor;
+            this.botActionButtonSelectedBackgroundColor = theme.botActionButtonSelectedBackgroundColor;
+            this.botActionButtonSelectedTextColor = theme.botActionButtonSelectedTextColor;
             this.iconAppBarBack = theme.iconAppBarBack;
             this.iconLeaveQueue = theme.iconLeaveQueue;
             this.iconSendMessage = theme.iconSendMessage;
@@ -797,6 +1022,14 @@ public class UiTheme implements Parcelable {
                     systemAgentBubbleColor,
                     fontRes,
                     systemNegativeColor,
+                    visitorMessageBackgroundColor,
+                    visitorMessageTextColor,
+                    operatorMessageBackgroundColor,
+                    operatorMessageTextColor,
+                    botActionButtonBackgroundColor,
+                    botActionButtonTextColor,
+                    botActionButtonSelectedBackgroundColor,
+                    botActionButtonSelectedTextColor,
                     iconAppBarBack,
                     iconLeaveQueue,
                     iconSendMessage,
@@ -853,6 +1086,38 @@ public class UiTheme implements Parcelable {
 
     public Integer getSystemNegativeColor() {
         return systemNegativeColor;
+    }
+
+    public Integer getVisitorMessageBackgroundColor() {
+        return visitorMessageBackgroundColor;
+    }
+
+    public Integer getVisitorMessageTextColor() {
+        return visitorMessageTextColor;
+    }
+
+    public Integer getOperatorMessageBackgroundColor() {
+        return operatorMessageBackgroundColor;
+    }
+
+    public Integer getOperatorMessageTextColor() {
+        return operatorMessageTextColor;
+    }
+
+    public Integer getBotActionButtonBackgroundColor() {
+        return botActionButtonBackgroundColor;
+    }
+
+    public Integer getBotActionButtonTextColor() {
+        return botActionButtonTextColor;
+    }
+
+    public Integer getBotActionButtonSelectedBackgroundColor() {
+        return botActionButtonSelectedBackgroundColor;
+    }
+
+    public Integer getBotActionButtonSelectedTextColor() {
+        return botActionButtonSelectedTextColor;
     }
 
     public Integer getIconAppBarBack() {

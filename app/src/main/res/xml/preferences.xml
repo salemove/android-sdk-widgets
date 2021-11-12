@@ -35,9 +35,9 @@
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreference
+            app:defaultValue="false"
             app:key="@string/pref_white_label"
-            app:title="@string/settings_white_label"
-            app:defaultValue="false" />
+            app:title="@string/settings_white_label" />
 
     </PreferenceCategory>
 
@@ -99,6 +99,69 @@
             android:title="@string/settings_chat_negative_color"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_visitor_message_bg_color"
+            android:title="@string/settings_chat_visitor_message_bg_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_visitor_message_txt_color"
+            android:title="@string/settings_chat_visitor_message_txt_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_operator_message_bg_color"
+            android:title="@string/settings_chat_operator_message_bg_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_operator_message_txt_color"
+            android:title="@string/settings_chat_operator_message_txt_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_bot_action_button_bg_color"
+            android:title="@string/settings_chat_bot_action_button_bg_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_bot_action_button_txt_color"
+            android:title="@string/settings_chat_bot_action_button_txt_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_bot_action_button_selected_bg_color"
+            android:title="@string/settings_chat_bot_action_button_selected_bg_color"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_bot_action_button_selected_txt_color"
+            android:title="@string/settings_chat_bot_action_button_selected_txt_color"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_typography">

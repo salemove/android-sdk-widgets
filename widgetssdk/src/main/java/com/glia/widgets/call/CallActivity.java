@@ -68,7 +68,7 @@ public class CallActivity extends AppCompatActivity {
         queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
         runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
         contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
-        useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
+        useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, Dependencies.getSdkConfigurationManager().isUseOverlay());
         callView.setTheme(runtimeTheme);
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);

@@ -80,6 +80,6 @@ public class MainFragment extends Fragment {
         UiTheme uiTheme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
         intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
         // use to set the bubble functionality
-        // intent.putExtra(GliaWidgets.USE_OVERLAY, false);
+        intent.putExtra(GliaWidgets.USE_OVERLAY, Utils.getUseOverlay(sharedPreferences, getResources()));
     }
 }

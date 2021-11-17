@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.glia.widgets.Constants;
+import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.view.head.ChatHeadService;
 import com.glia.widgets.view.head.ChatHeadsController;
@@ -22,17 +23,20 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static final List<String> activitiesInBackstack = new ArrayList<>();
     private static INotificationManager notificationManager;
+    private static GliaSdkConfigurationManager sdkConfigurationManager;
     private static UseCaseFactory useCaseFactory;
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
+        sdkConfigurationManager = new GliaSdkConfigurationManager();
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
                 new PermissionDialogManager(application),
-                notificationManager
+                notificationManager,
+                sdkConfigurationManager
         );
 
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
@@ -56,6 +60,10 @@ public class Dependencies {
 
     public static INotificationManager getNotificationManager() {
         return notificationManager;
+    }
+
+    public static GliaSdkConfigurationManager getSdkConfigurationManager() {
+        return sdkConfigurationManager;
     }
 
     public static void init() {

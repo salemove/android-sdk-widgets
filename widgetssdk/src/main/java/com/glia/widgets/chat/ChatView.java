@@ -260,6 +260,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             String contextUrl,
             boolean useOverlays,
             Bundle savedInstanceState) {
+        Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
         Activity activity = Utils.getActivity(this.getContext());
         if (controller != null) {
 

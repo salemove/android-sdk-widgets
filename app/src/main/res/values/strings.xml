@@ -56,5 +56,6 @@
     <string name="main_start_chat_flow">Start new chat flow</string>
     <string name="main_start_audio_call">Start new audio call</string>
     <string name="main_start_video_call">Start new video call</string>
+    <string name="main_clear_visitor_session">Clear Session</string>
 
 </resources>

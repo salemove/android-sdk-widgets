@@ -62,6 +62,9 @@ public class MainFragment extends Fragment {
             intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_VIDEO);
             startActivity(intent);
         });
+        view.findViewById(R.id.clear_session_button).setOnClickListener(v -> {
+            GliaWidgets.clearVisitorSession();
+        });
     }
 
     @Override
@@ -80,6 +83,6 @@ public class MainFragment extends Fragment {
         UiTheme uiTheme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
         intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
         // use to set the bubble functionality
-        // intent.putExtra(GliaWidgets.USE_OVERLAY, false);
+        intent.putExtra(GliaWidgets.USE_OVERLAY, Utils.getUseOverlay(sharedPreferences, getResources()));
     }
 }

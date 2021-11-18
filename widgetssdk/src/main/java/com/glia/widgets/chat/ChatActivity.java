@@ -12,14 +12,10 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.core.configuration.Configuration;
 import com.glia.widgets.di.Dependencies;
 
 public class ChatActivity extends AppCompatActivity {
-
-    private String companyName;
-    private String queueId;
-    private String contextUrl;
-    private boolean useOverlays;
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
@@ -31,32 +27,39 @@ public class ChatActivity extends AppCompatActivity {
                 chatView.navigateToCallSuccess();
             };
 
+    private Configuration configuration;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Dependencies.addActivityToBackStack(Constants.CHAT_ACTIVITY);
         setContentView(R.layout.chat_activity);
-
-        Intent intent = getIntent();
-        companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
-        queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-        UiTheme runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
-        contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
-        useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
-
         chatView = findViewById(R.id.chat_view);
-        chatView.setTheme(runtimeTheme);
+
+        buildConfiguration();
+
+        chatView.setTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnNavigateToCallListener(onNavigateToCallListener);
         chatView.startChat(
-                companyName,
-                queueId,
-                contextUrl,
-                useOverlays,
+                configuration.getCompanyName(),
+                configuration.getQueueId(),
+                configuration.getContextUrl(),
+                configuration.getUseOverlay(),
                 savedInstanceState
         );
+    }
+
+    private void buildConfiguration() {
+        configuration = new Configuration.Builder()
+                .companyName(getCompanyName())
+                .queueId(getQueueId())
+                .runTimeTheme(getRunTimeUiTheme())
+                .contextUrl(getContextUrl())
+                .useOverlay(getUseOverlay())
+                .build();
     }
 
     @Override
@@ -96,11 +99,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void navigateToCall(UiTheme theme, String mediaType) {
         Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
+        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
+        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
+        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
         newIntent.putExtra(GliaWidgets.UI_THEME, theme);
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
+        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
         newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
         startActivity(newIntent);
     }
@@ -109,5 +112,28 @@ public class ChatActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         chatView.onStop();
+    }
+
+    private String getCompanyName() {
+        return getIntent().getStringExtra(GliaWidgets.COMPANY_NAME);
+    }
+
+    private String getQueueId() {
+        return getIntent().getStringExtra(GliaWidgets.QUEUE_ID);
+    }
+
+    private String getContextUrl() {
+        return getIntent().getStringExtra(GliaWidgets.CONTEXT_URL);
+    }
+
+    private UiTheme getRunTimeUiTheme() {
+        return getIntent().getParcelableExtra(GliaWidgets.UI_THEME);
+    }
+
+    private boolean getUseOverlay() {
+        return getIntent().getBooleanExtra(
+                GliaWidgets.USE_OVERLAY,
+                Dependencies.getSdkConfigurationManager().isUseOverlay()
+        );
     }
 }

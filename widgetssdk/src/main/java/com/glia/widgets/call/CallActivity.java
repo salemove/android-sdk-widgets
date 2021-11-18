@@ -17,6 +17,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.core.configuration.Configuration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
@@ -33,11 +34,7 @@ public class CallActivity extends AppCompatActivity {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private String companyName;
-    private String queueId;
-    private UiTheme runtimeTheme;
-    private String contextUrl;
-    private boolean useOverlays;
+    private Configuration configuration;
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = () -> {
@@ -63,20 +60,31 @@ public class CallActivity extends AppCompatActivity {
             return;
         }
 
-        Intent intent = getIntent();
-        companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
-        queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-        runtimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
-        contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
-        useOverlays = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, true);
-        callView.setTheme(runtimeTheme);
+        buildConfiguration();
+
+        callView.setTheme(configuration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
 
-        startCallWithPermissions(companyName, queueId, contextUrl, useOverlays, getMediaType(intent));
+        startCallWithPermissions(
+                configuration.getCompanyName(),
+                configuration.getQueueId(),
+                configuration.getContextUrl(),
+                configuration.getUseOverlay(),
+                getMediaType(getIntent())
+        );
     }
 
+    private void buildConfiguration() {
+        configuration = new Configuration.Builder()
+                .companyName(getCompanyName())
+                .queueId(getQueueId())
+                .runTimeTheme(getRunTimeUiTheme())
+                .contextUrl(getContextUrl())
+                .useOverlay(getUseOverlay())
+                .build();
+    }
 
     private void startCallWithPermissions(String companyName,
                                           String queueId,
@@ -188,11 +196,11 @@ public class CallActivity extends AppCompatActivity {
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, companyName);
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, queueId);
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, contextUrl);
-        newIntent.putExtra(GliaWidgets.UI_THEME, runtimeTheme);
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, useOverlays);
+        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
+        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
+        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
+        newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
+        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
         startActivity(newIntent);
     }
 
@@ -203,5 +211,28 @@ public class CallActivity extends AppCompatActivity {
         } else {
             return Engagement.MediaType.AUDIO;
         }
+    }
+
+    private String getCompanyName() {
+        return getIntent().getStringExtra(GliaWidgets.COMPANY_NAME);
+    }
+
+    private String getQueueId() {
+        return getIntent().getStringExtra(GliaWidgets.QUEUE_ID);
+    }
+
+    private String getContextUrl() {
+        return getIntent().getStringExtra(GliaWidgets.CONTEXT_URL);
+    }
+
+    private UiTheme getRunTimeUiTheme() {
+        return getIntent().getParcelableExtra(GliaWidgets.UI_THEME);
+    }
+
+    private boolean getUseOverlay() {
+        return getIntent().getBooleanExtra(
+                GliaWidgets.USE_OVERLAY,
+                Dependencies.getSdkConfigurationManager().isUseOverlay()
+        );
     }
 }

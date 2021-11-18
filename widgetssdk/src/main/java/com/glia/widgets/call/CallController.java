@@ -496,7 +496,7 @@ public class CallController implements
         Logger.d(TAG, "videoButtonClicked");
         if (callState.isCallOngoingAndOperatorConnected()) {
             VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
-            Logger.d(TAG, "videoButton status:" + currentMediaState.getAudio().getStatus().toString());
+            Logger.d(TAG, "videoButton status:" + currentMediaState.getVideo().getStatus().toString());
             if (currentMediaState.getVideo().getStatus() == Media.Status.PAUSED) {
                 currentMediaState.getVideo().resume();
                 if (currentMediaState.getVideo().getStatus() == Media.Status.PLAYING) {

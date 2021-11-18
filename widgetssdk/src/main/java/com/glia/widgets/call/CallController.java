@@ -171,6 +171,9 @@ public class CallController implements
                          String contextUrl,
                          Engagement.MediaType mediaType) {
         Logger.d(TAG, "initCall");
+        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
+            dialogController.showOverlayPermissionsDialog();
+        }
         messagesNotSeenHandler.onNavigatedToCall();
         if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;
@@ -402,10 +405,6 @@ public class CallController implements
 
     public void onResume() {
         Logger.d(TAG, "onResume\n");
-
-        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
-            dialogController.showOverlayPermissionsDialog();
-        }
 
         if (hasCallNotificationChannelEnabledUseCase.execute()) {
             if (callState.isVideoCall() || callState.is2WayVideoCall()) {

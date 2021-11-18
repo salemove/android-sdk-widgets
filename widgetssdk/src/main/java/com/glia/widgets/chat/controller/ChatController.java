@@ -300,6 +300,8 @@ public class ChatController implements
                          String queueId,
                          String contextUrl
     ) {
+        if (isShowOverlayPermissionRequestDialogUseCase.execute())
+            dialogController.showOverlayPermissionsDialog();
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
@@ -536,11 +538,6 @@ public class ChatController implements
 
     public void onResume() {
         Logger.d(TAG, "onResume\n");
-
-        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
-            dialogController.showOverlayPermissionsDialog();
-        }
-
         messagesNotSeenHandler.callChatButtonClicked();
     }
 

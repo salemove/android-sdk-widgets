@@ -39,7 +39,7 @@ ext {
     appCompatVersion = '1.2.0'
     materialVersion = '1.3.0'
     constraintLayoutVersion = '2.0.4'
-    gliaSdkVersion = '0.22.3'
+    gliaSdkVersion = '0.22.4'
     junitVersion = '4.13.1'
     androidXTestVersion = '1.1.2'
     espresso = '3.3.0'

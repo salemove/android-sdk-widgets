@@ -62,6 +62,9 @@ public class MainFragment extends Fragment {
             intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_VIDEO);
             startActivity(intent);
         });
+        view.findViewById(R.id.clear_session_button).setOnClickListener(v -> {
+            GliaWidgets.clearVisitorSession();
+        });
     }
 
     @Override

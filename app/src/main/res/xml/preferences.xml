@@ -39,6 +39,11 @@
             app:key="@string/pref_white_label"
             app:title="@string/settings_white_label" />
 
+        <SwitchPreference
+            app:defaultValue="true"
+            app:key="@string/pref_use_overlay"
+            app:title="@string/settings_use_overlay" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_colors_title">

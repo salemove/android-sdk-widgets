@@ -201,6 +201,7 @@ public class CallView extends ConstraintLayout {
                           String contextUrl,
                           boolean useOverlays,
                           Engagement.MediaType mediaType) {
+        Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
         if (controller != null) {
             controller.initCall(
                     companyName,

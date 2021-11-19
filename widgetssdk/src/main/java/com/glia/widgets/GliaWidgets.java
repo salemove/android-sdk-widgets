@@ -131,4 +131,10 @@ public class GliaWidgets {
         Logger.d(TAG, "onActivityResult");
         Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
     }
+
+    public static void clearVisitorSession() {
+        Logger.d(TAG, "clearVisitorSession");
+        Dependencies.getControllerFactory().destroyControllers();
+        Glia.clearVisitorSession();
+    }
 }

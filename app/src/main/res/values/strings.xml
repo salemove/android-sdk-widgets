@@ -46,6 +46,7 @@
     <string name="settings_company_name">Company name</string>
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
+    <string name="settings_use_overlay">Use Overlay</string>
     <string name="settings_context_url">Context url</string>
 
     <string name="main_open_settings">Open Settings</string>
@@ -55,5 +56,6 @@
     <string name="main_start_chat_flow">Start new chat flow</string>
     <string name="main_start_audio_call">Start new audio call</string>
     <string name="main_start_video_call">Start new video call</string>
+    <string name="main_clear_visitor_session">Clear Session</string>
 
 </resources>

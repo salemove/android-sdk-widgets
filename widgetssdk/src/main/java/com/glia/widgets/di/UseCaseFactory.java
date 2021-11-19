@@ -6,6 +6,7 @@ import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
@@ -56,16 +57,20 @@ public class UseCaseFactory {
     private final RepositoryFactory repositoryFactory;
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
+    private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
     private final INotificationManager notificationManager;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
                           PermissionManager permissionManager,
                           PermissionDialogManager permissionDialogManager,
-                          INotificationManager notificationManager) {
+                          INotificationManager notificationManager,
+                          GliaSdkConfigurationManager gliaSdkConfigurationManager
+    ) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
         this.notificationManager = notificationManager;
+        this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
     }
 
     public ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase() {
@@ -270,7 +275,7 @@ public class UseCaseFactory {
     }
 
     public IsShowOverlayPermissionRequestDialogUseCase createIsShowOverlayPermissionRequestDialogUseCase() {
-        return new IsShowOverlayPermissionRequestDialogUseCase(permissionManager, permissionDialogManager);
+        return new IsShowOverlayPermissionRequestDialogUseCase(permissionManager, permissionDialogManager, gliaSdkConfigurationManager);
     }
 
     public HasCallNotificationChannelEnabledUseCase createHasCallNotificationChannelEnabledUseCase() {

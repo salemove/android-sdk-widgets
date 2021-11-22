@@ -20,9 +20,9 @@
             android:layout_gravity="center"
             android:textAppearance="?attr/textAppearanceHeadline2" />
 
-        <com.google.android.material.button.MaterialButton
+        <com.glia.widgets.view.header.button.GliaEndButton
             android:id="@+id/end_button"
-            style="?attr/buttonBarNegativeButtonStyle"
+            style="?attr/gliaHeaderEndButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

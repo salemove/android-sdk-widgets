@@ -25,6 +25,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.head.model.ChatHeadInput;
 
 import java.io.File;
@@ -454,6 +455,11 @@ public class Utils {
 
         Integer whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
 
+        ButtonConfiguration endButtonConfiguration
+                = newTheme.getGliaEndButtonConfiguration() != null ?
+                newTheme.getGliaEndButtonConfiguration() :
+                oldTheme.getGliaEndButtonConfiguration();
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColorRes);
@@ -490,6 +496,7 @@ public class Utils {
         builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
         builder.setWhiteLabel(whiteLabel);
+        builder.setHeaderEndButtonConfiguration(endButtonConfiguration);
         return builder.build();
     }
 

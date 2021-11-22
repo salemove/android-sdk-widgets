@@ -12,7 +12,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
-import com.glia.widgets.core.configuration.Configuration;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.di.Dependencies;
 
 public class ChatActivity extends AppCompatActivity {
@@ -27,7 +27,7 @@ public class ChatActivity extends AppCompatActivity {
                 chatView.navigateToCallSuccess();
             };
 
-    private Configuration configuration;
+    private GliaSdkConfiguration configuration;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void buildConfiguration() {
-        configuration = new Configuration.Builder()
+        configuration = new GliaSdkConfiguration.Builder()
                 .companyName(getCompanyName())
                 .queueId(getQueueId())
                 .runTimeTheme(getRunTimeUiTheme())

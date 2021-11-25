@@ -729,14 +729,18 @@ public class ChatController implements
             changeLastOperatorMessages(currentChatItems, message);
             appendMessagesNotSeen();
             if (message.getAttachment() instanceof SingleChoiceAttachment) {
-                SingleChoiceAttachment attachment =
-                        ((SingleChoiceAttachment) message.getAttachment());
+                SingleChoiceAttachment attachment = ((SingleChoiceAttachment) message.getAttachment());
                 emitViewState(
                         chatState.chatInputModeChanged(
                                 attachment.getOptions() != null ?
                                         ChatInputMode.SINGLE_CHOICE_CARD :
                                         ChatInputMode.ENABLED
-                        ));
+                        )
+                );
+            } else if (chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD) {
+                emitViewState(
+                        chatState.chatInputModeChanged(ChatInputMode.ENABLED)
+                );
             }
         }
     }

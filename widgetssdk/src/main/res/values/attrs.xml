@@ -146,6 +146,9 @@
 
     <attr name="gliaWhiteLabel" format="reference" />
 
+    <!-- Styleable components -->
+    <attr name="gliaHeaderEndButtonStyle" format="reference" />
+
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />
         <attr name="title" format="string" />

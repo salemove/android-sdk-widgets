@@ -40,6 +40,8 @@
         <item name="botActionButtonSelectedTextColor">?attr/gliaBotActionButtonSelectedTextColor
         </item>
 
+        <item name="gliaHeaderEndButtonStyle">?attr/gliaHeaderEndButtonStyle</item>
+
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
     </style>
 
@@ -104,6 +106,8 @@
         <item name="textAppearanceCaption">@style/Application.Glia.Caption</item>
         <item name="textAppearanceBody1">@style/Application.Glia.Body</item>
         <item name="textAppearanceSubtitle2">@style/Application.Glia.Subtitle2</item>
+
+        <item name="gliaHeaderEndButtonStyle">@style/Application.Glia.Header.EndButton</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

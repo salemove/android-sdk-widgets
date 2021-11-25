@@ -2,14 +2,14 @@ package com.glia.widgets.core.configuration;
 
 import com.glia.widgets.UiTheme;
 
-public class Configuration {
+public class GliaSdkConfiguration {
     private final String companyName;
     private final String queueId;
     private final String contextUrl;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
 
-    private Configuration(
+    private GliaSdkConfiguration(
             Builder builder
     ) {
         this.companyName = builder.companyName;
@@ -74,8 +74,8 @@ public class Configuration {
             return this;
         }
 
-        public Configuration build() {
-            return new Configuration(this);
+        public GliaSdkConfiguration build() {
+            return new GliaSdkConfiguration(this);
         }
     }
 }

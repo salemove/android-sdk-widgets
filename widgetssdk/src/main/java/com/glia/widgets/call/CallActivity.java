@@ -17,7 +17,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
-import com.glia.widgets.core.configuration.Configuration;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
@@ -34,7 +34,7 @@ public class CallActivity extends AppCompatActivity {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private Configuration configuration;
+    private GliaSdkConfiguration configuration;
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = () -> {
@@ -77,7 +77,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void buildConfiguration() {
-        configuration = new Configuration.Builder()
+        configuration = new GliaSdkConfiguration.Builder()
                 .companyName(getCompanyName())
                 .queueId(getQueueId())
                 .runTimeTheme(getRunTimeUiTheme())

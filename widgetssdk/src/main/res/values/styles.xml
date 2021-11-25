@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Application.Glia.Header.EndButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">?attr/gliaSystemNegativeColor</item>
+        <item name="android:strokeColor">?attr/gliaSystemNegativeColor</item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle2</item>
+        <item name="android:textColor">?attr/gliaBaseLightColor</item>
+    </style>
 
     <style name="Application.Glia.Chat.Edittext" parent="Widget.AppCompat.EditText">
         <item name="android:inputType">textCapSentences|textMultiLine</item>

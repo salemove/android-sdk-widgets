@@ -54,7 +54,10 @@ class Utils {
         builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColor);
         builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColor);
         builder.setWhiteLabel(whiteLabel);
-        
+
+        // here goes header end engagement button configuration
+        builder.setHeaderEndButtonConfiguration(null);
+
         return builder.build();
     }
 

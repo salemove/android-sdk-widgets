@@ -7,8 +7,10 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.FontRes;
 
-public class UiTheme implements Parcelable {
+import com.glia.widgets.view.configuration.ButtonConfiguration;
 
+
+public class UiTheme implements Parcelable {
     /**
      * Text to be shown on the top of the app bar in the chat
      **/
@@ -183,78 +185,47 @@ public class UiTheme implements Parcelable {
 
     private final Integer whiteLabel;
 
-    private UiTheme(String appBarTitle,
-                    Integer brandPrimaryColor,
-                    Integer baseLightColor,
-                    Integer baseDarkColor,
-                    Integer baseNormalColor,
-                    Integer baseShadeColor,
-                    Integer systemAgentBubbleColor,
-                    Integer fontRes,
-                    Integer systemNegativeColor,
-                    Integer visitorMessageBackgroundColor,
-                    Integer visitorMessageTextColor,
-                    Integer operatorMessageBackgroundColor,
-                    Integer operatorMessageTextColor,
-                    Integer botActionButtonBackgroundColor,
-                    Integer botActionButtonTextColor,
-                    Integer botActionButtonSelectedBackgroundColor,
-                    Integer botActionButtonSelectedTextColor,
-                    Integer iconAppBarBack,
-                    Integer iconLeaveQueue,
-                    Integer iconSendMessage,
-                    Integer iconChatAudioUpgrade,
-                    Integer iconUpgradeAudioDialog,
-                    Integer iconCallAudioOn,
-                    Integer iconChatVideoUpgrade,
-                    Integer iconUpgradeVideoDialog,
-                    Integer iconScreenSharingDialog,
-                    Integer iconCallVideoOn,
-                    Integer iconCallAudioOff,
-                    Integer iconCallVideoOff,
-                    Integer iconCallChat,
-                    Integer iconCallSpeakerOn,
-                    Integer iconCallSpeakerOff,
-                    Integer iconCallMinimize,
-                    Integer iconPlaceholder,
-                    Integer whiteLabel
-    ) {
-        this.appBarTitle = appBarTitle;
-        this.brandPrimaryColor = brandPrimaryColor;
-        this.baseLightColor = baseLightColor;
-        this.baseDarkColor = baseDarkColor;
-        this.baseNormalColor = baseNormalColor;
-        this.baseShadeColor = baseShadeColor;
-        this.systemAgentBubbleColor = systemAgentBubbleColor;
-        this.fontRes = fontRes;
-        this.systemNegativeColor = systemNegativeColor;
-        this.visitorMessageBackgroundColor = visitorMessageBackgroundColor;
-        this.visitorMessageTextColor = visitorMessageTextColor;
-        this.operatorMessageBackgroundColor = operatorMessageBackgroundColor;
-        this.operatorMessageTextColor = operatorMessageTextColor;
-        this.botActionButtonBackgroundColor = botActionButtonBackgroundColor;
-        this.botActionButtonTextColor = botActionButtonTextColor;
-        this.botActionButtonSelectedBackgroundColor = botActionButtonSelectedBackgroundColor;
-        this.botActionButtonSelectedTextColor = botActionButtonSelectedTextColor;
-        this.iconAppBarBack = iconAppBarBack;
-        this.iconLeaveQueue = iconLeaveQueue;
-        this.iconSendMessage = iconSendMessage;
-        this.iconChatAudioUpgrade = iconChatAudioUpgrade;
-        this.iconUpgradeAudioDialog = iconUpgradeAudioDialog;
-        this.iconCallAudioOn = iconCallAudioOn;
-        this.iconChatVideoUpgrade = iconChatVideoUpgrade;
-        this.iconUpgradeVideoDialog = iconUpgradeVideoDialog;
-        this.iconScreenSharingDialog = iconScreenSharingDialog;
-        this.iconCallVideoOn = iconCallVideoOn;
-        this.iconCallAudioOff = iconCallAudioOff;
-        this.iconCallVideoOff = iconCallVideoOff;
-        this.iconCallChat = iconCallChat;
-        this.iconCallSpeakerOn = iconCallSpeakerOn;
-        this.iconCallSpeakerOff = iconCallSpeakerOff;
-        this.iconCallMinimize = iconCallMinimize;
-        this.iconPlaceholder = iconPlaceholder;
-        this.whiteLabel = whiteLabel;
+    private final ButtonConfiguration headerEndButtonConfiguration;
+
+    private UiTheme(UiThemeBuilder builder) {
+        this.appBarTitle = builder.appBarTitle;
+        this.brandPrimaryColor = builder.brandPrimaryColor;
+        this.baseLightColor = builder.baseLightColor;
+        this.baseDarkColor = builder.baseDarkColor;
+        this.baseNormalColor = builder.baseNormalColor;
+        this.baseShadeColor = builder.baseShadeColor;
+        this.systemAgentBubbleColor = builder.systemAgentBubbleColor;
+        this.fontRes = builder.fontRes;
+        this.systemNegativeColor = builder.systemNegativeColor;
+        this.visitorMessageBackgroundColor = builder.visitorMessageBackgroundColor;
+        this.visitorMessageTextColor = builder.visitorMessageTextColor;
+        this.operatorMessageBackgroundColor = builder.operatorMessageBackgroundColor;
+        this.operatorMessageTextColor = builder.operatorMessageTextColor;
+        this.botActionButtonBackgroundColor = builder.botActionButtonBackgroundColor;
+        this.botActionButtonTextColor = builder.botActionButtonTextColor;
+        this.botActionButtonSelectedBackgroundColor = builder.botActionButtonSelectedBackgroundColor;
+        this.botActionButtonSelectedTextColor = builder.botActionButtonSelectedTextColor;
+        this.iconAppBarBack = builder.iconAppBarBack;
+        this.iconLeaveQueue = builder.iconLeaveQueue;
+        this.iconSendMessage = builder.iconSendMessage;
+        this.iconChatAudioUpgrade = builder.iconChatAudioUpgrade;
+        this.iconUpgradeAudioDialog = builder.iconUpgradeAudioDialog;
+        this.iconCallAudioOn = builder.iconCallAudioOn;
+        this.iconChatVideoUpgrade = builder.iconChatVideoUpgrade;
+        this.iconUpgradeVideoDialog = builder.iconUpgradeVideoDialog;
+        this.iconScreenSharingDialog = builder.iconScreenSharingDialog;
+        this.iconCallVideoOn = builder.iconCallVideoOn;
+        this.iconCallAudioOff = builder.iconCallAudioOff;
+        this.iconCallVideoOff = builder.iconCallVideoOff;
+        this.iconCallChat = builder.iconCallChat;
+        this.iconCallSpeakerOn = builder.iconCallSpeakerOn;
+        this.iconCallSpeakerOff = builder.iconCallSpeakerOff;
+        this.iconCallMinimize = builder.iconCallMinimize;
+        this.iconPlaceholder = builder.iconPlaceholder;
+        this.whiteLabel = builder.whiteLabel;
+        this.headerEndButtonConfiguration = builder.headerEndButtonConfiguration;
     }
+
 
     protected UiTheme(Parcel in) {
         appBarTitle = in.readString();
@@ -287,11 +258,6 @@ public class UiTheme implements Parcelable {
             systemAgentBubbleColor = null;
         } else {
             systemAgentBubbleColor = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            fontRes = null;
-        } else {
-            fontRes = in.readInt();
         }
         if (in.readByte() == 0) {
             systemNegativeColor = null;
@@ -337,6 +303,11 @@ public class UiTheme implements Parcelable {
             botActionButtonSelectedTextColor = null;
         } else {
             botActionButtonSelectedTextColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            fontRes = null;
+        } else {
+            fontRes = in.readInt();
         }
         if (in.readByte() == 0) {
             iconAppBarBack = null;
@@ -424,10 +395,11 @@ public class UiTheme implements Parcelable {
             iconPlaceholder = in.readInt();
         }
         if (in.readByte() == 0) {
-            whiteLabel = 0;
+            whiteLabel = null;
         } else {
             whiteLabel = in.readInt();
         }
+        headerEndButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
     }
 
     @Override
@@ -468,12 +440,6 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(systemAgentBubbleColor);
-        }
-        if (fontRes == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(fontRes);
         }
         if (systemNegativeColor == null) {
             dest.writeByte((byte) 0);
@@ -528,6 +494,12 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(botActionButtonSelectedTextColor);
+        }
+        if (fontRes == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(fontRes);
         }
         if (iconAppBarBack == null) {
             dest.writeByte((byte) 0);
@@ -637,6 +609,7 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(whiteLabel);
         }
+        dest.writeParcelable(headerEndButtonConfiguration, flags);
     }
 
     @Override
@@ -655,6 +628,10 @@ public class UiTheme implements Parcelable {
             return new UiTheme[size];
         }
     };
+
+    public ButtonConfiguration getGliaEndButtonConfiguration() {
+        return headerEndButtonConfiguration;
+    }
 
     public static class UiThemeBuilder {
         /**
@@ -831,6 +808,9 @@ public class UiTheme implements Parcelable {
         private
         Integer whiteLabel;
 
+        private
+        ButtonConfiguration headerEndButtonConfiguration;
+
         public void setAppBarTitle(String appBarTitle) {
             this.appBarTitle = appBarTitle;
         }
@@ -975,6 +955,10 @@ public class UiTheme implements Parcelable {
             this.whiteLabel = whiteLabel;
         }
 
+        public void setHeaderEndButtonConfiguration(ButtonConfiguration configuration) {
+            this.headerEndButtonConfiguration = configuration;
+        }
+
         public void setTheme(UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -1010,45 +994,11 @@ public class UiTheme implements Parcelable {
             this.iconCallSpeakerOff = theme.iconCallSpeakerOff;
             this.iconCallMinimize = theme.iconCallMinimize;
             this.iconPlaceholder = theme.iconPlaceholder;
+            this.headerEndButtonConfiguration = theme.headerEndButtonConfiguration;
         }
 
         public UiTheme build() {
-            return new UiTheme(appBarTitle,
-                    brandPrimaryColor,
-                    baseLightColor,
-                    baseDarkColor,
-                    baseNormalColor,
-                    baseShadeColor,
-                    systemAgentBubbleColor,
-                    fontRes,
-                    systemNegativeColor,
-                    visitorMessageBackgroundColor,
-                    visitorMessageTextColor,
-                    operatorMessageBackgroundColor,
-                    operatorMessageTextColor,
-                    botActionButtonBackgroundColor,
-                    botActionButtonTextColor,
-                    botActionButtonSelectedBackgroundColor,
-                    botActionButtonSelectedTextColor,
-                    iconAppBarBack,
-                    iconLeaveQueue,
-                    iconSendMessage,
-                    iconChatAudioUpgrade,
-                    iconUpgradeAudioDialog,
-                    iconCallAudioOn,
-                    iconChatVideoUpgrade,
-                    iconUpgradeVideoDialog,
-                    iconScreenSharingDialog,
-                    iconCallVideoOn,
-                    iconCallAudioOff,
-                    iconCallVideoOff,
-                    iconCallChat,
-                    iconCallSpeakerOn,
-                    iconCallSpeakerOff,
-                    iconCallMinimize,
-                    iconPlaceholder,
-                    whiteLabel
-            );
+            return new UiTheme(this);
         }
     }
 

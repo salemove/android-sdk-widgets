@@ -8,13 +8,11 @@ import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -22,14 +20,14 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.header.button.GliaEndButton;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 
 public class AppBarView extends AppBarLayout {
-
+    private final GliaEndButton gliaEndButton;
     private final MaterialToolbar materialToolbar;
     private final TextView titleView;
-    private final Button endButton;
 
     public AppBarView(@NonNull Context context) {
         this(context, null);
@@ -45,7 +43,7 @@ public class AppBarView extends AppBarLayout {
 
         materialToolbar = view.findViewById(R.id.toolbar);
         titleView = view.findViewById(R.id.title);
-        endButton = view.findViewById(R.id.end_button);
+        gliaEndButton = view.findViewById(R.id.end_button);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AppBarView);
         Integer backIconResId = Utils.getTypedArrayIntegerValue(
@@ -67,11 +65,6 @@ public class AppBarView extends AppBarLayout {
                         context,
                         R.styleable.AppBarView_lightTint,
                         R.attr.gliaBaseLightColor));
-        ColorStateList negativeColorStateList = ContextCompat.getColorStateList(this.getContext(),
-                Utils.getTypedArrayIntegerValue(typedArray,
-                        context,
-                        R.styleable.AppBarView_negativeTint,
-                        R.attr.gliaSystemNegativeColor));
         materialToolbar.setBackgroundTintList(backgroundTintList);
         titleView.setTextColor(lightColor);
         materialToolbar.getNavigationIcon().setTint(lightColor);
@@ -83,8 +76,6 @@ public class AppBarView extends AppBarLayout {
                                 R.styleable.AppBarView_lightTint,
                                 R.attr.gliaBaseLightColor),
                         this.getContext().getTheme()));
-        endButton.setBackgroundTintList(negativeColorStateList);
-        endButton.setTextColor(lightColor);
 
         String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
         if (title != null) {
@@ -113,14 +104,7 @@ public class AppBarView extends AppBarLayout {
                 this.getContext().getTheme()));
         materialToolbar.getNavigationIcon().setTint(
                 ContextCompat.getColor(this.getContext(), theme.getBaseLightColor()));
-        endButton.setBackgroundTintList(
-                ContextCompat.getColorStateList(
-                        this.getContext(),
-                        theme.getSystemNegativeColor()));
-        endButton.setTextColor(ResourcesCompat.getColor(
-                getResources(),
-                theme.getBaseLightColor(),
-                this.getContext().getTheme()));
+        gliaEndButton.setTheme(theme);
         // fonts
         if (theme.getFontRes() != null) {
             changeFontFamily(theme.getFontRes());
@@ -132,7 +116,6 @@ public class AppBarView extends AppBarLayout {
                 this.getContext(),
                 fontRes);
         titleView.setTypeface(fontFamily);
-        endButton.setTypeface(fontFamily);
     }
 
     public void setTitle(String title) {
@@ -144,12 +127,12 @@ public class AppBarView extends AppBarLayout {
     }
 
     public void showXButton() {
-        endButton.setVisibility(GONE);
+        gliaEndButton.setVisibility(GONE);
         materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(true);
     }
 
     public void showEndButton() {
-        endButton.setVisibility(VISIBLE);
+        gliaEndButton.setVisibility(VISIBLE);
         materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(false);
     }
 
@@ -165,11 +148,11 @@ public class AppBarView extends AppBarLayout {
     }
 
     public void setOnEndChatClickedListener(OnEndChatClickedListener onEndChatClickedListener) {
-        endButton.setOnClickListener(v -> onEndChatClickedListener.onEnd());
+        gliaEndButton.setOnClickListener(v -> onEndChatClickedListener.onEnd());
     }
 
     public void hideLeaveButtons() {
-        endButton.setVisibility(GONE);
+        gliaEndButton.setVisibility(GONE);
         materialToolbar.getMenu().findItem(R.id.leave_queue_button).setVisible(false);
     }
 

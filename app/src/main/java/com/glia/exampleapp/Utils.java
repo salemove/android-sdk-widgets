@@ -1,6 +1,5 @@
 package com.glia.exampleapp;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
@@ -14,7 +13,7 @@ class Utils {
         return sharedPreferences.getString(resources.getString(keyValue), defaultValue);
     }
 
-    public static UiTheme getUiThemeByPrefs(Context context, SharedPreferences sharedPreferences, Resources resources) {
+    public static UiTheme getUiThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) {
         String title = Utils.getStringFromPrefs(R.string.pref_header_title, null, sharedPreferences, resources);
         Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences, resources);
         Integer baseDarkColor = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences, resources);

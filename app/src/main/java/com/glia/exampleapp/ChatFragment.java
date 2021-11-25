@@ -49,7 +49,7 @@ public class ChatFragment extends Fragment {
         navController.addOnDestinationChangedListener(onDestinationChangedListener);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         chatView = view.findViewById(R.id.chat_view);
-        UiTheme theme = Utils.getUiThemeByPrefs(getContext(), sharedPreferences, getResources());
+        UiTheme theme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
         chatView.setTheme(theme);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnBackClickedListener(onBackClickedListener);

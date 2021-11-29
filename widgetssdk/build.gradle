@@ -73,6 +73,9 @@ dependencies {
     // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 
     implementation "com.airbnb.android:lottie:$lottieVersion"
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
 }
 
 ext {

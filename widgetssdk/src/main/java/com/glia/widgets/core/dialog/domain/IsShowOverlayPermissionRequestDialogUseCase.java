@@ -20,7 +20,9 @@ public class IsShowOverlayPermissionRequestDialogUseCase {
     }
 
     public boolean execute() {
-        return hasNoOverlayPermissions() && hasNotShownOverlayPermissionRequest() && isUseOverlay();
+        return hasNoOverlayPermissions() &&
+                hasNotShownOverlayPermissionRequest() &&
+                isUseOverlay();
     }
 
     private boolean hasNoOverlayPermissions() {

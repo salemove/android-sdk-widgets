@@ -5,6 +5,7 @@ import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
@@ -312,5 +313,9 @@ public class UseCaseFactory {
 
     public DownloadFileUseCase createDownloadFileUseCase() {
         return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository());
+    }
+
+    public IsEnableChatEditTextUseCase createIsEnableChatEditTextUseCase() {
+        return new IsEnableChatEditTextUseCase();
     }
 }

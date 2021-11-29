@@ -385,6 +385,13 @@ public class Utils {
         imm.hideSoftInputFromWindow(windowToken, 0);
     }
 
+    private static ButtonConfiguration getButtonConfiguration(
+            ButtonConfiguration newConf,
+            ButtonConfiguration oldConf
+    ) {
+        return newConf != null ? newConf : oldConf;
+    }
+
     public static UiTheme getFullHybridTheme(UiTheme newTheme, UiTheme oldTheme) {
         String title = newTheme.getAppBarTitle() != null ? newTheme.getAppBarTitle() : oldTheme.getAppBarTitle();
         Integer baseLightColorRes = newTheme.getBaseLightColor() != null ?
@@ -455,10 +462,29 @@ public class Utils {
 
         Integer whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
 
-        ButtonConfiguration endButtonConfiguration
-                = newTheme.getGliaEndButtonConfiguration() != null ?
-                newTheme.getGliaEndButtonConfiguration() :
-                oldTheme.getGliaEndButtonConfiguration();
+        ButtonConfiguration endButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaEndButtonConfiguration(),
+                        oldTheme.getGliaEndButtonConfiguration()
+                );
+
+        ButtonConfiguration positiveButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaPositiveButtonConfiguration(),
+                        oldTheme.getGliaPositiveButtonConfiguration()
+                );
+
+        ButtonConfiguration negativeButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaNegativeButtonConfiguration(),
+                        oldTheme.getGliaNegativeButtonConfiguration()
+                );
+
+        ButtonConfiguration neutralButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaNeutralButtonConfiguration(),
+                        oldTheme.getGliaNeutralButtonConfiguration()
+                );
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
@@ -497,6 +523,9 @@ public class Utils {
         builder.setIconPlaceholder(iconPlaceholder);
         builder.setWhiteLabel(whiteLabel);
         builder.setHeaderEndButtonConfiguration(endButtonConfiguration);
+        builder.setPositiveButtonConfiguration(positiveButtonConfiguration);
+        builder.setNegativeButtonConfiguration(negativeButtonConfiguration);
+        builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
         return builder.build();
     }
 

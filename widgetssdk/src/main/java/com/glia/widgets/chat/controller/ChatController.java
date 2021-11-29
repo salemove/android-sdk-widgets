@@ -428,6 +428,11 @@ public class ChatController implements
             Logger.d(TAG, "messageSent: " + message.toString() + ", id: " + message.getId());
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             changeDeliveredIndex(currentChatItems, message);
+
+            // chat input mode has to be set to enabled after message is sent
+            if (chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD) {
+                emitViewState(chatState.chatInputModeChanged(ChatInputMode.ENABLED));
+            }
             emitChatItems(chatState.changeItems(currentChatItems));
         }
     }
@@ -739,10 +744,6 @@ public class ChatController implements
                                         ChatInputMode.SINGLE_CHOICE_CARD :
                                         ChatInputMode.ENABLED
                         )
-                );
-            } else if (chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD) {
-                emitViewState(
-                        chatState.chatInputModeChanged(ChatInputMode.ENABLED)
                 );
             }
         }

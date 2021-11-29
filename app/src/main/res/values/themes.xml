@@ -4,13 +4,14 @@
     <style name="Theme.GliaAndroidSDKWidgetsExample" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
-        <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button</item>
+        <item name="materialButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Button
+        </item>
     </style>
 
     <!-- Must be included for dialog styling -->
     <style name="Application.Glia.Activity.Style" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- example usage of compile time styling -->
-        <!--item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item -->
+        <!-- item name="gliaChatStyle">@style/Theme.GliaAndroidSdkWidgetsExample.Chat</item-->
     </style>
 
     <style name="Theme.GliaAndroidSdkWidgetsExample.Chat" parent="Application.Glia.Chat">
@@ -21,7 +22,15 @@
     <style name="ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat" parent="ThemeOverlay.Glia.Chat">
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_person</item>
-        <item name="gliaHeaderEndButtonStyle">@style/Application.GliaAndroidSdkWidgetsExample.Header.EndButton</item>
+        <item name="gliaHeaderEndButtonStyle">
+            @style/Application.GliaAndroidSdkWidgetsExample.Header.EndButton
+        </item>
+        <item name="buttonBarNegativeButtonStyle">
+            @style/Application.GliaAndroidSdkWidgetsExample.Button.Negative
+        </item>
+        <item name="buttonBarPositiveButtonStyle">
+            @style/Application.GliaAndroidSdkWidgetsExample.Button.Positive
+        </item>
     </style>
 
     <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.MaterialComponents.Button.TextButton.Icon">
@@ -35,7 +44,25 @@
         <item name="android:backgroundTint">@color/color_dark_cyan</item>
         <item name="android:textColor">@color/color_pure_yellow</item>
         <item name="android:strokeColor">?attr/gliaSystemNegativeColor</item>
-        <item name="android:fontFamily">@font/tangerine</item>
+        <!-- item name="android:fontFamily">@font/tangerine</item -->
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Application.GliaAndroidSdkWidgetsExample.Button.Positive" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:backgroundTint">@color/color_blue</item>
+        <item name="android:textColor">@color/color_black</item>
+        <!-- item name="android:fontFamily">@font/tangerine</item -->
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Application.GliaAndroidSdkWidgetsExample.Button.Negative" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:backgroundTint">@color/color_white</item>
+        <item name="android:textColor">@color/color_black</item>
+        <item name="android:strokeColor">@color/color_black</item>
+        <item name="strokeWidth">1dp</item>
+        <!-- item name="android:fontFamily">@font/tangerine</item -->
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
     </style>

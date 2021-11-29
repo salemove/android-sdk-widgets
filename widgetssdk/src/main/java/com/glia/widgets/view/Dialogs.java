@@ -18,7 +18,8 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.google.android.material.button.MaterialButton;
+import com.glia.widgets.view.button.GliaNegativeButton;
+import com.glia.widgets.view.button.GliaPositiveButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class Dialogs {
@@ -38,23 +39,19 @@ public class Dialogs {
 
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
-        MaterialButton negativeButton = customLayout.findViewById(R.id.negative_button);
-        MaterialButton positiveButton = customLayout.findViewById(R.id.positive_button);
+
+        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
+        negativeButton.setTheme(theme);
+
+        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        positiveButton.setTheme(theme);
+
         ImageView logoView = customLayout.findViewById(R.id.logo_view);
 
         int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
-        int baseLightColor = ContextCompat.getColor(context, theme.getBaseLightColor());
-        ColorStateList primaryBrandColorStateList =
-                ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
-        ColorStateList systemNegativeColorStateList =
-                ContextCompat.getColorStateList(context, theme.getSystemNegativeColor());
 
         titleView.setTextColor(baseDarkColor);
         messageView.setTextColor(baseDarkColor);
-        negativeButton.setTextColor(baseLightColor);
-        positiveButton.setTextColor(baseLightColor);
-        negativeButton.setBackgroundTintList(systemNegativeColorStateList);
-        positiveButton.setBackgroundTintList(primaryBrandColorStateList);
         logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
 
         logoView.setVisibility(theme.getWhiteLabel() == 1 ? View.GONE : View.VISIBLE);
@@ -132,14 +129,13 @@ public class Dialogs {
         View customLayout = LayoutInflater.from(context).inflate(R.layout.operator_ended_engagement_dialog, null, false);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
-        Button okButton = customLayout.findViewById(R.id.ok_button);
+        GliaPositiveButton okButton = customLayout.findViewById(R.id.ok_button);
+        okButton.setTheme(theme);
 
         int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
-        ColorStateList brandPrimaryColorStateList = ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
 
         titleView.setTextColor(baseDarkColor);
         messageView.setTextColor(baseDarkColor);
-        okButton.setBackgroundTintList(brandPrimaryColorStateList);
 
         if (theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, theme.getFontRes());
@@ -173,23 +169,18 @@ public class Dialogs {
         View customLayout = LayoutInflater.from(context).inflate(R.layout.upgrade_dialog, null, false);
         ImageView titleIconView = customLayout.findViewById(R.id.chat_title_icon);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
-        MaterialButton negativeButton = customLayout.findViewById(R.id.negative_button);
-        MaterialButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
+        negativeButton.setTheme(theme);
+        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        positiveButton.setTheme(theme);
         ImageView logoView = customLayout.findViewById(R.id.logo_view);
 
         int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
-        int baseLightColor = ContextCompat.getColor(context, theme.getBaseLightColor());
         ColorStateList primaryBrandColorStateList =
                 ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
-        ColorStateList systemNegativeColorStateList =
-                ContextCompat.getColorStateList(context, theme.getSystemNegativeColor());
 
         titleIconView.setImageTintList(primaryBrandColorStateList);
         titleView.setTextColor(baseDarkColor);
-        negativeButton.setTextColor(baseLightColor);
-        positiveButton.setTextColor(baseLightColor);
-        negativeButton.setBackgroundTintList(systemNegativeColorStateList);
-        positiveButton.setBackgroundTintList(primaryBrandColorStateList);
         logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
 
         if (theme.getFontRes() != null) {
@@ -249,24 +240,19 @@ public class Dialogs {
         ImageView titleIconView = customLayout.findViewById(R.id.title_icon);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
-        MaterialButton negativeButton = customLayout.findViewById(R.id.negative_button);
-        MaterialButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
+        negativeButton.setTheme(theme);
+        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        positiveButton.setTheme(theme);
         ImageView logoView = customLayout.findViewById(R.id.logo_view);
 
         int baseDarkColor = ContextCompat.getColor(context, theme.getBaseDarkColor());
-        int baseLightColor = ContextCompat.getColor(context, theme.getBaseLightColor());
         ColorStateList primaryBrandColorStateList =
                 ContextCompat.getColorStateList(context, theme.getBrandPrimaryColor());
-        ColorStateList systemNegativeColorStateList =
-                ContextCompat.getColorStateList(context, theme.getSystemNegativeColor());
 
         titleIconView.setImageTintList(primaryBrandColorStateList);
         titleView.setTextColor(baseDarkColor);
         messageView.setTextColor(baseDarkColor);
-        negativeButton.setTextColor(baseLightColor);
-        positiveButton.setTextColor(baseLightColor);
-        negativeButton.setBackgroundTintList(systemNegativeColorStateList);
-        positiveButton.setBackgroundTintList(primaryBrandColorStateList);
         logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
 
         if (theme.getFontRes() != null) {

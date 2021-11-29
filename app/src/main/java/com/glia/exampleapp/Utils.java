@@ -1,11 +1,16 @@
 package com.glia.exampleapp;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
 
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.TextConfiguration;
 
 class Utils {
 
@@ -57,8 +62,45 @@ class Utils {
 
         // here goes header end engagement button configuration
         builder.setHeaderEndButtonConfiguration(null);
+        builder.setPositiveButtonConfiguration(null);
+        builder.setNegativeButtonConfiguration(null);
+        builder.setNeutralButtonConfiguration(null);
 
         return builder.build();
+    }
+
+    // Positive button configuration Example runtime
+    private static ButtonConfiguration getPositiveButtonTestingConfiguration(Context context) {
+        return ButtonConfiguration.builder()
+                .backgroundColor(
+                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_blue))
+                )
+                .textConfiguration(
+                        TextConfiguration.builder()
+                                .textColor(
+                                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
+                                )
+                                .build()
+                )
+                .build();
+    }
+
+    // Negative button configuration Example runtime
+    private static ButtonConfiguration getNegativeButtonTestingConfiguration(Context context) {
+        return ButtonConfiguration.builder()
+                .backgroundColor(
+                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_white))
+                )
+                .textConfiguration(
+                        TextConfiguration.builder()
+                                .textColor(
+                                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
+                                )
+                                .build()
+                )
+                .strokeWidth(1)
+                .strokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black)))
+                .build();
     }
 
     public static Integer getColorValueFromPrefs(@StringRes int keyValue, SharedPreferences sharedPreferences, Resources resources) {

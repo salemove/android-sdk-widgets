@@ -18,6 +18,7 @@
     <string name="pref_context_url">context_url</string>
     <string name="pref_white_label">white_label_toggle</string>
     <string name="pref_use_overlay">use_overlay</string>
+    <string name="pref_use_alert_dialog_button_vertical_alignment">use_alert_dialog_button_vertical_alignment</string>
     <string name="pref_visitor_message_bg_color">visitor_message_bg_color</string>
     <string name="pref_visitor_message_txt_color">visitor_message_txt_color</string>
     <string name="pref_operator_message_bg_color">operator_message_bg_color</string>

@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +17,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.button.GliaNegativeButton;
 import com.glia.widgets.view.button.GliaPositiveButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -33,9 +33,17 @@ public class Dialogs {
                                                 View.OnClickListener positiveButtonClickListener,
                                                 View.OnClickListener negativeButtonClickListener,
                                                 DialogInterface.OnCancelListener cancelListener) {
+
+        boolean isUseAlertDialogButtonVerticalAlignment = Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme);
+
+        int layout =
+                isUseAlertDialogButtonVerticalAlignment ?
+                        R.layout.options_dialog_vertical :
+                        R.layout.options_dialog;
+
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
                 .setOnCancelListener(cancelListener);
-        View customLayout = LayoutInflater.from(context).inflate(R.layout.options_dialog, null, false);
+        View customLayout = LayoutInflater.from(context).inflate(layout, null, false);
 
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
@@ -164,9 +172,16 @@ public class Dialogs {
                                                 DialogOfferType type,
                                                 View.OnClickListener onAcceptOfferClickListener,
                                                 View.OnClickListener onCloseClickListener) {
+        boolean isUseAlertDialogButtonVerticalAlignment = Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme);
+
+        int layout =
+                isUseAlertDialogButtonVerticalAlignment ?
+                        R.layout.upgrade_dialog_vertical :
+                        R.layout.upgrade_dialog;
+
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setCancelable(false);
-        View customLayout = LayoutInflater.from(context).inflate(R.layout.upgrade_dialog, null, false);
+        View customLayout = LayoutInflater.from(context).inflate(layout, null, false);
         ImageView titleIconView = customLayout.findViewById(R.id.chat_title_icon);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
@@ -236,7 +251,14 @@ public class Dialogs {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setCancelable(false);
 
-        View customLayout = LayoutInflater.from(context).inflate(R.layout.screensharing_dialog, null, false);
+        boolean isUseAlertDialogButtonVerticalAlignment = Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme);
+
+        int layout =
+                isUseAlertDialogButtonVerticalAlignment ?
+                        R.layout.screensharing_dialog_vertical :
+                        R.layout.screensharing_dialog;
+
+        View customLayout = LayoutInflater.from(context).inflate(layout, null, false);
         ImageView titleIconView = customLayout.findViewById(R.id.title_icon);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);

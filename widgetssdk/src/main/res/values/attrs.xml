@@ -73,6 +73,7 @@
         <attr name="botActionButtonSelectedTextColor" format="reference" />
 
         <attr name="whiteLabel" format="reference" />
+        <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
     </declare-styleable>
 
     <attr name="gliaChatStyle" format="reference" />
@@ -145,6 +146,7 @@
     <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
 
     <attr name="gliaWhiteLabel" format="reference" />
+    <attr name="gliaAlertDialogButtonUseVerticalAlignment" format="boolean" />
 
     <!-- Styleable components -->
     <attr name="gliaHeaderEndButtonStyle" format="reference" />

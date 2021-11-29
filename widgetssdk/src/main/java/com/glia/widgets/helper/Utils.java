@@ -332,7 +332,23 @@ public class Utils {
                         R.attr.gliaWhiteLabel
                 )
         );
+        defaultThemeBuilder.setGliaAlertDialogButtonUseVerticalAlignment(
+                getTypedArrayBooleanValue(
+                        typedArray,
+                        R.styleable.GliaView_gliaAlertDialogButtonUseVerticalAlignment
+                )
+        );
         return defaultThemeBuilder.build();
+    }
+
+    public static Boolean getGliaAlertDialogButtonUseVerticalAlignment(UiTheme theme) {
+        return theme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
+                theme.getGliaAlertDialogButtonUseVerticalAlignment() :
+                false;
+    }
+
+    private static Boolean getTypedArrayBooleanValue(TypedArray typedArray, int index) {
+        return typedArray.hasValue(index) && typedArray.getBoolean(index, false);
     }
 
     private static String getAppBarTitleValue(TypedArray typedArray) {
@@ -461,6 +477,10 @@ public class Utils {
                 newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
 
         Integer whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
+        Boolean isUseAlertDialogButtonVerticalAlignment =
+                newTheme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
+                        newTheme.getGliaAlertDialogButtonUseVerticalAlignment() :
+                        oldTheme.getGliaAlertDialogButtonUseVerticalAlignment();
 
         ButtonConfiguration endButtonConfiguration =
                 getButtonConfiguration(
@@ -522,6 +542,7 @@ public class Utils {
         builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
         builder.setWhiteLabel(whiteLabel);
+        builder.setGliaAlertDialogButtonUseVerticalAlignment(isUseAlertDialogButtonVerticalAlignment);
         builder.setHeaderEndButtonConfiguration(endButtonConfiguration);
         builder.setPositiveButtonConfiguration(positiveButtonConfiguration);
         builder.setNegativeButtonConfiguration(negativeButtonConfiguration);

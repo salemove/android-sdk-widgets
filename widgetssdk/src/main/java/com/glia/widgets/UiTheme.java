@@ -184,6 +184,7 @@ public class UiTheme implements Parcelable {
     final Integer iconPlaceholder;
 
     private final Integer whiteLabel;
+    private final Boolean gliaAlertDialogButtonUseVerticalAlignment;
 
     private final ButtonConfiguration headerEndButtonConfiguration;
     private final ButtonConfiguration positiveButtonConfiguration;
@@ -226,6 +227,7 @@ public class UiTheme implements Parcelable {
         this.iconCallMinimize = builder.iconCallMinimize;
         this.iconPlaceholder = builder.iconPlaceholder;
         this.whiteLabel = builder.whiteLabel;
+        this.gliaAlertDialogButtonUseVerticalAlignment = builder.gliaAlertDialogButtonUseVerticalAlignment;
         this.headerEndButtonConfiguration = builder.headerEndButtonConfiguration;
         this.positiveButtonConfiguration = builder.positiveButtonConfiguration;
         this.negativeButtonConfiguration = builder.negativeButtonConfiguration;
@@ -408,6 +410,9 @@ public class UiTheme implements Parcelable {
         Integer whiteLabel;
 
         private
+        Boolean gliaAlertDialogButtonUseVerticalAlignment;
+
+        private
         ButtonConfiguration headerEndButtonConfiguration;
 
         private
@@ -561,6 +566,10 @@ public class UiTheme implements Parcelable {
 
         public void setWhiteLabel(Integer whiteLabel) {
             this.whiteLabel = whiteLabel;
+        }
+
+        public void setGliaAlertDialogButtonUseVerticalAlignment(Boolean value) {
+            this.gliaAlertDialogButtonUseVerticalAlignment = value;
         }
 
         public void setHeaderEndButtonConfiguration(ButtonConfiguration configuration) {
@@ -797,6 +806,8 @@ public class UiTheme implements Parcelable {
         } else {
             whiteLabel = in.readInt();
         }
+        byte tmpGliaAlertDialogButtonUseVerticalAlignment = in.readByte();
+        gliaAlertDialogButtonUseVerticalAlignment = tmpGliaAlertDialogButtonUseVerticalAlignment == 0 ? null : tmpGliaAlertDialogButtonUseVerticalAlignment == 1;
         headerEndButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         positiveButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         negativeButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
@@ -1010,6 +1021,7 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(whiteLabel);
         }
+        dest.writeByte((byte) (gliaAlertDialogButtonUseVerticalAlignment == null ? 0 : gliaAlertDialogButtonUseVerticalAlignment ? 1 : 2));
         dest.writeParcelable(headerEndButtonConfiguration, flags);
         dest.writeParcelable(positiveButtonConfiguration, flags);
         dest.writeParcelable(negativeButtonConfiguration, flags);
@@ -1171,6 +1183,10 @@ public class UiTheme implements Parcelable {
 
     public Integer getWhiteLabel() {
         return whiteLabel;
+    }
+
+    public Boolean getGliaAlertDialogButtonUseVerticalAlignment() {
+        return gliaAlertDialogButtonUseVerticalAlignment;
     }
 
     public ButtonConfiguration getGliaEndButtonConfiguration() {

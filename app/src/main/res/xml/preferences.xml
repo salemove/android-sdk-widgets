@@ -44,6 +44,11 @@
             app:key="@string/pref_use_overlay"
             app:title="@string/settings_use_overlay" />
 
+        <SwitchPreference
+            app:defaultValue="false"
+            app:key="@string/pref_use_alert_dialog_button_vertical_alignment"
+            app:title="@string/settings_use_alert_dialog_button_vertical_alignment" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_colors_title">

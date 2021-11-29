@@ -31,6 +31,8 @@
         <item name="buttonBarPositiveButtonStyle">
             @style/Application.GliaAndroidSdkWidgetsExample.Button.Positive
         </item>
+
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
     </style>
 
     <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.MaterialComponents.Button.TextButton.Icon">

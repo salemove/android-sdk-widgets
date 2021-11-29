@@ -460,8 +460,8 @@ public class CallView extends ConstraintLayout {
     private void showExitQueueDialog() {
         showOptionsDialog(resources.getString(R.string.glia_dialog_leave_queue_title),
                 resources.getString(R.string.glia_dialog_leave_queue_message),
-                resources.getString(R.string.glia_dialog_yes),
-                resources.getString(R.string.glia_dialog_no),
+                resources.getString(R.string.glia_dialog_leave_queue_yes),
+                resources.getString(R.string.glia_dialog_leave_queue_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -497,8 +497,8 @@ public class CallView extends ConstraintLayout {
                     this.theme,
                     resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
                     resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                    resources.getString(R.string.glia_dialog_yes),
-                    resources.getString(R.string.glia_dialog_no),
+                    resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
+                    resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
                     view -> {
                         dismissAlertDialog();
                         controller.notificationsDialogDismissed();
@@ -525,8 +525,8 @@ public class CallView extends ConstraintLayout {
                     this.theme,
                     resources.getString(R.string.glia_dialog_allow_notifications_title),
                     resources.getString(R.string.glia_dialog_allow_notifications_message),
-                    resources.getString(R.string.glia_dialog_yes),
-                    resources.getString(R.string.glia_dialog_no),
+                    resources.getString(R.string.glia_dialog_allow_notifications_yes),
+                    resources.getString(R.string.glia_dialog_allow_notifications_no),
                     view -> {
                         dismissAlertDialog();
                         controller.notificationsDialogDismissed();
@@ -551,8 +551,8 @@ public class CallView extends ConstraintLayout {
                     theme,
                     resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
                     resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
-                    R.string.glia_dialog_accept,
-                    R.string.glia_dialog_decline,
+                    R.string.glia_dialog_screen_sharing_offer_accept,
+                    R.string.glia_dialog_screen_sharing_offer_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
@@ -565,8 +565,8 @@ public class CallView extends ConstraintLayout {
                     theme,
                     resources.getString(R.string.glia_dialog_screen_sharing_end_title),
                     resources.getString(R.string.glia_dialog_screen_sharing_end_message),
-                    R.string.glia_dialog_cancel,
-                    R.string.glia_dialog_end_sharing,
+                    R.string.glia_dialog_screen_sharing_end_cancel,
+                    R.string.glia_dialog_screen_sharing_end_end,
                     view -> screenSharingController.onDismissEndScreenSharing(),
                     view -> screenSharingController.onEndScreenSharing()
             );
@@ -779,8 +779,8 @@ public class CallView extends ConstraintLayout {
         showOptionsDialog(
                 resources.getString(R.string.glia_dialog_end_engagement_title),
                 resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
-                resources.getString(R.string.glia_dialog_yes),
-                resources.getString(R.string.glia_dialog_no),
+                resources.getString(R.string.glia_dialog_end_engagement_yes),
+                resources.getString(R.string.glia_dialog_end_engagement_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -948,8 +948,8 @@ public class CallView extends ConstraintLayout {
     private void showOverlayPermissionsDialog() {
         showOptionsDialog(resources.getString(R.string.glia_dialog_overlay_permissions_title),
                 resources.getString(R.string.glia_dialog_overlay_permissions_message),
-                resources.getString(R.string.glia_dialog_ok),
-                resources.getString(R.string.glia_dialog_no),
+                resources.getString(R.string.glia_dialog_overlay_permissions_ok),
+                resources.getString(R.string.glia_dialog_overlay_permissions_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {

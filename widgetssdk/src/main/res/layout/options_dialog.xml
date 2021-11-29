@@ -42,9 +42,8 @@
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view"
         app:layout_goneMarginTop="@dimen/glia_large" />
 
-    <com.google.android.material.button.MaterialButton
+    <com.glia.widgets.view.button.GliaNegativeButton
         android:id="@+id/negative_button"
-        style="?attr/buttonBarNegativeButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large_x_large"
@@ -54,9 +53,8 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/dialog_message_view" />
 
-    <com.google.android.material.button.MaterialButton
+    <com.glia.widgets.view.button.GliaPositiveButton
         android:id="@+id/positive_button"
-        style="?attr/buttonBarPositiveButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/glia_small"
@@ -83,10 +81,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_large_x_large"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintTop_toBottomOf="@id/logo_view"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo_view"
+        app:layout_constraintVertical_bias="0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

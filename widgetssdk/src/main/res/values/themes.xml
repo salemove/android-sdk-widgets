@@ -41,6 +41,13 @@
         </item>
 
         <item name="gliaHeaderEndButtonStyle">?attr/gliaHeaderEndButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">?attr/buttonBarPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">?attr/buttonBarNeutralButtonStyle</item>
+
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">
+            ?attr/gliaAlertDialogButtonUseVerticalAlignment
+        </item>
 
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
     </style>
@@ -95,11 +102,6 @@
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
-        </item>
-        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Positive
-        </item>
-        <item name="buttonBarNeutralButtonStyle">@style/Application.Glia.Chat.Button.Neutral</item>
         <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
         <item name="textAppearanceHeadline2">@style/Application.Glia.Header2</item>
         <item name="textAppearanceHeadline3">@style/Application.Glia.Header3</item>
@@ -108,6 +110,13 @@
         <item name="textAppearanceSubtitle2">@style/Application.Glia.Subtitle2</item>
 
         <item name="gliaHeaderEndButtonStyle">@style/Application.Glia.Header.EndButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Positive
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
+        </item>
+        <item name="buttonBarNeutralButtonStyle">@style/Application.Glia.Chat.Button.Neutral</item>
+
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">false</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

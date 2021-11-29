@@ -27,6 +27,7 @@ import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
@@ -183,6 +184,7 @@ public class ChatController implements
     private final IsShowSendButtonUseCase isShowSendButtonUseCase;
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final DownloadFileUseCase downloadFileUseCase;
+    private final IsEnableChatEditTextUseCase isEnableChatEditTextUseCase;
 
     private Disposable disposable = null;
 
@@ -220,7 +222,8 @@ public class ChatController implements
             SupportedFileCountCheckUseCase supportedFileCountCheckUseCase,
             IsShowSendButtonUseCase isShowSendButtonUseCase,
             IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
-            DownloadFileUseCase downloadFileUseCase
+            DownloadFileUseCase downloadFileUseCase,
+            IsEnableChatEditTextUseCase isEnableChatEditTextUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = chatViewCallback;
@@ -273,6 +276,7 @@ public class ChatController implements
         this.isShowSendButtonUseCase = isShowSendButtonUseCase;
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.downloadFileUseCase = downloadFileUseCase;
+        this.isEnableChatEditTextUseCase = isEnableChatEditTextUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -430,6 +434,11 @@ public class ChatController implements
             Logger.d(TAG, "messageSent: " + message.toString() + ", id: " + message.getId());
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             changeDeliveredIndex(currentChatItems, message);
+
+            // chat input mode has to be set to enabled after message is sent
+            if (isEnableChatEditTextUseCase.execute(currentChatItems, chatState.chatInputMode)) {
+                emitViewState(chatState.chatInputModeChanged(ChatInputMode.ENABLED));
+            }
             emitChatItems(chatState.changeItems(currentChatItems));
         }
     }
@@ -736,10 +745,6 @@ public class ChatController implements
                                         ChatInputMode.SINGLE_CHOICE_CARD :
                                         ChatInputMode.ENABLED
                         )
-                );
-            } else if (chatState.chatInputMode == ChatInputMode.SINGLE_CHOICE_CARD) {
-                emitViewState(
-                        chatState.chatInputModeChanged(ChatInputMode.ENABLED)
                 );
             }
         }

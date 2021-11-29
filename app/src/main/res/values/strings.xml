@@ -48,6 +48,7 @@
     <string name="settings_white_label">White label</string>
     <string name="settings_use_overlay">Use Overlay</string>
     <string name="settings_context_url">Context url</string>
+    <string name="settings_use_alert_dialog_button_vertical_alignment">Align AlertDialog Buttons Vertically</string>
 
     <string name="main_open_settings">Open Settings</string>
     <string name="main_launch_activity">Launch Chat in Activity</string>

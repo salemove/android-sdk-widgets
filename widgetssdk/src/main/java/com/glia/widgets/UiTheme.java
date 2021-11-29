@@ -184,8 +184,12 @@ public class UiTheme implements Parcelable {
     final Integer iconPlaceholder;
 
     private final Integer whiteLabel;
+    private final Boolean gliaAlertDialogButtonUseVerticalAlignment;
 
     private final ButtonConfiguration headerEndButtonConfiguration;
+    private final ButtonConfiguration positiveButtonConfiguration;
+    private final ButtonConfiguration negativeButtonConfiguration;
+    private final ButtonConfiguration neutralButtonConfiguration;
 
     private UiTheme(UiThemeBuilder builder) {
         this.appBarTitle = builder.appBarTitle;
@@ -223,9 +227,412 @@ public class UiTheme implements Parcelable {
         this.iconCallMinimize = builder.iconCallMinimize;
         this.iconPlaceholder = builder.iconPlaceholder;
         this.whiteLabel = builder.whiteLabel;
+        this.gliaAlertDialogButtonUseVerticalAlignment = builder.gliaAlertDialogButtonUseVerticalAlignment;
         this.headerEndButtonConfiguration = builder.headerEndButtonConfiguration;
+        this.positiveButtonConfiguration = builder.positiveButtonConfiguration;
+        this.negativeButtonConfiguration = builder.negativeButtonConfiguration;
+        this.neutralButtonConfiguration = builder.neutralButtonConfiguration;
     }
 
+    public static class UiThemeBuilder {
+        /**
+         * Text to be shown on the top of the app bar in the chat
+         **/
+        private String appBarTitle;
+        /**
+         * Primary color for your brand. Used for example to set the color of the appbar
+         **/
+        private @ColorRes
+        Integer brandPrimaryColor;
+        /**
+         * Dark color of the UI widgets. Used for example to change the body text colors
+         **/
+        private @ColorRes
+        Integer baseLightColor;
+        /**
+         * Light color of the UI widgets. Used for example to change the title text colors.
+         * Background color of the chat, etc.
+         **/
+        private @ColorRes
+        Integer baseDarkColor;
+        /**
+         * Base normal color of the chat
+         */
+        private @ColorRes
+        Integer baseNormalColor;
+        /**
+         * Base shade color of the chat
+         */
+        private @ColorRes
+        Integer baseShadeColor;
+        /**
+         * Color for the operator's chat messages background
+         */
+        private @ColorRes
+        Integer systemAgentBubbleColor;
+        /**
+         * Color for any error or chat widgets
+         */
+        private @ColorRes
+        Integer systemNegativeColor;
+        /**
+         * Color for visitor message background
+         */
+        private @ColorRes
+        Integer visitorMessageBackgroundColor;
+        /**
+         * Color for visitor message text
+         */
+        private @ColorRes
+        Integer visitorMessageTextColor;
+        /**
+         * Color for operator message background
+         */
+        private @ColorRes
+        Integer operatorMessageBackgroundColor;
+        /**
+         * Color for operator message text
+         */
+        private @ColorRes
+        Integer operatorMessageTextColor;
+        /**
+         * Color for bot action button background color
+         */
+        private @ColorRes
+        Integer botActionButtonBackgroundColor;
+        /**
+         * Color for bot action button text color
+         */
+        private @ColorRes
+        Integer botActionButtonTextColor;
+        /**
+         * Color for bot action button background color
+         */
+        private @ColorRes
+        Integer botActionButtonSelectedBackgroundColor;
+        /**
+         * Color for bot action button text color
+         */
+        private @ColorRes
+        Integer botActionButtonSelectedTextColor;
+        /**
+         * Allow overriding the view's fontFamily
+         */
+        private @FontRes
+        Integer fontRes;
+        /**
+         * The appbar's back icon resId
+         */
+        private @DrawableRes
+        Integer iconAppBarBack;
+        /**
+         * The appbar's leave queue icon resId
+         */
+        private @DrawableRes
+        Integer iconLeaveQueue;
+        /**
+         * The send message icon resId
+         */
+        private @DrawableRes
+        Integer iconSendMessage;
+        /**
+         * The icon resId used in chat messages to display an ongoing audio upgrade timer
+         */
+        private @DrawableRes
+        Integer iconChatAudioUpgrade;
+        /**
+         * The icon resId used in the header of an audio upgrade dialog
+         */
+        private @DrawableRes
+        Integer iconUpgradeAudioDialog;
+        /**
+         * The icon resId used to set the call's audio on
+         */
+        private @DrawableRes
+        Integer iconCallAudioOn;
+        /**
+         * The icon resId used in chat messages to display an ongoing video upgrade timer
+         */
+        private @DrawableRes
+        Integer iconChatVideoUpgrade;
+        /**
+         * The icon resId used in the header of an video upgrade dialog
+         */
+        private @DrawableRes
+        Integer iconUpgradeVideoDialog;
+        /**
+         * The icon resId used in the header of of a screen sharing upgrade dialog
+         */
+        private @DrawableRes
+        Integer iconScreenSharingDialog;
+        /**
+         * The icon resId used to set the call's video on
+         */
+        private @DrawableRes
+        Integer iconCallVideoOn;
+        /**
+         * The icon resId used to set the call's audio off
+         */
+        private @DrawableRes
+        Integer iconCallAudioOff;
+        /**
+         * The icon resId used set the call's video off
+         */
+        private @DrawableRes
+        Integer iconCallVideoOff;
+        /**
+         * The icon resId used to navigate back to the chat from a call
+         */
+        private @DrawableRes
+        Integer iconCallChat;
+        /**
+         * The icon resId used to set the call's speaker on
+         */
+        private @DrawableRes
+        Integer iconCallSpeakerOn;
+        /**
+         * The icon resId used to set the call's speaker off
+         */
+        private @DrawableRes
+        Integer iconCallSpeakerOff;
+        /**
+         * The icon resId used to minimize a call
+         */
+        private @DrawableRes
+        Integer iconCallMinimize;
+        /**
+         * The icon resId used in a chat head if an operator's profile image is absent
+         */
+        private @DrawableRes
+        Integer iconPlaceholder;
+
+        private
+        Integer whiteLabel;
+
+        private
+        Boolean gliaAlertDialogButtonUseVerticalAlignment;
+
+        private
+        ButtonConfiguration headerEndButtonConfiguration;
+
+        private
+        ButtonConfiguration positiveButtonConfiguration;
+
+        private
+        ButtonConfiguration negativeButtonConfiguration;
+
+        private
+        ButtonConfiguration neutralButtonConfiguration;
+
+        public void setAppBarTitle(String appBarTitle) {
+            this.appBarTitle = appBarTitle;
+        }
+
+        public void setFontRes(@FontRes Integer fontRes) {
+            if (fontRes != null && fontRes != 0) {
+                this.fontRes = fontRes;
+            } else {
+                this.fontRes = null;
+            }
+        }
+
+        public void setBrandPrimaryColor(@ColorRes Integer brandPrimaryColor) {
+            this.brandPrimaryColor = brandPrimaryColor;
+        }
+
+        public void setBaseLightColor(@ColorRes Integer baseLightColor) {
+            this.baseLightColor = baseLightColor;
+        }
+
+        public void setBaseDarkColor(@ColorRes Integer baseDarkColor) {
+            this.baseDarkColor = baseDarkColor;
+        }
+
+        public void setBaseNormalColor(Integer baseNormalColor) {
+            this.baseNormalColor = baseNormalColor;
+        }
+
+        public void setBaseShadeColor(Integer baseShadeColor) {
+            this.baseShadeColor = baseShadeColor;
+        }
+
+        public void setSystemAgentBubbleColor(@ColorRes Integer systemAgentBubbleColor) {
+            this.systemAgentBubbleColor = systemAgentBubbleColor;
+        }
+
+        public void setSystemNegativeColor(@ColorRes Integer systemNegativeColor) {
+            this.systemNegativeColor = systemNegativeColor;
+        }
+
+        public void setVisitorMessageBackgroundColor(@ColorRes Integer color) {
+            this.visitorMessageBackgroundColor = color;
+        }
+
+        public void setVisitorMessageTextColor(@ColorRes Integer color) {
+            this.visitorMessageTextColor = color;
+        }
+
+        public void setOperatorMessageBackgroundColor(@ColorRes Integer color) {
+            this.operatorMessageBackgroundColor = color;
+        }
+
+        public void setOperatorMessageTextColor(@ColorRes Integer color) {
+            this.operatorMessageTextColor = color;
+        }
+
+        public void setBotActionButtonBackgroundColor(@ColorRes Integer color) {
+            this.botActionButtonBackgroundColor = color;
+        }
+
+        public void setBotActionButtonTextColor(@ColorRes Integer color) {
+            this.botActionButtonTextColor = color;
+        }
+
+        public void setBotActionButtonSelectedBackgroundColor(@ColorRes Integer color) {
+            this.botActionButtonSelectedBackgroundColor = color;
+        }
+
+        public void setBotActionButtonSelectedTextColor(@ColorRes Integer color) {
+            this.botActionButtonSelectedTextColor = color;
+        }
+
+        public void setIconAppBarBack(@DrawableRes Integer iconAppBarBack) {
+            this.iconAppBarBack = iconAppBarBack;
+        }
+
+        public void setIconLeaveQueue(@DrawableRes Integer iconLeaveQueue) {
+            this.iconLeaveQueue = iconLeaveQueue;
+        }
+
+        public void setIconSendMessage(@DrawableRes Integer iconSendMessage) {
+            this.iconSendMessage = iconSendMessage;
+        }
+
+        public void setIconChatAudioUpgrade(@DrawableRes Integer iconChatAudioUpgrade) {
+            this.iconChatAudioUpgrade = iconChatAudioUpgrade;
+        }
+
+        public void setIconUpgradeAudioDialog(@DrawableRes Integer iconUpgradeAudioDialog) {
+            this.iconUpgradeAudioDialog = iconUpgradeAudioDialog;
+        }
+
+        public void setIconCallAudioOn(@DrawableRes Integer iconCallAudioOn) {
+            this.iconCallAudioOn = iconCallAudioOn;
+        }
+
+        public void setIconChatVideoUpgrade(@DrawableRes Integer iconChatVideoUpgrade) {
+            this.iconChatVideoUpgrade = iconChatVideoUpgrade;
+        }
+
+        public void setIconUpgradeVideoDialog(@DrawableRes Integer iconUpgradeVideoDialog) {
+            this.iconUpgradeVideoDialog = iconUpgradeVideoDialog;
+        }
+
+        public void setIconScreenSharingDialog(@DrawableRes Integer iconScreenSharingDialog) {
+            this.iconScreenSharingDialog = iconScreenSharingDialog;
+        }
+
+        public void setIconCallVideoOn(@DrawableRes Integer iconCallVideoOn) {
+            this.iconCallVideoOn = iconCallVideoOn;
+        }
+
+        public void setIconCallAudioOff(@DrawableRes Integer iconCallAudioOff) {
+            this.iconCallAudioOff = iconCallAudioOff;
+        }
+
+        public void setIconCallVideoOff(@DrawableRes Integer iconCallVideoOff) {
+            this.iconCallVideoOff = iconCallVideoOff;
+        }
+
+        public void setIconCallChat(@DrawableRes Integer iconCallChat) {
+            this.iconCallChat = iconCallChat;
+        }
+
+        public void setIconCallSpeakerOn(@DrawableRes Integer iconCallSpeakerOn) {
+            this.iconCallSpeakerOn = iconCallSpeakerOn;
+        }
+
+        public void setIconCallSpeakerOff(@DrawableRes Integer iconCallSpeakerOff) {
+            this.iconCallSpeakerOff = iconCallSpeakerOff;
+        }
+
+        public void setIconCallMinimize(@DrawableRes Integer iconCallMinimize) {
+            this.iconCallMinimize = iconCallMinimize;
+        }
+
+        public void setIconPlaceholder(@DrawableRes Integer iconPlaceholder) {
+            this.iconPlaceholder = iconPlaceholder;
+        }
+
+        public void setWhiteLabel(Integer whiteLabel) {
+            this.whiteLabel = whiteLabel;
+        }
+
+        public void setGliaAlertDialogButtonUseVerticalAlignment(Boolean value) {
+            this.gliaAlertDialogButtonUseVerticalAlignment = value;
+        }
+
+        public void setHeaderEndButtonConfiguration(ButtonConfiguration configuration) {
+            this.headerEndButtonConfiguration = configuration;
+        }
+
+        public void setPositiveButtonConfiguration(ButtonConfiguration configuration) {
+            this.positiveButtonConfiguration = configuration;
+        }
+
+        public void setNegativeButtonConfiguration(ButtonConfiguration configuration) {
+            this.negativeButtonConfiguration = configuration;
+        }
+
+        public void setNeutralButtonConfiguration(ButtonConfiguration configuration) {
+            this.neutralButtonConfiguration = configuration;
+        }
+
+        public void setTheme(UiTheme theme) {
+            this.appBarTitle = theme.appBarTitle;
+            this.brandPrimaryColor = theme.brandPrimaryColor;
+            this.baseLightColor = theme.baseLightColor;
+            this.baseDarkColor = theme.baseDarkColor;
+            this.baseNormalColor = theme.baseNormalColor;
+            this.baseShadeColor = theme.baseShadeColor;
+            this.systemAgentBubbleColor = theme.systemAgentBubbleColor;
+            this.fontRes = theme.fontRes;
+            this.systemNegativeColor = theme.systemNegativeColor;
+            this.visitorMessageBackgroundColor = theme.visitorMessageBackgroundColor;
+            this.visitorMessageTextColor = theme.visitorMessageTextColor;
+            this.operatorMessageBackgroundColor = theme.operatorMessageBackgroundColor;
+            this.operatorMessageTextColor = theme.operatorMessageTextColor;
+            this.botActionButtonBackgroundColor = theme.botActionButtonBackgroundColor;
+            this.botActionButtonTextColor = theme.botActionButtonTextColor;
+            this.botActionButtonSelectedBackgroundColor = theme.botActionButtonSelectedBackgroundColor;
+            this.botActionButtonSelectedTextColor = theme.botActionButtonSelectedTextColor;
+            this.iconAppBarBack = theme.iconAppBarBack;
+            this.iconLeaveQueue = theme.iconLeaveQueue;
+            this.iconSendMessage = theme.iconSendMessage;
+            this.iconChatAudioUpgrade = theme.iconChatAudioUpgrade;
+            this.iconUpgradeAudioDialog = theme.iconUpgradeAudioDialog;
+            this.iconCallAudioOn = theme.iconCallAudioOn;
+            this.iconChatVideoUpgrade = theme.iconChatVideoUpgrade;
+            this.iconUpgradeVideoDialog = theme.iconUpgradeVideoDialog;
+            this.iconScreenSharingDialog = theme.iconScreenSharingDialog;
+            this.iconCallVideoOn = theme.iconCallVideoOn;
+            this.iconCallAudioOff = theme.iconCallAudioOff;
+            this.iconCallVideoOff = theme.iconCallVideoOff;
+            this.iconCallChat = theme.iconCallChat;
+            this.iconCallSpeakerOn = theme.iconCallSpeakerOn;
+            this.iconCallSpeakerOff = theme.iconCallSpeakerOff;
+            this.iconCallMinimize = theme.iconCallMinimize;
+            this.iconPlaceholder = theme.iconPlaceholder;
+            this.headerEndButtonConfiguration = theme.headerEndButtonConfiguration;
+            this.positiveButtonConfiguration = theme.positiveButtonConfiguration;
+            this.negativeButtonConfiguration = theme.negativeButtonConfiguration;
+            this.neutralButtonConfiguration = theme.neutralButtonConfiguration;
+        }
+
+        public UiTheme build() {
+            return new UiTheme(this);
+        }
+    }
 
     protected UiTheme(Parcel in) {
         appBarTitle = in.readString();
@@ -399,7 +806,12 @@ public class UiTheme implements Parcelable {
         } else {
             whiteLabel = in.readInt();
         }
+        byte tmpGliaAlertDialogButtonUseVerticalAlignment = in.readByte();
+        gliaAlertDialogButtonUseVerticalAlignment = tmpGliaAlertDialogButtonUseVerticalAlignment == 0 ? null : tmpGliaAlertDialogButtonUseVerticalAlignment == 1;
         headerEndButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
+        positiveButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
+        negativeButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
+        neutralButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
     }
 
     @Override
@@ -609,7 +1021,11 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(whiteLabel);
         }
+        dest.writeByte((byte) (gliaAlertDialogButtonUseVerticalAlignment == null ? 0 : gliaAlertDialogButtonUseVerticalAlignment ? 1 : 2));
         dest.writeParcelable(headerEndButtonConfiguration, flags);
+        dest.writeParcelable(positiveButtonConfiguration, flags);
+        dest.writeParcelable(negativeButtonConfiguration, flags);
+        dest.writeParcelable(neutralButtonConfiguration, flags);
     }
 
     @Override
@@ -628,379 +1044,6 @@ public class UiTheme implements Parcelable {
             return new UiTheme[size];
         }
     };
-
-    public ButtonConfiguration getGliaEndButtonConfiguration() {
-        return headerEndButtonConfiguration;
-    }
-
-    public static class UiThemeBuilder {
-        /**
-         * Text to be shown on the top of the app bar in the chat
-         **/
-        private String appBarTitle;
-        /**
-         * Primary color for your brand. Used for example to set the color of the appbar
-         **/
-        private @ColorRes
-        Integer brandPrimaryColor;
-        /**
-         * Dark color of the UI widgets. Used for example to change the body text colors
-         **/
-        private @ColorRes
-        Integer baseLightColor;
-        /**
-         * Light color of the UI widgets. Used for example to change the title text colors.
-         * Background color of the chat, etc.
-         **/
-        private @ColorRes
-        Integer baseDarkColor;
-        /**
-         * Base normal color of the chat
-         */
-        private @ColorRes
-        Integer baseNormalColor;
-        /**
-         * Base shade color of the chat
-         */
-        private @ColorRes
-        Integer baseShadeColor;
-        /**
-         * Color for the operator's chat messages background
-         */
-        private @ColorRes
-        Integer systemAgentBubbleColor;
-        /**
-         * Color for any error or chat widgets
-         */
-        private @ColorRes
-        Integer systemNegativeColor;
-        /**
-         * Color for visitor message background
-         */
-        private @ColorRes
-        Integer visitorMessageBackgroundColor;
-        /**
-         * Color for visitor message text
-         */
-        private @ColorRes
-        Integer visitorMessageTextColor;
-        /**
-         * Color for operator message background
-         */
-        private @ColorRes
-        Integer operatorMessageBackgroundColor;
-        /**
-         * Color for operator message text
-         */
-        private @ColorRes
-        Integer operatorMessageTextColor;
-        /**
-         * Color for bot action button background color
-         */
-        private @ColorRes
-        Integer botActionButtonBackgroundColor;
-        /**
-         * Color for bot action button text color
-         */
-        private @ColorRes
-        Integer botActionButtonTextColor;
-        /**
-         * Color for bot action button background color
-         */
-        private @ColorRes
-        Integer botActionButtonSelectedBackgroundColor;
-        /**
-         * Color for bot action button text color
-         */
-        private @ColorRes
-        Integer botActionButtonSelectedTextColor;
-        /**
-         * Allow overriding the view's fontFamily
-         */
-        private @FontRes
-        Integer fontRes;
-        /**
-         * The appbar's back icon resId
-         */
-        private @DrawableRes
-        Integer iconAppBarBack;
-        /**
-         * The appbar's leave queue icon resId
-         */
-        private @DrawableRes
-        Integer iconLeaveQueue;
-        /**
-         * The send message icon resId
-         */
-        private @DrawableRes
-        Integer iconSendMessage;
-        /**
-         * The icon resId used in chat messages to display an ongoing audio upgrade timer
-         */
-        private @DrawableRes
-        Integer iconChatAudioUpgrade;
-        /**
-         * The icon resId used in the header of an audio upgrade dialog
-         */
-        private @DrawableRes
-        Integer iconUpgradeAudioDialog;
-        /**
-         * The icon resId used to set the call's audio on
-         */
-        private @DrawableRes
-        Integer iconCallAudioOn;
-        /**
-         * The icon resId used in chat messages to display an ongoing video upgrade timer
-         */
-        private @DrawableRes
-        Integer iconChatVideoUpgrade;
-        /**
-         * The icon resId used in the header of an video upgrade dialog
-         */
-        private @DrawableRes
-        Integer iconUpgradeVideoDialog;
-        /**
-         * The icon resId used in the header of of a screen sharing upgrade dialog
-         */
-        private @DrawableRes
-        Integer iconScreenSharingDialog;
-        /**
-         * The icon resId used to set the call's video on
-         */
-        private @DrawableRes
-        Integer iconCallVideoOn;
-        /**
-         * The icon resId used to set the call's audio off
-         */
-        private @DrawableRes
-        Integer iconCallAudioOff;
-        /**
-         * The icon resId used set the call's video off
-         */
-        private @DrawableRes
-        Integer iconCallVideoOff;
-        /**
-         * The icon resId used to navigate back to the chat from a call
-         */
-        private @DrawableRes
-        Integer iconCallChat;
-        /**
-         * The icon resId used to set the call's speaker on
-         */
-        private @DrawableRes
-        Integer iconCallSpeakerOn;
-        /**
-         * The icon resId used to set the call's speaker off
-         */
-        private @DrawableRes
-        Integer iconCallSpeakerOff;
-        /**
-         * The icon resId used to minimize a call
-         */
-        private @DrawableRes
-        Integer iconCallMinimize;
-        /**
-         * The icon resId used in a chat head if an operator's profile image is absent
-         */
-        private @DrawableRes
-        Integer iconPlaceholder;
-
-        private
-        Integer whiteLabel;
-
-        private
-        ButtonConfiguration headerEndButtonConfiguration;
-
-        public void setAppBarTitle(String appBarTitle) {
-            this.appBarTitle = appBarTitle;
-        }
-
-        public void setFontRes(@FontRes Integer fontRes) {
-            if (fontRes != null && fontRes != 0) {
-                this.fontRes = fontRes;
-            } else {
-                this.fontRes = null;
-            }
-        }
-
-        public void setBrandPrimaryColor(@ColorRes Integer brandPrimaryColor) {
-            this.brandPrimaryColor = brandPrimaryColor;
-        }
-
-        public void setBaseLightColor(@ColorRes Integer baseLightColor) {
-            this.baseLightColor = baseLightColor;
-        }
-
-        public void setBaseDarkColor(@ColorRes Integer baseDarkColor) {
-            this.baseDarkColor = baseDarkColor;
-        }
-
-        public void setBaseNormalColor(Integer baseNormalColor) {
-            this.baseNormalColor = baseNormalColor;
-        }
-
-        public void setBaseShadeColor(Integer baseShadeColor) {
-            this.baseShadeColor = baseShadeColor;
-        }
-
-        public void setSystemAgentBubbleColor(@ColorRes Integer systemAgentBubbleColor) {
-            this.systemAgentBubbleColor = systemAgentBubbleColor;
-        }
-
-        public void setSystemNegativeColor(@ColorRes Integer systemNegativeColor) {
-            this.systemNegativeColor = systemNegativeColor;
-        }
-
-        public void setVisitorMessageBackgroundColor(@ColorRes Integer color) {
-            this.visitorMessageBackgroundColor = color;
-        }
-
-        public void setVisitorMessageTextColor(@ColorRes Integer color) {
-            this.visitorMessageTextColor = color;
-        }
-
-        public void setOperatorMessageBackgroundColor(@ColorRes Integer color) {
-            this.operatorMessageBackgroundColor = color;
-        }
-
-        public void setOperatorMessageTextColor(@ColorRes Integer color) {
-            this.operatorMessageTextColor = color;
-        }
-
-        public void setBotActionButtonBackgroundColor(@ColorRes Integer color) {
-            this.botActionButtonBackgroundColor = color;
-        }
-
-        public void setBotActionButtonTextColor(@ColorRes Integer color) {
-            this.botActionButtonTextColor = color;
-        }
-
-        public void setBotActionButtonSelectedBackgroundColor(@ColorRes Integer color) {
-            this.botActionButtonSelectedBackgroundColor = color;
-        }
-
-        public void setBotActionButtonSelectedTextColor(@ColorRes Integer color) {
-            this.botActionButtonSelectedTextColor = color;
-        }
-
-        public void setIconAppBarBack(@DrawableRes Integer iconAppBarBack) {
-            this.iconAppBarBack = iconAppBarBack;
-        }
-
-        public void setIconLeaveQueue(@DrawableRes Integer iconLeaveQueue) {
-            this.iconLeaveQueue = iconLeaveQueue;
-        }
-
-        public void setIconSendMessage(@DrawableRes Integer iconSendMessage) {
-            this.iconSendMessage = iconSendMessage;
-        }
-
-        public void setIconChatAudioUpgrade(@DrawableRes Integer iconChatAudioUpgrade) {
-            this.iconChatAudioUpgrade = iconChatAudioUpgrade;
-        }
-
-        public void setIconUpgradeAudioDialog(@DrawableRes Integer iconUpgradeAudioDialog) {
-            this.iconUpgradeAudioDialog = iconUpgradeAudioDialog;
-        }
-
-        public void setIconCallAudioOn(@DrawableRes Integer iconCallAudioOn) {
-            this.iconCallAudioOn = iconCallAudioOn;
-        }
-
-        public void setIconChatVideoUpgrade(@DrawableRes Integer iconChatVideoUpgrade) {
-            this.iconChatVideoUpgrade = iconChatVideoUpgrade;
-        }
-
-        public void setIconUpgradeVideoDialog(@DrawableRes Integer iconUpgradeVideoDialog) {
-            this.iconUpgradeVideoDialog = iconUpgradeVideoDialog;
-        }
-
-        public void setIconScreenSharingDialog(@DrawableRes Integer iconScreenSharingDialog) {
-            this.iconScreenSharingDialog = iconScreenSharingDialog;
-        }
-
-        public void setIconCallVideoOn(@DrawableRes Integer iconCallVideoOn) {
-            this.iconCallVideoOn = iconCallVideoOn;
-        }
-
-        public void setIconCallAudioOff(@DrawableRes Integer iconCallAudioOff) {
-            this.iconCallAudioOff = iconCallAudioOff;
-        }
-
-        public void setIconCallVideoOff(@DrawableRes Integer iconCallVideoOff) {
-            this.iconCallVideoOff = iconCallVideoOff;
-        }
-
-        public void setIconCallChat(@DrawableRes Integer iconCallChat) {
-            this.iconCallChat = iconCallChat;
-        }
-
-        public void setIconCallSpeakerOn(@DrawableRes Integer iconCallSpeakerOn) {
-            this.iconCallSpeakerOn = iconCallSpeakerOn;
-        }
-
-        public void setIconCallSpeakerOff(@DrawableRes Integer iconCallSpeakerOff) {
-            this.iconCallSpeakerOff = iconCallSpeakerOff;
-        }
-
-        public void setIconCallMinimize(@DrawableRes Integer iconCallMinimize) {
-            this.iconCallMinimize = iconCallMinimize;
-        }
-
-        public void setIconPlaceholder(@DrawableRes Integer iconPlaceholder) {
-            this.iconPlaceholder = iconPlaceholder;
-        }
-
-        public void setWhiteLabel(Integer whiteLabel) {
-            this.whiteLabel = whiteLabel;
-        }
-
-        public void setHeaderEndButtonConfiguration(ButtonConfiguration configuration) {
-            this.headerEndButtonConfiguration = configuration;
-        }
-
-        public void setTheme(UiTheme theme) {
-            this.appBarTitle = theme.appBarTitle;
-            this.brandPrimaryColor = theme.brandPrimaryColor;
-            this.baseLightColor = theme.baseLightColor;
-            this.baseDarkColor = theme.baseDarkColor;
-            this.baseNormalColor = theme.baseNormalColor;
-            this.baseShadeColor = theme.baseShadeColor;
-            this.systemAgentBubbleColor = theme.systemAgentBubbleColor;
-            this.fontRes = theme.fontRes;
-            this.systemNegativeColor = theme.systemNegativeColor;
-            this.visitorMessageBackgroundColor = theme.visitorMessageBackgroundColor;
-            this.visitorMessageTextColor = theme.visitorMessageTextColor;
-            this.operatorMessageBackgroundColor = theme.operatorMessageBackgroundColor;
-            this.operatorMessageTextColor = theme.operatorMessageTextColor;
-            this.botActionButtonBackgroundColor = theme.botActionButtonBackgroundColor;
-            this.botActionButtonTextColor = theme.botActionButtonTextColor;
-            this.botActionButtonSelectedBackgroundColor = theme.botActionButtonSelectedBackgroundColor;
-            this.botActionButtonSelectedTextColor = theme.botActionButtonSelectedTextColor;
-            this.iconAppBarBack = theme.iconAppBarBack;
-            this.iconLeaveQueue = theme.iconLeaveQueue;
-            this.iconSendMessage = theme.iconSendMessage;
-            this.iconChatAudioUpgrade = theme.iconChatAudioUpgrade;
-            this.iconUpgradeAudioDialog = theme.iconUpgradeAudioDialog;
-            this.iconCallAudioOn = theme.iconCallAudioOn;
-            this.iconChatVideoUpgrade = theme.iconChatVideoUpgrade;
-            this.iconUpgradeVideoDialog = theme.iconUpgradeVideoDialog;
-            this.iconScreenSharingDialog = theme.iconScreenSharingDialog;
-            this.iconCallVideoOn = theme.iconCallVideoOn;
-            this.iconCallAudioOff = theme.iconCallAudioOff;
-            this.iconCallVideoOff = theme.iconCallVideoOff;
-            this.iconCallChat = theme.iconCallChat;
-            this.iconCallSpeakerOn = theme.iconCallSpeakerOn;
-            this.iconCallSpeakerOff = theme.iconCallSpeakerOff;
-            this.iconCallMinimize = theme.iconCallMinimize;
-            this.iconPlaceholder = theme.iconPlaceholder;
-            this.headerEndButtonConfiguration = theme.headerEndButtonConfiguration;
-        }
-
-        public UiTheme build() {
-            return new UiTheme(this);
-        }
-    }
 
     public String getAppBarTitle() {
         return appBarTitle;
@@ -1140,5 +1183,25 @@ public class UiTheme implements Parcelable {
 
     public Integer getWhiteLabel() {
         return whiteLabel;
+    }
+
+    public Boolean getGliaAlertDialogButtonUseVerticalAlignment() {
+        return gliaAlertDialogButtonUseVerticalAlignment;
+    }
+
+    public ButtonConfiguration getGliaEndButtonConfiguration() {
+        return headerEndButtonConfiguration;
+    }
+
+    public ButtonConfiguration getGliaPositiveButtonConfiguration() {
+        return positiveButtonConfiguration;
+    }
+
+    public ButtonConfiguration getGliaNegativeButtonConfiguration() {
+        return negativeButtonConfiguration;
+    }
+
+    public ButtonConfiguration getGliaNeutralButtonConfiguration() {
+        return neutralButtonConfiguration;
     }
 }

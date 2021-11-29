@@ -39,6 +39,11 @@ class Utils {
 
         Integer whiteLabel = getWhiteLabelValueFromPrefs(sharedPreferences, resources);
 
+        Boolean gliaAlertDialogButtonUseVerticalAlignment = sharedPreferences.getBoolean(
+                resources.getString(R.string.pref_use_alert_dialog_button_vertical_alignment),
+                false
+        );
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
 
         builder.setAppBarTitle(title);
@@ -59,6 +64,9 @@ class Utils {
         builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColor);
         builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColor);
         builder.setWhiteLabel(whiteLabel);
+
+        // to set alert buttons to align vertically in runtime
+        builder.setGliaAlertDialogButtonUseVerticalAlignment(gliaAlertDialogButtonUseVerticalAlignment);
 
         // here goes header end engagement button configuration
         builder.setHeaderEndButtonConfiguration(null);

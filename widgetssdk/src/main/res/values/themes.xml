@@ -45,6 +45,10 @@
         <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">?attr/buttonBarNeutralButtonStyle</item>
 
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">
+            ?attr/gliaAlertDialogButtonUseVerticalAlignment
+        </item>
+
         <item name="materialThemeOverlay">@style/ThemeOverlay.Glia.Chat</item>
     </style>
 
@@ -111,6 +115,8 @@
         <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
         </item>
         <item name="buttonBarNeutralButtonStyle">@style/Application.Glia.Chat.Button.Neutral</item>
+
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">false</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

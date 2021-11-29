@@ -332,7 +332,23 @@ public class Utils {
                         R.attr.gliaWhiteLabel
                 )
         );
+        defaultThemeBuilder.setGliaAlertDialogButtonUseVerticalAlignment(
+                getTypedArrayBooleanValue(
+                        typedArray,
+                        R.styleable.GliaView_gliaAlertDialogButtonUseVerticalAlignment
+                )
+        );
         return defaultThemeBuilder.build();
+    }
+
+    public static Boolean getGliaAlertDialogButtonUseVerticalAlignment(UiTheme theme) {
+        return theme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
+                theme.getGliaAlertDialogButtonUseVerticalAlignment() :
+                false;
+    }
+
+    private static Boolean getTypedArrayBooleanValue(TypedArray typedArray, int index) {
+        return typedArray.hasValue(index) && typedArray.getBoolean(index, false);
     }
 
     private static String getAppBarTitleValue(TypedArray typedArray) {
@@ -383,6 +399,13 @@ public class Utils {
     public static void hideSoftKeyboard(Context context, IBinder windowToken) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(windowToken, 0);
+    }
+
+    private static ButtonConfiguration getButtonConfiguration(
+            ButtonConfiguration newConf,
+            ButtonConfiguration oldConf
+    ) {
+        return newConf != null ? newConf : oldConf;
     }
 
     public static UiTheme getFullHybridTheme(UiTheme newTheme, UiTheme oldTheme) {
@@ -454,11 +477,34 @@ public class Utils {
                 newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
 
         Integer whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
+        Boolean isUseAlertDialogButtonVerticalAlignment =
+                newTheme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
+                        newTheme.getGliaAlertDialogButtonUseVerticalAlignment() :
+                        oldTheme.getGliaAlertDialogButtonUseVerticalAlignment();
 
-        ButtonConfiguration endButtonConfiguration
-                = newTheme.getGliaEndButtonConfiguration() != null ?
-                newTheme.getGliaEndButtonConfiguration() :
-                oldTheme.getGliaEndButtonConfiguration();
+        ButtonConfiguration endButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaEndButtonConfiguration(),
+                        oldTheme.getGliaEndButtonConfiguration()
+                );
+
+        ButtonConfiguration positiveButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaPositiveButtonConfiguration(),
+                        oldTheme.getGliaPositiveButtonConfiguration()
+                );
+
+        ButtonConfiguration negativeButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaNegativeButtonConfiguration(),
+                        oldTheme.getGliaNegativeButtonConfiguration()
+                );
+
+        ButtonConfiguration neutralButtonConfiguration =
+                getButtonConfiguration(
+                        newTheme.getGliaNeutralButtonConfiguration(),
+                        oldTheme.getGliaNeutralButtonConfiguration()
+                );
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
@@ -496,7 +542,11 @@ public class Utils {
         builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
         builder.setWhiteLabel(whiteLabel);
+        builder.setGliaAlertDialogButtonUseVerticalAlignment(isUseAlertDialogButtonVerticalAlignment);
         builder.setHeaderEndButtonConfiguration(endButtonConfiguration);
+        builder.setPositiveButtonConfiguration(positiveButtonConfiguration);
+        builder.setNegativeButtonConfiguration(negativeButtonConfiguration);
+        builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
         return builder.build();
     }
 

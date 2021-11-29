@@ -45,9 +45,8 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
 
-    <Button
+    <com.glia.widgets.view.button.GliaPositiveButton
         android:id="@+id/ok_button"
-        style="@style/Application.Glia.Chat.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"

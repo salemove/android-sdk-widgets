@@ -182,6 +182,25 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     };
 
+    private final TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (controller != null) {
+                controller.sendMessagePreview(editable.toString().trim());
+            }
+        }
+    };
+
     public ChatView(Context context) {
         this(context, null);
     }
@@ -622,8 +641,11 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void updateChatEditText(ChatState chatState) {
-        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText))
+        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
+            chatEditText.removeTextChangedListener(textWatcher);
             chatEditText.setText(chatState.lastTypedText);
+            chatEditText.addTextChangedListener(textWatcher);
+        }
     }
 
     private void updateShowSendButton(ChatState chatState) {
@@ -643,8 +665,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     this.theme,
                     resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
                     resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                    resources.getString(R.string.glia_dialog_yes),
-                    resources.getString(R.string.glia_dialog_no),
+                    resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
+                    resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
                     view -> {
                         dismissAlertDialog();
                         NotificationManager.openNotificationChannelScreen(this.getContext());
@@ -670,8 +692,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     this.theme,
                     resources.getString(R.string.glia_dialog_allow_notifications_title),
                     resources.getString(R.string.glia_dialog_allow_notifications_message),
-                    resources.getString(R.string.glia_dialog_yes),
-                    resources.getString(R.string.glia_dialog_no),
+                    resources.getString(R.string.glia_dialog_allow_notifications_yes),
+                    resources.getString(R.string.glia_dialog_allow_notifications_no),
                     view -> {
                         dismissAlertDialog();
                         controller.notificationsDialogDismissed();
@@ -696,8 +718,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     theme,
                     resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
                     resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
-                    R.string.glia_dialog_accept,
-                    R.string.glia_dialog_decline,
+                    R.string.glia_dialog_screen_sharing_offer_accept,
+                    R.string.glia_dialog_screen_sharing_offer_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
@@ -711,8 +733,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                     theme,
                     resources.getString(R.string.glia_dialog_screen_sharing_end_title),
                     resources.getString(R.string.glia_dialog_screen_sharing_end_message),
-                    R.string.glia_dialog_cancel,
-                    R.string.glia_dialog_end_sharing,
+                    R.string.glia_dialog_screen_sharing_end_cancel,
+                    R.string.glia_dialog_screen_sharing_end_end,
                     view -> screenSharingController.onDismissEndScreenSharing(),
                     view -> screenSharingController.onEndScreenSharing()
             );
@@ -879,24 +901,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupViewActions() {
-        chatEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (controller != null) {
-                    controller.sendMessagePreview(editable.toString().trim());
-                }
-            }
-        });
+        chatEditText.addTextChangedListener(textWatcher);
 
         sendButton.setOnClickListener(view -> {
             String message = chatEditText.getText().toString().trim();
@@ -1006,8 +1011,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private void showExitQueueDialog() {
         showOptionsDialog(resources.getString(R.string.glia_dialog_leave_queue_title),
                 resources.getString(R.string.glia_dialog_leave_queue_message),
-                resources.getString(R.string.glia_dialog_yes),
-                resources.getString(R.string.glia_dialog_no),
+                resources.getString(R.string.glia_dialog_leave_queue_yes),
+                resources.getString(R.string.glia_dialog_leave_queue_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -1039,8 +1044,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private void showEndEngagementDialog(String operatorName) {
         showOptionsDialog(resources.getString(R.string.glia_dialog_end_engagement_title),
                 resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
-                resources.getString(R.string.glia_dialog_yes),
-                resources.getString(R.string.glia_dialog_no),
+                resources.getString(R.string.glia_dialog_end_engagement_yes),
+                resources.getString(R.string.glia_dialog_end_engagement_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {
@@ -1186,8 +1191,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         showOptionsDialog(
                 resources.getString(R.string.glia_dialog_overlay_permissions_title),
                 resources.getString(R.string.glia_dialog_overlay_permissions_message),
-                resources.getString(R.string.glia_dialog_ok),
-                resources.getString(R.string.glia_dialog_no),
+                resources.getString(R.string.glia_dialog_overlay_permissions_ok),
+                resources.getString(R.string.glia_dialog_overlay_permissions_no),
                 v -> {
                     dismissAlertDialog();
                     if (controller != null) {

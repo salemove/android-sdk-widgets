@@ -21,39 +21,78 @@
     <string name="glia_top_app_bar_chat_end">End</string>
 
     <!--    dialogs-->
+    <!-- Leave Queue Dialog -->
     <string name="glia_dialog_leave_queue_title">Are you sure you want to leave?</string>
     <string name="glia_dialog_leave_queue_message">You will lose your place in the queue.</string>
+    <string name="glia_dialog_leave_queue_yes">@string/glia_dialog_yes</string>
+    <string name="glia_dialog_leave_queue_no">@string/glia_dialog_no</string>
+
+    <!-- Share screen Dialog -->
+    <string name="glia_dialog_screen_sharing_offer_enable_notifications_title">Share your screen?</string>
+    <string name="glia_dialog_screen_sharing_offer_enable_notifications_message">The operator has requested you share your screen. However this requires the app\'s notifications be switched on. Do this now?</string>
+    <string name="glia_dialog_screen_sharing_offer_enable_notifications_yes">@string/glia_dialog_yes</string>
+    <string name="glia_dialog_screen_sharing_offer_enable_notifications_no">@string/glia_dialog_no</string>
+
+    <!-- Allow notifications Dialog -->
+    <string name="glia_dialog_allow_notifications_title">Allow Notifications?</string>
+    <string name="glia_dialog_allow_notifications_message">The engagement would like to show notifications on the status bar. Open settings to enable notifications?</string>
+    <string name="glia_dialog_allow_notifications_yes">@string/glia_dialog_yes</string>
+    <string name="glia_dialog_allow_notifications_no">@string/glia_dialog_no</string>
+
+    <!-- End engagement Dialog -->
     <string name="glia_dialog_end_engagement_title">End Engagement?</string>
     <string name="glia_dialog_end_engagement_message">Are you sure you want to end engagement with %1$s?</string>
-    <string name="glia_dialog_yes">Yes</string>
-    <string name="glia_dialog_no">No</string>
-    <string name="glia_dialog_operators_unavailable_title">We\'re sorry</string>
-    <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
-    <string name="glia_dialog_unexpected_error_title">We\'re sorry, there has been an unexpected error.</string>
-    <string name="glia_dialog_permission_error_title">We\'re sorry, one or more permission(s) are missing for required action.</string>
-    <string name="glia_dialog_unexpected_error_message">Please try again later.</string>
-    <string name="glia_dialog_permission_error_message">Please make sure all required permissions are enabled.</string>
-    <string name="glia_dialog_ok">Ok</string>
+    <string name="glia_dialog_end_engagement_yes">@string/glia_dialog_yes</string>
+    <string name="glia_dialog_end_engagement_no">@string/glia_dialog_no</string>
+
+    <!-- ScreenSharing offer Dialog -->
+    <string name="glia_dialog_screen_sharing_offer_title">You are about to share your screen</string>
+    <string name="glia_dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
+    <string name="glia_dialog_screen_sharing_offer_accept">@string/glia_dialog_accept</string>
+    <string name="glia_dialog_screen_sharing_offer_decline">@string/glia_dialog_decline</string>
+
+    <!-- Engagement ended Dialog -->
+    <string name="glia_dialog_engagement_ended_title">Engagement Ended</string>
+    <string name="glia_dialog_engagement_ended_message">This engagement has ended. Thank you!</string>
+    <string name="glia_dialog_engagement_ended_action_ok">@string/glia_dialog_ok</string>
+
+    <!-- Overlay permissions required Dialog -->
     <string name="glia_dialog_overlay_permissions_title">Overlay Permissions Required</string>
     <string name="glia_dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
+    <string name="glia_dialog_overlay_permissions_ok">@string/glia_dialog_ok</string>
+    <string name="glia_dialog_overlay_permissions_no">@string/glia_dialog_no</string>
+
+    <!-- Upgrade offer Dialog -->
     <string name="glia_dialog_upgrade_audio_title">%1$s has offered you to upgrade to audio</string>
     <string name="glia_dialog_upgrade_video_2_way_title">%1$s has offered you to upgrade to video</string>
     <string name="glia_dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
-    <string name="glia_dialog_decline">Decline</string>
-    <string name="glia_dialog_accept">Accept</string>
-    <string name="glia_dialog_cancel">Cancel</string>
-    <string name="glia_dialog_end_sharing">End</string>
-    <string name="glia_dialog_screen_sharing_offer_title">You are about to share your screen</string>
-    <string name="glia_dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
+    <string name="glia_dialog_upgrade_accept">@string/glia_dialog_accept</string>
+    <string name="glia_dialog_upgrade_decline">@string/glia_dialog_decline</string>
+
+    <!-- End screen sharing Dialog -->
     <string name="glia_dialog_screen_sharing_end_title">End Screen Sharing?</string>
     <string name="glia_dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
-    <string name="glia_dialog_allow_notifications_title">Allow Notifications?</string>
-    <string name="glia_dialog_allow_notifications_message">The engagement would like to show notifications on the status bar. Open settings to enable notifications?</string>
-    <string name="glia_dialog_screen_sharing_offer_enable_notifications_title">Share your screen?</string>
-    <string name="glia_dialog_screen_sharing_offer_enable_notifications_message">The operator has requested you share your screen. However this requires the app\'s notifications be switched on. Do this now?</string>
-    <string name="glia_dialog_engagement_ended_title">Engagement Ended</string>
-    <string name="glia_dialog_engagement_ended_message">This engagement has ended. Thank you!</string>
-    <string name="glia_dialog_engagement_ended_action_ok">OK</string>
+    <string name="glia_dialog_screen_sharing_end_cancel">@string/glia_dialog_cancel</string>
+    <string name="glia_dialog_screen_sharing_end_end">End</string>
+
+    <!-- Operators unavailable AlertDialog -->
+    <string name="glia_dialog_operators_unavailable_title">We\'re sorry</string>
+    <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
+
+    <!-- Unexpected error AlertDialog -->
+    <string name="glia_dialog_unexpected_error_title">We\'re sorry, there has been an unexpected error.</string>
+    <string name="glia_dialog_unexpected_error_message">Please try again later.</string>
+
+    <!-- Permission error AlertDialog -->
+    <string name="glia_dialog_permission_error_title">We\'re sorry, one or more permission(s) are missing for required action.</string>
+    <string name="glia_dialog_permission_error_message">Please make sure all required permissions are enabled.</string>
+
+    <string name="glia_dialog_yes">Yes</string>
+    <string name="glia_dialog_no">No</string>
+    <string name="glia_dialog_decline">Decline</string>
+    <string name="glia_dialog_accept">Accept</string>
+    <string name="glia_dialog_ok">OK</string>
+    <string name="glia_dialog_cancel">Cancel</string>
 
     <!--    call screen-->
     <string name="glia_call_audio_app_bar_title">Audio call</string>

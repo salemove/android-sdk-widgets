@@ -96,7 +96,8 @@ public class ControllerFactory {
                     useCaseFactory.createSupportedFileCountCheckUseCase(),
                     useCaseFactory.createIsShowSendButtonUseCase(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
-                    useCaseFactory.createDownloadFileUseCase()
+                    useCaseFactory.createDownloadFileUseCase(),
+                    useCaseFactory.createIsEnableChatEditTextUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

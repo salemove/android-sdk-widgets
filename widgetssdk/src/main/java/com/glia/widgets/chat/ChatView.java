@@ -182,6 +182,25 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     };
 
+    private final TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            if (controller != null) {
+                controller.sendMessagePreview(editable.toString().trim());
+            }
+        }
+    };
+
     public ChatView(Context context) {
         this(context, null);
     }
@@ -622,8 +641,11 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void updateChatEditText(ChatState chatState) {
-        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText))
+        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
+            chatEditText.removeTextChangedListener(textWatcher);
             chatEditText.setText(chatState.lastTypedText);
+            chatEditText.addTextChangedListener(textWatcher);
+        }
     }
 
     private void updateShowSendButton(ChatState chatState) {
@@ -879,24 +901,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupViewActions() {
-        chatEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if (controller != null) {
-                    controller.sendMessagePreview(editable.toString().trim());
-                }
-            }
-        });
+        chatEditText.addTextChangedListener(textWatcher);
 
         sendButton.setOnClickListener(view -> {
             String message = chatEditText.getText().toString().trim();

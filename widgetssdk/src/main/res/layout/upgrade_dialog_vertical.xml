@@ -46,7 +46,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large_x_large"
-        android:text="@string/glia_dialog_accept"
+        android:text="@string/glia_dialog_upgrade_accept"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
@@ -55,7 +55,7 @@
         android:id="@+id/negative_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/glia_dialog_decline"
+        android:text="@string/glia_dialog_upgrade_decline"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/positive_button" />

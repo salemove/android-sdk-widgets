@@ -644,6 +644,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
             chatEditText.removeTextChangedListener(textWatcher);
             chatEditText.setText(chatState.lastTypedText);
+            if (controller != null) {
+                controller.sendMessagePreview(chatState.lastTypedText);
+            }
             chatEditText.addTextChangedListener(textWatcher);
         }
     }

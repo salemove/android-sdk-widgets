@@ -5,9 +5,15 @@ import android.content.Intent;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
+import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
+import com.glia.widgets.core.visitor.GliaWidgetException;
+import com.glia.widgets.core.visitor.GliaVisitorInfo;
+import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.view.head.ChatHeadsController;
+
+import java.util.function.Consumer;
 
 /**
  * This class is a starting point for integration with Glia Widgets SDK
@@ -136,5 +142,44 @@ public class GliaWidgets {
         Logger.d(TAG, "clearVisitorSession");
         Dependencies.getControllerFactory().destroyControllers();
         Glia.clearVisitorSession();
+    }
+
+    /**
+     * Updates the visitor's information
+     * <p>
+     * Updates the visitor's information stored on the server. This information will also be displayed to the operator.
+     */
+    public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
+        Glia.updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
+                .setName(visitorInfoUpdate.getName())
+                .setEmail(visitorInfoUpdate.getEmail())
+                .setPhone(visitorInfoUpdate.getPhone())
+                .setNote(visitorInfoUpdate.getNote())
+                .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
+                .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
+                .setNoteUpdateMethod(VisitorInfoUpdateRequest.NoteUpdateMethod.REPLACE)
+                .build(), e -> {
+            if(e != null){
+                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
+            }else {
+                exceptionConsumer.accept(null);
+            }
+        });
+    }
+
+    /**
+     * Fetches the visitor's information
+     * <p>
+     * If visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
+     */
+    public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
+        Glia.getVisitorInfo((visitorInfo, e) -> {
+            if(visitorInfo != null){
+                visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
+            }
+            if(e != null){
+                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
+            }
+        });
     }
 }

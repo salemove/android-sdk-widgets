@@ -52,38 +52,9 @@ public class AppBarView extends AppBarLayout {
                 R.styleable.AppBarView_backIcon,
                 R.attr.gliaIconAppBarBack);
         materialToolbar.setNavigationIcon(backIconResId);
-
-        ColorStateList backgroundTintList = ContextCompat.getColorStateList(
-                context,
-                Utils.getTypedArrayIntegerValue(typedArray,
-                        context,
-                        R.styleable.AppBarView_android_backgroundTint,
-                        R.attr.gliaBrandPrimaryColor
-                )
-        );
-
-        int titleTintColor = ContextCompat.getColor(
-                context,
-                Utils.getTypedArrayIntegerValue(typedArray,
-                        context,
-                        R.styleable.AppBarView_lightTint,
-                        R.attr.gliaChatHeaderTitleTintColor
-                )
-        );
-
-        int homeButtonTintColor = ContextCompat.getColor(
-                context,
-                Utils.getTypedArrayIntegerValue(typedArray,
-                        context,
-                        R.styleable.AppBarView_lightTint,
-                        R.attr.gliaChatHeaderHomeButtonTintColor
-                )
-        );
-
-
-        materialToolbar.setBackgroundTintList(backgroundTintList);
-        titleView.setTextColor(titleTintColor);
-        materialToolbar.getNavigationIcon().setTint(homeButtonTintColor);
+        setDefaultTitleTintColor(typedArray, context);
+        setDefaultHomeButtonTintColor(typedArray, context);
+        setDefaultBackgroundTintColor(typedArray, context);
 
         String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
         if (title != null) {
@@ -105,6 +76,42 @@ public class AppBarView extends AppBarLayout {
         );
     }
 
+    private void setDefaultBackgroundTintColor(TypedArray typedArray, Context context) {
+        ColorStateList backgroundTintList = ContextCompat.getColorStateList(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_android_backgroundTint,
+                        R.attr.gliaBrandPrimaryColor
+                )
+        );
+        materialToolbar.setBackgroundTintList(backgroundTintList);
+    }
+
+    private void setDefaultHomeButtonTintColor(TypedArray typedArray, Context context) {
+        int homeButtonTintColor = ContextCompat.getColor(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_lightTint,
+                        R.attr.gliaChatHeaderHomeButtonTintColor
+                )
+        );
+        materialToolbar.getNavigationIcon().setTint(homeButtonTintColor);
+    }
+
+    private void setDefaultTitleTintColor(TypedArray typedArray, Context context) {
+        int titleTintColor = ContextCompat.getColor(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_lightTint,
+                        R.attr.gliaChatHeaderTitleTintColor
+                )
+        );
+        titleView.setTextColor(titleTintColor);
+    }
+
 
     private void setTypeface() {
         if (this.theme.getFontRes() != null) {
@@ -114,7 +121,6 @@ public class AppBarView extends AppBarLayout {
             );
             titleView.setTypeface(fontFamily);
         }
-
     }
 
     public void setTheme(UiTheme uiTheme) {

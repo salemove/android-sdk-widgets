@@ -29,6 +29,10 @@ class Utils {
         Integer chatHeaderTitleTintColor = getColorValueFromPrefs(R.string.pref_chat_header_title_tint_color, sharedPreferences, resources);
         Integer chatHeaderHomeButtonTintColor = getColorValueFromPrefs(R.string.pref_chat_header_home_button_tint_color, sharedPreferences, resources);
         Integer chatHeaderExitQueueButtonTintColor = getColorValueFromPrefs(R.string.pref_chat_header_exit_queue_button_tint_color, sharedPreferences, resources);
+        Integer chatStartingHeadingTextColorRes = getColorValueFromPrefs(R.string.pref_chat_starting_heading_text_color, sharedPreferences, resources);
+        Integer chatStartingCaptionTextColorRes = getColorValueFromPrefs(R.string.pref_chat_starting_caption_text_color, sharedPreferences, resources);
+        Integer chatStartedHeadingTextColorRes = getColorValueFromPrefs(R.string.pref_chat_started_heading_text_color, sharedPreferences, resources);
+        Integer chatStartedCaptionTextColorRes = getColorValueFromPrefs(R.string.pref_chat_started_caption_text_color, sharedPreferences, resources);
         Integer fontFamily = getTypefaceFromPrefs(sharedPreferences, resources);
         Integer systemNegativeColor = getColorValueFromPrefs(R.string.pref_system_negative_color, sharedPreferences, resources);
         Integer visitorMessageBackgroundColor = getColorValueFromPrefs(R.string.pref_visitor_message_bg_color, sharedPreferences, resources);
@@ -81,6 +85,10 @@ class Utils {
         builder.setGliaChatHeaderHomeButtonTintColor(chatHeaderHomeButtonTintColor);
         builder.setGliaChatHeaderExitQueueButtonTintColor(chatHeaderExitQueueButtonTintColor);
 
+        builder.setChatStartingHeadingTextColor(chatStartingHeadingTextColorRes);
+        builder.setChatStartingCaptionTextColor(chatStartingCaptionTextColorRes);
+        builder.setChatStartedHeadingTextColor(chatStartedHeadingTextColorRes);
+        builder.setChatStartedCaptionTextColor(chatStartedCaptionTextColorRes);
         return builder.build();
     }
 

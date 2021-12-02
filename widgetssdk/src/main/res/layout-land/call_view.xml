@@ -127,7 +127,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.15" />
 
-    <com.glia.widgets.view.AppBarView
+    <com.glia.widgets.view.header.AppBarView
         android:id="@+id/top_app_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

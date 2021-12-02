@@ -44,7 +44,7 @@ import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.AppBarView;
+import com.glia.widgets.view.header.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
@@ -645,7 +645,6 @@ public class CallView extends ConstraintLayout {
         chatButtonBadgeView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), this.theme.getBrandPrimaryColor()));
         // fonts
         if (this.theme.getFontRes() != null) {
-            appBar.changeFontFamily(this.theme.getFontRes());
             Typeface fontFamily = ResourcesCompat.getFont(
                     this.getContext(),
                     this.theme.getFontRes());
@@ -666,11 +665,13 @@ public class CallView extends ConstraintLayout {
 
     private void setAppBarTheme() {
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
-        builder.setIconAppBarBack(theme.getIconAppBarBack());
-        builder.setIconLeaveQueue(theme.getIconLeaveQueue());
+        builder.setTheme(theme);
         builder.setSystemNegativeColor(R.color.glia_system_negative_color);
         builder.setBaseLightColor(R.color.glia_base_light_color);
         builder.setBrandPrimaryColor(android.R.color.transparent);
+        builder.setGliaChatHeaderTitleTintColor(android.R.color.white);
+        builder.setGliaChatHomeButtonTintColor(android.R.color.white);
+        builder.setFontRes(theme.getFontRes());
         appBar.setTheme(builder.build());
     }
 

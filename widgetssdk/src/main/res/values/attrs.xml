@@ -72,6 +72,9 @@
         <!-- Bot message action button text color -->
         <attr name="botActionButtonSelectedTextColor" format="reference" />
 
+        <attr name="chatHeaderTitleTintColor" format="reference" />
+        <attr name="chatHeaderHomeButtonTintColor" format="reference" />
+
         <attr name="whiteLabel" format="reference" />
         <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
     </declare-styleable>
@@ -127,6 +130,10 @@
     <attr name="gliaIconCallMinimize" format="reference" />
     <!-- The icon resId used in a chat head if an operator's profile image is absent -->
     <attr name="gliaIconPlaceholder" format="reference" />
+
+    <!-- Header colors -->
+    <attr name="gliaChatHeaderTitleTintColor" format="reference" />
+    <attr name="gliaChatHeaderHomeButtonTintColor" format="reference" />
 
     <!-- Visitor message background color -->
     <attr name="gliaVisitorMessageBackgroundColor" format="reference" />

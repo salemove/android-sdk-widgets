@@ -28,6 +28,9 @@
         <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
         <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
 
+        <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
+        <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
+
         <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
         <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
         <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
@@ -90,6 +93,9 @@
         <item name="gliaIconCallSpeakerOff">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
+
+        <item name="gliaChatHeaderTitleTintColor">?attr/gliaBaseLightColor</item>
+        <item name="gliaChatHeaderHomeButtonTintColor">?attr/gliaBaseLightColor</item>
 
         <item name="gliaVisitorMessageBackgroundColor">?attr/gliaBrandPrimaryColor</item>
         <item name="gliaVisitorMessageTextColor">?attr/gliaBaseLightColor</item>

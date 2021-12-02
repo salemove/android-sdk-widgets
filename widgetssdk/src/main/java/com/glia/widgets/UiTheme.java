@@ -91,6 +91,16 @@ public class UiTheme implements Parcelable {
      */
     private @ColorRes
     final Integer botActionButtonSelectedTextColor;
+    /**
+     * Color for Chat Header title
+     */
+    private @ColorRes
+    final Integer gliaChatHeaderTitleTintColor;
+    /**
+     * Color for Chat Home Button
+     */
+    private @ColorRes
+    final Integer gliaChatHeaderHomeButtonTintColor;
 
     /**
      * Allow overriding the view's fontFamily
@@ -209,6 +219,8 @@ public class UiTheme implements Parcelable {
         this.botActionButtonTextColor = builder.botActionButtonTextColor;
         this.botActionButtonSelectedBackgroundColor = builder.botActionButtonSelectedBackgroundColor;
         this.botActionButtonSelectedTextColor = builder.botActionButtonSelectedTextColor;
+        this.gliaChatHeaderTitleTintColor = builder.gliaChatHeaderTitleTintColor;
+        this.gliaChatHeaderHomeButtonTintColor = builder.gliaChatHomeButtonTintColor;
         this.iconAppBarBack = builder.iconAppBarBack;
         this.iconLeaveQueue = builder.iconLeaveQueue;
         this.iconSendMessage = builder.iconSendMessage;
@@ -315,6 +327,16 @@ public class UiTheme implements Parcelable {
          */
         private @ColorRes
         Integer botActionButtonSelectedTextColor;
+        /**
+         * Color for Chat Header Title
+         */
+        private @ColorRes
+        Integer gliaChatHeaderTitleTintColor;
+        /**
+         * Color for Chat Home Button
+         */
+        private @ColorRes
+        Integer gliaChatHomeButtonTintColor;
         /**
          * Allow overriding the view's fontFamily
          */
@@ -588,6 +610,14 @@ public class UiTheme implements Parcelable {
             this.neutralButtonConfiguration = configuration;
         }
 
+        public void setGliaChatHeaderTitleTintColor(Integer color) {
+            this.gliaChatHeaderTitleTintColor = color;
+        }
+
+        public void setGliaChatHomeButtonTintColor(Integer color) {
+            this.gliaChatHomeButtonTintColor = color;
+        }
+
         public void setTheme(UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -627,6 +657,8 @@ public class UiTheme implements Parcelable {
             this.positiveButtonConfiguration = theme.positiveButtonConfiguration;
             this.negativeButtonConfiguration = theme.negativeButtonConfiguration;
             this.neutralButtonConfiguration = theme.neutralButtonConfiguration;
+            this.gliaChatHeaderTitleTintColor = theme.gliaChatHeaderTitleTintColor;
+            this.gliaChatHomeButtonTintColor = theme.gliaChatHeaderHomeButtonTintColor;
         }
 
         public UiTheme build() {
@@ -710,6 +742,16 @@ public class UiTheme implements Parcelable {
             botActionButtonSelectedTextColor = null;
         } else {
             botActionButtonSelectedTextColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            gliaChatHeaderTitleTintColor = null;
+        } else {
+            gliaChatHeaderTitleTintColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            gliaChatHeaderHomeButtonTintColor = null;
+        } else {
+            gliaChatHeaderHomeButtonTintColor = in.readInt();
         }
         if (in.readByte() == 0) {
             fontRes = null;
@@ -906,6 +948,18 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(botActionButtonSelectedTextColor);
+        }
+        if (gliaChatHeaderTitleTintColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(gliaChatHeaderTitleTintColor);
+        }
+        if (gliaChatHeaderHomeButtonTintColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(gliaChatHeaderHomeButtonTintColor);
         }
         if (fontRes == null) {
             dest.writeByte((byte) 0);
@@ -1111,6 +1165,14 @@ public class UiTheme implements Parcelable {
 
     public Integer getBotActionButtonSelectedTextColor() {
         return botActionButtonSelectedTextColor;
+    }
+
+    public Integer getGliaChatHeaderTitleTintColor() {
+        return gliaChatHeaderTitleTintColor;
+    }
+
+    public Integer getGliaChatHeaderHomeButtonTintColor() {
+        return gliaChatHeaderHomeButtonTintColor;
     }
 
     public Integer getIconAppBarBack() {

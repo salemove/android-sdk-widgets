@@ -670,7 +670,8 @@ public class CallView extends ConstraintLayout {
         builder.setBaseLightColor(R.color.glia_base_light_color);
         builder.setBrandPrimaryColor(android.R.color.transparent);
         builder.setGliaChatHeaderTitleTintColor(android.R.color.white);
-        builder.setGliaChatHomeButtonTintColor(android.R.color.white);
+        builder.setGliaChatHeaderHomeButtonTintColor(android.R.color.white);
+        builder.setGliaChatHeaderExitQueueButtonTintColor(android.R.color.white);
         builder.setFontRes(theme.getFontRes());
         appBar.setTheme(builder.build());
     }

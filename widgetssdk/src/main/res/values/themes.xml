@@ -30,6 +30,9 @@
 
         <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
         <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
+        <item name="chatHeaderExitQueueButtonTintColor">
+            ?attr/gliaChatHeaderExitQueueButtonTintColor
+        </item>
 
         <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
         <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
@@ -96,6 +99,7 @@
 
         <item name="gliaChatHeaderTitleTintColor">?attr/gliaBaseLightColor</item>
         <item name="gliaChatHeaderHomeButtonTintColor">?attr/gliaBaseLightColor</item>
+        <item name="gliaChatHeaderExitQueueButtonTintColor">?attr/gliaBaseLightColor</item>
 
         <item name="gliaVisitorMessageBackgroundColor">?attr/gliaBrandPrimaryColor</item>
         <item name="gliaVisitorMessageTextColor">?attr/gliaBaseLightColor</item>

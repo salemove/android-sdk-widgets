@@ -101,7 +101,11 @@ public class UiTheme implements Parcelable {
      */
     private @ColorRes
     final Integer gliaChatHeaderHomeButtonTintColor;
-
+    /**
+     * Color for Chat Exit Queue Button
+     */
+    private @ColorRes
+    final Integer gliaChatHeaderExitQueueButtonTintColor;
     /**
      * Allow overriding the view's fontFamily
      */
@@ -221,6 +225,7 @@ public class UiTheme implements Parcelable {
         this.botActionButtonSelectedTextColor = builder.botActionButtonSelectedTextColor;
         this.gliaChatHeaderTitleTintColor = builder.gliaChatHeaderTitleTintColor;
         this.gliaChatHeaderHomeButtonTintColor = builder.gliaChatHomeButtonTintColor;
+        this.gliaChatHeaderExitQueueButtonTintColor = builder.gliaChatHeaderExitQueueButtonTintColor;
         this.iconAppBarBack = builder.iconAppBarBack;
         this.iconLeaveQueue = builder.iconLeaveQueue;
         this.iconSendMessage = builder.iconSendMessage;
@@ -337,6 +342,11 @@ public class UiTheme implements Parcelable {
          */
         private @ColorRes
         Integer gliaChatHomeButtonTintColor;
+        /**
+         *
+         */
+        private @ColorRes
+        Integer gliaChatHeaderExitQueueButtonTintColor;
         /**
          * Allow overriding the view's fontFamily
          */
@@ -614,8 +624,12 @@ public class UiTheme implements Parcelable {
             this.gliaChatHeaderTitleTintColor = color;
         }
 
-        public void setGliaChatHomeButtonTintColor(Integer color) {
+        public void setGliaChatHeaderHomeButtonTintColor(Integer color) {
             this.gliaChatHomeButtonTintColor = color;
+        }
+
+        public void setGliaChatHeaderExitQueueButtonTintColor(Integer color) {
+            this.gliaChatHeaderExitQueueButtonTintColor = color;
         }
 
         public void setTheme(UiTheme theme) {
@@ -659,6 +673,7 @@ public class UiTheme implements Parcelable {
             this.neutralButtonConfiguration = theme.neutralButtonConfiguration;
             this.gliaChatHeaderTitleTintColor = theme.gliaChatHeaderTitleTintColor;
             this.gliaChatHomeButtonTintColor = theme.gliaChatHeaderHomeButtonTintColor;
+            this.gliaChatHeaderExitQueueButtonTintColor = theme.gliaChatHeaderExitQueueButtonTintColor;
         }
 
         public UiTheme build() {
@@ -752,6 +767,11 @@ public class UiTheme implements Parcelable {
             gliaChatHeaderHomeButtonTintColor = null;
         } else {
             gliaChatHeaderHomeButtonTintColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            gliaChatHeaderExitQueueButtonTintColor = null;
+        } else {
+            gliaChatHeaderExitQueueButtonTintColor = in.readInt();
         }
         if (in.readByte() == 0) {
             fontRes = null;
@@ -960,6 +980,12 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(gliaChatHeaderHomeButtonTintColor);
+        }
+        if (gliaChatHeaderExitQueueButtonTintColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(gliaChatHeaderExitQueueButtonTintColor);
         }
         if (fontRes == null) {
             dest.writeByte((byte) 0);
@@ -1173,6 +1199,10 @@ public class UiTheme implements Parcelable {
 
     public Integer getGliaChatHeaderHomeButtonTintColor() {
         return gliaChatHeaderHomeButtonTintColor;
+    }
+
+    public Integer getGliaChatHeaderExitQueueButtonTintColor() {
+        return gliaChatHeaderExitQueueButtonTintColor;
     }
 
     public Integer getIconAppBarBack() {

@@ -74,6 +74,7 @@
 
         <attr name="chatHeaderTitleTintColor" format="reference" />
         <attr name="chatHeaderHomeButtonTintColor" format="reference" />
+        <attr name="chatHeaderExitQueueButtonTintColor" format="reference" />
 
         <attr name="whiteLabel" format="reference" />
         <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
@@ -134,6 +135,7 @@
     <!-- Header colors -->
     <attr name="gliaChatHeaderTitleTintColor" format="reference" />
     <attr name="gliaChatHeaderHomeButtonTintColor" format="reference" />
+    <attr name="gliaChatHeaderExitQueueButtonTintColor" format="reference" />
 
     <!-- Visitor message background color -->
     <attr name="gliaVisitorMessageBackgroundColor" format="reference" />

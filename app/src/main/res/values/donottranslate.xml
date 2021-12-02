@@ -9,6 +9,7 @@
     <string name="pref_system_negative_color">system_negative_color</string>
     <string name="pref_chat_header_title_tint_color">chat_header_title_tint_color</string>
     <string name="pref_chat_header_home_button_tint_color">chat_header_home_button_tint_color</string>
+    <string name="pref_chat_header_exit_queue_button_tint_color">chat_header_exit_queue_button_tint_color</string>
     <string name="pref_font_family">font_family</string>
     <string name="pref_font_color">font_color</string>
     <string name="pref_font_size">font_size</string>

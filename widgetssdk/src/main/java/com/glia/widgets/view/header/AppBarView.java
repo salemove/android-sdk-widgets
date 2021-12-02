@@ -84,16 +84,6 @@ public class AppBarView extends AppBarLayout {
         materialToolbar.setBackgroundTintList(backgroundTintList);
         titleView.setTextColor(titleTintColor);
         materialToolbar.getNavigationIcon().setTint(homeButtonTintColor);
-        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
-                ResourcesCompat.getColor(
-                        getResources(),
-                        Utils.getTypedArrayIntegerValue(typedArray,
-                                context,
-                                R.styleable.AppBarView_lightTint,
-                                R.attr.gliaBaseLightColor
-                        ),
-                        this.getContext().getTheme())
-        );
 
         String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
         if (title != null) {
@@ -103,6 +93,16 @@ public class AppBarView extends AppBarLayout {
         TypedArray typedArrayView = context.obtainStyledAttributes(attrs, R.styleable.GliaView);
         this.theme = Utils.getThemeFromTypedArray(typedArrayView, this.getContext());
         setTypeface();
+        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
+                ResourcesCompat.getColor(
+                        getResources(),
+                        Utils.getTypedArrayIntegerValue(typedArrayView,
+                                context,
+                                R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
+                                R.attr.gliaChatHeaderExitQueueButtonTintColor
+                        ),
+                        this.getContext().getTheme())
+        );
     }
 
 
@@ -140,6 +140,10 @@ public class AppBarView extends AppBarLayout {
         titleView.setTextColor(ContextCompat.getColorStateList(getContext(), theme.getGliaChatHeaderTitleTintColor()));
         materialToolbar.getNavigationIcon().setTint(ContextCompat.getColor(this.getContext(), theme.getGliaChatHeaderHomeButtonTintColor()));
         gliaEndButton.setTheme(theme);
+        DrawableCompat.setTint(
+                materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
+                ContextCompat.getColor(getContext(), theme.getGliaChatHeaderExitQueueButtonTintColor())
+        );
         setTypeface();
     }
 

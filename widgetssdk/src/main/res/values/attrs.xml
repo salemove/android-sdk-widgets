@@ -76,6 +76,12 @@
         <attr name="chatHeaderHomeButtonTintColor" format="reference" />
         <attr name="chatHeaderExitQueueButtonTintColor" format="reference" />
 
+        <!-- Operator Status Layout -->
+        <attr name="chatStartingHeadingTextColor" format="reference" />
+        <attr name="chatStartingCaptionTextColor" format="reference" />
+        <attr name="chatStartedHeadingTextColor" format="reference" />
+        <attr name="chatStartedCaptionTextColor" format="reference" />
+
         <attr name="whiteLabel" format="reference" />
         <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
     </declare-styleable>
@@ -136,6 +142,12 @@
     <attr name="gliaChatHeaderTitleTintColor" format="reference" />
     <attr name="gliaChatHeaderHomeButtonTintColor" format="reference" />
     <attr name="gliaChatHeaderExitQueueButtonTintColor" format="reference" />
+
+    <!-- Operator status Layout -->
+    <attr name="gliaChatStartingHeadingTextColor" format="reference" />
+    <attr name="gliaChatStartingCaptionTextColor" format="reference" />
+    <attr name="gliaChatStartedHeadingTextColor" format="reference" />
+    <attr name="gliaChatStartedCaptionTextColor" format="reference" />
 
     <!-- Visitor message background color -->
     <attr name="gliaVisitorMessageBackgroundColor" format="reference" />

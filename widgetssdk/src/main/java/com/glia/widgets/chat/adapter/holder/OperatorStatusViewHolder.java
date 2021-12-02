@@ -14,6 +14,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     private final OperatorStatusView statusPictureView;
@@ -34,10 +35,11 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
         context = itemView.getContext();
 
         statusPictureView.setTheme(uiTheme);
-        chatStartingHeadingView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
-        chatStartingCaptionView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
-        chatStartedNameView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseDarkColor()));
-        chatStartedCaptionView.setTextColor(ContextCompat.getColor(context, uiTheme.getBrandPrimaryColor()));
+
+        setStartingHeadingTextColor(uiTheme);
+        setStartingCaptionTextColor(uiTheme);
+        setStartedHeadingTextColor(uiTheme);
+        setStartedCaptionTextColor(uiTheme);
 
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
@@ -46,6 +48,42 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             chatStartedNameView.setTypeface(fontFamily, Typeface.BOLD);
             chatStartedCaptionView.setTypeface(fontFamily);
         }
+    }
+
+    private void setStartingHeadingTextColor(UiTheme uiTheme) {
+        chatStartingHeadingView.setTextColor(
+                ContextCompat.getColor(
+                        context,
+                        uiTheme.getGliaChatStartingHeadingTextColor()
+                )
+        );
+    }
+
+    private void setStartingCaptionTextColor(UiTheme uiTheme) {
+        chatStartingCaptionView.setTextColor(
+                ContextCompat.getColor(
+                        context,
+                        uiTheme.getGliaChatStartingCaptionTextColor()
+                )
+        );
+    }
+
+    private void setStartedHeadingTextColor(UiTheme uiTheme) {
+        chatStartedNameView.setTextColor(
+                ContextCompat.getColor(
+                        context,
+                        uiTheme.getGliaChatStartedHeadingTextColor()
+                )
+        );
+    }
+
+    private void setStartedCaptionTextColor(UiTheme uiTheme) {
+        chatStartedCaptionView.setTextColor(
+                ContextCompat.getColor(
+                        context,
+                        uiTheme.getGliaChatStartedCaptionTextColor()
+                )
+        );
     }
 
     public void bind(OperatorStatusItem item) {

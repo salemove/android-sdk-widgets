@@ -174,6 +174,37 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/settings_operator_layout_styling">
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_chat_starting_heading_text_color"
+            android:title="@string/settings_chat_starting_heading_text_color"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_chat_starting_caption_text_color"
+            android:title="@string/settings_chat_starting_caption_text_color"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_chat_started_heading_text_color"
+            android:title="@string/settings_chat_started_heading_text_color"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:defaultValue="@string/default_value"
+            android:entries="@array/colors"
+            android:entryValues="@array/color_values"
+            android:key="@string/pref_chat_started_caption_text_color"
+            android:title="@string/settings_chat_started_caption_text_color"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/settings_header_styling">
         <ListPreference
             android:defaultValue="@string/default_value"

@@ -30,7 +30,10 @@
     <string name="pref_bot_action_button_txt_color">bot_action_button_txt_color</string>
     <string name="pref_bot_action_button_selected_bg_color">bot_action_button_selected_bg_color</string>
     <string name="pref_bot_action_button_selected_txt_color">bot_action_button_selected_txt_color</string>
-
+    <string name="pref_chat_starting_heading_text_color">chat_starting_heading_text_color</string>
+    <string name="pref_chat_starting_caption_text_color">chat_starting_caption_text_color</string>
+    <string name="pref_chat_started_heading_text_color">chat_started_heading_text_color</string>
+    <string name="pref_chat_started_caption_text_color">chat_started_caption_text_color</string>
     <string name="default_value">default</string>
     <string name="color_blue_value">blue</string>
     <string name="color_grey_value">grey</string>

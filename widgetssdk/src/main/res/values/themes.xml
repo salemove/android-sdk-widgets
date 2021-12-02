@@ -34,6 +34,11 @@
             ?attr/gliaChatHeaderExitQueueButtonTintColor
         </item>
 
+        <item name="chatStartingHeadingTextColor">?attr/gliaChatStartingHeadingTextColor</item>
+        <item name="chatStartingCaptionTextColor">?attr/gliaChatStartingCaptionTextColor</item>
+        <item name="chatStartedHeadingTextColor">?attr/gliaChatStartedHeadingTextColor</item>
+        <item name="chatStartedCaptionTextColor">?attr/gliaChatStartedCaptionTextColor</item>
+
         <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
         <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
         <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
@@ -100,6 +105,11 @@
         <item name="gliaChatHeaderTitleTintColor">?attr/gliaBaseLightColor</item>
         <item name="gliaChatHeaderHomeButtonTintColor">?attr/gliaBaseLightColor</item>
         <item name="gliaChatHeaderExitQueueButtonTintColor">?attr/gliaBaseLightColor</item>
+
+        <item name="gliaChatStartingHeadingTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaChatStartingCaptionTextColor">?attr/gliaBaseNormalColor</item>
+        <item name="gliaChatStartedHeadingTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaChatStartedCaptionTextColor">?attr/gliaBrandPrimaryColor</item>
 
         <item name="gliaVisitorMessageBackgroundColor">?attr/gliaBrandPrimaryColor</item>
         <item name="gliaVisitorMessageTextColor">?attr/gliaBaseLightColor</item>

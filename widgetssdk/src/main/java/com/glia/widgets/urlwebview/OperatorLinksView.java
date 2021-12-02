@@ -4,11 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,7 +16,7 @@ import androidx.core.content.ContextCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.AppBarView;
+import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class OperatorLinksView extends ConstraintLayout {

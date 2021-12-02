@@ -180,6 +180,30 @@ public class Utils {
                         R.attr.gliaBotActionButtonSelectedTextColor
                 )
         );
+        defaultThemeBuilder.setGliaChatHeaderTitleTintColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_chatHeaderTitleTintColor,
+                        R.attr.gliaChatHeaderTitleTintColor
+                )
+        );
+        defaultThemeBuilder.setGliaChatHeaderHomeButtonTintColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_chatHeaderHomeButtonTintColor,
+                        R.attr.gliaChatHeaderHomeButtonTintColor
+                )
+        );
+        defaultThemeBuilder.setGliaChatHeaderExitQueueButtonTintColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
+                        R.attr.gliaChatHeaderExitQueueButtonTintColor
+                )
+        );
         defaultThemeBuilder.setFontRes(
                 getTypedArrayIntegerValue(
                         typedArray,
@@ -422,6 +446,12 @@ public class Utils {
                 newTheme.getBrandPrimaryColor() : oldTheme.getBrandPrimaryColor();
         Integer systemAgentBubbleColorRes = newTheme.getSystemAgentBubbleColor() != null ?
                 newTheme.getSystemAgentBubbleColor() : oldTheme.getSystemAgentBubbleColor();
+        Integer chatHeaderTitleColor = newTheme.getGliaChatHeaderTitleTintColor() != null ?
+                newTheme.getGliaChatHeaderTitleTintColor() : oldTheme.getGliaChatHeaderTitleTintColor();
+        Integer chatHeaderHomeButtonTintColor = newTheme.getGliaChatHeaderHomeButtonTintColor() != null ?
+                newTheme.getGliaChatHeaderHomeButtonTintColor() : oldTheme.getGliaChatHeaderHomeButtonTintColor();
+        Integer chatHeaderExitQueueButtonTintColor = newTheme.getGliaChatHeaderExitQueueButtonTintColor() != null ?
+                newTheme.getGliaChatHeaderExitQueueButtonTintColor() : oldTheme.getGliaChatHeaderExitQueueButtonTintColor();
         Integer fontRes = newTheme.getFontRes() != null ? newTheme.getFontRes() : oldTheme.getFontRes();
         Integer systemNegativeColorRes = newTheme.getSystemNegativeColor() != null ?
                 newTheme.getSystemNegativeColor() : oldTheme.getSystemNegativeColor();
@@ -514,6 +544,9 @@ public class Utils {
         builder.setBaseShadeColor(baseShadeColorRes);
         builder.setBrandPrimaryColor(brandPriamryColorRes);
         builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
+        builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleColor);
+        builder.setGliaChatHeaderHomeButtonTintColor(chatHeaderHomeButtonTintColor);
+        builder.setGliaChatHeaderExitQueueButtonTintColor(chatHeaderExitQueueButtonTintColor);
         builder.setFontRes(fontRes);
         builder.setSystemNegativeColor(systemNegativeColorRes);
         builder.setVisitorMessageBackgroundColor(visitorMessageBackgroundColorRes);

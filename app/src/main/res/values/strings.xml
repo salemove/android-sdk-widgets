@@ -39,9 +39,13 @@
     <string name="settings_chat_bot_action_button_txt_color">Bot action button txt color</string>
     <string name="settings_chat_bot_action_button_selected_bg_color">Bot selected action button bg color</string>
     <string name="settings_chat_bot_action_button_selected_txt_color">Bot selected action button txt color</string>
+    <string name="settings_chat_header_title_tint_color">Header Title Tint color</string>
+    <string name="settings_chat_header_home_button_tint_color">Header Home Button Tint color</string>
+    <string name="settings_chat_header_exit_queue_button_tint_color">Header Exit Queue Button Tint color</string>
     <string name="settings_colors_title">Colors</string>
     <string name="settings_sdk_title">Sdk settings</string>
     <string name="settings_typography">Typography</string>
+    <string name="settings_header_styling">Header Styling</string>
     <string name="settings_other">Other</string>
     <string name="settings_company_name">Company name</string>
     <string name="settings_queue_id">Queue id</string>

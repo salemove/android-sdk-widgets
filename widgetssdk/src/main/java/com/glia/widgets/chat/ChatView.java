@@ -132,6 +132,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     private AttachmentFile downloadFileHolder = null;
 
+    private Uri photoCaptureFileUri = null;
+
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
     private Integer defaultStatusbarColor;
@@ -294,7 +296,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                                     contextUrl,
                                     this.theme
                             ),
-                            activity instanceof ChatActivity, activity instanceof ChatActivity && useOverlays
+                            true,
+                            useOverlays
                     );
                 }
             }
@@ -996,14 +999,13 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
 
         if (photoFile != null) {
-            controller.setPhotoCaptureFileUri(
-                    FileProvider.getUriForFile(
-                            getContext(),
-                            FileHelper.getFileProviderAuthority(getContext()),
-                            photoFile)
+            photoCaptureFileUri = FileProvider.getUriForFile(
+                    getContext(),
+                    FileHelper.getFileProviderAuthority(getContext()),
+                    photoFile
             );
-            if (controller.getPhotoCaptureFileUri() != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, controller.getPhotoCaptureFileUri());
+            if (photoCaptureFileUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoCaptureFileUri);
                 Utils.getActivity(getContext()).startActivityForResult(
                         intent,
                         CAPTURE_IMAGE_ACTION_REQUEST
@@ -1234,20 +1236,26 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    private static Uri chooseUriByRequestCode(int requestCode, Uri galeryImgUri, Uri cameraImgUri) {
-        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST) return galeryImgUri;
-        else if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) return cameraImgUri;
-        else return null;
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if ((requestCode == OPEN_DOCUMENT_ACTION_REQUEST || requestCode == CAPTURE_IMAGE_ACTION_REQUEST || requestCode == CAPTURE_VIDEO_ACTION_REQUEST)
-                && resultCode == Activity.RESULT_OK) {
-            Uri dataUri = intent != null ? intent.getData() : null;
-            Uri uri = chooseUriByRequestCode(requestCode, dataUri, controller.getPhotoCaptureFileUri());
-            controller.setPhotoCaptureFileUri(null);
+
+        if (resultCode != Activity.RESULT_OK) return;
+
+        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST
+                || requestCode == CAPTURE_VIDEO_ACTION_REQUEST) {
+            Uri uri = intent != null ? intent.getData() : null;
             if (uri != null) {
                 controller.onAttachmentReceived(Utils.mapUriToFileAttachment(getContext().getContentResolver(), uri));
+            }
+        }
+
+        if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) {
+            if (photoCaptureFileUri != null) {
+                FileHelper.fixCapturedPhotoRotation(getContext(), photoCaptureFileUri);
+                FileAttachment fa = Utils.mapUriToFileAttachment(
+                        getContext().getContentResolver(),
+                        photoCaptureFileUri
+                );
+                controller.onAttachmentReceived(fa);
             }
         }
     }
@@ -1313,7 +1321,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileOpenClick(AttachmentFile attachment) {
-        Uri contentUri = null;
+        Uri contentUri;
         Context context = getContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Uri downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL);

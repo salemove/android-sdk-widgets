@@ -132,8 +132,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     private AttachmentFile downloadFileHolder = null;
 
-    private Uri photoCaptureFileUri = null;
-
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
     private Integer defaultStatusbarColor;
@@ -999,13 +997,14 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
 
         if (photoFile != null) {
-            photoCaptureFileUri = FileProvider.getUriForFile(
-                    getContext(),
-                    FileHelper.getFileProviderAuthority(getContext()),
-                    photoFile
+            controller.setPhotoCaptureFileUri(
+                    FileProvider.getUriForFile(
+                            getContext(),
+                            FileHelper.getFileProviderAuthority(getContext()),
+                            photoFile)
             );
-            if (photoCaptureFileUri != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoCaptureFileUri);
+            if (controller.getPhotoCaptureFileUri() != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, controller.getPhotoCaptureFileUri());
                 Utils.getActivity(getContext()).startActivityForResult(
                         intent,
                         CAPTURE_IMAGE_ACTION_REQUEST
@@ -1240,23 +1239,33 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
         if (resultCode != Activity.RESULT_OK) return;
 
-        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST
-                || requestCode == CAPTURE_VIDEO_ACTION_REQUEST) {
-            Uri uri = intent != null ? intent.getData() : null;
-            if (uri != null) {
-                controller.onAttachmentReceived(Utils.mapUriToFileAttachment(getContext().getContentResolver(), uri));
-            }
+        switch (requestCode) {
+            case OPEN_DOCUMENT_ACTION_REQUEST:
+            case CAPTURE_VIDEO_ACTION_REQUEST:
+                handleDocumentOrVideoActionResult(intent);
+                break;
+            case CAPTURE_IMAGE_ACTION_REQUEST:
+                handleCaptureImageActionResult();
+                break;
         }
+    }
 
-        if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) {
-            if (photoCaptureFileUri != null) {
-                FileHelper.fixCapturedPhotoRotation(getContext(), photoCaptureFileUri);
-                FileAttachment fa = Utils.mapUriToFileAttachment(
-                        getContext().getContentResolver(),
-                        photoCaptureFileUri
-                );
-                controller.onAttachmentReceived(fa);
-            }
+    private void handleDocumentOrVideoActionResult(Intent intent) {
+        Uri uri = intent != null ? intent.getData() : null;
+        if (uri != null) {
+            controller.onAttachmentReceived(Utils.mapUriToFileAttachment(getContext().getContentResolver(), uri));
+        }
+    }
+
+    private void handleCaptureImageActionResult() {
+        Uri photoCaptureFileUri = controller != null ? controller.getPhotoCaptureFileUri() : null;
+        if (photoCaptureFileUri != null) {
+            FileHelper.fixCapturedPhotoRotation(getContext(), photoCaptureFileUri);
+            FileAttachment fa = Utils.mapUriToFileAttachment(
+                    getContext().getContentResolver(),
+                    photoCaptureFileUri
+            );
+            controller.onAttachmentReceived(fa);
         }
     }
 

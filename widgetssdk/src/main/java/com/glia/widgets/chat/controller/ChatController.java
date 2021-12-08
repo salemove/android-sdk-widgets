@@ -188,6 +188,9 @@ public class ChatController implements
 
     private Disposable disposable = null;
 
+    // pending photoCaptureFileUri - need to move some place better
+    private Uri photoCaptureFileUri = null;
+
     public ChatController(
             MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
             TimeCounter sharedTimer,
@@ -274,6 +277,14 @@ public class ChatController implements
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.downloadFileUseCase = downloadFileUseCase;
         this.isEnableChatEditTextUseCase = isEnableChatEditTextUseCase;
+    }
+
+    public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
+        this.photoCaptureFileUri = photoCaptureFileUri;
+    }
+
+    public Uri getPhotoCaptureFileUri() {
+        return this.photoCaptureFileUri;
     }
 
     private final Observer fileAttachmentObserver = new Observer() {

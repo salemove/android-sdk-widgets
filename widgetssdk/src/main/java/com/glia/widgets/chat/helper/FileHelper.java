@@ -4,18 +4,22 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+
+import androidx.exifinterface.media.ExifInterface;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import io.reactivex.Maybe;
 
 public class FileHelper {
-    private static final String TAG = FileHelper.class.getSimpleName();
     private static final String FILE_PROVIDER_AUTHORITY = "com.glia.widgets.fileprovider";
     private static final int DESIRED_IMAGE_SIZE = 640;
 
@@ -27,19 +31,10 @@ public class FileHelper {
 
                     double ratio = ((double) rawWidth) / ((double) rawHeight);
                     Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawBitmap, (int) (DESIRED_IMAGE_SIZE * ratio), DESIRED_IMAGE_SIZE, false);
-                    if (scaledBitmap != null)
-                        emitter.onSuccess(rotateImage(scaledBitmap, 90));
-                    else {
-                        emitter.onError(new Exception());
-                    }
+                    if (scaledBitmap != null) emitter.onSuccess(scaledBitmap);
+                    else emitter.onError(new Exception());
                 }
         );
-    }
-
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     public static String getFileProviderAuthority(Context context) {
@@ -69,5 +64,46 @@ public class FileHelper {
         String fileName = new File(fullName).getName();
         int dotIndex = fileName.lastIndexOf('.');
         return (dotIndex == -1) ? "" : fileName.substring(dotIndex);
+    }
+
+    public static void fixCapturedPhotoRotation(Context context, Uri uri) {
+        int rotation = getRotationFromExif(context, uri);
+
+        try (InputStream in = context.getContentResolver().openInputStream(uri)) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+            Bitmap bitmap = BitmapFactory.decodeStream(in);
+            Bitmap bmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+            try (OutputStream os = context.getContentResolver().openOutputStream(uri)) {
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int getRotationFromExif(Context context, Uri uri) {
+        int rotation = 0;
+        try (InputStream in = context.getContentResolver().openInputStream(uri)) {
+            int orientation = new ExifInterface(in).getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotation = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotation = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotation = 270;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return rotation;
     }
 }

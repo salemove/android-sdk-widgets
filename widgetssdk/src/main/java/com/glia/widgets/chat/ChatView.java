@@ -294,8 +294,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                                     contextUrl,
                                     this.theme
                             ),
-                            true,
-                            useOverlays
+                            activity instanceof ChatActivity, activity instanceof ChatActivity && useOverlays
                     );
                 }
             }

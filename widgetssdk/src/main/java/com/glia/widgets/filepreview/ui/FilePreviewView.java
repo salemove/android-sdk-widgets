@@ -23,7 +23,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.AppBarView;
+import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 import java.io.File;

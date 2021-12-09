@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <com.glia.widgets.view.AppBarView
+    <com.glia.widgets.view.header.AppBarView
         android:id="@+id/app_bar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

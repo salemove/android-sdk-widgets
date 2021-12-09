@@ -1,4 +1,4 @@
-package com.glia.widgets.view;
+package com.glia.widgets.view.header;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -28,6 +27,7 @@ public class AppBarView extends AppBarLayout {
     private final GliaEndButton gliaEndButton;
     private final MaterialToolbar materialToolbar;
     private final TextView titleView;
+    private UiTheme theme;
 
     public AppBarView(@NonNull Context context) {
         this(context, null);
@@ -52,38 +52,81 @@ public class AppBarView extends AppBarLayout {
                 R.styleable.AppBarView_backIcon,
                 R.attr.gliaIconAppBarBack);
         materialToolbar.setNavigationIcon(backIconResId);
-
-        ColorStateList backgroundTintList = ContextCompat.getColorStateList(
-                context,
-                Utils.getTypedArrayIntegerValue(typedArray,
-                        context,
-                        R.styleable.AppBarView_android_backgroundTint,
-                        R.attr.gliaBrandPrimaryColor));
-        int lightColor = ContextCompat.getColor(
-                context,
-                Utils.getTypedArrayIntegerValue(typedArray,
-                        context,
-                        R.styleable.AppBarView_lightTint,
-                        R.attr.gliaBaseLightColor));
-        materialToolbar.setBackgroundTintList(backgroundTintList);
-        titleView.setTextColor(lightColor);
-        materialToolbar.getNavigationIcon().setTint(lightColor);
-        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
-                ResourcesCompat.getColor(
-                        getResources(),
-                        Utils.getTypedArrayIntegerValue(typedArray,
-                                context,
-                                R.styleable.AppBarView_lightTint,
-                                R.attr.gliaBaseLightColor),
-                        this.getContext().getTheme()));
+        setDefaultTitleTintColor(typedArray, context);
+        setDefaultHomeButtonTintColor(typedArray, context);
+        setDefaultBackgroundTintColor(typedArray, context);
 
         String title = Utils.getTypedArrayStringValue(typedArray, R.styleable.AppBarView_titleText);
         if (title != null) {
             titleView.setText(title);
         }
+
+        TypedArray typedArrayView = context.obtainStyledAttributes(attrs, R.styleable.GliaView);
+        this.theme = Utils.getThemeFromTypedArray(typedArrayView, this.getContext());
+        setTypeface();
+        DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
+                ResourcesCompat.getColor(
+                        getResources(),
+                        Utils.getTypedArrayIntegerValue(typedArrayView,
+                                context,
+                                R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
+                                R.attr.gliaChatHeaderExitQueueButtonTintColor
+                        ),
+                        this.getContext().getTheme())
+        );
     }
 
-    public void setTheme(UiTheme theme) {
+    private void setDefaultBackgroundTintColor(TypedArray typedArray, Context context) {
+        ColorStateList backgroundTintList = ContextCompat.getColorStateList(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_android_backgroundTint,
+                        R.attr.gliaBrandPrimaryColor
+                )
+        );
+        materialToolbar.setBackgroundTintList(backgroundTintList);
+    }
+
+    private void setDefaultHomeButtonTintColor(TypedArray typedArray, Context context) {
+        int homeButtonTintColor = ContextCompat.getColor(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_lightTint,
+                        R.attr.gliaChatHeaderHomeButtonTintColor
+                )
+        );
+        materialToolbar.getNavigationIcon().setTint(homeButtonTintColor);
+    }
+
+    private void setDefaultTitleTintColor(TypedArray typedArray, Context context) {
+        int titleTintColor = ContextCompat.getColor(
+                context,
+                Utils.getTypedArrayIntegerValue(typedArray,
+                        context,
+                        R.styleable.AppBarView_lightTint,
+                        R.attr.gliaChatHeaderTitleTintColor
+                )
+        );
+        titleView.setTextColor(titleTintColor);
+    }
+
+
+    private void setTypeface() {
+        if (this.theme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(
+                    this.getContext(),
+                    this.theme.getFontRes()
+            );
+            titleView.setTypeface(fontFamily);
+        }
+    }
+
+    public void setTheme(UiTheme uiTheme) {
+        if (uiTheme == null) return;
+        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+
         // icons
         materialToolbar.setNavigationIcon(theme.getIconAppBarBack());
         materialToolbar.getMenu().findItem(R.id.leave_queue_button).setIcon(theme.getIconLeaveQueue());
@@ -93,29 +136,21 @@ public class AppBarView extends AppBarLayout {
                 ContextCompat.getColorStateList(
                         this.getContext(),
                         theme.getBrandPrimaryColor()));
+
         DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
                 ResourcesCompat.getColor(
                         getResources(),
                         theme.getBaseLightColor(),
                         this.getContext().getTheme()));
-        titleView.setTextColor(ResourcesCompat.getColor(
-                getResources(),
-                theme.getBaseLightColor(),
-                this.getContext().getTheme()));
-        materialToolbar.getNavigationIcon().setTint(
-                ContextCompat.getColor(this.getContext(), theme.getBaseLightColor()));
-        gliaEndButton.setTheme(theme);
-        // fonts
-        if (theme.getFontRes() != null) {
-            changeFontFamily(theme.getFontRes());
-        }
-    }
 
-    public void changeFontFamily(@FontRes int fontRes) {
-        Typeface fontFamily = ResourcesCompat.getFont(
-                this.getContext(),
-                fontRes);
-        titleView.setTypeface(fontFamily);
+        titleView.setTextColor(ContextCompat.getColorStateList(getContext(), theme.getGliaChatHeaderTitleTintColor()));
+        materialToolbar.getNavigationIcon().setTint(ContextCompat.getColor(this.getContext(), theme.getGliaChatHeaderHomeButtonTintColor()));
+        gliaEndButton.setTheme(theme);
+        DrawableCompat.setTint(
+                materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
+                ContextCompat.getColor(getContext(), theme.getGliaChatHeaderExitQueueButtonTintColor())
+        );
+        setTypeface();
     }
 
     public void setTitle(String title) {

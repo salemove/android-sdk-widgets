@@ -8,7 +8,6 @@ import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class GliaQueueRepository {

@@ -71,7 +71,7 @@ import com.glia.widgets.filepreview.ui.FilePreviewActivity;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.urlwebview.OperatorLinksActivity;
-import com.glia.widgets.view.AppBarView;
+import com.glia.widgets.view.header.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
@@ -644,6 +644,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
             chatEditText.removeTextChangedListener(textWatcher);
             chatEditText.setText(chatState.lastTypedText);
+            if (controller != null) {
+                controller.sendMessagePreview(chatState.lastTypedText);
+            }
             chatEditText.addTextChangedListener(textWatcher);
         }
     }
@@ -872,7 +875,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (this.theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(
                     this.getContext(),
-                    this.theme.getFontRes());
+                    this.theme.getFontRes()
+            );
             chatEditText.setTypeface(fontFamily);
         }
         // texts

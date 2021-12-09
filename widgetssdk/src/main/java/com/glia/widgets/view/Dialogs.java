@@ -62,7 +62,7 @@ public class Dialogs {
         messageView.setTextColor(baseDarkColor);
         logoView.setImageTintList(ContextCompat.getColorStateList(context, theme.getBaseShadeColor()));
 
-        logoView.setVisibility(theme.getWhiteLabel() == 1 ? View.GONE : View.VISIBLE);
+        logoView.setVisibility(theme.getWhiteLabel() ? View.GONE : View.VISIBLE);
 
         if (theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, theme.getFontRes());
@@ -206,7 +206,7 @@ public class Dialogs {
             negativeButton.setTypeface(fontFamily);
         }
 
-        logoView.setVisibility(theme.getWhiteLabel() == 1 ? View.GONE : View.VISIBLE);
+        logoView.setVisibility(theme.getWhiteLabel() ? View.GONE : View.VISIBLE);
 
         if (type instanceof DialogOfferType.AudioUpgradeOffer) {
             titleView.setText(
@@ -286,7 +286,7 @@ public class Dialogs {
             negativeButton.setTypeface(fontFamily);
         }
 
-        logoView.setVisibility(theme.getWhiteLabel() == 1 ? View.GONE : View.VISIBLE);
+        logoView.setVisibility(theme.getWhiteLabel() ? View.GONE : View.VISIBLE);
 
         titleView.setText(title);
         messageView.setText(message);

@@ -44,7 +44,7 @@ class Utils {
         Integer botActionButtonSelectedBackgroundColor = getColorValueFromPrefs(R.string.pref_bot_action_button_selected_bg_color, sharedPreferences, resources);
         Integer botActionButtonSelectedTextColor = getColorValueFromPrefs(R.string.pref_bot_action_button_selected_txt_color, sharedPreferences, resources);
 
-        Integer whiteLabel = getWhiteLabelValueFromPrefs(sharedPreferences, resources);
+        Boolean whiteLabel = sharedPreferences.getBoolean(resources.getString(R.string.pref_white_label), false);
 
         Boolean gliaAlertDialogButtonUseVerticalAlignment = sharedPreferences.getBoolean(
                 resources.getString(R.string.pref_use_alert_dialog_button_vertical_alignment),
@@ -193,10 +193,5 @@ class Utils {
 
     public static boolean getUseOverlay(SharedPreferences sharedPreferences, Resources resources) {
         return sharedPreferences.getBoolean(resources.getString(R.string.pref_use_overlay), true);
-    }
-
-    public static Integer getWhiteLabelValueFromPrefs(SharedPreferences sharedPreferences, Resources resources) {
-        boolean whiteLabel = sharedPreferences.getBoolean(resources.getString(R.string.pref_white_label), false);
-        return whiteLabel ? 1 : 0;
     }
 }

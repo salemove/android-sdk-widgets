@@ -221,7 +221,7 @@ public class UiTheme implements Parcelable {
     private @ColorRes
     final Integer chatStartedCaptionTextColor;
 
-    private final Integer whiteLabel;
+    private final Boolean whiteLabel;
     private final Boolean gliaAlertDialogButtonUseVerticalAlignment;
 
     private final ButtonConfiguration headerEndButtonConfiguration;
@@ -491,7 +491,7 @@ public class UiTheme implements Parcelable {
         Integer chatStartedCaptionTextColor;
 
         private
-        Integer whiteLabel;
+        Boolean whiteLabel;
 
         private
         Boolean gliaAlertDialogButtonUseVerticalAlignment;
@@ -648,7 +648,7 @@ public class UiTheme implements Parcelable {
             this.iconPlaceholder = iconPlaceholder;
         }
 
-        public void setWhiteLabel(Integer whiteLabel) {
+        public void setWhiteLabel(Boolean whiteLabel) {
             this.whiteLabel = whiteLabel;
         }
 
@@ -955,11 +955,8 @@ public class UiTheme implements Parcelable {
         } else {
             chatStartedCaptionTextColor = in.readInt();
         }
-        if (in.readByte() == 0) {
-            whiteLabel = null;
-        } else {
-            whiteLabel = in.readInt();
-        }
+        byte tmpWhiteLabel = in.readByte();
+        whiteLabel = tmpWhiteLabel == 0 ? null : tmpWhiteLabel == 1;
         byte tmpGliaAlertDialogButtonUseVerticalAlignment = in.readByte();
         gliaAlertDialogButtonUseVerticalAlignment = tmpGliaAlertDialogButtonUseVerticalAlignment == 0 ? null : tmpGliaAlertDialogButtonUseVerticalAlignment == 1;
         headerEndButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
@@ -1211,12 +1208,7 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(chatStartedCaptionTextColor);
         }
-        if (whiteLabel == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(whiteLabel);
-        }
+        dest.writeByte((byte) (whiteLabel == null ? 0 : whiteLabel ? 1 : 2));
         dest.writeByte((byte) (gliaAlertDialogButtonUseVerticalAlignment == null ? 0 : gliaAlertDialogButtonUseVerticalAlignment ? 1 : 2));
         dest.writeParcelable(headerEndButtonConfiguration, flags);
         dest.writeParcelable(positiveButtonConfiguration, flags);
@@ -1389,7 +1381,7 @@ public class UiTheme implements Parcelable {
         return iconPlaceholder;
     }
 
-    public Integer getWhiteLabel() {
+    public Boolean getWhiteLabel() {
         return whiteLabel;
     }
 

@@ -1,5 +1,7 @@
 package com.glia.widgets.view.textview;
 
+import static com.glia.widgets.helper.Utils.pxToSp;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -44,10 +46,6 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
                 .textColorHint(getHintTextColors())
                 .textSize(pxToSp(getContext(), getTextSize()))
                 .build();
-    }
-
-    private float pxToSp(Context context, float pixels) {
-        return pixels / context.getResources().getDisplayMetrics().scaledDensity;
     }
 
     public void setTheme(UiTheme theme) {

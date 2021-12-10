@@ -50,6 +50,10 @@ public class Utils {
         return toMmSs(Long.valueOf(TimeUnit.MILLISECONDS.toSeconds(milliseconds)).intValue());
     }
 
+    public static float pxToSp(Context context, float pixels) {
+        return pixels / context.getResources().getDisplayMetrics().scaledDensity;
+    }
+
     public static String formatOperatorName(String operatorName) {
         if (operatorName == null) return "";
         int i = operatorName.indexOf(' ');

@@ -8,6 +8,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.FontRes;
 
 import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.TextConfiguration;
 
 
 public class UiTheme implements Parcelable {
@@ -221,8 +222,10 @@ public class UiTheme implements Parcelable {
     private @ColorRes
     final Integer chatStartedCaptionTextColor;
 
-    private final Integer whiteLabel;
+    private final Boolean whiteLabel;
     private final Boolean gliaAlertDialogButtonUseVerticalAlignment;
+
+    private final TextConfiguration choiceCardContentTextConfiguration;
 
     private final ButtonConfiguration headerEndButtonConfiguration;
     private final ButtonConfiguration positiveButtonConfiguration;
@@ -277,6 +280,7 @@ public class UiTheme implements Parcelable {
         this.chatStartingHeadingTextColor = builder.chatStartingHeadingTextColor;
         this.chatStartedCaptionTextColor = builder.chatStartedCaptionTextColor;
         this.chatStartedHeadingTextColor = builder.chatStartedHeadingTextColor;
+        this.choiceCardContentTextConfiguration = builder.choiceCardContentTextConfiguration;
     }
 
     public static class UiThemeBuilder {
@@ -491,7 +495,7 @@ public class UiTheme implements Parcelable {
         Integer chatStartedCaptionTextColor;
 
         private
-        Integer whiteLabel;
+        Boolean whiteLabel;
 
         private
         Boolean gliaAlertDialogButtonUseVerticalAlignment;
@@ -507,6 +511,9 @@ public class UiTheme implements Parcelable {
 
         private
         ButtonConfiguration neutralButtonConfiguration;
+
+        private
+        TextConfiguration choiceCardContentTextConfiguration;
 
         public void setAppBarTitle(String appBarTitle) {
             this.appBarTitle = appBarTitle;
@@ -648,7 +655,7 @@ public class UiTheme implements Parcelable {
             this.iconPlaceholder = iconPlaceholder;
         }
 
-        public void setWhiteLabel(Integer whiteLabel) {
+        public void setWhiteLabel(Boolean whiteLabel) {
             this.whiteLabel = whiteLabel;
         }
 
@@ -700,6 +707,10 @@ public class UiTheme implements Parcelable {
             this.chatStartedCaptionTextColor = color;
         }
 
+        public void setChoiceCardContentTextConfiguration(TextConfiguration textConfiguration) {
+            this.choiceCardContentTextConfiguration = textConfiguration;
+        }
+
         public void setTheme(UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -735,6 +746,7 @@ public class UiTheme implements Parcelable {
             this.iconCallSpeakerOff = theme.iconCallSpeakerOff;
             this.iconCallMinimize = theme.iconCallMinimize;
             this.iconPlaceholder = theme.iconPlaceholder;
+            this.whiteLabel = theme.whiteLabel;
             this.headerEndButtonConfiguration = theme.headerEndButtonConfiguration;
             this.positiveButtonConfiguration = theme.positiveButtonConfiguration;
             this.negativeButtonConfiguration = theme.negativeButtonConfiguration;
@@ -746,6 +758,7 @@ public class UiTheme implements Parcelable {
             this.chatStartingHeadingTextColor = theme.chatStartingHeadingTextColor;
             this.chatStartedCaptionTextColor = theme.chatStartedCaptionTextColor;
             this.chatStartedHeadingTextColor = theme.chatStartedHeadingTextColor;
+            this.choiceCardContentTextConfiguration = theme.choiceCardContentTextConfiguration;
         }
 
         public UiTheme build() {
@@ -955,13 +968,11 @@ public class UiTheme implements Parcelable {
         } else {
             chatStartedCaptionTextColor = in.readInt();
         }
-        if (in.readByte() == 0) {
-            whiteLabel = null;
-        } else {
-            whiteLabel = in.readInt();
-        }
+        byte tmpWhiteLabel = in.readByte();
+        whiteLabel = tmpWhiteLabel == 0 ? null : tmpWhiteLabel == 1;
         byte tmpGliaAlertDialogButtonUseVerticalAlignment = in.readByte();
         gliaAlertDialogButtonUseVerticalAlignment = tmpGliaAlertDialogButtonUseVerticalAlignment == 0 ? null : tmpGliaAlertDialogButtonUseVerticalAlignment == 1;
+        choiceCardContentTextConfiguration = in.readParcelable(TextConfiguration.class.getClassLoader());
         headerEndButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         positiveButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         negativeButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
@@ -1211,13 +1222,9 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(chatStartedCaptionTextColor);
         }
-        if (whiteLabel == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(whiteLabel);
-        }
+        dest.writeByte((byte) (whiteLabel == null ? 0 : whiteLabel ? 1 : 2));
         dest.writeByte((byte) (gliaAlertDialogButtonUseVerticalAlignment == null ? 0 : gliaAlertDialogButtonUseVerticalAlignment ? 1 : 2));
+        dest.writeParcelable(choiceCardContentTextConfiguration, flags);
         dest.writeParcelable(headerEndButtonConfiguration, flags);
         dest.writeParcelable(positiveButtonConfiguration, flags);
         dest.writeParcelable(negativeButtonConfiguration, flags);
@@ -1389,7 +1396,7 @@ public class UiTheme implements Parcelable {
         return iconPlaceholder;
     }
 
-    public Integer getWhiteLabel() {
+    public Boolean getWhiteLabel() {
         return whiteLabel;
     }
 
@@ -1411,6 +1418,10 @@ public class UiTheme implements Parcelable {
 
     public ButtonConfiguration getGliaNeutralButtonConfiguration() {
         return neutralButtonConfiguration;
+    }
+
+    public TextConfiguration getGliaChoiceCardContentTextConfiguration() {
+        return choiceCardContentTextConfiguration;
     }
 
     public Integer getGliaChatStartingHeadingTextColor() {

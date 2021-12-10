@@ -44,7 +44,7 @@ class Utils {
         Integer botActionButtonSelectedBackgroundColor = getColorValueFromPrefs(R.string.pref_bot_action_button_selected_bg_color, sharedPreferences, resources);
         Integer botActionButtonSelectedTextColor = getColorValueFromPrefs(R.string.pref_bot_action_button_selected_txt_color, sharedPreferences, resources);
 
-        Integer whiteLabel = getWhiteLabelValueFromPrefs(sharedPreferences, resources);
+        Boolean whiteLabel = sharedPreferences.getBoolean(resources.getString(R.string.pref_white_label), false);
 
         Boolean gliaAlertDialogButtonUseVerticalAlignment = sharedPreferences.getBoolean(
                 resources.getString(R.string.pref_use_alert_dialog_button_vertical_alignment),
@@ -66,11 +66,15 @@ class Utils {
         builder.setVisitorMessageTextColor(visitorMessageTextColor);
         builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColor);
         builder.setOperatorMessageTextColor(operatorMessageTextColor);
+
+        builder.setWhiteLabel(whiteLabel);
+
+        // choice card attributes
+        builder.setChoiceCardContentTextConfiguration(null);
         builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColor);
         builder.setBotActionButtonTextColor(botActionButtonTextColor);
         builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColor);
         builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColor);
-        builder.setWhiteLabel(whiteLabel);
 
         // to set alert buttons to align vertically in runtime
         builder.setGliaAlertDialogButtonUseVerticalAlignment(gliaAlertDialogButtonUseVerticalAlignment);
@@ -123,6 +127,14 @@ class Utils {
                 )
                 .strokeWidth(1)
                 .strokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black)))
+                .build();
+    }
+
+    private static TextConfiguration getChoiceCardContentTextConfiguration(Context context) {
+        return TextConfiguration.builder()
+                .textSize(16f)      // in sp
+                .fontFamily(R.font.tangerine)
+                .textColor(ContextCompat.getColorStateList(context, R.color.color_dark_cyan))
                 .build();
     }
 
@@ -193,10 +205,5 @@ class Utils {
 
     public static boolean getUseOverlay(SharedPreferences sharedPreferences, Resources resources) {
         return sharedPreferences.getBoolean(resources.getString(R.string.pref_use_overlay), true);
-    }
-
-    public static Integer getWhiteLabelValueFromPrefs(SharedPreferences sharedPreferences, Resources resources) {
-        boolean whiteLabel = sharedPreferences.getBoolean(resources.getString(R.string.pref_white_label), false);
-        return whiteLabel ? 1 : 0;
     }
 }

@@ -20,6 +20,7 @@ import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.textview.ChoiceCardContentTextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.squareup.picasso.Callback;
@@ -32,7 +33,7 @@ public class SingleChoiceCardView extends FrameLayout {
     private final MaterialCardView materialCardView;
     private final ImageView imageView;
     private final ConstraintLayout layout;
-    private final TextView contentView;
+    private final ChoiceCardContentTextView contentView;
     private OnOptionClickedListener onOptionClickedListener;
     private OnImageLoadedListener onImageLoadedListener;
 
@@ -64,15 +65,8 @@ public class SingleChoiceCardView extends FrameLayout {
             OnImageLoadedListener onImageLoadedListener
     ) {
         this.onImageLoadedListener = onImageLoadedListener;
-
-        int gliaBaseDarkColor = ContextCompat.getColor(
-                this.getContext(), theme.getBaseDarkColor()
-        );
         int gliaBaseLightColor = ContextCompat.getColor(
                 this.getContext(), theme.getBaseLightColor()
-        );
-        int gliaBaseShadeColor = ContextCompat.getColor(
-                this.getContext(), theme.getBaseShadeColor()
         );
         int gliaBrandPrimaryColor = ContextCompat.getColor(
                 this.getContext(), theme.getBrandPrimaryColor()
@@ -97,9 +91,8 @@ public class SingleChoiceCardView extends FrameLayout {
             });
         }
         imageView.setVisibility(imageUrl != null ? VISIBLE : GONE);
-        contentView.setTextColor(gliaBaseDarkColor);
-
         contentView.setText(content);
+        contentView.setTheme(theme);
         ConstraintSet constraintSet = new ConstraintSet();
         int topViewId = R.id.content_view;
         for (int index = 0; index < options.size(); index++) {
@@ -159,12 +152,10 @@ public class SingleChoiceCardView extends FrameLayout {
                             ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonSelectedBackgroundColor()) :
                             ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonBackgroundColor());
 
-
             ColorStateList actionButtonTextColor =
                     isSelected ?
                             ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonSelectedTextColor()) :
                             ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonTextColor());
-
 
             button.setBackgroundTintList(actionButtonBackgroundColor);
             button.setTextColor(actionButtonTextColor);
@@ -176,8 +167,6 @@ public class SingleChoiceCardView extends FrameLayout {
                                 theme.getFontRes())
                 );
             }
-
-
             if (selectedIndex != null && selectedIndex != index) {
                 button.setStrokeWidth(
                         Float.valueOf(Utils.pxFromDp(this.getContext(), 1f)).intValue()
@@ -199,13 +188,6 @@ public class SingleChoiceCardView extends FrameLayout {
                 });
             }
             constraintSet.applyTo(layout);
-        }
-        if (theme.getFontRes() != null) {
-            contentView.setTypeface(
-                    ResourcesCompat.getFont(
-                            this.getContext(),
-                            theme.getFontRes())
-            );
         }
     }
 

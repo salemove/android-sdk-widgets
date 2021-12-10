@@ -82,7 +82,7 @@
         <attr name="chatStartedHeadingTextColor" format="reference" />
         <attr name="chatStartedCaptionTextColor" format="reference" />
 
-        <attr name="whiteLabel" format="reference" />
+        <attr name="whiteLabel" />
         <attr name="gliaAlertDialogButtonUseVerticalAlignment" />
     </declare-styleable>
 
@@ -166,7 +166,7 @@
     <!-- Bot message action button text color -->
     <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
 
-    <attr name="gliaWhiteLabel" format="reference" />
+    <attr name="whiteLabel" format="boolean" />
     <attr name="gliaAlertDialogButtonUseVerticalAlignment" format="boolean" />
 
     <!-- Styleable components -->
@@ -174,6 +174,7 @@
     <attr name="buttonBarPositiveButtonStyle" format="reference" />
     <attr name="buttonBarNegativeButtonStyle" format="reference" />
     <attr name="buttonBarNeutralButtonStyle" format="reference" />
+    <attr name="choiceCardContentTextStyle" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />

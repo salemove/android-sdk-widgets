@@ -1234,21 +1234,37 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    private static Uri chooseUriByRequestCode(int requestCode, Uri galeryImgUri, Uri cameraImgUri) {
-        if (requestCode == OPEN_DOCUMENT_ACTION_REQUEST) return galeryImgUri;
-        else if (requestCode == CAPTURE_IMAGE_ACTION_REQUEST) return cameraImgUri;
-        else return null;
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        if (resultCode != Activity.RESULT_OK) return;
+
+        switch (requestCode) {
+            case OPEN_DOCUMENT_ACTION_REQUEST:
+            case CAPTURE_VIDEO_ACTION_REQUEST:
+                handleDocumentOrVideoActionResult(intent);
+                break;
+            case CAPTURE_IMAGE_ACTION_REQUEST:
+                handleCaptureImageActionResult();
+                break;
+        }
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if ((requestCode == OPEN_DOCUMENT_ACTION_REQUEST || requestCode == CAPTURE_IMAGE_ACTION_REQUEST || requestCode == CAPTURE_VIDEO_ACTION_REQUEST)
-                && resultCode == Activity.RESULT_OK) {
-            Uri dataUri = intent != null ? intent.getData() : null;
-            Uri uri = chooseUriByRequestCode(requestCode, dataUri, controller.getPhotoCaptureFileUri());
-            controller.setPhotoCaptureFileUri(null);
-            if (uri != null) {
-                controller.onAttachmentReceived(Utils.mapUriToFileAttachment(getContext().getContentResolver(), uri));
-            }
+    private void handleDocumentOrVideoActionResult(Intent intent) {
+        Uri uri = intent != null ? intent.getData() : null;
+        if (uri != null) {
+            controller.onAttachmentReceived(Utils.mapUriToFileAttachment(getContext().getContentResolver(), uri));
+        }
+    }
+
+    private void handleCaptureImageActionResult() {
+        Uri photoCaptureFileUri = controller != null ? controller.getPhotoCaptureFileUri() : null;
+        if (photoCaptureFileUri != null) {
+            FileHelper.fixCapturedPhotoRotation(getContext(), photoCaptureFileUri);
+            FileAttachment fa = Utils.mapUriToFileAttachment(
+                    getContext().getContentResolver(),
+                    photoCaptureFileUri
+            );
+            controller.onAttachmentReceived(fa);
         }
     }
 
@@ -1313,7 +1329,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
     @Override
     public void onFileOpenClick(AttachmentFile attachment) {
-        Uri contentUri = null;
+        Uri contentUri;
         Context context = getContext();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Uri downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL);

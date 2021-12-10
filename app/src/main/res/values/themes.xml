@@ -33,6 +33,7 @@
         </item>
 
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
+        <item name="whiteLabel">false</item>
     </style>
 
     <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.MaterialComponents.Button.TextButton.Icon">

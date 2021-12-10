@@ -381,11 +381,9 @@ public class Utils {
                 )
         );
         defaultThemeBuilder.setWhiteLabel(
-                getTypedArrayIntegerValue(
+                getTypedArrayBooleanValue(
                         typedArray,
-                        context,
-                        R.styleable.GliaView_whiteLabel,
-                        R.attr.gliaWhiteLabel
+                        R.styleable.GliaView_whiteLabel
                 )
         );
         defaultThemeBuilder.setGliaAlertDialogButtonUseVerticalAlignment(
@@ -546,7 +544,7 @@ public class Utils {
         Integer iconPlaceholder = newTheme.getIconPlaceholder() != null ?
                 newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
 
-        Integer whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
+        Boolean whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
         Boolean isUseAlertDialogButtonVerticalAlignment =
                 newTheme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
                         newTheme.getGliaAlertDialogButtonUseVerticalAlignment() :

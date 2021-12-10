@@ -66,11 +66,15 @@ class Utils {
         builder.setVisitorMessageTextColor(visitorMessageTextColor);
         builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColor);
         builder.setOperatorMessageTextColor(operatorMessageTextColor);
+
+        builder.setWhiteLabel(whiteLabel);
+
+        // choice card attributes
+        builder.setChoiceCardContentTextConfiguration(null);
         builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColor);
         builder.setBotActionButtonTextColor(botActionButtonTextColor);
         builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColor);
         builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColor);
-        builder.setWhiteLabel(whiteLabel);
 
         // to set alert buttons to align vertically in runtime
         builder.setGliaAlertDialogButtonUseVerticalAlignment(gliaAlertDialogButtonUseVerticalAlignment);
@@ -123,6 +127,14 @@ class Utils {
                 )
                 .strokeWidth(1)
                 .strokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black)))
+                .build();
+    }
+
+    private static TextConfiguration getChoiceCardContentTextConfiguration(Context context) {
+        return TextConfiguration.builder()
+                .textSize(16f)      // in sp
+                .fontFamily(R.font.tangerine)
+                .textColor(ContextCompat.getColorStateList(context, R.color.color_dark_cyan))
                 .build();
     }
 

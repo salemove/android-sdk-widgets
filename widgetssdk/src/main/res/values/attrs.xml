@@ -174,6 +174,7 @@
     <attr name="buttonBarPositiveButtonStyle" format="reference" />
     <attr name="buttonBarNegativeButtonStyle" format="reference" />
     <attr name="buttonBarNeutralButtonStyle" format="reference" />
+    <attr name="choiceCardContentTextStyle" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />

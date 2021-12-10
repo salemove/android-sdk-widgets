@@ -31,6 +31,9 @@
         <item name="buttonBarPositiveButtonStyle">
             @style/Application.GliaAndroidSdkWidgetsExample.Button.Positive
         </item>
+        <item name="choiceCardContentTextStyle">
+            @style/Application.GliaAndroidSdkWidgetsExample.ChoiceCard.ContentText
+        </item>
 
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
         <item name="whiteLabel">false</item>
@@ -68,6 +71,12 @@
         <!-- item name="android:fontFamily">@font/tangerine</item -->
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Application.GliaAndroidSdkWidgetsExample.ChoiceCard.ContentText" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">40sp</item>
+        <item name="android:textColor">@color/color_dark_cyan</item>
+        <!-- item name="fontFamily">@font/tangerine</item -->
     </style>
 
 </resources>

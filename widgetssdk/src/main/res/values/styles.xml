@@ -92,6 +92,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="Application.Glia.ChoiceCard.ContentText" parent="Application.Glia.Body">
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+    </style>
+
     <style name="ShapeAppearance.CircularBorder" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>

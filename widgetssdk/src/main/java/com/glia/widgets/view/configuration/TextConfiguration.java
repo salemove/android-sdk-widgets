@@ -212,7 +212,7 @@ public class TextConfiguration implements Parcelable {
             return this;
         }
 
-        public Builder textSize(float textSize) {
+        public Builder textSize(Float textSize) {
             this.textSize = textSize;
             return this;
         }

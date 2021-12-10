@@ -26,6 +26,7 @@ import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.head.model.ChatHeadInput;
 
 import java.io.File;
@@ -455,9 +456,9 @@ public class Utils {
         imm.hideSoftInputFromWindow(windowToken, 0);
     }
 
-    private static ButtonConfiguration getButtonConfiguration(
-            ButtonConfiguration newConf,
-            ButtonConfiguration oldConf
+    private static <T> T getConfiguration(
+            T newConf,
+            T oldConf
     ) {
         return newConf != null ? newConf : oldConf;
     }
@@ -551,27 +552,33 @@ public class Utils {
                         oldTheme.getGliaAlertDialogButtonUseVerticalAlignment();
 
         ButtonConfiguration endButtonConfiguration =
-                getButtonConfiguration(
+                getConfiguration(
                         newTheme.getGliaEndButtonConfiguration(),
                         oldTheme.getGliaEndButtonConfiguration()
                 );
 
         ButtonConfiguration positiveButtonConfiguration =
-                getButtonConfiguration(
+                getConfiguration(
                         newTheme.getGliaPositiveButtonConfiguration(),
                         oldTheme.getGliaPositiveButtonConfiguration()
                 );
 
         ButtonConfiguration negativeButtonConfiguration =
-                getButtonConfiguration(
+                getConfiguration(
                         newTheme.getGliaNegativeButtonConfiguration(),
                         oldTheme.getGliaNegativeButtonConfiguration()
                 );
 
         ButtonConfiguration neutralButtonConfiguration =
-                getButtonConfiguration(
+                getConfiguration(
                         newTheme.getGliaNeutralButtonConfiguration(),
                         oldTheme.getGliaNeutralButtonConfiguration()
+                );
+
+        TextConfiguration choiceCardContentTextConfiguration =
+                getConfiguration(
+                        newTheme.getGliaChoiceCardContentTextConfiguration(),
+                        oldTheme.getGliaChoiceCardContentTextConfiguration()
                 );
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
@@ -622,6 +629,7 @@ public class Utils {
         builder.setPositiveButtonConfiguration(positiveButtonConfiguration);
         builder.setNegativeButtonConfiguration(negativeButtonConfiguration);
         builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
+        builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
         return builder.build();
     }
 

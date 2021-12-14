@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     app:cardBackgroundColor="@color/glia_attachment_menu_bg"
     app:cardCornerRadius="@dimen/glia_chat_attachment_menu_corner_radius"
     app:layout_constraintBottom_toBottomOf="parent"

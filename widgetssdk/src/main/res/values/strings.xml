@@ -14,7 +14,6 @@
     <string name="glia_chat_file_download_fail_message">"File download is failed."</string>
     <string name="glia_chat_file_open_file_title">"Open File"</string>
     <string name="glia_chat_file_download_failed_msg">Unable to download the file at the moment, please try again later.</string>
-    <string name="glia_chat_no_email_app_msg">There is no email app on your device that supports this action.</string>
 
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
@@ -147,6 +146,4 @@
     <string name="glia_preview_activity_toolbar_title">Preview</string>
     <string name="glia_preview_activity_img_fetch_fail_msg">Unable to fetch image at the moment, please try again later.</string>
 
-    <!--    OperatorLinkActivity-->
-    <string name="operator_link_title">Operator Link</string>
 </resources>

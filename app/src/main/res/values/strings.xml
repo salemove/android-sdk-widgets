@@ -46,6 +46,7 @@
     <string name="settings_chat_starting_caption_text_color">Operator Layout Connecting Caption Color</string>
     <string name="settings_chat_started_heading_text_color">Operator Layout Connected Heading Color</string>
     <string name="settings_chat_started_caption_text_color">Operator Layout Connected Caption Color</string>
+    <string name="settings_send_message_button_tint_color">Send message button tint color</string>
     <string name="settings_colors_title">Colors</string>
     <string name="settings_sdk_title">Sdk settings</string>
     <string name="settings_typography">Typography</string>

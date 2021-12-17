@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -848,7 +849,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         sendButton.setImageTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(),
-                        this.theme.getBrandPrimaryColor()));
+                        this.theme.getSendMessageButtonTintColor()));
         chatEditText.setTextColor(ContextCompat.getColor(
                 this.getContext(), this.theme.getBaseDarkColor()));
         chatEditText.setHintTextColor(ContextCompat.getColor(

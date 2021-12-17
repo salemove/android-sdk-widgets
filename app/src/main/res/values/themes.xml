@@ -20,6 +20,7 @@
     </style>
 
     <style name="ThemeOverlay.GliaAndroidSDKWidgetsExample.Chat" parent="ThemeOverlay.Glia.Chat">
+        <item name="gliaSendMessageButtonTintColor">@color/color_pure_yellow</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_person</item>
         <item name="gliaHeaderEndButtonStyle">

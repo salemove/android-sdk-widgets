@@ -108,7 +108,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private ChatRecyclerView chatRecyclerView;
-    private ImageButton sendButton; // TODO
+    private ImageButton sendButton;
     private ImageButton addAttachmentButton;
     private FileUploadMenuView addAttachmentMenu;
     private RecyclerView attachmentsRecyclerView;

@@ -14,11 +14,6 @@
 
     <application>
         <activity
-            android:name=".urlwebview.OperatorLinksActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@style/Application.Glia.Chat.Activity" />
-        <activity
             android:name=".chat.ChatActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Chat.Activity"
@@ -61,15 +56,4 @@
                 android:resource="@xml/file_provider" />
         </provider>
     </application>
-
-    <queries>
-        <intent>
-            <action android:name="android.support.customtabs.action.CustomTabsService" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.SENDTO" />
-            <data android:scheme="*" />
-        </intent>
-    </queries>
-
 </manifest>

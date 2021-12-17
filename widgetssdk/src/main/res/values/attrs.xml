@@ -71,6 +71,8 @@
         <attr name="botActionButtonSelectedBackgroundColor" format="reference" />
         <!-- Bot message action button text color -->
         <attr name="botActionButtonSelectedTextColor" format="reference" />
+        <!-- Send message button tint color -->
+        <attr name="chatSendMessageButtonTintColor" format="reference" />
 
         <attr name="chatHeaderTitleTintColor" format="reference" />
         <attr name="chatHeaderHomeButtonTintColor" format="reference" />
@@ -165,6 +167,8 @@
     <attr name="gliaBotActionButtonSelectedBackgroundColor" format="reference" />
     <!-- Bot message action button text color -->
     <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
+    <!-- Send message button tint color -->
+    <attr name="gliaSendMessageButtonTintColor" format="reference" />
 
     <attr name="whiteLabel" format="boolean" />
     <attr name="gliaAlertDialogButtonUseVerticalAlignment" format="boolean" />

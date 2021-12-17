@@ -63,15 +63,6 @@
 
     </RelativeLayout>
 
-    <com.glia.widgets.chat.FileUploadMenuView
-        android:id="@+id/add_attachment_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="21dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/divider_view"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/operator_typing_animation_view"
         android:layout_width="wrap_content"
@@ -105,6 +96,15 @@
         app:layout_constraintTop_toBottomOf="@id/divider_view"
         tools:itemCount="6"
         tools:listitem="@layout/chat_attachment_uploaded_item" />
+
+    <com.glia.widgets.chat.FileUploadMenuView
+        android:id="@+id/add_attachment_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="13dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/chat_message_layout"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:id="@+id/chat_message_layout"

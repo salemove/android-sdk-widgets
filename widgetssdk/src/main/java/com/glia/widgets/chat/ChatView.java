@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -24,7 +25,6 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -48,13 +48,11 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
-import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.controller.ChatController;
-import com.glia.widgets.chat.helper.CustomTabActivityHelper;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
@@ -70,8 +68,6 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.ui.FilePreviewActivity;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.urlwebview.OperatorLinksActivity;
-import com.glia.widgets.view.header.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
@@ -79,6 +75,7 @@ import com.glia.widgets.view.SingleChoiceCardView;
 import com.glia.widgets.view.head.ChatHeadService;
 import com.glia.widgets.view.head.ChatHeadsController;
 import com.glia.widgets.view.head.model.ChatHeadInput;
+import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.shape.MarkerEdgeTreatment;
 import com.google.android.material.shape.ShapeAppearanceModel;
@@ -87,10 +84,9 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItemClickListener, ChatAdapter.OnImageItemClickListener, ChatAdapter.OnTextClickListener {
+public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItemClickListener, ChatAdapter.OnImageItemClickListener {
 
     private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
@@ -98,7 +94,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ChatViewCallback callback;
     private ChatController controller;
     private ChatHeadsController chatHeadsController;
-    private CustomTabActivityHelper customTabActivityHelper;
 
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
@@ -401,13 +396,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    public void onStart() {
-        customTabActivityHelper.bindCustomTabsService((Utils.getActivity(this.getContext())));
-    }
-
     public void onStop() {
         controller.onStop();
-        customTabActivityHelper.unbindCustomTabsService((Utils.getActivity(this.getContext())));
     }
 
     /**
@@ -634,10 +624,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
-
-        if (customTabActivityHelper == null) {
-            customTabActivityHelper = new CustomTabActivityHelper();
-        }
     }
 
     private void updateChatEditText(ChatState chatState) {
@@ -811,7 +797,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 this.onImageLoadedListener,
                 this,
                 this,
-                this,
                 Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
                 Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
                 Dependencies.getUseCaseFactory().createGetImageFileFromNetworkUseCase()
@@ -864,7 +849,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         sendButton.setImageTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(),
-                        this.theme.getBrandPrimaryColor()));
+                        this.theme.getSendMessageButtonTintColor()));
         chatEditText.setTextColor(ContextCompat.getColor(
                 this.getContext(), this.theme.getBaseDarkColor()));
         chatEditText.setHintTextColor(ContextCompat.getColor(
@@ -1382,44 +1367,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (requestCode == WRITE_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (downloadFileHolder != null) onFileDownload(downloadFileHolder);
         }
-    }
-
-    @Override
-    public void onTextClick(String text) {
-        Activity activity = Utils.getActivity(this.getContext());
-
-        if (Patterns.WEB_URL.matcher(text).matches()) {
-            if (CustomTabActivityHelper.hasSupportedBrowser(activity)) {
-                int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
-                int baseLightColor = ContextCompat.getColor(this.getContext(), theme.getBaseLightColor());
-
-                CustomTabActivityHelper.openCustomTab(activity, text, primaryColor, baseLightColor);
-            } else {
-                activity.startActivity(OperatorLinksActivity.intent(activity, text, theme));
-            }
-        } else if (Patterns.EMAIL_ADDRESS.matcher(text).matches()) {
-            composeEmail(text, activity);
-        } else if (Pattern.matches(Constants.PHONE_NUMBER_REGEX, text)) {
-            composeCall(text, activity);
-        }
-    }
-
-    public void composeEmail(String email, Activity activity) {
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email.trim()});
-        intent.setData(Uri.parse("mailto:"));
-
-        if (intent.resolveActivity(activity.getPackageManager()) != null) {
-            activity.startActivity(intent);
-        } else {
-            Toast.makeText(activity, activity.getString(R.string.glia_chat_no_email_app_msg), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void composeCall(String phoneNumber, Activity activity) {
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:" + phoneNumber));
-        activity.startActivity(intent);
     }
 
     public interface OnBackClickedListener {

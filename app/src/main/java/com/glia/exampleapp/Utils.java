@@ -26,6 +26,7 @@ class Utils {
         Integer baseShadeColor = getColorValueFromPrefs(R.string.pref_base_shade_color, sharedPreferences, resources);
         Integer brandPrimaryColor = getColorValueFromPrefs(R.string.pref_brand_primary_color, sharedPreferences, resources);
         Integer systemAgentBubbleColor = getColorValueFromPrefs(R.string.pref_system_agent_bubble_color, sharedPreferences, resources);
+        Integer chatSendMessageButtonTintColor = getColorValueFromPrefs(R.string.pref_send_message_button_tint_color, sharedPreferences, resources);
         Integer chatHeaderTitleTintColor = getColorValueFromPrefs(R.string.pref_chat_header_title_tint_color, sharedPreferences, resources);
         Integer chatHeaderHomeButtonTintColor = getColorValueFromPrefs(R.string.pref_chat_header_home_button_tint_color, sharedPreferences, resources);
         Integer chatHeaderExitQueueButtonTintColor = getColorValueFromPrefs(R.string.pref_chat_header_exit_queue_button_tint_color, sharedPreferences, resources);
@@ -84,6 +85,8 @@ class Utils {
         builder.setPositiveButtonConfiguration(null);
         builder.setNegativeButtonConfiguration(null);
         builder.setNeutralButtonConfiguration(null);
+
+        builder.setSendMessageButtonTintColor(chatSendMessageButtonTintColor);
 
         builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleTintColor);
         builder.setGliaChatHeaderHomeButtonTintColor(chatHeaderHomeButtonTintColor);

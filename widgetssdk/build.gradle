@@ -67,7 +67,7 @@ dependencies {
     // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 
     // Replaced with a local AAR file
-    implementation "com.glia:android-sdk:$gliaSdkVersion"
+    api "com.glia:android-sdk:$gliaSdkVersion"
     // Glia sdk aar
     // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 

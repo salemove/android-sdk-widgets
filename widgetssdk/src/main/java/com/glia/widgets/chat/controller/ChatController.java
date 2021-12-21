@@ -226,7 +226,13 @@ public class ChatController implements
             IsEnableChatEditTextUseCase isEnableChatEditTextUseCase
     ) {
         Logger.d(TAG, "constructor");
-        this.viewCallback = chatViewCallback;
+
+        // viewCallback is accessed from multiple threads
+        // and must be protected from race condition
+        synchronized (this) {
+            this.viewCallback = chatViewCallback;
+        }
+
         this.chatState = new ChatState.Builder()
                 .setQueueTicketId(null)
                 .setHistoryLoaded(false)
@@ -355,7 +361,13 @@ public class ChatController implements
     public void onDestroy(boolean retain) {
         Logger.d(TAG, "onDestroy, retain:" + retain);
         destroyView();
-        viewCallback = null;
+
+        // viewCallback is accessed from multiple threads
+        // and must be protected from race condition
+        synchronized (this) {
+            viewCallback = null;
+        }
+
         if (disposable != null) disposable.dispose();
         if (!retain) {
             mediaUpgradeOfferRepository.stopAll();
@@ -525,7 +537,9 @@ public class ChatController implements
         return chatState.isVisible;
     }
 
-    public void setViewCallback(ChatViewCallback chatViewCallback) {
+    // viewCallback is accessed from multiple threads
+    // and must be protected from race condition
+    public synchronized void setViewCallback(ChatViewCallback chatViewCallback) {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = chatViewCallback;
         viewCallback.emitState(chatState);

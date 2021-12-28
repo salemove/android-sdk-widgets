@@ -2,6 +2,7 @@ package com.glia.widgets;
 
 import android.app.Application;
 import android.content.Intent;
+import android.security.identity.UnknownAuthenticationKeyException;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
@@ -90,16 +91,32 @@ public class GliaWidgets {
      * @param gliaWidgetsConfig Glia configuration
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
-        GliaConfig gliaConfig = new GliaConfig.Builder()
-                .setAppToken(gliaWidgetsConfig.getAppToken())
+        Glia.init(createGliaConfig(gliaWidgetsConfig));
+        Dependencies.init();
+        Logger.d(TAG, "init");
+    }
+
+    private static GliaConfig createGliaConfig(GliaWidgetsConfig gliaWidgetsConfig) {
+        GliaConfig.Builder builder = new GliaConfig.Builder();
+        setAuthorization(gliaWidgetsConfig, builder);
+        return builder
                 .setSiteId(gliaWidgetsConfig.getSiteId())
                 .setRegion(gliaWidgetsConfig.getRegion())
                 .setContext(gliaWidgetsConfig.getContext())
                 .build();
+    }
 
-        Glia.init(gliaConfig);
-        Dependencies.init();
-        Logger.d(TAG, "init");
+    private static void setAuthorization(
+            GliaWidgetsConfig widgetsConfig,
+            GliaConfig.Builder builder
+    ) {
+        if (widgetsConfig.getSiteApiKey() != null) {
+            builder.setSiteApiKey(widgetsConfig.getSiteApiKey());
+        } else if (widgetsConfig.getAppToken() != null) {
+            builder.setAppToken(widgetsConfig.getAppToken());
+        } else {
+            throw new RuntimeException("Site key or app token is missing");
+        }
     }
 
     /**
@@ -159,9 +176,9 @@ public class GliaWidgets {
                 .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
                 .setNoteUpdateMethod(VisitorInfoUpdateRequest.NoteUpdateMethod.REPLACE)
                 .build(), e -> {
-            if(e != null){
+            if (e != null) {
                 exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            }else {
+            } else {
                 exceptionConsumer.accept(null);
             }
         });
@@ -174,10 +191,10 @@ public class GliaWidgets {
      */
     public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
         Glia.getVisitorInfo((visitorInfo, e) -> {
-            if(visitorInfo != null){
+            if (visitorInfo != null) {
                 visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
             }
-            if(e != null){
+            if (e != null) {
                 exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
             }
         });

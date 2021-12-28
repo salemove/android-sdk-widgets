@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_token" tools:ignore="ExtraTranslation">xWa2EKJTN35En26o</string>
-    <string name="site_id" tools:ignore="ExtraTranslation">72c76913-ff1b-48a6-b209-bbeb57bd8649</string>
-    <string name="queue_id" tools:ignore="ExtraTranslation">a0b87175-4ed1-44a7-9e78-e798f45d233f</string>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation,TypographyDashes,Typos">
+    <string name="app_token">xWa2EKJTN35En26o</string>
+    <string name="site_id">72c76913-ff1b-48a6-b209-bbeb57bd8649</string>
+    <string name="queue_id">a0b87175-4ed1-44a7-9e78-e798f45d233f</string>
+    <string name="glia_api_key_id">9542b30d-faf2-443c-8553-d76ae331f9eb</string>
+    <string name="glia_api_key_secret">gls_wZSeWDzOGFYzy794U5yDL5Sq4UlIadxPPglH</string>
     <!--    for bot-->
     <!--    <string name="queue_id" tools:ignore="ExtraTranslation">9f7632ed-56be-4999-819d-381fc3ffa22c</string>-->
 </resources>

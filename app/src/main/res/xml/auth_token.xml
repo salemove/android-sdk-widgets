@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditTextPreference
+        app:defaultValue="@string/app_token"
+        app:key="@string/pref_app_token"
+        app:title="@string/settings_app_token"
+        app:useSimpleSummaryProvider="true" />
+</PreferenceScreen>

@@ -3,6 +3,7 @@ package com.glia.widgets.chat.model.history;
 import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
@@ -14,8 +15,8 @@ public class OperatorAttachmentItem extends ChatItem {
     public final boolean isFileExists;
     public final boolean isDownloading;
 
-    public OperatorAttachmentItem(String id, int viewType, boolean showChatHead, AttachmentFile attachmentFile, String operatorProfileImgUrl, boolean isFileExists, boolean isDownloading) {
-        super(id, viewType);
+    public OperatorAttachmentItem(String chatItemId, int viewType, boolean showChatHead, AttachmentFile attachmentFile, String operatorProfileImgUrl, boolean isFileExists, boolean isDownloading) {
+        super(chatItemId, viewType);
         this.showChatHead = showChatHead;
         this.attachmentFile = attachmentFile;
         this.operatorProfileImgUrl = operatorProfileImgUrl;
@@ -46,7 +47,8 @@ public class OperatorAttachmentItem extends ChatItem {
     public String toString() {
         return "OperatorAttachmentItem{" +
                 ", showChatHead=" + showChatHead +
-                ", attachmentFile='" + attachmentFile + '\'' +
+                ", attachmentFile=" + Utils.toString(attachmentFile) +
+                ", chatItemId='" + getId() + '\'' +
                 ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                 ", isFileExists='" + isFileExists + '\'' +
                 ", isDownloading='" + isDownloading + '\'' +

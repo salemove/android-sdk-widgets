@@ -285,6 +285,9 @@ public class CallView extends ConstraintLayout {
                 post(() -> {
                     if (callState.isMediaEngagementStarted()) {
                         appBar.showEndButton();
+                        if (callState.isCallOngoingAndOperatorIsConnecting()) {
+                            appBar.setTitle(resources.getString(R.string.glia_call_connecting_app_bar_title));
+                        } else
                         if (callState.isVideoCall()) {
                             appBar.setTitle(resources.getString(R.string.glia_call_video_app_bar_title));
                         } else {

@@ -94,6 +94,7 @@
     <string name="glia_dialog_cancel">Cancel</string>
 
     <!--    call screen-->
+    <string name="glia_call_connecting_app_bar_title">Connecting…</string>
     <string name="glia_call_audio_app_bar_title">Audio call</string>
     <string name="glia_call_video_app_bar_title">Video call</string>
     <string name="glia_call_chat_button_label">Chat</string>

@@ -631,7 +631,7 @@ public class ChatController implements
                 Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess");
                 if (submitter == MediaUpgradeOfferRepository.Submitter.CHAT) {
                     String requestedMediaType;
-                    if (offer.video != null) {
+                    if (offer.video != null && offer.video != MediaDirection.NONE) {
                         requestedMediaType = GliaWidgets.MEDIA_TYPE_VIDEO;
                     } else {
                         requestedMediaType = GliaWidgets.MEDIA_TYPE_AUDIO;

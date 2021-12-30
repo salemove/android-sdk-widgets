@@ -139,6 +139,13 @@ class CallState {
                 .createCallState();
     }
 
+    public CallState changeRequestedMediaType(Engagement.MediaType requestedMediaType) {
+        return new Builder()
+                .copyFrom(this)
+                .setRequestedMediaType(requestedMediaType)
+                .createCallState();
+    }
+
     public CallState engagementStarted(
             String operatorName,
             String operatorProfileImgUrl) {

@@ -253,6 +253,13 @@ public class CallController implements
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess");
+                Engagement.MediaType mediaType;
+                if (offer.video != null && offer.video != MediaDirection.NONE) {
+                    mediaType = Engagement.MediaType.VIDEO;
+                } else {
+                    mediaType = Engagement.MediaType.AUDIO;
+                }
+                emitViewState(callState.changeRequestedMediaType(mediaType));
                 dialogController.dismissDialogs();
             }
 

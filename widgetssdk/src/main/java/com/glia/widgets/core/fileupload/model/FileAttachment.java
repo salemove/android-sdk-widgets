@@ -90,6 +90,8 @@ final public class FileAttachment {
         ERROR_UNKNOWN,
         ERROR_SECURITY_SCAN_FAILED,
 
+        ERROR_FILE_UPLOAD_FORBIDDEN,
+
         ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED
     }
 }

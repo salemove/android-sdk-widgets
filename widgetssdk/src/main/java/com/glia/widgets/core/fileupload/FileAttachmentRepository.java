@@ -172,6 +172,8 @@ public class FileAttachmentRepository {
 
     private FileAttachment.Status getAttachmentStatus(GliaException exception) {
         switch (exception.cause) {
+            case FILE_UPLOAD_FORBIDDEN:
+                return FileAttachment.Status.ERROR_FILE_UPLOAD_FORBIDDEN;
             case INVALID_INPUT:
                 return FileAttachment.Status.ERROR_INVALID_INPUT;
             case NETWORK_TIMEOUT:

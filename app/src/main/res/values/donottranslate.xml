@@ -34,6 +34,7 @@
     <string name="pref_chat_starting_caption_text_color">chat_starting_caption_text_color</string>
     <string name="pref_chat_started_heading_text_color">chat_started_heading_text_color</string>
     <string name="pref_chat_started_caption_text_color">chat_started_caption_text_color</string>
+    <string name="pref_send_message_button_tint_color">send_message_button_tint_color</string>
     <string name="default_value">default</string>
     <string name="color_blue_value">blue</string>
     <string name="color_grey_value">grey</string>

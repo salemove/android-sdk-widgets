@@ -93,6 +93,11 @@ public class UiTheme implements Parcelable {
     private @ColorRes
     final Integer botActionButtonSelectedTextColor;
     /**
+     * Color for Chat Send message Button
+     */
+    private @ColorRes
+    final Integer sendMessageButtonTintColor;
+    /**
      * Color for Chat Header title
      */
     private @ColorRes
@@ -250,6 +255,7 @@ public class UiTheme implements Parcelable {
         this.botActionButtonTextColor = builder.botActionButtonTextColor;
         this.botActionButtonSelectedBackgroundColor = builder.botActionButtonSelectedBackgroundColor;
         this.botActionButtonSelectedTextColor = builder.botActionButtonSelectedTextColor;
+        this.sendMessageButtonTintColor = builder.sendMessageButtonTintColor;
         this.gliaChatHeaderTitleTintColor = builder.gliaChatHeaderTitleTintColor;
         this.gliaChatHeaderHomeButtonTintColor = builder.gliaChatHomeButtonTintColor;
         this.gliaChatHeaderExitQueueButtonTintColor = builder.gliaChatHeaderExitQueueButtonTintColor;
@@ -364,6 +370,11 @@ public class UiTheme implements Parcelable {
          */
         private @ColorRes
         Integer botActionButtonSelectedTextColor;
+        /**
+         * Color for Send message Button
+         */
+        private @ColorRes
+        Integer sendMessageButtonTintColor;
         /**
          * Color for Chat Header Title
          */
@@ -679,6 +690,10 @@ public class UiTheme implements Parcelable {
             this.neutralButtonConfiguration = configuration;
         }
 
+        public void setSendMessageButtonTintColor(Integer color) {
+            this.sendMessageButtonTintColor = color;
+        }
+
         public void setGliaChatHeaderTitleTintColor(Integer color) {
             this.gliaChatHeaderTitleTintColor = color;
         }
@@ -751,6 +766,7 @@ public class UiTheme implements Parcelable {
             this.positiveButtonConfiguration = theme.positiveButtonConfiguration;
             this.negativeButtonConfiguration = theme.negativeButtonConfiguration;
             this.neutralButtonConfiguration = theme.neutralButtonConfiguration;
+            this.sendMessageButtonTintColor = theme.sendMessageButtonTintColor;
             this.gliaChatHeaderTitleTintColor = theme.gliaChatHeaderTitleTintColor;
             this.gliaChatHomeButtonTintColor = theme.gliaChatHeaderHomeButtonTintColor;
             this.gliaChatHeaderExitQueueButtonTintColor = theme.gliaChatHeaderExitQueueButtonTintColor;
@@ -842,6 +858,11 @@ public class UiTheme implements Parcelable {
             botActionButtonSelectedTextColor = null;
         } else {
             botActionButtonSelectedTextColor = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            sendMessageButtonTintColor = null;
+        } else {
+            sendMessageButtonTintColor = in.readInt();
         }
         if (in.readByte() == 0) {
             gliaChatHeaderTitleTintColor = null;
@@ -1071,6 +1092,12 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(botActionButtonSelectedTextColor);
+        }
+        if (sendMessageButtonTintColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(sendMessageButtonTintColor);
         }
         if (gliaChatHeaderTitleTintColor == null) {
             dest.writeByte((byte) 0);
@@ -1314,6 +1341,10 @@ public class UiTheme implements Parcelable {
 
     public Integer getBotActionButtonSelectedTextColor() {
         return botActionButtonSelectedTextColor;
+    }
+
+    public Integer getSendMessageButtonTintColor() {
+        return sendMessageButtonTintColor;
     }
 
     public Integer getGliaChatHeaderTitleTintColor() {

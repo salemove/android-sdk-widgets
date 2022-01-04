@@ -27,6 +27,7 @@
         android:backgroundTint="?attr/gliaBrandPrimaryColor"
         android:textAppearance="?attr/textAppearanceBody1"
         android:textColor="?attr/gliaBaseLightColor"
+        android:textIsSelectable="true"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="1"

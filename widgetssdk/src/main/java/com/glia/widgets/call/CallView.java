@@ -285,18 +285,13 @@ public class CallView extends ConstraintLayout {
                 post(() -> {
                     if (callState.isMediaEngagementStarted()) {
                         appBar.showEndButton();
-                        if (callState.isVideoCall()) {
-                            appBar.setTitle(resources.getString(R.string.glia_call_video_app_bar_title));
-                        } else {
-                            appBar.setTitle(resources.getString(R.string.glia_call_audio_app_bar_title));
-                        }
                     } else {
                         appBar.showXButton();
-                        if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
-                            appBar.setTitle(resources.getString(R.string.glia_call_video_app_bar_title));
-                        } else {
-                            appBar.setTitle(resources.getString(R.string.glia_call_audio_app_bar_title));
-                        }
+                    }
+                    if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
+                        appBar.setTitle(resources.getString(R.string.glia_call_video_app_bar_title));
+                    } else {
+                        appBar.setTitle(resources.getString(R.string.glia_call_audio_app_bar_title));
                     }
                     operatorStatusView.isRippleAnimationShowing(
                             callState.isCallNotOngoing() ||

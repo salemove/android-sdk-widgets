@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditTextPreference
+        app:defaultValue="@string/glia_api_key_id"
+        app:key="@string/pref_api_key_id"
+        app:title="@string/settings_site_api_key_id"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        app:defaultValue="@string/glia_api_key_secret"
+        app:key="@string/pref_api_key_secret"
+        app:title="@string/settings_site_api_key_secret"
+        app:useSimpleSummaryProvider="true" />
+</PreferenceScreen>

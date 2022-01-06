@@ -12,8 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.chat.adapter.holder.FileAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.ImageAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder;
 import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder;
@@ -109,10 +112,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return new OperatorStatusViewHolder(inflater.inflate(R.layout.chat_operator_status_layout, parent, false), uiTheme);
         } else if (viewType == VISITOR_FILE_VIEW_TYPE) {
             View view = inflater.inflate(R.layout.chat_attachment_visitor_file_layout, parent, false);
-            return new FileAttachmentViewHolder(view, uiTheme);
+            return new VisitorFileAttachmentViewHolder(view, uiTheme);
         } else if (viewType == VISITOR_IMAGE_VIEW_TYPE) {
-            return new ImageAttachmentViewHolder(
+            return new VisitorImageAttachmentViewHolder(
                     inflater.inflate(R.layout.chat_attachment_visitor_image_layout, parent, false),
+                    uiTheme,
                     getImageFileFromCacheUseCase,
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase
@@ -120,14 +124,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (viewType == VISITOR_MESSAGE_TYPE) {
             return new VisitorMessageViewHolder(inflater.inflate(R.layout.chat_visitor_message_layout, parent, false), uiTheme);
         } else if (viewType == OPERATOR_IMAGE_VIEW_TYPE) {
-            return new ImageAttachmentViewHolder(
+            return new OperatorImageAttachmentViewHolder(
                     inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false),
                     getImageFileFromCacheUseCase,
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase
             );
         } else if (viewType == OPERATOR_FILE_VIEW_TYPE) {
-            return new FileAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_file_layout, parent, false), uiTheme);
+            return new OperatorFileAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_file_layout, parent, false), uiTheme);
         } else if (viewType == OPERATOR_MESSAGE_VIEW_TYPE) {
             return new OperatorMessageViewHolder(inflater.inflate(R.layout.chat_operator_message_layout, parent, false), uiTheme);
         } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
@@ -152,7 +156,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);
         } else if (chatItem instanceof OperatorAttachmentItem) {
             if (chatItem.getViewType() == OPERATOR_FILE_VIEW_TYPE) {
-                FileAttachmentViewHolder viewHolder = (FileAttachmentViewHolder) holder;
+                OperatorFileAttachmentViewHolder viewHolder = (OperatorFileAttachmentViewHolder) holder;
                 OperatorAttachmentItem item = (OperatorAttachmentItem) chatItem;
                 viewHolder.bind(item);
                 viewHolder.itemView.setOnClickListener(v -> {
@@ -163,15 +167,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
             } else {
-                //holder.setIsRecyclable(false);
-                ImageAttachmentViewHolder viewHolder = (ImageAttachmentViewHolder) holder;
+                OperatorImageAttachmentViewHolder viewHolder = (OperatorImageAttachmentViewHolder) holder;
                 AttachmentFile file = ((OperatorAttachmentItem) chatItem).attachmentFile;
                 viewHolder.bind(file);
                 viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(file));
             }
         } else if (chatItem instanceof VisitorAttachmentItem) {
             if (chatItem.getViewType() == VISITOR_FILE_VIEW_TYPE) {
-                FileAttachmentViewHolder viewHolder = (FileAttachmentViewHolder) holder;
+                VisitorFileAttachmentViewHolder viewHolder = (VisitorFileAttachmentViewHolder) holder;
                 VisitorAttachmentItem item = (VisitorAttachmentItem) chatItem;
                 viewHolder.bind(item);
                 viewHolder.itemView.setOnClickListener(v -> {
@@ -182,11 +185,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     }
                 });
             } else {
-                //holder.setIsRecyclable(false);
-                ImageAttachmentViewHolder viewHolder = (ImageAttachmentViewHolder) holder;
-                AttachmentFile file = ((VisitorAttachmentItem) chatItem).attachmentFile;
-                viewHolder.bind(file);
-                viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(file));
+                VisitorImageAttachmentViewHolder viewHolder = (VisitorImageAttachmentViewHolder) holder;
+                VisitorAttachmentItem item = (VisitorAttachmentItem) chatItem;
+                viewHolder.bind(item.attachmentFile, item.showDelivered);
+                viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.attachmentFile));
             }
         }
     }

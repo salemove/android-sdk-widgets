@@ -723,7 +723,7 @@ public class ChatController implements
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
             appendHistoryMessage(currentChatItems, message);
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message.getAttachment());
+            addVisitorAttachmentItemsToChatItems(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
         }
@@ -745,9 +745,7 @@ public class ChatController implements
     private void appendMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (message.getSender() == Chat.Participant.VISITOR) {
             appendSentMessage(currentChatItems, message);
-
-            MessageAttachment attachment = message.getAttachment();
-            addVisitorAttachmentItemsToChatItems(currentChatItems, attachment);
+            addVisitorAttachmentItemsToChatItems(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
             changeLastOperatorMessages(currentChatItems, message);
             appendMessagesNotSeen();
@@ -764,35 +762,21 @@ public class ChatController implements
         }
     }
 
-    private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, MessageAttachment attachment) {
+    private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, ChatMessage chatMessage) {
+        MessageAttachment attachment = chatMessage.getAttachment();
         if (attachment instanceof FilesAttachment) {
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
-
             for (AttachmentFile file : files) {
-                String mimeType = file.getContentType();
-                if (mimeType.startsWith("image")) {
-                    currentChatItems.add(
-                            new VisitorAttachmentItem(
-                                    file.getId(),
-                                    ChatAdapter.VISITOR_IMAGE_VIEW_TYPE,
-                                    file,
-                                    false,
-                                    false
-                            )
-                    );
+                int type;
+                if (file.getContentType().startsWith("image")) {
+                    type = ChatAdapter.VISITOR_IMAGE_VIEW_TYPE;
                 } else {
-                    currentChatItems.add(
-                            new VisitorAttachmentItem(
-                                    file.getId(),
-                                    ChatAdapter.VISITOR_FILE_VIEW_TYPE,
-                                    file,
-                                    false,
-                                    false
-                            )
-                    );
+                    type = ChatAdapter.VISITOR_FILE_VIEW_TYPE;
                 }
-
+                currentChatItems.add(
+                        new VisitorAttachmentItem(chatMessage.getId(), type, file, false, false, false)
+                );
             }
         }
     }
@@ -824,32 +808,54 @@ public class ChatController implements
     }
 
     private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
+        // "Delivered" status only applies to visitor messages
+        if (message.getSender() != Chat.Participant.VISITOR) return;
+        String messageId = message.getId();
+        boolean foundDelivered = false;
         for (int i = currentChatItems.size() - 1; i >= 0; i--) {
-            if (currentChatItems.get(i) instanceof VisitorMessageItem) {
-                VisitorMessageItem item = (VisitorMessageItem) currentChatItems.get(i);
-                if (item.getId().equals(VisitorMessageItem.HISTORY_ID)) {
+            ChatItem currentChatItem = currentChatItems.get(i);
+            if (currentChatItem instanceof VisitorMessageItem) {
+                VisitorMessageItem item = (VisitorMessageItem) currentChatItem;
+                String itemId = item.getId();
+                if (itemId.equals(VisitorMessageItem.HISTORY_ID)) {
                     // we reached the history items no point in going searching further
                     break;
-                } else if (item.getId().equals(message.getId())) {
-                    // the visitormessage. show delivered for it.
-                    currentChatItems.remove(i);
-                    currentChatItems
-                            .add(i, new VisitorMessageItem(message.getId(), true, message.getContent()));
+                } else if (!foundDelivered && itemId.equals(messageId)) {
+                    foundDelivered = true;
+                    currentChatItems.set(i, new VisitorMessageItem(itemId, true, item.getMessage()));
                 } else if (item.isShowDelivered()) {
-                    // remove all other delivered references
-                    currentChatItems.remove(i);
-                    currentChatItems.add(i, new VisitorMessageItem(item.getId(), false, item.getMessage()));
+                    currentChatItems.set(i, new VisitorMessageItem(itemId, false, item.getMessage()));
+                }
+            } else if (currentChatItem instanceof VisitorAttachmentItem) {
+                VisitorAttachmentItem item = (VisitorAttachmentItem) currentChatItem;
+                if (!foundDelivered && item.getId().equals(messageId)) {
+                    foundDelivered = true;
+                    setDelivered(currentChatItems, i, item, true);
+                } else if (item.showDelivered) {
+                    setDelivered(currentChatItems, i, item, false);
                 }
             }
         }
     }
 
-    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
-        MessageAttachment attachment = message.getAttachment();
+    private void setDelivered(List<ChatItem> currentChatItems, int i, VisitorAttachmentItem item, boolean delivered) {
+        currentChatItems.set(
+                i,
+                new VisitorAttachmentItem(
+                        item.getId(),
+                        item.getViewType(),
+                        item.attachmentFile,
+                        item.isFileExists,
+                        item.isDownloading,
+                        delivered
+                )
+        );
+    }
 
+    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
         replaceLastChatHeadItem(currentChatItems);
-        addOperatorDownloadableItems(currentChatItems, attachment);
-        addLastMessageItem(currentChatItems, message, attachment);
+        addOperatorDownloadableItems(currentChatItems, message);
+        addLastMessageItem(currentChatItems, message);
     }
 
     private void replaceLastChatHeadItem(List<ChatItem> currentChatItems) {
@@ -881,7 +887,8 @@ public class ChatController implements
         }
     }
 
-    private void addOperatorDownloadableItems(List<ChatItem> currentChatItems, MessageAttachment attachment) {
+    private void addOperatorDownloadableItems(List<ChatItem> currentChatItems, ChatMessage message) {
+        MessageAttachment attachment = message.getAttachment();
         if (attachment instanceof FilesAttachment) {
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
@@ -891,37 +898,40 @@ public class ChatController implements
                 boolean showChatHead = i == files.length - 1;
                 String mimeType = file.getContentType();
                 if (mimeType.startsWith("image")) {
-                    currentChatItems.add(new OperatorAttachmentItem(
-                            file.getId(),
-                            ChatAdapter.OPERATOR_IMAGE_VIEW_TYPE,
-                            showChatHead,
-                            file,
-                            chatState.operatorProfileImgUrl, false, false));
-
-
+                    currentChatItems.add(
+                            new OperatorAttachmentItem(
+                                    message.getId(),
+                                    ChatAdapter.OPERATOR_IMAGE_VIEW_TYPE,
+                                    showChatHead,
+                                    file,
+                                    chatState.operatorProfileImgUrl, false, false)
+                    );
                 } else {
-                    currentChatItems.add(new OperatorAttachmentItem(
-                            file.getId(),
-                            ChatAdapter.OPERATOR_FILE_VIEW_TYPE,
-                            showChatHead,
-                            file,
-                            chatState.operatorProfileImgUrl, false, false));
+                    currentChatItems.add(
+                            new OperatorAttachmentItem(
+                                    message.getId(),
+                                    ChatAdapter.OPERATOR_FILE_VIEW_TYPE,
+                                    showChatHead,
+                                    file,
+                                    chatState.operatorProfileImgUrl, false, false)
+                    );
                 }
 
             }
         }
     }
 
-    private void addLastMessageItem(List<ChatItem> currentChatItems, ChatMessage message, MessageAttachment attachment) {
+    private void addLastMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (!message.getContent().equals("")) {
+            MessageAttachment messageAttachment = message.getAttachment();
             currentChatItems.add(new OperatorMessageItem(
                     message.getId(),
                     chatState.operatorProfileImgUrl,
                     true,
                     message.getContent(),
-                    getSingleChoiceAttachmentOptions(attachment),
+                    getSingleChoiceAttachmentOptions(messageAttachment),
                     null,
-                    getSingleChoiceAttachmentImgUrl(attachment)
+                    getSingleChoiceAttachmentImgUrl(messageAttachment)
             ));
         }
     }

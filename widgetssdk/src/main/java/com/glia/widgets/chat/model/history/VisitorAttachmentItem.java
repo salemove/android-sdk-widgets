@@ -3,6 +3,7 @@ package com.glia.widgets.chat.model.history;
 import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
@@ -11,12 +12,15 @@ public class VisitorAttachmentItem extends ChatItem {
     public final AttachmentFile attachmentFile;
     public final boolean isFileExists;
     public final boolean isDownloading;
+    public final boolean showDelivered;
 
-    public VisitorAttachmentItem(String id, int viewType, AttachmentFile attachmentFile, boolean isFileExists, boolean isDownloading) {
-        super(id, viewType);
+    public VisitorAttachmentItem(String chatItemId, int viewType, AttachmentFile attachmentFile,
+                                 boolean isFileExists, boolean isDownloading, boolean showDelivered) {
+        super(chatItemId, viewType);
         this.attachmentFile = attachmentFile;
         this.isFileExists = isFileExists;
         this.isDownloading = isDownloading;
+        this.showDelivered = showDelivered;
     }
 
     @Override
@@ -25,23 +29,24 @@ public class VisitorAttachmentItem extends ChatItem {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         VisitorAttachmentItem that = (VisitorAttachmentItem) o;
-        return Objects.equals(attachmentFile, that.attachmentFile) &&
-                Objects.equals(isFileExists, that.isFileExists) &&
-                Objects.equals(isDownloading, that.isDownloading);
+        return isFileExists == that.isFileExists && isDownloading == that.isDownloading &&
+                showDelivered == that.showDelivered && Objects.equals(attachmentFile, that.attachmentFile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), attachmentFile, isFileExists, isDownloading);
+        return Objects.hash(super.hashCode(), attachmentFile, isFileExists, isDownloading, showDelivered);
     }
 
     @NonNull
     @Override
     public String toString() {
         return "VisitorAttachmentItem{" +
-                ", attachmentFile='" + attachmentFile + '\'' +
-                ", isFileExists='" + isFileExists + '\'' +
-                ", isDownloading='" + isDownloading + '\'' +
-                +'}';
+                "attachmentFile=" + Utils.toString(attachmentFile) +
+                ", chatItemId=" + getId() +
+                ", isFileExists=" + isFileExists +
+                ", isDownloading=" + isDownloading +
+                ", showDelivered=" + showDelivered +
+                '}';
     }
 }

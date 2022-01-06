@@ -14,8 +14,12 @@
     <string name="pref_font_color">font_color</string>
     <string name="pref_font_size">font_size</string>
     <string name="pref_header_title">header_title</string>
+    <string name="pref_authorization_type">authorization_type</string>
     <string name="pref_app_token">app_token</string>
+    <string name="pref_app_authorization">app_authorization</string>
     <string name="pref_site_id">site_id</string>
+    <string name="pref_api_key_id">api_key</string>
+    <string name="pref_api_key_secret">api_key_secret</string>
     <string name="pref_company_name">company_name</string>
     <string name="pref_queue_id">queue_id</string>
     <string name="pref_context_url">context_url</string>

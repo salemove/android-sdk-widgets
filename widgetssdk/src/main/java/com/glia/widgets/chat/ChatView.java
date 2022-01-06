@@ -486,56 +486,36 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             @Override
             public void emitItems(List<ChatItem> items) {
                 List<ChatItem> updatedItems = items.stream()
-                        .map(this::updateChatItem)
+                        .map(this::updateIsFileDownloaded)
                         .collect(Collectors.toList());
 
                 post(() -> adapter.submitList(updatedItems));
             }
 
-            private ChatItem updateChatItem(ChatItem item) {
+            private ChatItem updateIsFileDownloaded(ChatItem item) {
                 if (item instanceof OperatorAttachmentItem) {
-                    AttachmentFile attachmentFile = ((OperatorAttachmentItem) item).attachmentFile;
-                    OperatorAttachmentItem newItem;
-                    if (FileHelper.isFileDownloaded(attachmentFile)) {
-                        newItem = new OperatorAttachmentItem(
-                                attachmentFile.getId(),
-                                item.getViewType(),
-                                ((OperatorAttachmentItem) item).showChatHead,
-                                ((OperatorAttachmentItem) item).attachmentFile,
-                                ((OperatorAttachmentItem) item).operatorProfileImgUrl,
-                                true,
-                                ((OperatorAttachmentItem) item).isDownloading);
-                    } else {
-                        newItem = new OperatorAttachmentItem(
-                                attachmentFile.getId(),
-                                item.getViewType(),
-                                ((OperatorAttachmentItem) item).showChatHead,
-                                ((OperatorAttachmentItem) item).attachmentFile,
-                                ((OperatorAttachmentItem) item).operatorProfileImgUrl,
-                                false,
-                                ((OperatorAttachmentItem) item).isDownloading);
-                    }
-
-                    return newItem;
+                    OperatorAttachmentItem oldItem = (OperatorAttachmentItem) item;
+                    boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
+                    return new OperatorAttachmentItem(
+                            oldItem.getId(),
+                            oldItem.getViewType(),
+                            oldItem.showChatHead,
+                            oldItem.attachmentFile,
+                            oldItem.operatorProfileImgUrl,
+                            isFileDownloaded,
+                            oldItem.isDownloading
+                    );
                 } else if (item instanceof VisitorAttachmentItem) {
-                    AttachmentFile attachmentFile = ((VisitorAttachmentItem) item).attachmentFile;
-                    VisitorAttachmentItem newItem;
-                    if (FileHelper.isFileDownloaded(attachmentFile)) {
-                        newItem = new VisitorAttachmentItem(
-                                attachmentFile.getId(),
-                                item.getViewType(),
-                                ((VisitorAttachmentItem) item).attachmentFile,
-                                true,
-                                ((VisitorAttachmentItem) item).isDownloading);
-                    } else {
-                        newItem = new VisitorAttachmentItem(
-                                attachmentFile.getId(),
-                                item.getViewType(),
-                                ((VisitorAttachmentItem) item).attachmentFile,
-                                false,
-                                ((VisitorAttachmentItem) item).isDownloading);
-                    }
-                    return newItem;
+                    VisitorAttachmentItem oldItem = (VisitorAttachmentItem) item;
+                    boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
+                    return new VisitorAttachmentItem(
+                            oldItem.getId(),
+                            oldItem.getViewType(),
+                            oldItem.attachmentFile,
+                            isFileDownloaded,
+                            oldItem.isDownloading,
+                            oldItem.showDelivered
+                    );
                 } else {
                     return item;
                 }
@@ -1288,28 +1268,33 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     @NonNull
-    private ChatItem updatedDownloadingItemState(AttachmentFile attachmentFile, ChatItem currentItem, boolean isDownloading, boolean isFileExists) {
-        if (currentItem.getId().equals(attachmentFile.getId())) {
-            if (currentItem instanceof VisitorAttachmentItem) {
+    private ChatItem updatedDownloadingItemState(AttachmentFile attachmentFile, ChatItem currentChatItem, boolean isDownloading, boolean isFileExists) {
+        if (currentChatItem instanceof VisitorAttachmentItem) {
+            VisitorAttachmentItem currentItem = (VisitorAttachmentItem) currentChatItem;
+            if (currentItem.attachmentFile.getId().equals(attachmentFile.getId())) {
                 return new VisitorAttachmentItem(
                         currentItem.getId(),
                         currentItem.getViewType(),
-                        ((VisitorAttachmentItem) currentItem).attachmentFile,
+                        currentItem.attachmentFile,
                         isFileExists,
-                        isDownloading
+                        isDownloading,
+                        currentItem.showDelivered
                 );
-            } else if (currentItem instanceof OperatorAttachmentItem) {
+            }
+        } else if (currentChatItem instanceof OperatorAttachmentItem) {
+            OperatorAttachmentItem currentItem = (OperatorAttachmentItem) currentChatItem;
+            if (currentItem.attachmentFile.getId().equals(attachmentFile.getId())) {
                 return new OperatorAttachmentItem(
                         currentItem.getId(),
                         currentItem.getViewType(),
-                        ((OperatorAttachmentItem) currentItem).showChatHead,
-                        ((OperatorAttachmentItem) currentItem).attachmentFile,
-                        ((OperatorAttachmentItem) currentItem).operatorProfileImgUrl,
+                        currentItem.showChatHead,
+                        currentItem.attachmentFile,
+                        currentItem.operatorProfileImgUrl,
                         isFileExists,
                         isDownloading);
             }
         }
-        return currentItem;
+        return currentChatItem;
     }
 
     @Override

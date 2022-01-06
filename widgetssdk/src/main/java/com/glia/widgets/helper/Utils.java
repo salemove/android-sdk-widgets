@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import androidx.annotation.AttrRes;
 import androidx.annotation.StyleableRes;
 
+import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -704,5 +705,15 @@ public class Utils {
         if (a == null && b == null) return true;
         if (a == null || b == null) return false;
         return a.trim().equals(b.trim());
+    }
+
+    public static String toString(AttachmentFile attachmentFile) {
+        return "{" +
+                "id=" + attachmentFile.getId() +
+                ", size=" + attachmentFile.getSize() +
+                ", contentType=" + attachmentFile.getContentType() +
+                ", isDeleted=" + attachmentFile.isDeleted() +
+                ", name=" + attachmentFile.getName() +
+                " }";
     }
 }

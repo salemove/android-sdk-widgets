@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <PreferenceCategory app:title="@string/settings_sdk_title">
-
-        <EditTextPreference
-            app:defaultValue="@string/app_token"
-            app:key="@string/pref_app_token"
-            app:title="@string/settings_app_token"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory app:title="Authorization">
+        <Preference
+            android:key="@string/pref_app_authorization"
+            android:summary="@string/settings_authorization_summary"
+            android:title="@string/settings_authorization" />
 
         <EditTextPreference
             app:defaultValue="@string/site_id"
@@ -16,6 +13,14 @@
             app:title="@string/settings_site_id"
             app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+            app:defaultValue="@string/queue_id"
+            app:key="@string/pref_queue_id"
+            app:title="@string/settings_queue_id"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/settings_sdk_title">
         <EditTextPreference
             app:defaultValue="@string/settings_value_default_company_name"
             app:key="@string/pref_company_name"
@@ -26,12 +31,6 @@
             app:defaultValue="https://en.wikipedia.org/wiki/Hamburger"
             app:key="@string/pref_context_url"
             app:title="@string/settings_context_url"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            app:defaultValue="@string/queue_id"
-            app:key="@string/pref_queue_id"
-            app:title="@string/settings_queue_id"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreference

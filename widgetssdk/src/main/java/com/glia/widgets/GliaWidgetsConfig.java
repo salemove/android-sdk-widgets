@@ -2,6 +2,8 @@ package com.glia.widgets;
 
 import android.content.Context;
 
+import com.glia.androidsdk.SiteApiKey;
+
 /**
  * Configurations used to initialize Glia SDK
  *
@@ -10,6 +12,7 @@ import android.content.Context;
 public class GliaWidgetsConfig {
     private final String appToken;
     private final String siteId;
+    private final SiteApiKey siteApiKey;
     private final Context context;
     private final String region;
     private final int requestCode;
@@ -22,12 +25,34 @@ public class GliaWidgetsConfig {
         this(appToken, siteId, context, region, requestCode);
     }
 
-    public GliaWidgetsConfig(String appToken, String siteId, Context context, String region, int requestCode) {
-        this.appToken = appToken;
-        this.siteId = siteId;
-        this.context = context;
-        this.region = region;
-        this.requestCode = requestCode;
+    /**
+     * @deprecated Deprecated since SDK version 1.6.18. Please use {@link GliaWidgetsConfig.Builder#setSiteApiKey(SiteApiKey)} instead.
+     */
+    @Deprecated
+    public GliaWidgetsConfig(
+            String appToken,
+            String siteId,
+            Context context,
+            String region,
+            int requestCode
+    ) {
+        this(
+                new Builder()
+                        .setAppToken(appToken)
+                        .setSiteId(siteId)
+                        .setContext(context)
+                        .setRegion(region)
+                        .setRequestCode(requestCode)
+        );
+    }
+
+    private GliaWidgetsConfig(Builder builder) {
+        this.appToken = builder.appToken;
+        this.siteApiKey = builder.siteApiKey;
+        this.siteId = builder.siteId;
+        this.context = builder.context;
+        this.region = builder.region;
+        this.requestCode = builder.requestCode;
     }
 
     /**
@@ -54,6 +79,10 @@ public class GliaWidgetsConfig {
         return region;
     }
 
+    public SiteApiKey getSiteApiKey() {
+        return siteApiKey;
+    }
+
     /**
      * @deprecated API token is no longer needed for SDK to function correctly.
      * Deprecated since SDK version 1.6.5
@@ -76,6 +105,14 @@ public class GliaWidgetsConfig {
      * <p>
      * Required information is:
      * <ul>
+     * <li>Site Api Key Id</li>
+     * <li>Site Api Key Secret</li>
+     * <li>Site ID</li>
+     * <li>Region</li>
+     * <li>Context</li>
+     * </ul>
+     * or this
+     * <ul>
      * <li>APP token</li>
      * <li>Site ID</li>
      * <li>Region</li>
@@ -84,6 +121,18 @@ public class GliaWidgetsConfig {
      * </p>
      * <p>
      * <b>Usage example:</b>
+     * <pre>
+     * <code>
+     * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
+     *   .setSiteApiKey(new SiteApiKey(SITE_API_KEY_ID, SITE_API_KEY_SECRET))
+     *   .setSiteId("SITE_ID")
+     *   .setRegion(Regions.US)
+     *   .setContext(getApplicationContext())
+     *   .build();
+     * </code>
+     * </pre>
+     * <p>
+     * or
      * <pre>
      * <code>
      * GliaBuildConfig gliaBuildConfig = new GliaBuildConfig.Builder(
@@ -98,13 +147,19 @@ public class GliaWidgetsConfig {
     public static class Builder {
         String appToken;
         String siteId;
+        SiteApiKey siteApiKey;
         Context context;
         String region;
-        int requestCode = 45554442;
+        int requestCode;
+
+        public Builder() {
+            requestCode = 45554442;
+        }
 
         /**
          * @param appToken - your APP token
          * @return Builder instance
+         * @deprecated use site api key instead
          */
         public Builder setAppToken(String appToken) {
             this.appToken = appToken;
@@ -148,13 +203,23 @@ public class GliaWidgetsConfig {
             return this;
         }
 
+        public Builder setSiteApiKey(SiteApiKey siteApiKey) {
+            this.siteApiKey = siteApiKey;
+            return this;
+        }
+
+        public Builder setRequestCode(int requestCode) {
+            this.requestCode = requestCode;
+            return this;
+        }
+
         /**
          * Builds the final configurations
          *
          * @return Glia SDK configurations
          */
         public GliaWidgetsConfig build() {
-            return new GliaWidgetsConfig(appToken, siteId, context, region, requestCode);
+            return new GliaWidgetsConfig(this);
         }
     }
 }

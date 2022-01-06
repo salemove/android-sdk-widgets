@@ -1,4 +1,4 @@
-package com.glia.widgets.chat.adapter.holder;
+package com.glia.widgets.chat.adapter.holder.imageattachment;
 
 import android.graphics.Color;
 import android.view.View;
@@ -39,7 +39,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
             GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
     ) {
         super(itemView);
-        imageView = itemView.findViewById(R.id.incoming_image_attachment);
+        this.imageView = itemView.findViewById(R.id.incoming_image_attachment);
         this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
         this.getImageFileFromDownloadsUseCase = getImageFileFromDownloadsUseCase;
         this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
@@ -64,6 +64,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
                         }
                 );
     }
+
 
     public void onStopView() {
         if (disposable != null) disposable.dispose();

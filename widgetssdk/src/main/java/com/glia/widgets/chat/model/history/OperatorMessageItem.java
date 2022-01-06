@@ -1,5 +1,7 @@
 package com.glia.widgets.chat.model.history;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 
@@ -52,11 +54,13 @@ public class OperatorMessageItem extends ChatItem {
         return Objects.hash(super.hashCode(), operatorProfileImgUrl, showChatHead, content, singleChoiceOptions, selectedChoiceIndex, choiceCardImageUrl);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "OperatorMessageItem{" +
                 "operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                 ", showChatHead=" + showChatHead +
+                ", chatItemId=" + getId() +
                 ", content='" + content + '\'' +
                 ", singleChoiceOptions=" + singleChoiceOptions +
                 ", selectedChoiceIndex=" + selectedChoiceIndex +

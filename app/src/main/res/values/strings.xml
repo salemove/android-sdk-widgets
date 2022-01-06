@@ -29,7 +29,9 @@
     <string name="settings_chat_font_family">Chat message font family</string>
     <string name="settings_header_title">Title</string>
     <string name="settings_app_token">App token</string>
-    <string name="settings_site_id">Site id</string>
+    <string name="settings_site_api_key_id">Site Api Key id</string>
+    <string name="settings_site_api_key_secret">Site Api Key Secret</string>
+    <string name="settings_site_id">Site id (needs restart)</string>
     <string name="settings_chat_negative_color">Negative color</string>
     <string name="settings_chat_visitor_message_bg_color">Visitor message bg color</string>
     <string name="settings_chat_visitor_message_txt_color">Visitor message txt color</string>
@@ -54,11 +56,16 @@
     <string name="settings_operator_layout_styling">Operator Layout Styling</string>
     <string name="settings_other">Other</string>
     <string name="settings_company_name">Company name</string>
+    <string name="settings_authorization">Authorization type (needs restart)</string>
+    <string name="settings_authorization_summary">Authorization type</string>
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
     <string name="settings_use_overlay">Use Overlay</string>
     <string name="settings_context_url">Context url</string>
     <string name="settings_use_alert_dialog_button_vertical_alignment">Align AlertDialog Buttons Vertically</string>
+
+    <string name="authorization_app_token">App Token</string>
+    <string name="authorization_site_api_key">Site Api Key</string>
 
     <string name="main_open_settings">Open Settings</string>
     <string name="main_launch_activity">Launch Chat in Activity</string>

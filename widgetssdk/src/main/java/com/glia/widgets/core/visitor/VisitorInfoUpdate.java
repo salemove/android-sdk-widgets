@@ -1,5 +1,7 @@
 package com.glia.widgets.core.visitor;
 
+import androidx.annotation.Nullable;
+
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -12,6 +14,7 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
     public LinkedTreeMap<String, String> customAttributes;
     public VisitorInfoUpdateRequest.NoteUpdateMethod noteUpdateMethod = VisitorInfoUpdateRequest.NoteUpdateMethod.APPEND;
     public VisitorInfoUpdateRequest.CustomAttributesUpdateMethod customAttrsUpdateMethod = VisitorInfoUpdateRequest.CustomAttributesUpdateMethod.MERGE;
+    public String externalId;
 
     public void setName(String name) {
         this.name = name;
@@ -40,6 +43,8 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
     public void setCustomAttrsUpdateMethod(CustomAttributesUpdateMethod customAttrsUpdateMethod) {
         this.customAttrsUpdateMethod = customAttrsUpdateMethod;
     }
+
+    public void setExternalId(String externalId) { this.externalId = externalId; }
 
     @Override
     public String getName() {
@@ -74,5 +79,10 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
     @Override
     public LinkedTreeMap<String, String> getCustomAttributes() {
         return customAttributes;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
     }
 }

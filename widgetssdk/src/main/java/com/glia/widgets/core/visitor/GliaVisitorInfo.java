@@ -13,6 +13,7 @@ public class GliaVisitorInfo implements VisitorInfo {
     public boolean banned;
     public String href;
     public String id;
+    public String externalId;
 
     public GliaVisitorInfo(VisitorInfo visitorInfo) {
         this.name = visitorInfo.getName();
@@ -24,6 +25,7 @@ public class GliaVisitorInfo implements VisitorInfo {
         this.banned = visitorInfo.getBanned();
         this.href = visitorInfo.getHref();
         this.id = visitorInfo.getId();
+        this.externalId = visitorInfo.getExternalId();
     }
 
     @Override
@@ -69,5 +71,10 @@ public class GliaVisitorInfo implements VisitorInfo {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
     }
 }

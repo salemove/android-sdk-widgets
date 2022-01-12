@@ -747,19 +747,29 @@ public class ChatController implements
             appendSentMessage(currentChatItems, message);
             addVisitorAttachmentItemsToChatItems(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
-            changeLastOperatorMessages(currentChatItems, message);
-            appendMessagesNotSeen();
-            if (message.getAttachment() instanceof SingleChoiceAttachment) {
-                SingleChoiceAttachment attachment = ((SingleChoiceAttachment) message.getAttachment());
-                emitViewState(
-                        chatState.chatInputModeChanged(
-                                attachment.getOptions() != null ?
-                                        ChatInputMode.SINGLE_CHOICE_CARD :
-                                        ChatInputMode.ENABLED
-                        )
-                );
-            }
+            onOperatorMessageReceived(currentChatItems, message);
         }
+    }
+
+    private void onOperatorMessageReceived(List<ChatItem> currentChatItems, ChatMessage message) {
+        changeLastOperatorMessages(currentChatItems, message);
+        appendMessagesNotSeen();
+        changeChatInputMode(message);
+    }
+
+    private void changeChatInputMode(ChatMessage message) {
+        ChatInputMode newInputMode = getChatInputMode(message);
+        if (chatState.chatInputMode != newInputMode)
+            emitViewState(chatState.chatInputModeChanged(newInputMode));
+    }
+
+    private ChatInputMode getChatInputMode(ChatMessage message) {
+        if (message.getAttachment() instanceof SingleChoiceAttachment) {
+            SingleChoiceAttachment attachment = ((SingleChoiceAttachment) message.getAttachment());
+            if (attachment.getOptions() != null)
+                return ChatInputMode.SINGLE_CHOICE_CARD;
+        }
+        return ChatInputMode.ENABLED;
     }
 
     private void addVisitorAttachmentItemsToChatItems(List<ChatItem> currentChatItems, ChatMessage chatMessage) {

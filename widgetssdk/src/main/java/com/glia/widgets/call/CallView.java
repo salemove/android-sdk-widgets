@@ -337,8 +337,12 @@ public class CallView extends ConstraintLayout {
                     videoButton.setEnabled(callState.is2WayVideoCall());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);
-                    setButtonActivated(muteButton, theme.getIconCallAudioOn(),
-                            theme.getIconCallAudioOff(), callState.isMuted);
+                    setButtonActivated(
+                            muteButton,
+                            theme.getIconCallAudioOff(),    // mute (eg. mic-off) button activated icon
+                            theme.getIconCallAudioOn(),     // mute (eg. mic-off) button deactivated icon
+                            callState.isMuted
+                    );
                     muteButtonLabel.setText(callState.isMuted ?
                             R.string.glia_call_mute_button_unmute :
                             R.string.glia_call_mute_button_mute

@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -144,13 +143,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                         optionIndex
                 );
             }
-        }
-    };
-    private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener = new SingleChoiceCardView.OnImageLoadedListener() {
-        @Override
-        public void onLoaded() {
-            Logger.d(TAG, "onSingleChoiceCardViewImageLoaded, scroll to bottom");
-            chatRecyclerView.smoothScrollToPosition(adapter.getItemCount());
         }
     };
     private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
@@ -289,7 +281,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                                     contextUrl,
                                     this.theme
                             ),
-                            activity instanceof ChatActivity, activity instanceof ChatActivity && useOverlays
+                            true,
+                            useOverlays
                     );
                 }
             }
@@ -774,7 +767,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         adapter = new ChatAdapter(
                 this.theme,
                 this.onOptionClickedListener,
-                this.onImageLoadedListener,
                 this,
                 this,
                 Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),

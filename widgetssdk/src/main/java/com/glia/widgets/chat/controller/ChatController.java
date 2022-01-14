@@ -759,8 +759,9 @@ public class ChatController implements
 
     private void changeChatInputMode(ChatMessage message) {
         ChatInputMode newInputMode = getChatInputMode(message);
-        if (chatState.chatInputMode != newInputMode)
+        if (chatState.chatInputMode != newInputMode) {
             emitViewState(chatState.chatInputModeChanged(newInputMode));
+        }
     }
 
     private ChatInputMode getChatInputMode(ChatMessage message) {

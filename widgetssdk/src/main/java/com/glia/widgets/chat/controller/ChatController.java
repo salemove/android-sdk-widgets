@@ -767,8 +767,9 @@ public class ChatController implements
     private ChatInputMode getChatInputMode(ChatMessage message) {
         if (message.getAttachment() instanceof SingleChoiceAttachment) {
             SingleChoiceAttachment attachment = ((SingleChoiceAttachment) message.getAttachment());
-            if (attachment.getOptions() != null)
+            if (attachment.getOptions() != null) {
                 return ChatInputMode.SINGLE_CHOICE_CARD;
+            }
         }
         return ChatInputMode.ENABLED;
     }

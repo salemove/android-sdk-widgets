@@ -4,6 +4,7 @@
     <dimen name="glia_x_small">2dp</dimen>
     <dimen name="glia_small">4dp</dimen>
     <dimen name="glia_medium">8dp</dimen>
+    <dimen name="glia_pre_large">12dp</dimen>
     <dimen name="glia_large">16dp</dimen>
     <dimen name="glia_large_x_large">24dp</dimen>
     <dimen name="glia_x_large">32dp</dimen>
@@ -48,4 +49,5 @@
     <dimen name="glia_call_video_height">250dp</dimen>
     <dimen name="glia_chat_operator_item_chat_head_size">36dp</dimen>
 
+    <dimen name="glia_single_choice_card_image_height">200dp</dimen>
 </resources>

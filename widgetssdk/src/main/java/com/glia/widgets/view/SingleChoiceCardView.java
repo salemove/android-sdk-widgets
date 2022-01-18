@@ -6,7 +6,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +22,6 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.textview.ChoiceCardContentTextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -35,7 +33,6 @@ public class SingleChoiceCardView extends FrameLayout {
     private final ConstraintLayout layout;
     private final ChoiceCardContentTextView contentView;
     private OnOptionClickedListener onOptionClickedListener;
-    private OnImageLoadedListener onImageLoadedListener;
 
     public SingleChoiceCardView(@NonNull Context context) {
         this(context, null);
@@ -61,40 +58,53 @@ public class SingleChoiceCardView extends FrameLayout {
             List<SingleChoiceOption> options,
             Integer selectedIndex,
             UiTheme theme,
-            int adapterPosition,
-            OnImageLoadedListener onImageLoadedListener
+            int adapterPosition
     ) {
-        this.onImageLoadedListener = onImageLoadedListener;
+        setupCardView(theme);
+        setupImage(imageUrl);
+        setupText(content, theme);
+        setupButtons(id, options, selectedIndex, theme, adapterPosition);
+    }
+
+    public void setOnOptionClickedListener(OnOptionClickedListener onOptionClickedListener) {
+        this.onOptionClickedListener = onOptionClickedListener;
+    }
+
+    public interface OnOptionClickedListener {
+        void onClicked(
+                String id,
+                int indexInList,
+                int indexOfOption
+        );
+    }
+
+    private void setupCardView(UiTheme theme) {
         int gliaBaseLightColor = ContextCompat.getColor(
                 this.getContext(), theme.getBaseLightColor()
         );
         int gliaBrandPrimaryColor = ContextCompat.getColor(
                 this.getContext(), theme.getBrandPrimaryColor()
         );
-
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
         materialCardView.setBackgroundColor(gliaBaseLightColor);
+    }
 
-        if (imageUrl != null) {
-            Picasso.get().load(imageUrl).into(imageView, new Callback() {
-                @Override
-                public void onSuccess() {
-                    if (SingleChoiceCardView.this.onImageLoadedListener != null) {
-                        onImageLoadedListener.onLoaded();
-                    }
-                }
-
-                @Override
-                public void onError(Exception e) {
-
-                }
-            });
-        }
+    private void setupImage(String imageUrl) {
         imageView.setVisibility(imageUrl != null ? VISIBLE : GONE);
+        Picasso.get().load(imageUrl).into(imageView);
+    }
+
+    private void setupText(String content, UiTheme theme) {
         contentView.setText(content);
         contentView.setTheme(theme);
+    }
+
+    private void setupButtons(String id, List<SingleChoiceOption> options, Integer selectedIndex, UiTheme theme, int adapterPosition) {
         ConstraintSet constraintSet = new ConstraintSet();
         int topViewId = R.id.content_view;
+
+        int horizontalMargin = getResources().getDimensionPixelOffset(R.dimen.glia_large);
+        int topMargin = getResources().getDimensionPixelOffset(R.dimen.glia_medium);
         for (int index = 0; index < options.size(); index++) {
             SingleChoiceOption option = options.get(index);
             MaterialButton button = new MaterialButton(
@@ -111,12 +121,7 @@ public class SingleChoiceCardView extends FrameLayout {
                     LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT
             );
-            params.setMargins(
-                    0,
-                    Float.valueOf(getResources().getDimension(R.dimen.glia_medium)).intValue(),
-                    0,
-                    0
-            );
+            params.setMargins(horizontalMargin, topMargin, horizontalMargin, 0);
             button.setLayoutParams(params);
             button.setId(View.generateViewId());
             button.setText(option.getText());
@@ -189,21 +194,5 @@ public class SingleChoiceCardView extends FrameLayout {
             }
             constraintSet.applyTo(layout);
         }
-    }
-
-    public void setOnOptionClickedListener(OnOptionClickedListener onOptionClickedListener) {
-        this.onOptionClickedListener = onOptionClickedListener;
-    }
-
-    public interface OnOptionClickedListener {
-        void onClicked(
-                String id,
-                int indexInList,
-                int indexOfOption
-        );
-    }
-
-    public interface OnImageLoadedListener {
-        void onLoaded();
     }
 }

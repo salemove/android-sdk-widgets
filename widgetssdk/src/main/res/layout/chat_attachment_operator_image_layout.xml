@@ -20,6 +20,18 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/glia_chat_operator_message_end" />
 
+    <com.glia.widgets.view.OperatorStatusView
+        android:id="@+id/chat_head_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/glia_small"
+        android:layout_marginEnd="@dimen/glia_small"
+        app:imageSize="@dimen/glia_chat_operator_item_chat_head_size"
+        app:layout_constraintBottom_toBottomOf="@id/incoming_image_attachment"
+        app:layout_constraintEnd_toStartOf="@id/start_guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription" />
+
     <include
         layout="@layout/chat_attachment_image_item"
         android:layout_width="@dimen/glia_chat_attachment_image_width"
@@ -29,5 +41,4 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

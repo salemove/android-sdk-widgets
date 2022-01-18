@@ -123,6 +123,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (viewType == OPERATOR_IMAGE_VIEW_TYPE) {
             return new OperatorImageAttachmentViewHolder(
                     inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false),
+                    uiTheme,
                     getImageFileFromCacheUseCase,
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase
@@ -165,9 +166,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else {
                 OperatorImageAttachmentViewHolder viewHolder = (OperatorImageAttachmentViewHolder) holder;
-                AttachmentFile file = ((OperatorAttachmentItem) chatItem).attachmentFile;
-                viewHolder.bind(file);
-                viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(file));
+                OperatorAttachmentItem item = (OperatorAttachmentItem) chatItem;
+                viewHolder.bind(item, onImageItemClickListener);
             }
         } else if (chatItem instanceof VisitorAttachmentItem) {
             if (chatItem.getViewType() == VISITOR_FILE_VIEW_TYPE) {

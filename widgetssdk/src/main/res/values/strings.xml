@@ -6,14 +6,14 @@
     <string name="glia_chat_in_queue_message">An MSR will be with you shortly.</string>
     <string name="glia_chat_operator_has_joined">%1$s has joined the conversation</string>
     <string name="glia_chat_delivered">Delivered</string>
-    <string name="glia_chat_upgraded_to_audio_call">Upgraded to Audio call</string>
-    <string name="glia_chat_upgraded_to_video_call">Upgraded to Video call</string>
+    <string name="glia_chat_upgraded_to_audio_call">Upgraded to audio call</string>
+    <string name="glia_chat_upgraded_to_video_call">Upgraded to video call</string>
     <string name="glia_chat_single_choice_card_hint">Tap on the answer above</string>
     <string name="glia_chat_not_started_hint">Send a message to start chatting</string>
-    <string name="glia_chat_file_download_success_message">File is downloaded successfully.</string>
-    <string name="glia_chat_file_download_fail_message">"File download is failed."</string>
-    <string name="glia_chat_file_open_file_title">"Open File"</string>
-    <string name="glia_chat_file_download_failed_msg">Unable to download the file at the moment, please try again later.</string>
+    <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>
+    <string name="glia_chat_file_download_fail_message">Could not download the file.</string>
+    <string name="glia_chat_file_open_file_title">Open File</string>
+    <string name="glia_chat_file_download_failed_msg">Could not download the file. Please try again.</string>
 
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
@@ -22,19 +22,19 @@
     <!--    dialogs-->
     <!-- Leave Queue Dialog -->
     <string name="glia_dialog_leave_queue_title">Are you sure you want to leave?</string>
-    <string name="glia_dialog_leave_queue_message">You will lose your place in the queue.</string>
+    <string name="glia_dialog_leave_queue_message">You will lose your position in the queue.</string>
     <string name="glia_dialog_leave_queue_yes">@string/glia_dialog_yes</string>
     <string name="glia_dialog_leave_queue_no">@string/glia_dialog_no</string>
 
     <!-- Share screen Dialog -->
-    <string name="glia_dialog_screen_sharing_offer_enable_notifications_title">Share your screen?</string>
-    <string name="glia_dialog_screen_sharing_offer_enable_notifications_message">The operator has requested you share your screen. However this requires the app\'s notifications be switched on. Do this now?</string>
+    <string name="glia_dialog_screen_sharing_offer_enable_notifications_title">Start Screen Sharing?</string>
+    <string name="glia_dialog_screen_sharing_offer_enable_notifications_message">The operator has requested to share your screen. To do this, you need to turn on app\'s notifications. Do this now?</string>
     <string name="glia_dialog_screen_sharing_offer_enable_notifications_yes">@string/glia_dialog_yes</string>
     <string name="glia_dialog_screen_sharing_offer_enable_notifications_no">@string/glia_dialog_no</string>
 
     <!-- Allow notifications Dialog -->
     <string name="glia_dialog_allow_notifications_title">Allow Notifications?</string>
-    <string name="glia_dialog_allow_notifications_message">The engagement would like to show notifications on the status bar. Open settings to enable notifications?</string>
+    <string name="glia_dialog_allow_notifications_message">We would like to show you notifications in the status bar. Please enable notifications in Settings.</string>
     <string name="glia_dialog_allow_notifications_yes">@string/glia_dialog_yes</string>
     <string name="glia_dialog_allow_notifications_no">@string/glia_dialog_no</string>
 
@@ -46,7 +46,7 @@
 
     <!-- ScreenSharing offer Dialog -->
     <string name="glia_dialog_screen_sharing_offer_title">You are about to share your screen</string>
-    <string name="glia_dialog_screen_sharing_offer_message">Keep in mind that depending on your selection, your full screen might be shared with the operator, not just the browser window.</string>
+    <string name="glia_dialog_screen_sharing_offer_message">Depending on your selection, your entire screen might be shared with the operator, not just the browser window.</string>
     <string name="glia_dialog_screen_sharing_offer_accept">@string/glia_dialog_accept</string>
     <string name="glia_dialog_screen_sharing_offer_decline">@string/glia_dialog_decline</string>
 
@@ -56,8 +56,8 @@
     <string name="glia_dialog_engagement_ended_action_ok">@string/glia_dialog_ok</string>
 
     <!-- Overlay permissions required Dialog -->
-    <string name="glia_dialog_overlay_permissions_title">Overlay Permissions Required</string>
-    <string name="glia_dialog_overlay_permissions_message">The chat requires screen overlay permissions to show message bubbles (optional). Please enable them for your app.</string>
+    <string name="glia_dialog_overlay_permissions_title">Screen Overlay Permissions Required</string>
+    <string name="glia_dialog_overlay_permissions_message">Allow screen overlay for your app to see the chat message bubbles</string>
     <string name="glia_dialog_overlay_permissions_ok">@string/glia_dialog_ok</string>
     <string name="glia_dialog_overlay_permissions_no">@string/glia_dialog_no</string>
 
@@ -70,20 +70,20 @@
 
     <!-- End screen sharing Dialog -->
     <string name="glia_dialog_screen_sharing_end_title">End Screen Sharing?</string>
-    <string name="glia_dialog_screen_sharing_end_message">Are You sure You want to end the screen sharing?</string>
+    <string name="glia_dialog_screen_sharing_end_message">Are you sure you want to end screen sharing?</string>
     <string name="glia_dialog_screen_sharing_end_cancel">@string/glia_dialog_cancel</string>
     <string name="glia_dialog_screen_sharing_end_end">End</string>
 
     <!-- Operators unavailable AlertDialog -->
-    <string name="glia_dialog_operators_unavailable_title">We\'re sorry</string>
+    <string name="glia_dialog_operators_unavailable_title">Operators Not Available</string>
     <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
 
     <!-- Unexpected error AlertDialog -->
-    <string name="glia_dialog_unexpected_error_title">We\'re sorry, there has been an unexpected error.</string>
-    <string name="glia_dialog_unexpected_error_message">Please try again later.</string>
+    <string name="glia_dialog_unexpected_error_title">Something Went Wrong</string>
+    <string name="glia_dialog_unexpected_error_message">Please try again.</string>
 
     <!-- Permission error AlertDialog -->
-    <string name="glia_dialog_permission_error_title">We\'re sorry, one or more permission(s) are missing for required action.</string>
+    <string name="glia_dialog_permission_error_title">Additional Permissions Required</string>
     <string name="glia_dialog_permission_error_message">Please make sure all required permissions are enabled.</string>
 
     <string name="glia_dialog_yes">Yes</string>
@@ -94,8 +94,8 @@
     <string name="glia_dialog_cancel">Cancel</string>
 
     <!--    call screen-->
-    <string name="glia_call_audio_app_bar_title">Audio call</string>
-    <string name="glia_call_video_app_bar_title">Video call</string>
+    <string name="glia_call_audio_app_bar_title">Audio Call</string>
+    <string name="glia_call_video_app_bar_title">Video Call</string>
     <string name="glia_call_chat_button_label">Chat</string>
     <string name="glia_call_video_button_label">Video</string>
     <string name="glia_call_mute_button_mute">Mute</string>
@@ -103,24 +103,24 @@
     <string name="glia_call_speaker_button_label">Speaker</string>
     <string name="glia_call_minimize_button_label">Minimize</string>
     <string name="glia_call_connecting_with">Connecting with %1$s\n%2$s</string>
-    <string name="glia_call_in_queue_message">An MSR will be with you shortly.</string>
-    <string name="glia_call_continue_browsing">You can continue browsing and\nwe’ll connect you automatically.</string>
+    <string name="glia_call_in_queue_message">An operator will be with you shortly.</string>
+    <string name="glia_call_continue_browsing">You can continue browsing and we will connect you automatically.</string>
 
     <!--    statusbar notifications-->
-    <string name="glia_notification_screen_sharing_channel_name">Screen Sharing notification channel</string>
-    <string name="glia_notification_screen_sharing_title">You are currently Sharing Your screen</string>
-    <string name="glia_notification_screen_sharing_message">To end sharing push \"END SHARING\" button</string>
+    <string name="glia_notification_screen_sharing_channel_name">Screen sharing notification channel</string>
+    <string name="glia_notification_screen_sharing_title">You are currently sharing your sceen</string>
+    <string name="glia_notification_screen_sharing_message">To stop sharing your screen, select \'End Sharing\'.</string>
     <string name="glia_notification_call_channel_name">Call notification channel</string>
-    <string name="glia_notification_audio_call_title">Audio call ongoing</string>
-    <string name="glia_notification_audio_call_message">Operator can hear You through the mic</string>
-    <string name="glia_notification_video_call_title">Video call ongoing</string>
-    <string name="glia_notification_video_call_message">Operator might see and hear You</string>
-    <string name="glia_notification_action_end_sharing">END SHARING</string>
+    <string name="glia_notification_audio_call_title">Ongoing Audio Call</string>
+    <string name="glia_notification_audio_call_message">Your microphone is on and the operator can hear you.</string>
+    <string name="glia_notification_video_call_title">Ongoing Video Call</string>
+    <string name="glia_notification_video_call_message">The operator can see and hear you.</string>
+    <string name="glia_notification_action_end_sharing">End Sharing</string>
 
-    <string name="glia_chat_attachment_upload_checking_file">Checking File…</string>
+    <string name="glia_chat_attachment_upload_checking_file">Checking file…</string>
     <string name="glia_chat_attachment_upload_ready_to_send">Ready to send</string>
-    <string name="glia_chat_attachment_upload_failed_upload">Upload failed</string>
-    <string name="glia_chat_attachment_upload_uploading">Uploading File…</string>
+    <string name="glia_chat_attachment_upload_failed_upload">Could not upload the file.</string>
+    <string name="glia_chat_attachment_upload_uploading">Uploading file…</string>
     <string name="glia_chat_attachment_upload_error_network_time_out">Nework time out</string>
     <string name="glia_chat_attachment_upload_error_invalid_input">Invalid input</string>
     <string name="glia_chat_attachment_upload_error_read_access_permissions_denied">File read access permission denied</string>

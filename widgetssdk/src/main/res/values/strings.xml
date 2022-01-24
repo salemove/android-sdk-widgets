@@ -11,7 +11,6 @@
     <string name="glia_chat_single_choice_card_hint">Tap on the answer above</string>
     <string name="glia_chat_not_started_hint">Send a message to start chatting</string>
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>
-    <string name="glia_chat_file_open_file_title">Open File</string>
     <string name="glia_chat_file_download_failed_msg">Could not download the file. Please try again.</string>
 
     <!--    top app bar-->
@@ -78,7 +77,7 @@
     <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
 
     <!-- Unexpected error AlertDialog -->
-    <string name="glia_dialog_unexpected_error_title">Something Went Wrong</string>
+    <string name="glia_dialog_unexpected_error_title">Something went wrong</string>
     <string name="glia_dialog_unexpected_error_message">Please try again.</string>
 
     <!-- Permission error AlertDialog -->
@@ -120,30 +119,30 @@
     <string name="glia_chat_attachment_upload_ready_to_send">Ready to send</string>
     <string name="glia_chat_attachment_upload_failed_upload">Could not upload the file.</string>
     <string name="glia_chat_attachment_upload_uploading">Uploading file…</string>
-    <string name="glia_chat_attachment_upload_error_network_time_out">Nework time out</string>
+    <string name="glia_chat_attachment_upload_error_network_time_out">Network timed out.</string>
     <string name="glia_chat_attachment_upload_error_invalid_input">Invalid input</string>
     <string name="glia_chat_attachment_upload_error_read_access_permissions_denied">File read access permission denied</string>
-    <string name="glia_chat_attachment_upload_error_file_type_invalid">Invalid file type</string>
-    <string name="glia_chat_attachment_upload_error_file_size_over_limit">File size over 25mb limit</string>
+    <string name="glia_chat_attachment_upload_error_file_type_invalid">This file type is not supported.</string>
+    <string name="glia_chat_attachment_upload_error_file_size_over_limit">The file is larger than the 25 MB limit.</string>
     <string name="glia_chat_attachment_upload_error_engagement_missing">Engagement missing</string>
     <string name="glia_chat_attachment_upload_error_file_count_limit_reached">Cannot upload more than 25 files</string>
     <string name="glia_chat_attachment_upload_error_internal_error">Internal error</string>
-    <string name="glia_chat_attachment_upload_error_failed_to_check_safety">Failed to check the safety of the file.</string>
+    <string name="glia_chat_attachment_upload_error_failed_to_check_safety">The safety of the file could not be confirmed.</string>
     <string name="glia_chat_attachment_upload_error_file_upload_forbidden">File uploading disabled</string>
     <string name="glia_chat_attachment_upload_menu_browse">Browse</string>
-    <string name="glia_chat_attachment_upload_menu_take_photo">Take Photo</string>
+    <string name="glia_chat_attachment_upload_menu_take_photo">Take photo</string>
     <string name="glia_chat_attachment_upload_menu_gallery">Photo library</string>
     <string name="glia_chat_attachment_download_button_label">Download</string>
     <string name="glia_chat_attachment_open_button_label">Open</string>
     <string name="glia_chat_attachment_downloading_label">Downloading file…</string>
 
     <!--    FilePreviewActivity-->
-    <string name="glia_preview_activity_preview_failed_msg">Unable to preview image at the moment, please try again later.</string>
-    <string name="glia_preview_activity_image_save_success_msg">Image is saved successfully.</string>
-    <string name="glia_preview_activity_image_save_fail_msg">Failed to save image.</string>
-    <string name="glia_preview_activity_image_share_fail_msg">Unable to share the image at the moment, please try again later.</string>
+    <string name="glia_preview_activity_preview_failed_msg">Could not load the image preview. Please try again.</string>
+    <string name="glia_preview_activity_image_save_success_msg">The image was saved successfully.</string>
+    <string name="glia_preview_activity_image_save_fail_msg">Could not save the image.</string>
+    <string name="glia_preview_activity_image_share_fail_msg">Could not share the image. Please try again.</string>
     <string name="glia_preview_activity_image_share_title">Share Image</string>
     <string name="glia_preview_activity_toolbar_title">Preview</string>
-    <string name="glia_preview_activity_img_fetch_fail_msg">Unable to fetch image at the moment, please try again later.</string>
+    <string name="glia_preview_activity_img_fetch_fail_msg">Could not fetch the image. Please try again.</string>
 
 </resources>

@@ -42,19 +42,21 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(
             OperatorMessageItem item,
-            SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
-            SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener
+            SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener
     ) {
         contentLayout.removeAllViews();
         if (item.singleChoiceOptions != null) {
-            addSingleChoiceCardView(item, onOptionClickedListener, onImageLoadedListener);
+            addSingleChoiceCardView(item, onOptionClickedListener);
         } else {
             addMessageTextView(item);
         }
         updateOperatorStatusView(item);
     }
 
-    private void addSingleChoiceCardView(OperatorMessageItem item, SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener, SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener) {
+    private void addSingleChoiceCardView(
+            OperatorMessageItem item,
+            SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener
+    ) {
         SingleChoiceCardView singleChoiceCardView = new SingleChoiceCardView(context);
         singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener);
         singleChoiceCardView.setData(
@@ -64,8 +66,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 item.singleChoiceOptions,
                 item.selectedChoiceIndex,
                 uiTheme,
-                getAdapterPosition(),
-                item.selectedChoiceIndex == null ? onImageLoadedListener : null
+                getAdapterPosition()
         );
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

@@ -12,15 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder;
-import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder;
 import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder;
 import com.glia.widgets.chat.adapter.holder.VisitorMessageViewHolder;
+import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder;
+import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
@@ -76,7 +76,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final UiTheme uiTheme;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener;
-    private final SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener;
     private final OnFileItemClickListener onFileItemClickListener;
     private final OnImageItemClickListener onImageItemClickListener;
 
@@ -87,7 +86,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public ChatAdapter(
             UiTheme uiTheme,
             SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
-            SingleChoiceCardView.OnImageLoadedListener onImageLoadedListener,
             OnFileItemClickListener onFileItemClickListener,
             OnImageItemClickListener onImageItemClickListener,
             GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
@@ -96,7 +94,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     ) {
         this.uiTheme = uiTheme;
         this.onOptionClickedListener = onOptionClickedListener;
-        this.onImageLoadedListener = onImageLoadedListener;
         this.onFileItemClickListener = onFileItemClickListener;
         this.onImageItemClickListener = onImageItemClickListener;
         this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
@@ -151,7 +148,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (chatItem instanceof OperatorMessageItem) {
             OperatorMessageViewHolder viewHolder = (OperatorMessageViewHolder) holder;
             OperatorMessageItem operatorMessageItem = ((OperatorMessageItem) chatItem);
-            viewHolder.bind(operatorMessageItem, onOptionClickedListener, onImageLoadedListener);
+            viewHolder.bind(operatorMessageItem, onOptionClickedListener);
         } else if (chatItem instanceof MediaUpgradeStartedTimerItem) {
             ((MediaUpgradeStartedViewHolder) holder).bind((MediaUpgradeStartedTimerItem) chatItem);
         } else if (chatItem instanceof OperatorAttachmentItem) {

@@ -97,15 +97,6 @@
         tools:itemCount="6"
         tools:listitem="@layout/chat_attachment_uploaded_item" />
 
-    <com.glia.widgets.chat.FileUploadMenuView
-        android:id="@+id/add_attachment_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="13dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/chat_message_layout"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <LinearLayout
         android:id="@+id/chat_message_layout"
         android:layout_width="match_parent"
@@ -121,7 +112,6 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/glia_medium"
             android:layout_marginStart="@dimen/glia_medium"
-            android:layout_marginEnd="@dimen/glia_medium"
             android:layout_weight="1"
             android:enabled="false"
             android:hint="@string/glia_chat_enter_message"
@@ -136,9 +126,7 @@
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/glia_chat_send_content_description"
-            android:paddingVertical="@dimen/glia_large"
-            android:paddingStart="@dimen/glia_medium"
-            android:paddingEnd="@dimen/glia_large"
+            android:padding="@dimen/glia_large"
             android:src="@drawable/ic_add_attachment" />
 
         <ImageButton
@@ -148,13 +136,10 @@
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/glia_chat_send_content_description"
-            android:paddingVertical="@dimen/glia_large"
-            android:paddingStart="@dimen/glia_medium"
-            android:paddingEnd="@dimen/glia_large"
+            android:padding="@dimen/glia_large"
             android:src="?attr/gliaIconSendMessage"
             android:tint="?attr/gliaBrandPrimaryColor"
-            android:visibility="gone" />
-
+            tools:src="@drawable/ic_baseline_send"
+            tools:tint="@color/glia_brand_primary_color" />
     </LinearLayout>
-
 </merge>

@@ -188,7 +188,7 @@ public class ChatController implements
 
     private Disposable disposable = null;
 
-    // pending photoCaptureFileUri - need to move some place better
+    // TODO pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
 
     public ChatController(
@@ -725,7 +725,7 @@ public class ChatController implements
             appendHistoryMessage(currentChatItems, message);
             addVisitorAttachmentItemsToChatItems(currentChatItems, message);
         } else if (message.getSender() == Chat.Participant.OPERATOR) {
-            changeLastOperatorMessages(currentChatItems, message);
+            appendOperatorMessage(currentChatItems, message);
         }
     }
 
@@ -752,7 +752,7 @@ public class ChatController implements
     }
 
     private void onOperatorMessageReceived(List<ChatItem> currentChatItems, ChatMessage message) {
-        changeLastOperatorMessages(currentChatItems, message);
+        appendOperatorMessage(currentChatItems, message);
         appendMessagesNotSeen();
         changeChatInputMode(message);
     }
@@ -864,87 +864,90 @@ public class ChatController implements
         );
     }
 
-    private void changeLastOperatorMessages(List<ChatItem> currentChatItems, ChatMessage message) {
-        replaceLastChatHeadItem(currentChatItems);
-        addOperatorDownloadableItems(currentChatItems, message);
-        addLastMessageItem(currentChatItems, message);
+    private void appendOperatorMessage(List<ChatItem> currentChatItems, ChatMessage message) {
+        setLastOperatorItemChatHeadVisibility(currentChatItems, false);
+        appendOperatorMessageItem(currentChatItems, message);
+        appendOperatorAttachmentItems(currentChatItems, message);
+        setLastOperatorItemChatHeadVisibility(currentChatItems, true);
     }
 
-    private void replaceLastChatHeadItem(List<ChatItem> currentChatItems) {
+    private void setLastOperatorItemChatHeadVisibility(List<ChatItem> currentChatItems, boolean showChatHead) {
         if (!currentChatItems.isEmpty()) {
             ChatItem lastItem = currentChatItems.get(currentChatItems.size() - 1);
-
             if (lastItem instanceof OperatorMessageItem) {
                 OperatorMessageItem lastItemInView = (OperatorMessageItem) lastItem;
                 currentChatItems.remove(lastItemInView);
-                currentChatItems.add(new OperatorMessageItem(
-                        lastItemInView.getId(),
-                        lastItemInView.operatorProfileImgUrl,
-                        false,
-                        lastItemInView.content,
-                        lastItemInView.singleChoiceOptions,
-                        lastItemInView.selectedChoiceIndex,
-                        lastItemInView.choiceCardImageUrl
-                ));
+                currentChatItems.add(
+                        new OperatorMessageItem(
+                                lastItemInView.getId(),
+                                lastItemInView.operatorProfileImgUrl,
+                                showChatHead,
+                                lastItemInView.content,
+                                lastItemInView.singleChoiceOptions,
+                                lastItemInView.selectedChoiceIndex,
+                                lastItemInView.choiceCardImageUrl
+                        )
+                );
             } else if (lastItem instanceof OperatorAttachmentItem) {
                 OperatorAttachmentItem lastItemInView = (OperatorAttachmentItem) lastItem;
                 currentChatItems.remove(lastItemInView);
-                currentChatItems.add(new OperatorAttachmentItem(
-                        lastItemInView.getId(),
-                        lastItemInView.getViewType(),
-                        true,
-                        lastItemInView.attachmentFile,
-                        lastItemInView.operatorProfileImgUrl, false, false));
+                currentChatItems.add(
+                        new OperatorAttachmentItem(
+                                lastItemInView.getId(),
+                                lastItemInView.getViewType(),
+                                showChatHead,
+                                lastItemInView.attachmentFile,
+                                lastItemInView.operatorProfileImgUrl,
+                                false,
+                                false
+                        )
+                );
             }
         }
     }
 
-    private void addOperatorDownloadableItems(List<ChatItem> currentChatItems, ChatMessage message) {
+    private void appendOperatorAttachmentItems(List<ChatItem> currentChatItems, ChatMessage message) {
         MessageAttachment attachment = message.getAttachment();
         if (attachment instanceof FilesAttachment) {
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
 
-            for (int i = 0; i < files.length; i++) {
-                AttachmentFile file = files[i];
-                boolean showChatHead = i == files.length - 1;
-                String mimeType = file.getContentType();
-                if (mimeType.startsWith("image")) {
-                    currentChatItems.add(
-                            new OperatorAttachmentItem(
-                                    message.getId(),
-                                    ChatAdapter.OPERATOR_IMAGE_VIEW_TYPE,
-                                    showChatHead,
-                                    file,
-                                    chatState.operatorProfileImgUrl, false, false)
-                    );
+            for (AttachmentFile file : files) {
+                int viewType;
+                if (file.getContentType().startsWith("image")) {
+                    viewType = ChatAdapter.OPERATOR_IMAGE_VIEW_TYPE;
                 } else {
-                    currentChatItems.add(
-                            new OperatorAttachmentItem(
-                                    message.getId(),
-                                    ChatAdapter.OPERATOR_FILE_VIEW_TYPE,
-                                    showChatHead,
-                                    file,
-                                    chatState.operatorProfileImgUrl, false, false)
-                    );
+                    viewType = ChatAdapter.OPERATOR_FILE_VIEW_TYPE;
                 }
-
+                currentChatItems.add(
+                        new OperatorAttachmentItem(
+                                message.getId(),
+                                viewType,
+                                false,
+                                file,
+                                chatState.operatorProfileImgUrl,
+                                false,
+                                false
+                        )
+                );
             }
         }
     }
 
-    private void addLastMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
+    private void appendOperatorMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
         if (!message.getContent().equals("")) {
             MessageAttachment messageAttachment = message.getAttachment();
-            currentChatItems.add(new OperatorMessageItem(
-                    message.getId(),
-                    chatState.operatorProfileImgUrl,
-                    true,
-                    message.getContent(),
-                    getSingleChoiceAttachmentOptions(messageAttachment),
-                    null,
-                    getSingleChoiceAttachmentImgUrl(messageAttachment)
-            ));
+            currentChatItems.add(
+                    new OperatorMessageItem(
+                            message.getId(),
+                            chatState.operatorProfileImgUrl,
+                            false,
+                            message.getContent(),
+                            getSingleChoiceAttachmentOptions(messageAttachment),
+                            null,
+                            getSingleChoiceAttachmentImgUrl(messageAttachment)
+                    )
+            );
         }
     }
 

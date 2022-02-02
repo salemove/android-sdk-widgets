@@ -27,7 +27,7 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
             GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
     ) {
         super(itemView, getImageFileFromCacheUseCase, getImageFileFromDownloadsUseCase, getImageFileFromNetworkUseCase);
-        this.deliveredView = itemView.findViewById(R.id.delivered_view);
+        deliveredView = itemView.findViewById(R.id.delivered_view);
         setupDeliveredView(itemView.getContext(), uiTheme);
     }
 

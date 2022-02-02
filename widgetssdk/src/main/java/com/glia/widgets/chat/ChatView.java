@@ -103,7 +103,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ChatRecyclerView chatRecyclerView;
     private ImageButton sendButton;
     private ImageButton addAttachmentButton;
-    private FileUploadMenuView addAttachmentMenu;
+    private View chatMessageLayout;
     private RecyclerView attachmentsRecyclerView;
     private UploadAttachmentAdapter uploadAttachmentAdapter;
     private EditText chatEditText;
@@ -303,11 +303,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
      * set its state accordingly.
      */
     public boolean backPressed() {
-        if (addAttachmentMenu.getVisibility() == VISIBLE) {
-            addAttachmentMenu.hide();
-            return false;
-        }
-
         if (controller != null) controller.onBackArrowClicked();
         if (chatHeadsController != null) chatHeadsController.onChatBackButtonPressed();
         return true;
@@ -758,7 +753,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         newMessagesCardView = view.findViewById(R.id.new_messages_indicator_card);
         newMessagesOperatorStatusView = view.findViewById(R.id.new_messages_indicator_image);
         newMessagesCountBadgeView = view.findViewById(R.id.new_messages_badge_view);
-        addAttachmentMenu = view.findViewById(R.id.add_attachment_menu);
+        chatMessageLayout = view.findViewById(R.id.chat_message_layout);
         attachmentsRecyclerView = view.findViewById(R.id.add_attachment_queue);
         operatorTypingAnimation = view.findViewById(R.id.operator_typing_animation_view);
     }
@@ -871,54 +866,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             }
         });
 
-        addAttachmentButton.setOnClickListener(view -> {
-            if (addAttachmentMenu.getVisibility() == VISIBLE)
-                addAttachmentMenu.hide();
-            else
-                addAttachmentMenu.show();
-        });
-
-        addAttachmentMenu.setCallback(
-                new FileUploadMenuView.Callback() {
-                    @Override
-                    public void onGalleryClicked() {
-                        addAttachmentMenu.hide();
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                        Utils.getActivity(getContext()).startActivityForResult(
-                                Intent.createChooser(intent, "Select Picture"),
-                                OPEN_DOCUMENT_ACTION_REQUEST
-                        );
-                    }
-
-                    @Override
-                    public void onTakePhotoClicked() {
-                        addAttachmentMenu.hide();
-                        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                            dispatchImageCapture();
-                        } else {
-                            Utils.getActivity(getContext())
-                                    .requestPermissions(
-                                            new String[]{Manifest.permission.CAMERA},
-                                            CAMERA_PERMISSION_REQUEST
-                                    );
-                        }
-                    }
-
-                    @Override
-                    public void onBrowseClicked() {
-                        addAttachmentMenu.hide();
-                        Intent intent = new Intent();
-                        intent.setType("*/*");
-                        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                        Utils.getActivity(getContext()).startActivityForResult(
-                                Intent.createChooser(intent, "Select file"),
-                                OPEN_DOCUMENT_ACTION_REQUEST
-                        );
-                    }
-                }
-        );
+        setupAddAttachmentButton();
 
         appBar.setOnBackClickedListener(() -> {
             if (onBackClickedListener != null) {
@@ -940,6 +888,50 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             if (controller != null) {
                 controller.newMessagesIndicatorClicked();
             }
+        });
+    }
+
+    private void setupAddAttachmentButton() {
+        addAttachmentButton.setOnClickListener(view -> {
+            AttachmentPopup.show(
+                    chatMessageLayout,
+                    new AttachmentPopup.Callback() {
+                        @Override
+                        public void onGalleryClicked() {
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                            Utils.getActivity(getContext()).startActivityForResult(
+                                    Intent.createChooser(intent, "Select Picture"),
+                                    OPEN_DOCUMENT_ACTION_REQUEST
+                            );
+                        }
+
+                        @Override
+                        public void onTakePhotoClicked() {
+                            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                dispatchImageCapture();
+                            } else {
+                                Utils.getActivity(getContext())
+                                        .requestPermissions(
+                                                new String[]{Manifest.permission.CAMERA},
+                                                CAMERA_PERMISSION_REQUEST
+                                        );
+                            }
+                        }
+
+                        @Override
+                        public void onBrowseClicked() {
+                            Intent intent = new Intent();
+                            intent.setType("*/*");
+                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                            Utils.getActivity(getContext()).startActivityForResult(
+                                    Intent.createChooser(intent, "Select file"),
+                                    OPEN_DOCUMENT_ACTION_REQUEST
+                            );
+                        }
+                    }
+            );
         });
     }
 

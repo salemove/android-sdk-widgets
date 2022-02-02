@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
     app:cardBackgroundColor="@color/glia_attachment_menu_bg"
-    app:cardCornerRadius="@dimen/glia_chat_attachment_menu_corner_radius"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    app:cardCornerRadius="@dimen/glia_chat_attachment_menu_corner_radius">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -20,6 +16,7 @@
             android:id="@+id/photo_library_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:minWidth="@dimen/glia_chat_attachment_menu_min_width"
             android:paddingTop="12dp">
 
@@ -48,7 +45,8 @@
                 android:src="@drawable/ic_photo_library"
                 app:layout_constraintBottom_toTopOf="@id/photo_library_separator"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
 
             <View
                 android:id="@+id/photo_library_separator"
@@ -65,6 +63,7 @@
             android:id="@+id/photo_or_video_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:minWidth="@dimen/glia_chat_attachment_menu_min_width"
             android:paddingTop="12dp">
 
@@ -93,7 +92,8 @@
                 android:src="@drawable/ic_photo_camera"
                 app:layout_constraintBottom_toTopOf="@id/photo_or_video_separator"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
 
             <View
                 android:id="@+id/photo_or_video_separator"
@@ -110,6 +110,7 @@
             android:id="@+id/browse_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
             android:minWidth="@dimen/glia_chat_attachment_menu_min_width"
             android:paddingTop="12dp">
 
@@ -138,9 +139,8 @@
                 android:src="@drawable/ic_browse"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -67,13 +67,15 @@ public class CallActivity extends AppCompatActivity {
         callView.setOnEndListener(onEndListener);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
 
-        startCallWithPermissions(
-                configuration.getCompanyName(),
-                configuration.getQueueId(),
-                configuration.getContextUrl(),
-                configuration.getUseOverlay(),
-                getMediaType(getIntent())
-        );
+        if (savedInstanceState == null) {
+            startCallWithPermissions(
+                    configuration.getCompanyName(),
+                    configuration.getQueueId(),
+                    configuration.getContextUrl(),
+                    configuration.getUseOverlay(),
+                    getMediaType(getIntent())
+            );
+        }
     }
 
     private void buildConfiguration() {

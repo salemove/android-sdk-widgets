@@ -5,6 +5,7 @@ import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.queuing.QueueTicket;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
@@ -60,14 +61,14 @@ public class GliaQueueRepository {
     };
 
     public void cleanOnEngagementEnd() {
-        Glia.off(Glia.Events.QUEUE_TICKET, ticketConsumer);
+        Dependencies.glia().off(Glia.Events.QUEUE_TICKET, ticketConsumer);
         cancelTicket();
         typeOfOngoingQueueing = TypeOfOngoingQueueing.NONE;
         eventsListeners.clear();
     }
 
     public void cancelTicket() {
-        if (queueTicket != null) Glia.cancelQueueTicket(queueTicket, stopQueueingExceptionConsumer);
+        if (queueTicket != null) Dependencies.glia().cancelQueueTicket(queueTicket, stopQueueingExceptionConsumer);
         typeOfOngoingQueueing = TypeOfOngoingQueueing.NONE;
     }
 
@@ -92,8 +93,8 @@ public class GliaQueueRepository {
         eventsListeners.add(listener);
         typeOfOngoingQueueing = TypeOfOngoingQueueing.CHAT;
         VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
-        Glia.on(Glia.Events.QUEUE_TICKET, ticketConsumer);
-        Glia.queueForEngagement(queueId, visitorContext, startQueueingExceptionConsumer);
+        Dependencies.glia().on(Glia.Events.QUEUE_TICKET, ticketConsumer);
+        Dependencies.glia().queueForEngagement(queueId, visitorContext, startQueueingExceptionConsumer);
     }
 
     public void startQueueingForMediaEngagement(String queueId,
@@ -104,8 +105,8 @@ public class GliaQueueRepository {
         eventsListeners.add(listener);
         typeOfOngoingQueueing = TypeOfOngoingQueueing.MEDIA;
         VisitorContext visitorContext = new VisitorContext(VisitorContext.Type.PAGE, contextUrl);
-        Glia.on(Glia.Events.QUEUE_TICKET, ticketConsumer);
-        Glia.queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, startQueueingExceptionConsumer);
+        Dependencies.glia().on(Glia.Events.QUEUE_TICKET, ticketConsumer);
+        Dependencies.glia().queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, startQueueingExceptionConsumer);
     }
 
     public String getQueueTicket() {

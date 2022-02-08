@@ -8,6 +8,7 @@ import com.glia.androidsdk.screensharing.LocalScreen;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.screensharing.ScreenSharingRequest;
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
 
@@ -32,7 +33,7 @@ public class GliaScreenSharingRepository {
     public void init(GliaScreenSharingCallback gliaScreenSharingCallback) {
         Logger.d(TAG, "init screen sharing repository");
         this.callback = gliaScreenSharingCallback;
-        Glia.on(Glia.Events.ENGAGEMENT, engagementConsumer);
+        Dependencies.glia().on(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     private void initScreenSharing(Engagement engagement) {
@@ -94,12 +95,12 @@ public class GliaScreenSharingRepository {
     }
 
     public void onDestroy() {
-        Glia.getCurrentEngagement().ifPresent(engagement -> {
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> {
             engagement.getScreenSharing().off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, screenSharingRequestConsumer);
             engagement.getScreenSharing().off(ScreenSharing.Events.VISITOR_STATE, visitorScreenSharingStateConsumer);
         });
 
-        Glia.off(Glia.Events.ENGAGEMENT, engagementConsumer);
+        Dependencies.glia().off(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     public void onEndScreenSharing() {

@@ -4,6 +4,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.util.function.Consumer;
@@ -47,13 +48,13 @@ public class GliaEngagementRepository {
     }
 
     public void unregisterEngagementEndListener(Runnable engagementEnded) {
-        Glia.getCurrentEngagement().ifPresent(engagement -> {
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> {
             engagement.off(Engagement.Events.END, engagementEnded);
         });
     }
 
     public void endEngagement() {
-        Glia.getCurrentEngagement().ifPresent(engagement -> {
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> {
             engagement.end(e -> {
                 if (e != null) {
                     Logger.e(TAG, "Ending engagement error: " + e.toString());
@@ -63,20 +64,20 @@ public class GliaEngagementRepository {
     }
 
     public void listenForEngagement(Consumer<OmnicoreEngagement> engagementConsumer) {
-        Glia.on(Glia.Events.ENGAGEMENT, engagementConsumer);
+        Dependencies.glia().on(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     public void unregisterEngagementListener(Consumer<OmnicoreEngagement> engagementConsumer) {
-        Glia.off(Glia.Events.ENGAGEMENT, engagementConsumer);
+        Dependencies.glia().off(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     public boolean hasOngoingEngagement() {
-        return Glia.getCurrentEngagement().isPresent();
+        return Dependencies.glia().getCurrentEngagement().isPresent();
     }
 
     public boolean isOperatorOnline() {
-        if (Glia.getCurrentEngagement().isPresent()) {
-            Engagement engagement = Glia.getCurrentEngagement().get();
+        if (Dependencies.glia().getCurrentEngagement().isPresent()) {
+            Engagement engagement = Dependencies.glia().getCurrentEngagement().get();
             Operator operator = engagement.getOperator();
             return operator != null && operator.getName() != null;
         }

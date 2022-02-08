@@ -2,9 +2,9 @@ package com.glia.widgets.filepreview.data;
 
 import android.graphics.Bitmap;
 
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException;
@@ -43,7 +43,7 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
 
     @Override
     public Maybe<Bitmap> loadImageFileFromNetwork(AttachmentFile attachmentFile) {
-        return Maybe.<InputStream>create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
+        return Maybe.<InputStream>create(emitter -> Dependencies.glia().fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
             if (gliaException != null) emitter.onError(gliaException);
             else emitter.onSuccess(fileInputStream);
         }))
@@ -55,7 +55,7 @@ public class GliaFileRepositoryImpl implements GliaFileRepository {
     @Override
     public Completable downloadFileFromNetwork(AttachmentFile attachmentFile) {
         return
-                Maybe.<InputStream>create(emitter -> Glia.fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
+                Maybe.<InputStream>create(emitter -> Dependencies.glia().fetchFile(attachmentFile, (fileInputStream, gliaException) -> {
                     if (gliaException != null) emitter.onError(gliaException);
                     else emitter.onSuccess(fileInputStream);
                 }))

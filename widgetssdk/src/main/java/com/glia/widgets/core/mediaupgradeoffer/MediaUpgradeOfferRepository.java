@@ -4,6 +4,7 @@ import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class MediaUpgradeOfferRepository {
             engagement.getMedia().on(Media.Events.MEDIA_UPGRADE_OFFER, upgradeOfferConsumer);
 
     public void startListening() {
-        Glia.on(Glia.Events.ENGAGEMENT, engagementHandler);
+        Dependencies.glia().on(Glia.Events.ENGAGEMENT, engagementHandler);
     }
 
     public void addCallback(MediaUpgradeOfferRepositoryCallback callback) {
@@ -61,8 +62,8 @@ public class MediaUpgradeOfferRepository {
     public void stopAll() {
         Logger.d(TAG, "stopAll");
         callbacks.clear();
-        Glia.off(Glia.Events.ENGAGEMENT, engagementHandler);
-        Glia.getCurrentEngagement().ifPresent(engagement ->
+        Dependencies.glia().off(Glia.Events.ENGAGEMENT, engagementHandler);
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement ->
                 engagement.getMedia().off(Media.Events.MEDIA_UPGRADE_OFFER, upgradeOfferConsumer));
     }
 

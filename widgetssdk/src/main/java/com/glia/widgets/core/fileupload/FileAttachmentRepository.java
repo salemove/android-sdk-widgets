@@ -3,12 +3,12 @@ package com.glia.widgets.core.fileupload;
 import android.net.Uri;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.di.Dependencies;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class FileAttachmentRepository {
     }
 
     public void uploadFile(FileAttachment file, AddFileToAttachmentAndUploadUseCase.Listener listener) {
-        Engagement engagement = Glia.getCurrentEngagement().orElse(null);
+        Engagement engagement = Dependencies.glia().getCurrentEngagement().orElse(null);
         if (engagement != null) {
             engagement.uploadFile(file.getUri(), (engagementFile, e) -> {
                 if (engagementFile != null) {

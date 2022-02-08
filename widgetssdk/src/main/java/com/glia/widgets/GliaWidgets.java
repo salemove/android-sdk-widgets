@@ -2,9 +2,7 @@ package com.glia.widgets;
 
 import android.app.Application;
 import android.content.Intent;
-import android.security.identity.UnknownAuthenticationKeyException;
 
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.core.visitor.GliaWidgetException;
@@ -80,7 +78,7 @@ public class GliaWidgets {
      * @param application the application where it is initialized
      */
     public synchronized static void onAppCreate(Application application) {
-        Glia.onAppCreate(application);
+        Dependencies.glia().onAppCreate(application);
         Dependencies.onAppCreate(application);
         Logger.d(TAG, "onAppCreate");
     }
@@ -91,7 +89,7 @@ public class GliaWidgets {
      * @param gliaWidgetsConfig Glia configuration
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
-        Glia.init(createGliaConfig(gliaWidgetsConfig));
+        Dependencies.glia().init(createGliaConfig(gliaWidgetsConfig));
         Dependencies.init();
         Logger.d(TAG, "init");
     }
@@ -134,7 +132,7 @@ public class GliaWidgets {
      */
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Logger.d(TAG, "onRequestPermissionsResult");
-        Glia.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Dependencies.glia().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     /**
@@ -152,13 +150,13 @@ public class GliaWidgets {
      */
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.d(TAG, "onActivityResult");
-        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
     }
 
     public static void clearVisitorSession() {
         Logger.d(TAG, "clearVisitorSession");
         Dependencies.getControllerFactory().destroyControllers();
-        Glia.clearVisitorSession();
+        Dependencies.glia().clearVisitorSession();
     }
 
     /**
@@ -167,7 +165,7 @@ public class GliaWidgets {
      * Updates the visitor's information stored on the server. This information will also be displayed to the operator.
      */
     public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
-        Glia.updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
+        Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
                 .setName(visitorInfoUpdate.getName())
                 .setEmail(visitorInfoUpdate.getEmail())
                 .setPhone(visitorInfoUpdate.getPhone())
@@ -190,7 +188,7 @@ public class GliaWidgets {
      * If visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
      */
     public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
-        Glia.getVisitorInfo((visitorInfo, e) -> {
+        Dependencies.glia().getVisitorInfo((visitorInfo, e) -> {
             if (visitorInfo != null) {
                 visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
             }

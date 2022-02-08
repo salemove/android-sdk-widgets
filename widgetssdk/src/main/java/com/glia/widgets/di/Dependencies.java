@@ -3,6 +3,8 @@ package com.glia.widgets.di;
 import android.app.Application;
 import android.content.Intent;
 
+import androidx.annotation.VisibleForTesting;
+
 import com.glia.widgets.Constants;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
@@ -25,6 +27,7 @@ public class Dependencies {
     private static INotificationManager notificationManager;
     private static GliaSdkConfigurationManager sdkConfigurationManager;
     private static UseCaseFactory useCaseFactory;
+    private static GliaCore gliaCore = new GliaCoreImpl();
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
@@ -99,5 +102,14 @@ public class Dependencies {
     public static boolean isInBackstack(String activity) {
         Logger.d(TAG, "isInBackstack");
         return activitiesInBackstack.contains(activity);
+    }
+
+    public static GliaCore glia() {
+        return gliaCore;
+    }
+
+    @VisibleForTesting
+    void setGlia(GliaCore gliaCore) {
+        Dependencies.gliaCore = gliaCore;
     }
 }

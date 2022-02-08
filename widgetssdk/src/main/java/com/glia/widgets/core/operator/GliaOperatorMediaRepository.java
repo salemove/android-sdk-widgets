@@ -1,7 +1,6 @@
 package com.glia.widgets.core.operator;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
 

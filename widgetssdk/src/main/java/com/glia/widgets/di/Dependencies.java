@@ -112,4 +112,24 @@ public class Dependencies {
     public static void setGlia(GliaCore gliaCore) {
         Dependencies.gliaCore = gliaCore;
     }
+
+    @VisibleForTesting
+    public static void setControllerFactory(ControllerFactory controllerFactory) {
+        Dependencies.controllerFactory = controllerFactory;
+    }
+
+    @VisibleForTesting
+    public static void setNotificationManager(INotificationManager notificationManager) {
+        Dependencies.notificationManager = notificationManager;
+    }
+
+    @VisibleForTesting
+    public static void setSdkConfigurationManager(GliaSdkConfigurationManager sdkConfigurationManager) {
+        Dependencies.sdkConfigurationManager = sdkConfigurationManager;
+    }
+
+    @VisibleForTesting
+    public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
+        Dependencies.useCaseFactory = useCaseFactory;
+    }
 }

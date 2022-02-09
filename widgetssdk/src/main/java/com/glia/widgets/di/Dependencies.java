@@ -109,7 +109,7 @@ public class Dependencies {
     }
 
     @VisibleForTesting
-    void setGlia(GliaCore gliaCore) {
+    public static void setGlia(GliaCore gliaCore) {
         Dependencies.gliaCore = gliaCore;
     }
 }

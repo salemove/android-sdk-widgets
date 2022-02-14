@@ -31,6 +31,7 @@
     <dimen name="glia_chat_attachment_progressbar_height">8dp</dimen>
     <dimen name="glia_chat_attachment_image_width">240dp</dimen>
     <dimen name="glia_chat_attachment_image_height">155dp</dimen>
+    <dimen name="glia_chat_attachment_menu_margin">21dp</dimen>
 
     <dimen name="glia_chat_attachment_menu_corner_radius">14dp</dimen>
     <dimen name="glia_chat_attachment_menu_min_width">250dp</dimen>

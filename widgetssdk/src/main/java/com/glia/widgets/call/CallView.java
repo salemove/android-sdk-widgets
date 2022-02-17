@@ -312,6 +312,11 @@ public class CallView extends ConstraintLayout {
                             callState.callStatus.getFormattedOperatorName(),
                             callState.callStatus.getTime()
                     ));
+                    connectingView.setContentDescription(resources.getString(
+                            R.string.glia_call_connecting_with,
+                            callState.callStatus.getFormattedOperatorName(),
+                            ""
+                    ));
                     if (callState.companyName != null) {
                         companyNameView.setText(callState.companyName);
                         msrView.setText(R.string.glia_call_in_queue_message);
@@ -320,6 +325,7 @@ public class CallView extends ConstraintLayout {
                         callTimerView.setText(callState.callStatus.getTime());
                     }
                     chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
+
 
                     if (resources.getConfiguration().orientation == ORIENTATION_LANDSCAPE &&
                             callState.isVideoCall()) {
@@ -347,6 +353,10 @@ public class CallView extends ConstraintLayout {
                             R.string.glia_call_mute_button_unmute :
                             R.string.glia_call_mute_button_mute
                     );
+                    muteButton.setContentDescription(resources.getString(callState.isMuted ?
+                            R.string.glia_call_mute_content_description :
+                            R.string.glia_call_unmute_content_description
+                    ));
 
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
@@ -368,6 +378,10 @@ public class CallView extends ConstraintLayout {
                         hideUIOnCallEnd();
                     }
                     chatButton.setEnabled(callState.isAudioCall() || callState.isVideoCall() || callState.is2WayVideoCall());
+                    chatButton.setContentDescription(callState.messagesNotSeen == 0 ?
+                            resources.getString(R.string.glia_call_chat_zero_content_description) :
+                            resources.getQuantityString(R.plurals.glia_call_chat_content_description,
+                                    callState.messagesNotSeen, callState.messagesNotSeen));
                 });
             }
 
@@ -454,6 +468,10 @@ public class CallView extends ConstraintLayout {
         }
         setButtonActivated(speakerButton, theme.getIconCallSpeakerOn(),
                 theme.getIconCallSpeakerOff(), isSpeakerOn);
+        speakerButton.setContentDescription(resources.getString(isSpeakerOn ?
+                R.string.glia_call_speaker_on_content_description :
+                R.string.glia_call_speaker_off_content_description
+        ));
     }
 
     private void showExitQueueDialog() {
@@ -579,6 +597,10 @@ public class CallView extends ConstraintLayout {
     ) {
         floatingActionButton.setActivated(isActivated);
         floatingActionButton.setImageResource(isActivated ? activatedDrawableRes : notActivatedDrawableRes);
+        floatingActionButton.setContentDescription(resources.getString(isActivated ?
+                R.string.glia_call_video_on_content_description :
+                R.string.glia_call_video_off_content_description
+        ));
     }
 
     private void handleControlsVisibility(CallState callState) {

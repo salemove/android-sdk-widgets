@@ -16,6 +16,8 @@
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
     <string name="glia_top_app_bar_chat_end">End</string>
+    <string name="glia_top_app_bar_navigate_up_content_description">Navigate Up</string>
+    <string name="glia_top_app_bar_chat_end_content_description">End engagement</string>
 
     <!--    dialogs-->
     <!-- Leave Queue Dialog -->
@@ -103,6 +105,27 @@
     <string name="glia_call_connecting_with">Connecting with %1$s\n%2$s</string>
     <string name="glia_call_in_queue_message">An operator will be with you shortly.</string>
     <string name="glia_call_continue_browsing">You can continue browsing and we will connect you automatically.</string>
+
+    <plurals name="glia_call_chat_content_description">
+        <item quantity="one">@string/glia_call_chat_one_content_description</item>
+        <item quantity="other">@string/glia_call_chat_other_content_description</item>
+    </plurals>
+    <string name="glia_call_chat_zero_content_description">Chat</string>
+    <string name="glia_call_chat_one_content_description">Chat. %1$d unread message</string>
+    <string name="glia_call_chat_other_content_description">Chat. %1$d unread messages</string>
+    <string name="glia_call_video_on_content_description">Turn off video</string>
+    <string name="glia_call_video_off_content_description">Turn on video</string>
+    <string name="glia_call_mute_content_description">Unmute microphone</string>
+    <string name="glia_call_unmute_content_description">Mute microphone</string>
+    <string name="glia_call_speaker_on_content_description">Turn off speaker</string>
+    <string name="glia_call_speaker_off_content_description">Turn on speaker</string>
+    <string name="glia_call_minimize_content_description">Minimize</string>
+    <string name="glia_call_operator_profile_picture_content_description">Operator Avatar</string>
+    <string name="glia_call_visitor_video_content_description">Your Video</string>
+    <string name="glia_call_operator_video_content_description">Operator\'s Video</string>
+    <string name="glia_call_company_name_hint">Company name</string>
+    <string name="glia_call_operator_name_hint">Operator name</string>
+    <string name="glia_call_call_duration_hint">Call duration</string>
 
     <!--    statusbar notifications-->
     <string name="glia_notification_screen_sharing_channel_name">Screen sharing notification channel</string>

@@ -399,6 +399,28 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void initControls() {
+        setupChatStateCallback();
+
+        screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
+
+        controller = Dependencies
+                .getControllerFactory()
+                .getChatController(Utils.getActivity(this.getContext()), callback);
+
+        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
+
+        setupDialogCallback();
+
+        dialogController = Dependencies
+                .getControllerFactory()
+                .getDialogController(dialogCallback);
+
+        screenSharingController = Dependencies
+                .getControllerFactory()
+                .getScreenSharingController(screenSharingCallback);
+    }
+
+    private void setupChatStateCallback() {
         callback = new ChatViewCallback() {
             @Override
             public void emitUploadAttachments(List<FileAttachment> attachments) {
@@ -461,52 +483,17 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                         operatorTypingAnimation.setVisibility(GONE);
                     }
 
-                    addAttachmentButton.setEnabled(chatState.isAttachmentButtonEnabled);
-
-                    if (chatState.isAttachmentButtonVisible) {
-                        addAttachmentButton.setVisibility(VISIBLE);
-                    } else {
-                        addAttachmentButton.setVisibility(GONE);
-                    }
+                    updateAttachmentButton(chatState);
                 });
             }
 
             @Override
             public void emitItems(List<ChatItem> items) {
                 List<ChatItem> updatedItems = items.stream()
-                        .map(this::updateIsFileDownloaded)
+                        .map(chatItem -> updateIsFileDownloaded(chatItem))
                         .collect(Collectors.toList());
 
                 post(() -> adapter.submitList(updatedItems));
-            }
-
-            private ChatItem updateIsFileDownloaded(ChatItem item) {
-                if (item instanceof OperatorAttachmentItem) {
-                    OperatorAttachmentItem oldItem = (OperatorAttachmentItem) item;
-                    boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
-                    return new OperatorAttachmentItem(
-                            oldItem.getId(),
-                            oldItem.getViewType(),
-                            oldItem.showChatHead,
-                            oldItem.attachmentFile,
-                            oldItem.operatorProfileImgUrl,
-                            isFileDownloaded,
-                            oldItem.isDownloading
-                    );
-                } else if (item instanceof VisitorAttachmentItem) {
-                    VisitorAttachmentItem oldItem = (VisitorAttachmentItem) item;
-                    boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
-                    return new VisitorAttachmentItem(
-                            oldItem.getId(),
-                            oldItem.getViewType(),
-                            oldItem.attachmentFile,
-                            isFileDownloaded,
-                            oldItem.isDownloading,
-                            oldItem.showDelivered
-                    );
-                } else {
-                    return item;
-                }
             }
 
             @Override
@@ -543,15 +530,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 fileDownloadCompleted(attachmentFile);
             }
         };
+    }
 
-        screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
-
-        controller = Dependencies
-                .getControllerFactory()
-                .getChatController(Utils.getActivity(this.getContext()), callback);
-
-        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
-
+    private void setupDialogCallback() {
         dialogCallback = dialogsState -> {
             if (dialogsState instanceof DialogsState.NoDialog) {
                 post(() -> {
@@ -584,14 +565,45 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 post(this::showAllowScreenSharingNotificationsAndStartSharingDialog);
             }
         };
+    }
 
-        dialogController = Dependencies
-                .getControllerFactory()
-                .getDialogController(dialogCallback);
+    private void updateAttachmentButton(ChatState chatState) {
+        addAttachmentButton.setEnabled(chatState.isAttachmentButtonEnabled);
 
-        screenSharingController = Dependencies
-                .getControllerFactory()
-                .getScreenSharingController(screenSharingCallback);
+        if (chatState.isAttachmentButtonVisible) {
+            addAttachmentButton.setVisibility(VISIBLE);
+        } else {
+            addAttachmentButton.setVisibility(GONE);
+        }
+    }
+
+    private ChatItem updateIsFileDownloaded(ChatItem item) {
+        if (item instanceof OperatorAttachmentItem) {
+            OperatorAttachmentItem oldItem = (OperatorAttachmentItem) item;
+            boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
+            return new OperatorAttachmentItem(
+                    oldItem.getId(),
+                    oldItem.getViewType(),
+                    oldItem.showChatHead,
+                    oldItem.attachmentFile,
+                    oldItem.operatorProfileImgUrl,
+                    isFileDownloaded,
+                    oldItem.isDownloading
+            );
+        } else if (item instanceof VisitorAttachmentItem) {
+            VisitorAttachmentItem oldItem = (VisitorAttachmentItem) item;
+            boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
+            return new VisitorAttachmentItem(
+                    oldItem.getId(),
+                    oldItem.getViewType(),
+                    oldItem.attachmentFile,
+                    isFileDownloaded,
+                    oldItem.isDownloading,
+                    oldItem.showDelivered
+            );
+        } else {
+            return item;
+        }
     }
 
     private void updateChatEditText(ChatState chatState) {

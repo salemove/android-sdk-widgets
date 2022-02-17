@@ -299,6 +299,7 @@ public class ChatState {
                 .setOperatorName(null)
                 .setOperatorProfileImgUrl(null)
                 .setChatInputMode(ChatInputMode.ENABLED)
+                .setIsAttachmentButtonVisible(true)
                 .setEngagementRequested(true)
                 .setOperatorStatusItem(operatorStatusItem)
                 .createChatState();
@@ -317,6 +318,7 @@ public class ChatState {
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
                 .setChatInputMode(ChatInputMode.ENABLED)
+                .setIsAttachmentButtonVisible(true)
                 .setEngagementRequested(true)
                 .createChatState();
     }
@@ -337,6 +339,7 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsAttachmentButtonVisible(true)
                 .setHistoryLoaded(true)
                 .setChatItems(chatItems)
                 .createChatState();
@@ -374,6 +377,7 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setChatInputMode(chatInputMode)
+                .setIsAttachmentButtonVisible(chatInputMode != ChatInputMode.SINGLE_CHOICE_CARD)
                 .createChatState();
     }
 

@@ -352,7 +352,7 @@ public class ChatController implements
     private synchronized void emitChatItems(ChatState state) {
         if (setState(state) && viewCallback != null) {
             Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
-                    "\n(State): " + state.toString());
+                    "\n(State): " + state);
             viewCallback.emitItems(state.chatItems);
             viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
         }
@@ -443,7 +443,7 @@ public class ChatController implements
 
     private void onMessageSent(VisitorMessage message) {
         if (message != null) {
-            Logger.d(TAG, "messageSent: " + message.toString() + ", id: " + message.getId());
+            Logger.d(TAG, "messageSent: " + message + ", id: " + message.getId());
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             changeDeliveredIndex(currentChatItems, message);
 
@@ -1107,7 +1107,10 @@ public class ChatController implements
         Logger.d(TAG, "newEngagementLoaded");
         String operatorProfileImgUrl = null;
         try {
-            operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
+            Optional<String> optionalUrl = engagement.getOperator().getPicture().getURL();
+            if (optionalUrl.isPresent()) {
+                operatorProfileImgUrl = optionalUrl.get();
+            }
         } catch (Exception ignored) {
         }
         operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);

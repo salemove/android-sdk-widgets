@@ -1,5 +1,7 @@
 package com.glia.widgets.chat.model;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
@@ -339,7 +341,7 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
-                .setIsAttachmentButtonVisible(true)
+                .setIsAttachmentButtonVisible(false)
                 .setHistoryLoaded(true)
                 .setChatItems(chatItems)
                 .createChatState();
@@ -377,7 +379,7 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setChatInputMode(chatInputMode)
-                .setIsAttachmentButtonVisible(chatInputMode != ChatInputMode.SINGLE_CHOICE_CARD)
+                .setIsAttachmentButtonVisible(chatInputMode == ChatInputMode.ENABLED)
                 .createChatState();
     }
 
@@ -430,13 +432,6 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState setIsAttachmentButtonVisible(boolean isAttachmentButtonVisible) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsAttachmentButtonVisible(isAttachmentButtonVisible)
-                .createChatState();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -472,6 +467,7 @@ public class ChatState {
         return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonVisible);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ChatState{" +

@@ -245,6 +245,7 @@ public class ChatController implements
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsAttachmentButtonVisible(false)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
                 .setPendingNavigationType(null)
@@ -717,7 +718,6 @@ public class ChatController implements
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(chatState.stop());
-        emitViewState(chatState.setIsAttachmentButtonVisible(false));
     }
 
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
@@ -1122,7 +1122,6 @@ public class ChatController implements
             sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
             Logger.d(TAG, "unsentMessage sent!");
         }
-        emitViewState(chatState.setIsAttachmentButtonVisible(true));
     }
 
     @Override

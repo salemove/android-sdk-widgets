@@ -434,14 +434,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 post(() -> {
                     updateShowSendButton(chatState);
                     updateChatEditText(chatState);
-
-                    if (chatState.isOperatorOnline()) {
-                        appBar.showEndButton();
-                    } else if (chatState.engagementRequested) {
-                        appBar.showXButton();
-                    } else {
-                        appBar.hideLeaveButtons();
-                    }
+                    updateAppBar(chatState);
 
                     newMessagesLayout.setVisibility(
                             chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
@@ -590,6 +583,16 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
+    private void updateShowSendButton(ChatState chatState) {
+        if (chatState.showSendButton && sendButton.getVisibility() != VISIBLE) {
+            sendButton.setVisibility(VISIBLE);
+        }
+
+        if (!chatState.showSendButton && sendButton.getVisibility() == VISIBLE) {
+            sendButton.setVisibility(GONE);
+        }
+    }
+
     private void updateChatEditText(ChatState chatState) {
         if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
             chatEditText.removeTextChangedListener(textWatcher);
@@ -617,13 +620,14 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
     }
 
-    private void updateShowSendButton(ChatState chatState) {
-        if (chatState.showSendButton && sendButton.getVisibility() != VISIBLE) {
-            sendButton.setVisibility(VISIBLE);
-        }
 
-        if (!chatState.showSendButton && sendButton.getVisibility() == VISIBLE) {
-            sendButton.setVisibility(GONE);
+    private void updateAppBar(ChatState chatState) {
+        if (chatState.isOperatorOnline()) {
+            appBar.showEndButton();
+        } else if (chatState.engagementRequested) {
+            appBar.showXButton();
+        } else {
+            appBar.hideLeaveButtons();
         }
     }
 

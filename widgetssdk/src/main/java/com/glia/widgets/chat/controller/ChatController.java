@@ -135,7 +135,6 @@ public class ChatController implements
         @Override
         public void onMessageValidated() {
             emitViewState(
-                    // todo should be "clearInputMessage" and then can get rid of editText.setText
                     chatState
                             .setLastTypedText("")
                             .setShowSendButton(isShowSendButtonUseCase.execute(""))

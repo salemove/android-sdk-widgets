@@ -94,7 +94,7 @@ public class ChatActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        chatView.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        chatView.onRequestPermissionsResult(requestCode, grantResults);
     }
 
     private void navigateToCall(UiTheme theme, String mediaType) {

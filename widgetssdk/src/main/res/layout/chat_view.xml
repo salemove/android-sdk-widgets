@@ -113,7 +113,6 @@
             android:layout_marginVertical="@dimen/glia_medium"
             android:layout_marginStart="@dimen/glia_medium"
             android:layout_weight="1"
-            android:enabled="false"
             android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
             android:textColor="?attr/gliaBaseDarkColor"

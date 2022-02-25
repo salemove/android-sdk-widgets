@@ -135,8 +135,9 @@ public class ChatController implements
         @Override
         public void onMessageValidated() {
             emitViewState(
+                    // todo should be "clearInputMessage" and then can get rid of editText.setText
                     chatState
-                            .chatInputChanged("")
+                            .setLastTypedText("")
                             .setShowSendButton(isShowSendButtonUseCase.execute(""))
             );
         }
@@ -393,17 +394,15 @@ public class ChatController implements
         messagesNotSeenHandler.onChatWentBackground();
     }
 
-    public void sendMessagePreview(String message) {
+    public void onMessageTextChanged(String message) {
         emitViewState(
                 chatState
-                        .chatInputChanged(message)
+                        .setLastTypedText(message)
                         .setShowSendButton(isShowSendButtonUseCase.execute(message))
         );
         if (chatState.isOperatorOnline()) {
             Logger.d(TAG, "Send preview: " + message);
             sendMessagePreviewUseCase.execute(message);
-        } else {
-            Logger.d(TAG, "Send preview not sending");
         }
     }
 

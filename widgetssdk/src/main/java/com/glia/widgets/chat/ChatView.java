@@ -1345,11 +1345,15 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
-        if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            dispatchImageCapture();
-        }
-        if (requestCode == WRITE_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (downloadFileHolder != null) onFileDownload(downloadFileHolder);
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case CAMERA_PERMISSION_REQUEST:
+                    dispatchImageCapture();
+                    break;
+                case WRITE_PERMISSION_REQUEST:
+                    if (downloadFileHolder != null) onFileDownload(downloadFileHolder);
+                    break;
+            }
         }
     }
 

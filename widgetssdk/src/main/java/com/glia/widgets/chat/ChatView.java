@@ -183,7 +183,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         @Override
         public void afterTextChanged(Editable editable) {
             if (controller != null) {
-                controller.sendMessagePreview(editable.toString().trim());
+                controller.onMessageTextChanged(editable.toString().trim());
             }
         }
     };
@@ -611,7 +611,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
             chatEditText.removeTextChangedListener(textWatcher);
             chatEditText.setText(chatState.lastTypedText);
             if (controller != null) {
-                controller.sendMessagePreview(chatState.lastTypedText);
+                // todo textwatcher is removed but the exact same controller is invoked and that triggers infinite loop
+                controller.onMessageTextChanged(chatState.lastTypedText);
             }
             chatEditText.addTextChangedListener(textWatcher);
         }
@@ -904,47 +905,46 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupAddAttachmentButton() {
-        addAttachmentButton.setOnClickListener(view -> {
-            AttachmentPopup.show(
-                    chatMessageLayout,
-                    new AttachmentPopup.Callback() {
-                        @Override
-                        public void onGalleryClicked() {
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                            Utils.getActivity(getContext()).startActivityForResult(
-                                    Intent.createChooser(intent, "Select Picture"),
-                                    OPEN_DOCUMENT_ACTION_REQUEST
-                            );
-                        }
+        addAttachmentButton.setOnClickListener(view ->
+                AttachmentPopup.show(
+                        chatMessageLayout,
+                        new AttachmentPopup.Callback() {
+                            @Override
+                            public void onGalleryClicked() {
+                                Intent intent = new Intent();
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                                Utils.getActivity(getContext()).startActivityForResult(
+                                        Intent.createChooser(intent, "Select Picture"),
+                                        OPEN_DOCUMENT_ACTION_REQUEST
+                                );
+                            }
 
-                        @Override
-                        public void onTakePhotoClicked() {
-                            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                                dispatchImageCapture();
-                            } else {
-                                Utils.getActivity(getContext())
-                                        .requestPermissions(
-                                                new String[]{Manifest.permission.CAMERA},
-                                                CAMERA_PERMISSION_REQUEST
-                                        );
+                            @Override
+                            public void onTakePhotoClicked() {
+                                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                    dispatchImageCapture();
+                                } else {
+                                    Utils.getActivity(getContext())
+                                            .requestPermissions(
+                                                    new String[]{Manifest.permission.CAMERA},
+                                                    CAMERA_PERMISSION_REQUEST
+                                            );
+                                }
+                            }
+
+                            @Override
+                            public void onBrowseClicked() {
+                                Intent intent = new Intent();
+                                intent.setType("*/*");
+                                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                                Utils.getActivity(getContext()).startActivityForResult(
+                                        Intent.createChooser(intent, "Select file"),
+                                        OPEN_DOCUMENT_ACTION_REQUEST
+                                );
                             }
                         }
-
-                        @Override
-                        public void onBrowseClicked() {
-                            Intent intent = new Intent();
-                            intent.setType("*/*");
-                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                            Utils.getActivity(getContext()).startActivityForResult(
-                                    Intent.createChooser(intent, "Select file"),
-                                    OPEN_DOCUMENT_ACTION_REQUEST
-                            );
-                        }
-                    }
-            );
-        });
+                ));
     }
 
     private void dispatchImageCapture() {
@@ -1341,7 +1341,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName(), theme));
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
         if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             dispatchImageCapture();
         }

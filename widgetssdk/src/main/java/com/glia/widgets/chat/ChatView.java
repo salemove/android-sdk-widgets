@@ -434,23 +434,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 post(() -> {
                     updateShowSendButton(chatState);
                     updateChatEditText(chatState);
-                    switch (chatState.chatInputMode) {
-                        case SINGLE_CHOICE_CARD:
-                            chatEditText.setHint(R.string.glia_chat_single_choice_card_hint);
-                            break;
-                        case ENABLED_NO_ENGAGEMENT:
-                            if (chatState.lastTypedText.isEmpty()) {
-                                chatEditText.setHint(R.string.glia_chat_not_started_hint);
-                            } else {
-                                chatEditText.setHint("");
-                            }
-                            break;
-                        default:
-                            chatEditText.setHint(R.string.glia_chat_enter_message);
-                            break;
-                    }
-                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
-                            chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
+
                     if (chatState.isOperatorOnline()) {
                         appBar.showEndButton();
                     } else if (chatState.engagementRequested) {
@@ -610,12 +594,27 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
             chatEditText.removeTextChangedListener(textWatcher);
             chatEditText.setText(chatState.lastTypedText);
-            if (controller != null) {
-                // todo textwatcher is removed but the exact same controller is invoked and that triggers infinite loop
-                controller.onMessageTextChanged(chatState.lastTypedText);
-            }
             chatEditText.addTextChangedListener(textWatcher);
         }
+
+        switch (chatState.chatInputMode) {
+            case SINGLE_CHOICE_CARD:
+                chatEditText.setHint(R.string.glia_chat_single_choice_card_hint);
+                break;
+            case ENABLED_NO_ENGAGEMENT:
+                if (chatState.lastTypedText.isEmpty()) {
+                    chatEditText.setHint(R.string.glia_chat_not_started_hint);
+                } else {
+                    chatEditText.setHint("");
+                }
+                break;
+            default:
+                chatEditText.setHint(R.string.glia_chat_enter_message);
+                break;
+        }
+
+        chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
+                chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
     }
 
     private void updateShowSendButton(ChatState chatState) {

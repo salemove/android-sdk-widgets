@@ -17,8 +17,8 @@ public class ChatState {
     public final boolean isVisible;
     public final boolean isChatInBottom;
     public final Integer messagesNotSeen;
-    public final String queueTicketId;
-    public final boolean historyLoaded;
+    public final String queueTicketId;      // TODO unused
+    public final boolean historyLoaded;     // TODO unused
     public final String operatorName;
     public final String operatorProfileImgUrl;
     public final String companyName;
@@ -28,7 +28,6 @@ public class ChatState {
     public final List<ChatItem> chatItems;
     public final ChatInputMode chatInputMode;
     public final String lastTypedText;
-
     public final boolean engagementRequested;
     public final String pendingNavigationType;
     public final List<VisitorMessageItem> unsentMessages;
@@ -301,7 +300,6 @@ public class ChatState {
                 .setOperatorName(null)
                 .setOperatorProfileImgUrl(null)
                 .setChatInputMode(ChatInputMode.ENABLED)
-                .setIsAttachmentButtonVisible(true)
                 .setEngagementRequested(true)
                 .setOperatorStatusItem(operatorStatusItem)
                 .createChatState();
@@ -334,6 +332,7 @@ public class ChatState {
                 .setOperatorProfileImgUrl(null)
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
+                .setIsAttachmentButtonVisible(false)
                 .createChatState();
     }
 

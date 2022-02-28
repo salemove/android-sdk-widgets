@@ -183,7 +183,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         @Override
         public void afterTextChanged(Editable editable) {
             if (controller != null) {
-                controller.sendMessagePreview(editable.toString().trim());
+                controller.onMessageTextChanged(editable.toString().trim());
             }
         }
     };
@@ -434,30 +434,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
                 post(() -> {
                     updateShowSendButton(chatState);
                     updateChatEditText(chatState);
-                    switch (chatState.chatInputMode) {
-                        case SINGLE_CHOICE_CARD:
-                            chatEditText.setHint(R.string.glia_chat_single_choice_card_hint);
-                            break;
-                        case ENABLED_NO_ENGAGEMENT:
-                            if (chatState.lastTypedText.isEmpty()) {
-                                chatEditText.setHint(R.string.glia_chat_not_started_hint);
-                            } else {
-                                chatEditText.setHint("");
-                            }
-                            break;
-                        default:
-                            chatEditText.setHint(R.string.glia_chat_enter_message);
-                            break;
-                    }
-                    chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
-                            chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
-                    if (chatState.isOperatorOnline()) {
-                        appBar.showEndButton();
-                    } else if (chatState.engagementRequested) {
-                        appBar.showXButton();
-                    } else {
-                        appBar.hideLeaveButtons();
-                    }
+                    updateAppBar(chatState);
 
                     newMessagesLayout.setVisibility(
                             chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
@@ -606,17 +583,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    private void updateChatEditText(ChatState chatState) {
-        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
-            chatEditText.removeTextChangedListener(textWatcher);
-            chatEditText.setText(chatState.lastTypedText);
-            if (controller != null) {
-                controller.sendMessagePreview(chatState.lastTypedText);
-            }
-            chatEditText.addTextChangedListener(textWatcher);
-        }
-    }
-
     private void updateShowSendButton(ChatState chatState) {
         if (chatState.showSendButton && sendButton.getVisibility() != VISIBLE) {
             sendButton.setVisibility(VISIBLE);
@@ -624,6 +590,44 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
         if (!chatState.showSendButton && sendButton.getVisibility() == VISIBLE) {
             sendButton.setVisibility(GONE);
+        }
+    }
+
+    private void updateChatEditText(ChatState chatState) {
+        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
+            chatEditText.removeTextChangedListener(textWatcher);
+            chatEditText.setText(chatState.lastTypedText);
+            chatEditText.addTextChangedListener(textWatcher);
+        }
+
+        switch (chatState.chatInputMode) {
+            case SINGLE_CHOICE_CARD:
+                chatEditText.setHint(R.string.glia_chat_single_choice_card_hint);
+                break;
+            case ENABLED_NO_ENGAGEMENT:
+                if (chatState.lastTypedText.isEmpty()) {
+                    chatEditText.setHint(R.string.glia_chat_not_started_hint);
+                } else {
+                    chatEditText.setHint("");
+                }
+                break;
+            default:
+                chatEditText.setHint(R.string.glia_chat_enter_message);
+                break;
+        }
+
+        chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
+                chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
+    }
+
+
+    private void updateAppBar(ChatState chatState) {
+        if (chatState.isOperatorOnline()) {
+            appBar.showEndButton();
+        } else if (chatState.engagementRequested) {
+            appBar.showXButton();
+        } else {
+            appBar.hideLeaveButtons();
         }
     }
 
@@ -904,47 +908,46 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     private void setupAddAttachmentButton() {
-        addAttachmentButton.setOnClickListener(view -> {
-            AttachmentPopup.show(
-                    chatMessageLayout,
-                    new AttachmentPopup.Callback() {
-                        @Override
-                        public void onGalleryClicked() {
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                            Utils.getActivity(getContext()).startActivityForResult(
-                                    Intent.createChooser(intent, "Select Picture"),
-                                    OPEN_DOCUMENT_ACTION_REQUEST
-                            );
-                        }
+        addAttachmentButton.setOnClickListener(view ->
+                AttachmentPopup.show(
+                        chatMessageLayout,
+                        new AttachmentPopup.Callback() {
+                            @Override
+                            public void onGalleryClicked() {
+                                Intent intent = new Intent();
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                                Utils.getActivity(getContext()).startActivityForResult(
+                                        Intent.createChooser(intent, "Select Picture"),
+                                        OPEN_DOCUMENT_ACTION_REQUEST
+                                );
+                            }
 
-                        @Override
-                        public void onTakePhotoClicked() {
-                            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                                dispatchImageCapture();
-                            } else {
-                                Utils.getActivity(getContext())
-                                        .requestPermissions(
-                                                new String[]{Manifest.permission.CAMERA},
-                                                CAMERA_PERMISSION_REQUEST
-                                        );
+                            @Override
+                            public void onTakePhotoClicked() {
+                                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                    dispatchImageCapture();
+                                } else {
+                                    Utils.getActivity(getContext())
+                                            .requestPermissions(
+                                                    new String[]{Manifest.permission.CAMERA},
+                                                    CAMERA_PERMISSION_REQUEST
+                                            );
+                                }
+                            }
+
+                            @Override
+                            public void onBrowseClicked() {
+                                Intent intent = new Intent();
+                                intent.setType("*/*");
+                                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                                Utils.getActivity(getContext()).startActivityForResult(
+                                        Intent.createChooser(intent, "Select file"),
+                                        OPEN_DOCUMENT_ACTION_REQUEST
+                                );
                             }
                         }
-
-                        @Override
-                        public void onBrowseClicked() {
-                            Intent intent = new Intent();
-                            intent.setType("*/*");
-                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                            Utils.getActivity(getContext()).startActivityForResult(
-                                    Intent.createChooser(intent, "Select file"),
-                                    OPEN_DOCUMENT_ACTION_REQUEST
-                            );
-                        }
-                    }
-            );
-        });
+                ));
     }
 
     private void dispatchImageCapture() {
@@ -1341,7 +1344,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         this.getContext().startActivity(FilePreviewActivity.intent(this.getContext(), file.getId(), file.getName(), theme));
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
         if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             dispatchImageCapture();
         }

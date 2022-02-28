@@ -367,7 +367,7 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState chatInputChanged(String text) {
+    public ChatState setLastTypedText(String text) {
         return new Builder()
                 .copyFrom(this)
                 .setLastTypedText(text)

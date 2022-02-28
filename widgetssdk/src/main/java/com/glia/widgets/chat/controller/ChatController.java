@@ -245,6 +245,7 @@ public class ChatController implements
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsAttachmentButtonVisible(false)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
                 .setPendingNavigationType(null)
@@ -352,7 +353,7 @@ public class ChatController implements
     private synchronized void emitChatItems(ChatState state) {
         if (setState(state) && viewCallback != null) {
             Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
-                    "\n(State): " + state.toString());
+                    "\n(State): " + state);
             viewCallback.emitItems(state.chatItems);
             viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
         }
@@ -443,7 +444,7 @@ public class ChatController implements
 
     private void onMessageSent(VisitorMessage message) {
         if (message != null) {
-            Logger.d(TAG, "messageSent: " + message.toString() + ", id: " + message.getId());
+            Logger.d(TAG, "messageSent: " + message + ", id: " + message.getId());
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             changeDeliveredIndex(currentChatItems, message);
 
@@ -717,7 +718,6 @@ public class ChatController implements
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(chatState.stop());
-        emitViewState(chatState.setIsAttachmentButtonVisible(false));
     }
 
     private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessage message) {
@@ -1107,7 +1107,10 @@ public class ChatController implements
         Logger.d(TAG, "newEngagementLoaded");
         String operatorProfileImgUrl = null;
         try {
-            operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
+            Optional<String> optionalUrl = engagement.getOperator().getPicture().getURL();
+            if (optionalUrl.isPresent()) {
+                operatorProfileImgUrl = optionalUrl.get();
+            }
         } catch (Exception ignored) {
         }
         operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
@@ -1119,7 +1122,6 @@ public class ChatController implements
             sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
             Logger.d(TAG, "unsentMessage sent!");
         }
-        emitViewState(chatState.setIsAttachmentButtonVisible(true));
     }
 
     @Override

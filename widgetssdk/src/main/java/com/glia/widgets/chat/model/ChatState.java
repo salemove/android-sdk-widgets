@@ -1,5 +1,7 @@
 package com.glia.widgets.chat.model;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
@@ -15,8 +17,8 @@ public class ChatState {
     public final boolean isVisible;
     public final boolean isChatInBottom;
     public final Integer messagesNotSeen;
-    public final String queueTicketId;
-    public final boolean historyLoaded;
+    public final String queueTicketId;      // TODO unused
+    public final boolean historyLoaded;     // TODO unused
     public final String operatorName;
     public final String operatorProfileImgUrl;
     public final String companyName;
@@ -26,7 +28,6 @@ public class ChatState {
     public final List<ChatItem> chatItems;
     public final ChatInputMode chatInputMode;
     public final String lastTypedText;
-
     public final boolean engagementRequested;
     public final String pendingNavigationType;
     public final List<VisitorMessageItem> unsentMessages;
@@ -317,6 +318,7 @@ public class ChatState {
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
                 .setChatInputMode(ChatInputMode.ENABLED)
+                .setIsAttachmentButtonVisible(true)
                 .setEngagementRequested(true)
                 .createChatState();
     }
@@ -330,6 +332,7 @@ public class ChatState {
                 .setOperatorProfileImgUrl(null)
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
+                .setIsAttachmentButtonVisible(false)
                 .createChatState();
     }
 
@@ -337,6 +340,7 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsAttachmentButtonVisible(false)
                 .setHistoryLoaded(true)
                 .setChatItems(chatItems)
                 .createChatState();
@@ -374,6 +378,7 @@ public class ChatState {
         return new Builder()
                 .copyFrom(this)
                 .setChatInputMode(chatInputMode)
+                .setIsAttachmentButtonVisible(chatInputMode == ChatInputMode.ENABLED)
                 .createChatState();
     }
 
@@ -426,13 +431,6 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState setIsAttachmentButtonVisible(boolean isAttachmentButtonVisible) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsAttachmentButtonVisible(isAttachmentButtonVisible)
-                .createChatState();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -468,6 +466,7 @@ public class ChatState {
         return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonVisible);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ChatState{" +

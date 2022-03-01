@@ -17,19 +17,13 @@ public class ChatHeadManager {
         this.chatHeadServiceIntent = ChatHeadService.getIntent(applicationContext);
     }
 
-    public boolean isServiceStarted() {
-        return isServiceStarted;
-    }
-
-    // Service start
     public void startChatHeadService() {
         if (!isServiceStarted) {
             isServiceStarted = true;
             applicationContext.startService(chatHeadServiceIntent);
         }
     }
-
-    // Service stop
+    
     public void stopChatHeadService() {
         if (isServiceStarted) {
             isServiceStarted = false;

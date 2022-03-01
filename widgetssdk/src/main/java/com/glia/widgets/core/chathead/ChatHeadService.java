@@ -13,6 +13,8 @@ import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
@@ -25,17 +27,13 @@ import com.glia.widgets.view.head.ChatHeadView;
 public class ChatHeadService extends Service {
     private static final String TAG = ChatHeadService.class.getSimpleName();
 
-    private WindowManager.LayoutParams layoutParams;
     private ChatHeadView chatHeadView;
+    private ServiceChatBubbleController controller;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    public static Intent getIntent(Context context) {
-        return new Intent(context, ChatHeadService.class);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -47,11 +45,11 @@ public class ChatHeadService extends Service {
         WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         chatHeadView = ChatHeadView.getInstance(this);
-        ServiceChatBubbleController controller = Dependencies
+        controller = Dependencies
                 .getControllerFactory()
                 .getChatHeadController();
 
-        layoutParams = getLayoutParams();
+        WindowManager.LayoutParams layoutParams = getLayoutParams();
         chatHeadView.setOnTouchListener(
                 new ViewHelpers.ChatHeadOnTouchListener(
                         () -> new Pair<>(layoutParams.x, layoutParams.y),
@@ -77,6 +75,9 @@ public class ChatHeadService extends Service {
         Logger.d(TAG, "onDestroy");
     }
 
+    public static Intent getIntent(Context context) {
+        return new Intent(context, ChatHeadService.class);
+    }
 
     private WindowManager.LayoutParams getLayoutParams() {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -112,7 +113,15 @@ public class ChatHeadService extends Service {
     }
 
     private int getDefaultXPosition(int screenWidth) {
-        return screenWidth - ((int) getResources().getDimension(R.dimen.glia_chat_head_size)) - Float.valueOf(Utils.pxFromDp(this, 16)).intValue();
+        return screenWidth - getChatHeadSize() - getChatHeadMargin();
+    }
+
+    private int getChatHeadSize() {
+        return ((int) getResources().getDimension(R.dimen.glia_chat_head_size));
+    }
+
+    private int getChatHeadMargin() {
+        return Float.valueOf(Utils.pxFromDp(this, 16)).intValue();
     }
 
     private int getDefaultYPosition(int screenHeight) {

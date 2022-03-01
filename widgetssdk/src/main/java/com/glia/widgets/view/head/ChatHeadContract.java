@@ -12,6 +12,8 @@ public interface ChatHeadContract {
         void onResume(android.view.View view);
 
         void onSetChatHeadView(View view);
+
+        void onApplicationStop();
     }
 
     interface View extends BaseView<Controller> {

@@ -23,42 +23,32 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static GliaSdkConfigurationManager sdkConfigurationManager;
-    private static ChatHeadManager chatHeadManager;
     private static UseCaseFactory useCaseFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
-    private static ApplicationLifecycleManager lifecycleManager;
-    private static final LifecycleEventObserver lifecycleEventObserver = (source, event) -> {
-        if (event == Lifecycle.Event.ON_STOP) {
-            useCaseFactory
-                    .getToggleChatBubbleServiceUseCase()
-                    .execute(null);
-        } else if (event == Lifecycle.Event.ON_DESTROY) {
-            chatHeadManager
-                    .stopChatHeadService();
-            lifecycleManager.onDestroy();
-        }
-    };
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
         sdkConfigurationManager = new GliaSdkConfigurationManager();
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
-
-        chatHeadManager = new ChatHeadManager(application);
-        lifecycleManager = new ApplicationLifecycleManager();
-        lifecycleManager.addObserver(lifecycleEventObserver);
-
+        ApplicationLifecycleManager lifecycleManager = new ApplicationLifecycleManager();
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
                 new PermissionDialogManager(application),
                 notificationManager,
                 sdkConfigurationManager,
-                chatHeadManager
+                new ChatHeadManager(application)
         );
 
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
+        lifecycleManager.addObserver((source, event) -> {
+            if (event == Lifecycle.Event.ON_STOP) {
+                controllerFactory.getChatHeadController().onApplicationStop();
+            } else if (event == Lifecycle.Event.ON_DESTROY) {
+                controllerFactory.getChatHeadController().onDestroy();
+            }
+        });
     }
 
     public static UseCaseFactory getUseCaseFactory() {

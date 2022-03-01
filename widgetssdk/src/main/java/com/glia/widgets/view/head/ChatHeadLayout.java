@@ -67,6 +67,11 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
         this.chatHeadClickedListener = listener;
     }
 
+
+    public void setConfiguration(GliaSdkConfiguration configuration) {
+        this.chatHeadView.updateConfiguration(uiTheme, configuration);
+    }
+
     /**
      * Method that allows integrator to override navigation on click with using own paths
      * <p>
@@ -76,17 +81,6 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
      */
     public void setNavigationCallback(NavigationCallback callback) {
         this.navigationCallback = callback;
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        float floatingViewX = w - getResources().getDimension(R.dimen.glia_chat_head_size)
-                - Utils.pxFromDp(this.getContext(), 16);
-        float floatingViewY = h / 10f * 8f;
-        chatHeadView.setX(floatingViewX);
-        chatHeadView.setY(floatingViewY);
-        chatHeadView.invalidate();
-        super.onSizeChanged(w, h, oldw, oldh);
     }
 
     @Override
@@ -145,6 +139,22 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     @Override
     public void setController(ChatHeadLayoutContract.Controller controller) {
         this.controller = controller;
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        float floatingViewX = w - getChatHeadSize() - getChatHeadMargin();
+        float floatingViewY = h / 10f * 8f;
+        chatHeadView.setX(floatingViewX);
+        chatHeadView.setY(floatingViewY);
+        chatHeadView.invalidate();
+        super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        controller.onDestroy();
+        super.onDetachedFromWindow();
     }
 
     private void init(@Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -214,14 +224,12 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
         }
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        controller.onDestroy();
-        super.onDetachedFromWindow();
+    private float getChatHeadSize() {
+        return getResources().getDimension(R.dimen.glia_chat_head_size);
     }
 
-    public void setConfiguration(GliaSdkConfiguration configuration) {
-        this.chatHeadView.updateConfiguration(uiTheme, configuration);
+    private float getChatHeadMargin() {
+        return Utils.pxFromDp(this.getContext(), 16);
     }
 
     public interface OnChatHeadClickedListener {

@@ -7,7 +7,6 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ApplicationLifecycleManager {
     private final List<LifecycleEventObserver> lifecycleEventObserverList = new ArrayList<>();
     private final Lifecycle lifecycle;

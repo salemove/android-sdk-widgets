@@ -98,7 +98,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private ServiceChatBubbleController serviceChatBubbleController;
-    private GliaSdkConfiguration sdkConfiguration;
 
     private ChatRecyclerView chatRecyclerView;
     private ImageButton sendButton;
@@ -1333,9 +1332,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     }
 
     public void setConfiguration(GliaSdkConfiguration configuration) {
-        sdkConfiguration = configuration;
         serviceChatBubbleController.setBuildTimeTheme(theme);
-        serviceChatBubbleController.setSdkConfiguration(sdkConfiguration);
+        serviceChatBubbleController.setSdkConfiguration(configuration);
     }
 
     public interface OnBackClickedListener {

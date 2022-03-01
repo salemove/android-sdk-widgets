@@ -89,6 +89,7 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
     @Override
     public void onDestroy() {
         toggleChatBubbleServiceUseCase.execute(null);
+        unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
     }
 
     @Override
@@ -99,6 +100,11 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
     @Override
     public void onSetChatHeadView(ChatHeadContract.View view) {
         this.chatHeadView = view;
+    }
+
+    @Override
+    public void onApplicationStop() {
+        toggleChatBubbleServiceUseCase.execute(null);
     }
 
     @Override
@@ -115,6 +121,24 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
 
     public void setSdkConfiguration(GliaSdkConfiguration configuration) {
         this.sdkConfiguration = configuration;
+    }
+
+    public void init() {
+        gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
+        messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
+        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
+    }
+
+    public void updateChatHeadView() {
+        if (chatHeadView != null) {
+            updateChatHeadViewState();
+            chatHeadView.showUnreadMessageCount(unreadMessagesCount);
+            chatHeadView.updateConfiguration(buildTimeTheme, sdkConfiguration);
+        }
+    }
+
+    public void setBuildTimeTheme(UiTheme theme) {
+        this.buildTimeTheme = theme;
     }
 
     private void engagementEnded() {
@@ -144,20 +168,6 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
         }
     }
 
-    public void init() {
-        gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
-        messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
-        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
-    }
-
-    public void updateChatHeadView() {
-        if (chatHeadView != null) {
-            updateChatHeadViewState();
-            chatHeadView.showUnreadMessageCount(unreadMessagesCount);
-            chatHeadView.updateConfiguration(buildTimeTheme, sdkConfiguration);
-        }
-    }
-
     private void updateChatHeadViewState() {
         switch (state) {
             case ENGAGEMENT:
@@ -170,10 +180,6 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
             default:
                 chatHeadView.showPlaceholder();
         }
-    }
-
-    public void setBuildTimeTheme(UiTheme theme) {
-        this.buildTimeTheme = theme;
     }
 
     private enum State {

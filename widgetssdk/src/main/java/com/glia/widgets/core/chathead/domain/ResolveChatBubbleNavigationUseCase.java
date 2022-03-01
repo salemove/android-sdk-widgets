@@ -18,8 +18,6 @@ public class ResolveChatBubbleNavigationUseCase {
     public Destinations execute() {
         if (isMediaEngagementOngoing() || isMediaQueueingOngoing()) {
             return Destinations.CALL_VIEW;
-        } else if (isChatEngagementOngoing() || isChatQueueingOngoing()) {
-            return Destinations.CHAT_VIEW;
         } else {
             return Destinations.CHAT_VIEW;
         }
@@ -36,13 +34,5 @@ public class ResolveChatBubbleNavigationUseCase {
 
     private boolean isMediaEngagementOngoing() {
         return engagementRepository.hasOngoingEngagement() && engagementRepository.isMediaEngagement();
-    }
-
-    private boolean isChatQueueingOngoing() {
-        return queueRepository.isChatQueueingOngoing();
-    }
-
-    private boolean isChatEngagementOngoing() {
-        return engagementRepository.hasOngoingEngagement() && engagementRepository.isChatEngagement();
     }
 }

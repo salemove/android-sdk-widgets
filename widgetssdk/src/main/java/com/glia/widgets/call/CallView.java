@@ -377,6 +377,13 @@ public class CallView extends ConstraintLayout {
                     onNavigateToChatListener.call();
                 }
             }
+
+            @Override
+            public void destroyView() {
+                if (onEndListener != null) {
+                    onEndListener.onEnd();
+                }
+            }
         };
 
         ScreenSharingController.ViewCallback screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();

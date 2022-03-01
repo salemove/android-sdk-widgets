@@ -153,10 +153,28 @@ public class GliaWidgets {
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
     }
 
+    /**
+     * Clears visitor session
+     */
     public static void clearVisitorSession() {
         Logger.d(TAG, "clearVisitorSession");
         Dependencies.getControllerFactory().destroyControllers();
         Dependencies.glia().clearVisitorSession();
+    }
+
+    /**
+     * Ends active engagement
+     * <p>
+     * Ends active engagement if existing and closes Widgets SDK UI (includes bubble).
+     */
+    public static void endEngagement() {
+        Logger.d(TAG, "endEngagement");
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
+            if (e != null) {
+                Logger.e(TAG, "Ending engagement error: " + e.toString());
+            }
+        }));
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     /**

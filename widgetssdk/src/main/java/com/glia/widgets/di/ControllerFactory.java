@@ -168,6 +168,7 @@ public class ControllerFactory {
         destroyCallController(false);
         destroyScreenSharingController(false);
         destroyChatController();
+        chatHeadsController.stopService();
     }
 
     public void destroyCallController(boolean retain) {

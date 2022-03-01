@@ -205,6 +205,10 @@ public class CallController implements
 
     public void onDestroy(boolean retain) {
         Logger.d(TAG, "onDestroy, retain: " + retain);
+        if (viewCallback != null) {
+            Logger.d(TAG, "destroyingView");
+            viewCallback.destroyView();
+        }
         viewCallback = null;
         if (!retain) {
             mediaUpgradeOfferRepository.stopAll();

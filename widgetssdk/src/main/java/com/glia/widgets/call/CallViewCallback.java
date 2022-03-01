@@ -5,4 +5,6 @@ public interface CallViewCallback {
     void emitState(CallState callState);
 
     void navigateToChat();
+
+    void destroyView();
 }

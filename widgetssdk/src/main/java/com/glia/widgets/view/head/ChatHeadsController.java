@@ -218,6 +218,14 @@ public class ChatHeadsController implements
         );
     }
 
+    public void stopService() {
+        Logger.d(TAG, "stopService");
+        ChatHeadState chatHeadState = new ChatHeadState.Builder()
+                .setUseOverlays(false)
+                .createChatHeadState();
+        emitViewState(chatHeadState);
+    }
+
     public void addChatHeadServiceListener(ChatHeadServiceListener chatHeadServiceListener) {
         Logger.d(TAG, "addChatHeadServiceListener");
         this.chatHeadServiceListener = chatHeadServiceListener;

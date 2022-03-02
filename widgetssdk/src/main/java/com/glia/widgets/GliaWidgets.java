@@ -172,7 +172,7 @@ public class GliaWidgets {
                 .setNote(visitorInfoUpdate.getNote())
                 .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
                 .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
-                .setNoteUpdateMethod(VisitorInfoUpdateRequest.NoteUpdateMethod.REPLACE)
+                .setNoteUpdateMethod(visitorInfoUpdate.getNoteUpdateMethod())
                 .build(), e -> {
             if (e != null) {
                 exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));

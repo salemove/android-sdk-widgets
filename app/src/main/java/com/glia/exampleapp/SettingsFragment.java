@@ -10,6 +10,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 import com.glia.exampleapp.auth.AuthorizationType;
+import com.glia.widgets.GliaWidgets;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
@@ -23,12 +24,21 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preferences, rootKey);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         initAuthorizationPreferenceClickListener();
+        setPreferenceDescription(R.string.pref_glia_core_sdk_version, GliaWidgets.getWidgetsCoreSdkVersion());
+        setPreferenceDescription(R.string.pref_glia_widgets_sdk_version, GliaWidgets.getWidgetsSdkVersion());
     }
 
     @Override
     public void onResume() {
         super.onResume();
         updateAuthorizationDescription();
+    }
+
+    private void setPreferenceDescription(int preferenceId, String value) {
+        Preference preference = findPreference(getString(preferenceId));
+        if (preference != null) {
+            preference.setSummary(value);
+        }
     }
 
     private void initAuthorizationPreferenceClickListener() {

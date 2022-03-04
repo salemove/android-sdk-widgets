@@ -259,4 +259,12 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Versions">
+        <Preference
+            android:key="@string/pref_glia_widgets_sdk_version"
+            android:title="Glia Widgets SDK Version" />
+        <Preference
+            android:key="@string/pref_glia_core_sdk_version"
+            android:title="Glia Core SDK Version" />
+    </PreferenceCategory>
 </PreferenceScreen>

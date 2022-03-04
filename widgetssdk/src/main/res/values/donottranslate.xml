@@ -10,9 +10,4 @@
 
     <string name="glia_screensharing_dialog_icon_content_description">Screen sharing icon content description</string>
 
-    <string name="glia_call_minimize_content_description">Call minimize content description</string>
-    <string name="glia_call_speaker_content_description">Call speaker content description</string>
-    <string name="glia_call_mute_content_description">Call mute content description</string>
-    <string name="glia_call_chat_content_description">Call chat content description</string>
-
 </resources>

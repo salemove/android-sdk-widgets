@@ -28,7 +28,25 @@ android {
             storeFile file('debug.keystore')
         }
     }
+
+    File propsFile = project.rootProject.file('local.properties')
+    if (propsFile.exists()) {
+        Properties p = new Properties()
+        new FileInputStream(propsFile).withCloseable { is -> p.load(is) }
+        p.each { name, value -> ext[name] = value }
+    } else {
+        ext["GLIA_API_KEY_SECRET"] = System.getenv("GLIA_API_KEY_SECRET") as String
+        ext["GLIA_API_KEY_ID"] = System.getenv("GLIA_API_KEY_ID") as String
+        ext["GLIA_APP_TOKEN"] = System.getenv("GLIA_APP_TOKEN") as String
+        ext["GLIA_SITE_ID"] = System.getenv("GLIA_SITE_ID") as String
+    }
     buildTypes {
+        all {
+            resValue("string", "app_token", GLIA_APP_TOKEN ?: "")
+            resValue("string", "site_id", GLIA_SITE_ID ?: "")
+            resValue("string", "glia_api_key_id", GLIA_API_KEY_ID ?: "")
+            resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET ?: "")
+        }
         debug {
             signingConfig signingConfigs.debug
             applicationIdSuffix '.debug'

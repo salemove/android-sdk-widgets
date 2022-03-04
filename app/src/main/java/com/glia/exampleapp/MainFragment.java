@@ -80,9 +80,9 @@ public class MainFragment extends Fragment {
         intent.putExtra(GliaWidgets.COMPANY_NAME,
                 Utils.getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences, getResources()));
         intent.putExtra(GliaWidgets.QUEUE_ID,
-                Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences, getResources()));
+                Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.default_queue_id), sharedPreferences, getResources()));
         intent.putExtra(GliaWidgets.CONTEXT_URL,
-                Utils.getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences, getResources()));
+                Utils.getStringFromPrefs(R.string.pref_context_url, getString(R.string.default_queue_id), sharedPreferences, getResources()));
         UiTheme uiTheme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
         intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
         // use to set the bubble functionality

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
+import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -28,37 +29,69 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         progressIndicator = itemView.findViewById(R.id.progress_indicator);
         titleText = itemView.findViewById(R.id.item_title);
         statusIndicator = itemView.findViewById(R.id.status_indicator);
+
+        setupExtensionContainer(itemView);
     }
 
     protected void setData(
             boolean isFileExists,
             boolean isDownloading,
-            AttachmentFile attachmentFile
+            AttachmentFile attachmentFile,
+            ChatAdapter.OnFileItemClickListener listener
     ) {
-        if (isFileExists) {
+        updateClickListener(isFileExists, isDownloading, attachmentFile, listener);
+        updateTitle(attachmentFile);
+        updateStatusIndicator(isFileExists, isDownloading);
+        updateProgressIndicator(isDownloading);
+    }
+
+    private void setupExtensionContainer(@NonNull View itemView) {
+        extensionContainerView.setCardBackgroundColor(
+                ContextCompat.getColor(
+                        itemView.getContext(),
+                        R.color.glia_brand_primary_color
+                )
+        );
+    }
+
+    private void updateClickListener(
+            boolean isFileExists,
+            boolean isDownloading,
+            AttachmentFile attachmentFile,
+            ChatAdapter.OnFileItemClickListener listener
+    ) {
+        if (isDownloading) {
+            itemView.setOnClickListener(null);
+        } else {
+            itemView.setOnClickListener(v -> {
+                if (isFileExists) {
+                    listener.onFileOpenClick(attachmentFile);
+                } else {
+                    listener.onFileDownloadClick(attachmentFile);
+                }
+            });
+        }
+    }
+
+    private void updateTitle(AttachmentFile attachmentFile) {
+        String name = attachmentFile.getName();
+        long byteSize = attachmentFile.getSize();
+        titleText.setText(String.format("%s • %s", name, Formatter.formatFileSize(itemView.getContext(), byteSize)));
+        String extension = Utils.getExtensionByStringHandling(name).orElse("");
+        extensionTypeText.setText(extension);
+    }
+
+    private void updateStatusIndicator(boolean isFileExists, boolean isDownloading) {
+        if (isDownloading) {
+            statusIndicator.setText(R.string.glia_chat_attachment_downloading_label);
+        } else if (isFileExists) {
             statusIndicator.setText(R.string.glia_chat_attachment_open_button_label);
         } else {
             statusIndicator.setText(R.string.glia_chat_attachment_download_button_label);
         }
+    }
 
-        if (isDownloading) {
-            statusIndicator.setText(R.string.glia_chat_attachment_downloading_label);
-            progressIndicator.setVisibility(View.VISIBLE);
-        } else {
-            progressIndicator.setVisibility(View.GONE);
-            if (isFileExists) {
-                statusIndicator.setText(R.string.glia_chat_attachment_open_button_label);
-            } else {
-                statusIndicator.setText(R.string.glia_chat_attachment_download_button_label);
-            }
-        }
-
-        String name = attachmentFile.getName();
-        long byteSize = attachmentFile.getSize();
-
-        extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_brand_primary_color));
-        titleText.setText(String.format("%s • %s", name, Formatter.formatFileSize(itemView.getContext(), byteSize)));
-        String extension = Utils.getExtensionByStringHandling(name).orElse("");
-        extensionTypeText.setText(extension);
+    private void updateProgressIndicator(boolean isDownloading) {
+        progressIndicator.setVisibility(isDownloading ? View.VISIBLE : View.GONE);
     }
 }

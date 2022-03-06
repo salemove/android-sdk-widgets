@@ -5,14 +5,14 @@
         android:id="@+id/save_item"
         android:icon="@drawable/ic_action_save"
         android:orderInCategory="1"
-        android:title="Save"
+        android:title="@string/glia_preview_activity_menu_save_button"
         android:visible="false"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/share_item"
         android:icon="@drawable/ic_action_share"
         android:orderInCategory="2"
-        android:title="Profile"
+        android:title="@string/glia_preview_activity_menu_share_button"
         android:visible="false"
         app:showAsAction="always" />
 </menu>

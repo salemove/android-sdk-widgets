@@ -167,5 +167,8 @@
     <string name="glia_preview_activity_image_share_title">Share Image</string>
     <string name="glia_preview_activity_toolbar_title">Preview</string>
     <string name="glia_preview_activity_img_fetch_fail_msg">Could not fetch the image. Please try again.</string>
+    <string name="glia_preview_activity_menu_save_button">Save</string>
+    <string name="glia_preview_activity_menu_share_button">Share</string>
+    <string name="glia_preview_activity_image_content_description">Preview content</string>
 
 </resources>

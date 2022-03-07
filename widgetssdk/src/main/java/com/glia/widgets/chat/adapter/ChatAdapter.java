@@ -156,14 +156,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chatItem.getViewType() == OPERATOR_FILE_VIEW_TYPE) {
                 OperatorFileAttachmentViewHolder viewHolder = (OperatorFileAttachmentViewHolder) holder;
                 OperatorAttachmentItem item = (OperatorAttachmentItem) chatItem;
-                viewHolder.bind(item);
-                viewHolder.itemView.setOnClickListener(v -> {
-                    if (item.isFileExists) {
-                        onFileItemClickListener.onFileOpenClick(item.attachmentFile);
-                    } else {
-                        onFileItemClickListener.onFileDownloadClick(item.attachmentFile);
-                    }
-                });
+                viewHolder.bind(item, onFileItemClickListener);
             } else {
                 OperatorImageAttachmentViewHolder viewHolder = (OperatorImageAttachmentViewHolder) holder;
                 OperatorAttachmentItem item = (OperatorAttachmentItem) chatItem;
@@ -173,14 +166,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (chatItem.getViewType() == VISITOR_FILE_VIEW_TYPE) {
                 VisitorFileAttachmentViewHolder viewHolder = (VisitorFileAttachmentViewHolder) holder;
                 VisitorAttachmentItem item = (VisitorAttachmentItem) chatItem;
-                viewHolder.bind(item);
-                viewHolder.itemView.setOnClickListener(v -> {
-                    if (item.isFileExists) {
-                        onFileItemClickListener.onFileOpenClick(item.attachmentFile);
-                    } else {
-                        onFileItemClickListener.onFileDownloadClick(item.attachmentFile);
-                    }
-                });
+                viewHolder.bind(item, onFileItemClickListener);
             } else {
                 VisitorImageAttachmentViewHolder viewHolder = (VisitorImageAttachmentViewHolder) holder;
                 VisitorAttachmentItem item = (VisitorAttachmentItem) chatItem;

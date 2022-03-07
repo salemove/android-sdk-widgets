@@ -11,6 +11,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 
 public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
@@ -22,6 +23,11 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         setupDeliveredView(itemView.getContext(), uiTheme);
     }
 
+    public void bind(VisitorAttachmentItem item, ChatAdapter.OnFileItemClickListener listener) {
+        super.setData(item.isFileExists, item.isDownloading, item.attachmentFile, listener);
+        updateDeliveredView(item);
+    }
+
     private void setupDeliveredView(Context context, UiTheme uiTheme) {
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
@@ -30,9 +36,7 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         deliveredView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
     }
 
-
-    public void bind(VisitorAttachmentItem item) {
-        super.setData(item.isFileExists, item.isDownloading, item.attachmentFile);
+    private void updateDeliveredView(VisitorAttachmentItem item) {
         deliveredView.setVisibility(item.showDelivered ? View.VISIBLE : View.GONE);
     }
 }

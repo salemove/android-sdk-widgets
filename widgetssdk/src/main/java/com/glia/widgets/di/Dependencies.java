@@ -16,6 +16,7 @@ import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
+import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
 
 public class Dependencies {
 
@@ -31,7 +32,6 @@ public class Dependencies {
         sdkConfigurationManager = new GliaSdkConfigurationManager();
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
-        ApplicationLifecycleManager lifecycleManager = new ApplicationLifecycleManager();
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
@@ -42,13 +42,10 @@ public class Dependencies {
         );
 
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
-        lifecycleManager.addObserver((source, event) -> {
-            if (event == Lifecycle.Event.ON_STOP) {
-                controllerFactory.getChatHeadController().onApplicationStop();
-            } else if (event == Lifecycle.Event.ON_DESTROY) {
-                controllerFactory.getChatHeadController().onDestroy();
-            }
-        });
+        initApplicationLifecycleObserver(
+                new ApplicationLifecycleManager(),
+                controllerFactory.getChatHeadController()
+        );
     }
 
     public static UseCaseFactory getUseCaseFactory() {
@@ -99,5 +96,18 @@ public class Dependencies {
     @VisibleForTesting
     public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
         Dependencies.useCaseFactory = useCaseFactory;
+    }
+
+    private static void initApplicationLifecycleObserver(
+            ApplicationLifecycleManager lifecycleManager,
+            ServiceChatBubbleController chatBubbleController
+    ) {
+        lifecycleManager.addObserver((source, event) -> {
+            if (event == Lifecycle.Event.ON_STOP) {
+                chatBubbleController.onApplicationStop();
+            } else if (event == Lifecycle.Event.ON_DESTROY) {
+                chatBubbleController.onDestroy();
+            }
+        });
     }
 }

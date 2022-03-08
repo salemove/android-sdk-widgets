@@ -13,8 +13,6 @@ import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
@@ -28,7 +26,6 @@ public class ChatHeadService extends Service {
     private static final String TAG = ChatHeadService.class.getSimpleName();
 
     private ChatHeadView chatHeadView;
-    private ServiceChatBubbleController controller;
 
     @Nullable
     @Override
@@ -36,32 +33,16 @@ public class ChatHeadService extends Service {
         return null;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate() {
         super.onCreate();
         Logger.d(TAG, "onCreate");
-        //Add the view to the window.
-        WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-
-        chatHeadView = ChatHeadView.getInstance(this);
-        controller = Dependencies
+        ServiceChatBubbleController controller = Dependencies
                 .getControllerFactory()
                 .getChatHeadController();
-
+        WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         WindowManager.LayoutParams layoutParams = getLayoutParams();
-        chatHeadView.setOnTouchListener(
-                new ViewHelpers.ChatHeadOnTouchListener(
-                        () -> new Pair<>(layoutParams.x, layoutParams.y),
-                        (x, y) -> {
-                            layoutParams.x = Float.valueOf(x).intValue();
-                            layoutParams.y = Float.valueOf(y).intValue();
-                            windowManager.updateViewLayout(chatHeadView, layoutParams);
-                        },
-                        (v) -> controller.onChatHeadClicked()
-                ));
-
-        chatHeadView.setController(controller);
+        initChatHeadView(controller, windowManager, layoutParams);
         controller.onSetChatHeadView(chatHeadView);
         controller.updateChatHeadView();
         windowManager.addView(chatHeadView, layoutParams);
@@ -77,6 +58,26 @@ public class ChatHeadService extends Service {
 
     public static Intent getIntent(Context context) {
         return new Intent(context, ChatHeadService.class);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initChatHeadView(
+            ServiceChatBubbleController controller,
+            WindowManager windowManager,
+            WindowManager.LayoutParams layoutParams
+    ) {
+        chatHeadView = ChatHeadView.getInstance(this);
+        chatHeadView.setController(controller);
+        chatHeadView.setOnTouchListener(
+                new ViewHelpers.ChatHeadOnTouchListener(
+                        () -> new Pair<>(layoutParams.x, layoutParams.y),
+                        (x, y) -> {
+                            layoutParams.x = Float.valueOf(x).intValue();
+                            layoutParams.y = Float.valueOf(y).intValue();
+                            windowManager.updateViewLayout(chatHeadView, layoutParams);
+                        },
+                        (v) -> controller.onChatHeadClicked()
+                ));
     }
 
     private WindowManager.LayoutParams getLayoutParams() {

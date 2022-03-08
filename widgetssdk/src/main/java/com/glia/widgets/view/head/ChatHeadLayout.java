@@ -57,32 +57,6 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
         init(attrs, defStyleAttr, defStyleRes);
     }
 
-    /**
-     * Method for the integrator to override if they want to do custom logic when the chat head is
-     * clicked.
-     *
-     * @param listener
-     */
-    public void setOnChatHeadClickedListener(OnChatHeadClickedListener listener) {
-        this.chatHeadClickedListener = listener;
-    }
-
-
-    public void setConfiguration(GliaSdkConfiguration configuration) {
-        this.chatHeadView.updateConfiguration(uiTheme, configuration);
-    }
-
-    /**
-     * Method that allows integrator to override navigation on click with using own paths
-     * <p>
-     * if set to null default navigation is restored
-     *
-     * @param callback
-     */
-    public void setNavigationCallback(NavigationCallback callback) {
-        this.navigationCallback = callback;
-    }
-
     @Override
     public void showOperatorImage(String operatorImgUrl) {
         chatHeadView.showOperatorImage(operatorImgUrl);
@@ -157,6 +131,35 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
         super.onDetachedFromWindow();
     }
 
+    /**
+     * Method for the integrator to override if they want to do custom logic when the chat head is
+     * clicked.
+     *
+     * @param listener
+     */
+    public void setOnChatHeadClickedListener(OnChatHeadClickedListener listener) {
+        this.chatHeadClickedListener = listener;
+    }
+
+    /**
+     * Method that allows integrator to override navigation on click with using own paths
+     * <p>
+     * if set to null default navigation is restored
+     *
+     * @param callback
+     */
+    public void setNavigationCallback(NavigationCallback callback) {
+        this.navigationCallback = callback;
+    }
+
+    public void setConfiguration(GliaSdkConfiguration configuration) {
+        this.chatHeadView.updateConfiguration(uiTheme, configuration);
+    }
+
+    public void setIsChatView(boolean value) {
+        this.isChatView = value;
+    }
+
     private void init(@Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         initConfigurations();
         initViews();
@@ -197,10 +200,6 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     private void setBuildTimeTheme(UiTheme theme) {
         this.uiTheme = theme;
         this.chatHeadView.updateConfiguration(uiTheme, null);
-    }
-
-    public void setIsChatView(boolean value) {
-        this.isChatView = value;
     }
 
     private void onChatHeadDragged(float x, float y) {

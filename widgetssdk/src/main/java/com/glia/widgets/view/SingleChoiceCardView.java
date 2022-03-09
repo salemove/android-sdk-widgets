@@ -164,6 +164,7 @@ public class SingleChoiceCardView extends FrameLayout {
 
             button.setBackgroundTintList(actionButtonBackgroundColor);
             button.setTextColor(actionButtonTextColor);
+            button.setSelected(isSelected);
 
             if (theme.getFontRes() != null) {
                 button.setTypeface(

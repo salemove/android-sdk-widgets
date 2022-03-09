@@ -8,6 +8,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
@@ -34,6 +37,18 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
     public void bind(AttachmentFile attachmentFile, boolean showDelivered) {
         super.bind(attachmentFile);
         setShowDelivered(showDelivered);
+
+        setAccessibilityLabels(showDelivered);
+    }
+
+    private void setAccessibilityLabels(boolean showDelivered) {
+        if (showDelivered) {
+            itemView.setContentDescription(itemView.getResources().getString(
+                    R.string.glia_chat_visitor_image_delivered_content_description));
+        } else {
+            itemView.setContentDescription(itemView.getResources().getString(
+                    R.string.glia_chat_visitor_image_content_description));
+        }
     }
 
     private void setShowDelivered(boolean showDelivered) {

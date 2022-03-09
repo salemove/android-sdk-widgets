@@ -3,6 +3,7 @@ package com.glia.widgets.chat.adapter.holder;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,12 +81,25 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 0
         );
         contentLayout.addView(singleChoiceCardView, params);
+
+        itemView.setContentDescription(item.content);
     }
 
     private void addMessageTextView(OperatorMessageItem item) {
         TextView contentView = getMessageContentView();
         contentView.setText(item.content);
         contentLayout.addView(contentView);
+
+        if (!TextUtils.isEmpty(item.operatorName)) {
+            itemView.setContentDescription(context.getString(
+                    R.string.glia_chat_operator_name_message_content_description,
+                    item.operatorName,
+                    item.content));
+        } else {
+            itemView.setContentDescription(context.getString(
+                    R.string.glia_chat_operator_message_content_description,
+                    item.content));
+        }
     }
 
     private TextView getMessageContentView() {
@@ -96,6 +110,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
         contentView.setBackgroundTintList(operatorBgColor);
         contentView.setTextColor(ContextCompat.getColor(context, uiTheme.getOperatorMessageTextColor()));
         contentView.setLinkTextColor(ContextCompat.getColor(context, uiTheme.getOperatorMessageTextColor()));
+        contentView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         if (uiTheme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
             contentView.setTypeface(fontFamily);

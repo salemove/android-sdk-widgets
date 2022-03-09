@@ -38,5 +38,12 @@ public class VisitorMessageViewHolder extends RecyclerView.ViewHolder {
     public void bind(VisitorMessageItem item) {
         content.setText(item.getMessage());
         deliveredView.setVisibility(item.isShowDelivered() ? View.VISIBLE : View.GONE);
+
+        String contentDescription = itemView.getResources().getString(
+                item.isShowDelivered()
+                        ? R.string.glia_chat_visitor_message_delivered_content_description
+                        : R.string.glia_chat_visitor_message_content_description,
+                item.getMessage());
+        itemView.setContentDescription(contentDescription);
     }
 }

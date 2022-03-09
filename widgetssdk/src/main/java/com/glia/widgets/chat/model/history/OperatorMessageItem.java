@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class OperatorMessageItem extends ChatItem {
+    public final String operatorName;
     public final String operatorProfileImgUrl;
     public final boolean showChatHead;
     public final String content;
@@ -19,6 +20,7 @@ public class OperatorMessageItem extends ChatItem {
 
     public OperatorMessageItem(
             String id,
+            String operatorName,
             String operatorProfileImgUrl,
             boolean showChatHead,
             String content,
@@ -27,6 +29,7 @@ public class OperatorMessageItem extends ChatItem {
             String choiceCardImageUrl
     ) {
         super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE);
+        this.operatorName = operatorName;
         this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.showChatHead = showChatHead;
         this.content = content;

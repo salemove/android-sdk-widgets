@@ -9,33 +9,34 @@ import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
-import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
-import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
-import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
-import com.glia.widgets.core.queue.QueueTicketsEventsListener;
-import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
+import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
+import com.glia.widgets.core.queue.QueueTicketsEventsListener;
+import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
+import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
-import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
-import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
-import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class CallController implements
@@ -355,7 +356,9 @@ public class CallController implements
     public void setViewCallback(CallViewCallback callViewCallback) {
         Logger.d(TAG, "setViewCallback");
         this.viewCallback = callViewCallback;
-        viewCallback.emitState(callState);
+        if (viewCallback != null) {
+            viewCallback.emitState(callState);
+        }
         emitViewState(callState.landscapeControlsVisibleChanged(!callState.isVideoCall()));
     }
 
@@ -583,8 +586,11 @@ public class CallController implements
         mediaUpgradeOfferRepository.startListening();
         String operatorProfileImgUrl = null;
         try {
-            operatorProfileImgUrl = engagement.getOperator().getPicture().getURL().get();
-        } catch (Exception e) {
+            Optional<String> optionalUrl = engagement.getOperator().getPicture().getURL();
+            if (optionalUrl.isPresent()) {
+                operatorProfileImgUrl = optionalUrl.get();
+            }
+        } catch (Exception ignored) {
         }
         emitViewState(
                 callState.engagementStarted(

@@ -401,7 +401,7 @@ public class ChatController implements
         }
     }
 
-    public void onStop() {
+    public void onPause() {
         messagesNotSeenHandler.onChatWentBackground();
     }
 

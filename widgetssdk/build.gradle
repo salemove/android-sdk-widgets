@@ -6,7 +6,7 @@ android {
     defaultPublishConfig "debug"
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 37
         versionName "1.7.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -23,35 +23,16 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    lintOptions {
-        disable "WrongLayoutName"
-        disable "LayoutFileNameMatchesClass"
-        disable "MatchingViewId"
-        disable "RawDimen"
-        disable "WrongAnnotationOrder"
-        disable "ColorCasing"
-        disable "WrongViewIdFormat"
-        disable "HardcodedText"
+    lint {
+        disable 'WrongLayoutName',
+                'LayoutFileNameMatchesClass',
+                'MatchingViewId',
+                'RawDimen',
+                'WrongAnnotationOrder',
+                'ColorCasing',
+                'WrongViewIdFormat',
+                'HardcodedText'
     }
-}
-
-ext {
-    appCompatVersion = '1.2.0'
-    materialVersion = '1.4.0'
-    constraintLayoutVersion = '2.0.4'
-    gliaSdkVersion = '0.23.7'
-    lifecycle_process = '2.3.1'
-    junitVersion = '4.13.1'
-    androidXTestVersion = '1.1.2'
-    archCoreVersion = '2.1.0'
-    espressoVersion = '3.3.0'
-    leakCanaryVersion = '2.6'
-    picassoVersion = '2.71828'
-    mockitoVersion = '4.3.1'
-    lottieVersion = '4.1.0'
-    rxAndroid = '2.1.0'
-    rxJava = '2.2.6'
-    gson = '2.8.5'
 }
 
 dependencies {
@@ -76,7 +57,6 @@ dependencies {
     // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 
     implementation "com.airbnb.android:lottie:$lottieVersion"
-
     implementation "com.google.code.gson:gson:$gson"
 
     testImplementation "junit:junit:$junitVersion"

@@ -20,7 +20,6 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".filepreview.ui.FilePreviewActivity"
-            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Application.Glia.Chat.Activity" />
         <activity
@@ -33,6 +32,10 @@
             android:enabled="true"
             android:stopWithTask="true" />
 
+        <service
+            android:name=".core.screensharing.MediaProjectionService"
+            android:foregroundServiceType="mediaProjection" />
+
         <receiver
             android:name=".core.notification.NotificationActionReceiver"
             android:exported="false">
@@ -40,11 +43,6 @@
                 <action android:name="com.glia.widgets.core.notification.NotificationActionReceiver.ACTION_ON_SCREEN_SHARING_END_PRESSED" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name=".core.screensharing.MediaProjectionService"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

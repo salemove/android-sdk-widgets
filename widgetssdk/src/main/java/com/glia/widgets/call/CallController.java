@@ -19,6 +19,8 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
+import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -72,6 +74,8 @@ public class CallController implements
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase;
     private final IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase;
+    private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
+    private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
     private final DialogController dialogController;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
@@ -128,7 +132,9 @@ public class CallController implements
             ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
             IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
             HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
-            IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase
+            IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase,
+            SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
@@ -164,6 +170,8 @@ public class CallController implements
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.hasCallNotificationChannelEnabledUseCase = hasCallNotificationChannelEnabledUseCase;
         this.isShowEnableCallNotificationChannelDialogUseCase = isShowEnableCallNotificationChannelDialogUseCase;
+        this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
+        this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
     }
 
     public void initCall(String companyName,
@@ -171,6 +179,7 @@ public class CallController implements
                          String contextUrl,
                          Engagement.MediaType mediaType) {
         Logger.d(TAG, "initCall");
+        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog();
         }
@@ -185,7 +194,7 @@ public class CallController implements
         initMessagesNotSeenCallback();
         onEngagementUseCase.execute(this);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
-        gliaQueueForMediaEngagementUseCase.execute(queueId, contextUrl, mediaType, queueTicketsEventsListener);
+        gliaQueueForMediaEngagementUseCase.execute(queueId, contextUrl, mediaType);
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
@@ -229,6 +238,8 @@ public class CallController implements
             onEngagementUseCase.unregisterListener(this);
             onVisitorMediaStateUseCase.unregisterListener(this);
             onEngagementEndUseCase.unregisterListener(this);
+
+            unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         }
     }
 
@@ -385,11 +396,6 @@ public class CallController implements
     public void leaveChatQueueClicked() {
         Logger.d(TAG, "leaveChatQueueClicked");
         dialogController.showExitQueueDialog();
-    }
-
-    public void onBackArrowClicked(boolean isChatInBackstack) {
-        Logger.d(TAG, "onBackArrowClicked");
-        messagesNotSeenHandler.callOnBackClicked(isChatInBackstack);
     }
 
     private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {

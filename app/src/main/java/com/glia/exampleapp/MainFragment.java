@@ -18,8 +18,11 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
+
+    private ChatHeadLayout chatHeadLayout;
 
     public MainFragment() {
     }
@@ -46,21 +49,13 @@ public class MainFragment extends Fragment {
         });
          */
         view.findViewById(R.id.chat_activity_button).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), ChatActivity.class);
-            setNavigationIntentData(intent, sharedPreferences);
-            startActivity(intent);
+            navigateToChat(sharedPreferences);
         });
         view.findViewById(R.id.audio_call_button).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), CallActivity.class);
-            setNavigationIntentData(intent, sharedPreferences);
-            intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_AUDIO);
-            startActivity(intent);
+            navigateToCall(sharedPreferences, GliaWidgets.MEDIA_TYPE_AUDIO);
         });
         view.findViewById(R.id.video_call_button).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), CallActivity.class);
-            setNavigationIntentData(intent, sharedPreferences);
-            intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_VIDEO);
-            startActivity(intent);
+            navigateToCall(sharedPreferences, GliaWidgets.MEDIA_TYPE_VIDEO);
         });
         view.findViewById(R.id.end_engagement_button).setOnClickListener(v -> {
             GliaWidgets.endEngagement();
@@ -68,6 +63,21 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.clear_session_button).setOnClickListener(v -> {
             GliaWidgets.clearVisitorSession();
         });
+
+        chatHeadLayout = view.findViewById(R.id.chat_head_layout);
+        chatHeadLayout.setNavigationCallback(
+                new ChatHeadLayout.NavigationCallback() {
+                    @Override
+                    public void onNavigateToChat() {
+                        navigateToChat(sharedPreferences);
+                    }
+
+                    @Override
+                    public void onNavigateToCall() {
+                        navigateToCall(sharedPreferences, null);
+                    }
+                }
+        );
     }
 
     @Override
@@ -87,5 +97,18 @@ public class MainFragment extends Fragment {
         intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
         // use to set the bubble functionality
         intent.putExtra(GliaWidgets.USE_OVERLAY, Utils.getUseOverlay(sharedPreferences, getResources()));
+    }
+
+    private void navigateToChat(SharedPreferences sharedPreferences) {
+        Intent intent = new Intent(requireContext(), ChatActivity.class);
+        setNavigationIntentData(intent, sharedPreferences);
+        startActivity(intent);
+    }
+
+    private void navigateToCall(SharedPreferences sharedPreferences, String mediaType) {
+        Intent intent = new Intent(requireContext(), CallActivity.class);
+        setNavigationIntentData(intent, sharedPreferences);
+        intent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
+        startActivity(intent);
     }
 }

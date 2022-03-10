@@ -1,8 +1,8 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
     defaultPublishConfig "debug"
     defaultConfig {
         minSdkVersion 24
@@ -40,13 +40,18 @@ ext {
     materialVersion = '1.4.0'
     constraintLayoutVersion = '2.0.4'
     gliaSdkVersion = '0.23.7'
+    lifecycle_process = '2.3.1'
     junitVersion = '4.13.1'
     androidXTestVersion = '1.1.2'
-    espresso = '3.3.0'
+    archCoreVersion = '2.1.0'
+    espressoVersion = '3.3.0'
     leakCanaryVersion = '2.6'
     picassoVersion = '2.71828'
-    lottieVersion = "4.1.0"
-    mockitoVersion = "4.3.1"
+    mockitoVersion = '4.3.1'
+    lottieVersion = '4.1.0'
+    rxAndroid = '2.1.0'
+    rxJava = '2.2.6'
+    gson = '2.8.5'
 }
 
 dependencies {
@@ -54,11 +59,12 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "com.google.android.material:material:$materialVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_process"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
 
     // Used for audio and video permissions by CallActivity
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.6'
+    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
+    implementation "io.reactivex.rxjava2:rxjava:$rxJava"
 
     // removed because becomes slow on Android 11. They say it is fixed, but I still have the issue.
     // https://square.github.io/leakcanary/changelog/
@@ -71,12 +77,13 @@ dependencies {
 
     implementation "com.airbnb.android:lottie:$lottieVersion"
 
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation "com.google.code.gson:gson:$gson"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }
 
 ext {

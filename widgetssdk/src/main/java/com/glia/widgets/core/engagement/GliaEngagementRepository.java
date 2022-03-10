@@ -43,6 +43,10 @@ public class GliaEngagementRepository {
         return engagementType == EngagementType.MEDIA;
     }
 
+    public boolean isChatEngagement() {
+        return engagementType == EngagementType.CHAT;
+    }
+
     public void listenForEngagementEnd(OmnicoreEngagement engagement, Runnable engagementEnded) {
         engagement.on(Engagement.Events.END, engagementEnded);
     }

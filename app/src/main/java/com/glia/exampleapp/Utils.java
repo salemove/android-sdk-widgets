@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
 class Utils {
@@ -86,6 +87,13 @@ class Utils {
         builder.setNegativeButtonConfiguration(null);
         builder.setNeutralButtonConfiguration(null);
 
+        builder.setChatHeadConfiguration(
+                getChatHeadConfiguration(
+                        brandPrimaryColor,
+                        baseLightColor
+                )
+        );
+
         builder.setSendMessageButtonTintColor(chatSendMessageButtonTintColor);
 
         builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleTintColor);
@@ -130,6 +138,19 @@ class Utils {
                 )
                 .strokeWidth(1)
                 .strokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black)))
+                .build();
+    }
+
+    private static ChatHeadConfiguration getChatHeadConfiguration(
+            Integer colorPrimary,
+            Integer colorBright
+    ) {
+        return ChatHeadConfiguration.builder()
+                .backgroundColorRes(colorPrimary)
+                .operatorPlaceholderIconTintList(colorBright)
+                .operatorPlaceholderBackgroundColor(colorPrimary)
+                .badgeTextColor(colorBright)
+                .badgeBackgroundTintList(colorPrimary)
                 .build();
     }
 

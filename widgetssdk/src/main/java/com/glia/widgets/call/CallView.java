@@ -34,9 +34,9 @@ import androidx.transition.TransitionSet;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
-import com.glia.widgets.Constants;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.core.notification.device.NotificationManager;
@@ -44,13 +44,11 @@ import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
 import com.glia.widgets.view.header.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
-import com.glia.widgets.view.head.ChatHeadService;
-import com.glia.widgets.view.head.ChatHeadsController;
-import com.glia.widgets.view.head.model.ChatHeadInput;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -62,9 +60,10 @@ public class CallView extends ConstraintLayout {
 
     private CallViewCallback callback;
     private CallController controller;
-    private ChatHeadsController chatHeadsController;
 
     private ScreenSharingController screenSharingController;
+
+    private ServiceChatBubbleController serviceChatBubbleController;
 
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
@@ -143,12 +142,6 @@ public class CallView extends ConstraintLayout {
 
     private void setupViewActions() {
         appBar.setOnBackClickedListener(() -> {
-            if (controller != null) {
-                controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
-            }
-            if (chatHeadsController != null) {
-                chatHeadsController.onCallBackButtonPressed();
-            }
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
             }
@@ -167,17 +160,11 @@ public class CallView extends ConstraintLayout {
             if (controller != null) {
                 controller.chatButtonClicked();
             }
-            if (chatHeadsController != null) {
-                chatHeadsController.onChatButtonClicked();
-            }
         });
         speakerButton.setOnClickListener(v -> controller.onSpeakerButtonPressed());
         minimizeButton.setOnClickListener(v -> {
             if (controller != null) {
                 controller.minimizeButtonClicked();
-            }
-            if (chatHeadsController != null) {
-                chatHeadsController.onMinimizeButtonClicked();
             }
             if (onEndListener != null) {
                 onEndListener.onEnd();
@@ -210,21 +197,12 @@ public class CallView extends ConstraintLayout {
                     mediaType
             );
         }
-        if (chatHeadsController != null) {
-            chatHeadsController.onNavigatedToCall(
-                    new ChatHeadInput(
-                            companyName,
-                            queueId,
-                            contextUrl,
-                            this.theme
-                    ),
-                    true,
-                    useOverlays
-            );
+        if (serviceChatBubbleController != null) {
+            serviceChatBubbleController.init();
         }
     }
 
-    public void onDestroy() {
+    public void onDestroy(boolean isFinishing) {
         if (operatorVideoView != null) {
             operatorVideoView.release();
             operatorVideoView = null;
@@ -240,6 +218,9 @@ public class CallView extends ConstraintLayout {
         if (dialogController != null) {
             dialogController.removeCallback(dialogCallback);
             dialogController = null;
+        }
+        if (serviceChatBubbleController != null && isFinishing) {
+            serviceChatBubbleController.onDestroy();
         }
         onEndListener = null;
         onBackClickedListener = null;
@@ -260,6 +241,9 @@ public class CallView extends ConstraintLayout {
         }
         if (screenSharingController != null) {
             screenSharingController.onResume(this.getContext());
+        }
+        if (serviceChatBubbleController != null) {
+            serviceChatBubbleController.onResume(this);
         }
     }
 
@@ -406,8 +390,6 @@ public class CallView extends ConstraintLayout {
                 .getControllerFactory()
                 .getCallController(callback);
 
-        chatHeadsController = Dependencies.getControllerFactory().getChatHeadsController();
-
         dialogCallback = dialogsState -> {
             if (dialogsState instanceof DialogsState.NoDialog) {
                 post(() -> {
@@ -447,6 +429,10 @@ public class CallView extends ConstraintLayout {
         screenSharingController = Dependencies
                 .getControllerFactory()
                 .getScreenSharingController(screenSharingCallback);
+
+        serviceChatBubbleController = Dependencies
+                .getControllerFactory()
+                .getChatHeadController();
     }
 
     private void handleVisitorVideoState(CallState state) {
@@ -490,9 +476,6 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -688,7 +671,6 @@ public class CallView extends ConstraintLayout {
             speakerButtonLabel.setTypeface(fontFamily);
             minimizeButtonLabel.setTypeface(fontFamily);
         }
-        if (chatHeadsController != null) chatHeadsController.onSetupViewAppearance(this.theme);
     }
 
     private void setAppBarTheme() {
@@ -770,15 +752,6 @@ public class CallView extends ConstraintLayout {
         this.onNavigateToChatListener = onNavigateToChatListener;
     }
 
-    public void backPressed() {
-        if (controller != null) {
-            controller.onBackArrowClicked(Dependencies.isInBackstack(Constants.CHAT_ACTIVITY));
-        }
-        if (chatHeadsController != null) {
-            chatHeadsController.onCallBackButtonPressed();
-        }
-    }
-
     private void showUIOnCallOngoing() {
         setVisibility(VISIBLE);
         handleStatusbarColor();
@@ -815,9 +788,6 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -907,9 +877,6 @@ public class CallView extends ConstraintLayout {
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
                     }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
-                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -925,9 +892,6 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.noMoreOperatorsAvailableDismissed();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -946,9 +910,6 @@ public class CallView extends ConstraintLayout {
                     if (controller != null) {
                         controller.unexpectedErrorDialogDismissed();
                     }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
-                    }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
                     }
@@ -964,9 +925,6 @@ public class CallView extends ConstraintLayout {
                     dismissAlertDialog();
                     if (controller != null) {
                         controller.unexpectedErrorDialogDismissed();
-                    }
-                    if (chatHeadsController != null) {
-                        chatHeadsController.chatEndedByUser();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -1013,7 +971,6 @@ public class CallView extends ConstraintLayout {
     }
 
     private void callEnded() {
-        this.getContext().stopService(new Intent(this.getContext(), ChatHeadService.class));
         Dependencies.getControllerFactory().destroyControllers();
     }
 
@@ -1067,6 +1024,11 @@ public class CallView extends ConstraintLayout {
         if (controller != null) {
             controller.onUserInteraction();
         }
+    }
+
+    public void setConfiguration(GliaSdkConfiguration configuration) {
+        serviceChatBubbleController.setBuildTimeTheme(theme);
+        serviceChatBubbleController.setSdkConfiguration(configuration);
     }
 
     public interface OnBackClickedListener {

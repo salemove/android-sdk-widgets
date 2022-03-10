@@ -7,15 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class ChatActivity extends AppCompatActivity {
+    private static final String KEY_WAS_ACTIVITY_FINISHING = "was_activity_finishing";
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
@@ -29,16 +30,19 @@ public class ChatActivity extends AppCompatActivity {
 
     private GliaSdkConfiguration configuration;
 
+    private boolean wasActivityFinishing = true;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Dependencies.addActivityToBackStack(Constants.CHAT_ACTIVITY);
         setContentView(R.layout.chat_activity);
         chatView = findViewById(R.id.chat_view);
+        ChatHeadLayout chatHeadLayout = findViewById(R.id.chat_head_layout);
+        chatHeadLayout.setIsChatView(true);
 
         buildConfiguration();
-
+        chatHeadLayout.setConfiguration(configuration);
+        chatView.setConfiguration(configuration);
         chatView.setTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnEndListener(onEndListener);
@@ -47,8 +51,7 @@ public class ChatActivity extends AppCompatActivity {
                 configuration.getCompanyName(),
                 configuration.getQueueId(),
                 configuration.getContextUrl(),
-                configuration.getUseOverlay(),
-                savedInstanceState
+                configuration.getUseOverlay()
         );
     }
 
@@ -63,8 +66,20 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(KEY_WAS_ACTIVITY_FINISHING, isFinishing());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        wasActivityFinishing = savedInstanceState.getBoolean(KEY_WAS_ACTIVITY_FINISHING, true);
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
     protected void onResume() {
-        chatView.onResume();
+        if (wasActivityFinishing) chatView.onResume();
         super.onResume();
     }
 
@@ -73,8 +88,7 @@ public class ChatActivity extends AppCompatActivity {
         onBackClickedListener = null;
         onEndListener = null;
         onNavigateToCallListener = null;
-        chatView.onDestroyView();
-        Dependencies.removeActivityFromBackStack(Constants.CHAT_ACTIVITY);
+        chatView.onDestroyView(isFinishing());
         super.onDestroy();
     }
 

@@ -14,6 +14,10 @@ android {
     }
 
     buildTypes {
+        all {
+            buildConfigField("String", "GLIA_CORE_SDK_VERSION", "\"$gliaSdkVersion\"")
+            buildConfigField("String", "GLIA_WIDGETS_SDK_VERSION", "\"$defaultConfig.versionName\"")
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

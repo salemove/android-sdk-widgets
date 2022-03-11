@@ -1,6 +1,7 @@
 package com.glia.widgets;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 
 import com.glia.androidsdk.GliaConfig;
@@ -213,5 +214,23 @@ public class GliaWidgets {
                 exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
             }
         });
+    }
+
+    /**
+     * Build time version of Glia Widgets SDK
+     *
+     * @return Glia Widgets SDK version name
+     */
+    public static String getWidgetsSdkVersion() {
+        return BuildConfig.GLIA_WIDGETS_SDK_VERSION;
+    }
+
+    /**
+     * Build time version of Glia Core SDK that is used by Glia Widgets SDK
+     *
+     * @return Glia Core SDK version name that is used by Glia Widgets SDK
+     */
+    public static String getWidgetsCoreSdkVersion() {
+        return BuildConfig.GLIA_CORE_SDK_VERSION;
     }
 }

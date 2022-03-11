@@ -137,7 +137,7 @@
             android:contentDescription="@string/glia_chat_send_content_description"
             android:padding="@dimen/glia_large"
             android:src="?attr/gliaIconSendMessage"
-            android:tint="?attr/gliaBrandPrimaryColor"
+            app:tint="?attr/gliaBrandPrimaryColor"
             tools:src="@drawable/ic_baseline_send"
             tools:tint="@color/glia_brand_primary_color" />
     </LinearLayout>

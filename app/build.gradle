@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 31
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "com.glia.exampleapp"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -61,27 +61,16 @@ android {
             applicationIdSuffix ''
         }
     }
-    lintOptions {
-        disable "WrongLayoutName"
-        disable "LayoutFileNameMatchesClass"
-        disable "MatchingViewId"
-        disable "RawDimen"
-        disable "WrongAnnotationOrder"
-        disable "ColorCasing"
-        disable "WrongViewIdFormat"
-        disable "HardcodedText"
+    lint {
+        disable 'WrongLayoutName',
+                'LayoutFileNameMatchesClass',
+                'MatchingViewId',
+                'RawDimen',
+                'WrongAnnotationOrder',
+                'ColorCasing',
+                'WrongViewIdFormat',
+                'HardcodedText'
     }
-}
-
-ext {
-    appCompatVersion = '1.2.0'
-    materialVersion = '1.2.1'
-    constraintLayoutVersion = '2.0.4'
-    navVersion = '2.3.1'
-    preferenceVersion = '1.1.1'
-    junitVersion = '4.13.1'
-    testLibraryVersion = '1.1.2'
-    espressoVersion = '3.3.0'
 }
 
 dependencies {
@@ -92,6 +81,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$navVersion"
     implementation "androidx.preference:preference:$preferenceVersion"
     implementation project(path: ':widgetssdk')
+
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"

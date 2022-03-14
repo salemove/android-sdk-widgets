@@ -18,6 +18,7 @@ import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.engagement.EngagementFile;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.Constants;
@@ -46,6 +47,8 @@ import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogU
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.survey.OnSurveyListener;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
@@ -67,6 +70,7 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -89,7 +93,8 @@ import io.reactivex.schedulers.Schedulers;
 public class ChatController implements
         GliaLoadHistoryUseCase.Listener,
         GliaOnEngagementUseCase.Listener,
-        GliaOnEngagementEndUseCase.Listener {
+        GliaOnEngagementEndUseCase.Listener,
+        OnSurveyListener {
 
     private final static String TAG = ChatController.class.getSimpleName();
     private final static String EMPTY_MESSAGE = "";
@@ -195,6 +200,7 @@ public class ChatController implements
     private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
     private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
     private final SiteInfoUseCase siteInfoUseCase;
+    private final GliaSurveyUseCase surveyUseCase;
 
     private Disposable disposable = null;
 
@@ -236,7 +242,8 @@ public class ChatController implements
             IsEnableChatEditTextUseCase isEnableChatEditTextUseCase,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
             UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
-            SiteInfoUseCase siteInfoUseCase
+            SiteInfoUseCase siteInfoUseCase,
+            GliaSurveyUseCase surveyUseCase
     ) {
         Logger.d(TAG, "constructor");
 
@@ -301,6 +308,7 @@ public class ChatController implements
         this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
         this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
         this.siteInfoUseCase = siteInfoUseCase;
+        this.surveyUseCase = surveyUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -414,6 +422,7 @@ public class ChatController implements
 
     public void onPause() {
         messagesNotSeenHandler.onChatWentBackground();
+        surveyUseCase.unregisterListener(this);
     }
 
     public void onMessageTextChanged(String message) {
@@ -592,6 +601,7 @@ public class ChatController implements
     public void onResume() {
         Logger.d(TAG, "onResume\n");
         messagesNotSeenHandler.callChatButtonClicked();
+        surveyUseCase.registerListener(this);
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -1160,7 +1170,18 @@ public class ChatController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEnded");
         stop();
-        dialogController.showEngagementEndedDialog();
+    }
+
+    @Override
+    public void onSurveyLoaded(@Nullable Survey survey) {
+        Logger.d(TAG, "newSurveyLoaded");
+
+        if (viewCallback != null && survey != null) {
+            viewCallback.navigateToSurvey(survey);
+        } else {
+            dialogController.showEngagementEndedDialog();
+        }
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {

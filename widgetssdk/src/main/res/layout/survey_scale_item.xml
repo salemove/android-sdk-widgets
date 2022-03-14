@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/glia_medium"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/glia_medium"
+        android:orientation="horizontal"
+        tools:ignore="RtlSymmetry">
+
+        <TextView
+            android:id="@+id/tv_required_scale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/gliaSystemNegativeColor"
+            android:text="@string/glia_survey_require_label"
+            android:textSize="@dimen/glia_large"
+            tools:ignore="HardcodedText,SpUsage" />
+
+        <TextView
+            android:id="@+id/tv_title_scale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/glia_large"
+            android:text="@string/glia_survey_scale_item_title"
+            android:textColor="?attr/gliaBaseDarkColor" />
+    </LinearLayout>
+
+    <RatingBar
+        android:id="@+id/rating_bed_good"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="@dimen/glia_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:rating="5"
+        android:stepSize="1" />
+
+</LinearLayout>

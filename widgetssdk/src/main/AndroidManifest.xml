@@ -26,6 +26,10 @@
             android:name=".call.CallActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Call.Activity" />
+        <activity
+            android:name=".survey.SurveyActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/Application.Glia.Chat.Activity" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

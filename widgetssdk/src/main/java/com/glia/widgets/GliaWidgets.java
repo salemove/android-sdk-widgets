@@ -77,6 +77,8 @@ public class GliaWidgets {
      */
     public static final String MEDIA_TYPE_VIDEO = "media_type_video";
 
+    public static final String SURVEY = "survey";
+
     /**
      * Use with {@link android.os.Bundle} to pass in
      * {@link com.glia.androidsdk.screensharing.ScreenSharing.Mode} as a navigation

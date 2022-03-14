@@ -13,6 +13,7 @@ public class ViewHelpers {
         private int initialY;
         private float initialTouchX;
         private float initialTouchY;
+        private int lastAction;
         private final OnRequestInitialCoordinates onRequestInitialCoordinates;
         private final OnMoveListener onMoveListener;
         private final View.OnClickListener onChatHeadClickedListener;
@@ -39,22 +40,22 @@ public class ViewHelpers {
                     //get the touch location
                     initialTouchX = event.getRawX();
                     initialTouchY = event.getRawY();
+
+                    lastAction = event.getAction();
                     return true;
                 case MotionEvent.ACTION_UP:
-                    int xDiff = (int) (event.getRawX() - initialTouchX);
-                    int yDiff = (int) (event.getRawY() - initialTouchY);
-
-                    //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
-                    //So that is click event.
-                    if (xDiff < 10 && yDiff < 10) {
+                    if (lastAction == MotionEvent.ACTION_DOWN) {
+                        v.performClick();
                         onChatHeadClickedListener.onClick(v);
                     }
+                    lastAction = event.getAction();
                     return true;
                 case MotionEvent.ACTION_MOVE:
                     //Calculate the X and Y coordinates of the view.
                     float x = initialX + (int) (event.getRawX() - initialTouchX);
                     float y = initialY + (int) (event.getRawY() - initialTouchY);
                     onMoveListener.onMove(x, y);
+                    lastAction = event.getAction();
                     return true;
             }
             return false;

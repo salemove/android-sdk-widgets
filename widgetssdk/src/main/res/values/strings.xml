@@ -182,4 +182,23 @@
     <string name="glia_preview_activity_menu_share_button">Share</string>
     <string name="glia_preview_activity_image_content_description">Preview content</string>
 
+    <!--    Survey-->
+    <string name="glia_survey_screen_title">Visitor Survey</string>
+    <string name="glia_survey_cancel_label">Cancel</string>
+    <string name="glia_survey_submit_label">Submit</string>
+    <string name="glia_survey_open_text_item_title">Additional thoughts?</string>
+    <string name="glia_survey_open_text_item_edit_hint">Comment</string>
+    <string name="glia_survey_scale_item_title">How would you rate this interaction? (1 - Bad, 5 - Good)</string>
+    <string name="glia_survey_scale_item_1">1</string>
+    <string name="glia_survey_scale_item_2">2</string>
+    <string name="glia_survey_scale_item_3">3</string>
+    <string name="glia_survey_scale_item_4">4</string>
+    <string name="glia_survey_scale_item_5">5</string>
+    <string name="glia_survey_single_choice_item_title">If you hadn\'t chatted with us today, what would you have done?</string>
+    <string name="glia_survey_yes_no_item_title">Would you use our chat again?</string>
+    <string name="glia_survey_yes_no_item_yes">Yes</string>
+    <string name="glia_survey_yes_no_item_no">No</string>
+    <string name="glia_survey_require_label"><![CDATA[%1$s\u00A0<font color=#%2$s>*</font>]]></string>
+    <string name="glia_survey_required_error_message">Please provide an answer.</string>
+
 </resources>

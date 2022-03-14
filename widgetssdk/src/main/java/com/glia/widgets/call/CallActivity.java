@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,11 +13,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.survey.SurveyActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +43,10 @@ public class CallActivity extends AppCompatActivity {
         navigateToChat();
         finish();
     };
+    private CallView.OnNavigateToSurveyListener onNavigateToSurveyListener = (Survey survey) -> {
+        navigateToSurvey(survey);
+        finish();
+    };
     private final PublishSubject<Pair<Integer, Integer[]>> permissionSubject = PublishSubject.create();
     private Disposable permissionSubjectDisposable;
 
@@ -59,6 +66,7 @@ public class CallActivity extends AppCompatActivity {
         callView.setOnBackClickedListener(onBackClickedListener);
         callView.setOnEndListener(onEndListener);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
+        callView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
 
         if (savedInstanceState == null) {
             startCallWithPermissions();
@@ -189,6 +197,13 @@ public class CallActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
         newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, configuration.getScreenSharingMode());
+        startActivity(newIntent);
+    }
+
+    private void navigateToSurvey(Survey survey) {
+        Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class);
+        newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
+        newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
     }
 }

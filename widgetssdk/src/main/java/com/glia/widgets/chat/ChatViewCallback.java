@@ -1,6 +1,9 @@
 package com.glia.widgets.chat;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
@@ -16,6 +19,8 @@ public interface ChatViewCallback {
     void emitItems(List<ChatItem> items);
 
     void navigateToCall(String requestedMediaType);
+
+    void navigateToSurvey(@NonNull Survey survey);
 
     void destroyView();
 

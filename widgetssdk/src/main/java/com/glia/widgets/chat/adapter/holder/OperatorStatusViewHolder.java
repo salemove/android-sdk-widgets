@@ -14,7 +14,6 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.view.OperatorStatusView;
-import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     private final OperatorStatusView statusPictureView;

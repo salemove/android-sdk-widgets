@@ -14,6 +14,7 @@ import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class Dependencies {
@@ -25,11 +26,12 @@ public class Dependencies {
             new GliaSdkConfigurationManager();
     private static UseCaseFactory useCaseFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
+    private static ResourceProvider resourceProvider;
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
-        RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
+        RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
@@ -48,6 +50,7 @@ public class Dependencies {
                 new ApplicationLifecycleManager(),
                 controllerFactory.getChatHeadController()
         );
+        resourceProvider = new ResourceProvider(application.getBaseContext());
     }
 
     public static UseCaseFactory getUseCaseFactory() {
@@ -78,6 +81,10 @@ public class Dependencies {
     @VisibleForTesting
     public static void setGlia(GliaCore gliaCore) {
         Dependencies.gliaCore = gliaCore;
+    }
+
+    public static ResourceProvider getResourceProvider() {
+        return resourceProvider;
     }
 
     @VisibleForTesting

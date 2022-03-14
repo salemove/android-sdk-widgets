@@ -164,6 +164,11 @@ public class DialogController {
         }
     }
 
+    public void showSubmitSurveyAnswersErrorDialog() {
+        Logger.d(TAG, "Show Unexpected error Dialog");
+        emitDialogState(new DialogsState.SubmitSurveyAnswersErrorDialog());
+    }
+
     public void addCallback(Callback callback) {
         Logger.d(TAG, "addCallback");
         callback.emitDialog(dialogsState);

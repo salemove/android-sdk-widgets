@@ -16,6 +16,7 @@ import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.comms.EngagementOptions;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.site.SiteInfo;
@@ -23,6 +24,7 @@ import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -101,6 +103,11 @@ public interface GliaCore {
     void unsubscribeFromQueueUpdates(Consumer<GliaException> onError, Consumer<Queue> callback);
 
     void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults);
+
+    void submitSurveyAnswers(@NonNull List<Survey.Answer> answers,
+                             @NonNull String surveyId,
+                             @NonNull String engagementId,
+                             @NonNull Consumer<GliaException> callback);
 
     boolean isInitialized();
 

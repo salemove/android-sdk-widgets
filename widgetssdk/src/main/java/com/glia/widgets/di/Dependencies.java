@@ -29,7 +29,7 @@ public class Dependencies {
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
-        RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
+        RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),

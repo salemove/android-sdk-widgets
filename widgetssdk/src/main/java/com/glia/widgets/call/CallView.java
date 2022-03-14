@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -35,6 +36,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -101,6 +103,7 @@ public class CallView extends ConstraintLayout {
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToChatListener onNavigateToChatListener;
+    private CallView.OnNavigateToSurveyListener onNavigateToSurveyListener;
 
     private UiTheme theme;
 
@@ -223,6 +226,7 @@ public class CallView extends ConstraintLayout {
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToChatListener = null;
+        onNavigateToSurveyListener = null;
         destroyControllers(isFinishing);
         callback = null;
     }
@@ -250,6 +254,9 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onPause() {
+        if (callController != null) {
+            callController.onPause();
+        }
         if (operatorVideoView != null) {
             operatorVideoView.pauseRendering();
         }
@@ -385,6 +392,13 @@ public class CallView extends ConstraintLayout {
             public void navigateToChat() {
                 if (onNavigateToChatListener != null) {
                     onNavigateToChatListener.call();
+                }
+            }
+
+            @Override
+            public void navigateToSurvey(@NonNull Survey survey) {
+                if (onNavigateToSurveyListener != null) {
+                    onNavigateToSurveyListener.onSurvey(survey);
                 }
             }
 
@@ -750,6 +764,10 @@ public class CallView extends ConstraintLayout {
         this.onNavigateToChatListener = onNavigateToChatListener;
     }
 
+    public void setOnNavigateToSurveyListener(CallView.OnNavigateToSurveyListener onNavigateToSurveyListener) {
+        this.onNavigateToSurveyListener = onNavigateToSurveyListener;
+    }
+
     private void showUIOnCallOngoing() {
         setVisibility(VISIBLE);
         handleStatusbarColor();
@@ -789,10 +807,6 @@ public class CallView extends ConstraintLayout {
                     if (callController != null) {
                         callController.endEngagementDialogYesClicked();
                     }
-                    if (onEndListener != null) {
-                        onEndListener.onEnd();
-                    }
-                    callEnded();
                     alertDialog = null;
                 },
                 v -> {
@@ -1046,6 +1060,10 @@ public class CallView extends ConstraintLayout {
 
     public interface OnNavigateToChatListener {
         void call();
+    }
+
+    public interface OnNavigateToSurveyListener {
+        void onSurvey(@NonNull Survey survey);
     }
 
     public boolean shouldShowMediaEngagementView() {

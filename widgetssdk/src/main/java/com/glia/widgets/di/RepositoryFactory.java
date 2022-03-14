@@ -1,5 +1,6 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
@@ -22,10 +23,13 @@ public class RepositoryFactory {
     private static GliaQueueRepository gliaQueueRepository;
     private static GliaFileRepository gliaFileRepository;
     private FileAttachmentRepository fileAttachmentRepository;
+    private GliaSurveyRepository gliaSurveyRepository;
 
+    private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
 
-    public RepositoryFactory(DownloadsFolderDataSource downloadsFolderDataSource) {
+    public RepositoryFactory(GliaCore gliaCore, DownloadsFolderDataSource downloadsFolderDataSource) {
+        this.gliaCore = gliaCore;
         this.downloadsFolderDataSource = downloadsFolderDataSource;
     }
 
@@ -84,5 +88,12 @@ public class RepositoryFactory {
             gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), downloadsFolderDataSource);
         }
         return gliaFileRepository;
+    }
+
+    public GliaSurveyRepository getGliaSurveyRepository() {
+        if (gliaSurveyRepository == null) {
+            gliaSurveyRepository = new GliaSurveyRepository(gliaCore);
+        }
+        return gliaSurveyRepository;
     }
 }

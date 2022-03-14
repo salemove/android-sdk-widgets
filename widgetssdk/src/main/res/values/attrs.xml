@@ -179,6 +179,7 @@
     <attr name="buttonBarPositiveButtonStyle" format="reference" />
     <attr name="buttonBarNegativeButtonStyle" format="reference" />
     <attr name="buttonBarNeutralButtonStyle" format="reference" />
+    <attr name="buttonSurveyOptionButtonStyle" format="reference" />
     <attr name="choiceCardContentTextStyle" format="reference" />
     <attr name="chatHeadStyle" format="reference" />
 

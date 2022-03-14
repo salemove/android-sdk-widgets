@@ -56,27 +56,26 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
 
         if (runTimeConfiguration.getTextColor() != null)
             builder.textColor(runTimeConfiguration.getTextColor());
-        if (runTimeConfiguration.getTextColorHighlight() != null)
+        if (runTimeConfiguration.getTextColorHighlight() != textConfiguration.getTextColorHighlight())
             builder.textColorHighlight(runTimeConfiguration.getTextColorHighlight());
         if (runTimeConfiguration.getTextColorHint() != null)
             builder.textColorHint(runTimeConfiguration.getTextColorHint());
-        if (runTimeConfiguration.getTextSize() != null)
+        if (runTimeConfiguration.getTextSize() != textConfiguration.getTextSize())
             builder.textSize(runTimeConfiguration.getTextSize());
-        if (runTimeConfiguration.getFontFamily() != null)
+        if (runTimeConfiguration.getFontFamily() != textConfiguration.getFontFamily())
             builder.fontFamily(runTimeConfiguration.getFontFamily());
 
         textConfiguration = builder.build();
         updateView();
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void updateView() {
         setTextSize(TypedValue.COMPLEX_UNIT_SP, textConfiguration.getTextSize());
         setTextColor(textConfiguration.getTextColor());
         setHintTextColor(textConfiguration.getTextColorHint());
         setLinkTextColor(textConfiguration.getTextColorLink());
         setHighlightColor(textConfiguration.getTextColorHighlight());
-        if (textConfiguration.getFontFamily() != null && textConfiguration.getFontFamily() != 0)
+        if (textConfiguration.getFontFamily() != 0)
             setTypeface(ResourcesCompat.getFont(getContext(), textConfiguration.getFontFamily()));
     }
 }

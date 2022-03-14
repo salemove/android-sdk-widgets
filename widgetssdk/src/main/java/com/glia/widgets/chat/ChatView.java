@@ -47,6 +47,7 @@ import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
@@ -135,6 +136,7 @@ public class ChatView extends ConstraintLayout implements
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnNavigateToCallListener onNavigateToCallListener;
+    private OnNavigateToSurveyListener onNavigateToSurveyListener;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
         public void onClicked(String id, int indexInList, int optionIndex) {
@@ -329,6 +331,10 @@ public class ChatView extends ConstraintLayout implements
         this.onNavigateToCallListener = onNavigateToCallListener;
     }
 
+    public void setOnNavigateToSurveyListener(OnNavigateToSurveyListener onNavigateToSurveyListener) {
+        this.onNavigateToSurveyListener = onNavigateToSurveyListener;
+    }
+
     /**
      * Use this method to notify the view when your activity or fragment is back in its resumed
      * state.
@@ -378,6 +384,7 @@ public class ChatView extends ConstraintLayout implements
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToCallListener = null;
+        onNavigateToSurveyListener = null;
         destroyController();
         callback = null;
         adapter.unregisterAdapterDataObserver(dataObserver);
@@ -477,6 +484,13 @@ public class ChatView extends ConstraintLayout implements
             public void navigateToCall(String mediaType) {
                 if (onNavigateToCallListener != null) {
                     onNavigateToCallListener.call(theme, mediaType);
+                }
+            }
+
+            @Override
+            public void navigateToSurvey(@NonNull Survey survey) {
+                if (onNavigateToSurveyListener != null) {
+                    onNavigateToSurveyListener.onSurvey(theme, survey);
                 }
             }
 
@@ -995,10 +1009,6 @@ public class ChatView extends ConstraintLayout implements
                     if (controller != null) {
                         controller.endEngagementDialogYesClicked();
                     }
-                    if (onEndListener != null) {
-                        onEndListener.onEnd();
-                    }
-                    chatEnded();
                 },
                 v -> {
                     dismissAlertDialog();
@@ -1355,5 +1365,9 @@ public class ChatView extends ConstraintLayout implements
          *              to the activity which is being navigated to.
          */
         void call(UiTheme theme, String mediaType);
+    }
+
+    public interface OnNavigateToSurveyListener {
+        void onSurvey(UiTheme theme, @NonNull Survey survey);
     }
 }

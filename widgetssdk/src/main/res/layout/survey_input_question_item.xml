@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/glia_large"
+    android:paddingStart="@dimen/glia_large_x_large"
+    android:paddingEnd="@dimen/glia_large_x_large"
+    android:paddingBottom="@dimen/glia_large">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/glia_survey_open_text_item_title"
+        android:textAppearance="?attr/textAppearanceBody1" />
+
+    <EditText
+        android:id="@+id/et_comment"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:layout_marginTop="@dimen/glia_large"
+        android:autofillHints="auto"
+        android:background="@drawable/bg_survey_edit_text"
+        android:gravity="start"
+        android:hint="@string/glia_survey_open_text_item_edit_hint"
+        android:imeOptions="actionNone"
+        android:inputType="textCapSentences|textMultiLine"
+        android:padding="@dimen/glia_medium" />
+
+    <TextView
+        android:id="@+id/required_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/glia_medium"
+        android:textColor="@color/glia_system_negative_color"
+        android:text="@string/glia_survey_required_error_message"
+        android:drawablePadding="@dimen/glia_small"
+        app:drawableStartCompat="@drawable/ic_attention" />
+
+</LinearLayout>

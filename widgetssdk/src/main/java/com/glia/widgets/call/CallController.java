@@ -1,5 +1,7 @@
 package com.glia.widgets.call;
 
+import androidx.annotation.Nullable;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.comms.Media;
@@ -7,6 +9,7 @@ import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.core.dialog.DialogController;
@@ -15,6 +18,8 @@ import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogU
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.survey.OnSurveyListener;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
@@ -30,6 +35,7 @@ import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -42,7 +48,8 @@ import java.util.concurrent.TimeUnit;
 public class CallController implements
         GliaOnEngagementUseCase.Listener,
         GliaOnVisitorMediaStateUseCase.Listener,
-        GliaOnEngagementEndUseCase.Listener {
+        GliaOnEngagementEndUseCase.Listener,
+        OnSurveyListener {
 
     private CallViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -78,6 +85,7 @@ public class CallController implements
     private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
     private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
     private final DialogController dialogController;
+    private final GliaSurveyUseCase surveyUseCase;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
         @Override
@@ -135,7 +143,8 @@ public class CallController implements
             HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
             IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
-            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
+            GliaSurveyUseCase surveyUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
@@ -173,6 +182,7 @@ public class CallController implements
         this.isShowEnableCallNotificationChannelDialogUseCase = isShowEnableCallNotificationChannelDialogUseCase;
         this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
         this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
+        this.surveyUseCase = surveyUseCase;
     }
 
     public void initCall(String companyName,
@@ -242,6 +252,10 @@ public class CallController implements
 
             unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         }
+    }
+
+    public void onPause() {
+        surveyUseCase.unregisterListener(this);
     }
 
     private void initControllerCallbacks() {
@@ -427,6 +441,8 @@ public class CallController implements
 
         showCallNotification();
         showLandscapeControls();
+
+        surveyUseCase.registerListener(this);
     }
 
     public void chatButtonClicked() {
@@ -476,6 +492,9 @@ public class CallController implements
     }
 
     public void onUserInteraction() {
+        if (viewCallback == null) {
+            return;
+        }
         showLandscapeControls();
     }
 
@@ -569,7 +588,18 @@ public class CallController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEndedByOperator");
         stop();
-        dialogController.showEngagementEndedDialog();
+    }
+
+    @Override
+    public void onSurveyLoaded(@Nullable Survey survey) {
+        Logger.d(TAG, "newSurveyLoaded");
+
+        if (viewCallback != null && survey != null) {
+            viewCallback.navigateToSurvey(survey);
+        } else {
+            dialogController.showEngagementEndedDialog();
+        }
+        Dependencies.getControllerFactory().destroyControllers();
     }
 
     @Override

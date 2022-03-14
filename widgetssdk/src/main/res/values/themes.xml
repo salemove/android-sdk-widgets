@@ -58,6 +58,7 @@
         <item name="buttonBarPositiveButtonStyle">?attr/buttonBarPositiveButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">?attr/buttonBarNegativeButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">?attr/buttonBarNeutralButtonStyle</item>
+        <item name="buttonSurveyOptionButtonStyle">?attr/buttonSurveyOptionButtonStyle</item>
 
         <item name="chatHeadStyle">?attr/chatHeadStyle</item>
 
@@ -77,7 +78,11 @@
 
     </style>
 
-    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
+    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Translucent.Activity">
+
+    </style>
+
+    <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
@@ -144,6 +149,8 @@
         <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
         </item>
         <item name="buttonBarNeutralButtonStyle">@style/Application.Glia.Chat.Button.Neutral</item>
+        <item name="buttonSurveyOptionButtonStyle">@style/Application.Glia.Chat.Button.SurveyOption
+        </item>
 
         <item name="chatHeadStyle">@style/Application.Glia.Chat.ChatHead</item>
 

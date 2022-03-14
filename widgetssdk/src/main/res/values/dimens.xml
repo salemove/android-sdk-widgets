@@ -50,5 +50,15 @@
     <dimen name="glia_call_video_height">250dp</dimen>
     <dimen name="glia_chat_operator_item_chat_head_size">36dp</dimen>
 
+    <dimen name="glia_survey_question_title_size">16sp</dimen>
+    <dimen name="glia_survey_option_button_height">48dp</dimen>
+    <dimen name="glia_survey_option_button_width">58dp</dimen>
+    <dimen name="glia_survey_default_border_width">1dp</dimen>
+    <dimen name="glia_survey_default_survey_corner_radius">24dp</dimen>
+    <dimen name="glia_survey_default_corner_radius">4dp</dimen>
+    <dimen name="glia_survey_default_text_size">16sp</dimen>
+    <dimen name="glia_survey_default_survey_title_text_size">20sp</dimen>
+    <dimen name="glia_survey_default_title_text_size">16sp</dimen>
+
     <dimen name="glia_single_choice_card_image_height">200dp</dimen>
 </resources>

@@ -17,6 +17,7 @@ import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShow
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -53,6 +54,7 @@ import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
+import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -204,7 +206,8 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaFileAttachmentRepository(),
                 createOnEngagementUseCase(),
                 createRemoveCallNotificationUseCase(),
-                createRemoveScreenSharingNotificationUseCase()
+                createRemoveScreenSharingNotificationUseCase(),
+                repositoryFactory.getGliaSurveyRepository()
         );
     }
 
@@ -369,5 +372,13 @@ public class UseCaseFactory {
 
     public SiteInfoUseCase createSiteInfoUseCase() {
         return new SiteInfoUseCase(repositoryFactory.getGliaEngagementRepository());
+    }
+
+    public GliaSurveyUseCase getGliaSurveyUseCase() {
+        return new GliaSurveyUseCase(repositoryFactory.getGliaSurveyRepository());
+    }
+
+    public GliaSurveyAnswerUseCase getSurveyAnswerUseCase() {
+        return new GliaSurveyAnswerUseCase(repositoryFactory.getGliaSurveyRepository());
     }
 }

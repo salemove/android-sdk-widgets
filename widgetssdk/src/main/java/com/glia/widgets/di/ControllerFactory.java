@@ -12,8 +12,9 @@ import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
-import com.glia.widgets.view.head.controller.ApplicationChatBubbleLayoutController;
-import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
+import com.glia.widgets.view.head.ChatHeadPosition;
+import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class ControllerFactory {
 
@@ -30,8 +31,9 @@ public class ControllerFactory {
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
     private final FilePreviewController filePreviewController;
+    private final ChatHeadPosition chatHeadPosition;
 
-    private static ServiceChatBubbleController serviceChatBubbleController;
+    private static ServiceChatHeadController serviceChatHeadController;
 
     public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
         this.repositoryFactory = repositoryFactory;
@@ -51,6 +53,7 @@ public class ControllerFactory {
                 useCaseFactory.createPutImageFileToDownloadsUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase()
         );
+        this.chatHeadPosition = ChatHeadPosition.getInstance();
     }
 
     public ChatController getChatController(ChatViewCallback chatViewCallback) {
@@ -153,7 +156,7 @@ public class ControllerFactory {
         destroyCallController();
         destroyScreenSharingController();
         destroyChatController();
-        serviceChatBubbleController.onDestroy();
+        serviceChatHeadController.onDestroy();
     }
 
     public void destroyCallController() {
@@ -193,25 +196,26 @@ public class ControllerFactory {
         return filePreviewController;
     }
 
-    public ServiceChatBubbleController getChatHeadController() {
-        if (serviceChatBubbleController == null) {
-            serviceChatBubbleController = new ServiceChatBubbleController(
-                    useCaseFactory.getToggleChatBubbleServiceUseCase(),
-                    useCaseFactory.getResolveChatBubbleNavigationUseCase(),
+    public ServiceChatHeadController getChatHeadController() {
+        if (serviceChatHeadController == null) {
+            serviceChatHeadController = new ServiceChatHeadController(
+                    useCaseFactory.getToggleChatHeadServiceUseCase(),
+                    useCaseFactory.getResolveChatHeadNavigationUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     messagesNotSeenHandler,
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    chatHeadPosition
             );
         }
-        return serviceChatBubbleController;
+        return serviceChatHeadController;
     }
 
     public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
-        return new ApplicationChatBubbleLayoutController(
-                useCaseFactory.getIsDisplayApplicationChatBubbleUseCase(),
-                useCaseFactory.getResolveChatBubbleNavigationUseCase(),
+        return new ApplicationChatHeadLayoutController(
+                useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
+                useCaseFactory.getResolveChatHeadNavigationUseCase(),
                 useCaseFactory.createOnEngagementUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase(),
                 messagesNotSeenHandler,

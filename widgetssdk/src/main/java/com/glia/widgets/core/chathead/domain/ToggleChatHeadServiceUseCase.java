@@ -11,14 +11,14 @@ import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.filepreview.ui.FilePreviewView;
 
-public class ToggleChatBubbleServiceUseCase {
+public class ToggleChatHeadServiceUseCase {
     private final GliaEngagementRepository engagementRepository;
     private final GliaQueueRepository queueRepository;
     private final ChatHeadManager chatHeadManager;
     private final PermissionManager permissionManager;
     private final GliaSdkConfigurationManager configurationManager;
 
-    public ToggleChatBubbleServiceUseCase(
+    public ToggleChatHeadServiceUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository,
             ChatHeadManager chatHeadManager,

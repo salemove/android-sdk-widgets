@@ -5,13 +5,13 @@ import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 
-public class IsDisplayApplicationChatBubbleUseCase {
+public class IsDisplayApplicationChatHeadUseCase {
     private final GliaEngagementRepository engagementRepository;
     private final GliaQueueRepository queueRepository;
     private final PermissionManager permissionManager;
     private final GliaSdkConfigurationManager configurationManager;
 
-    public IsDisplayApplicationChatBubbleUseCase(
+    public IsDisplayApplicationChatHeadUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository,
             PermissionManager permissionManager,

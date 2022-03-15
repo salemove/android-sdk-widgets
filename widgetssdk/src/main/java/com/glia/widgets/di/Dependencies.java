@@ -5,7 +5,6 @@ import android.app.Application;
 import androidx.annotation.VisibleForTesting;
 
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
 
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
@@ -16,7 +15,7 @@ import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
-import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class Dependencies {
 
@@ -100,7 +99,7 @@ public class Dependencies {
 
     private static void initApplicationLifecycleObserver(
             ApplicationLifecycleManager lifecycleManager,
-            ServiceChatBubbleController chatBubbleController
+            ServiceChatHeadController chatBubbleController
     ) {
         lifecycleManager.addObserver((source, event) -> {
             if (event == Lifecycle.Event.ON_STOP) {

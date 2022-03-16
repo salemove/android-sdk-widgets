@@ -8,7 +8,7 @@ import androidx.core.util.Pair;
 public class ViewHelpers {
 
     public static class ChatHeadOnTouchListener implements View.OnTouchListener {
-
+        private static final int DIFF_THRESHOLD = 20;
         private int initialX;
         private int initialY;
         private float initialTouchX;
@@ -43,7 +43,7 @@ public class ViewHelpers {
                 case MotionEvent.ACTION_UP:
                     int xDiff = (int) Math.abs(event.getRawX() - initialTouchX);
                     int yDiff = (int) Math.abs(event.getRawY() - initialTouchY);
-                    if (xDiff < 20 && yDiff < 20) {
+                    if (xDiff < DIFF_THRESHOLD && yDiff < DIFF_THRESHOLD) {
                         onChatHeadClickedListener.onClick(v);
                     }
                     return true;

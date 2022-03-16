@@ -48,6 +48,13 @@
             app:key="@string/pref_use_alert_dialog_button_vertical_alignment"
             app:title="@string/settings_use_alert_dialog_button_vertical_alignment" />
 
+        <ListPreference
+            android:defaultValue="@string/screen_sharing_mode_unbounded"
+            android:entries="@array/screen_sharing_mode_keys"
+            android:entryValues="@array/screen_sharing_mode_values"
+            android:key="@string/pref_screen_sharing_mode"
+            android:title="@string/settings_screen_sharing_mode_title"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_colors_title">

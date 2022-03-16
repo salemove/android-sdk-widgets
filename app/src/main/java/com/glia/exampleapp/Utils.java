@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
@@ -229,5 +230,23 @@ class Utils {
 
     public static boolean getUseOverlay(SharedPreferences sharedPreferences, Resources resources) {
         return sharedPreferences.getBoolean(resources.getString(R.string.pref_use_overlay), true);
+    }
+
+    public static ScreenSharing.Mode getScreenSharingModeFromPrefs(
+            SharedPreferences sharedPreferences,
+            Resources resources
+    ) {
+        String unboundedValue = resources.getString(R.string.screen_sharing_mode_unbounded);
+        String appBoundedValue = resources.getString(R.string.screen_sharing_mode_app_bounded);
+        String valueFromPrefs = sharedPreferences.getString(
+                resources.getString(R.string.pref_screen_sharing_mode),
+                unboundedValue
+        );
+
+        if (valueFromPrefs.equals(appBoundedValue)) {
+            return ScreenSharing.Mode.APP_BOUNDED;
+        } else {
+            return ScreenSharing.Mode.UNBOUNDED;
+        }
     }
 }

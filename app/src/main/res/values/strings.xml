@@ -63,6 +63,9 @@
     <string name="settings_use_overlay">Use Overlay</string>
     <string name="settings_context_url">Context url</string>
     <string name="settings_use_alert_dialog_button_vertical_alignment">Align AlertDialog Buttons Vertically</string>
+    <string name="settings_screen_sharing_mode_title">Screen sharing mode</string>
+    <string name="settings_screen_sharing_mode_unbounded">Unbounded</string>
+    <string name="settings_screen_sharing_mode_app_bounded">App bounded</string>
 
     <string name="authorization_app_token">App Token</string>
     <string name="authorization_site_api_key">Site Api Key</string>

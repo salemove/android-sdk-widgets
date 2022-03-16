@@ -8,12 +8,11 @@ import androidx.core.util.Pair;
 public class ViewHelpers {
 
     public static class ChatHeadOnTouchListener implements View.OnTouchListener {
-
+        private static final int DIFF_THRESHOLD = 20;
         private int initialX;
         private int initialY;
         private float initialTouchX;
         private float initialTouchY;
-        private int lastAction;
         private final OnRequestInitialCoordinates onRequestInitialCoordinates;
         private final OnMoveListener onMoveListener;
         private final View.OnClickListener onChatHeadClickedListener;
@@ -40,22 +39,19 @@ public class ViewHelpers {
                     //get the touch location
                     initialTouchX = event.getRawX();
                     initialTouchY = event.getRawY();
-
-                    lastAction = event.getAction();
                     return true;
                 case MotionEvent.ACTION_UP:
-                    if (lastAction == MotionEvent.ACTION_DOWN) {
-                        v.performClick();
+                    int xDiff = (int) Math.abs(event.getRawX() - initialTouchX);
+                    int yDiff = (int) Math.abs(event.getRawY() - initialTouchY);
+                    if (xDiff < DIFF_THRESHOLD && yDiff < DIFF_THRESHOLD) {
                         onChatHeadClickedListener.onClick(v);
                     }
-                    lastAction = event.getAction();
                     return true;
                 case MotionEvent.ACTION_MOVE:
                     //Calculate the X and Y coordinates of the view.
-                    float x = initialX + (int) (event.getRawX() - initialTouchX);
-                    float y = initialY + (int) (event.getRawY() - initialTouchY);
-                    onMoveListener.onMove(x, y);
-                    lastAction = event.getAction();
+                    xDiff = initialX + (int) (event.getRawX() - initialTouchX);
+                    yDiff = initialY + (int) (event.getRawY() - initialTouchY);
+                    onMoveListener.onMove(xDiff, yDiff);
                     return true;
             }
             return false;

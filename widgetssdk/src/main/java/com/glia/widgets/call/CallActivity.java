@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -37,9 +36,7 @@ public class CallActivity extends AppCompatActivity {
     private GliaSdkConfiguration configuration;
 
     private CallView callView;
-    private CallView.OnBackClickedListener onBackClickedListener = () -> {
-        finish();
-    };
+    private CallView.OnBackClickedListener onBackClickedListener = this::finish;
     private CallView.OnEndListener onEndListener = this::finish;
     private CallView.OnNavigateToChatListener onNavigateToChatListener = () -> {
         navigateToChat();
@@ -131,7 +128,8 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private boolean hasPermission(String permission) {
-        return ContextCompat.checkSelfPermission(getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(getApplicationContext(), permission)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     private void onCallPermissionsAvailable(String companyName,
@@ -153,7 +151,7 @@ public class CallActivity extends AppCompatActivity {
         callView.onPause();
         super.onPause();
     }
-    
+
     @Override
     protected void onDestroy() {
         if (permissionSubjectDisposable != null) {

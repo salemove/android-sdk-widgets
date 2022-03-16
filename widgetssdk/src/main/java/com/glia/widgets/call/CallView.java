@@ -44,11 +44,11 @@ import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
-import com.glia.widgets.view.header.AppBarView;
 import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
+import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -59,8 +59,10 @@ public class CallView extends ConstraintLayout {
     private final String TAG = CallView.class.getSimpleName();
 
     private CallViewCallback callback;
-    private CallController controller;
+    private CallController callController;
 
+    private final ScreenSharingController.ViewCallback screenSharingViewCallback = exception ->
+            showToast(exception.debugMessage);
     private ScreenSharingController screenSharingController;
 
     private ServiceChatBubbleController serviceChatBubbleController;
@@ -137,7 +139,7 @@ public class CallView extends ConstraintLayout {
         readTypedArray(attrs, defStyleAttr, defStyleRes);
         setupViewAppearance();
         setupViewActions();
-        initControls();
+        setupControllers();
     }
 
     private void setupViewActions() {
@@ -147,38 +149,38 @@ public class CallView extends ConstraintLayout {
             }
         });
         appBar.setOnEndChatClickedListener(() -> {
-            if (controller != null) {
-                controller.leaveChatClicked();
+            if (callController != null) {
+                callController.leaveChatClicked();
             }
         });
         appBar.setOnXClickedListener(() -> {
-            if (controller != null) {
-                controller.leaveChatQueueClicked();
+            if (callController != null) {
+                callController.leaveChatQueueClicked();
             }
         });
         chatButton.setOnClickListener(v -> {
-            if (controller != null) {
-                controller.chatButtonClicked();
+            if (callController != null) {
+                callController.chatButtonClicked();
             }
         });
-        speakerButton.setOnClickListener(v -> controller.onSpeakerButtonPressed());
+        speakerButton.setOnClickListener(v -> callController.onSpeakerButtonPressed());
         minimizeButton.setOnClickListener(v -> {
-            if (controller != null) {
-                controller.minimizeButtonClicked();
+            if (callController != null) {
+                callController.minimizeButtonClicked();
             }
             if (onEndListener != null) {
                 onEndListener.onEnd();
             }
         });
         muteButton.setOnClickListener(v -> {
-            if (controller != null) {
-                controller.muteButtonClicked();
+            if (callController != null) {
+                callController.muteButtonClicked();
             }
         });
 
         videoButton.setOnClickListener(v -> {
-            if (controller != null) {
-                controller.videoButtonClicked();
+            if (callController != null) {
+                callController.videoButtonClicked();
             }
         });
     }
@@ -189,8 +191,8 @@ public class CallView extends ConstraintLayout {
                           boolean useOverlays,
                           Engagement.MediaType mediaType) {
         Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
-        if (controller != null) {
-            controller.initCall(
+        if (callController != null) {
+            callController.initCall(
                     companyName,
                     queueId,
                     contextUrl,
@@ -225,13 +227,13 @@ public class CallView extends ConstraintLayout {
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToChatListener = null;
-        destroyController();
+        destroyControllers();
         callback = null;
     }
 
     public void onResume() {
-        if (controller != null) {
-            controller.onResume();
+        if (callController != null) {
+            callController.onResume();
             if (operatorVideoView != null) {
                 operatorVideoView.resumeRendering();
             }
@@ -240,6 +242,7 @@ public class CallView extends ConstraintLayout {
             }
         }
         if (screenSharingController != null) {
+            screenSharingController.setViewCallback(screenSharingViewCallback);
             screenSharingController.onResume(this.getContext());
         }
         if (serviceChatBubbleController != null) {
@@ -254,15 +257,18 @@ public class CallView extends ConstraintLayout {
         if (visitorVideoView != null) {
             visitorVideoView.resumeRendering();
         }
+        if (screenSharingController != null) {
+            screenSharingController.removeViewCallback(screenSharingViewCallback);
+        }
     }
 
-    private void destroyController() {
-        Dependencies.getControllerFactory().destroyCallController(true);
-        Dependencies.getControllerFactory().destroyScreenSharingController(true);
-        controller = null;
+    private void destroyControllers() {
+        callController.setViewCallback(null);
+        callController = null;
+        screenSharingController = null;
     }
 
-    private void initControls() {
+    private void setupControllers() {
         callback = new CallViewCallback() {
             @Override
             public void emitState(CallState callState) {
@@ -384,9 +390,7 @@ public class CallView extends ConstraintLayout {
             }
         };
 
-        ScreenSharingController.ViewCallback screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
-
-        controller = Dependencies
+        callController = Dependencies
                 .getControllerFactory()
                 .getCallController(callback);
 
@@ -423,12 +427,13 @@ public class CallView extends ConstraintLayout {
                 post(this::showAllowScreenSharingNotificationsAndStartSharingDialog);
             }
         };
-
-        dialogController = Dependencies.getControllerFactory().getDialogController(dialogCallback);
+        dialogController = Dependencies
+                .getControllerFactory()
+                .getDialogController(dialogCallback);
 
         screenSharingController = Dependencies
                 .getControllerFactory()
-                .getScreenSharingController(screenSharingCallback);
+                .getScreenSharingController();
 
         serviceChatBubbleController = Dependencies
                 .getControllerFactory()
@@ -474,8 +479,8 @@ public class CallView extends ConstraintLayout {
                 resources.getString(R.string.glia_dialog_leave_queue_no),
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.endEngagementDialogYesClicked();
+                    if (callController != null) {
+                        callController.endEngagementDialogYesClicked();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -484,14 +489,14 @@ public class CallView extends ConstraintLayout {
                 },
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.endEngagementDialogDismissed();
+                    if (callController != null) {
+                        callController.endEngagementDialogDismissed();
                     }
                 },
                 dialog -> {
                     dialog.dismiss();
-                    if (controller != null) {
-                        controller.endEngagementDialogDismissed();
+                    if (callController != null) {
+                        callController.endEngagementDialogDismissed();
                     }
                 }
         );
@@ -508,17 +513,17 @@ public class CallView extends ConstraintLayout {
                     resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
                     view -> {
                         dismissAlertDialog();
-                        controller.notificationsDialogDismissed();
+                        callController.notificationsDialogDismissed();
                         NotificationManager.openNotificationChannelScreen(this.getContext());
                     },
                     view -> {
                         dismissAlertDialog();
-                        controller.notificationsDialogDismissed();
+                        callController.notificationsDialogDismissed();
                         screenSharingController.onScreenSharingDeclined();
                     },
                     dialog -> {
                         dialog.dismiss();
-                        controller.notificationsDialogDismissed();
+                        callController.notificationsDialogDismissed();
                         screenSharingController.onScreenSharingDeclined();
                     }
             );
@@ -536,16 +541,16 @@ public class CallView extends ConstraintLayout {
                     resources.getString(R.string.glia_dialog_allow_notifications_no),
                     view -> {
                         dismissAlertDialog();
-                        controller.notificationsDialogDismissed();
+                        callController.notificationsDialogDismissed();
                         NotificationManager.openNotificationChannelScreen(this.getContext());
                     },
                     view -> {
                         dismissAlertDialog();
-                        controller.notificationsDialogDismissed();
+                        callController.notificationsDialogDismissed();
                     },
                     dialog -> {
                         dialog.dismiss();
-                        controller.notificationsDialogDismissed();
+                        callController.notificationsDialogDismissed();
                     }
             );
         }
@@ -786,8 +791,8 @@ public class CallView extends ConstraintLayout {
                 resources.getString(R.string.glia_dialog_end_engagement_no),
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.endEngagementDialogYesClicked();
+                    if (callController != null) {
+                        callController.endEngagementDialogYesClicked();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -797,15 +802,15 @@ public class CallView extends ConstraintLayout {
                 },
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.endEngagementDialogDismissed();
+                    if (callController != null) {
+                        callController.endEngagementDialogDismissed();
                     }
                     alertDialog = null;
                 },
                 dialog -> {
                     dialog.dismiss();
-                    if (controller != null) {
-                        controller.endEngagementDialogDismissed();
+                    if (callController != null) {
+                        callController.endEngagementDialogDismissed();
                     }
                 }
         );
@@ -818,14 +823,14 @@ public class CallView extends ConstraintLayout {
                 type,
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
+                    if (callController != null) {
+                        callController.acceptUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 },
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
+                    if (callController != null) {
+                        callController.declineUpgradeOfferClicked(type.getUpgradeOffer());
                     }
                 });
     }
@@ -874,8 +879,8 @@ public class CallView extends ConstraintLayout {
                 this.theme,
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.noMoreOperatorsAvailableDismissed();
+                    if (callController != null) {
+                        callController.noMoreOperatorsAvailableDismissed();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -890,8 +895,8 @@ public class CallView extends ConstraintLayout {
                 R.string.glia_dialog_operators_unavailable_message,
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.noMoreOperatorsAvailableDismissed();
+                    if (callController != null) {
+                        callController.noMoreOperatorsAvailableDismissed();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -907,8 +912,8 @@ public class CallView extends ConstraintLayout {
                 R.string.glia_dialog_unexpected_error_message,
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.unexpectedErrorDialogDismissed();
+                    if (callController != null) {
+                        callController.unexpectedErrorDialogDismissed();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -923,8 +928,8 @@ public class CallView extends ConstraintLayout {
                 R.string.glia_dialog_permission_error_message,
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.unexpectedErrorDialogDismissed();
+                    if (callController != null) {
+                        callController.unexpectedErrorDialogDismissed();
                     }
                     if (onEndListener != null) {
                         onEndListener.onEnd();
@@ -940,8 +945,8 @@ public class CallView extends ConstraintLayout {
                 resources.getString(R.string.glia_dialog_overlay_permissions_no),
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.overlayPermissionsDialogDismissed();
+                    if (callController != null) {
+                        callController.overlayPermissionsDialogDismissed();
                     }
                     Intent overlayIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                             Uri.parse("package:" + this.getContext().getPackageName()));
@@ -950,14 +955,14 @@ public class CallView extends ConstraintLayout {
                 },
                 v -> {
                     dismissAlertDialog();
-                    if (controller != null) {
-                        controller.overlayPermissionsDialogDismissed();
+                    if (callController != null) {
+                        callController.overlayPermissionsDialogDismissed();
                     }
                 },
                 dialog -> {
                     dialog.dismiss();
-                    if (controller != null) {
-                        controller.overlayPermissionsDialogDismissed();
+                    if (callController != null) {
+                        callController.overlayPermissionsDialogDismissed();
                     }
                 }
         );
@@ -1021,14 +1026,18 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onUserInteraction() {
-        if (controller != null) {
-            controller.onUserInteraction();
+        if (callController != null) {
+            callController.onUserInteraction();
         }
     }
 
     public void setConfiguration(GliaSdkConfiguration configuration) {
         serviceChatBubbleController.setBuildTimeTheme(theme);
         serviceChatBubbleController.setSdkConfiguration(configuration);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     public interface OnBackClickedListener {
@@ -1044,7 +1053,7 @@ public class CallView extends ConstraintLayout {
     }
 
     public boolean shouldShowMediaEngagementView() {
-        if (controller != null) return controller.shouldShowMediaEngagementView();
+        if (callController != null) return callController.shouldShowMediaEngagementView();
         return false;
     }
 }

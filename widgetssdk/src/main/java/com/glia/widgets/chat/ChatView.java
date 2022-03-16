@@ -83,7 +83,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItemClickListener, ChatAdapter.OnImageItemClickListener {
+public class ChatView extends ConstraintLayout implements
+        ChatAdapter.OnFileItemClickListener,
+        ChatAdapter.OnImageItemClickListener {
 
     private final static String TAG = "ChatView";
     private AlertDialog alertDialog;
@@ -94,8 +96,9 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     private DialogController.Callback dialogCallback;
     private DialogController dialogController;
 
+    private final ScreenSharingController.ViewCallback screenSharingViewCallback = exception ->
+            showToast(exception.debugMessage);
     private ScreenSharingController screenSharingController;
-    private ScreenSharingController.ViewCallback screenSharingCallback;
 
     private ServiceChatBubbleController serviceChatBubbleController;
 
@@ -218,7 +221,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         readTypedArray(attrs, defStyleAttr, defStyleRes);
         setupViewAppearance();
         setupViewActions();
-        initControls();
+        setupControllers();
     }
 
     /**
@@ -331,14 +334,22 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     public void onResume() {
         if (controller != null) {
             controller.onResume();
-            if (screenSharingCallback != null)
-                screenSharingController.setGliaScreenSharingCallback(screenSharingCallback);
         }
         if (screenSharingController != null) {
+            screenSharingController.setViewCallback(screenSharingViewCallback);
             screenSharingController.onResume(this.getContext());
         }
         if (serviceChatBubbleController != null) {
             serviceChatBubbleController.onResume(this);
+        }
+    }
+
+    public void onPause() {
+        if (controller != null) {
+            controller.onPause();
+        }
+        if (screenSharingController != null) {
+            screenSharingController.removeViewCallback(screenSharingViewCallback);
         }
     }
 
@@ -364,18 +375,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         attachmentsRecyclerView.setAdapter(null);
         if (isFinishing) serviceChatBubbleController.onDestroy();
 
-        if (screenSharingController != null) {
-            screenSharingController.onDestroy(true);
-        }
-
         if (dialogController != null) {
             dialogController.removeCallback(dialogCallback);
             dialogController = null;
         }
-    }
-
-    public void onStop() {
-        controller.onStop();
     }
 
     /**
@@ -388,10 +391,8 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         }
     }
 
-    private void initControls() {
+    private void setupControllers() {
         setupChatStateCallback();
-
-        screenSharingCallback = exception -> Toast.makeText(getContext(), exception.debugMessage, Toast.LENGTH_SHORT).show();
 
         controller = Dependencies
                 .getControllerFactory()
@@ -405,7 +406,7 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
 
         screenSharingController = Dependencies
                 .getControllerFactory()
-                .getScreenSharingController(screenSharingCallback);
+                .getScreenSharingController();
 
         serviceChatBubbleController = Dependencies
                 .getControllerFactory()
@@ -611,7 +612,6 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
         chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
                 chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
     }
-
 
     private void updateAppBar(ChatState chatState) {
         if (chatState.isOperatorOnline()) {
@@ -1334,6 +1334,10 @@ public class ChatView extends ConstraintLayout implements ChatAdapter.OnFileItem
     public void setConfiguration(GliaSdkConfiguration configuration) {
         serviceChatBubbleController.setBuildTimeTheme(theme);
         serviceChatBubbleController.setSdkConfiguration(configuration);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     public interface OnBackClickedListener {

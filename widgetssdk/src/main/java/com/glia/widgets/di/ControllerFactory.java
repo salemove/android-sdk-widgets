@@ -135,56 +135,46 @@ public class ControllerFactory {
         return retainedCallController;
     }
 
-    public ScreenSharingController getScreenSharingController(ScreenSharingController.ViewCallback gliaScreenSharingCallback) {
-        if (gliaScreenSharingCallback != null) {
-            if (retainedScreenSharingController == null) {
-                Logger.d(TAG, "new screen sharing controller");
-                retainedScreenSharingController = new ScreenSharingController(
-                        repositoryFactory.getGliaScreenSharingRepository(),
-                        dialogController,
-                        useCaseFactory.createShowScreenSharingNotificationUseCase(),
-                        useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
-                        useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
-                        gliaScreenSharingCallback
-                );
-            } else {
-                Logger.d(TAG, "retained screen sharing controller");
-                retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
-            }
+    public ScreenSharingController getScreenSharingController() {
+        if (retainedScreenSharingController == null) {
+            Logger.d(TAG, "new screen sharing controller");
+            retainedScreenSharingController = new ScreenSharingController(
+                    repositoryFactory.getGliaScreenSharingRepository(),
+                    dialogController,
+                    useCaseFactory.createShowScreenSharingNotificationUseCase(),
+                    useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
+                    useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase()
+            );
         }
         return retainedScreenSharingController;
     }
 
     public void destroyControllers() {
-        destroyCallController(false);
-        destroyScreenSharingController(false);
+        destroyCallController();
+        destroyScreenSharingController();
         destroyChatController();
         serviceChatBubbleController.onDestroy();
     }
 
-    public void destroyCallController(boolean retain) {
-        Logger.d(TAG, "destroyCallController, retain: " + retain);
+    public void destroyCallController() {
+        Logger.d(TAG, "destroyCallController");
         if (retainedCallController != null) {
-            retainedCallController.onDestroy(retain);
-        }
-        if (!retain) {
+            retainedCallController.onDestroy(false);
             retainedCallController = null;
         }
     }
 
-    public void destroyScreenSharingController(boolean retain) {
-        Logger.d(TAG, "destroyScreenSharingController, retain: " + retain);
+    public void destroyScreenSharingController() {
+        Logger.d(TAG, "destroyScreenSharingController");
         if (retainedScreenSharingController != null) {
-            retainedScreenSharingController.onDestroy(retain);
-        }
-        if (!retain) {
+            retainedScreenSharingController.onDestroy();
             retainedScreenSharingController = null;
         }
     }
 
     private void destroyChatController() {
+        Logger.d(TAG, "destroyChatController");
         if (retainedChatController != null) {
-            Logger.d(TAG, "destroyChatController");
             retainedChatController.onDestroy(false);
             retainedChatController = null;
         }

@@ -123,9 +123,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        chatView.onStop();
+    protected void onPause() {
+        super.onPause();
+        chatView.onPause();
     }
 
     private String getCompanyName() {

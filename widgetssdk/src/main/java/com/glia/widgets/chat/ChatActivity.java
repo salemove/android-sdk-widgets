@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -55,14 +56,25 @@ public class ChatActivity extends AppCompatActivity {
         );
     }
 
-    private void buildConfiguration() {
-        configuration = new GliaSdkConfiguration.Builder()
-                .companyName(getCompanyName())
-                .queueId(getQueueId())
-                .runTimeTheme(getRunTimeUiTheme())
-                .contextUrl(getContextUrl())
-                .useOverlay(getUseOverlay())
-                .build();
+    @Override
+    protected void onResume() {
+        if (wasActivityFinishing) chatView.onResume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        chatView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        onBackClickedListener = null;
+        onEndListener = null;
+        onNavigateToCallListener = null;
+        chatView.onDestroyView(isFinishing());
+        super.onDestroy();
     }
 
     @Override
@@ -75,21 +87,6 @@ public class ChatActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         wasActivityFinishing = savedInstanceState.getBoolean(KEY_WAS_ACTIVITY_FINISHING, true);
         super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected void onResume() {
-        if (wasActivityFinishing) chatView.onResume();
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        onBackClickedListener = null;
-        onEndListener = null;
-        onNavigateToCallListener = null;
-        chatView.onDestroyView(isFinishing());
-        super.onDestroy();
     }
 
     @Override
@@ -111,21 +108,15 @@ public class ChatActivity extends AppCompatActivity {
         chatView.onRequestPermissionsResult(requestCode, grantResults);
     }
 
-    private void navigateToCall(UiTheme theme, String mediaType) {
-        Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
-        newIntent.putExtra(GliaWidgets.UI_THEME, theme);
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
-        newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
-        startActivity(newIntent);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        chatView.onPause();
+    private void buildConfiguration() {
+        configuration = new GliaSdkConfiguration.Builder()
+                .companyName(getCompanyName())
+                .queueId(getQueueId())
+                .runTimeTheme(getRunTimeUiTheme())
+                .contextUrl(getContextUrl())
+                .useOverlay(getUseOverlay())
+                .screenSharingMode(getScreenSharingMode())
+                .build();
     }
 
     private String getCompanyName() {
@@ -136,12 +127,12 @@ public class ChatActivity extends AppCompatActivity {
         return getIntent().getStringExtra(GliaWidgets.QUEUE_ID);
     }
 
-    private String getContextUrl() {
-        return getIntent().getStringExtra(GliaWidgets.CONTEXT_URL);
-    }
-
     private UiTheme getRunTimeUiTheme() {
         return getIntent().getParcelableExtra(GliaWidgets.UI_THEME);
+    }
+
+    private String getContextUrl() {
+        return getIntent().getStringExtra(GliaWidgets.CONTEXT_URL);
     }
 
     private boolean getUseOverlay() {
@@ -149,5 +140,22 @@ public class ChatActivity extends AppCompatActivity {
                 GliaWidgets.USE_OVERLAY,
                 Dependencies.getSdkConfigurationManager().isUseOverlay()
         );
+    }
+
+    private ScreenSharing.Mode getScreenSharingMode() {
+        return (ScreenSharing.Mode) getIntent().getSerializableExtra(
+                GliaWidgets.SCREEN_SHARING_MODE
+        );
+    }
+
+    private void navigateToCall(UiTheme theme, String mediaType) {
+        Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
+        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
+        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
+        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
+        newIntent.putExtra(GliaWidgets.UI_THEME, theme);
+        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
+        newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
+        startActivity(newIntent);
     }
 }

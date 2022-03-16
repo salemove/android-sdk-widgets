@@ -1,5 +1,6 @@
 package com.glia.widgets.core.configuration;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
 
 public class GliaSdkConfiguration {
@@ -8,17 +9,17 @@ public class GliaSdkConfiguration {
     private final String contextUrl;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
+    private final ScreenSharing.Mode screenSharingMode;
 
-    private GliaSdkConfiguration(
-            Builder builder
-    ) {
+    private GliaSdkConfiguration(Builder builder) {
         this.companyName = builder.companyName;
         this.queueId = builder.queueId;
         this.contextUrl = builder.contextUrl;
         this.runTimeTheme = builder.runTimeTheme;
         this.useOverlay = builder.useOverlay;
+        this.screenSharingMode = builder.screenSharingMode;
     }
-    
+
     public String getCompanyName() {
         return this.companyName;
     }
@@ -39,15 +40,17 @@ public class GliaSdkConfiguration {
         return this.useOverlay;
     }
 
+    public ScreenSharing.Mode getScreenSharingMode() {
+        return screenSharingMode;
+    }
+
     public static class Builder {
         private String companyName;
         private String queueId;
         private String contextUrl;
         private UiTheme runTimeTheme;
         private boolean useOverlay;
-
-        public Builder() {
-        }
+        private ScreenSharing.Mode screenSharingMode;
 
         public Builder companyName(String companyName) {
             this.companyName = companyName;
@@ -71,6 +74,11 @@ public class GliaSdkConfiguration {
 
         public Builder useOverlay(boolean useOverlay) {
             this.useOverlay = useOverlay;
+            return this;
+        }
+
+        public Builder screenSharingMode(ScreenSharing.Mode screenSharingMode) {
+            this.screenSharingMode = screenSharingMode;
             return this;
         }
 

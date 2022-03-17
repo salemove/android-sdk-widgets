@@ -3,11 +3,11 @@ package com.glia.widgets.core.chathead.domain;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 
-public class ResolveChatBubbleNavigationUseCase {
+public class ResolveChatHeadNavigationUseCase {
     private final GliaEngagementRepository engagementRepository;
     private final GliaQueueRepository queueRepository;
 
-    public ResolveChatBubbleNavigationUseCase(
+    public ResolveChatHeadNavigationUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository
     ) {

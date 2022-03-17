@@ -71,7 +71,7 @@ import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
-import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.shape.MarkerEdgeTreatment;
@@ -100,7 +100,7 @@ public class ChatView extends ConstraintLayout implements
             showToast(exception.debugMessage);
     private ScreenSharingController screenSharingController;
 
-    private ServiceChatBubbleController serviceChatBubbleController;
+    private ServiceChatHeadController serviceChatHeadController;
 
     private ChatRecyclerView chatRecyclerView;
     private ImageButton sendButton;
@@ -272,8 +272,8 @@ public class ChatView extends ConstraintLayout implements
         if (controller != null) {
             controller.initChat(companyName, queueId, contextUrl);
         }
-        if (serviceChatBubbleController != null) {
-            serviceChatBubbleController.init();
+        if (serviceChatHeadController != null) {
+            serviceChatHeadController.init();
         }
     }
 
@@ -339,8 +339,8 @@ public class ChatView extends ConstraintLayout implements
             screenSharingController.setViewCallback(screenSharingViewCallback);
             screenSharingController.onResume(this.getContext());
         }
-        if (serviceChatBubbleController != null) {
-            serviceChatBubbleController.onResume(this);
+        if (serviceChatHeadController != null) {
+            serviceChatHeadController.onResume(this);
         }
     }
 
@@ -373,7 +373,7 @@ public class ChatView extends ConstraintLayout implements
         chatRecyclerView.setAdapter(null);
         chatRecyclerView.removeOnScrollListener(onScrollListener);
         attachmentsRecyclerView.setAdapter(null);
-        if (isFinishing) serviceChatBubbleController.onDestroy();
+        if (isFinishing) serviceChatHeadController.onDestroy();
 
         if (dialogController != null) {
             dialogController.removeCallback(dialogCallback);
@@ -408,7 +408,7 @@ public class ChatView extends ConstraintLayout implements
                 .getControllerFactory()
                 .getScreenSharingController();
 
-        serviceChatBubbleController = Dependencies
+        serviceChatHeadController = Dependencies
                 .getControllerFactory()
                 .getChatHeadController();
     }
@@ -1332,8 +1332,8 @@ public class ChatView extends ConstraintLayout implements
     }
 
     public void setConfiguration(GliaSdkConfiguration configuration) {
-        serviceChatBubbleController.setBuildTimeTheme(theme);
-        serviceChatBubbleController.setSdkConfiguration(configuration);
+        serviceChatHeadController.setBuildTimeTheme(theme);
+        serviceChatHeadController.setSdkConfiguration(configuration);
     }
 
     private void showToast(String message) {

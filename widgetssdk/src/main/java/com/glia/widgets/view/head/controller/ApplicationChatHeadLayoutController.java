@@ -3,7 +3,7 @@ package com.glia.widgets.view.head.controller;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.core.chathead.domain.ResolveChatBubbleNavigationUseCase;
+import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
@@ -11,13 +11,13 @@ import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
-import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatBubbleUseCase;
+import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 
 import java.util.Optional;
 
-public class ApplicationChatBubbleLayoutController implements ChatHeadLayoutContract.Controller {
-    private final IsDisplayApplicationChatBubbleUseCase isDisplayApplicationChatBubbleUseCase;
-    private final ResolveChatBubbleNavigationUseCase navigationDestinationUseCase;
+public class ApplicationChatHeadLayoutController implements ChatHeadLayoutContract.Controller {
+    private final IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
+    private final ResolveChatHeadNavigationUseCase navigationDestinationUseCase;
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
@@ -60,16 +60,16 @@ public class ApplicationChatBubbleLayoutController implements ChatHeadLayoutCont
     private String operatorProfileImgUrl = null;
     private int unreadMessagesCount = 0;
 
-    public ApplicationChatBubbleLayoutController(
-            IsDisplayApplicationChatBubbleUseCase isDisplayApplicationChatBubbleUseCase,
-            ResolveChatBubbleNavigationUseCase navigationDestinationUseCase,
+    public ApplicationChatHeadLayoutController(
+            IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase,
+            ResolveChatHeadNavigationUseCase navigationDestinationUseCase,
             GliaOnEngagementUseCase gliaOnEngagementUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
             UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
     ) {
-        this.isDisplayApplicationChatBubbleUseCase = isDisplayApplicationChatBubbleUseCase;
+        this.isDisplayApplicationChatHeadUseCase = isDisplayApplicationChatHeadUseCase;
         this.navigationDestinationUseCase = navigationDestinationUseCase;
         this.gliaOnEngagementUseCase = gliaOnEngagementUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
@@ -136,7 +136,7 @@ public class ApplicationChatBubbleLayoutController implements ChatHeadLayoutCont
     }
 
     private void updateChatHeadLayoutVisibility(ChatHeadLayoutContract.View view) {
-        if (isDisplayApplicationChatBubbleUseCase.execute(view.isInChatView())) {
+        if (isDisplayApplicationChatHeadUseCase.execute(view.isInChatView())) {
             view.show();
         } else {
             view.hide();

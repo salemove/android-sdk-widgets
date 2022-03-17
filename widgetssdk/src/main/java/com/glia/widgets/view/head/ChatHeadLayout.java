@@ -184,7 +184,7 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     private void setupViewActions() {
         chatHeadView.setOnTouchListener(
                 new ViewHelpers.ChatHeadOnTouchListener(
-                        this::getInitialCoordinates,
+                        this::getChatHeadViewPosition,
                         this::onChatHeadDragged,
                         this::onChatHeadClicked
                 )
@@ -208,7 +208,7 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
         chatHeadView.invalidate();
     }
 
-    private Pair<Integer, Integer> getInitialCoordinates() {
+    private Pair<Integer, Integer> getChatHeadViewPosition() {
         return new Pair<>(
                 Float.valueOf(chatHeadView.getX()).intValue(),
                 Float.valueOf(chatHeadView.getY()).intValue()

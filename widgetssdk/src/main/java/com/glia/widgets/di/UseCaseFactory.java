@@ -49,9 +49,9 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseC
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
-import com.glia.widgets.core.chathead.domain.ResolveChatBubbleNavigationUseCase;
-import com.glia.widgets.core.chathead.domain.ToggleChatBubbleServiceUseCase;
-import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatBubbleUseCase;
+import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
+import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
+import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -59,9 +59,9 @@ public class UseCaseFactory {
     private static RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
-    private static ToggleChatBubbleServiceUseCase toggleChatBubbleServiceUseCase;
-    private static IsDisplayApplicationChatBubbleUseCase isDisplayApplicationChatBubbleUseCase;
-    private static ResolveChatBubbleNavigationUseCase resolveChatBubbleNavigationUseCase;
+    private static ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
+    private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
+    private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
     private final RepositoryFactory repositoryFactory;
     private final PermissionManager permissionManager;
@@ -85,9 +85,9 @@ public class UseCaseFactory {
         this.chatHeadManager = chatHeadManager;
     }
 
-    public ToggleChatBubbleServiceUseCase getToggleChatBubbleServiceUseCase() {
-        if (toggleChatBubbleServiceUseCase == null) {
-            toggleChatBubbleServiceUseCase = new ToggleChatBubbleServiceUseCase(
+    public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
+        if (toggleChatHeadServiceUseCase == null) {
+            toggleChatHeadServiceUseCase = new ToggleChatHeadServiceUseCase(
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository(),
                     chatHeadManager,
@@ -95,29 +95,29 @@ public class UseCaseFactory {
                     gliaSdkConfigurationManager
             );
         }
-        return toggleChatBubbleServiceUseCase;
+        return toggleChatHeadServiceUseCase;
     }
 
-    public IsDisplayApplicationChatBubbleUseCase getIsDisplayApplicationChatBubbleUseCase() {
-        if (isDisplayApplicationChatBubbleUseCase == null) {
-            isDisplayApplicationChatBubbleUseCase = new IsDisplayApplicationChatBubbleUseCase(
+    public IsDisplayApplicationChatHeadUseCase getIsDisplayApplicationChatHeadUseCase() {
+        if (isDisplayApplicationChatHeadUseCase == null) {
+            isDisplayApplicationChatHeadUseCase = new IsDisplayApplicationChatHeadUseCase(
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository(),
                     permissionManager,
                     gliaSdkConfigurationManager
             );
         }
-        return isDisplayApplicationChatBubbleUseCase;
+        return isDisplayApplicationChatHeadUseCase;
     }
 
-    public ResolveChatBubbleNavigationUseCase getResolveChatBubbleNavigationUseCase() {
-        if (resolveChatBubbleNavigationUseCase == null) {
-            resolveChatBubbleNavigationUseCase = new ResolveChatBubbleNavigationUseCase(
+    public ResolveChatHeadNavigationUseCase getResolveChatHeadNavigationUseCase() {
+        if (resolveChatHeadNavigationUseCase == null) {
+            resolveChatHeadNavigationUseCase = new ResolveChatHeadNavigationUseCase(
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository()
             );
         }
-        return resolveChatBubbleNavigationUseCase;
+        return resolveChatHeadNavigationUseCase;
     }
 
     public ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase() {

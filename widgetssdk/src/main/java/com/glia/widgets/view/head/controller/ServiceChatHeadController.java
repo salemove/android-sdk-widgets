@@ -2,6 +2,8 @@ package com.glia.widgets.view.head.controller;
 
 import android.view.View;
 
+import androidx.core.util.Pair;
+
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
@@ -13,21 +15,23 @@ import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.view.MessagesNotSeenHandler;
-import com.glia.widgets.core.chathead.domain.ResolveChatBubbleNavigationUseCase;
-import com.glia.widgets.core.chathead.domain.ToggleChatBubbleServiceUseCase;
+import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
+import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.view.head.ChatHeadContract;
+import com.glia.widgets.view.head.ChatHeadPosition;
 
 import java.util.Optional;
 
-public class ServiceChatBubbleController implements ChatHeadContract.Controller {
-    private final ToggleChatBubbleServiceUseCase toggleChatBubbleServiceUseCase;
-    private final ResolveChatBubbleNavigationUseCase resolveChatBubbleNavigationUseCase;
+public class ServiceChatHeadController implements ChatHeadContract.Controller {
+    private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
+    private final ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
     private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
+    private final ChatHeadPosition chatHeadPosition;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
         @Override
@@ -68,33 +72,35 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
     private GliaSdkConfiguration sdkConfiguration;
     private UiTheme buildTimeTheme;
 
-    public ServiceChatBubbleController(
-            ToggleChatBubbleServiceUseCase toggleChatBubbleServiceUseCase,
-            ResolveChatBubbleNavigationUseCase resolveChatBubbleNavigationUseCase,
+    public ServiceChatHeadController(
+            ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase,
+            ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase,
             GliaOnEngagementUseCase gliaOnEngagementUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
-            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
+            ChatHeadPosition chatHeadPosition
     ) {
-        this.toggleChatBubbleServiceUseCase = toggleChatBubbleServiceUseCase;
-        this.resolveChatBubbleNavigationUseCase = resolveChatBubbleNavigationUseCase;
+        this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
+        this.resolveChatHeadNavigationUseCase = resolveChatHeadNavigationUseCase;
         this.gliaOnEngagementUseCase = gliaOnEngagementUseCase;
         this.gliaOnEngagementEndUseCase = onEngagementEndUseCase;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
         this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
         this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
+        this.chatHeadPosition = chatHeadPosition;
     }
 
     @Override
     public void onDestroy() {
-        toggleChatBubbleServiceUseCase.execute(null);
+        toggleChatHeadServiceUseCase.execute(null);
         unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
     }
 
     @Override
     public void onResume(View view) {
-        toggleChatBubbleServiceUseCase.execute(view);
+        toggleChatHeadServiceUseCase.execute(view);
     }
 
     @Override
@@ -104,12 +110,22 @@ public class ServiceChatBubbleController implements ChatHeadContract.Controller 
 
     @Override
     public void onApplicationStop() {
-        toggleChatBubbleServiceUseCase.execute(null);
+        toggleChatHeadServiceUseCase.execute(null);
+    }
+
+    @Override
+    public void onChatHeadPositionChanged(int x, int y) {
+        chatHeadPosition.set(x, y);
+    }
+
+    @Override
+    public Pair<Integer, Integer> getChatHeadPosition() {
+        return chatHeadPosition.get();
     }
 
     @Override
     public void onChatHeadClicked() {
-        switch (resolveChatBubbleNavigationUseCase.execute()) {
+        switch (resolveChatHeadNavigationUseCase.execute()) {
             case CALL_VIEW:
                 chatHeadView.navigateToCall();
                 break;

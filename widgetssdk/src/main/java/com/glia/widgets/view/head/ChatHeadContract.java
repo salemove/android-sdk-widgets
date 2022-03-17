@@ -1,5 +1,7 @@
 package com.glia.widgets.view.head;
 
+import androidx.core.util.Pair;
+
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.base.BaseController;
 import com.glia.widgets.base.BaseView;
@@ -14,6 +16,10 @@ public interface ChatHeadContract {
         void onSetChatHeadView(View view);
 
         void onApplicationStop();
+
+        void onChatHeadPositionChanged(int x, int y);
+
+        Pair<Integer, Integer> getChatHeadPosition();
     }
 
     interface View extends BaseView<Controller> {

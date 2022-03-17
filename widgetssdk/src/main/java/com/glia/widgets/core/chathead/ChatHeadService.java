@@ -19,7 +19,7 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.ViewHelpers;
-import com.glia.widgets.view.head.controller.ServiceChatBubbleController;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.head.ChatHeadView;
 
 public class ChatHeadService extends Service {
@@ -37,11 +37,12 @@ public class ChatHeadService extends Service {
     public void onCreate() {
         super.onCreate();
         Logger.d(TAG, "onCreate");
-        ServiceChatBubbleController controller = Dependencies
+        ServiceChatHeadController controller = Dependencies
                 .getControllerFactory()
                 .getChatHeadController();
         WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         WindowManager.LayoutParams layoutParams = getLayoutParams();
+        initChatHeadPosition(layoutParams, controller.getChatHeadPosition());
         initChatHeadView(controller, windowManager, layoutParams);
         controller.onSetChatHeadView(chatHeadView);
         controller.updateChatHeadView();
@@ -62,7 +63,7 @@ public class ChatHeadService extends Service {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initChatHeadView(
-            ServiceChatBubbleController controller,
+            ServiceChatHeadController controller,
             WindowManager windowManager,
             WindowManager.LayoutParams layoutParams
     ) {
@@ -75,6 +76,7 @@ public class ChatHeadService extends Service {
                             layoutParams.x = Float.valueOf(x).intValue();
                             layoutParams.y = Float.valueOf(y).intValue();
                             windowManager.updateViewLayout(chatHeadView, layoutParams);
+                            controller.onChatHeadPositionChanged(layoutParams.x, layoutParams.y);
                         },
                         (v) -> controller.onChatHeadClicked()
                 ));
@@ -88,14 +90,23 @@ public class ChatHeadService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
+        params.gravity = Gravity.TOP | Gravity.START;
+        return params;
+    }
+
+    private void initChatHeadPosition(
+            WindowManager.LayoutParams params,
+            Pair<Integer, Integer> chatHeadPosition
+    ) {
         DisplayMetrics displayMetrics = getDisplayMetrics();
         int screenHeight = displayMetrics.heightPixels;
         int screenWidth = displayMetrics.widthPixels;
+        params.x = notNullOrDefault(chatHeadPosition.first, getDefaultXPosition(screenWidth));
+        params.y = notNullOrDefault(chatHeadPosition.second, getDefaultYPosition(screenHeight));
+    }
 
-        params.gravity = Gravity.TOP | Gravity.START;
-        params.x = getDefaultXPosition(screenWidth);
-        params.y = getDefaultYPosition(screenHeight);
-        return params;
+    private int notNullOrDefault(Integer item, Integer defaultItem) {
+        return item != null ? item : defaultItem;
     }
 
     private int getLayoutFlag() {

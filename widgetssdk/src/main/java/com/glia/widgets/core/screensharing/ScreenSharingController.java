@@ -16,6 +16,7 @@ import java.util.Set;
 
 public class ScreenSharingController implements GliaScreenSharingCallback {
     private static final String TAG = "ScreenSharingController";
+
     private final GliaScreenSharingRepository repository;
     private final DialogController dialogController;
     private final ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
@@ -110,25 +111,9 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
         hasPendingScreenSharingRequest = false;
     }
 
-    public void onDismissEndScreenSharing() {
-        Logger.d(TAG, "onDismissEndScreenSharing");
-        dialogController.dismissDialogs();
-    }
-
-    public void onEndScreenSharing() {
-        Logger.d(TAG, "onEndScreenSharing");
-        dialogController.dismissDialogs();
+    public void onScreenSharingNotificationEndPressed() {
         hideScreenSharingEnabledNotification();
         repository.onEndScreenSharing();
-    }
-
-    public void onScreenSharingNotificationEndPressed() {
-        Logger.d(TAG, "onScreenSharingNotificationEndPressed");
-        if (viewCallbacks.isEmpty()) {
-            onEndScreenSharing();
-        } else {
-            dialogController.showEndScreenSharingDialog();
-        }
     }
 
     public void setViewCallback(ViewCallback callback) {

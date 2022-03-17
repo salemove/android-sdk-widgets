@@ -85,12 +85,6 @@
     <string name="glia_dialog_upgrade_accept">@string/glia_dialog_accept</string>
     <string name="glia_dialog_upgrade_decline">@string/glia_dialog_decline</string>
 
-    <!-- End screen sharing Dialog -->
-    <string name="glia_dialog_screen_sharing_end_title">End Screen Sharing?</string>
-    <string name="glia_dialog_screen_sharing_end_message">Are you sure you want to end screen sharing?</string>
-    <string name="glia_dialog_screen_sharing_end_cancel">@string/glia_dialog_cancel</string>
-    <string name="glia_dialog_screen_sharing_end_end">End</string>
-
     <!-- Operators unavailable AlertDialog -->
     <string name="glia_dialog_operators_unavailable_title">Operators Not Available</string>
     <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>

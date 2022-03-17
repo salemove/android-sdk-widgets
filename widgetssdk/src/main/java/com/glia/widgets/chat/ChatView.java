@@ -527,8 +527,6 @@ public class ChatView extends ConstraintLayout implements
                 post(this::showEngagementEndedDialog);
             } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
                 post(this::showScreenSharingDialog);
-            } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
-                post(this::showScreenSharingEndDialog);
             } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
                 post(this::showAllowNotificationsDialog);
             } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
@@ -687,21 +685,6 @@ public class ChatView extends ConstraintLayout implements
                     R.string.glia_dialog_screen_sharing_offer_decline,
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
-            );
-        }
-    }
-
-    private void showScreenSharingEndDialog() {
-        if (alertDialog == null || !alertDialog.isShowing()) {
-            alertDialog = Dialogs.showScreenSharingDialog(
-                    this.getContext(),
-                    theme,
-                    resources.getString(R.string.glia_dialog_screen_sharing_end_title),
-                    resources.getString(R.string.glia_dialog_screen_sharing_end_message),
-                    R.string.glia_dialog_screen_sharing_end_cancel,
-                    R.string.glia_dialog_screen_sharing_end_end,
-                    view -> screenSharingController.onDismissEndScreenSharing(),
-                    view -> screenSharingController.onEndScreenSharing()
             );
         }
     }

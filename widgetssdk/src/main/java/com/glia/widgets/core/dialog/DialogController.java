@@ -149,13 +149,6 @@ public class DialogController {
         }
     }
 
-    public void showEndScreenSharingDialog() {
-        if (isNoDialogShown()) {
-            Logger.d(TAG, "Show End Screen Sharing Dialog");
-            emitDialogState(new DialogsState.EndScreenSharingDialog());
-        }
-    }
-
     public void showEnableCallNotificationChannelDialog() {
         if (isNoDialogShown()) {
             Logger.d(TAG, "Show Enable Notification Channel Dialog");

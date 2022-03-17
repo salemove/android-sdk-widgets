@@ -331,7 +331,7 @@ public class ChatView extends ConstraintLayout implements
      * Use this method to notify the view when your activity or fragment is back in its resumed
      * state.
      */
-    public void onResume() {
+    public void onResume(boolean needToInitialize) {
         if (controller != null) {
             controller.onResume();
         }
@@ -339,7 +339,10 @@ public class ChatView extends ConstraintLayout implements
             screenSharingController.setViewCallback(screenSharingViewCallback);
             screenSharingController.onResume(this.getContext());
         }
-        if (serviceChatHeadController != null) {
+        if (dialogController != null) {
+            dialogController.addCallback(dialogCallback);
+        }
+        if (needToInitialize && serviceChatHeadController != null) {
             serviceChatHeadController.onResume(this);
         }
     }
@@ -350,6 +353,9 @@ public class ChatView extends ConstraintLayout implements
         }
         if (screenSharingController != null) {
             screenSharingController.removeViewCallback(screenSharingViewCallback);
+        }
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
         }
     }
 
@@ -374,11 +380,7 @@ public class ChatView extends ConstraintLayout implements
         chatRecyclerView.removeOnScrollListener(onScrollListener);
         attachmentsRecyclerView.setAdapter(null);
         if (isFinishing) serviceChatHeadController.onDestroy();
-
-        if (dialogController != null) {
-            dialogController.removeCallback(dialogCallback);
-            dialogController = null;
-        }
+        dialogController = null;
     }
 
     /**
@@ -402,7 +404,7 @@ public class ChatView extends ConstraintLayout implements
 
         dialogController = Dependencies
                 .getControllerFactory()
-                .getDialogController(dialogCallback);
+                .getDialogController();
 
         screenSharingController = Dependencies
                 .getControllerFactory()

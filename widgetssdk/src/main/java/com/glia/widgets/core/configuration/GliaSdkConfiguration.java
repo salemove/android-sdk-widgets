@@ -1,9 +1,17 @@
 package com.glia.widgets.core.configuration;
 
+import android.content.Intent;
+
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 
 public class GliaSdkConfiguration {
+
+    private static final boolean DEFAULT_USE_OVERLAY = true;
+    private static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE =
+            ScreenSharing.Mode.UNBOUNDED;
+
     private final String companyName;
     private final String queueId;
     private final String contextUrl;
@@ -11,13 +19,24 @@ public class GliaSdkConfiguration {
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
 
-    private GliaSdkConfiguration(Builder builder) {
-        this.companyName = builder.companyName;
-        this.queueId = builder.queueId;
-        this.contextUrl = builder.contextUrl;
-        this.runTimeTheme = builder.runTimeTheme;
-        this.useOverlay = builder.useOverlay;
-        this.screenSharingMode = builder.screenSharingMode;
+    public static GliaSdkConfiguration fromIntent(Intent intent) {
+        String companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
+        String queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
+        UiTheme uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+        String contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
+        boolean useOverLay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
+        ScreenSharing.Mode screenSharingMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
+                ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
+                : DEFAULT_SCREEN_SHARING_MODE;
+
+        return new GliaSdkConfiguration.Builder()
+                .companyName(companyName)
+                .queueId(queueId)
+                .runTimeTheme(uiTheme)
+                .contextUrl(contextUrl)
+                .useOverlay(useOverLay)
+                .screenSharingMode(screenSharingMode)
+                .build();
     }
 
     public String getCompanyName() {
@@ -44,7 +63,7 @@ public class GliaSdkConfiguration {
         return screenSharingMode;
     }
 
-    public static class Builder {
+    public static class Builder   {
         private String companyName;
         private String queueId;
         private String contextUrl;
@@ -85,5 +104,14 @@ public class GliaSdkConfiguration {
         public GliaSdkConfiguration build() {
             return new GliaSdkConfiguration(this);
         }
+    }
+
+    private GliaSdkConfiguration(Builder builder) {
+        this.companyName = builder.companyName;
+        this.queueId = builder.queueId;
+        this.contextUrl = builder.contextUrl;
+        this.runTimeTheme = builder.runTimeTheme;
+        this.useOverlay = builder.useOverlay;
+        this.screenSharingMode = builder.screenSharingMode;
     }
 }

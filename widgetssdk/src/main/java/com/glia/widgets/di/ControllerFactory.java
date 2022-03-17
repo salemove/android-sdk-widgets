@@ -4,6 +4,7 @@ import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
+import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
@@ -24,6 +25,7 @@ public class ControllerFactory {
     private final DialogController dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
+    private final GliaSdkConfigurationManager sdkConfigurationManager;
 
     private static final String TAG = "ControllerFactory";
 
@@ -35,7 +37,11 @@ public class ControllerFactory {
 
     private static ServiceChatHeadController serviceChatHeadController;
 
-    public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
+    public ControllerFactory(
+            RepositoryFactory repositoryFactory,
+            UseCaseFactory useCaseFactory,
+            GliaSdkConfigurationManager sdkConfigurationManager
+    ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
                 useCaseFactory.createGliaOnMessageUseCase(),
@@ -54,6 +60,7 @@ public class ControllerFactory {
                 useCaseFactory.createOnEngagementEndUseCase()
         );
         this.chatHeadPosition = ChatHeadPosition.getInstance();
+        this.sdkConfigurationManager = sdkConfigurationManager;
     }
 
     public ChatController getChatController(ChatViewCallback chatViewCallback) {
@@ -147,7 +154,8 @@ public class ControllerFactory {
                     dialogController,
                     useCaseFactory.createShowScreenSharingNotificationUseCase(),
                     useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
-                    useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase()
+                    useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
+                    sdkConfigurationManager
             );
         }
         return retainedScreenSharingController;

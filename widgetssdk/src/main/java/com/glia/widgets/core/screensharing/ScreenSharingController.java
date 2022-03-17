@@ -3,6 +3,7 @@ package com.glia.widgets.core.screensharing;
 import android.content.Context;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
@@ -22,24 +23,26 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     private final ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private final RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
     private final HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase;
+    private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
+    private final Set<ViewCallback> viewCallbacks = new HashSet<>();
 
     private boolean hasPendingScreenSharingRequest = false;
-
-    private final Set<ViewCallback> viewCallbacks = new HashSet<>();
 
     public ScreenSharingController(
             GliaScreenSharingRepository gliaScreenSharingRepository,
             DialogController gliaDialogController,
             ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase,
             RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase,
-            HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase
+            HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase,
+            GliaSdkConfigurationManager sdkConfigurationManager
     ) {
         Logger.d(TAG, "init");
-        repository = gliaScreenSharingRepository;
-        dialogController = gliaDialogController;
+        this.repository = gliaScreenSharingRepository;
+        this.dialogController = gliaDialogController;
         this.showScreenSharingNotificationUseCase = showScreenSharingNotificationUseCase;
         this.removeScreenSharingNotificationUseCase = removeScreenSharingNotificationUseCase;
         this.hasScreenSharingNotificationChannelEnabledUseCase = hasScreenSharingNotificationChannelEnabledUseCase;
+        this.gliaSdkConfigurationManager = sdkConfigurationManager;
         repository.init(this);
     }
 
@@ -100,7 +103,10 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
         Logger.d(TAG, "onScreenSharingAccepted");
         dialogController.dismissDialogs();
         showScreenSharingEnabledNotification();
-        repository.onScreenSharingAccepted(Utils.getActivity(context));
+        repository.onScreenSharingAccepted(
+                Utils.getActivity(context),
+                gliaSdkConfigurationManager.getScreenSharingMode()
+        );
         hasPendingScreenSharingRequest = false;
     }
 

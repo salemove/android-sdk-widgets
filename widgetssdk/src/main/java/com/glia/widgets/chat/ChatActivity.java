@@ -7,13 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class ChatActivity extends AppCompatActivity {
@@ -41,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
         ChatHeadLayout chatHeadLayout = findViewById(R.id.chat_head_layout);
         chatHeadLayout.setIsChatView(true);
 
-        buildConfiguration();
+        configuration = GliaSdkConfiguration.fromIntent(getIntent());
         chatHeadLayout.setConfiguration(configuration);
         chatView.setConfiguration(configuration);
         chatView.setTheme(configuration.getRunTimeTheme());
@@ -52,7 +50,8 @@ public class ChatActivity extends AppCompatActivity {
                 configuration.getCompanyName(),
                 configuration.getQueueId(),
                 configuration.getContextUrl(),
-                configuration.getUseOverlay()
+                configuration.getUseOverlay(),
+                configuration.getScreenSharingMode()
         );
     }
 
@@ -106,46 +105,6 @@ public class ChatActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
         chatView.onRequestPermissionsResult(requestCode, grantResults);
-    }
-
-    private void buildConfiguration() {
-        configuration = new GliaSdkConfiguration.Builder()
-                .companyName(getCompanyName())
-                .queueId(getQueueId())
-                .runTimeTheme(getRunTimeUiTheme())
-                .contextUrl(getContextUrl())
-                .useOverlay(getUseOverlay())
-                .screenSharingMode(getScreenSharingMode())
-                .build();
-    }
-
-    private String getCompanyName() {
-        return getIntent().getStringExtra(GliaWidgets.COMPANY_NAME);
-    }
-
-    private String getQueueId() {
-        return getIntent().getStringExtra(GliaWidgets.QUEUE_ID);
-    }
-
-    private UiTheme getRunTimeUiTheme() {
-        return getIntent().getParcelableExtra(GliaWidgets.UI_THEME);
-    }
-
-    private String getContextUrl() {
-        return getIntent().getStringExtra(GliaWidgets.CONTEXT_URL);
-    }
-
-    private boolean getUseOverlay() {
-        return getIntent().getBooleanExtra(
-                GliaWidgets.USE_OVERLAY,
-                Dependencies.getSdkConfigurationManager().isUseOverlay()
-        );
-    }
-
-    private ScreenSharing.Mode getScreenSharingMode() {
-        return (ScreenSharing.Mode) getIntent().getSerializableExtra(
-                GliaWidgets.SCREEN_SHARING_MODE
-        );
     }
 
     private void navigateToCall(UiTheme theme, String mediaType) {

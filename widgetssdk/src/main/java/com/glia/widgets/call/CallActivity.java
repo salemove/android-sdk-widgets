@@ -12,13 +12,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
@@ -56,7 +53,7 @@ public class CallActivity extends AppCompatActivity {
             return;
         }
 
-        buildConfiguration();
+        configuration = GliaSdkConfiguration.fromIntent(getIntent());
         callView.setConfiguration(configuration);
         callView.setTheme(configuration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
@@ -112,46 +109,6 @@ public class CallActivity extends AppCompatActivity {
         permissionSubject.onNext(new Pair<>(requestCode, convertedGrantResults));
     }
 
-    private void buildConfiguration() {
-        configuration = new GliaSdkConfiguration.Builder()
-                .companyName(getCompanyName())
-                .queueId(getQueueId())
-                .runTimeTheme(getRunTimeUiTheme())
-                .contextUrl(getContextUrl())
-                .useOverlay(getUseOverlay())
-                .screenSharingMode(getScreenSharingMode())
-                .build();
-    }
-
-    private String getCompanyName() {
-        return getIntent().getStringExtra(GliaWidgets.COMPANY_NAME);
-    }
-
-    private String getQueueId() {
-        return getIntent().getStringExtra(GliaWidgets.QUEUE_ID);
-    }
-
-    private String getContextUrl() {
-        return getIntent().getStringExtra(GliaWidgets.CONTEXT_URL);
-    }
-
-    private UiTheme getRunTimeUiTheme() {
-        return getIntent().getParcelableExtra(GliaWidgets.UI_THEME);
-    }
-
-    private boolean getUseOverlay() {
-        return getIntent().getBooleanExtra(
-                GliaWidgets.USE_OVERLAY,
-                Dependencies.getSdkConfigurationManager().isUseOverlay()
-        );
-    }
-
-    private ScreenSharing.Mode getScreenSharingMode() {
-        return (ScreenSharing.Mode) getIntent().getSerializableExtra(
-                GliaWidgets.SCREEN_SHARING_MODE
-        );
-    }
-
     private void startCallWithPermissions() {
         List<String> missingPermissions = new ArrayList<>();
         Engagement.MediaType mediaType = getMediaType();
@@ -203,6 +160,7 @@ public class CallActivity extends AppCompatActivity {
                 configuration.getQueueId(),
                 configuration.getContextUrl(),
                 configuration.getUseOverlay(),
+                configuration.getScreenSharingMode(),
                 getMediaType()
         );
     }

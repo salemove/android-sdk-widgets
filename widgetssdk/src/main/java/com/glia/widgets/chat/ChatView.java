@@ -46,6 +46,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieProperty;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
@@ -248,7 +249,7 @@ public class ChatView extends ConstraintLayout implements
             String companyName,
             String queueId,
             String contextUrl) {
-        startChat(companyName, queueId, contextUrl, false);
+        startChat(companyName, queueId, contextUrl, false, null);
     }
 
     /**
@@ -265,10 +266,11 @@ public class ChatView extends ConstraintLayout implements
             String companyName,
             String queueId,
             String contextUrl,
-            boolean useOverlays
+            boolean useOverlays,
+            ScreenSharing.Mode screenSharingMode
     ) {
         Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
-
+        Dependencies.getSdkConfigurationManager().setScreenSharingMode(screenSharingMode);
         if (controller != null) {
             controller.initChat(companyName, queueId, contextUrl);
         }

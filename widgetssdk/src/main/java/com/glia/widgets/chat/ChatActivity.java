@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -114,6 +115,7 @@ public class ChatActivity extends AppCompatActivity {
                 .runTimeTheme(getRunTimeUiTheme())
                 .contextUrl(getContextUrl())
                 .useOverlay(getUseOverlay())
+                .screenSharingMode(getScreenSharingMode())
                 .build();
     }
 
@@ -137,6 +139,12 @@ public class ChatActivity extends AppCompatActivity {
         return getIntent().getBooleanExtra(
                 GliaWidgets.USE_OVERLAY,
                 Dependencies.getSdkConfigurationManager().isUseOverlay()
+        );
+    }
+
+    private ScreenSharing.Mode getScreenSharingMode() {
+        return (ScreenSharing.Mode) getIntent().getSerializableExtra(
+                GliaWidgets.SCREEN_SHARING_MODE
         );
     }
 

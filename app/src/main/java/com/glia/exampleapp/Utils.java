@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
@@ -211,7 +212,7 @@ class Utils {
         String delius = resources.getString(R.string.font_delius_value);
         String expletus = resources.getString(R.string.font_expletus_value);
         String tangerine = resources.getString(R.string.font_tangerine_value);
-        String defaultPrefValue = resources.getString(R.string.settings_value_default);
+        String defaultPrefValue = resources.getString(R.string.settings_value_default); // todo Wrong string resource is used. should be R.string.default_value
 
         String typeFaceValue = sharedPreferences.getString(resources.getString(R.string.pref_font_family), defaultPrefValue);
 
@@ -229,5 +230,25 @@ class Utils {
 
     public static boolean getUseOverlay(SharedPreferences sharedPreferences, Resources resources) {
         return sharedPreferences.getBoolean(resources.getString(R.string.pref_use_overlay), true);
+    }
+
+    public static ScreenSharing.Mode getScreenSharingModeFromPrefs(
+            SharedPreferences sharedPreferences,
+            Resources resources
+    ) {
+        String value = sharedPreferences.getString(
+                resources.getString(R.string.pref_screen_sharing_mode),
+                resources.getString(R.string.default_value)
+        );
+        String unbounded = resources.getString(R.string.screen_sharing_mode_unbounded);
+        String appBounded = resources.getString(R.string.screen_sharing_mode_app_bounded);
+
+        if (value.equals(unbounded)) {
+            return ScreenSharing.Mode.UNBOUNDED;
+        } else if (value.equals(appBounded)) {
+            return ScreenSharing.Mode.APP_BOUNDED;
+        } else {
+            return null;
+        }
     }
 }

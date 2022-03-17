@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -63,13 +64,7 @@ public class CallActivity extends AppCompatActivity {
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
 
         if (savedInstanceState == null) {
-            startCallWithPermissions(
-                    configuration.getCompanyName(),
-                    configuration.getQueueId(),
-                    configuration.getContextUrl(),
-                    configuration.getUseOverlay(),
-                    getMediaType(getIntent())
-            );
+            startCallWithPermissions();
         }
     }
 
@@ -124,6 +119,7 @@ public class CallActivity extends AppCompatActivity {
                 .runTimeTheme(getRunTimeUiTheme())
                 .contextUrl(getContextUrl())
                 .useOverlay(getUseOverlay())
+                .screenSharingMode(getScreenSharingMode())
                 .build();
     }
 
@@ -150,13 +146,15 @@ public class CallActivity extends AppCompatActivity {
         );
     }
 
-    private void startCallWithPermissions(String companyName,
-                                          String queueId,
-                                          String contextUrl,
-                                          boolean useOverlays,
-                                          Engagement.MediaType mediaType) {
+    private ScreenSharing.Mode getScreenSharingMode() {
+        return (ScreenSharing.Mode) getIntent().getSerializableExtra(
+                GliaWidgets.SCREEN_SHARING_MODE
+        );
+    }
 
+    private void startCallWithPermissions() {
         List<String> missingPermissions = new ArrayList<>();
+        Engagement.MediaType mediaType = getMediaType();
         if (mediaType == Engagement.MediaType.VIDEO && missingPermission(Manifest.permission.CAMERA)) {
             missingPermissions.add(Manifest.permission.CAMERA);
         }
@@ -175,7 +173,7 @@ public class CallActivity extends AppCompatActivity {
                     .subscribe(
                             (isPermissionRequestSuccessful) -> {
                                 if (isPermissionRequestSuccessful) {
-                                    onCallPermissionsAvailable(companyName, queueId, contextUrl, useOverlays, mediaType);
+                                    onCallPermissionsAvailable();
                                 } else {
                                     callView.showMissingPermissionsDialog();
                                 }
@@ -187,7 +185,7 @@ public class CallActivity extends AppCompatActivity {
                     MEDIA_PERMISSION_REQUEST_CODE
             );
         } else {
-            onCallPermissionsAvailable(companyName, queueId, contextUrl, useOverlays, mediaType);
+            onCallPermissionsAvailable();
         }
     }
 
@@ -199,16 +197,18 @@ public class CallActivity extends AppCompatActivity {
         return permissionData != null && permissionData.first != null && permissionData.first == MEDIA_PERMISSION_REQUEST_CODE;
     }
 
-    private void onCallPermissionsAvailable(String companyName,
-                                            String queueId,
-                                            String contextUrl,
-                                            boolean useOverlays,
-                                            Engagement.MediaType mediaType) {
-        callView.startCall(companyName, queueId, contextUrl, useOverlays, mediaType);
+    private void onCallPermissionsAvailable() {
+        callView.startCall(
+                configuration.getCompanyName(),
+                configuration.getQueueId(),
+                configuration.getContextUrl(),
+                configuration.getUseOverlay(),
+                getMediaType()
+        );
     }
 
-    private Engagement.MediaType getMediaType(Intent intent) {
-        String mediaType = intent.getStringExtra(GliaWidgets.MEDIA_TYPE);
+    private Engagement.MediaType getMediaType() {
+        String mediaType = getIntent().getStringExtra(GliaWidgets.MEDIA_TYPE);
         if (mediaType != null && mediaType.equals(GliaWidgets.MEDIA_TYPE_VIDEO)) {
             return Engagement.MediaType.VIDEO;
         } else {
@@ -224,6 +224,7 @@ public class CallActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
         newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
+        newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, configuration.getScreenSharingMode());
         startActivity(newIntent);
     }
 }

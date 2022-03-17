@@ -50,10 +50,10 @@
 
         <ListPreference
             android:defaultValue="@string/default_value"
-            android:entries="@array/screensharing_scope_keys"
-            android:entryValues="@array/screensharing_scope_values"
-            android:key="@string/pref_screensharing_scope"
-            android:title="@string/settings_screensharing_scope_title"
+            android:entries="@array/screen_sharing_mode_keys"
+            android:entryValues="@array/screen_sharing_mode_values"
+            android:key="@string/pref_screen_sharing_mode"
+            android:title="@string/settings_screen_sharing_mode_title"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 

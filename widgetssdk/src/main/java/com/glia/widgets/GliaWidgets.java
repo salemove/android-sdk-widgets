@@ -1,13 +1,12 @@
 package com.glia.widgets;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
-import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
+import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
@@ -20,26 +19,31 @@ import java.util.function.Consumer;
 public class GliaWidgets {
 
     private final static String TAG = "GliaWidgets";
+
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String UI_THEME = "ui_theme";
+
     /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String COMPANY_NAME = "company_name";
+
     /**
      * Use with {@link android.os.Bundle} to pass in the id of the queue you wish to enroll in
      * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String QUEUE_ID = "queue_id";
+
     /**
      * Use with {@link android.os.Bundle} to pass in a context url as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String CONTEXT_URL = "context_url";
+
     /**
      * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
      * use the chat head bubble as an overlay as a navigation argument when
@@ -59,18 +63,24 @@ public class GliaWidgets {
      * {@link MEDIA_TYPE_AUDIO} or {@link MEDIA_TYPE_VIDEO}.
      * If no parameter is passed then will default to {@link MEDIA_TYPE_AUDIO}
      */
-
     public static final String MEDIA_TYPE = "media_type";
+
     /**
      * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
      * {@link com.glia.widgets.call.CallActivity} to start an audio call media engagement.
      */
     public static final String MEDIA_TYPE_AUDIO = "media_type_audio";
+
     /**
      * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
      * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
      */
     public static final String MEDIA_TYPE_VIDEO = "media_type_video";
+
+    /**
+     * TODO add documentation
+     */
+    public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
 
     /**
      * Should be called when the application is starting in {@link Application}.onCreate()

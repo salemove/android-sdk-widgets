@@ -419,8 +419,6 @@ public class CallView extends ConstraintLayout {
                 post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
             } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
                 post(this::showScreenSharingDialog);
-            } else if (dialogsState instanceof DialogsState.EndScreenSharingDialog) {
-                post(this::showScreenSharingEndDialog);
             } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
                 post(this::showAllowNotificationsDialog);
             } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
@@ -568,21 +566,6 @@ public class CallView extends ConstraintLayout {
                     view -> screenSharingController.onScreenSharingAccepted(getContext()),
                     view -> screenSharingController.onScreenSharingDeclined()
             );
-    }
-
-    private void showScreenSharingEndDialog() {
-        if (alertDialog == null || !alertDialog.isShowing()) {
-            alertDialog = Dialogs.showScreenSharingDialog(
-                    this.getContext(),
-                    theme,
-                    resources.getString(R.string.glia_dialog_screen_sharing_end_title),
-                    resources.getString(R.string.glia_dialog_screen_sharing_end_message),
-                    R.string.glia_dialog_screen_sharing_end_cancel,
-                    R.string.glia_dialog_screen_sharing_end_end,
-                    view -> screenSharingController.onDismissEndScreenSharing(),
-                    view -> screenSharingController.onEndScreenSharing()
-            );
-        }
     }
 
     private void setButtonActivated(FloatingActionButton floatingActionButton,

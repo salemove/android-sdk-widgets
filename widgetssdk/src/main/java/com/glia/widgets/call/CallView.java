@@ -217,17 +217,10 @@ public class CallView extends ConstraintLayout {
             alertDialog.dismiss();
             alertDialog = null;
         }
-        if (dialogController != null) {
-            dialogController.removeCallback(dialogCallback);
-            dialogController = null;
-        }
-        if (serviceChatHeadController != null && isFinishing) {
-            serviceChatHeadController.onDestroy();
-        }
         onEndListener = null;
         onBackClickedListener = null;
         onNavigateToChatListener = null;
-        destroyControllers();
+        destroyControllers(isFinishing);
         callback = null;
     }
 
@@ -248,6 +241,9 @@ public class CallView extends ConstraintLayout {
         if (serviceChatHeadController != null) {
             serviceChatHeadController.onResume(this);
         }
+        if (dialogController != null) {
+            dialogController.addCallback(dialogCallback);
+        }
     }
 
     public void onPause() {
@@ -260,12 +256,19 @@ public class CallView extends ConstraintLayout {
         if (screenSharingController != null) {
             screenSharingController.removeViewCallback(screenSharingViewCallback);
         }
+        if (dialogController != null) {
+            dialogController.removeCallback(dialogCallback);
+        }
     }
 
-    private void destroyControllers() {
+    private void destroyControllers(boolean isFinishing) {
+        if (serviceChatHeadController != null && isFinishing) {
+            serviceChatHeadController.onDestroy();
+        }
         callController.setViewCallback(null);
         callController = null;
         screenSharingController = null;
+        dialogController = null;
     }
 
     private void setupControllers() {
@@ -427,7 +430,7 @@ public class CallView extends ConstraintLayout {
         };
         dialogController = Dependencies
                 .getControllerFactory()
-                .getDialogController(dialogCallback);
+                .getDialogController();
 
         screenSharingController = Dependencies
                 .getControllerFactory()

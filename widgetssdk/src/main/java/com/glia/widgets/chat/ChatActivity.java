@@ -79,7 +79,7 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        if (wasActivityFinishing) chatView.onResume();
+        chatView.onResume(wasActivityFinishing);
         super.onResume();
     }
 

@@ -183,8 +183,7 @@ public class ControllerFactory {
         }
     }
 
-    public DialogController getDialogController(DialogController.Callback callback) {
-        dialogController.addCallback(callback);
+    public DialogController getDialogController() {
         return dialogController;
     }
 

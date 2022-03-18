@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:focusable="true">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/type_indicator_view"

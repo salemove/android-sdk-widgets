@@ -13,6 +13,23 @@
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>
     <string name="glia_chat_file_download_failed_msg">Could not download the file. Please try again.</string>
 
+    <string name="glia_chat_in_queue_message_content_description">%1$s. \n An MSR will be with you shortly.</string>
+    <string name="glia_chat_operator_has_joined_content_description">Operator %1$s has joined the conversation</string>
+    <string name="glia_chat_send_content_description">Send message</string>
+    <string name="glia_chat_add_attachment_description">Add attachment</string>
+    <string name="glia_chat_visitor_message_content_description">Your message: %1$s</string>
+    <string name="glia_chat_visitor_message_delivered_content_description">Your message: %1$s \n Delivered</string>
+    <string name="glia_chat_operator_message_content_description">Operator\'s message: %1$s</string>
+    <string name="glia_chat_operator_name_message_content_description">Operator %1$s, Message: %2$s</string>
+    <string name="glia_chat_visitor_image_content_description">Your attached image</string>
+    <string name="glia_chat_visitor_image_delivered_content_description">Your attached image. \n Delivered</string>
+    <string name="glia_chat_operator_image_content_description">Operator\'s attached image</string>
+    <string name="glia_chat_visitor_file_content_description">Your attached file %1$s, size %2$s</string>
+    <string name="glia_chat_visitor_file_delivered_content_description">Your attached file %1$s, size %2$s. \n Delivered</string>
+    <string name="glia_chat_operator_file_content_description">Operator\'s attached file %1$s, size %2$s</string>
+    <string name="glia_chat_attachment_item_content_description">Attachment %1$s, size %2$s. %3$s</string>
+    <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
+
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
     <string name="glia_top_app_bar_chat_end">End</string>

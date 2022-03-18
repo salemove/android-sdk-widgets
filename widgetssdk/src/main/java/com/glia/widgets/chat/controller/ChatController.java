@@ -890,6 +890,7 @@ public class ChatController implements
                 currentChatItems.add(
                         new OperatorMessageItem(
                                 lastItemInView.getId(),
+                                lastItemInView.operatorName,
                                 lastItemInView.operatorProfileImgUrl,
                                 showChatHead,
                                 lastItemInView.content,
@@ -950,6 +951,7 @@ public class ChatController implements
             currentChatItems.add(
                     new OperatorMessageItem(
                             message.getId(),
+                            chatState.operatorName,
                             chatState.operatorProfileImgUrl,
                             false,
                             message.getContent(),
@@ -1056,6 +1058,7 @@ public class ChatController implements
             OperatorMessageItem choiceCardItemWithSelected =
                     new OperatorMessageItem(
                             id,
+                            choiceCardItem.operatorName,
                             choiceCardItem.operatorProfileImgUrl,
                             choiceCardItem.showChatHead,
                             choiceCardItem.content,

@@ -3,6 +3,9 @@ package com.glia.widgets.chat.adapter.holder.imageattachment;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -37,6 +40,26 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
         super.bind(item.attachmentFile);
         itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.attachmentFile));
         updateOperatorStatus(item);
+
+        setAccessibilityLabels();
+    }
+
+    private void setAccessibilityLabels() {
+        itemView.setContentDescription(itemView.getResources().getString(
+                R.string.glia_chat_operator_image_content_description));
+        ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+
+                String actionLabel = host.getResources().getString(R.string.glia_chat_attachment_open_button_label);
+
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
+                        = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
+                info.addAction(actionClick);
+            }
+        });
     }
 
     private void updateOperatorStatus(OperatorAttachmentItem item) {

@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/glia_medium">
+    android:layout_marginTop="@dimen/glia_medium"
+    android:focusable="true">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"
@@ -28,6 +29,7 @@
         android:textAppearance="?attr/textAppearanceBody1"
         android:textColor="?attr/gliaBaseLightColor"
         android:textIsSelectable="true"
+        android:importantForAccessibility="no"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="1"
@@ -43,6 +45,7 @@
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="?attr/gliaBaseNormalColor"
         android:visibility="gone"
+        android:importantForAccessibility="no"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintHorizontal_bias="1"

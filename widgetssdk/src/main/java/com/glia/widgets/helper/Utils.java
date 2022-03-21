@@ -189,6 +189,14 @@ public class Utils {
                         R.attr.gliaSendMessageButtonTintColor
                 )
         );
+        defaultThemeBuilder.setGliaChatBackgroundColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_gliaChatBackgroundColor,
+                        R.attr.gliaChatBackgroundColor
+                )
+        );
         defaultThemeBuilder.setGliaChatHeaderTitleTintColor(
                 getTypedArrayIntegerValue(
                         typedArray,
@@ -487,6 +495,8 @@ public class Utils {
                 newTheme.getSystemAgentBubbleColor() : oldTheme.getSystemAgentBubbleColor();
         Integer chatSendMessageButtonTintColor = newTheme.getSendMessageButtonTintColor() != null ?
                 newTheme.getSendMessageButtonTintColor() : oldTheme.getSendMessageButtonTintColor();
+        Integer gliaChatBackgroundColorRes = newTheme.getGliaChatBackgroundColor() != null ?
+                newTheme.getGliaChatBackgroundColor() : oldTheme.getGliaChatBackgroundColor();
         Integer chatHeaderTitleColor = newTheme.getGliaChatHeaderTitleTintColor() != null ?
                 newTheme.getGliaChatHeaderTitleTintColor() : oldTheme.getGliaChatHeaderTitleTintColor();
         Integer chatHeaderHomeButtonTintColor = newTheme.getGliaChatHeaderHomeButtonTintColor() != null ?
@@ -606,7 +616,6 @@ public class Utils {
         builder.setBrandPrimaryColor(brandPriamryColorRes);
         builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
         builder.setSendMessageButtonTintColor(chatSendMessageButtonTintColor);
-        builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleColor);
         builder.setGliaChatHeaderHomeButtonTintColor(chatHeaderHomeButtonTintColor);
         builder.setGliaChatHeaderExitQueueButtonTintColor(chatHeaderExitQueueButtonTintColor);
         builder.setChatStartingHeadingTextColor(chatStartingHeadingTextColorRes);
@@ -618,6 +627,8 @@ public class Utils {
         builder.setVisitorMessageBackgroundColor(visitorMessageBackgroundColorRes);
         builder.setVisitorMessageTextColor(visitorMessageTextColorRes);
         builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColorRes);
+        builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleColor);
+        builder.setGliaChatBackgroundColor(gliaChatBackgroundColorRes);
         builder.setOperatorMessageTextColor(operatorMessageTextColorRes);
         builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColorRes);
         builder.setBotActionButtonTextColor(botActionButtonTextColorRes);

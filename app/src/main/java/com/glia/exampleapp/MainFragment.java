@@ -33,12 +33,8 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         NavController navController = NavHostFragment.findNavController(this);
-        view.findViewById(R.id.settings_button).setOnClickListener(view1 -> navController.navigate(R.id.settings));
-        /* todo https://salemove.atlassian.net/browse/MUIC-362
-        view.findViewById(R.id.integrator_chat).setOnClickListener(view1 -> {
-            navController.navigate(R.id.chat);
-        });
-         */
+        view.findViewById(R.id.settings_button).setOnClickListener(view1 ->
+                navController.navigate(R.id.settings));
         view.findViewById(R.id.chat_activity_button).setOnClickListener(v ->
                 navigateToChat());
         view.findViewById(R.id.audio_call_button).setOnClickListener(v ->

@@ -212,7 +212,7 @@ class Utils {
         String delius = resources.getString(R.string.font_delius_value);
         String expletus = resources.getString(R.string.font_expletus_value);
         String tangerine = resources.getString(R.string.font_tangerine_value);
-        String defaultPrefValue = resources.getString(R.string.settings_value_default); // todo Wrong string resource is used. should be R.string.default_value
+        String defaultPrefValue = resources.getString(R.string.settings_value_default);
 
         String typeFaceValue = sharedPreferences.getString(resources.getString(R.string.pref_font_family), defaultPrefValue);
 

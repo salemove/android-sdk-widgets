@@ -93,7 +93,8 @@ public class ControllerFactory {
                     useCaseFactory.createDownloadFileUseCase(),
                     useCaseFactory.createIsEnableChatEditTextUseCase(),
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createSiteInfoUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

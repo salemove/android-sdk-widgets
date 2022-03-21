@@ -813,7 +813,7 @@ public class ChatView extends ConstraintLayout implements
         chatEditText.setHintTextColor(ContextCompat.getColor(
                 this.getContext(), this.theme.getBaseNormalColor()));
         setBackgroundColor(
-                ContextCompat.getColor(this.getContext(), this.theme.getBaseLightColor()));
+                ContextCompat.getColor(this.getContext(), this.theme.getGliaChatBackgroundColor()));
         // fonts
         if (this.theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(

@@ -30,6 +30,7 @@
 
         <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
 
+        <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>
         <item name="chatHeaderTitleTintColor">?attr/gliaChatHeaderTitleTintColor</item>
         <item name="chatHeaderHomeButtonTintColor">?attr/gliaChatHeaderHomeButtonTintColor</item>
         <item name="chatHeaderExitQueueButtonTintColor">
@@ -106,6 +107,7 @@
         <item name="gliaIconCallSpeakerOff">@drawable/ic_baseline_volume_off</item>
         <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
+        <item name="gliaChatBackgroundColor">@color/glia_chat_background_color</item>
 
         <item name="gliaSendMessageButtonTintColor">?attr/gliaBrandPrimaryColor</item>
 

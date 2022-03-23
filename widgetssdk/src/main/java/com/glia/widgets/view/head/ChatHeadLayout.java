@@ -102,12 +102,12 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
 
     @Override
     public void show() {
-        this.setVisibility(VISIBLE);
+        post(() -> setVisibility(VISIBLE));
     }
 
     @Override
     public void hide() {
-        this.setVisibility(GONE);
+        post(() -> setVisibility(GONE));
     }
 
     @Override
@@ -161,6 +161,7 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     }
 
     private void init(@Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        setVisibility(GONE);
         initConfigurations();
         initViews();
         setupViewActions();

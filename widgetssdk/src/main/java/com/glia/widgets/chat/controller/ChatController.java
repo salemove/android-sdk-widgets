@@ -257,6 +257,7 @@ public class ChatController implements
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
                 .setIsAttachmentButtonNeeded(false)
+                .setIsAttachmentAllowed(true)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
                 .setPendingNavigationType(null)
@@ -1278,11 +1279,12 @@ public class ChatController implements
     private void fileDownloadSuccess(AttachmentFile attachmentFile) {
         if (viewCallback != null) viewCallback.fileDownloadSuccess(attachmentFile);
     }
+
     private void updateAllowFileSendState() {
         siteInfoUseCase.execute((siteInfo, e) -> onSiteInfoReceived(siteInfo));
     }
 
     private void onSiteInfoReceived(@Nullable SiteInfo siteInfo) {
-        emitViewState(chatState.allowSendAttachmentStateChanged(siteInfo != null && siteInfo.getAllowedFileSenders().isVisitorAllowed()));
+        emitViewState(chatState.allowSendAttachmentStateChanged(siteInfo == null || siteInfo.getAllowedFileSenders().isVisitorAllowed()));
     }
 }

@@ -539,12 +539,7 @@ public class ChatView extends ConstraintLayout implements
 
     private void updateAttachmentButton(ChatState chatState) {
         addAttachmentButton.setEnabled(chatState.isAttachmentButtonEnabled);
-
-        if (chatState.isAttachmentButtonVisible) {
-            addAttachmentButton.setVisibility(VISIBLE);
-        } else {
-            addAttachmentButton.setVisibility(GONE);
-        }
+        addAttachmentButton.setVisibility(chatState.isAttachmentButtonVisible() ? VISIBLE : GONE);
     }
 
     private ChatItem updateIsFileDownloaded(ChatItem item) {

@@ -7,6 +7,7 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
@@ -63,6 +64,8 @@ public class UseCaseFactory {
     private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
+    private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
+    private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final RepositoryFactory repositoryFactory;
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
@@ -153,9 +156,6 @@ public class UseCaseFactory {
     public GliaLoadHistoryUseCase createGliaLoadHistoryUseCase() {
         return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository());
     }
-
-    private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
-    private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
 
     public GliaQueueForChatEngagementUseCase createQueueForChatEngagementUseCase() {
         if (gliaQueueForChatEngagementUseCase == null) {
@@ -365,5 +365,9 @@ public class UseCaseFactory {
 
     public UnsubscribeFromQueueingStateChangeUseCase createUnSubscribeToQueueingStateChangeUseCase() {
         return new UnsubscribeFromQueueingStateChangeUseCase(repositoryFactory.getGliaQueueRepository());
+    }
+
+    public SiteInfoUseCase createSiteInfoUseCase() {
+        return new SiteInfoUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 }

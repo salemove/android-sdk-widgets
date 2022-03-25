@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller;
 
 import android.net.Uri;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
@@ -18,6 +19,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.chat.ChatViewCallback;
@@ -29,6 +31,7 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
@@ -189,6 +192,7 @@ public class ChatController implements
     private final IsEnableChatEditTextUseCase isEnableChatEditTextUseCase;
     private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
     private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
+    private final SiteInfoUseCase siteInfoUseCase;
 
     private Disposable disposable = null;
 
@@ -229,7 +233,8 @@ public class ChatController implements
             DownloadFileUseCase downloadFileUseCase,
             IsEnableChatEditTextUseCase isEnableChatEditTextUseCase,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
-            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
+            SiteInfoUseCase siteInfoUseCase
     ) {
         Logger.d(TAG, "constructor");
 
@@ -251,7 +256,8 @@ public class ChatController implements
                 .setChatItems(new ArrayList<>())
                 .setLastTypedText("")
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
-                .setIsAttachmentButtonVisible(false)
+                .setIsAttachmentButtonNeeded(false)
+                .setIsAttachmentAllowed(true)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
                 .setPendingNavigationType(null)
@@ -292,6 +298,7 @@ public class ChatController implements
         this.isEnableChatEditTextUseCase = isEnableChatEditTextUseCase;
         this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
         this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
+        this.siteInfoUseCase = siteInfoUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -340,6 +347,8 @@ public class ChatController implements
         if (getIsQueueingOngoingUseCase.execute()) {
             queueForEngagementOngoing();
         }
+
+        updateAllowFileSendState();
     }
 
     private void queueForEngagement() {
@@ -1269,5 +1278,13 @@ public class ChatController implements
 
     private void fileDownloadSuccess(AttachmentFile attachmentFile) {
         if (viewCallback != null) viewCallback.fileDownloadSuccess(attachmentFile);
+    }
+
+    private void updateAllowFileSendState() {
+        siteInfoUseCase.execute((siteInfo, e) -> onSiteInfoReceived(siteInfo));
+    }
+
+    private void onSiteInfoReceived(@Nullable SiteInfo siteInfo) {
+        emitViewState(chatState.allowSendAttachmentStateChanged(siteInfo == null || siteInfo.getAllowedFileSenders().isVisitorAllowed()));
     }
 }

@@ -19,26 +19,6 @@ public class GliaSdkConfiguration {
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
 
-    public static GliaSdkConfiguration fromIntent(Intent intent) {
-        String companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
-        String queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-        UiTheme uiTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
-        String contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
-        boolean useOverLay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
-        ScreenSharing.Mode screenSharingMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
-                ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
-                : DEFAULT_SCREEN_SHARING_MODE;
-
-        return new GliaSdkConfiguration.Builder()
-                .companyName(companyName)
-                .queueId(queueId)
-                .runTimeTheme(uiTheme)
-                .contextUrl(contextUrl)
-                .useOverlay(useOverLay)
-                .screenSharingMode(screenSharingMode)
-                .build();
-    }
-
     public String getCompanyName() {
         return this.companyName;
     }
@@ -63,7 +43,7 @@ public class GliaSdkConfiguration {
         return screenSharingMode;
     }
 
-    public static class Builder   {
+    public static class Builder {
         private String companyName;
         private String queueId;
         private String contextUrl;
@@ -98,6 +78,18 @@ public class GliaSdkConfiguration {
 
         public Builder screenSharingMode(ScreenSharing.Mode screenSharingMode) {
             this.screenSharingMode = screenSharingMode;
+            return this;
+        }
+
+        public Builder intent(Intent intent) {
+            this.companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
+            this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
+            this.runTimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+            this.contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
+            this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
+            this.screenSharingMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
+                    ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
+                    : DEFAULT_SCREEN_SHARING_MODE;
             return this;
         }
 

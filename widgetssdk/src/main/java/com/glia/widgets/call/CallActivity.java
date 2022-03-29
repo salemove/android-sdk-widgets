@@ -53,7 +53,7 @@ public class CallActivity extends AppCompatActivity {
             return;
         }
 
-        configuration = GliaSdkConfiguration.fromIntent(getIntent());
+        configuration = createConfiguration(getIntent());
         callView.setConfiguration(configuration);
         callView.setTheme(configuration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
@@ -107,6 +107,12 @@ public class CallActivity extends AppCompatActivity {
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Integer[] convertedGrantResults = IntStream.of(grantResults).boxed().toArray(Integer[]::new);
         permissionSubject.onNext(new Pair<>(requestCode, convertedGrantResults));
+    }
+
+    private GliaSdkConfiguration createConfiguration(Intent intent) {
+        return new GliaSdkConfiguration.Builder()
+                .intent(intent)
+                .build();
     }
 
     private void startCallWithPermissions() {

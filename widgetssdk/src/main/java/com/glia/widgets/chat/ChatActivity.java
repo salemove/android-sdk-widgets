@@ -39,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
         ChatHeadLayout chatHeadLayout = findViewById(R.id.chat_head_layout);
         chatHeadLayout.setIsChatView(true);
 
-        configuration = GliaSdkConfiguration.fromIntent(getIntent());
+        configuration = createConfiguration(getIntent());
         chatHeadLayout.setConfiguration(configuration);
         chatView.setConfiguration(configuration);
         chatView.setTheme(configuration.getRunTimeTheme());
@@ -105,6 +105,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
         chatView.onRequestPermissionsResult(requestCode, grantResults);
+    }
+
+    private GliaSdkConfiguration createConfiguration(Intent intent) {
+        return new GliaSdkConfiguration.Builder()
+                .intent(intent)
+                .build();
     }
 
     private void navigateToCall(UiTheme theme, String mediaType) {

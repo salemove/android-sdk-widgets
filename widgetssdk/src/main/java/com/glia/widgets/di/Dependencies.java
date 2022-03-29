@@ -3,18 +3,17 @@ package com.glia.widgets.di;
 import android.app.Application;
 
 import androidx.annotation.VisibleForTesting;
-
 import androidx.lifecycle.Lifecycle;
 
+import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
-import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
-import com.glia.widgets.helper.Logger;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
+import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
-import com.glia.widgets.core.chathead.ChatHeadManager;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class Dependencies {
@@ -22,13 +21,13 @@ public class Dependencies {
     private final static String TAG = "Dependencies";
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
-    private static GliaSdkConfigurationManager sdkConfigurationManager;
+    private static GliaSdkConfigurationManager sdkConfigurationManager =
+            new GliaSdkConfigurationManager();
     private static UseCaseFactory useCaseFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
-        sdkConfigurationManager = new GliaSdkConfigurationManager();
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
         useCaseFactory = new UseCaseFactory(
@@ -40,7 +39,11 @@ public class Dependencies {
                 new ChatHeadManager(application)
         );
 
-        controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
+        controllerFactory = new ControllerFactory(
+                repositoryFactory,
+                useCaseFactory,
+                sdkConfigurationManager
+        );
         initApplicationLifecycleObserver(
                 new ApplicationLifecycleManager(),
                 controllerFactory.getChatHeadController()
@@ -90,11 +93,6 @@ public class Dependencies {
     @VisibleForTesting
     public static void setSdkConfigurationManager(GliaSdkConfigurationManager sdkConfigurationManager) {
         Dependencies.sdkConfigurationManager = sdkConfigurationManager;
-    }
-
-    @VisibleForTesting
-    public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
-        Dependencies.useCaseFactory = useCaseFactory;
     }
 
     private static void initApplicationLifecycleObserver(

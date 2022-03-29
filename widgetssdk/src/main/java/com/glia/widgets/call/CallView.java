@@ -34,6 +34,7 @@ import androidx.transition.TransitionSet;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -189,8 +190,10 @@ public class CallView extends ConstraintLayout {
                           String queueId,
                           String contextUrl,
                           boolean useOverlays,
+                          ScreenSharing.Mode screenSharingMode,
                           Engagement.MediaType mediaType) {
         Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
+        Dependencies.getSdkConfigurationManager().setScreenSharingMode(screenSharingMode);
         if (callController != null) {
             callController.initCall(
                     companyName,

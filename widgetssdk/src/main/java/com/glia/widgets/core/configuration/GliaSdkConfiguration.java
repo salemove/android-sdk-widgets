@@ -1,24 +1,23 @@
 package com.glia.widgets.core.configuration;
 
+import android.content.Intent;
+
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 
 public class GliaSdkConfiguration {
+
+    private static final boolean DEFAULT_USE_OVERLAY = true;
+    private static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE =
+            ScreenSharing.Mode.UNBOUNDED;
+
     private final String companyName;
     private final String queueId;
     private final String contextUrl;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
-
-    private GliaSdkConfiguration(Builder builder) {
-        this.companyName = builder.companyName;
-        this.queueId = builder.queueId;
-        this.contextUrl = builder.contextUrl;
-        this.runTimeTheme = builder.runTimeTheme;
-        this.useOverlay = builder.useOverlay;
-        this.screenSharingMode = builder.screenSharingMode;
-    }
 
     public String getCompanyName() {
         return this.companyName;
@@ -82,8 +81,29 @@ public class GliaSdkConfiguration {
             return this;
         }
 
+        public Builder intent(Intent intent) {
+            this.companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
+            this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
+            this.runTimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+            this.contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
+            this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
+            this.screenSharingMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
+                    ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
+                    : DEFAULT_SCREEN_SHARING_MODE;
+            return this;
+        }
+
         public GliaSdkConfiguration build() {
             return new GliaSdkConfiguration(this);
         }
+    }
+
+    private GliaSdkConfiguration(Builder builder) {
+        this.companyName = builder.companyName;
+        this.queueId = builder.queueId;
+        this.contextUrl = builder.contextUrl;
+        this.runTimeTheme = builder.runTimeTheme;
+        this.useOverlay = builder.useOverlay;
+        this.screenSharingMode = builder.screenSharingMode;
     }
 }

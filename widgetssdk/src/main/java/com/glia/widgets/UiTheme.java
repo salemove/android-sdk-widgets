@@ -209,6 +209,12 @@ public class UiTheme implements Parcelable {
     final Integer iconPlaceholder;
 
     /**
+     * The icon resId used when visitor is put on hold by the operator
+     */
+    private @DrawableRes
+    final Integer iconOnHold;
+
+    /**
      * Connecting Operator Status Layout Heading Text Color
      */
     private @ColorRes
@@ -284,6 +290,7 @@ public class UiTheme implements Parcelable {
         this.iconCallSpeakerOff = builder.iconCallSpeakerOff;
         this.iconCallMinimize = builder.iconCallMinimize;
         this.iconPlaceholder = builder.iconPlaceholder;
+        this.iconOnHold = builder.iconOnHold;
         this.whiteLabel = builder.whiteLabel;
         this.gliaAlertDialogButtonUseVerticalAlignment = builder.gliaAlertDialogButtonUseVerticalAlignment;
         this.headerEndButtonConfiguration = builder.headerEndButtonConfiguration;
@@ -496,6 +503,12 @@ public class UiTheme implements Parcelable {
         Integer iconPlaceholder;
 
         /**
+         * The icon resId used when visitor is put on hold by operator
+         */
+        private @DrawableRes
+        Integer iconOnHold;
+
+        /**
          * Connecting Operator Status Layout Heading Text Color
          */
         private @ColorRes
@@ -683,6 +696,10 @@ public class UiTheme implements Parcelable {
             this.iconPlaceholder = iconPlaceholder;
         }
 
+        public void setIconOnHold(@DrawableRes Integer iconOnHold) {
+            this.iconOnHold = iconOnHold;
+        }
+
         public void setWhiteLabel(Boolean whiteLabel) {
             this.whiteLabel = whiteLabel;
         }
@@ -786,6 +803,7 @@ public class UiTheme implements Parcelable {
             this.iconCallSpeakerOff = theme.iconCallSpeakerOff;
             this.iconCallMinimize = theme.iconCallMinimize;
             this.iconPlaceholder = theme.iconPlaceholder;
+            this.iconOnHold = theme.iconOnHold;
             this.whiteLabel = theme.whiteLabel;
             this.headerEndButtonConfiguration = theme.headerEndButtonConfiguration;
             this.positiveButtonConfiguration = theme.positiveButtonConfiguration;
@@ -1002,6 +1020,11 @@ public class UiTheme implements Parcelable {
             iconPlaceholder = in.readInt();
         }
         if (in.readByte() == 0) {
+            iconOnHold = null;
+        } else {
+            iconOnHold = in.readInt();
+        }
+        if (in.readByte() == 0) {
             chatStartingHeadingTextColor = null;
         } else {
             chatStartingHeadingTextColor = in.readInt();
@@ -1096,12 +1119,6 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(operatorMessageBackgroundColor);
         }
-        if (gliaChatBackgroundColor == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(gliaChatBackgroundColor);
-        }
         if (operatorMessageTextColor == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -1137,6 +1154,12 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(sendMessageButtonTintColor);
+        }
+        if (gliaChatBackgroundColor == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(gliaChatBackgroundColor);
         }
         if (gliaChatHeaderTitleTintColor == null) {
             dest.writeByte((byte) 0);
@@ -1263,6 +1286,12 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(iconPlaceholder);
+        }
+        if (iconOnHold == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(iconOnHold);
         }
         if (chatStartingHeadingTextColor == null) {
             dest.writeByte((byte) 0);
@@ -1469,6 +1498,10 @@ public class UiTheme implements Parcelable {
 
     public Integer getIconPlaceholder() {
         return iconPlaceholder;
+    }
+
+    public Integer getIconOnHold() {
+        return iconOnHold;
     }
 
     public Boolean getWhiteLabel() {

@@ -11,6 +11,9 @@ public class ChatHeadConfiguration implements Parcelable {
     private final Integer badgeTextColor;
     private final Integer backgroundColorRes;
 
+    private final Integer onHoldIcon;
+    private final Integer onHoldIconTintList;
+
 
     private ChatHeadConfiguration(
             Builder builder
@@ -21,6 +24,8 @@ public class ChatHeadConfiguration implements Parcelable {
         badgeBackgroundTintList = builder.badgeBackgroundTintList;
         badgeTextColor = builder.badgeTextColor;
         backgroundColorRes = builder.backgroundColorRes;
+        onHoldIcon = builder.onHoldIcon;
+        onHoldIconTintList = builder.onHoldIconTintList;
     }
 
     protected ChatHeadConfiguration(Parcel in) {
@@ -53,6 +58,16 @@ public class ChatHeadConfiguration implements Parcelable {
             backgroundColorRes = null;
         } else {
             backgroundColorRes = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            onHoldIcon = null;
+        } else {
+            onHoldIcon = in.readInt();
+        }
+        if (in.readByte() == 0) {
+            onHoldIconTintList = null;
+        } else {
+            onHoldIconTintList = in.readInt();
         }
     }
 
@@ -93,6 +108,18 @@ public class ChatHeadConfiguration implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(backgroundColorRes);
+        }
+        if (onHoldIcon == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(onHoldIcon);
+        }
+        if (onHoldIconTintList == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(onHoldIconTintList);
         }
     }
 
@@ -137,6 +164,14 @@ public class ChatHeadConfiguration implements Parcelable {
         return backgroundColorRes;
     }
 
+    public Integer getOnHoldIcon() {
+        return onHoldIcon;
+    }
+
+    public Integer getOnHoldIconTintList() {
+        return onHoldIconTintList;
+    }
+
     public static class Builder {
         private Integer operatorPlaceholderBackgroundColor;
         private Integer operatorPlaceholderIcon;
@@ -144,6 +179,8 @@ public class ChatHeadConfiguration implements Parcelable {
         private Integer badgeBackgroundTintList;
         private Integer badgeTextColor;
         private Integer backgroundColorRes;
+        private Integer onHoldIcon;
+        private Integer onHoldIconTintList;
 
         public Builder() {
         }
@@ -155,6 +192,8 @@ public class ChatHeadConfiguration implements Parcelable {
             badgeBackgroundTintList = buildTime.badgeBackgroundTintList;
             badgeTextColor = buildTime.badgeTextColor;
             backgroundColorRes = buildTime.backgroundColorRes;
+            onHoldIcon = buildTime.onHoldIcon;
+            onHoldIconTintList = buildTime.onHoldIconTintList;
         }
 
         public Builder operatorPlaceholderBackgroundColor(Integer operatorPlaceholderBackgroundColor) {
@@ -184,6 +223,16 @@ public class ChatHeadConfiguration implements Parcelable {
 
         public Builder backgroundColorRes(Integer backgroundColorRes) {
             this.backgroundColorRes = backgroundColorRes;
+            return this;
+        }
+
+        public Builder onHoldIcon(Integer onHoldIcon) {
+            this.onHoldIcon = onHoldIcon;
+            return this;
+        }
+
+        public Builder onHoldIconTintList(Integer onHoldIconTintList) {
+            this.onHoldIconTintList = onHoldIconTintList;
             return this;
         }
 

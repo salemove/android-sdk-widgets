@@ -54,6 +54,9 @@
         <attr name="iconCallMinimize" format="reference" />
         <!-- The icon resId used in a chat head if an operator's profile image is absent -->
         <attr name="iconPlaceholder" format="reference" />
+        <!-- The icon resId used when visitor is put on hold by operator -->
+        <attr name="iconOnHold" format="reference" />
+
         <!-- Visitor message background color -->
         <attr name="visitorMessageBackgroundColor" format="reference" />
         <!-- Visitor message text color -->
@@ -140,6 +143,8 @@
     <attr name="gliaIconCallMinimize" format="reference" />
     <!-- The icon resId used in a chat head if an operator's profile image is absent -->
     <attr name="gliaIconPlaceholder" format="reference" />
+    <!-- The icon resId used in views to indicate operator put visitor on hold -->
+    <attr name="gliaIconOnHold" format="reference" />
 
     <!-- Header colors -->
     <attr name="gliaChatHeaderTitleTintColor" format="reference" />

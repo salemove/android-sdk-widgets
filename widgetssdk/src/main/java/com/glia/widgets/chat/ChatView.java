@@ -788,7 +788,7 @@ public class ChatView extends ConstraintLayout implements
                         resources.getDimension(R.dimen.glia_chat_new_messages_bottom_edge_radius)
                 ))
                 .build();
-        newMessagesOperatorStatusView.isRippleAnimationShowing(false);
+        newMessagesOperatorStatusView.setShowRippleAnimation(false);
         newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
         newMessagesCountBadgeView.setBackgroundTintList(
                 ContextCompat.getColorStateList(

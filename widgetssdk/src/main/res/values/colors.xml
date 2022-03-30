@@ -15,4 +15,5 @@
     <color name="glia_separator_gray">#5C3C3C43</color>
     <color name="glia_attachment_menu_bg">#F2F2F2</color>
     <color name="glia_chat_background_color">#FFFFFF</color>
+    <color name="glia_dark_transparent_bg">#99000000</color>
 </resources>

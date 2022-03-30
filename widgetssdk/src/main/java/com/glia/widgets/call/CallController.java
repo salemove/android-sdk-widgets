@@ -238,6 +238,9 @@ public class CallController implements
         }
     }
 
+    public void onPause() {
+    }
+
     private void initControllerCallbacks() {
         mediaUpgradeOfferRepositoryCallback = new MediaUpgradeOfferRepositoryCallback() {
             @Override

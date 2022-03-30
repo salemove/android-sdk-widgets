@@ -1,5 +1,7 @@
 package com.glia.widgets.call;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -9,7 +11,6 @@ import com.glia.androidsdk.comms.VisitorMediaState;
 import java.util.Objects;
 
 class CallState {
-
     public final boolean integratorCallStarted;
     public final boolean isVisible;
     public final int messagesNotSeen;
@@ -21,33 +22,55 @@ class CallState {
     public final String companyName;
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
+    public final boolean isOnHold;
 
-    private CallState(boolean integratorCallStarted,
-                      boolean isVisible,
-                      int messagesNotSeen,
-                      CallStatus callStatus,
-                      boolean landscapeLayoutControlsVisible,
-                      boolean isMuted,
-                      boolean hasVideo,
-                      String queueTicketId,
-                      String companyName,
-                      Engagement.MediaType requestedMediaType,
-                      boolean isSpeakerOn) {
-        this.integratorCallStarted = integratorCallStarted;
-        this.isVisible = isVisible;
-        this.messagesNotSeen = messagesNotSeen;
-        this.callStatus = callStatus;
-        this.landscapeLayoutControlsVisible = landscapeLayoutControlsVisible;
-        this.isMuted = isMuted;
-        this.hasVideo = hasVideo;
-        this.queueTicketId = queueTicketId;
-        this.companyName = companyName;
-        this.requestedMediaType = requestedMediaType;
-        this.isSpeakerOn = isSpeakerOn;
+    @NonNull
+    @Override
+    public String toString() {
+        return "CallState{" +
+                "integratorCallStarted=" + integratorCallStarted +
+                ", isVisible=" + isVisible +
+                ", messagesNotSeen=" + messagesNotSeen +
+                ", callStatus=" + callStatus +
+                ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
+                ", isMuted=" + isMuted +
+                ", hasVideo=" + hasVideo +
+                ", queueTicketId: " + queueTicketId +
+                ", companyName: " + companyName +
+                ", requestedMediaType: " + requestedMediaType +
+                ", isSpeakerOn: " + isSpeakerOn +
+                ", isOnHold: " + isOnHold +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CallState callState = (CallState) o;
+        return integratorCallStarted == callState.integratorCallStarted &&
+                isVisible == callState.isVisible &&
+                messagesNotSeen == callState.messagesNotSeen &&
+                landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
+                isMuted == callState.isMuted &&
+                hasVideo == callState.hasVideo &&
+                Objects.equals(callStatus, callState.callStatus) &&
+                Objects.equals(queueTicketId, callState.queueTicketId) &&
+                Objects.equals(companyName, callState.companyName) &&
+                Objects.equals(requestedMediaType, callState.requestedMediaType) &&
+                isSpeakerOn == callState.isSpeakerOn &&
+                isOnHold == callState.isOnHold;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
+                callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo, queueTicketId,
+                companyName, requestedMediaType, isSpeakerOn, isOnHold);
     }
 
     public boolean showOperatorStatusView() {
-        return isCallNotOngoing() || isCallOngoingAndOperatorIsConnecting() || isAudioCall();
+        return isCallNotOngoing() || isCallOngoingAndOperatorIsConnecting() || isAudioCall() || isOnHold;
     }
 
     public boolean isMediaEngagementStarted() {
@@ -74,11 +97,6 @@ class CallState {
         return callStatus instanceof CallStatus.StartedVideoCall && isVisitorVideoAvailable();
     }
 
-    private boolean isVisitorVideoAvailable() {
-        return callStatus.getVisitorMediaState() != null &&
-                callStatus.getVisitorMediaState().getVideo() != null;
-    }
-
     public boolean is2WayVideoCallAndVisitorVideoIsConnected() {
         if (is2WayVideoCall()) {
             Video visitorVideo = callStatus.getVisitorMediaState().getVideo();
@@ -86,11 +104,6 @@ class CallState {
         } else {
             return false;
         }
-    }
-
-    private boolean isOperatorVideoAvailable() {
-        return callStatus.getOperatorMediaState() != null &&
-                callStatus.getOperatorMediaState().getVideo() != null;
     }
 
     public boolean isVideoCallAndOperatorVideoIsConnected() {
@@ -148,7 +161,8 @@ class CallState {
 
     public CallState engagementStarted(
             String operatorName,
-            String operatorProfileImgUrl) {
+            String operatorProfileImgUrl
+    ) {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
@@ -205,7 +219,8 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setHasVideo(
-                        visitorMediaState.getVideo() != null &&
+                        visitorMediaState != null &&
+                                visitorMediaState.getVideo() != null &&
                                 visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING
                 )
                 .setIsMuted(false)
@@ -305,46 +320,45 @@ class CallState {
                 .createCallState();
     }
 
-    @Override
-    public String toString() {
-        return "CallState{" +
-                "integratorCallStarted=" + integratorCallStarted +
-                ", isVisible=" + isVisible +
-                ", messagesNotSeen=" + messagesNotSeen +
-                ", callStatus=" + callStatus +
-                ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
-                ", isMuted=" + isMuted +
-                ", hasVideo=" + hasVideo +
-                ", queueTicketId: " + queueTicketId +
-                ", companyName: " + companyName +
-                ", requestedMediaType: " + requestedMediaType +
-                ", isSpeakerOn: " + isSpeakerOn +
-                '}';
+    public CallState setOnHold(boolean isOnHold) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsOnHold(isOnHold)
+                .createCallState();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CallState callState = (CallState) o;
-        return integratorCallStarted == callState.integratorCallStarted &&
-                isVisible == callState.isVisible &&
-                messagesNotSeen == callState.messagesNotSeen &&
-                landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
-                isMuted == callState.isMuted &&
-                hasVideo == callState.hasVideo &&
-                Objects.equals(callStatus, callState.callStatus) &&
-                Objects.equals(queueTicketId, callState.queueTicketId) &&
-                Objects.equals(companyName, callState.companyName) &&
-                Objects.equals(requestedMediaType, callState.requestedMediaType) &&
-                isSpeakerOn == callState.isSpeakerOn;
+    public boolean isEnableMuteButton() {
+        return (isAudioCall() || is2WayVideoCall()) && !isOnHold;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
-                callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo, queueTicketId,
-                companyName, requestedMediaType, isSpeakerOn);
+    public boolean isEnableVideoButton() {
+        return is2WayVideoCall() && !isOnHold;
+    }
+
+    public boolean isEnableSpeakerButton() {
+        return isAudioCall() || is2WayVideoCall();
+    }
+
+    private boolean isVisitorVideoAvailable() {
+        return callStatus.getVisitorMediaState() != null &&
+                callStatus.getVisitorMediaState().getVideo() != null;
+    }
+
+    private boolean isOperatorVideoAvailable() {
+        return callStatus.getOperatorMediaState() != null &&
+                callStatus.getOperatorMediaState().getVideo() != null;
+    }
+
+    public boolean isShowCallTimerView() {
+        return isCallOngoingAndOperatorConnected() && !isOnHold;
+    }
+
+    public boolean showOperatorVideo() {
+        return isVideoCallAndOperatorVideoIsConnected() && !isOnHold;
+    }
+
+    public boolean showContinueBrowsingView() {
+        return isCallOngoingAndOperatorIsConnecting() || isCallNotOngoing() || isOnHold;
     }
 
     public static class Builder {
@@ -359,6 +373,7 @@ class CallState {
         private String companyName;
         private Engagement.MediaType requestedMediaType;
         private boolean isSpeakerOn;
+        private boolean isOnHold;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -415,6 +430,11 @@ class CallState {
             return this;
         }
 
+        public Builder setIsOnHold(boolean isOnHold) {
+            this.isOnHold = isOnHold;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -427,23 +447,27 @@ class CallState {
             companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
+            isOnHold = callState.isOnHold;
             return this;
         }
 
         public CallState createCallState() {
-            return new CallState(
-                    integratorCallStarted,
-                    isVisible,
-                    messagesNotSeen,
-                    callStatus,
-                    landscapeLayoutControlsVisible,
-                    isMuted,
-                    hasVideo,
-                    queueTicketId,
-                    companyName,
-                    requestedMediaType,
-                    isSpeakerOn
-            );
+            return new CallState(this);
         }
+    }
+
+    private CallState(Builder builder) {
+        this.integratorCallStarted = builder.integratorCallStarted;
+        this.isVisible = builder.isVisible;
+        this.messagesNotSeen = builder.messagesNotSeen;
+        this.callStatus = builder.callStatus;
+        this.landscapeLayoutControlsVisible = builder.landscapeLayoutControlsVisible;
+        this.isMuted = builder.isMuted;
+        this.hasVideo = builder.hasVideo;
+        this.queueTicketId = builder.queueTicketId;
+        this.companyName = builder.companyName;
+        this.requestedMediaType = builder.requestedMediaType;
+        this.isSpeakerOn = builder.isSpeakerOn;
+        this.isOnHold = builder.isOnHold;
     }
 }

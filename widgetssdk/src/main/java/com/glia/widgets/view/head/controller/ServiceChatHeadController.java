@@ -6,6 +6,7 @@ import androidx.core.util.Pair;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
+import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -14,6 +15,9 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
+import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
+import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
+import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
@@ -22,7 +26,7 @@ import com.glia.widgets.view.head.ChatHeadPosition;
 
 import java.util.Optional;
 
-public class ServiceChatHeadController implements ChatHeadContract.Controller {
+public class ServiceChatHeadController implements ChatHeadContract.Controller, VisitorMediaUpdatesListener {
     private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
     private final ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
@@ -31,6 +35,8 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
     private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
+    private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
+    private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final ChatHeadPosition chatHeadPosition;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
@@ -68,6 +74,7 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
     private State state = State.ENDED;
     private String operatorProfileImgUrl = null;
     private int unreadMessagesCount = 0;
+    private boolean isOnHold = false;
 
     private GliaSdkConfiguration sdkConfiguration;
     private UiTheme buildTimeTheme;
@@ -80,6 +87,8 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
             MessagesNotSeenHandler messagesNotSeenHandler,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
             UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
+            AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
+            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
             ChatHeadPosition chatHeadPosition
     ) {
         this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
@@ -90,6 +99,8 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
         this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
         this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
         this.chatHeadPosition = chatHeadPosition;
+        this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
+        this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
     }
 
     @Override
@@ -135,6 +146,16 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
         }
     }
 
+    @Override
+    public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
+    } // no-op
+
+    @Override
+    public void onHoldChanged(boolean isOnHold) {
+        this.isOnHold = isOnHold;
+        updateChatHeadView();
+    }
+
     public void setSdkConfiguration(GliaSdkConfiguration configuration) {
         this.sdkConfiguration = configuration;
     }
@@ -143,11 +164,13 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
         gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
         messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
         subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
+        addVisitorMediaStateListenerUseCase.execute(this);
     }
 
     public void updateChatHeadView() {
         if (chatHeadView != null) {
             updateChatHeadViewState();
+            updateOnHold();
             chatHeadView.showUnreadMessageCount(unreadMessagesCount);
             chatHeadView.updateConfiguration(buildTimeTheme, sdkConfiguration);
         }
@@ -195,6 +218,14 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
             case ENDED:
             default:
                 chatHeadView.showPlaceholder();
+        }
+    }
+
+    private void updateOnHold() {
+        if (isOnHold) {
+            chatHeadView.showOnHold();
+        } else {
+            chatHeadView.hideOnHold();
         }
     }
 

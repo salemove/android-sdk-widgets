@@ -29,6 +29,7 @@ import com.squareup.picasso.Picasso;
 public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.View {
     private ShapeableImageView operatorImageView;
     private ShapeableImageView operatorPlaceholderImageView;
+    private ShapeableImageView onHoldView;
     private TextView badgeView;
     private LottieAnimationView queueingAnimation;
     private GliaSdkConfiguration sdkConfiguration;
@@ -104,6 +105,16 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
     }
 
     @Override
+    public void showOnHold() {
+        post(() -> onHoldView.setVisibility(VISIBLE));
+    }
+
+    @Override
+    public void hideOnHold() {
+        post(() -> onHoldView.setVisibility(GONE));
+    }
+
+    @Override
     public void updateConfiguration(
             UiTheme buildTimeTheme,
             GliaSdkConfiguration sdkConfiguration
@@ -113,7 +124,7 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
                 buildTimeTheme,
                 sdkConfiguration
         );
-        updateView();
+        post(this::updateView);
     }
 
     @Override
@@ -146,6 +157,8 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
                 .badgeTextColor(buildTimeTheme.getBaseLightColor())
                 .badgeBackgroundTintList(buildTimeTheme.getBrandPrimaryColor())
                 .backgroundColorRes(buildTimeTheme.getBrandPrimaryColor())
+                .iconOnHold(buildTimeTheme.getIconOnHold())
+                .iconOnHoldTintList(buildTimeTheme.getBaseLightColor())
                 .build();
     }
 
@@ -178,6 +191,12 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
             if (runTimeConfiguration.getBackgroundColorRes() != null) {
                 builder.backgroundColorRes(runTimeConfiguration.getBackgroundColorRes());
             }
+            if (runTimeConfiguration.getIconOnHold() != null) {
+                builder.iconOnHold(runTimeConfiguration.getIconOnHold());
+            }
+            if (runTimeConfiguration.getIconOnHoldTintList() != null) {
+                builder.iconOnHoldTintList(runTimeConfiguration.getIconOnHoldTintList());
+            }
         }
         configuration = builder.build();
     }
@@ -188,6 +207,7 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
         operatorPlaceholderImageView = view.findViewById(R.id.placeholder_view);
         badgeView = view.findViewById(R.id.chat_bubble_badge);
         queueingAnimation = view.findViewById(R.id.queueing_lottie_animation);
+        onHoldView = view.findViewById(R.id.on_hold_icon);
     }
 
     private void updateOperatorPlaceholderImageView() {
@@ -214,6 +234,19 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
                                         .getOperatorPlaceholderIconTintList()
                         )
                 );
+    }
+
+    private void updateOnHoldImageView() {
+        onHoldView.setImageResource(
+                configuration.getIconOnHold()
+        );
+
+        onHoldView.setImageTintList(
+                ContextCompat.getColorStateList(
+                        this.getContext(),
+                        configuration.getIconOnHoldTintList()
+                )
+        );
     }
 
     private void updateBadgeView() {
@@ -252,6 +285,7 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
 
     private void updateView() {
         updateOperatorPlaceholderImageView();
+        updateOnHoldImageView();
         updateBadgeView();
         updateOperatorImageView();
         updateQueueingAnimationView();

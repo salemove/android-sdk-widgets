@@ -43,6 +43,8 @@ import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
+import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
+import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -191,7 +193,8 @@ public class UseCaseFactory {
         return new GliaOnEngagementUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
                 repositoryFactory.getGliaOperatorMediaRepository(),
-                repositoryFactory.getGliaQueueRepository()
+                repositoryFactory.getGliaQueueRepository(),
+                repositoryFactory.getGliaVisitorMediaRepository()
         );
     }
 
@@ -203,7 +206,8 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaFileAttachmentRepository(),
                 createOnEngagementUseCase(),
                 createRemoveCallNotificationUseCase(),
-                createRemoveScreenSharingNotificationUseCase()
+                createRemoveScreenSharingNotificationUseCase(),
+                repositoryFactory.getGliaVisitorMediaRepository()
         );
     }
 
@@ -361,5 +365,13 @@ public class UseCaseFactory {
 
     public SiteInfoUseCase createSiteInfoUseCase() {
         return new SiteInfoUseCase(repositoryFactory.getGliaEngagementRepository());
+    }
+
+    public AddVisitorMediaStateListenerUseCase createAddVisitorMediaStateListenerUseCase() {
+        return new AddVisitorMediaStateListenerUseCase(repositoryFactory.getGliaVisitorMediaRepository());
+    }
+
+    public RemoveVisitorMediaStateListenerUseCase createRemoveVisitorMediaStateListenerUseCase() {
+        return new RemoveVisitorMediaStateListenerUseCase(repositoryFactory.getGliaVisitorMediaRepository());
     }
 }

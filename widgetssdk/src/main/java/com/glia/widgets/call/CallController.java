@@ -29,6 +29,9 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
+import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
+import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
+import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.helper.Utils;
@@ -40,7 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 public class CallController implements
         GliaOnEngagementUseCase.Listener,
-        GliaOnEngagementEndUseCase.Listener {
+        GliaOnEngagementEndUseCase.Listener,
+        VisitorMediaUpdatesListener {
 
     private CallViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -74,6 +78,8 @@ public class CallController implements
     private final IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase;
     private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
     private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
+    private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
+    private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final DialogController dialogController;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
@@ -131,7 +137,9 @@ public class CallController implements
             HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
             IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase,
             SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
-            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
+            AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
+            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
@@ -168,6 +176,8 @@ public class CallController implements
         this.isShowEnableCallNotificationChannelDialogUseCase = isShowEnableCallNotificationChannelDialogUseCase;
         this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
         this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
+        this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
+        this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
     }
 
     public void initCall(String companyName,
@@ -239,6 +249,7 @@ public class CallController implements
     }
 
     public void onPause() {
+        removeVisitorMediaStateListenerUseCase.execute(this);
     }
 
     private void initControllerCallbacks() {
@@ -423,6 +434,7 @@ public class CallController implements
     public void onResume() {
         Logger.d(TAG, "onResume\n");
 
+        addVisitorMediaStateListenerUseCase.execute(this);
         if (hasCallNotificationChannelEnabledUseCase.execute()) {
             if (callState.isVideoCall() || callState.is2WayVideoCall()) {
                 showVideoCallNotificationUseCase.execute();
@@ -677,5 +689,17 @@ public class CallController implements
 
     public boolean shouldShowMediaEngagementView() {
         return shouldShowMediaEngagementViewUseCase.execute();
+    }
+
+    @Override
+    public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
+        Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState);
+        emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
+        Logger.d(TAG, "newVisitorMediaState- is2WayVideo:" + callState.is2WayVideoCall());
+    }
+
+    @Override
+    public void onHoldChanged(boolean isOnHold) {
+        emitViewState(callState.setOnHold(isOnHold));
     }
 }

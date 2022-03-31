@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static float pxFromDp(final Context context, final float dp) {
@@ -690,12 +690,6 @@ public class Utils {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1).toUpperCase());
-    }
-
-    public static boolean compareStringWithTrim(String a, String b) {
-        if (a == null && b == null) return true;
-        if (a == null || b == null) return false;
-        return a.trim().equals(b.trim());
     }
 
     public static String toString(AttachmentFile attachmentFile) {

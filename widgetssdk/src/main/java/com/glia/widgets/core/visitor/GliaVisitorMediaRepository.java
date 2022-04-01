@@ -4,11 +4,11 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.VisitorMediaState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
-    private final List<VisitorMediaUpdatesListener> visitorMediaUpdatesListeners = new ArrayList<>();
+    private final Set<VisitorMediaUpdatesListener> visitorMediaUpdatesListeners = new HashSet<>();
 
     private VisitorMediaState currentMediaState = null;
     private boolean isOnHold = false;

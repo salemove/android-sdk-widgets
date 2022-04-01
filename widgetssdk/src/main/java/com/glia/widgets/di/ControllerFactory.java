@@ -16,6 +16,8 @@ import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
 
 public class ControllerFactory {
 
@@ -232,6 +234,13 @@ public class ControllerFactory {
                 messagesNotSeenHandler,
                 useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
                 useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
+        );
+    }
+
+    public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {
+        return new FloatingVisitorVideoController(
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                 useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
         );

@@ -50,7 +50,7 @@ import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.header.AppBarView;
-import com.google.android.material.card.MaterialCardView;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoCoordinatorLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import com.google.android.material.transition.MaterialFade;
@@ -82,8 +82,6 @@ public class CallView extends ConstraintLayout {
     private TextView continueBrowsingView;
     private FrameLayout operatorVideoContainer;
     private VideoView operatorVideoView;
-    private MaterialCardView visitorVideoContainer;
-    private VideoView visitorVideoView;
     private TextView chatButtonLabel;
     private TextView videoButtonLabel;
     private TextView muteButtonLabel;
@@ -91,6 +89,7 @@ public class CallView extends ConstraintLayout {
     private TextView minimizeButtonLabel;
     private View buttonsLayoutBackground;
     private View buttonsLayout;
+    private FloatingVisitorVideoCoordinatorLayout floatingVisitorVideoCoordinatorLayout;
     private FloatingActionButton chatButton;
     private FloatingActionButton videoButton;
     private FloatingActionButton muteButton;
@@ -210,7 +209,7 @@ public class CallView extends ConstraintLayout {
 
     public void onDestroy(boolean isFinishing) {
         releaseOperatorVideoStream();
-        releaseVisitorVideoStream();
+        floatingVisitorVideoCoordinatorLayout.onDestroy();
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
@@ -223,13 +222,11 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onResume() {
+        floatingVisitorVideoCoordinatorLayout.onResume();
         if (callController != null) {
             callController.onResume();
             if (operatorVideoView != null) {
                 operatorVideoView.resumeRendering();
-            }
-            if (visitorVideoView != null) {
-                visitorVideoView.resumeRendering();
             }
         }
         if (screenSharingController != null) {
@@ -245,11 +242,9 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onPause() {
+        floatingVisitorVideoCoordinatorLayout.onPause();
         if (operatorVideoView != null) {
             operatorVideoView.pauseRendering();
-        }
-        if (visitorVideoView != null) {
-            visitorVideoView.pauseRendering();
         }
         if (screenSharingController != null) {
             screenSharingController.removeViewCallback(screenSharingViewCallback);
@@ -349,7 +344,6 @@ public class CallView extends ConstraintLayout {
                     handleContinueBrowsingView(callState);
                     handleOperatorStatusViewState(callState);
                     handleOperatorVideoState(callState);
-                    handleVisitorVideoState(callState);
                     handleControlsVisibility(callState);
                     onIsSpeakerOnStateChanged(callState.isSpeakerOn);
                     if (callState.isVisible) {
@@ -479,16 +473,6 @@ public class CallView extends ConstraintLayout {
             operatorStatusView.showProfileImage(state.callStatus.getOperatorProfileImageUrl());
         } else {
             operatorStatusView.showPlaceHolderWithIconPadding();
-        }
-    }
-
-    private void handleVisitorVideoState(CallState state) {
-        if (state.is2WayVideoCallAndVisitorVideoIsConnected() && visitorVideoContainer.getVisibility() == GONE) {
-            visitorVideoContainer.setVisibility(VISIBLE);
-            showVisitorVideo(state.callStatus.getVisitorMediaState());
-        } else if (!state.is2WayVideoCall() && visitorVideoContainer.getVisibility() == VISIBLE) {
-            visitorVideoContainer.setVisibility(GONE);
-            hideVisitorVideo();
         }
     }
 
@@ -741,7 +725,6 @@ public class CallView extends ConstraintLayout {
         connectingView = findViewById(R.id.connecting_view);
         continueBrowsingView = findViewById(R.id.continue_browsing_view);
         operatorVideoContainer = findViewById(R.id.operator_video_container);
-        visitorVideoContainer = findViewById(R.id.visitor_video_container);
         chatButtonLabel = findViewById(R.id.chat_button_label);
         videoButtonLabel = findViewById(R.id.video_button_label);
         chatButtonBadgeView = findViewById(R.id.chat_button_badge);
@@ -757,6 +740,9 @@ public class CallView extends ConstraintLayout {
         buttonsLayoutBackground = findViewById(R.id.buttons_layout_bg);
         buttonsLayout = findViewById(R.id.buttons_layout);
         onHoldTextView = findViewById(R.id.on_hold_text);
+
+        floatingVisitorVideoCoordinatorLayout = findViewById(R.id.floating_visitor_video);
+        floatingVisitorVideoCoordinatorLayout.setActivity(Utils.getActivity(getContext()));
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -799,7 +785,8 @@ public class CallView extends ConstraintLayout {
         setVisibility(INVISIBLE);
         Activity activity = Utils.getActivity(this.getContext());
         hideOperatorVideo();
-        hideVisitorVideo();
+        floatingVisitorVideoCoordinatorLayout.setVisibility(GONE);
+        floatingVisitorVideoCoordinatorLayout.hide();
         if (defaultStatusbarColor != null && activity != null) {
             activity.getWindow().setStatusBarColor(defaultStatusbarColor);
             defaultStatusbarColor = null;
@@ -1020,33 +1007,11 @@ public class CallView extends ConstraintLayout {
         if (operatorMediaState != null && operatorMediaState.getVideo() != null) {
             Logger.d(TAG, "Starting video operator");
             operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
+            operatorVideoView.setZ(10);
+            operatorVideoView.setZOrderMediaOverlay(true);
             operatorVideoContainer.removeAllViews();
             operatorVideoContainer.addView(operatorVideoView);
             operatorVideoContainer.invalidate();
-        }
-    }
-
-    private void showVisitorVideo(MediaState visitorMediaState) {
-        releaseVisitorVideoStream();
-        if (visitorMediaState != null && visitorMediaState.getVideo() != null) {
-            Logger.d(TAG, "Starting video visitor");
-            visitorVideoView = visitorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
-            visitorVideoContainer.removeAllViews();
-            visitorVideoContainer.addView(visitorVideoView);
-            visitorVideoContainer.invalidate();
-        }
-    }
-
-    private void hideVisitorVideo() {
-        visitorVideoContainer.removeAllViews();
-        visitorVideoContainer.invalidate();
-        releaseVisitorVideoStream();
-    }
-
-    private void releaseVisitorVideoStream() {
-        if (visitorVideoView != null) {
-            visitorVideoView.release();
-            visitorVideoView = null;
         }
     }
 

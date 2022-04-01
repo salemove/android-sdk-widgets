@@ -10,6 +10,10 @@
     <dimen name="glia_x_large">32dp</dimen>
     <dimen name="glia_xx_large">64dp</dimen>
 
+    <dimen name="glia_visitor_video_height">182dp</dimen>
+    <dimen name="glia_visitor_video_width">104dp</dimen>
+    <dimen name="glia_visitor_video_corner_radius">@dimen/glia_medium</dimen>
+
     <dimen name="glia_ripple_animation_size">142dp</dimen>
     <dimen name="glia_chat_profile_picture_size">80dp</dimen>
     <dimen name="glia_chat_profile_picture_content_padding">20dp</dimen>

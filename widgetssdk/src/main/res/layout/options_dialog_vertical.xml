@@ -43,7 +43,7 @@
         app:layout_goneMarginTop="@dimen/glia_large" />
 
     <com.glia.widgets.view.button.GliaPositiveButton
-        android:id="@+id/positive_button"
+        android:id="@+id/accept_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large_x_large"
@@ -53,13 +53,13 @@
         app:layout_constraintTop_toBottomOf="@id/dialog_message_view" />
 
     <com.glia.widgets.view.button.GliaNegativeButton
-        android:id="@+id/negative_button"
+        android:id="@+id/decline_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/glia_dialog_decline"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/positive_button" />
+        app:layout_constraintTop_toBottomOf="@id/accept_button" />
 
     <ImageView
         android:id="@+id/logo_view"
@@ -70,7 +70,7 @@
         android:src="@drawable/ic_powered_by_glia"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/negative_button"
+        app:layout_constraintTop_toBottomOf="@id/decline_button"
         app:tint="?attr/gliaBaseShadeColor" />
 
     <Space

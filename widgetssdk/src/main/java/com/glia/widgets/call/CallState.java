@@ -218,11 +218,7 @@ class CallState {
         callStatus.setVisitorMediaState(visitorMediaState);
         return new Builder()
                 .copyFrom(this)
-                .setHasVideo(
-                        visitorMediaState != null &&
-                                visitorMediaState.getVideo() != null &&
-                                visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING
-                )
+                .setHasVideo(isVisitorVideoPlaying(visitorMediaState))
                 .setIsMuted(false)
                 .createCallState();
     }
@@ -327,26 +323,16 @@ class CallState {
                 .createCallState();
     }
 
-    public boolean isEnableMuteButton() {
+    public boolean isMuteButtonEnabled() {
         return (isAudioCall() || is2WayVideoCall()) && !isOnHold;
     }
 
-    public boolean isEnableVideoButton() {
+    public boolean isVideoButtonEnabled() {
         return is2WayVideoCall() && !isOnHold;
     }
 
-    public boolean isEnableSpeakerButton() {
+    public boolean isSpeakerButtonEnabled() {
         return isAudioCall() || is2WayVideoCall();
-    }
-
-    private boolean isVisitorVideoAvailable() {
-        return callStatus.getVisitorMediaState() != null &&
-                callStatus.getVisitorMediaState().getVideo() != null;
-    }
-
-    private boolean isOperatorVideoAvailable() {
-        return callStatus.getOperatorMediaState() != null &&
-                callStatus.getOperatorMediaState().getVideo() != null;
     }
 
     public boolean isShowCallTimerView() {
@@ -359,6 +345,20 @@ class CallState {
 
     public boolean showContinueBrowsingView() {
         return isCallOngoingAndOperatorIsConnecting() || isCallNotOngoing() || isOnHold;
+    }
+
+    private boolean isVisitorVideoAvailable() {
+        return callStatus.getVisitorMediaState() != null &&
+                callStatus.getVisitorMediaState().getVideo() != null;
+    }
+
+    private boolean isOperatorVideoAvailable() {
+        return callStatus.getOperatorMediaState() != null &&
+                callStatus.getOperatorMediaState().getVideo() != null;
+    }
+
+    private boolean isVisitorVideoPlaying(VisitorMediaState visitorMediaState) {
+        return visitorMediaState != null && visitorMediaState.getVideo() != null && visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
     }
 
     public static class Builder {

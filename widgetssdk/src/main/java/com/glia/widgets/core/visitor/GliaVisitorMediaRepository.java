@@ -10,12 +10,23 @@ import java.util.List;
 public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
     private final List<VisitorMediaStateListener> visitorMediaStateUpdates = new ArrayList<>();
 
-    private VisitorMediaState currentMediaState;
-    private boolean isOnHold;
+    private VisitorMediaState currentMediaState = null;
+    private boolean isOnHold = false;
 
-    public GliaVisitorMediaRepository() {
-        currentMediaState = null;
-        isOnHold = false;
+    @Override
+    public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
+        currentMediaState = visitorMediaState;
+        visitorMediaStateUpdates.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
+        setAudioOnHoldListener();
+        setVideoOnHoldListener();
+    }
+
+    @Override
+    public void onHoldChanged(boolean newOnHold) {
+        if (isOnHold != newOnHold) {
+            isOnHold = newOnHold;
+            visitorMediaStateUpdates.forEach(listener -> listener.onHoldChanged(isOnHold));
+        }
     }
 
     public void onEngagementStarted(Engagement engagement) {
@@ -55,22 +66,6 @@ public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
     private void setAudioOnHoldListener() {
         if (hasVisitorAudioMedia()) {
             currentMediaState.getAudio().setOnHoldHandler(this::onHoldChanged);
-        }
-    }
-
-    @Override
-    public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
-        currentMediaState = visitorMediaState;
-        visitorMediaStateUpdates.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
-        setAudioOnHoldListener();
-        setVideoOnHoldListener();
-    }
-
-    @Override
-    public void onHoldChanged(boolean newOnHold) {
-        if (isOnHold != newOnHold) {
-            isOnHold = newOnHold;
-            visitorMediaStateUpdates.forEach(listener -> listener.onHoldChanged(isOnHold));
         }
     }
 }

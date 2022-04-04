@@ -946,7 +946,10 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void showExitQueueDialog() {
-        showOptionsDialog(resources.getString(R.string.glia_dialog_leave_queue_title),
+        alertDialog = Dialogs.showOptionsDialog(
+                this.getContext(),
+                this.theme,
+                resources.getString(R.string.glia_dialog_leave_queue_title),
                 resources.getString(R.string.glia_dialog_leave_queue_message),
                 resources.getString(R.string.glia_dialog_leave_queue_yes),
                 resources.getString(R.string.glia_dialog_leave_queue_no),
@@ -971,7 +974,8 @@ public class ChatView extends ConstraintLayout implements
                     if (controller != null) {
                         controller.endEngagementDialogDismissed();
                     }
-                }
+                },
+                true
         );
     }
 

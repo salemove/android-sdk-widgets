@@ -8,15 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
-    private final List<VisitorMediaStateListener> visitorMediaStateUpdates = new ArrayList<>();
+    private final List<VisitorMediaStateListener> visitorMediaStateListeners = new ArrayList<>();
 
     private VisitorMediaState currentMediaState = null;
     private boolean isOnHold = false;
 
     @Override
-    public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
-        currentMediaState = visitorMediaState;
-        visitorMediaStateUpdates.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
+    public void onNewVisitorMediaState(VisitorMediaState state) {
+        updateVisitorMediaState(state);
         setAudioOnHoldListener();
         setVideoOnHoldListener();
     }
@@ -24,8 +23,7 @@ public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
     @Override
     public void onHoldChanged(boolean newOnHold) {
         if (isOnHold != newOnHold) {
-            isOnHold = newOnHold;
-            visitorMediaStateUpdates.forEach(listener -> listener.onHoldChanged(isOnHold));
+            updateOnHoldState(newOnHold);
         }
     }
 
@@ -42,11 +40,21 @@ public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
     public void addVisitorMediaStateListener(VisitorMediaStateListener listener) {
         listener.onNewVisitorMediaState(currentMediaState);
         listener.onHoldChanged(isOnHold);
-        visitorMediaStateUpdates.add(listener);
+        visitorMediaStateListeners.add(listener);
     }
 
     public void removeVisitorMediaStateListener(VisitorMediaStateListener listener) {
-        visitorMediaStateUpdates.remove(listener);
+        visitorMediaStateListeners.remove(listener);
+    }
+
+    private void updateVisitorMediaState(VisitorMediaState state) {
+        currentMediaState = state;
+        visitorMediaStateListeners.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
+    }
+
+    private void updateOnHoldState(boolean newOnHold) {
+        isOnHold = newOnHold;
+        visitorMediaStateListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
     }
 
     private boolean hasVisitorVideoMedia() {

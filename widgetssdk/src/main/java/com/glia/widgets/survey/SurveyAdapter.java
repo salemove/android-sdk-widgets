@@ -1,18 +1,24 @@
 package com.glia.widgets.survey;
 
+import static java.util.Arrays.asList;
+
+import android.content.Context;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.engagement.Survey;
@@ -64,40 +70,35 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         Survey.Answer answer = questionItem.getAnswer();
 
         if (getItemViewType(position) == SURVEY_SCALE) {
-            bindScale(position, questionItem, question, answer, (SurveyScaleViewHolder) viewHolder);
+            bindScale(questionItem, question, answer, (SurveyScaleViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_SINGLE_CHOICE) {
-            bindSingle(position, questionItem, question, (SurveySingleChoiceViewHolder) viewHolder);
+            bindSingle(questionItem, question, (SurveySingleChoiceViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_YES_NO) {
-            bindYesNo(position, questionItem, question, answer, (SurveyYesNoViewHolder) viewHolder);
+            bindYesNo(questionItem, question, answer, (SurveyYesNoViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_OPEN_TEXT) {
-            bindOpenText(position, question, answer, (SurveyOpenTextViewHolder) viewHolder);
+            bindOpenText(question, answer, (SurveyOpenTextViewHolder) viewHolder);
         }
     }
 
-    private void bindScale(int position, QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyScaleViewHolder scaleViewHolder) {
-        scaleViewHolder.titleScale.setText(question.getText());
+    private void bindScale(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyScaleViewHolder scaleViewHolder) {
+        setItemTitle(scaleViewHolder.titleTextView, question.getText(), question.isRequired());
 
-        RatingBar ratingBedGood = scaleViewHolder.ratingBedGood;
-        if (answer != null) {
-            int response = answer.getResponse();
-            ratingBedGood.setRating(response);
-        }
-        ratingBedGood.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-            setAnswer(questionItem, Math.round(rating));
-        });
-        updateRequiredVisibility(position, scaleViewHolder.tvRequiredScale);
+        scaleViewHolder.setAnswer(answer);
+
+        scaleViewHolder.listener = value -> {
+            setAnswer(questionItem, value);
+            scaleViewHolder.setSelected(value);
+        };
     }
 
-    private void bindSingle(int position, QuestionItem questionItem, Survey.Question question, SurveySingleChoiceViewHolder singleChoiceViewHolder) {
-        singleChoiceViewHolder.title.setText(question.getText());
-        updateRequiredVisibility(position, singleChoiceViewHolder.tvRequiredChoice);
+    private void bindSingle(QuestionItem questionItem, Survey.Question question, SurveySingleChoiceViewHolder singleChoiceViewHolder) {
+        setItemTitle(singleChoiceViewHolder.title, question.getText(), question.isRequired());
 
         singleChoiceViewHolder.singleChoice(question.getOptions(), questionItem);
     }
 
-    private void bindYesNo(int position, QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyYesNoViewHolder yesNoViewHolder) {
-        yesNoViewHolder.titleYesNo.setText(question.getText());
-        updateRequiredVisibility(position, yesNoViewHolder.tvRequiredYesNo);
+    private void bindYesNo(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyYesNoViewHolder yesNoViewHolder) {
+        setItemTitle(yesNoViewHolder.titleYesNo, question.getText(), question.isRequired());
 
         SwitchCompat switchCompat = yesNoViewHolder.switchCompat;
         if (answer != null) {
@@ -109,14 +110,25 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 });
     }
 
-    private void bindOpenText(int position, Survey.Question question, Survey.Answer answer, SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
-        surveyOpenTextViewHolder.titleComment.setText(question.getText());
+    private void bindOpenText(Survey.Question question, Survey.Answer answer, SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
+        setItemTitle(surveyOpenTextViewHolder.titleComment, question.getText(), question.isRequired());
         EditText comment = surveyOpenTextViewHolder.comment;
         if (answer != null) {
             comment.setText(answer.getResponse());
         }
         comment.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        updateRequiredVisibility(position, surveyOpenTextViewHolder.tvRequiredText);
+    }
+
+    private void setItemTitle(TextView textView, String title, boolean require) {
+        if (require) {
+            Context context = textView.getContext();
+            int color = ContextCompat.getColor(context, R.color.glia_system_negative_color);
+            String colorString = String.format("%X", color).substring(2);
+            String source = context.getString(R.string.glia_survey_require_label, title, colorString);
+            textView.setText(Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            textView.setText(title);
+        }
     }
 
     private void setAnswer(QuestionItem questionItem, int response) {
@@ -129,14 +141,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private void setAnswer(QuestionItem questionItem, String response) {
         questionItem.setAnswer(Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response));
-    }
-
-    private void updateRequiredVisibility(int position, TextView view) {
-        if (items.get(position).getQuestion().isRequired())
-            view.setVisibility(View.VISIBLE);
-        else {
-            view.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -160,36 +164,69 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public static class SurveyScaleViewHolder extends RecyclerView.ViewHolder {
 
-        TextView titleScale;
-        TextView tvRequiredScale;
-        RatingBar ratingBedGood;
+        interface OnSurveyScaleClickListener {
+            void onSurveyScaleClickListener(int value);
+        }
+
+        TextView titleTextView;
+        List<Button> buttons;
+        OnSurveyScaleClickListener listener;
 
         public SurveyScaleViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleScale = itemView.findViewById(R.id.tv_title_scale);
-            ratingBedGood = itemView.findViewById(R.id.rating_bed_good);
-            tvRequiredScale = itemView.findViewById(R.id.tv_required_scale);
+            titleTextView = itemView.findViewById(R.id.tv_title);
+            Button scale1Button = itemView.findViewById(R.id.scale_1_button);
+            Button scale2Button = itemView.findViewById(R.id.scale_2_button);
+            Button scale3Button = itemView.findViewById(R.id.scale_3_button);
+            Button scale4Button = itemView.findViewById(R.id.scale_4_button);
+            Button scale5Button = itemView.findViewById(R.id.scale_5_button);
+            buttons = asList(scale1Button, scale2Button, scale3Button, scale4Button, scale5Button);
+
+            buttons.forEach(button -> button.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onSurveyScaleClickListener(buttons.indexOf(button) + 1);
+                }
+            }));
+        }
+
+        void setAnswer(@Nullable Survey.Answer answer) {
+            if (answer != null) {
+                int value = answer.getResponse();
+                setSelected(value);
+            } else {
+                unselectAll();
+            }
+        }
+
+        void setSelected(int value) {
+            for (int i = 0; i < buttons.size(); i++) {
+                Button button = buttons.get(i);
+                boolean isSelected = (i + 1) == value;
+
+                button.setSelected(isSelected);
+            }
+        }
+
+        void unselectAll() {
+            setSelected(0);
         }
     }
 
     public static class SurveyYesNoViewHolder extends RecyclerView.ViewHolder {
 
         TextView titleYesNo;
-        TextView tvRequiredYesNo;
         SwitchCompat switchCompat;
 
         public SurveyYesNoViewHolder(@NonNull View itemView) {
             super(itemView);
             titleYesNo = itemView.findViewById(R.id.tv_title_yes_no);
             switchCompat = itemView.findViewById(R.id.switch_compat);
-            tvRequiredYesNo = itemView.findViewById(R.id.tv_required_yes_no);
         }
     }
 
     public static class SurveySingleChoiceViewHolder extends RecyclerView.ViewHolder {
 
         TextView title;
-        TextView tvRequiredChoice;
         RecyclerView recyclerView;
         SingleChoiceAdapter.SingleChoiceCallback scaleResultCallback;
         QuestionItem item;
@@ -198,7 +235,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             super(itemView);
             this.scaleResultCallback = scaleResultCallback;
             title = itemView.findViewById(R.id.tv_title_choice);
-            tvRequiredChoice = itemView.findViewById(R.id.tv_required_choice);
             recyclerView = itemView.findViewById(R.id.survey_single_choice_list);
         }
 
@@ -212,13 +248,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public class SurveyOpenTextViewHolder extends RecyclerView.ViewHolder {
 
         TextView titleComment;
-        TextView tvRequiredText;
         EditText comment;
 
         public SurveyOpenTextViewHolder(@NonNull View itemView) {
             super(itemView);
             titleComment = itemView.findViewById(R.id.tv_title_text);
-            tvRequiredText = itemView.findViewById(R.id.tv_required_text);
             comment = itemView.findViewById(R.id.et_comment);
 
             comment.addTextChangedListener(new TextWatcher() {

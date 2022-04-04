@@ -8,22 +8,13 @@
     android:padding="@dimen/glia_large"
     android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_required_yes_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?attr/gliaSystemNegativeColor"
-            android:text="@string/glia_survey_require_label"
-            android:textSize="@dimen/glia_large"
-            tools:ignore="HardcodedText,SpUsage" />
-
-        <TextView
-            android:id="@+id/tv_title_yes_no"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/glia_survey_yes_no_item_title"
-            android:textColor="?attr/gliaBaseDarkColor"
-            android:layout_weight="1" />
+    <TextView
+        android:id="@+id/tv_title_yes_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/glia_survey_yes_no_item_title"
+        android:textColor="?attr/gliaBaseDarkColor"
+        android:layout_weight="1" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch_compat"

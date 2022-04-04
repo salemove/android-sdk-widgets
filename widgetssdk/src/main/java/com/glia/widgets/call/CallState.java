@@ -358,7 +358,9 @@ class CallState {
     }
 
     private boolean isVisitorVideoPlaying(VisitorMediaState visitorMediaState) {
-        return visitorMediaState != null && visitorMediaState.getVideo() != null && visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
+        return visitorMediaState != null &&
+                visitorMediaState.getVideo() != null &&
+                visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
     }
 
     public static class Builder {

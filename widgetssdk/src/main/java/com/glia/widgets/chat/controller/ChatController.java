@@ -438,6 +438,7 @@ public class ChatController implements
     }
 
     private void clearMessagePreview() {
+        // Empty string has to be sent to clear the message preview.
         sendMessagePreview(EMPTY_MESSAGE);
     }
 

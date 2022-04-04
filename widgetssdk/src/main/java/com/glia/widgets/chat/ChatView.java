@@ -976,7 +976,10 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void showEndEngagementDialog(String operatorName) {
-        showOptionsDialog(resources.getString(R.string.glia_dialog_end_engagement_title),
+        alertDialog = Dialogs.showOptionsDialog(
+                this.getContext(),
+                this.theme,
+                resources.getString(R.string.glia_dialog_end_engagement_title),
                 resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
                 resources.getString(R.string.glia_dialog_end_engagement_yes),
                 resources.getString(R.string.glia_dialog_end_engagement_no),
@@ -1001,7 +1004,8 @@ public class ChatView extends ConstraintLayout implements
                         controller.endEngagementDialogDismissed();
                     }
                     dialog.dismiss();
-                }
+                },
+                true
         );
     }
 

@@ -516,7 +516,32 @@ public class ChatState {
         }
 
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, operatorStatusItem, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonNeeded, isAttachmentAllowed);
+            return new ChatState(
+                    queueTicketId,
+                    historyLoaded,
+                    operatorName,
+                    operatorProfileImgUrl,
+                    companyName,
+                    queueId,
+                    contextUrl,
+                    isVisible,
+                    integratorChatStarted,
+                    mediaUpgradeStartedTimerItem,
+                    chatItems,
+                    chatInputMode,
+                    lastTypedText,
+                    isChatInBottom,
+                    messagesNotSeen,
+                    engagementRequested,
+                    pendingNavigationType,
+                    unsentMessages,
+                    operatorStatusItem,
+                    showSendButton,
+                    isOperatorTyping,
+                    isAttachmentButtonEnabled,
+                    isAttachmentButtonNeeded,
+                    isAttachmentAllowed
+            );
         }
     }
 }

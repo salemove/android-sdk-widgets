@@ -92,6 +92,7 @@ public class ChatController implements
         GliaOnEngagementEndUseCase.Listener {
 
     private final static String TAG = ChatController.class.getSimpleName();
+    private final static String EMPTY_MESSAGE = "";
 
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -139,10 +140,11 @@ public class ChatController implements
 
         @Override
         public void onMessageValidated() {
+            viewCallback.clearMessageInput();
             emitViewState(
                     chatState
-                            .setLastTypedText("")
-                            .setShowSendButton(isShowSendButtonUseCase.execute(""))
+                            .setLastTypedText(EMPTY_MESSAGE)
+                            .setShowSendButton(isShowSendButtonUseCase.execute(EMPTY_MESSAGE))
             );
         }
 
@@ -254,7 +256,7 @@ public class ChatController implements
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
                 .setChatItems(new ArrayList<>())
-                .setLastTypedText("")
+                .setLastTypedText(EMPTY_MESSAGE)
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
                 .setIsAttachmentButtonNeeded(false)
                 .setIsAttachmentAllowed(true)
@@ -420,16 +422,24 @@ public class ChatController implements
                         .setLastTypedText(message)
                         .setShowSendButton(isShowSendButtonUseCase.execute(message))
         );
-        if (chatState.isOperatorOnline()) {
-            Logger.d(TAG, "Send preview: " + message);
-            sendMessagePreviewUseCase.execute(message);
-        }
+        sendMessagePreview(message);
     }
 
     public void sendMessage(String message) {
         Logger.d(TAG, "Send MESSAGE: " + message);
-        Logger.d(TAG, "SEND MESSAGE sending");
+        clearMessagePreview();
         sendMessageUseCase.execute(message, sendMessageCallback);
+    }
+
+    private void sendMessagePreview(String message) {
+        if (chatState.isOperatorOnline()) {
+            sendMessagePreviewUseCase.execute(message);
+        }
+    }
+
+    private void clearMessagePreview() {
+        // Empty string has to be sent to clear the message preview.
+        sendMessagePreview(EMPTY_MESSAGE);
     }
 
     private void onMessage(ChatMessage message) {
@@ -955,7 +965,7 @@ public class ChatController implements
     }
 
     private void appendOperatorMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
-        if (!message.getContent().equals("")) {
+        if (!message.getContent().equals(EMPTY_MESSAGE)) {
             MessageAttachment messageAttachment = message.getAttachment();
             currentChatItems.add(
                     new OperatorMessageItem(

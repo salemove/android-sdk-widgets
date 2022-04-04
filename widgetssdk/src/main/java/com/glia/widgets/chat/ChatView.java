@@ -503,6 +503,13 @@ public class ChatView extends ConstraintLayout implements
             public void fileDownloadSuccess(AttachmentFile attachmentFile) {
                 fileDownloadCompleted(attachmentFile);
             }
+
+            @Override
+            public void clearMessageInput() {
+                chatEditText.removeTextChangedListener(textWatcher);
+                chatEditText.getText().clear();
+                chatEditText.addTextChangedListener(textWatcher);
+            }
         };
     }
 
@@ -584,22 +591,12 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void updateChatEditText(ChatState chatState) {
-        if (!Utils.compareStringWithTrim(chatEditText.getText().toString(), chatState.lastTypedText)) {
-            chatEditText.removeTextChangedListener(textWatcher);
-            chatEditText.setText(chatState.lastTypedText);
-            chatEditText.addTextChangedListener(textWatcher);
-        }
-
         switch (chatState.chatInputMode) {
             case SINGLE_CHOICE_CARD:
                 chatEditText.setHint(R.string.glia_chat_single_choice_card_hint);
                 break;
             case ENABLED_NO_ENGAGEMENT:
-                if (chatState.lastTypedText.isEmpty()) {
-                    chatEditText.setHint(R.string.glia_chat_not_started_hint);
-                } else {
-                    chatEditText.setHint("");
-                }
+                chatEditText.setHint(R.string.glia_chat_not_started_hint);
                 break;
             default:
                 chatEditText.setHint(R.string.glia_chat_enter_message);

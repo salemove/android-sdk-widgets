@@ -1,9 +1,8 @@
 package com.glia.widgets.survey;
 
-import static java.util.Arrays.asList;
-
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -29,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int SURVEY_SINGLE_CHOICE = 3;
     private static final int SURVEY_OPEN_TEXT = 4;
 
+    private SurveyStyle style;
     private final List<QuestionItem> questionItems = new ArrayList<>();
     private final SurveyAdapterListener listener;
 
@@ -67,16 +68,16 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         View view;
         if (viewType == SURVEY_SCALE) {
             view = createNewLayout(parent, R.layout.survey_scale_item);
-            return new SurveyScaleViewHolder(view);
+            return new SurveyScaleViewHolder(view, style);
         } else if (viewType == SURVEY_YES_NO) {
             view = createNewLayout(parent, R.layout.survey_yes_no_item);
-            return new SurveyYesNoViewHolder(view);
+            return new SurveyYesNoViewHolder(view, style);
         } else if (viewType == SURVEY_SINGLE_CHOICE) {
             view = createNewLayout(parent, R.layout.survey_single_choice_item);
-            return new SurveySingleChoiceViewHolder(view);
+            return new SurveySingleChoiceViewHolder(view, style);
         } else {
             view = createNewLayout(parent, R.layout.survey_open_text_item);
-            return new SurveyOpenTextViewHolder(view);
+            return new SurveyOpenTextViewHolder(view, style);
         }
     }
 
@@ -285,14 +286,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         LinearLayout containerView;
         RadioGroup radioGroup;
 
-        public SurveySingleChoiceViewHolder(@NonNull View itemView) {
+        public SurveySingleChoiceViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             containerView = itemView.findViewById(R.id.single_choice_view);
             radioGroup = itemView.findViewById(R.id.radio_group);
+            requiredError = itemView.findViewById(R.id.required_error);
 
             int bkgColor = ContextCompat.getColor(itemView.getContext(), R.color.glia_base_light_color);
-            containerView.setBackgroundColor(bkgColor);
-            requiredError = itemView.findViewById(R.id.required_error);
+            containerView.setBackgroundColor(Color.parseColor(style.getBgColor()));
         }
 
         @Override

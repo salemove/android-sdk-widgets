@@ -143,7 +143,7 @@
     <attr name="gliaIconCallMinimize" format="reference" />
     <!-- The icon resId used in a chat head if an operator's profile image is absent -->
     <attr name="gliaIconPlaceholder" format="reference" />
-    <!-- The icon resId used in views to indicate operator put visitor on hold -->
+    <!-- The icon resId used when visitor is put on hold by operator -->
     <attr name="gliaIconOnHold" format="reference" />
 
     <!-- Header colors -->

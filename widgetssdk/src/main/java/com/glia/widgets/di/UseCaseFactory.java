@@ -44,7 +44,6 @@ import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
-import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -234,13 +233,6 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaMessageRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
                 repositoryFactory.getGliaEngagementRepository()
-        );
-    }
-
-    public GliaOnVisitorMediaStateUseCase createGliaOnVisitorMediaStateUseCase() {
-        return new GliaOnVisitorMediaStateUseCase(
-                createOnEngagementUseCase(),
-                repositoryFactory.getGliaVisitorMediaRepository()
         );
     }
 

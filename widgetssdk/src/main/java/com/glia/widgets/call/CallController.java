@@ -34,7 +34,6 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
 import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
-import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -47,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 
 public class CallController implements
         GliaOnEngagementUseCase.Listener,
-        GliaOnVisitorMediaStateUseCase.Listener,
         GliaOnEngagementEndUseCase.Listener,
         OnSurveyListener {
 
@@ -75,7 +73,6 @@ public class CallController implements
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaOnEngagementUseCase onEngagementUseCase;
     private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
-    private final GliaOnVisitorMediaStateUseCase onVisitorMediaStateUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase;
@@ -135,7 +132,6 @@ public class CallController implements
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
-            GliaOnVisitorMediaStateUseCase gliaOnVisitorMediaStateUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             GliaEndEngagementUseCase endEngagementUseCase,
             ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
@@ -173,7 +169,6 @@ public class CallController implements
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
-        this.onVisitorMediaStateUseCase = gliaOnVisitorMediaStateUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
         this.shouldShowMediaEngagementViewUseCase = shouldShowMediaEngagementViewUseCase;
@@ -247,7 +242,6 @@ public class CallController implements
             messagesNotSeenHandlerListener = null;
 
             onEngagementUseCase.unregisterListener(this);
-            onVisitorMediaStateUseCase.unregisterListener(this);
             onEngagementEndUseCase.unregisterListener(this);
 
             unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
@@ -558,14 +552,12 @@ public class CallController implements
             }
 
             onOperatorMediaStateVideo(operatorMediaState);
-            onVisitorMediaStateUseCase.execute(this);
         } else if (operatorMediaState.getAudio() != null) {
             if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
                 dialogController.showEnableCallNotificationChannelDialog();
             }
 
             onOperatorMediaStateAudio(operatorMediaState);
-            onVisitorMediaStateUseCase.execute(this);
         } else {
             onOperatorMediaStateUnknown();
         }
@@ -575,13 +567,6 @@ public class CallController implements
         ) {
             callTimer.startNew(Constants.CALL_TIMER_DELAY, Constants.CALL_TIMER_INTERVAL_VALUE);
         }
-    }
-
-    @Override
-    public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
-        Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState.toString());
-        emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
-        Logger.d(TAG, "newVisitorMediaState- is2WayVideo:" + callState.is2WayVideoCall());
     }
 
     @Override

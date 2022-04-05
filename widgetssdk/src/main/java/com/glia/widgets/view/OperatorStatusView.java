@@ -126,7 +126,14 @@ public class OperatorStatusView extends ConstraintLayout {
     public void showProfileImage(String profileImgUrl) {
         Picasso.get().load(profileImgUrl).into(profilePictureView);
         placeholderView.setVisibility(GONE);
-        placeholderView.post(() -> placeholderView.setContentPadding(placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding));
+        placeholderView.post(() ->
+                placeholderView.setContentPadding(
+                        placeHolderViewContentPadding,
+                        placeHolderViewContentPadding,
+                        placeHolderViewContentPadding,
+                        placeHolderViewContentPadding
+                )
+        );
     }
 
     public void setShowOnHold(boolean isOnHold) {

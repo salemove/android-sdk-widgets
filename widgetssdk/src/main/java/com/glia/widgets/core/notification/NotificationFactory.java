@@ -23,7 +23,7 @@ public class NotificationFactory {
                         context,
                         SCREEN_SHARING_PENDING_INTENT_REQUEST_CODE,
                         NotificationActionReceiver.getScreenSharingEndPressedActionIntent(context),
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_IMMUTABLE
                 );
 
         return new NotificationCompat.Builder(context, NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)

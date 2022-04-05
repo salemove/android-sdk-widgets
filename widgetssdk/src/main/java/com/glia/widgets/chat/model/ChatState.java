@@ -34,8 +34,9 @@ public class ChatState {
     public final OperatorStatusItem operatorStatusItem;
     public final boolean showSendButton;
     public final boolean isAttachmentButtonEnabled;
-    public final boolean isAttachmentButtonVisible;
+    public final boolean isAttachmentButtonNeeded;
     public final boolean isOperatorTyping;
+    public final boolean isAttachmentAllowed;
 
     private ChatState(
             String queueTicketId,
@@ -60,7 +61,8 @@ public class ChatState {
             boolean showSendButton,
             boolean isOperatorTyping,
             boolean isAttachmentButtonEnabled,
-            boolean isAttachmentButtonVisible) {
+            boolean isAttachmentButtonNeeded,
+            boolean isAttachmentAllowed) {
         this.queueTicketId = queueTicketId;
         this.historyLoaded = historyLoaded;
         this.operatorName = operatorName;
@@ -83,7 +85,8 @@ public class ChatState {
         this.showSendButton = showSendButton;
         this.isOperatorTyping = isOperatorTyping;
         this.isAttachmentButtonEnabled = isAttachmentButtonEnabled;
-        this.isAttachmentButtonVisible = isAttachmentButtonVisible;
+        this.isAttachmentButtonNeeded = isAttachmentButtonNeeded;
+        this.isAttachmentAllowed = isAttachmentAllowed;
     }
 
     public boolean isOperatorOnline() {
@@ -107,7 +110,241 @@ public class ChatState {
         return !isChatInBottom && messagesNotSeen != null && messagesNotSeen > 0;
     }
 
+    public boolean isAttachmentButtonVisible() {
+        return isAttachmentButtonNeeded && isAttachmentAllowed;
+    }
+
+    public ChatState initChat(String companyName,
+                              String queueId,
+                              String contextUrl) {
+        return new Builder()
+                .copyFrom(this)
+                .setIntegratorChatStarted(true)
+                .setCompanyName(companyName)
+                .setQueueId(queueId)
+                .setContextUrl(contextUrl)
+                .setIsVisible(true)
+                .setShowSendButton(false)
+                .setIsAttachmentButtonEnabled(true)
+                .setIsAttachmentAllowed(true)
+                .createChatState();
+    }
+
+    public ChatState queueingStarted(OperatorStatusItem operatorStatusItem) {
+        return new Builder()
+                .copyFrom(this)
+                .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
+                .setChatInputMode(ChatInputMode.ENABLED)
+                .setEngagementRequested(true)
+                .setOperatorStatusItem(operatorStatusItem)
+                .createChatState();
+    }
+
+    public ChatState queueTicketSuccess(String queueTicketId) {
+        return new Builder()
+                .copyFrom(this)
+                .setQueueTicketId(queueTicketId)
+                .createChatState();
+    }
+
+    public ChatState allowSendAttachmentStateChanged(boolean isAttachmentAllowed) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsAttachmentAllowed(isAttachmentAllowed)
+                .createChatState();
+    }
+
+    public ChatState engagementStarted(String operatorName, String operatorProfileImgUrl) {
+        return new Builder()
+                .copyFrom(this)
+                .setOperatorName(operatorName)
+                .setOperatorProfileImgUrl(operatorProfileImgUrl)
+                .setChatInputMode(ChatInputMode.ENABLED)
+                .setIsAttachmentButtonNeeded(true)
+                .setEngagementRequested(true)
+                .createChatState();
+    }
+
+    public ChatState stop() {
+        return new Builder()
+                .copyFrom(this)
+                .setQueueTicketId(null)
+                .setHistoryLoaded(false)
+                .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
+                .setIsVisible(false)
+                .setIntegratorChatStarted(false)
+                .setIsAttachmentButtonNeeded(false)
+                .createChatState();
+    }
+
+    public ChatState historyLoaded(List<ChatItem> chatItems) {
+        return new Builder()
+                .copyFrom(this)
+                .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
+                .setIsAttachmentButtonNeeded(false)
+                .setHistoryLoaded(true)
+                .setChatItems(chatItems)
+                .createChatState();
+    }
+
+    public ChatState changeItems(List<ChatItem> newItems) {
+        return new Builder()
+                .copyFrom(this)
+                .setChatItems(newItems)
+                .createChatState();
+    }
+
+    public ChatState changeTimerItem(List<ChatItem> newItems, MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem) {
+        return new Builder()
+                .copyFrom(changeItems(newItems))
+                .setMediaUpgradeStartedItem(mediaUpgradeStartedTimerItem)
+                .createChatState();
+    }
+
+    public ChatState changeVisibility(boolean isVisible) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsVisible(isVisible)
+                .createChatState();
+    }
+
+    public ChatState setLastTypedText(String text) {
+        return new Builder()
+                .copyFrom(this)
+                .setLastTypedText(text)
+                .createChatState();
+    }
+
+    public ChatState chatInputModeChanged(ChatInputMode chatInputMode) {
+        return new Builder()
+                .copyFrom(this)
+                .setChatInputMode(chatInputMode)
+                .setIsAttachmentButtonNeeded(chatInputMode == ChatInputMode.ENABLED)
+                .createChatState();
+    }
+
+    public ChatState isInBottomChanged(boolean isChatInBottom) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsChatInBottom(isChatInBottom)
+                .createChatState();
+    }
+
+    public ChatState messagesNotSeenChanged(int messagesNotSeen) {
+        return new Builder()
+                .copyFrom(this)
+                .setMessagesNotSeen(messagesNotSeen)
+                .createChatState();
+    }
+
+    public ChatState setPendingNavigationType(String pendingNavigationType) {
+        return new Builder()
+                .copyFrom(this)
+                .setPendingNavigationType(pendingNavigationType)
+                .createChatState();
+    }
+
+    public ChatState changeUnsentMessages(List<VisitorMessageItem> unsentMessages) {
+        return new Builder()
+                .copyFrom(this)
+                .setUnsentMessages(Collections.unmodifiableList(unsentMessages))
+                .createChatState();
+    }
+
+    public ChatState setShowSendButton(boolean isShow) {
+        return new Builder()
+                .copyFrom(this)
+                .setShowSendButton(isShow)
+                .createChatState();
+    }
+
+    public ChatState setIsOperatorTyping(boolean isOperatorTyping) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsOperatorTyping(isOperatorTyping)
+                .createChatState();
+    }
+
+    public ChatState setIsAttachmentButtonEnabled(boolean isAttachmentButtonEnabled) {
+        return new Builder()
+                .copyFrom(this)
+                .setIsAttachmentButtonEnabled(isAttachmentButtonEnabled)
+                .createChatState();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChatState chatState = (ChatState) o;
+        return integratorChatStarted == chatState.integratorChatStarted &&
+                isVisible == chatState.isVisible &&
+                historyLoaded == chatState.historyLoaded &&
+                Objects.equals(queueTicketId, chatState.queueTicketId) &&
+                Objects.equals(operatorName, chatState.operatorName) &&
+                Objects.equals(operatorProfileImgUrl, chatState.operatorProfileImgUrl) &&
+                Objects.equals(companyName, chatState.companyName) &&
+                Objects.equals(queueId, chatState.queueId) &&
+                Objects.equals(contextUrl, chatState.contextUrl) &&
+                Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
+                Objects.equals(chatInputMode, chatState.chatInputMode) &&
+                Objects.equals(lastTypedText, chatState.lastTypedText) &&
+                isChatInBottom == chatState.isChatInBottom &&
+                engagementRequested == chatState.engagementRequested &&
+                Objects.equals(pendingNavigationType, chatState.pendingNavigationType) &&
+                Objects.equals(messagesNotSeen, chatState.messagesNotSeen) &&
+                Objects.equals(operatorStatusItem, chatState.operatorStatusItem) &&
+                Objects.equals(unsentMessages, chatState.unsentMessages) &&
+                Objects.equals(chatItems, chatState.chatItems) &&
+                showSendButton == chatState.showSendButton &&
+                isOperatorTyping == chatState.isOperatorTyping &&
+                isAttachmentButtonEnabled == chatState.isAttachmentButtonEnabled &&
+                isAttachmentButtonNeeded == chatState.isAttachmentButtonNeeded &&
+                isAttachmentAllowed == chatState.isAttachmentAllowed;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonNeeded);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "ChatState{" +
+                "integratorChatStarted=" + integratorChatStarted +
+                ", isVisible=" + isVisible +
+                ", queueTicketId='" + queueTicketId + '\'' +
+                ", historyLoaded=" + historyLoaded +
+                ", operatorName='" + operatorName + '\'' +
+                ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
+                ", companyName='" + companyName + '\'' +
+                ", queueId='" + queueId + '\'' +
+                ", contextUrl='" + contextUrl + '\'' +
+                ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
+                ", chatInputMode=" + chatInputMode +
+                ", lastTypedText: " + lastTypedText +
+                ", messagesNotSeen: " + messagesNotSeen +
+                ", isChatInBottom: " + isChatInBottom +
+                ", engagementRequested: " + engagementRequested +
+                ", pendingNavigationType: " + pendingNavigationType +
+                ", operatorStatusItem: " + operatorStatusItem +
+                ", unsentMessages: " + unsentMessages +
+                ", chatItems=" + chatItems +
+                ", showSendButton=" + showSendButton +
+                ", isOperatorTyping=" + isOperatorTyping +
+                ", isAttachmentButtonEnabled=" + isAttachmentButtonEnabled +
+                ", isAttachmentButtonEnabled=" + isAttachmentButtonEnabled +
+                ", isAttachmentAllowed=" + isAttachmentAllowed +
+                '}';
+    }
+
     public static class Builder {
+        public boolean isOperatorTyping;
+        public boolean isAttachmentButtonEnabled;
+        public boolean isAttachmentButtonNeeded;
         private String queueTicketId;
         private boolean historyLoaded;
         private boolean isChatInBottom;
@@ -128,9 +365,7 @@ public class ChatState {
         private List<VisitorMessageItem> unsentMessages;
         private OperatorStatusItem operatorStatusItem;
         private boolean showSendButton;
-        public boolean isOperatorTyping;
-        public boolean isAttachmentButtonEnabled;
-        public boolean isAttachmentButtonVisible;
+        private boolean isAttachmentAllowed;
 
         public Builder copyFrom(ChatState chatState) {
             queueTicketId = chatState.queueTicketId;
@@ -155,7 +390,8 @@ public class ChatState {
             showSendButton = chatState.showSendButton;
             isOperatorTyping = chatState.isOperatorTyping;
             isAttachmentButtonEnabled = chatState.isAttachmentButtonEnabled;
-            isAttachmentButtonVisible = chatState.isAttachmentButtonVisible;
+            isAttachmentButtonNeeded = chatState.isAttachmentButtonNeeded;
+            isAttachmentAllowed = chatState.isAttachmentAllowed;
             return this;
         }
 
@@ -269,230 +505,43 @@ public class ChatState {
             return this;
         }
 
-        public Builder setIsAttachmentButtonVisible(boolean isAttachmentButtonVisible) {
-            this.isAttachmentButtonVisible = isAttachmentButtonVisible;
+        public Builder setIsAttachmentButtonNeeded(boolean isAttachmentButtonNeeded) {
+            this.isAttachmentButtonNeeded = isAttachmentButtonNeeded;
+            return this;
+        }
+
+        public Builder setIsAttachmentAllowed(boolean isAttachmentAllowed) {
+            this.isAttachmentAllowed = isAttachmentAllowed;
             return this;
         }
 
         public ChatState createChatState() {
-            return new ChatState(queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, isVisible, integratorChatStarted, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, isChatInBottom, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, operatorStatusItem, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonVisible);
+            return new ChatState(
+                    queueTicketId,
+                    historyLoaded,
+                    operatorName,
+                    operatorProfileImgUrl,
+                    companyName,
+                    queueId,
+                    contextUrl,
+                    isVisible,
+                    integratorChatStarted,
+                    mediaUpgradeStartedTimerItem,
+                    chatItems,
+                    chatInputMode,
+                    lastTypedText,
+                    isChatInBottom,
+                    messagesNotSeen,
+                    engagementRequested,
+                    pendingNavigationType,
+                    unsentMessages,
+                    operatorStatusItem,
+                    showSendButton,
+                    isOperatorTyping,
+                    isAttachmentButtonEnabled,
+                    isAttachmentButtonNeeded,
+                    isAttachmentAllowed
+            );
         }
-    }
-
-    public ChatState initChat(String companyName,
-                              String queueId,
-                              String contextUrl) {
-        return new Builder()
-                .copyFrom(this)
-                .setIntegratorChatStarted(true)
-                .setCompanyName(companyName)
-                .setQueueId(queueId)
-                .setContextUrl(contextUrl)
-                .setIsVisible(true)
-                .setShowSendButton(false)
-                .setIsAttachmentButtonEnabled(true)
-                .createChatState();
-    }
-
-    public ChatState queueingStarted(OperatorStatusItem operatorStatusItem) {
-        return new Builder()
-                .copyFrom(this)
-                .setOperatorName(null)
-                .setOperatorProfileImgUrl(null)
-                .setChatInputMode(ChatInputMode.ENABLED)
-                .setEngagementRequested(true)
-                .setOperatorStatusItem(operatorStatusItem)
-                .createChatState();
-    }
-
-    public ChatState queueTicketSuccess(String queueTicketId) {
-        return new Builder()
-                .copyFrom(this)
-                .setQueueTicketId(queueTicketId)
-                .createChatState();
-    }
-
-    public ChatState engagementStarted(String operatorName, String operatorProfileImgUrl) {
-        return new Builder()
-                .copyFrom(this)
-                .setOperatorName(operatorName)
-                .setOperatorProfileImgUrl(operatorProfileImgUrl)
-                .setChatInputMode(ChatInputMode.ENABLED)
-                .setIsAttachmentButtonVisible(true)
-                .setEngagementRequested(true)
-                .createChatState();
-    }
-
-    public ChatState stop() {
-        return new Builder()
-                .copyFrom(this)
-                .setQueueTicketId(null)
-                .setHistoryLoaded(false)
-                .setOperatorName(null)
-                .setOperatorProfileImgUrl(null)
-                .setIsVisible(false)
-                .setIntegratorChatStarted(false)
-                .setIsAttachmentButtonVisible(false)
-                .createChatState();
-    }
-
-    public ChatState historyLoaded(List<ChatItem> chatItems) {
-        return new Builder()
-                .copyFrom(this)
-                .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
-                .setIsAttachmentButtonVisible(false)
-                .setHistoryLoaded(true)
-                .setChatItems(chatItems)
-                .createChatState();
-    }
-
-    public ChatState changeItems(List<ChatItem> newItems) {
-        return new Builder()
-                .copyFrom(this)
-                .setChatItems(newItems)
-                .createChatState();
-    }
-
-    public ChatState changeTimerItem(List<ChatItem> newItems, MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem) {
-        return new Builder()
-                .copyFrom(changeItems(newItems))
-                .setMediaUpgradeStartedItem(mediaUpgradeStartedTimerItem)
-                .createChatState();
-    }
-
-    public ChatState changeVisibility(boolean isVisible) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsVisible(isVisible)
-                .createChatState();
-    }
-
-    public ChatState setLastTypedText(String text) {
-        return new Builder()
-                .copyFrom(this)
-                .setLastTypedText(text)
-                .createChatState();
-    }
-
-    public ChatState chatInputModeChanged(ChatInputMode chatInputMode) {
-        return new Builder()
-                .copyFrom(this)
-                .setChatInputMode(chatInputMode)
-                .setIsAttachmentButtonVisible(chatInputMode == ChatInputMode.ENABLED)
-                .createChatState();
-    }
-
-    public ChatState isInBottomChanged(boolean isChatInBottom) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsChatInBottom(isChatInBottom)
-                .createChatState();
-    }
-
-    public ChatState messagesNotSeenChanged(int messagesNotSeen) {
-        return new Builder()
-                .copyFrom(this)
-                .setMessagesNotSeen(messagesNotSeen)
-                .createChatState();
-    }
-
-    public ChatState setPendingNavigationType(String pendingNavigationType) {
-        return new Builder()
-                .copyFrom(this)
-                .setPendingNavigationType(pendingNavigationType)
-                .createChatState();
-    }
-
-    public ChatState changeUnsentMessages(List<VisitorMessageItem> unsentMessages) {
-        return new Builder()
-                .copyFrom(this)
-                .setUnsentMessages(Collections.unmodifiableList(unsentMessages))
-                .createChatState();
-    }
-
-    public ChatState setShowSendButton(boolean isShow) {
-        return new Builder()
-                .copyFrom(this)
-                .setShowSendButton(isShow)
-                .createChatState();
-    }
-
-    public ChatState setIsOperatorTyping(boolean isOperatorTyping) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsOperatorTyping(isOperatorTyping)
-                .createChatState();
-    }
-
-    public ChatState setIsAttachmentButtonEnabled(boolean isAttachmentButtonEnabled) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsAttachmentButtonEnabled(isAttachmentButtonEnabled)
-                .createChatState();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChatState chatState = (ChatState) o;
-        return integratorChatStarted == chatState.integratorChatStarted &&
-                isVisible == chatState.isVisible &&
-                historyLoaded == chatState.historyLoaded &&
-                Objects.equals(queueTicketId, chatState.queueTicketId) &&
-                Objects.equals(operatorName, chatState.operatorName) &&
-                Objects.equals(operatorProfileImgUrl, chatState.operatorProfileImgUrl) &&
-                Objects.equals(companyName, chatState.companyName) &&
-                Objects.equals(queueId, chatState.queueId) &&
-                Objects.equals(contextUrl, chatState.contextUrl) &&
-                Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
-                Objects.equals(chatInputMode, chatState.chatInputMode) &&
-                Objects.equals(lastTypedText, chatState.lastTypedText) &&
-                isChatInBottom == chatState.isChatInBottom &&
-                engagementRequested == chatState.engagementRequested &&
-                Objects.equals(pendingNavigationType, chatState.pendingNavigationType) &&
-                Objects.equals(messagesNotSeen, chatState.messagesNotSeen) &&
-                Objects.equals(operatorStatusItem, chatState.operatorStatusItem) &&
-                Objects.equals(unsentMessages, chatState.unsentMessages) &&
-                Objects.equals(chatItems, chatState.chatItems) &&
-                showSendButton == chatState.showSendButton &&
-                isOperatorTyping == chatState.isOperatorTyping &&
-                isAttachmentButtonEnabled == chatState.isAttachmentButtonEnabled &&
-                isAttachmentButtonVisible == chatState.isAttachmentButtonVisible;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonVisible);
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return "ChatState{" +
-                "integratorChatStarted=" + integratorChatStarted +
-                ", isVisible=" + isVisible +
-                ", queueTicketId='" + queueTicketId + '\'' +
-                ", historyLoaded=" + historyLoaded +
-                ", operatorName='" + operatorName + '\'' +
-                ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
-                ", companyName='" + companyName + '\'' +
-                ", queueId='" + queueId + '\'' +
-                ", contextUrl='" + contextUrl + '\'' +
-                ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
-                ", chatInputMode=" + chatInputMode +
-                ", lastTypedText: " + lastTypedText +
-                ", messagesNotSeen: " + messagesNotSeen +
-                ", isChatInBottom: " + isChatInBottom +
-                ", engagementRequested: " + engagementRequested +
-                ", pendingNavigationType: " + pendingNavigationType +
-                ", operatorStatusItem: " + operatorStatusItem +
-                ", unsentMessages: " + unsentMessages +
-                ", chatItems=" + chatItems +
-                ", showSendButton=" + showSendButton +
-                ", isOperatorTyping=" + isOperatorTyping +
-                ", isAttachmentButtonEnabled=" + isAttachmentButtonEnabled +
-                ", isAttachmentButtonVisible=" + isAttachmentButtonVisible +
-                '}';
     }
 }

@@ -1,9 +1,9 @@
 package com.glia.widgets.view.head;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
@@ -13,20 +13,27 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.airbnb.lottie.LottieProperty;
+import com.airbnb.lottie.model.KeyPath;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.helper.Utils;
+import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.google.android.material.imageview.ShapeableImageView;
-import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import com.squareup.picasso.Picasso;
 
-public class ChatHeadView extends ConstraintLayout {
-
-    private ShapeableImageView profilePictureView;
-    private ShapeableImageView placeholderView;
-    private TextView chatBubbleBadge;
-
-    private UiTheme theme;
+public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.View {
+    private ShapeableImageView operatorImageView;
+    private ShapeableImageView operatorPlaceholderImageView;
+    private TextView badgeView;
+    private LottieAnimationView queueingAnimation;
+    private GliaSdkConfiguration sdkConfiguration;
+    private ChatHeadContract.Controller controller;
+    private ChatHeadConfiguration configuration;
 
     public ChatHeadView(@NonNull Context context) {
         this(context, null);
@@ -42,77 +49,225 @@ public class ChatHeadView extends ConstraintLayout {
 
     public ChatHeadView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(
-                MaterialThemeOverlay.wrap(
-                        context,
-                        attrs,
-                        defStyleAttr,
-                        defStyleRes),
+                context,
                 attrs,
                 defStyleAttr,
                 defStyleRes
         );
-        initViews();
-        readTypedArray(attrs, defStyleAttr, defStyleRes);
-        setupViewAppearance();
+        init();
     }
 
-    private void initViews() {
-        View view = View.inflate(this.getContext(), R.layout.chat_head_view, this);
-        profilePictureView = view.findViewById(R.id.profile_picture_view);
-        placeholderView = view.findViewById(R.id.placeholder_view);
-        chatBubbleBadge = view.findViewById(R.id.chat_bubble_badge);
+    public static ChatHeadView getInstance(Context context) {
+        return new ChatHeadView(context);
     }
 
-    private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        @SuppressLint("CustomViewStyleable") TypedArray typedArray = this.getContext().obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes);
-        setDefaultTheme(typedArray);
-        typedArray.recycle();
+    @Override
+    public void setController(ChatHeadContract.Controller controller) {
+        this.controller = controller;
     }
 
-    private void setDefaultTheme(TypedArray typedArray) {
-        this.theme = Utils.getThemeFromTypedArray(typedArray, this.getContext());
-    }
-
-    public void setTheme(UiTheme uiTheme) {
-        if (uiTheme == null) return;
-        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
-        setupViewAppearance();
-    }
-
-    private void setupViewAppearance() {
-        placeholderView.setImageResource(theme.getIconPlaceholder());
-        // colors
-        ColorStateList backgroundColor =
-                ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor());
-        int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
-        ColorStateList primaryColorStateList = ContextCompat.getColorStateList(this.getContext(), theme.getBrandPrimaryColor());
-        profilePictureView.setBackgroundColor(primaryColor);
-        placeholderView.setBackgroundColor(primaryColor);
-        placeholderView.setImageTintList(backgroundColor);
-        chatBubbleBadge.setBackgroundTintList(primaryColorStateList);
-        chatBubbleBadge.setTextColor(backgroundColor);
-    }
-
-    public void updateImage(String operatorProfileImgUrl) {
+    @Override
+    public void showUnreadMessageCount(int unreadMessageCount) {
         post(() -> {
-            if (placeholderView != null && profilePictureView != null) {
-                if (operatorProfileImgUrl != null) {
-                    Picasso.get().load(operatorProfileImgUrl).into(profilePictureView);
-                    placeholderView.setVisibility(View.GONE);
-                } else {
-                    int primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
-                    profilePictureView.setImageDrawable(null);
-                    profilePictureView.setBackgroundColor(primaryColor);
-                    placeholderView.setVisibility(View.VISIBLE);
-                }
+            badgeView.setText(String.valueOf(unreadMessageCount));
+            badgeView.setVisibility(isDisplayUnreadMessageBadge(unreadMessageCount));
+        });
+    }
+
+    @Override
+    public void showOperatorImage(String operatorProfileImgUrl) {
+        post(() -> {
+            queueingAnimation.setVisibility(GONE);
+            operatorPlaceholderImageView.setVisibility(GONE);
+            Picasso.get().load(operatorProfileImgUrl).into(operatorImageView);
+        });
+    }
+
+    @Override
+    public void showPlaceholder() {
+        post(() -> {
+            queueingAnimation.setVisibility(GONE);
+            operatorImageView.setImageDrawable(null);
+            operatorImageView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), configuration.getBackgroundColorRes()));
+            operatorPlaceholderImageView.setVisibility(VISIBLE);
+        });
+    }
+
+    @Override
+    public void showQueueing() {
+        post(() -> {
+            operatorPlaceholderImageView.setVisibility(GONE);
+            operatorImageView.setImageDrawable(null);
+            operatorImageView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), configuration.getBadgeTextColor()));
+            queueingAnimation.setVisibility(VISIBLE);
+        });
+    }
+
+    @Override
+    public void updateConfiguration(
+            UiTheme buildTimeTheme,
+            GliaSdkConfiguration sdkConfiguration
+    ) {
+        this.sdkConfiguration = sdkConfiguration;
+        createHybridConfiguration(
+                buildTimeTheme,
+                sdkConfiguration
+        );
+        updateView();
+    }
+
+    @Override
+    public void navigateToChat() {
+        getContext().startActivity(
+                getNavigationIntent(
+                        getContext(),
+                        ChatActivity.class,
+                        sdkConfiguration
+                )
+        );
+    }
+
+    @Override
+    public void navigateToCall() {
+        getContext().startActivity(
+                getNavigationIntent(
+                        getContext(),
+                        CallActivity.class,
+                        sdkConfiguration
+                )
+        );
+    }
+
+    private ChatHeadConfiguration createBuildTimeConfiguration(UiTheme buildTimeTheme) {
+        return ChatHeadConfiguration.builder()
+                .operatorPlaceholderBackgroundColor(buildTimeTheme.getBrandPrimaryColor())
+                .operatorPlaceholderIcon(buildTimeTheme.getIconPlaceholder())
+                .operatorPlaceholderIconTintList(buildTimeTheme.getBaseLightColor())
+                .badgeTextColor(buildTimeTheme.getBaseLightColor())
+                .badgeBackgroundTintList(buildTimeTheme.getBrandPrimaryColor())
+                .backgroundColorRes(buildTimeTheme.getBrandPrimaryColor())
+                .build();
+    }
+
+    private void createHybridConfiguration(
+            UiTheme buildTimeTheme,
+            GliaSdkConfiguration sdkConfiguration
+    ) {
+        configuration = createBuildTimeConfiguration(buildTimeTheme);
+        if (sdkConfiguration == null) return;
+        UiTheme runTimeTheme = sdkConfiguration.getRunTimeTheme();
+        if (runTimeTheme == null) return;
+        ChatHeadConfiguration runTimeConfiguration = runTimeTheme.getChatHeadConfiguration();
+        ChatHeadConfiguration.Builder builder = ChatHeadConfiguration.builder(configuration);
+        if (runTimeConfiguration != null) {
+            if (runTimeConfiguration.getOperatorPlaceholderBackgroundColor() != null) {
+                builder.operatorPlaceholderBackgroundColor(runTimeConfiguration.getOperatorPlaceholderBackgroundColor());
             }
-        });
+            if (runTimeConfiguration.getOperatorPlaceholderIcon() != null) {
+                builder.operatorPlaceholderIcon(runTimeConfiguration.getOperatorPlaceholderIcon());
+            }
+            if (runTimeConfiguration.getOperatorPlaceholderIconTintList() != null) {
+                builder.operatorPlaceholderIconTintList(runTimeConfiguration.getOperatorPlaceholderIconTintList());
+            }
+            if (runTimeConfiguration.getBadgeBackgroundTintList() != null) {
+                builder.badgeBackgroundTintList(runTimeConfiguration.getBadgeBackgroundTintList());
+            }
+            if (runTimeConfiguration.getBadgeTextColor() != null) {
+                builder.badgeTextColor(runTimeConfiguration.getBadgeTextColor());
+            }
+            if (runTimeConfiguration.getBackgroundColorRes() != null) {
+                builder.backgroundColorRes(runTimeConfiguration.getBackgroundColorRes());
+            }
+        }
+        configuration = builder.build();
     }
 
-    public void setMessageBadgeCount(int messageCount) {
-        post(() -> {
-            chatBubbleBadge.setText(String.valueOf(messageCount));
-            chatBubbleBadge.setVisibility(messageCount > 0 ? VISIBLE : GONE);
-        });
+    private void init() {
+        View view = View.inflate(this.getContext(), R.layout.chat_head_view, this);
+        operatorImageView = view.findViewById(R.id.profile_picture_view);
+        operatorPlaceholderImageView = view.findViewById(R.id.placeholder_view);
+        badgeView = view.findViewById(R.id.chat_bubble_badge);
+        queueingAnimation = view.findViewById(R.id.queueing_lottie_animation);
+    }
+
+    private void updateOperatorPlaceholderImageView() {
+        operatorPlaceholderImageView
+                .setImageResource(
+                        configuration.getOperatorPlaceholderIcon()
+                );
+
+        operatorPlaceholderImageView
+                .setBackgroundColor(
+                        ContextCompat
+                                .getColor(
+                                        this.getContext(),
+                                        configuration
+                                                .getOperatorPlaceholderBackgroundColor()
+                                )
+                );
+
+        operatorPlaceholderImageView
+                .setImageTintList(
+                        ContextCompat.getColorStateList(
+                                this.getContext(),
+                                configuration
+                                        .getOperatorPlaceholderIconTintList()
+                        )
+                );
+    }
+
+    private void updateBadgeView() {
+        badgeView.setBackgroundTintList(
+                ContextCompat.getColorStateList(
+                        this.getContext(),
+                        configuration
+                                .getBadgeBackgroundTintList()
+                )
+        );
+        badgeView.setTextColor(
+                ContextCompat.getColor(
+                        this.getContext(),
+                        configuration
+                                .getBadgeTextColor()
+                )
+        );
+    }
+
+    private void updateOperatorImageView() {
+        operatorImageView.setBackgroundColor(
+                ContextCompat.getColor(
+                        this.getContext(),
+                        configuration.getBackgroundColorRes()
+                )
+        );
+    }
+
+    private void updateQueueingAnimationView() {
+        queueingAnimation.addValueCallback(
+                new KeyPath("**"),
+                LottieProperty.COLOR_FILTER,
+                frameInfo -> new PorterDuffColorFilter(ContextCompat.getColor(this.getContext(), this.configuration.getBackgroundColorRes()), PorterDuff.Mode.SRC_OVER)
+        );
+    }
+
+    private void updateView() {
+        updateOperatorPlaceholderImageView();
+        updateBadgeView();
+        updateOperatorImageView();
+        updateQueueingAnimationView();
+    }
+
+    private static Intent getNavigationIntent(Context context, Class<?> cls, GliaSdkConfiguration sdkConfiguration) {
+        Intent newIntent = new Intent(context, cls);
+        newIntent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
+        newIntent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
+        newIntent.putExtra(GliaWidgets.CONTEXT_URL, sdkConfiguration.getContextUrl());
+        newIntent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
+        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return newIntent;
+    }
+
+    private int isDisplayUnreadMessageBadge(int unreadMessageCount) {
+        return unreadMessageCount > 0 ? VISIBLE : GONE;
     }
 }

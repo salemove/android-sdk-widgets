@@ -13,9 +13,28 @@
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>
     <string name="glia_chat_file_download_failed_msg">Could not download the file. Please try again.</string>
 
+    <string name="glia_chat_in_queue_message_content_description">%1$s. \n An MSR will be with you shortly.</string>
+    <string name="glia_chat_operator_has_joined_content_description">Operator %1$s has joined the conversation</string>
+    <string name="glia_chat_send_content_description">Send message</string>
+    <string name="glia_chat_add_attachment_description">Add attachment</string>
+    <string name="glia_chat_visitor_message_content_description">Your message: %1$s</string>
+    <string name="glia_chat_visitor_message_delivered_content_description">Your message: %1$s \n Delivered</string>
+    <string name="glia_chat_operator_message_content_description">Operator\'s message: %1$s</string>
+    <string name="glia_chat_operator_name_message_content_description">Operator %1$s, Message: %2$s</string>
+    <string name="glia_chat_visitor_image_content_description">Your attached image</string>
+    <string name="glia_chat_visitor_image_delivered_content_description">Your attached image. \n Delivered</string>
+    <string name="glia_chat_operator_image_content_description">Operator\'s attached image</string>
+    <string name="glia_chat_visitor_file_content_description">Your attached file %1$s, size %2$s</string>
+    <string name="glia_chat_visitor_file_delivered_content_description">Your attached file %1$s, size %2$s. \n Delivered</string>
+    <string name="glia_chat_operator_file_content_description">Operator\'s attached file %1$s, size %2$s</string>
+    <string name="glia_chat_attachment_item_content_description">Attachment %1$s, size %2$s. %3$s</string>
+    <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
+
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
     <string name="glia_top_app_bar_chat_end">End</string>
+    <string name="glia_top_app_bar_navigate_up_content_description">Navigate Up</string>
+    <string name="glia_top_app_bar_chat_end_content_description">End engagement</string>
 
     <!--    dialogs-->
     <!-- Leave Queue Dialog -->
@@ -66,12 +85,6 @@
     <string name="glia_dialog_upgrade_accept">@string/glia_dialog_accept</string>
     <string name="glia_dialog_upgrade_decline">@string/glia_dialog_decline</string>
 
-    <!-- End screen sharing Dialog -->
-    <string name="glia_dialog_screen_sharing_end_title">End Screen Sharing?</string>
-    <string name="glia_dialog_screen_sharing_end_message">Are you sure you want to end screen sharing?</string>
-    <string name="glia_dialog_screen_sharing_end_cancel">@string/glia_dialog_cancel</string>
-    <string name="glia_dialog_screen_sharing_end_end">End</string>
-
     <!-- Operators unavailable AlertDialog -->
     <string name="glia_dialog_operators_unavailable_title">Operators Not Available</string>
     <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
@@ -103,6 +116,27 @@
     <string name="glia_call_connecting_with">Connecting with %1$s\n%2$s</string>
     <string name="glia_call_in_queue_message">An operator will be with you shortly.</string>
     <string name="glia_call_continue_browsing">You can continue browsing and we will connect you automatically.</string>
+
+    <plurals name="glia_call_chat_content_description">
+        <item quantity="one">@string/glia_call_chat_one_content_description</item>
+        <item quantity="other">@string/glia_call_chat_other_content_description</item>
+    </plurals>
+    <string name="glia_call_chat_zero_content_description">Chat</string>
+    <string name="glia_call_chat_one_content_description">Chat. %1$d unread message</string>
+    <string name="glia_call_chat_other_content_description">Chat. %1$d unread messages</string>
+    <string name="glia_call_video_on_content_description">Turn off video</string>
+    <string name="glia_call_video_off_content_description">Turn on video</string>
+    <string name="glia_call_mute_content_description">Unmute microphone</string>
+    <string name="glia_call_unmute_content_description">Mute microphone</string>
+    <string name="glia_call_speaker_on_content_description">Turn off speaker</string>
+    <string name="glia_call_speaker_off_content_description">Turn on speaker</string>
+    <string name="glia_call_minimize_content_description">Minimize</string>
+    <string name="glia_call_operator_profile_picture_content_description">Operator Avatar</string>
+    <string name="glia_call_visitor_video_content_description">Your Video</string>
+    <string name="glia_call_operator_video_content_description">Operator\'s Video</string>
+    <string name="glia_call_company_name_hint">Company name</string>
+    <string name="glia_call_operator_name_hint">Operator name</string>
+    <string name="glia_call_call_duration_hint">Call duration</string>
 
     <!--    statusbar notifications-->
     <string name="glia_notification_screen_sharing_channel_name">Screen sharing notification channel</string>
@@ -144,5 +178,8 @@
     <string name="glia_preview_activity_image_share_title">Share Image</string>
     <string name="glia_preview_activity_toolbar_title">Preview</string>
     <string name="glia_preview_activity_img_fetch_fail_msg">Could not fetch the image. Please try again.</string>
+    <string name="glia_preview_activity_menu_save_button">Save</string>
+    <string name="glia_preview_activity_menu_share_button">Share</string>
+    <string name="glia_preview_activity_image_content_description">Preview content</string>
 
 </resources>

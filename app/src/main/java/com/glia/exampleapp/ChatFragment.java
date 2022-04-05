@@ -55,13 +55,13 @@ public class ChatFragment extends Fragment {
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.startChat(
                 Utils.getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences, getResources()),
-                Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences, getResources()),
-                Utils.getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences, getResources()));
+                Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.default_queue_id), sharedPreferences, getResources()),
+                Utils.getStringFromPrefs(R.string.pref_context_url, getString(R.string.default_queue_id), sharedPreferences, getResources()));
     }
 
     @Override
     public void onResume() {
-        chatView.onResume();
+        chatView.onResume(true);
         super.onResume();
     }
 
@@ -71,7 +71,7 @@ public class ChatFragment extends Fragment {
         onEndListener = null;
         navController.removeOnDestinationChangedListener(onDestinationChangedListener);
         onBackClickedListener = null;
-        chatView.onDestroyView();
+        chatView.onDestroyView(true);
         super.onDestroyView();
     }
 

@@ -1,9 +1,13 @@
 package com.glia.widgets.core.engagement;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.Operator;
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
@@ -11,9 +15,6 @@ import java.util.function.Consumer;
 
 public class GliaEngagementRepository {
     private final String TAG = GliaEngagementRepository.class.getSimpleName();
-
-    enum EngagementType {NONE, CHAT, MEDIA}
-
     private EngagementType engagementType = EngagementType.NONE;
 
     public GliaEngagementRepository() {
@@ -43,6 +44,10 @@ public class GliaEngagementRepository {
         return engagementType == EngagementType.MEDIA;
     }
 
+    public boolean isChatEngagement() {
+        return engagementType == EngagementType.CHAT;
+    }
+
     public void listenForEngagementEnd(OmnicoreEngagement engagement, Runnable engagementEnded) {
         engagement.on(Engagement.Events.END, engagementEnded);
     }
@@ -57,7 +62,7 @@ public class GliaEngagementRepository {
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> {
             engagement.end(e -> {
                 if (e != null) {
-                    Logger.e(TAG, "Ending engagement error: " + e.toString());
+                    Logger.e(TAG, "Ending engagement error: " + e);
                 }
             });
         });
@@ -75,6 +80,10 @@ public class GliaEngagementRepository {
         return Dependencies.glia().getCurrentEngagement().isPresent();
     }
 
+    public void getSiteInfo(@NonNull RequestCallback<SiteInfo> callback) {
+        Dependencies.glia().getSiteInfo(callback);
+    }
+
     public boolean isOperatorOnline() {
         if (Dependencies.glia().getCurrentEngagement().isPresent()) {
             Engagement engagement = Dependencies.glia().getCurrentEngagement().get();
@@ -83,4 +92,6 @@ public class GliaEngagementRepository {
         }
         return false;
     }
+
+    enum EngagementType {NONE, CHAT, MEDIA}
 }

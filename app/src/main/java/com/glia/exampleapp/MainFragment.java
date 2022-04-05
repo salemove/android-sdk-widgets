@@ -15,14 +15,11 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 
 import com.glia.widgets.GliaWidgets;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
-
-    public MainFragment() {
-    }
 
     @Nullable
     @Override
@@ -36,38 +33,33 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         NavController navController = NavHostFragment.findNavController(this);
-        view.findViewById(R.id.settings_button).setOnClickListener(view1 -> {
-            navController.navigate(R.id.settings);
-        });
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-        /* https://salemove.atlassian.net/browse/MUIC-362
-        view.findViewById(R.id.integrator_chat).setOnClickListener(view1 -> {
-            navController.navigate(R.id.chat);
-        });
-         */
-        view.findViewById(R.id.chat_activity_button).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), ChatActivity.class);
-            setNavigationIntentData(intent, sharedPreferences);
-            startActivity(intent);
-        });
-        view.findViewById(R.id.audio_call_button).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), CallActivity.class);
-            setNavigationIntentData(intent, sharedPreferences);
-            intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_AUDIO);
-            startActivity(intent);
-        });
-        view.findViewById(R.id.video_call_button).setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), CallActivity.class);
-            setNavigationIntentData(intent, sharedPreferences);
-            intent.putExtra(GliaWidgets.MEDIA_TYPE, GliaWidgets.MEDIA_TYPE_VIDEO);
-            startActivity(intent);
-        });
-        view.findViewById(R.id.end_engagement_button).setOnClickListener(v -> {
-            GliaWidgets.endEngagement();
-        });
-        view.findViewById(R.id.clear_session_button).setOnClickListener(v -> {
-            GliaWidgets.clearVisitorSession();
-        });
+        view.findViewById(R.id.settings_button).setOnClickListener(view1 ->
+                navController.navigate(R.id.settings));
+        view.findViewById(R.id.chat_activity_button).setOnClickListener(v ->
+                navigateToChat());
+        view.findViewById(R.id.audio_call_button).setOnClickListener(v ->
+                navigateToCall(GliaWidgets.MEDIA_TYPE_AUDIO));
+        view.findViewById(R.id.video_call_button).setOnClickListener(v ->
+                navigateToCall(GliaWidgets.MEDIA_TYPE_VIDEO));
+        view.findViewById(R.id.end_engagement_button).setOnClickListener(v ->
+                GliaWidgets.endEngagement());
+        view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
+                GliaWidgets.clearVisitorSession());
+
+        ChatHeadLayout chatHeadLayout = view.findViewById(R.id.chat_head_layout);
+        chatHeadLayout.setNavigationCallback(
+                new ChatHeadLayout.NavigationCallback() {
+                    @Override
+                    public void onNavigateToChat() {
+                        navigateToChat();
+                    }
+
+                    @Override
+                    public void onNavigateToCall() {
+                        navigateToCall(null);
+                    }
+                }
+        );
     }
 
     @Override
@@ -76,16 +68,61 @@ public class MainFragment extends Fragment {
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void setNavigationIntentData(Intent intent, SharedPreferences sharedPreferences) {
-        intent.putExtra(GliaWidgets.COMPANY_NAME,
-                Utils.getStringFromPrefs(R.string.pref_company_name, "", sharedPreferences, getResources()));
-        intent.putExtra(GliaWidgets.QUEUE_ID,
-                Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.queue_id), sharedPreferences, getResources()));
-        intent.putExtra(GliaWidgets.CONTEXT_URL,
-                Utils.getStringFromPrefs(R.string.pref_context_url, getString(R.string.queue_id), sharedPreferences, getResources()));
-        UiTheme uiTheme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
-        intent.putExtra(GliaWidgets.UI_THEME, uiTheme);
-        // use to set the bubble functionality
-        intent.putExtra(GliaWidgets.USE_OVERLAY, Utils.getUseOverlay(sharedPreferences, getResources()));
+    private void navigateToChat() {
+        Intent intent = new Intent(requireContext(), ChatActivity.class);
+        setNavigationIntentData(intent);
+        startActivity(intent);
+    }
+
+    private void navigateToCall(String mediaType) {
+        Intent intent = new Intent(requireContext(), CallActivity.class);
+        setNavigationIntentData(intent);
+        intent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
+        startActivity(intent);
+    }
+
+    private void setNavigationIntentData(Intent intent) {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(requireContext());
+
+        intent.putExtra(
+                GliaWidgets.COMPANY_NAME,
+                Utils.getStringFromPrefs(
+                        R.string.pref_company_name,
+                        "",
+                        sharedPreferences,
+                        getResources()
+                )
+        );
+        intent.putExtra(
+                GliaWidgets.QUEUE_ID,
+                Utils.getStringFromPrefs(
+                        R.string.pref_queue_id,
+                        getString(R.string.default_queue_id),
+                        sharedPreferences,
+                        getResources()
+                )
+        );
+        intent.putExtra(
+                GliaWidgets.CONTEXT_URL,
+                Utils.getStringFromPrefs(
+                        R.string.pref_context_url,
+                        getString(R.string.default_queue_id),
+                        sharedPreferences,
+                        getResources()
+                )
+        );
+        intent.putExtra(
+                GliaWidgets.UI_THEME,
+                Utils.getUiThemeByPrefs(sharedPreferences, getResources())
+        );
+        intent.putExtra(
+                GliaWidgets.USE_OVERLAY,
+                Utils.getUseOverlay(sharedPreferences, getResources())
+        );
+        intent.putExtra(
+                GliaWidgets.SCREEN_SHARING_MODE,
+                Utils.getScreenSharingModeFromPrefs(sharedPreferences, getResources())
+        );
     }
 }

@@ -1,37 +1,33 @@
 package com.glia.widgets.di;
 
 import android.app.Application;
-import android.content.Intent;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.lifecycle.Lifecycle;
 
-import com.glia.widgets.Constants;
+import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
-import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
-import com.glia.widgets.view.head.ChatHeadService;
-import com.glia.widgets.view.head.ChatHeadsController;
-import com.glia.widgets.helper.Logger;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
+import com.glia.widgets.helper.ApplicationLifecycleManager;
+import com.glia.widgets.helper.Logger;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class Dependencies {
 
     private final static String TAG = "Dependencies";
     private static ControllerFactory controllerFactory;
-    private static final List<String> activitiesInBackstack = new ArrayList<>();
     private static INotificationManager notificationManager;
-    private static GliaSdkConfigurationManager sdkConfigurationManager;
+    private static GliaSdkConfigurationManager sdkConfigurationManager =
+            new GliaSdkConfigurationManager();
     private static UseCaseFactory useCaseFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
-        sdkConfigurationManager = new GliaSdkConfigurationManager();
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(downloadsFolderDataSource);
         useCaseFactory = new UseCaseFactory(
@@ -39,22 +35,19 @@ public class Dependencies {
                 new PermissionManager(application),
                 new PermissionDialogManager(application),
                 notificationManager,
-                sdkConfigurationManager
+                sdkConfigurationManager,
+                new ChatHeadManager(application)
         );
 
-        controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory);
-        controllerFactory.getChatHeadsController().addChatHeadServiceListener(
-                new ChatHeadsController.ChatHeadServiceListener() {
-                    @Override
-                    public void startService() {
-                        application.startService(new Intent(application, ChatHeadService.class));
-                    }
-
-                    @Override
-                    public void stopService() {
-                        application.stopService(new Intent(application, ChatHeadService.class));
-                    }
-                });
+        controllerFactory = new ControllerFactory(
+                repositoryFactory,
+                useCaseFactory,
+                sdkConfigurationManager
+        );
+        initApplicationLifecycleObserver(
+                new ApplicationLifecycleManager(),
+                controllerFactory.getChatHeadController()
+        );
     }
 
     public static UseCaseFactory getUseCaseFactory() {
@@ -76,32 +69,6 @@ public class Dependencies {
     public static ControllerFactory getControllerFactory() {
         Logger.d(TAG, "getControllerFactory");
         return controllerFactory;
-    }
-
-    /**
-     * Needed because CallActivity uses translucent window. And this flag messes with any background
-     * activity lifecycles. Used to know what activities are in the current backstack.
-     *
-     * @param activity 1 of either {@link com.glia.widgets.Constants#CALL_ACTIVITY}
-     *                 or {@link com.glia.widgets.Constants#CHAT_ACTIVITY}
-     */
-    public static void addActivityToBackStack(String activity) {
-        Logger.d(TAG, "addActivityToBackStack");
-        if (activity.equals(Constants.CALL_ACTIVITY) || activity.equals(Constants.CHAT_ACTIVITY) || activity.equals(Constants.IMAGE_PREVIEW_ACTIVITY)) {
-            if (!activitiesInBackstack.contains(activity)) {
-                activitiesInBackstack.add(activity);
-            }
-        }
-    }
-
-    public static void removeActivityFromBackStack(String activity) {
-        Logger.d(TAG, "removeActivityFromBackStack");
-        activitiesInBackstack.remove(activity);
-    }
-
-    public static boolean isInBackstack(String activity) {
-        Logger.d(TAG, "isInBackstack");
-        return activitiesInBackstack.contains(activity);
     }
 
     public static GliaCore glia() {
@@ -128,8 +95,16 @@ public class Dependencies {
         Dependencies.sdkConfigurationManager = sdkConfigurationManager;
     }
 
-    @VisibleForTesting
-    public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
-        Dependencies.useCaseFactory = useCaseFactory;
+    private static void initApplicationLifecycleObserver(
+            ApplicationLifecycleManager lifecycleManager,
+            ServiceChatHeadController chatBubbleController
+    ) {
+        lifecycleManager.addObserver((source, event) -> {
+            if (event == Lifecycle.Event.ON_STOP) {
+                chatBubbleController.onApplicationStop();
+            } else if (event == Lifecycle.Event.ON_DESTROY) {
+                chatBubbleController.onDestroy();
+            }
+        });
     }
 }

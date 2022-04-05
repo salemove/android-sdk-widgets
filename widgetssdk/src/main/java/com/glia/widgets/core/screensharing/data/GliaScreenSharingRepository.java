@@ -1,5 +1,7 @@
 package com.glia.widgets.core.screensharing.data;
 
+import android.app.Activity;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
@@ -8,9 +10,9 @@ import com.glia.androidsdk.screensharing.LocalScreen;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.screensharing.ScreenSharingRequest;
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState;
+import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
 
 import java.util.function.Consumer;
 
@@ -74,9 +76,17 @@ public class GliaScreenSharingRepository {
         callback.onScreenSharingRequest();
     }
 
-    public void onScreenSharingAccepted(android.app.Activity activity) {
+    public void onScreenSharingAccepted(
+            Activity activity,
+            ScreenSharing.Mode screenSharingMode
+    ) {
         Logger.d(TAG, "screen sharing accepted by the user");
-        screenSharingRequest.accept(ScreenSharing.Mode.UNBOUNDED, activity, UNIQUE_RESULT_CODE, exceptionConsumer);
+        screenSharingRequest.accept(
+                screenSharingMode,
+                activity,
+                UNIQUE_RESULT_CODE,
+                exceptionConsumer
+        );
     }
 
     public void onScreenSharingDeclined() {

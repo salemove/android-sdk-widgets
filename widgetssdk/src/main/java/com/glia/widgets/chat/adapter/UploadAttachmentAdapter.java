@@ -66,6 +66,7 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
         }
 
         public void onBind(FileAttachment attachment, ItemCallback callback) {
+            Context context = itemView.getContext();
             CardView extensionContainerView = itemView.findViewById(R.id.type_indicator_view);
             TextView extensionTypeText = itemView.findViewById(R.id.type_indicator_text);
             ImageView extensionTypeImage = itemView.findViewById(R.id.type_indicator_image);
@@ -78,21 +79,21 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
             });
 
             String diplayName = attachment.getDisplayName();
-            long size = attachment.getSize();
+            String size = Formatter.formatFileSize(itemView.getContext(), attachment.getSize());
             String mimeType = attachment.getMimeType();
 
             setProgressIndicatorState(progressIndicator, attachment.getAttachmentStatus());
-            statusIndicator.setText(getStatusIndicatorText(itemView.getContext(), attachment.getAttachmentStatus()));
+            statusIndicator.setText(getStatusIndicatorText(context, attachment.getAttachmentStatus()));
             setTitleText(titleText, diplayName, size, attachment.getAttachmentStatus());
 
             if (isError(attachment.getAttachmentStatus())) {
-                extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_system_agent_bubble_color));
+                extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.glia_system_agent_bubble_color));
                 extensionTypeImage.setVisibility(View.VISIBLE);
                 extensionTypeText.setVisibility(View.GONE);
                 extensionTypeImage.setImageResource(R.drawable.ic_info);
                 extensionTypeImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             } else {
-                extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_brand_primary_color));
+                extensionContainerView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.glia_brand_primary_color));
                 extensionTypeImage.setScaleType(ImageView.ScaleType.FIT_XY);
                 if (mimeType.startsWith("image")) {
                     extensionTypeText.setVisibility(View.GONE);
@@ -110,6 +111,15 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
                     extensionTypeText.setText(extension);
                 }
             }
+
+            removeItemButton.setContentDescription(context.getString(
+                    R.string.glia_chat_attachment_remove_item_content_description,
+                    diplayName));
+            itemView.setContentDescription(context.getString(
+                    R.string.glia_chat_attachment_item_content_description,
+                    diplayName,
+                    size,
+                    getStatusIndicatorText(context, attachment.getAttachmentStatus())));
         }
 
         private boolean isError(FileAttachment.Status status) {
@@ -131,13 +141,13 @@ public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadA
             }
         }
 
-        private void setTitleText(TextView titleText, String fileName, long byteSize, FileAttachment.Status status) {
+        private void setTitleText(TextView titleText, String fileName, String byteSize, FileAttachment.Status status) {
             switch (status) {
                 case UPLOADING:
                 case SECURITY_SCAN:
                 case READY_TO_SEND:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.glia_base_normal_color));
-                    titleText.setText(String.format("%s • %s", fileName, Formatter.formatFileSize(itemView.getContext(), byteSize)));
+                    titleText.setText(String.format("%s • %s", fileName, byteSize));
                     break;
                 case ERROR_NETWORK_TIMEOUT:
                     titleText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.design_default_color_error));

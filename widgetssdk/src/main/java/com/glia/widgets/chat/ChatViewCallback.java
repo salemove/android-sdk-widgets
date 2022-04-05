@@ -26,4 +26,6 @@ public interface ChatViewCallback {
     void fileDownloadError(AttachmentFile attachmentFile, Throwable error);
 
     void fileDownloadSuccess(AttachmentFile attachmentFile);
+
+    void clearMessageInput();
 }

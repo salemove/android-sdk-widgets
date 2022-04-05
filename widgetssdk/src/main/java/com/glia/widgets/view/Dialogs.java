@@ -18,11 +18,37 @@ import androidx.core.content.res.ResourcesCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.button.BaseConfigurableButton;
 import com.glia.widgets.view.button.GliaNegativeButton;
 import com.glia.widgets.view.button.GliaPositiveButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class Dialogs {
+
+    public static AlertDialog showOptionsDialog(
+            Context context,
+            UiTheme theme,
+            String title,
+            String message,
+            String positiveButtonText,
+            String negativeButtonText,
+            View.OnClickListener positiveButtonClickListener,
+            View.OnClickListener negativeButtonClickListener,
+            DialogInterface.OnCancelListener cancelListener
+    ) {
+        return showOptionsDialog(
+                context,
+                theme,
+                title,
+                message,
+                positiveButtonText,
+                negativeButtonText,
+                positiveButtonClickListener,
+                negativeButtonClickListener,
+                cancelListener,
+                false
+        );
+    }
 
     public static AlertDialog showOptionsDialog(Context context,
                                                 UiTheme theme,
@@ -32,14 +58,11 @@ public class Dialogs {
                                                 String negativeButtonText,
                                                 View.OnClickListener positiveButtonClickListener,
                                                 View.OnClickListener negativeButtonClickListener,
-                                                DialogInterface.OnCancelListener cancelListener) {
+                                                DialogInterface.OnCancelListener cancelListener,
+                                                boolean isButtonsColorsReversed) {
 
         boolean isUseAlertDialogButtonVerticalAlignment = Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme);
-
-        int layout =
-                isUseAlertDialogButtonVerticalAlignment ?
-                        R.layout.options_dialog_vertical :
-                        R.layout.options_dialog;
+        int layout = getOptionsAlertDialogLayout(isUseAlertDialogButtonVerticalAlignment, isButtonsColorsReversed);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
                 .setOnCancelListener(cancelListener);
@@ -48,11 +71,11 @@ public class Dialogs {
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
 
-        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
-        negativeButton.setTheme(theme);
+        BaseConfigurableButton declineButton = customLayout.findViewById(R.id.decline_button);
+        declineButton.setTheme(theme);
 
-        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.positive_button);
-        positiveButton.setTheme(theme);
+        BaseConfigurableButton acceptButton = customLayout.findViewById(R.id.accept_button);
+        acceptButton.setTheme(theme);
 
         ImageView logoView = customLayout.findViewById(R.id.logo_view);
 
@@ -69,17 +92,17 @@ public class Dialogs {
 
             titleView.setTypeface(fontFamily);
             messageView.setTypeface(fontFamily);
-            positiveButton.setTypeface(fontFamily);
-            negativeButton.setTypeface(fontFamily);
+            acceptButton.setTypeface(fontFamily);
+            declineButton.setTypeface(fontFamily);
         }
 
         titleView.setText(title);
         messageView.setText(message);
-        negativeButton.setText(negativeButtonText);
-        positiveButton.setText(positiveButtonText);
+        declineButton.setText(negativeButtonText);
+        acceptButton.setText(positiveButtonText);
 
-        negativeButton.setOnClickListener(negativeButtonClickListener);
-        positiveButton.setOnClickListener(positiveButtonClickListener);
+        declineButton.setOnClickListener(negativeButtonClickListener);
+        acceptButton.setOnClickListener(positiveButtonClickListener);
 
         builder.setView(customLayout);
 
@@ -89,6 +112,18 @@ public class Dialogs {
         dialog.getWindow().getDecorView().getBackground().setTint(ContextCompat.getColor(
                 context, theme.getBaseLightColor()));
         return dialog;
+    }
+
+    private static int getOptionsAlertDialogLayout(boolean useVerticalAlignment, boolean isButtonsColorsReversed) {
+        if (useVerticalAlignment && isButtonsColorsReversed) {
+            return R.layout.options_dialog_vertical_reversed;
+        } else if (useVerticalAlignment) {
+            return R.layout.options_dialog_vertical;
+        } else if (isButtonsColorsReversed) {
+            return R.layout.options_dialog_reversed;
+        } else {
+            return R.layout.options_dialog;
+        }
     }
 
     public static AlertDialog showAlertDialog(Context context,
@@ -184,9 +219,9 @@ public class Dialogs {
         View customLayout = LayoutInflater.from(context).inflate(layout, null, false);
         ImageView titleIconView = customLayout.findViewById(R.id.chat_title_icon);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
-        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
+        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.decline_button);
         negativeButton.setTheme(theme);
-        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.accept_button);
         positiveButton.setTheme(theme);
         ImageView logoView = customLayout.findViewById(R.id.logo_view);
 
@@ -262,9 +297,9 @@ public class Dialogs {
         ImageView titleIconView = customLayout.findViewById(R.id.title_icon);
         TextView titleView = customLayout.findViewById(R.id.dialog_title_view);
         TextView messageView = customLayout.findViewById(R.id.dialog_message_view);
-        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.negative_button);
+        GliaNegativeButton negativeButton = customLayout.findViewById(R.id.decline_button);
         negativeButton.setTheme(theme);
-        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.positive_button);
+        GliaPositiveButton positiveButton = customLayout.findViewById(R.id.accept_button);
         positiveButton.setTheme(theme);
         ImageView logoView = customLayout.findViewById(R.id.logo_view);
 

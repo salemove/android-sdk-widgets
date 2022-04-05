@@ -22,14 +22,20 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.squareup.picasso.Picasso;
 
 public class OperatorStatusView extends ConstraintLayout {
-
+    // Animation behind the view
     private final LottieAnimationView rippleAnimation;
+
+    // Main view
     private final ShapeableImageView profilePictureView;
+    // Icon on top of main view - displayed if no image available
     private final ShapeableImageView placeholderView;
+    // On Hold status view on top of main view - displayed when on hold status changes
+    private final ShapeableImageView onHoldOverlayView;
+
+    private final int placeHolderViewContentPadding;
+
     private int primaryColor;
-    private final int connectedImageSize;
-    private final int placeholderBackgroundSize;
-    private final int placeHolderSize;
+    private boolean isOnHold = false;
 
     public OperatorStatusView(@NonNull Context context) {
         this(context, null);
@@ -45,6 +51,7 @@ public class OperatorStatusView extends ConstraintLayout {
         rippleAnimation = view.findViewById(R.id.ripple_animation);
         profilePictureView = view.findViewById(R.id.profile_picture_view);
         placeholderView = view.findViewById(R.id.placeholder_view);
+        onHoldOverlayView = view.findViewById(R.id.on_hold_icon);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.OperatorStatusView);
         int rippleAnimationColor = typedArray.getResourceId(R.styleable.OperatorStatusView_rippleTint, 0);
@@ -55,89 +62,114 @@ public class OperatorStatusView extends ConstraintLayout {
                     frameInfo -> new SimpleColorFilter(this.getContext().getColor(rippleAnimationColor))
             );
         }
-        placeholderBackgroundSize =
-                typedArray.getDimensionPixelSize(
-                        R.styleable.OperatorStatusView_imageSize,
-                        (int) getResources().getDimension(R.dimen.glia_chat_profile_picture_size)
-                );
-        placeHolderSize = placeholderBackgroundSize / 2;
-        connectedImageSize =
-                typedArray.getDimensionPixelSize(
-                        R.styleable.OperatorStatusView_imageSize,
-                        placeholderBackgroundSize
-                );
-        typedArray.recycle();
-    }
 
-    public void setPlaceHolderIcon(UiTheme theme) {
-        placeholderView.setImageResource(theme.getIconPlaceholder());
+        int imageSize = (int) typedArray.getDimensionPixelSize(
+                R.styleable.OperatorStatusView_imageSize,
+                (int) getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_size)
+        );
+        profilePictureView.getLayoutParams().width = imageSize;
+        profilePictureView.getLayoutParams().height = imageSize;
+
+        placeHolderViewContentPadding = imageSize / 4;
+
+        typedArray.recycle();
+        setOnHoldVisibility();
     }
 
     public void setTheme(UiTheme theme) {
         // icons
         setPlaceHolderIcon(theme);
+        setOnHoldIcon(theme);
 
         // colors
-        ColorStateList backgroundColor = ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor());
-        primaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
+        ColorStateList backgroundColor = ContextCompat.getColorStateList(
+                this.getContext(), theme.getBaseLightColor()
+        );
+        primaryColor = ContextCompat.getColor(
+                this.getContext(), theme.getBrandPrimaryColor()
+        );
         rippleAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
                 frameInfo -> new SimpleColorFilter(this.getContext().getColor(theme.getBrandPrimaryColor()))
         );
-        profilePictureView.setBackgroundColor(primaryColor);
-        placeholderView.setBackgroundColor(primaryColor);
+        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
         placeholderView.setImageTintList(backgroundColor);
     }
 
-    public void showProfileImage(String profileImgUrl) {
-        profilePictureView.getLayoutParams().width = connectedImageSize;
-        profilePictureView.getLayoutParams().height = connectedImageSize;
-        showProfilePictureView(profileImgUrl);
-    }
-
     public void showPlaceHolder() {
-        profilePictureView.getLayoutParams().width = placeholderBackgroundSize;
-        profilePictureView.getLayoutParams().height = placeholderBackgroundSize;
-        placeholderView.getLayoutParams().width = placeHolderSize;
-        placeholderView.getLayoutParams().height = placeHolderSize;
-        showPlaceHolderView();
-    }
-
-    public void showDefaultSizeProfileImage(String profileImgUrl) {
-        int backgroundSize = (int) getResources().getDimension(R.dimen.glia_chat_profile_picture_size);
-        profilePictureView.getLayoutParams().width = backgroundSize;
-        profilePictureView.getLayoutParams().height = backgroundSize;
-        showProfilePictureView(profileImgUrl);
-    }
-
-    public void showDefaultSizePlaceHolder() {
-        int backgroundSize = (int) getResources().getDimension(R.dimen.glia_chat_profile_picture_size);
-        profilePictureView.getLayoutParams().width = backgroundSize;
-        profilePictureView.getLayoutParams().height = backgroundSize;
-        placeholderView.getLayoutParams().width = backgroundSize / 2;
-        placeholderView.getLayoutParams().height = backgroundSize / 2;
-        showPlaceHolderView();
-    }
-
-    private void showPlaceHolderView() {
-        ColorDrawable cd = new ColorDrawable(primaryColor);
-        profilePictureView.setImageDrawable(cd);
+        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
+        placeholderView.setContentPadding(0, 0, 0, 0);
         placeholderView.setVisibility(VISIBLE);
     }
 
-    private void showProfilePictureView(String profileImgUrl) {
-        Picasso.get().load(profileImgUrl).into(profilePictureView);
-        placeholderView.setVisibility(GONE);
+    public void showPlaceHolderWithIconPadding() {
+        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
+        placeholderView.setVisibility(VISIBLE);
+        placeholderView.post(() -> placeholderView.setContentPadding(placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding));
     }
 
-    public void isRippleAnimationShowing(boolean show) {
-        if (show) {
-            rippleAnimation.playAnimation();
-            rippleAnimation.setVisibility(VISIBLE);
-        } else {
-            rippleAnimation.cancelAnimation();
-            rippleAnimation.setVisibility(GONE);
+    public void showPlaceHolderWithIconPaddingOnConnect() {
+        int imageSize = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
+        profilePictureView.getLayoutParams().width = imageSize;
+        profilePictureView.getLayoutParams().height = imageSize;
+        showPlaceHolderWithIconPadding();
+    }
+
+    public void showProfileImageOnConnect(String profileImgUrl) {
+        int imageSize = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
+        profilePictureView.getLayoutParams().width = imageSize;
+        profilePictureView.getLayoutParams().height = imageSize;
+        showProfileImage(profileImgUrl);
+    }
+
+    public void showProfileImage(String profileImgUrl) {
+        Picasso.get().load(profileImgUrl).into(profilePictureView);
+        placeholderView.setVisibility(GONE);
+        placeholderView.post(() ->
+                placeholderView.setContentPadding(
+                        placeHolderViewContentPadding,
+                        placeHolderViewContentPadding,
+                        placeHolderViewContentPadding,
+                        placeHolderViewContentPadding
+                )
+        );
+    }
+
+    public void setShowOnHold(boolean isOnHold) {
+        if (this.isOnHold != isOnHold) {
+            this.isOnHold = isOnHold;
+            setOnHoldVisibility();
         }
+    }
+
+    public void setShowRippleAnimation(boolean show) {
+        if (show) {
+            showRippleAnimation();
+        } else {
+            hideRippleAnimation();
+        }
+    }
+
+    private void showRippleAnimation() {
+        rippleAnimation.playAnimation();
+        rippleAnimation.setVisibility(VISIBLE);
+    }
+
+    private void hideRippleAnimation() {
+        rippleAnimation.cancelAnimation();
+        rippleAnimation.setVisibility(GONE);
+    }
+
+    private void setOnHoldVisibility() {
+        onHoldOverlayView.setVisibility(isOnHold ? View.VISIBLE : View.GONE);
+    }
+
+    private void setPlaceHolderIcon(UiTheme theme) {
+        placeholderView.setImageResource(theme.getIconPlaceholder());
+    }
+
+    private void setOnHoldIcon(UiTheme theme) {
+        onHoldOverlayView.setImageResource(theme.getIconOnHold());
     }
 }

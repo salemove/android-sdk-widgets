@@ -21,16 +21,16 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profile_picture_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/glia_chat_profile_picture_size"
+        android:layout_height="@dimen/glia_chat_profile_picture_size"
         android:layout_gravity="center"
         android:background="?attr/gliaBrandPrimaryColor"
-        android:scaleType="centerCrop"
         android:contentDescription="@string/glia_call_operator_profile_picture_content_description"
-        app:layout_constraintBottom_toBottomOf="@id/ripple_animation"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/ripple_animation"
+        app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
         app:srcCompat="?attr/gliaBrandPrimaryColor" />
 
@@ -39,7 +39,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:background="?attr/gliaBrandPrimaryColor"
         android:scaleType="fitCenter"
         android:tint="?attr/gliaBaseLightColor"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
@@ -49,4 +48,20 @@
         app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
         app:srcCompat="?attr/gliaIconPlaceholder" />
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/on_hold_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:background="@color/glia_dark_transparent_bg"
+        android:contentDescription="@string/glia_call_operator_status_on_hold_description"
+        android:scaleType="fitCenter"
+        android:tint="?attr/gliaBaseLightColor"
+        app:contentPadding="@dimen/glia_operator_status_view_content_padding"
+        app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
+        app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
+        app:layout_constraintStart_toStartOf="@id/profile_picture_view"
+        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
+        app:shapeAppearance="@style/Application.Glia.Chat.CircleImageView"
+        app:srcCompat="?attr/gliaIconOnHold" />
 </merge>

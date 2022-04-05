@@ -14,7 +14,6 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.view.OperatorStatusView;
-import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     private final OperatorStatusView statusPictureView;
@@ -89,7 +88,7 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     public void bind(OperatorStatusItem item) {
         chatStartingHeadingView.setText(item.getCompanyName());
         if (item.getStatus() == OperatorStatusItem.Status.IN_QUEUE) {
-            statusPictureView.showPlaceHolder();
+            statusPictureView.showPlaceHolderWithIconPadding();
             chatStartingHeadingView.setVisibility(View.VISIBLE);
             chatStartingCaptionView.setVisibility(View.VISIBLE);
             chatStartedNameView.setVisibility(View.GONE);
@@ -99,7 +98,7 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             if (item.getProfileImgUrl() != null) {
                 statusPictureView.showProfileImage(item.getProfileImgUrl());
             } else {
-                statusPictureView.showPlaceHolder();
+                statusPictureView.showPlaceHolderWithIconPadding();
             }
             chatStartedNameView.setText(item.getOperatorName());
             chatStartedCaptionView.setText(context.getString(R.string.glia_chat_operator_has_joined, item.getOperatorName()));
@@ -111,6 +110,6 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
 
             itemView.setContentDescription(context.getString(R.string.glia_chat_operator_has_joined_content_description, item.getOperatorName()));
         }
-        statusPictureView.isRippleAnimationShowing(item.getStatus() == OperatorStatusItem.Status.IN_QUEUE);
+        statusPictureView.setShowRippleAnimation(item.getStatus() == OperatorStatusItem.Status.IN_QUEUE);
     }
 }

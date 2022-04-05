@@ -33,7 +33,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
 
     private void setupOperatorStatus(UiTheme uiTheme) {
         operatorStatusView.setTheme(uiTheme);
-        operatorStatusView.isRippleAnimationShowing(false);
+        operatorStatusView.setShowRippleAnimation(false);
     }
 
     public void bind(OperatorAttachmentItem item, ChatAdapter.OnImageItemClickListener onImageItemClickListener) {
@@ -67,7 +67,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
         if (item.operatorProfileImgUrl != null) {
             operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
         } else {
-            operatorStatusView.showPlaceHolder();
+            operatorStatusView.showPlaceHolderWithIconPadding();
         }
     }
 }

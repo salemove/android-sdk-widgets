@@ -220,6 +220,8 @@ public class ControllerFactory {
                     messagesNotSeenHandler,
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     chatHeadPosition
             );
         }
@@ -234,7 +236,9 @@ public class ControllerFactory {
                 useCaseFactory.createOnEngagementEndUseCase(),
                 messagesNotSeenHandler,
                 useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
         );
     }
 

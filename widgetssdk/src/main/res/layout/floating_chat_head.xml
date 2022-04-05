@@ -19,8 +19,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/placeholder_view"
-        android:layout_width="@dimen/glia_hat_head_placeholder_size"
-        android:layout_height="@dimen/glia_hat_head_placeholder_size"
+        android:layout_width="@dimen/glia_chat_head_placeholder_size"
+        android:layout_height="@dimen/glia_chat_head_placeholder_size"
         android:layout_gravity="center"
         android:elevation="@dimen/glia_small"
         android:scaleType="fitCenter"

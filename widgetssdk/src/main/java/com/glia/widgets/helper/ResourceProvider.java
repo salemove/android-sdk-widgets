@@ -1,0 +1,56 @@
+package com.glia.widgets.helper;
+
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
+
+import java.lang.ref.WeakReference;
+
+public class ResourceProvider implements IResourceProvider {
+
+    private final WeakReference<Context> weakContext;
+
+    public ResourceProvider(Context context) {
+        weakContext = new WeakReference<>(context);
+    }
+
+    @Override
+    public String getString(int id) {
+        return (weakContext.get()).getResources().getString(id);
+    }
+
+    @Override
+    public String getString(int id, @Nullable Object... formatArgs) {
+        return (weakContext.get()).getResources().getString(id, formatArgs);
+    }
+
+    @Override
+    public Integer getColor(int id) {
+        return ResourcesCompat.getColor((weakContext.get()).getResources(), id, null);
+    }
+
+    @Nullable
+    @Override
+    public Drawable getDrawable(int id) {
+        return ResourcesCompat.getDrawable((weakContext.get()).getResources(), id, null);
+    }
+}
+
+interface IResourceProvider {
+
+    String getString(@StringRes int id);
+
+    String getString(@StringRes int id, @Nullable Object... formatArgs);
+
+    @ColorInt
+    Integer getColor(@ColorRes int id);
+
+    @Nullable
+    Drawable getDrawable(@DrawableRes int id);
+}

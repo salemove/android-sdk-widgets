@@ -303,7 +303,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             singleChoice(questionItem);
         }
 
-        void singleChoice(QuestionItem item) {
+        void singleChoice(QuestionItem item, SurveyStyle style) {
             String selectedId = Optional.ofNullable(item.getAnswer())
                     .map(answer -> (String) answer.getResponse())
                     .orElse(null);

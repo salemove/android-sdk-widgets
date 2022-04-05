@@ -30,7 +30,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
 
     private void setupOperatorStatusView(UiTheme uiTheme) {
         operatorStatusView.setTheme(uiTheme);
-        operatorStatusView.isRippleAnimationShowing(false);
+        operatorStatusView.setShowRippleAnimation(false);
     }
 
     private void updateOperatorStatusView(OperatorAttachmentItem item) {
@@ -38,7 +38,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         if (item.operatorProfileImgUrl != null) {
             operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
         } else {
-            operatorStatusView.showPlaceHolder();
+            operatorStatusView.showPlaceHolderWithIconPadding();
         }
 
         String name = item.attachmentFile.getName();

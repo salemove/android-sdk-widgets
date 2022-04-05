@@ -136,7 +136,9 @@ public class ControllerFactory {
                     useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
                     useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");

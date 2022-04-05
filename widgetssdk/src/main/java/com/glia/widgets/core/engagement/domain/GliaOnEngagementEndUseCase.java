@@ -8,6 +8,7 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
+import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 
 public class GliaOnEngagementEndUseCase implements
         GliaOnEngagementUseCase.Listener {
@@ -23,6 +24,7 @@ public class GliaOnEngagementEndUseCase implements
     private final GliaQueueRepository gliaQueueRepository;
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
+    private final GliaVisitorMediaRepository gliaVisitorMediaRepository;
 
     private Listener listener;
 
@@ -45,6 +47,7 @@ public class GliaOnEngagementEndUseCase implements
             fileAttachmentRepository.detachAllFiles();
             removeScreenSharingNotificationUseCase.execute();
             removeCallNotificationUseCase.execute();
+            gliaVisitorMediaRepository.onEngagementEnded(engagement);
         }
     }
 
@@ -57,7 +60,8 @@ public class GliaOnEngagementEndUseCase implements
             FileAttachmentRepository fileAttachmentRepository,
             GliaOnEngagementUseCase engagementUseCase,
             RemoveCallNotificationUseCase removeCallNotificationUseCase,
-            RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase
+            RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase,
+            GliaVisitorMediaRepository gliaVisitorMediaRepository
     ) {
         this.repository = repository;
         this.engagementUseCase = engagementUseCase;
@@ -66,6 +70,7 @@ public class GliaOnEngagementEndUseCase implements
         this.gliaQueueRepository = gliaQueueRepository;
         this.operatorMediaRepository = operatorMediaRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
+        this.gliaVisitorMediaRepository = gliaVisitorMediaRepository;
     }
 
     public void execute(Listener listener) {

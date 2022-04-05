@@ -129,7 +129,6 @@ public class ControllerFactory {
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
-                    useCaseFactory.createGliaOnVisitorMediaStateUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
                     useCaseFactory.createShouldShowMediaEngagementViewUseCase(),

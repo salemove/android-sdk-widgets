@@ -19,6 +19,10 @@ public interface ChatHeadLayoutContract {
 
         void showQueueing();
 
+        void showOnHold();
+
+        void hideOnHold();
+
         void navigateToChat();
 
         void navigateToCall();

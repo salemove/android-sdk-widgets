@@ -7,8 +7,8 @@ import com.glia.androidsdk.comms.VisitorMediaState;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
-    private final List<VisitorMediaStateListener> visitorMediaStateListeners = new ArrayList<>();
+public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
+    private final List<VisitorMediaUpdatesListener> visitorMediaUpdatesListeners = new ArrayList<>();
 
     private VisitorMediaState currentMediaState = null;
     private boolean isOnHold = false;
@@ -37,24 +37,24 @@ public class GliaVisitorMediaRepository implements VisitorMediaStateListener {
         isOnHold = false;
     }
 
-    public void addVisitorMediaStateListener(VisitorMediaStateListener listener) {
+    public void addVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {
         listener.onNewVisitorMediaState(currentMediaState);
         listener.onHoldChanged(isOnHold);
-        visitorMediaStateListeners.add(listener);
+        visitorMediaUpdatesListeners.add(listener);
     }
 
-    public void removeVisitorMediaStateListener(VisitorMediaStateListener listener) {
-        visitorMediaStateListeners.remove(listener);
+    public void removeVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {
+        visitorMediaUpdatesListeners.remove(listener);
     }
 
     private void updateVisitorMediaState(VisitorMediaState state) {
         currentMediaState = state;
-        visitorMediaStateListeners.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
+        visitorMediaUpdatesListeners.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
     }
 
     private void updateOnHoldState(boolean newOnHold) {
         isOnHold = newOnHold;
-        visitorMediaStateListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
+        visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
     }
 
     private boolean hasVisitorVideoMedia() {

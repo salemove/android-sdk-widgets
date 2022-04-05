@@ -1,7 +1,7 @@
 package com.glia.widgets.core.visitor.domain;
 
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
-import com.glia.widgets.core.visitor.VisitorMediaStateListener;
+import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 
 public class RemoveVisitorMediaStateListenerUseCase {
     private final GliaVisitorMediaRepository repository;
@@ -10,7 +10,7 @@ public class RemoveVisitorMediaStateListenerUseCase {
         this.repository = repository;
     }
 
-    public void execute(VisitorMediaStateListener listener) {
+    public void execute(VisitorMediaUpdatesListener listener) {
         repository.removeVisitorMediaStateListener(listener);
     }
 }

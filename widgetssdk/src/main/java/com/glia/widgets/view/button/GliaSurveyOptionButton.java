@@ -28,7 +28,7 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         ColorStateList actionButtonBackgroundColor =
                 selected ?
                         ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
-                        ContextCompat.getColorStateList(getContext(), R.color.glia_system_agent_bubble_color);
+                        ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color);
 
         ColorStateList actionButtonTextColor =
                 selected ?

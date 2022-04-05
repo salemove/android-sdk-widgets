@@ -17,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -98,16 +97,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void bindYesNo(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyYesNoViewHolder yesNoViewHolder) {
-        setItemTitle(yesNoViewHolder.titleYesNo, question.getText(), question.isRequired());
+        setItemTitle(yesNoViewHolder.titleTextView, question.getText(), question.isRequired());
 
-        SwitchCompat switchCompat = yesNoViewHolder.switchCompat;
-        if (answer != null) {
-            switchCompat.setChecked(answer.getResponse());
-        }
-        switchCompat.setOnCheckedChangeListener(
-                (compoundButton, value) -> {
-                    setAnswer(questionItem, value);
-                });
+        yesNoViewHolder.setAnswer(answer);
+
+        yesNoViewHolder.listener = value -> {
+            setAnswer(questionItem, value);
+            yesNoViewHolder.setSelected(value);
+        };
     }
 
     private void bindOpenText(Survey.Question question, Survey.Answer answer, SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
@@ -214,13 +211,50 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public static class SurveyYesNoViewHolder extends RecyclerView.ViewHolder {
 
-        TextView titleYesNo;
-        SwitchCompat switchCompat;
+        interface OnSurveyYesNoClickListener {
+            void onSurveyYesNoClickListener(boolean value);
+        }
+
+        TextView titleTextView;
+        Button yesButton;
+        Button noButton;
+        OnSurveyYesNoClickListener listener;
 
         public SurveyYesNoViewHolder(@NonNull View itemView) {
             super(itemView);
-            titleYesNo = itemView.findViewById(R.id.tv_title_yes_no);
-            switchCompat = itemView.findViewById(R.id.switch_compat);
+            titleTextView = itemView.findViewById(R.id.tv_title);
+            yesButton = itemView.findViewById(R.id.yes_button);
+            noButton = itemView.findViewById(R.id.no_button);
+
+            yesButton.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onSurveyYesNoClickListener(true);
+                }
+            });
+            noButton.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onSurveyYesNoClickListener(false);
+                }
+            });
+        }
+
+        void setAnswer(@Nullable Survey.Answer answer) {
+            if (answer != null) {
+                boolean value = answer.getResponse();
+                setSelected(value);
+            } else {
+                unselectAll();
+            }
+        }
+
+        void setSelected(boolean value) {
+            yesButton.setSelected(value);
+            noButton.setSelected(!value);
+        }
+
+        void unselectAll() {
+            yesButton.setSelected(false);
+            noButton.setSelected(false);
         }
     }
 

@@ -7,6 +7,7 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
@@ -35,18 +36,23 @@ import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasOverlayEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
-import com.glia.widgets.core.queue.domain.AddQueueTicketsEventsListenerUseCase;
 import com.glia.widgets.core.queue.domain.GetIsMediaQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
+import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.core.visitor.domain.GliaOnVisitorMediaStateUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
+import com.glia.widgets.core.chathead.ChatHeadManager;
+import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
+import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
+import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -54,24 +60,67 @@ public class UseCaseFactory {
     private static RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
+    private static ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
+    private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
+    private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
+    private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
+    private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final RepositoryFactory repositoryFactory;
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
     private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
     private final INotificationManager notificationManager;
+    private final ChatHeadManager chatHeadManager;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
                           PermissionManager permissionManager,
                           PermissionDialogManager permissionDialogManager,
                           INotificationManager notificationManager,
-                          GliaSdkConfigurationManager gliaSdkConfigurationManager
+                          GliaSdkConfigurationManager gliaSdkConfigurationManager,
+                          ChatHeadManager chatHeadManager
     ) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
         this.notificationManager = notificationManager;
         this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
+        this.chatHeadManager = chatHeadManager;
+    }
+
+    public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
+        if (toggleChatHeadServiceUseCase == null) {
+            toggleChatHeadServiceUseCase = new ToggleChatHeadServiceUseCase(
+                    repositoryFactory.getGliaEngagementRepository(),
+                    repositoryFactory.getGliaQueueRepository(),
+                    chatHeadManager,
+                    permissionManager,
+                    gliaSdkConfigurationManager
+            );
+        }
+        return toggleChatHeadServiceUseCase;
+    }
+
+    public IsDisplayApplicationChatHeadUseCase getIsDisplayApplicationChatHeadUseCase() {
+        if (isDisplayApplicationChatHeadUseCase == null) {
+            isDisplayApplicationChatHeadUseCase = new IsDisplayApplicationChatHeadUseCase(
+                    repositoryFactory.getGliaEngagementRepository(),
+                    repositoryFactory.getGliaQueueRepository(),
+                    permissionManager,
+                    gliaSdkConfigurationManager
+            );
+        }
+        return isDisplayApplicationChatHeadUseCase;
+    }
+
+    public ResolveChatHeadNavigationUseCase getResolveChatHeadNavigationUseCase() {
+        if (resolveChatHeadNavigationUseCase == null) {
+            resolveChatHeadNavigationUseCase = new ResolveChatHeadNavigationUseCase(
+                    repositoryFactory.getGliaEngagementRepository(),
+                    repositoryFactory.getGliaQueueRepository()
+            );
+        }
+        return resolveChatHeadNavigationUseCase;
     }
 
     public ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase() {
@@ -107,9 +156,6 @@ public class UseCaseFactory {
     public GliaLoadHistoryUseCase createGliaLoadHistoryUseCase() {
         return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository());
     }
-
-    private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
-    private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
 
     public GliaQueueForChatEngagementUseCase createQueueForChatEngagementUseCase() {
         if (gliaQueueForChatEngagementUseCase == null) {
@@ -213,12 +259,6 @@ public class UseCaseFactory {
         );
     }
 
-    public AddQueueTicketsEventsListenerUseCase createAddQueueTicketsEventsListenerUseCase() {
-        return new AddQueueTicketsEventsListenerUseCase(
-                repositoryFactory.getGliaQueueRepository()
-        );
-    }
-
     public OnUpgradeToMediaEngagementUseCase createOnUpgradeToMediaEngagementUseCase() {
         return new OnUpgradeToMediaEngagementUseCase(
                 repositoryFactory.getGliaEngagementRepository()
@@ -317,5 +357,17 @@ public class UseCaseFactory {
 
     public IsEnableChatEditTextUseCase createIsEnableChatEditTextUseCase() {
         return new IsEnableChatEditTextUseCase();
+    }
+
+    public SubscribeToQueueingStateChangeUseCase createSubscribeToQueueingStateChangeUseCase() {
+        return new SubscribeToQueueingStateChangeUseCase(repositoryFactory.getGliaQueueRepository());
+    }
+
+    public UnsubscribeFromQueueingStateChangeUseCase createUnSubscribeToQueueingStateChangeUseCase() {
+        return new UnsubscribeFromQueueingStateChangeUseCase(repositoryFactory.getGliaQueueRepository());
+    }
+
+    public SiteInfoUseCase createSiteInfoUseCase() {
+        return new SiteInfoUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 }

@@ -1,11 +1,10 @@
 package com.glia.widgets.di;
 
-import android.app.Activity;
-
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
+import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
@@ -13,17 +12,20 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
-import com.glia.widgets.view.head.ChatHeadsController;
+import com.glia.widgets.view.head.ChatHeadLayoutContract;
+import com.glia.widgets.view.head.ChatHeadPosition;
+import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class ControllerFactory {
 
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
-    private final ChatHeadsController chatHeadsController;
     private final DialogController dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
+    private final GliaSdkConfigurationManager sdkConfigurationManager;
 
     private static final String TAG = "ControllerFactory";
 
@@ -31,22 +33,19 @@ public class ControllerFactory {
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
     private final FilePreviewController filePreviewController;
+    private final ChatHeadPosition chatHeadPosition;
 
+    private static ServiceChatHeadController serviceChatHeadController;
 
-    public ControllerFactory(RepositoryFactory repositoryFactory, UseCaseFactory useCaseFactory) {
+    public ControllerFactory(
+            RepositoryFactory repositoryFactory,
+            UseCaseFactory useCaseFactory,
+            GliaSdkConfigurationManager sdkConfigurationManager
+    ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
                 useCaseFactory.createGliaOnMessageUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase()
-        );
-        chatHeadsController = new ChatHeadsController(
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
-                useCaseFactory.createAddQueueTicketsEventsListenerUseCase(),
-                messagesNotSeenHandler,
-                useCaseFactory.createGetIsMediaEngagementOngoingUseCase(),
-                useCaseFactory.createHasOverlayEnabledUseCase()
         );
 
         this.useCaseFactory = useCaseFactory;
@@ -60,9 +59,11 @@ public class ControllerFactory {
                 useCaseFactory.createPutImageFileToDownloadsUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase()
         );
+        this.chatHeadPosition = ChatHeadPosition.getInstance();
+        this.sdkConfigurationManager = sdkConfigurationManager;
     }
 
-    public ChatController getChatController(Activity activity, ChatViewCallback chatViewCallback) {
+    public ChatController getChatController(ChatViewCallback chatViewCallback) {
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
@@ -97,7 +98,10 @@ public class ControllerFactory {
                     useCaseFactory.createIsShowSendButtonUseCase(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createDownloadFileUseCase(),
-                    useCaseFactory.createIsEnableChatEditTextUseCase()
+                    useCaseFactory.createIsEnableChatEditTextUseCase(),
+                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createSiteInfoUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -131,7 +135,9 @@ public class ControllerFactory {
                     useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
-                    useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase()
+                    useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
+                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -140,76 +146,89 @@ public class ControllerFactory {
         return retainedCallController;
     }
 
-    public ScreenSharingController getScreenSharingController(ScreenSharingController.ViewCallback gliaScreenSharingCallback) {
-        if (gliaScreenSharingCallback != null) {
-            if (retainedScreenSharingController == null) {
-                Logger.d(TAG, "new screen sharing controller");
-                retainedScreenSharingController = new ScreenSharingController(
-                        repositoryFactory.getGliaScreenSharingRepository(),
-                        dialogController,
-                        useCaseFactory.createShowScreenSharingNotificationUseCase(),
-                        useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
-                        useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
-                        gliaScreenSharingCallback
-                );
-            } else {
-                Logger.d(TAG, "retained screen sharing controller");
-                retainedScreenSharingController.setGliaScreenSharingCallback(gliaScreenSharingCallback);
-            }
+    public ScreenSharingController getScreenSharingController() {
+        if (retainedScreenSharingController == null) {
+            Logger.d(TAG, "new screen sharing controller");
+            retainedScreenSharingController = new ScreenSharingController(
+                    repositoryFactory.getGliaScreenSharingRepository(),
+                    dialogController,
+                    useCaseFactory.createShowScreenSharingNotificationUseCase(),
+                    useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
+                    useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
+                    sdkConfigurationManager
+            );
         }
         return retainedScreenSharingController;
     }
 
-    public ChatHeadsController getChatHeadsController() {
-        return chatHeadsController;
-    }
-
     public void destroyControllers() {
-        destroyCallController(false);
-        destroyScreenSharingController(false);
+        destroyCallController();
+        destroyScreenSharingController();
         destroyChatController();
-        chatHeadsController.stopService();
+        serviceChatHeadController.onDestroy();
     }
 
-    public void destroyCallController(boolean retain) {
-        Logger.d(TAG, "destroyCallController, retain: " + retain);
+    public void destroyCallController() {
+        Logger.d(TAG, "destroyCallController");
         if (retainedCallController != null) {
-            retainedCallController.onDestroy(retain);
-        }
-        if (!retain) {
+            retainedCallController.onDestroy(false);
             retainedCallController = null;
         }
     }
 
-    public void destroyScreenSharingController(boolean retain) {
-        Logger.d(TAG, "destroyScreenSharingController, retain: " + retain);
+    public void destroyScreenSharingController() {
+        Logger.d(TAG, "destroyScreenSharingController");
         if (retainedScreenSharingController != null) {
-            retainedScreenSharingController.onDestroy(retain);
-        }
-        if (!retain) {
+            retainedScreenSharingController.onDestroy();
             retainedScreenSharingController = null;
         }
     }
 
     private void destroyChatController() {
+        Logger.d(TAG, "destroyChatController");
         if (retainedChatController != null) {
-            Logger.d(TAG, "destroyChatController");
             retainedChatController.onDestroy(false);
             retainedChatController = null;
         }
     }
 
-    public DialogController getDialogController(DialogController.Callback callback) {
-        dialogController.addCallback(callback);
+    public DialogController getDialogController() {
         return dialogController;
     }
 
     public void init() {
-        chatHeadsController.initChatObserving();
         messagesNotSeenHandler.init();
     }
 
     public FilePreviewController getImagePreviewController() {
         return filePreviewController;
+    }
+
+    public ServiceChatHeadController getChatHeadController() {
+        if (serviceChatHeadController == null) {
+            serviceChatHeadController = new ServiceChatHeadController(
+                    useCaseFactory.getToggleChatHeadServiceUseCase(),
+                    useCaseFactory.getResolveChatHeadNavigationUseCase(),
+                    useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createOnEngagementEndUseCase(),
+                    messagesNotSeenHandler,
+                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    chatHeadPosition
+            );
+        }
+        return serviceChatHeadController;
+    }
+
+    public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
+        return new ApplicationChatHeadLayoutController(
+                useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
+                useCaseFactory.getResolveChatHeadNavigationUseCase(),
+                useCaseFactory.createOnEngagementUseCase(),
+                useCaseFactory.createOnEngagementEndUseCase(),
+                messagesNotSeenHandler,
+                useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
+                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+        );
     }
 }

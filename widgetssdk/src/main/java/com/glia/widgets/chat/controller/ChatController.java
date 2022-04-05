@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller;
 
 import android.net.Uri;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
@@ -18,6 +19,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.chat.ChatViewCallback;
@@ -29,6 +31,7 @@ import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
@@ -62,6 +65,8 @@ import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
+import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
+import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -87,6 +92,7 @@ public class ChatController implements
         GliaOnEngagementEndUseCase.Listener {
 
     private final static String TAG = ChatController.class.getSimpleName();
+    private final static String EMPTY_MESSAGE = "";
 
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
@@ -134,10 +140,11 @@ public class ChatController implements
 
         @Override
         public void onMessageValidated() {
+            viewCallback.clearMessageInput();
             emitViewState(
                     chatState
-                            .setLastTypedText("")
-                            .setShowSendButton(isShowSendButtonUseCase.execute(""))
+                            .setLastTypedText(EMPTY_MESSAGE)
+                            .setShowSendButton(isShowSendButtonUseCase.execute(EMPTY_MESSAGE))
             );
         }
 
@@ -185,6 +192,9 @@ public class ChatController implements
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final DownloadFileUseCase downloadFileUseCase;
     private final IsEnableChatEditTextUseCase isEnableChatEditTextUseCase;
+    private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
+    private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
+    private final SiteInfoUseCase siteInfoUseCase;
 
     private Disposable disposable = null;
 
@@ -223,7 +233,10 @@ public class ChatController implements
             IsShowSendButtonUseCase isShowSendButtonUseCase,
             IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
             DownloadFileUseCase downloadFileUseCase,
-            IsEnableChatEditTextUseCase isEnableChatEditTextUseCase
+            IsEnableChatEditTextUseCase isEnableChatEditTextUseCase,
+            SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
+            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
+            SiteInfoUseCase siteInfoUseCase
     ) {
         Logger.d(TAG, "constructor");
 
@@ -243,9 +256,10 @@ public class ChatController implements
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
                 .setChatItems(new ArrayList<>())
-                .setLastTypedText("")
+                .setLastTypedText(EMPTY_MESSAGE)
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
-                .setIsAttachmentButtonVisible(false)
+                .setIsAttachmentButtonNeeded(false)
+                .setIsAttachmentAllowed(true)
                 .setIsChatInBottom(true)
                 .setMessagesNotSeen(0)
                 .setPendingNavigationType(null)
@@ -284,6 +298,9 @@ public class ChatController implements
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.downloadFileUseCase = downloadFileUseCase;
         this.isEnableChatEditTextUseCase = isEnableChatEditTextUseCase;
+        this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
+        this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
+        this.siteInfoUseCase = siteInfoUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -299,8 +316,11 @@ public class ChatController implements
         public void update(Observable observable, Object o) {
             if (viewCallback != null) {
                 viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
-                emitViewState(chatState.setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText)));
-                emitViewState(chatState.setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute()));
+                emitViewState(
+                        chatState
+                                .setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText))
+                                .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute())
+                );
             }
         }
     };
@@ -325,17 +345,19 @@ public class ChatController implements
         minimizeHandler.addListener(minimizeCalledListener);
         createNewTimerCallback();
         callTimer.addFormattedValueListener(timerStatusListener);
+        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         if (getIsQueueingOngoingUseCase.execute()) {
             queueForEngagementOngoing();
         }
+
+        updateAllowFileSendState();
     }
 
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
         queueForChatEngagementUseCase.execute(
                 chatState.queueId,
-                chatState.contextUrl,
-                queueTicketsEventsListener
+                chatState.contextUrl
         );
     }
 
@@ -386,10 +408,11 @@ public class ChatController implements
             onMessageUseCase.unregisterListener();
             onOperatorTypingUseCase.unregisterListener();
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
+            unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         }
     }
 
-    public void onStop() {
+    public void onPause() {
         messagesNotSeenHandler.onChatWentBackground();
     }
 
@@ -399,16 +422,24 @@ public class ChatController implements
                         .setLastTypedText(message)
                         .setShowSendButton(isShowSendButtonUseCase.execute(message))
         );
-        if (chatState.isOperatorOnline()) {
-            Logger.d(TAG, "Send preview: " + message);
-            sendMessagePreviewUseCase.execute(message);
-        }
+        sendMessagePreview(message);
     }
 
     public void sendMessage(String message) {
         Logger.d(TAG, "Send MESSAGE: " + message);
-        Logger.d(TAG, "SEND MESSAGE sending");
+        clearMessagePreview();
         sendMessageUseCase.execute(message, sendMessageCallback);
+    }
+
+    private void sendMessagePreview(String message) {
+        if (chatState.isOperatorOnline()) {
+            sendMessagePreviewUseCase.execute(message);
+        }
+    }
+
+    private void clearMessagePreview() {
+        // Empty string has to be sent to clear the message preview.
+        sendMessagePreview(EMPTY_MESSAGE);
     }
 
     private void onMessage(ChatMessage message) {
@@ -878,6 +909,7 @@ public class ChatController implements
                 currentChatItems.add(
                         new OperatorMessageItem(
                                 lastItemInView.getId(),
+                                lastItemInView.operatorName,
                                 lastItemInView.operatorProfileImgUrl,
                                 showChatHead,
                                 lastItemInView.content,
@@ -933,11 +965,12 @@ public class ChatController implements
     }
 
     private void appendOperatorMessageItem(List<ChatItem> currentChatItems, ChatMessage message) {
-        if (!message.getContent().equals("")) {
+        if (!message.getContent().equals(EMPTY_MESSAGE)) {
             MessageAttachment messageAttachment = message.getAttachment();
             currentChatItems.add(
                     new OperatorMessageItem(
                             message.getId(),
+                            chatState.operatorName,
                             chatState.operatorProfileImgUrl,
                             false,
                             message.getContent(),
@@ -1044,6 +1077,7 @@ public class ChatController implements
             OperatorMessageItem choiceCardItemWithSelected =
                     new OperatorMessageItem(
                             id,
+                            choiceCardItem.operatorName,
                             choiceCardItem.operatorProfileImgUrl,
                             choiceCardItem.showChatHead,
                             choiceCardItem.content,
@@ -1254,5 +1288,13 @@ public class ChatController implements
 
     private void fileDownloadSuccess(AttachmentFile attachmentFile) {
         if (viewCallback != null) viewCallback.fileDownloadSuccess(attachmentFile);
+    }
+
+    private void updateAllowFileSendState() {
+        siteInfoUseCase.execute((siteInfo, e) -> onSiteInfoReceived(siteInfo));
+    }
+
+    private void onSiteInfoReceived(@Nullable SiteInfo siteInfo) {
+        emitViewState(chatState.allowSendAttachmentStateChanged(siteInfo == null || siteInfo.getAllowedFileSenders().isVisitorAllowed()));
     }
 }

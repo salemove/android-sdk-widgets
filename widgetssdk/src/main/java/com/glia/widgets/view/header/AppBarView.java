@@ -45,6 +45,8 @@ public class AppBarView extends AppBarLayout {
         titleView = view.findViewById(R.id.title);
         gliaEndButton = view.findViewById(R.id.end_button);
 
+        materialToolbar.setNavigationContentDescription(context.getString(R.string.glia_top_app_bar_navigate_up_content_description));
+
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.AppBarView);
         Integer backIconResId = Utils.getTypedArrayIntegerValue(
                 typedArray,

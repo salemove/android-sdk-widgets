@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -19,24 +18,20 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.StyleableRes;
 
 import com.glia.androidsdk.chat.AttachmentFile;
-import com.glia.widgets.Constants;
-import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.call.CallActivity;
-import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
-import com.glia.widgets.view.head.model.ChatHeadInput;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static float pxFromDp(final Context context, final float dp) {
@@ -192,6 +187,14 @@ public class Utils {
                         context,
                         R.styleable.GliaView_chatSendMessageButtonTintColor,
                         R.attr.gliaSendMessageButtonTintColor
+                )
+        );
+        defaultThemeBuilder.setGliaChatBackgroundColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_gliaChatBackgroundColor,
+                        R.attr.gliaChatBackgroundColor
                 )
         );
         defaultThemeBuilder.setGliaChatHeaderTitleTintColor(
@@ -492,6 +495,8 @@ public class Utils {
                 newTheme.getSystemAgentBubbleColor() : oldTheme.getSystemAgentBubbleColor();
         Integer chatSendMessageButtonTintColor = newTheme.getSendMessageButtonTintColor() != null ?
                 newTheme.getSendMessageButtonTintColor() : oldTheme.getSendMessageButtonTintColor();
+        Integer gliaChatBackgroundColorRes = newTheme.getGliaChatBackgroundColor() != null ?
+                newTheme.getGliaChatBackgroundColor() : oldTheme.getGliaChatBackgroundColor();
         Integer chatHeaderTitleColor = newTheme.getGliaChatHeaderTitleTintColor() != null ?
                 newTheme.getGliaChatHeaderTitleTintColor() : oldTheme.getGliaChatHeaderTitleTintColor();
         Integer chatHeaderHomeButtonTintColor = newTheme.getGliaChatHeaderHomeButtonTintColor() != null ?
@@ -596,6 +601,12 @@ public class Utils {
                         oldTheme.getGliaChoiceCardContentTextConfiguration()
                 );
 
+        ChatHeadConfiguration chatHeadConfiguration =
+                getConfiguration(
+                        newTheme.getChatHeadConfiguration(),
+                        oldTheme.getChatHeadConfiguration()
+                );
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColorRes);
@@ -605,7 +616,6 @@ public class Utils {
         builder.setBrandPrimaryColor(brandPriamryColorRes);
         builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
         builder.setSendMessageButtonTintColor(chatSendMessageButtonTintColor);
-        builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleColor);
         builder.setGliaChatHeaderHomeButtonTintColor(chatHeaderHomeButtonTintColor);
         builder.setGliaChatHeaderExitQueueButtonTintColor(chatHeaderExitQueueButtonTintColor);
         builder.setChatStartingHeadingTextColor(chatStartingHeadingTextColorRes);
@@ -617,6 +627,8 @@ public class Utils {
         builder.setVisitorMessageBackgroundColor(visitorMessageBackgroundColorRes);
         builder.setVisitorMessageTextColor(visitorMessageTextColorRes);
         builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColorRes);
+        builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleColor);
+        builder.setGliaChatBackgroundColor(gliaChatBackgroundColorRes);
         builder.setOperatorMessageTextColor(operatorMessageTextColorRes);
         builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColorRes);
         builder.setBotActionButtonTextColor(botActionButtonTextColorRes);
@@ -646,29 +658,8 @@ public class Utils {
         builder.setNegativeButtonConfiguration(negativeButtonConfiguration);
         builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
         builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
+        builder.setChatHeadConfiguration(chatHeadConfiguration);
         return builder.build();
-    }
-
-    public static Intent getReturnToEngagementIntent(
-            Context context,
-            ChatHeadInput chatHeadInput,
-            String returnDestination
-    ) {
-        if (returnDestination.equals(Constants.CHAT_ACTIVITY)) {
-            return getNavigationIntent(context, ChatActivity.class, chatHeadInput);
-        } else {
-            return getNavigationIntent(context, CallActivity.class, chatHeadInput);
-        }
-    }
-
-    private static Intent getNavigationIntent(Context context, Class<?> cls, ChatHeadInput chatHeadInput) {
-        Intent newIntent = new Intent(context, cls);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, chatHeadInput.companyName);
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, chatHeadInput.queueId);
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, chatHeadInput.contextUrl);
-        newIntent.putExtra(GliaWidgets.UI_THEME, chatHeadInput.uiTheme);
-        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        return newIntent;
     }
 
     public static File createTempPhotoFile(Context context) throws IOException {
@@ -699,12 +690,6 @@ public class Utils {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1).toUpperCase());
-    }
-
-    public static boolean compareStringWithTrim(String a, String b) {
-        if (a == null && b == null) return true;
-        if (a == null || b == null) return false;
-        return a.trim().equals(b.trim());
     }
 
     public static String toString(AttachmentFile attachmentFile) {

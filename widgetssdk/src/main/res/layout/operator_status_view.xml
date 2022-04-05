@@ -26,6 +26,7 @@
         android:layout_gravity="center"
         android:background="?attr/gliaBrandPrimaryColor"
         android:scaleType="centerCrop"
+        android:contentDescription="@string/glia_call_operator_profile_picture_content_description"
         app:layout_constraintBottom_toBottomOf="@id/ripple_animation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

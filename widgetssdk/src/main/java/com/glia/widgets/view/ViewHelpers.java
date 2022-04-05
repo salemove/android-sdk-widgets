@@ -8,7 +8,7 @@ import androidx.core.util.Pair;
 public class ViewHelpers {
 
     public static class ChatHeadOnTouchListener implements View.OnTouchListener {
-
+        private static final int DIFF_THRESHOLD = 20;
         private int initialX;
         private int initialY;
         private float initialTouchX;
@@ -41,20 +41,17 @@ public class ViewHelpers {
                     initialTouchY = event.getRawY();
                     return true;
                 case MotionEvent.ACTION_UP:
-                    int xDiff = (int) (event.getRawX() - initialTouchX);
-                    int yDiff = (int) (event.getRawY() - initialTouchY);
-
-                    //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
-                    //So that is click event.
-                    if (xDiff < 10 && yDiff < 10) {
+                    int xDiff = (int) Math.abs(event.getRawX() - initialTouchX);
+                    int yDiff = (int) Math.abs(event.getRawY() - initialTouchY);
+                    if (xDiff < DIFF_THRESHOLD && yDiff < DIFF_THRESHOLD) {
                         onChatHeadClickedListener.onClick(v);
                     }
                     return true;
                 case MotionEvent.ACTION_MOVE:
                     //Calculate the X and Y coordinates of the view.
-                    float x = initialX + (int) (event.getRawX() - initialTouchX);
-                    float y = initialY + (int) (event.getRawY() - initialTouchY);
-                    onMoveListener.onMove(x, y);
+                    xDiff = initialX + (int) (event.getRawX() - initialTouchX);
+                    yDiff = initialY + (int) (event.getRawY() - initialTouchY);
+                    onMoveListener.onMove(xDiff, yDiff);
                     return true;
             }
             return false;

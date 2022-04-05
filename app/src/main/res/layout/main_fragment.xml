@@ -109,6 +109,7 @@
         app:layout_constraintTop_toBottomOf="@+id/end_engagement_button" />
 
     <com.glia.widgets.view.head.ChatHeadLayout
+        android:id="@+id/chat_head_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

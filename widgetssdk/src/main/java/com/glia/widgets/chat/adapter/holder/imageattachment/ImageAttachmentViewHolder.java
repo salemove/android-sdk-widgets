@@ -4,6 +4,9 @@ import android.graphics.Color;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
@@ -63,8 +66,25 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
                             imageView.setBackgroundColor(Color.BLACK);
                         }
                 );
+
+        setAccessibilityActions();
     }
 
+    private void setAccessibilityActions() {
+        ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+
+                String actionLabel = host.getResources().getString(R.string.glia_chat_attachment_open_button_label);
+
+                AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
+                        = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
+                info.addAction(actionClick);
+            }
+        });
+    }
 
     public void onStopView() {
         if (disposable != null) disposable.dispose();

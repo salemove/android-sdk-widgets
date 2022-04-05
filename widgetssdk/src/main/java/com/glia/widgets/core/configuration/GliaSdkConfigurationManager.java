@@ -1,12 +1,11 @@
 package com.glia.widgets.core.configuration;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
+
 public class GliaSdkConfigurationManager {
-    private static final String TAG = GliaSdkConfigurationManager.class.getSimpleName();
 
-    private boolean useOverlay = true;
-
-    public GliaSdkConfigurationManager() {
-    }
+    private boolean useOverlay = false;
+    private ScreenSharing.Mode screenSharingMode = null;
 
     public boolean isUseOverlay() {
         return this.useOverlay;
@@ -14,5 +13,13 @@ public class GliaSdkConfigurationManager {
 
     public void setUseOverlay(boolean enabled) {
         this.useOverlay = enabled;
+    }
+
+    public ScreenSharing.Mode getScreenSharingMode() {
+        return screenSharingMode;
+    }
+
+    public void setScreenSharingMode(ScreenSharing.Mode screenSharingMode) {
+        this.screenSharingMode = screenSharingMode;
     }
 }

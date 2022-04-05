@@ -25,9 +25,6 @@ public interface DialogsState {
     class StartScreenSharingDialog implements DialogsState {
     }
 
-    class EndScreenSharingDialog implements DialogsState {
-    }
-
     class EndEngagementDialog implements DialogsState {
         public final String operatorName;
 

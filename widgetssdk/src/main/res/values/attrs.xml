@@ -8,8 +8,7 @@
         <attr name="brandPrimaryColor" format="reference" />
         <!-- Dark color of the UI widgets. Used for example to change the body text colors.  -->
         <attr name="baseDarkColor" format="reference" />
-        <!-- Light color of the UI widgets. Used for example to change the title text colors.
-         Background color of the chat, etc.  -->
+        <!-- Light color of the UI widgets. Used for example to change the title text colors, etc. -->
         <attr name="baseLightColor" format="reference" />
         <!-- Base normal color of the chat  -->
         <attr name="baseNormalColor" format="reference" />
@@ -73,6 +72,8 @@
         <attr name="botActionButtonSelectedTextColor" format="reference" />
         <!-- Send message button tint color -->
         <attr name="chatSendMessageButtonTintColor" format="reference" />
+        <!-- Chat background color -->
+        <attr name="gliaChatBackgroundColor" format="reference" />
 
         <attr name="chatHeaderTitleTintColor" format="reference" />
         <attr name="chatHeaderHomeButtonTintColor" format="reference" />
@@ -179,6 +180,7 @@
     <attr name="buttonBarNegativeButtonStyle" format="reference" />
     <attr name="buttonBarNeutralButtonStyle" format="reference" />
     <attr name="choiceCardContentTextStyle" format="reference" />
+    <attr name="chatHeadStyle" format="reference" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />
@@ -197,6 +199,15 @@
     <declare-styleable name="OperatorStatusView">
         <attr name="imageSize" format="dimension" />
         <attr name="rippleTint" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="ChatHeadView">
+        <attr name="operatorPlaceholderBackgroundColor" format="reference" />
+        <attr name="operatorPlaceholderIcon" format="reference" />
+        <attr name="operatorPlaceholderIconTintList" format="reference" />
+        <attr name="badgeBackgroundTintList" format="reference" />
+        <attr name="badgeTextColor" />
+        <attr name="backgroundTintList" format="reference" />
     </declare-styleable>
 
 </resources>

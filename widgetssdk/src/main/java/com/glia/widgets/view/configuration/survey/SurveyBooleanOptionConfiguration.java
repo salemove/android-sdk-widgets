@@ -4,10 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.view.configuration.FontConfiguration;
-import com.glia.widgets.view.configuration.Text;
+import com.glia.widgets.view.configuration.TextRuntimeConfiguration;
 
 public class SurveyBooleanOptionConfiguration implements Parcelable {
-    private Text title;
+    private TextRuntimeConfiguration title;
     private String selectedColor;    /* use for border and background for selected option */
     private String highlightedColor; /* use for border and not-selected option on validation */
     private FontConfiguration font;
@@ -20,7 +20,7 @@ public class SurveyBooleanOptionConfiguration implements Parcelable {
     }
 
     public static class Builder {
-        private Text title;
+        private TextRuntimeConfiguration title;
         private String selectedColor;    /* use for border and background for selected option */
         private String highlightedColor; /* use for border and not-selected option on validation */
         private FontConfiguration font;
@@ -28,7 +28,7 @@ public class SurveyBooleanOptionConfiguration implements Parcelable {
         public Builder(){
         }
 
-        public Builder title(Text title) {
+        public Builder title(TextRuntimeConfiguration title) {
             this.title = title;
             return this;
         }
@@ -68,14 +68,14 @@ public class SurveyBooleanOptionConfiguration implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
-        this.title = source.readParcelable(Text.class.getClassLoader());
+        this.title = source.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
         this.selectedColor = source.readString();
         this.highlightedColor = source.readString();
         this.font = source.readParcelable(FontConfiguration.class.getClassLoader());
     }
 
     protected SurveyBooleanOptionConfiguration(Parcel in) {
-        this.title = in.readParcelable(Text.class.getClassLoader());
+        this.title = in.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
         this.selectedColor = in.readString();
         this.highlightedColor = in.readString();
         this.font = in.readParcelable(FontConfiguration.class.getClassLoader());

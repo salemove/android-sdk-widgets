@@ -5,11 +5,11 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
-import com.glia.widgets.view.configuration.Text;
+import com.glia.widgets.view.configuration.TextRuntimeConfiguration;
 
 public class SurveyStyle implements Parcelable {
     private String bgColor;
-    private Text title;
+    private TextRuntimeConfiguration title;
     private SurveyBooleanOptionConfiguration booleanOption;
     private SurveyScaleOptionConfiguration scaleOption;
     private SurveySingleOptionConfiguration singleOption;
@@ -19,7 +19,7 @@ public class SurveyStyle implements Parcelable {
         return bgColor;
     }
 
-    public Text getTitle() {
+    public TextRuntimeConfiguration getTitle() {
         return title;
     }
 
@@ -50,7 +50,7 @@ public class SurveyStyle implements Parcelable {
 
     public static class Builder {
         private String bgColor;
-        private Text title;
+        private TextRuntimeConfiguration title;
         private SurveyBooleanOptionConfiguration booleanOption;
         private SurveyScaleOptionConfiguration scaleOption;
         private SurveySingleOptionConfiguration singleOption;
@@ -66,7 +66,7 @@ public class SurveyStyle implements Parcelable {
             return this;
         }
 
-        public Builder title(Text title) {
+        public Builder title(TextRuntimeConfiguration title) {
             this.title = title;
             return this;
         }
@@ -114,7 +114,7 @@ public class SurveyStyle implements Parcelable {
 
     public void readFromParcel(Parcel source) {
         this.bgColor = source.readString();
-        this.title = source.readParcelable(Text.class.getClassLoader());
+        this.title = source.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
         this.booleanOption = source.readParcelable(SurveyBooleanOptionConfiguration.class.getClassLoader());
         this.scaleOption = source.readParcelable(SurveyScaleOptionConfiguration.class.getClassLoader());
         this.singleOption = source.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
@@ -123,7 +123,7 @@ public class SurveyStyle implements Parcelable {
 
     protected SurveyStyle(Parcel in) {
         this.bgColor = in.readString();
-        this.title = in.readParcelable(Text.class.getClassLoader());
+        this.title = in.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
         this.booleanOption = in.readParcelable(SurveyBooleanOptionConfiguration.class.getClassLoader());
         this.scaleOption = in.readParcelable(SurveyScaleOptionConfiguration.class.getClassLoader());
         this.singleOption = in.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());

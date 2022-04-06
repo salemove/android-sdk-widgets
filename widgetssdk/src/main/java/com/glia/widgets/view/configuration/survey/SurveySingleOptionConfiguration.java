@@ -4,10 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.view.configuration.FontConfiguration;
-import com.glia.widgets.view.configuration.Text;
+import com.glia.widgets.view.configuration.TextRuntimeConfiguration;
 
 public class SurveySingleOptionConfiguration implements Parcelable {
-    private Text title;
+    private TextRuntimeConfiguration title;
     private String highlightedColor; /* use for border and not-selected option on validation */
     private FontConfiguration textFieldFont;
 
@@ -18,14 +18,14 @@ public class SurveySingleOptionConfiguration implements Parcelable {
     }
 
     public static class Builder {
-        private Text title;
+        private TextRuntimeConfiguration title;
         private String highlightedColor; /* use for border and not-selected option on validation */
         private FontConfiguration textFieldFont;
 
         public Builder(){
         }
 
-        public Builder title(Text title) {
+        public Builder title(TextRuntimeConfiguration title) {
             this.title = title;
             return this;
         }
@@ -59,13 +59,13 @@ public class SurveySingleOptionConfiguration implements Parcelable {
     }
 
     public void readFromParcel(Parcel source) {
-        this.title = source.readParcelable(Text.class.getClassLoader());
+        this.title = source.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
         this.highlightedColor = source.readString();
         this.textFieldFont = source.readParcelable(FontConfiguration.class.getClassLoader());
     }
 
     protected SurveySingleOptionConfiguration(Parcel in) {
-        this.title = in.readParcelable(Text.class.getClassLoader());
+        this.title = in.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
         this.highlightedColor = in.readString();
         this.textFieldFont = in.readParcelable(FontConfiguration.class.getClassLoader());
     }

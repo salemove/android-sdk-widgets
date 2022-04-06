@@ -8,7 +8,7 @@ import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.SurveyBooleanOption;
 import com.glia.widgets.view.configuration.SurveyInputOption;
 import com.glia.widgets.view.configuration.SurveyScaleOption;
-import com.glia.widgets.view.configuration.SurveySingleOption;
+import com.glia.widgets.view.configuration.survey.SurveySingleOptionConfiguration;
 import com.glia.widgets.view.configuration.Text;
 
 public class SurveyStyle implements Parcelable {
@@ -16,7 +16,7 @@ public class SurveyStyle implements Parcelable {
     private Text title;
     private SurveyBooleanOption booleanOption;
     private SurveyScaleOption scaleOption;
-    private SurveySingleOption singleOption;
+    private SurveySingleOptionConfiguration singleOption;
     private SurveyInputOption inputOption;
 
     public String getBgColor() {
@@ -35,7 +35,7 @@ public class SurveyStyle implements Parcelable {
         return scaleOption;
     }
 
-    public SurveySingleOption getSingleOption() {
+    public SurveySingleOptionConfiguration getSingleOption() {
         return singleOption;
     }
 
@@ -43,9 +43,7 @@ public class SurveyStyle implements Parcelable {
         return inputOption;
     }
 
-    private SurveyStyle(
-            Builder builder
-    ) {
+    private SurveyStyle(Builder builder) {
         this.bgColor = builder.bgColor;
         this.title = builder.title;
         this.booleanOption = builder.booleanOption;
@@ -59,7 +57,7 @@ public class SurveyStyle implements Parcelable {
         private Text title;
         private SurveyBooleanOption booleanOption;
         private SurveyScaleOption scaleOption;
-        private SurveySingleOption singleOption;
+        private SurveySingleOptionConfiguration singleOption;
         private SurveyInputOption inputOption;
 
         public Builder(ResourceProvider resourceProvider) {
@@ -87,7 +85,7 @@ public class SurveyStyle implements Parcelable {
             return this;
         }
 
-        public Builder singleOption(SurveySingleOption singleOption) {
+        public Builder singleOption(SurveySingleOptionConfiguration singleOption) {
             this.singleOption = singleOption;
             return this;
         }
@@ -123,7 +121,7 @@ public class SurveyStyle implements Parcelable {
         this.title = source.readParcelable(Text.class.getClassLoader());
         this.booleanOption = source.readParcelable(SurveyBooleanOption.class.getClassLoader());
         this.scaleOption = source.readParcelable(SurveyScaleOption.class.getClassLoader());
-        this.singleOption = source.readParcelable(SurveySingleOption.class.getClassLoader());
+        this.singleOption = source.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
         this.inputOption = source.readParcelable(SurveyInputOption.class.getClassLoader());
     }
 
@@ -132,7 +130,7 @@ public class SurveyStyle implements Parcelable {
         this.title = in.readParcelable(Text.class.getClassLoader());
         this.booleanOption = in.readParcelable(SurveyBooleanOption.class.getClassLoader());
         this.scaleOption = in.readParcelable(SurveyScaleOption.class.getClassLoader());
-        this.singleOption = in.readParcelable(SurveySingleOption.class.getClassLoader());
+        this.singleOption = in.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
         this.inputOption = in.readParcelable(SurveyInputOption.class.getClassLoader());
     }
 

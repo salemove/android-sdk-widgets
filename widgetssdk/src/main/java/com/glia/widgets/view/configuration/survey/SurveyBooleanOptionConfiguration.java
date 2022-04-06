@@ -7,10 +7,51 @@ import com.glia.widgets.view.configuration.FontConfiguration;
 import com.glia.widgets.view.configuration.Text;
 
 public class SurveyBooleanOptionConfiguration implements Parcelable {
-    public Text title;
-    public String selectedColor;    /* use for border and background for selected option */
-    public String highlightedColor; /* use for border and not-selected option on validation */
-    public FontConfiguration font;
+    private Text title;
+    private String selectedColor;    /* use for border and background for selected option */
+    private String highlightedColor; /* use for border and not-selected option on validation */
+    private FontConfiguration font;
+
+    private SurveyBooleanOptionConfiguration(Builder builder) {
+        this.title = builder.title;
+        this.selectedColor = builder.selectedColor;
+        this.highlightedColor = builder.highlightedColor;
+        this.font = builder.font;
+    }
+
+    public static class Builder {
+        private Text title;
+        private String selectedColor;    /* use for border and background for selected option */
+        private String highlightedColor; /* use for border and not-selected option on validation */
+        private FontConfiguration font;
+
+        public Builder(){
+        }
+
+        public Builder title(Text title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder selectedColor(String selectedColor) {
+            this.selectedColor = selectedColor;
+            return this;
+        }
+
+        public Builder highlightedColor(String highlightedColor) {
+            this.highlightedColor = highlightedColor;
+            return this;
+        }
+
+        public Builder font(FontConfiguration font) {
+            this.font = font;
+            return this;
+        }
+
+        public SurveyBooleanOptionConfiguration build() {
+            return new SurveyBooleanOptionConfiguration(this);
+        }
+    }
 
     /* BEGIN: Parcelable related */
     @Override
@@ -31,9 +72,6 @@ public class SurveyBooleanOptionConfiguration implements Parcelable {
         this.selectedColor = source.readString();
         this.highlightedColor = source.readString();
         this.font = source.readParcelable(FontConfiguration.class.getClassLoader());
-    }
-
-    public SurveyBooleanOptionConfiguration() {
     }
 
     protected SurveyBooleanOptionConfiguration(Parcel in) {

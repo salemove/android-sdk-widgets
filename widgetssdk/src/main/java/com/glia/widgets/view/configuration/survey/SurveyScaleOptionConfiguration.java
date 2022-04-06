@@ -7,10 +7,51 @@ import com.glia.widgets.view.configuration.FontConfiguration;
 import com.glia.widgets.view.configuration.Text;
 
 public class SurveyScaleOptionConfiguration implements Parcelable {
-    public Text title;
-    public String borderColor;
-    public String highlightedColor; /* use for border and not-selected option on validation */
-    public FontConfiguration textFieldFont;
+    private Text title;
+    private String borderColor;
+    private String highlightedColor; /* use for border and not-selected option on validation */
+    private FontConfiguration textFieldFont;
+
+    private SurveyScaleOptionConfiguration(Builder builder) {
+        this.title = builder.title;
+        this.borderColor = builder.borderColor;
+        this.highlightedColor = builder.highlightedColor;
+        this.textFieldFont = builder.textFieldFont;
+    }
+
+    public static class Builder {
+        private Text title;
+        private String borderColor;
+        private String highlightedColor; /* use for border and not-selected option on validation */
+        private FontConfiguration textFieldFont;
+
+        public Builder(){
+        }
+
+        public Builder title(Text title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder borderColor(String borderColor) {
+            this.borderColor = borderColor;
+            return this;
+        }
+
+        public Builder highlightedColor(String highlightedColor) {
+            this.highlightedColor = highlightedColor;
+            return this;
+        }
+
+        public Builder textFieldFont(FontConfiguration textFieldFont) {
+            this.textFieldFont = textFieldFont;
+            return this;
+        }
+
+        public SurveyScaleOptionConfiguration build() {
+            return new SurveyScaleOptionConfiguration(this);
+        }
+    }
 
     /* BEGIN: Parcelable related */
     @Override
@@ -31,9 +72,6 @@ public class SurveyScaleOptionConfiguration implements Parcelable {
         this.borderColor = source.readString();
         this.highlightedColor = source.readString();
         this.textFieldFont = source.readParcelable(FontConfiguration.class.getClassLoader());
-    }
-
-    public SurveyScaleOptionConfiguration() {
     }
 
     protected SurveyScaleOptionConfiguration(Parcel in) {

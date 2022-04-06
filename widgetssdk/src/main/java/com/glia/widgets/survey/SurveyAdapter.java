@@ -29,6 +29,7 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.ArrayList;
 import java.util.List;

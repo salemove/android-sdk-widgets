@@ -23,6 +23,8 @@ import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.Dialogs;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class SurveyView extends ConstraintLayout implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {

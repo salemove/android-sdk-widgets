@@ -1,23 +1,19 @@
-package com.glia.widgets.survey;
+package com.glia.widgets.view.configuration.survey;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
-import com.glia.widgets.view.configuration.SurveyBooleanOption;
-import com.glia.widgets.view.configuration.SurveyInputOption;
-import com.glia.widgets.view.configuration.SurveyScaleOption;
-import com.glia.widgets.view.configuration.survey.SurveySingleOptionConfiguration;
 import com.glia.widgets.view.configuration.Text;
 
 public class SurveyStyle implements Parcelable {
     private String bgColor;
     private Text title;
-    private SurveyBooleanOption booleanOption;
-    private SurveyScaleOption scaleOption;
+    private SurveyBooleanOptionConfiguration booleanOption;
+    private SurveyScaleOptionConfiguration scaleOption;
     private SurveySingleOptionConfiguration singleOption;
-    private SurveyInputOption inputOption;
+    private SurveyInputOptionConfiguration inputOption;
 
     public String getBgColor() {
         return bgColor;
@@ -27,11 +23,11 @@ public class SurveyStyle implements Parcelable {
         return title;
     }
 
-    public SurveyBooleanOption getBooleanOption() {
+    public SurveyBooleanOptionConfiguration getBooleanOption() {
         return booleanOption;
     }
 
-    public SurveyScaleOption getScaleOption() {
+    public SurveyScaleOptionConfiguration getScaleOption() {
         return scaleOption;
     }
 
@@ -39,7 +35,7 @@ public class SurveyStyle implements Parcelable {
         return singleOption;
     }
 
-    public SurveyInputOption getInputOption() {
+    public SurveyInputOptionConfiguration getInputOption() {
         return inputOption;
     }
 
@@ -55,10 +51,10 @@ public class SurveyStyle implements Parcelable {
     public static class Builder {
         private String bgColor;
         private Text title;
-        private SurveyBooleanOption booleanOption;
-        private SurveyScaleOption scaleOption;
+        private SurveyBooleanOptionConfiguration booleanOption;
+        private SurveyScaleOptionConfiguration scaleOption;
         private SurveySingleOptionConfiguration singleOption;
-        private SurveyInputOption inputOption;
+        private SurveyInputOptionConfiguration inputOption;
 
         public Builder(ResourceProvider resourceProvider) {
             // Default values
@@ -75,12 +71,12 @@ public class SurveyStyle implements Parcelable {
             return this;
         }
 
-        public Builder booleanOption(SurveyBooleanOption booleanOption) {
+        public Builder booleanOption(SurveyBooleanOptionConfiguration booleanOption) {
             this.booleanOption = booleanOption;
             return this;
         }
 
-        public Builder scaleOption(SurveyScaleOption scaleOption) {
+        public Builder scaleOption(SurveyScaleOptionConfiguration scaleOption) {
             this.scaleOption = scaleOption;
             return this;
         }
@@ -90,7 +86,7 @@ public class SurveyStyle implements Parcelable {
             return this;
         }
 
-        public Builder inputOption(SurveyInputOption inputOption) {
+        public Builder inputOption(SurveyInputOptionConfiguration inputOption) {
             this.inputOption = inputOption;
             return this;
         }
@@ -119,19 +115,19 @@ public class SurveyStyle implements Parcelable {
     public void readFromParcel(Parcel source) {
         this.bgColor = source.readString();
         this.title = source.readParcelable(Text.class.getClassLoader());
-        this.booleanOption = source.readParcelable(SurveyBooleanOption.class.getClassLoader());
-        this.scaleOption = source.readParcelable(SurveyScaleOption.class.getClassLoader());
+        this.booleanOption = source.readParcelable(SurveyBooleanOptionConfiguration.class.getClassLoader());
+        this.scaleOption = source.readParcelable(SurveyScaleOptionConfiguration.class.getClassLoader());
         this.singleOption = source.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
-        this.inputOption = source.readParcelable(SurveyInputOption.class.getClassLoader());
+        this.inputOption = source.readParcelable(SurveyInputOptionConfiguration.class.getClassLoader());
     }
 
     protected SurveyStyle(Parcel in) {
         this.bgColor = in.readString();
         this.title = in.readParcelable(Text.class.getClassLoader());
-        this.booleanOption = in.readParcelable(SurveyBooleanOption.class.getClassLoader());
-        this.scaleOption = in.readParcelable(SurveyScaleOption.class.getClassLoader());
+        this.booleanOption = in.readParcelable(SurveyBooleanOptionConfiguration.class.getClassLoader());
+        this.scaleOption = in.readParcelable(SurveyScaleOptionConfiguration.class.getClassLoader());
         this.singleOption = in.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
-        this.inputOption = in.readParcelable(SurveyInputOption.class.getClassLoader());
+        this.inputOption = in.readParcelable(SurveyInputOptionConfiguration.class.getClassLoader());
     }
 
     public static final Creator<SurveyStyle> CREATOR = new Creator<SurveyStyle>() {

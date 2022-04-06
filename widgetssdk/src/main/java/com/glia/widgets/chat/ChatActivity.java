@@ -15,6 +15,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.survey.SurveyActivity;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class ChatActivity extends AppCompatActivity {

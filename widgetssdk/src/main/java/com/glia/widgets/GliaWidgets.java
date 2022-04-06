@@ -10,6 +10,7 @@ import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.function.Consumer;
 
@@ -26,6 +27,11 @@ public class GliaWidgets {
      */
     public static final String UI_THEME = "ui_theme";
 
+    /**
+     * Use with {@link android.os.Bundle} to pass in a {@link SurveyStyle}
+     * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
+    public static final String SURVEY_STYLE = "survey_style";
     /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}

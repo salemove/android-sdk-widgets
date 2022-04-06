@@ -8,6 +8,7 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 public class SurveyActivity extends AppCompatActivity {
     private static final String TAG = SurveyActivity.class.getSimpleName();

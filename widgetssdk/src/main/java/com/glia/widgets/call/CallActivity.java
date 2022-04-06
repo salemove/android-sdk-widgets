@@ -20,6 +20,7 @@ import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.survey.SurveyActivity;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.ArrayList;
 import java.util.Arrays;

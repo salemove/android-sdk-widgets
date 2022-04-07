@@ -3,15 +3,18 @@ package com.glia.widgets.survey;
 import static java.util.Arrays.asList;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.LayoutRes;
@@ -50,7 +53,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return new SurveyYesNoViewHolder(view);
         } else if (viewType == SURVEY_SINGLE_CHOICE) {
             view = createNewLayout(parent, R.layout.survey_single_choice_item);
-            return new SurveySingleChoiceViewHolder(view, this::setAnswer);
+            return new SurveySingleChoiceViewHolder(view);
         } else {
             view = createNewLayout(parent, R.layout.survey_open_text_item);
             return new SurveyOpenTextViewHolder(view);
@@ -257,24 +260,55 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class SurveySingleChoiceViewHolder extends RecyclerView.ViewHolder {
+    public class SurveySingleChoiceViewHolder extends RecyclerView.ViewHolder {
 
+        LinearLayout containerView;
         TextView title;
-        RecyclerView recyclerView;
-        SingleChoiceAdapter.SingleChoiceCallback scaleResultCallback;
-        QuestionItem item;
+        RadioGroup radioGroup;
 
-        public SurveySingleChoiceViewHolder(@NonNull View itemView, SingleChoiceAdapter.SingleChoiceCallback scaleResultCallback) {
+        public SurveySingleChoiceViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.scaleResultCallback = scaleResultCallback;
+            containerView = itemView.findViewById(R.id.single_choice_view);
             title = itemView.findViewById(R.id.tv_title_choice);
-            recyclerView = itemView.findViewById(R.id.survey_single_choice_list);
+            radioGroup = itemView.findViewById(R.id.radio_group);
+
+            int bkgColor = ContextCompat.getColor(itemView.getContext(), R.color.glia_base_light_color);
+            containerView.setBackgroundColor(bkgColor);
         }
 
         public void singleChoice(List<Survey.Question.Option> options, QuestionItem item) {
-            SingleChoiceAdapter singleChoiceAdapter = new SingleChoiceAdapter(item, scaleResultCallback);
-            recyclerView.setAdapter(singleChoiceAdapter);
-            this.item = item;
+            if (options == null) {
+                return;
+            }
+
+            for (int i = 0; i < options.size(); i++) {
+                Survey.Question.Option option = options.get(i);
+
+                RadioButton radioButton = new RadioButton(itemView.getContext());
+                radioButton.setId(View.generateViewId());
+                radioButton.setText(option.getLabel());
+                radioButton.setContentDescription("survey_question_single_choice_" + option.getId());
+                radioButton.setOnClickListener(v -> setAnswer(item, option.getId()));
+                ColorStateList colorStateList = getRadioButtonColor();
+                radioButton.setButtonTintList(colorStateList);
+                radioGroup.addView(radioButton);
+            }
+        }
+
+        @NonNull
+        private ColorStateList getRadioButtonColor() {
+            return new ColorStateList(
+                    new int[][]{
+                            new int[]{-android.R.attr.state_checked},
+                            new int[]{android.R.attr.state_checked}
+                    },
+                    new int[]{
+                            ContextCompat.getColor(containerView.getContext(),
+                                    R.color.glia_base_shade_color), //disabled
+                            ContextCompat.getColor(containerView.getContext(),
+                                    R.color.glia_brand_primary_color) //enabled
+                    }
+            );
         }
     }
 

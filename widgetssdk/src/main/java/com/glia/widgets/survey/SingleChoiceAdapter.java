@@ -49,7 +49,7 @@ public class SingleChoiceAdapter extends RecyclerView.Adapter<SingleChoiceAdapte
 
         Survey.Answer answer = questionItem.getAnswer();
         if (answer != null && option.getId().equals(answer.getResponse())) {
-            holder.layoutChoice.setBackgroundResource(R.drawable.border_background);
+            holder.layoutChoice.setBackgroundResource(R.drawable.bg_survey_gray);
         } else {
             holder.layoutChoice.setBackgroundColor(Color.TRANSPARENT);
         }

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/glia_medium"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="@dimen/glia_medium">
 
     <TextView
         android:id="@+id/tv_title_text"
@@ -13,15 +12,19 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/glia_large"
         android:text="@string/glia_survey_open_text_item_title"
-        android:textColor="?attr/gliaBaseDarkColor"/>
+        android:textColor="?attr/gliaBaseDarkColor" />
 
     <EditText
         android:id="@+id/et_comment"
-        android:layout_marginTop="@dimen/glia_medium"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/glia_xx_large"
+        android:layout_height="96dp"
+        android:layout_marginTop="@dimen/glia_medium"
+        android:autofillHints="auto"
+        android:background="@drawable/bg_survey_gray"
+        android:gravity="start"
         android:hint="@string/glia_survey_open_text_item_edit_hint"
-        android:inputType="text"
-        android:autofillHints="auto" />
+        android:imeOptions="actionNone"
+        android:inputType="textCapSentences|textMultiLine"
+        android:padding="@dimen/glia_medium" />
 
 </LinearLayout>

@@ -182,4 +182,21 @@
     <string name="glia_preview_activity_menu_share_button">Share</string>
     <string name="glia_preview_activity_image_content_description">Preview content</string>
 
+    <!--    Survey-->
+    <string name="glia_survey_engagement_ended_title">Engagement Ended</string>
+    <string name="glia_survey_cancel_label">Cancel</string>
+    <string name="glia_survey_submit_label">Submit</string>
+    <string name="glia_survey_open_text_item_title">Additional thoughts?</string>
+    <string name="glia_survey_open_text_item_edit_hint">Comment</string>
+    <string name="glia_survey_scale_item_title">How would you rate this interaction? (1 - Bad, 5 - Good)</string>
+    <string name="glia_survey_single_choice_item_title">If you hadn\'t chatted with us today, what would you have done?</string>
+    <string name="glia_survey_yes_no_item_title">Would you use our chat again?</string>
+    <string name="glia_survey_yes_no_item_yes">Yes</string>
+    <string name="glia_survey_yes_no_item_no">No</string>
+    <string name="glia_survey_require_label">*</string>
+
+    <!-- Submit survey answers error AlertDialog -->
+    <string name="glia_dialog_submit_survey_answers_error_title">Submit error</string>
+    <string name="glia_dialog_submit_survey_answers_error_message">Please fill all the required fields.</string>
+
 </resources>

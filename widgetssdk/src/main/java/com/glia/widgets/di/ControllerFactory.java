@@ -10,6 +10,8 @@ import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.survey.SurveyContract;
+import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
@@ -34,6 +36,7 @@ public class ControllerFactory {
     private ScreenSharingController retainedScreenSharingController;
     private final FilePreviewController filePreviewController;
     private final ChatHeadPosition chatHeadPosition;
+    private SurveyController surveyController;
 
     private static ServiceChatHeadController serviceChatHeadController;
 
@@ -101,7 +104,8 @@ public class ControllerFactory {
                     useCaseFactory.createIsEnableChatEditTextUseCase(),
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createSiteInfoUseCase()
+                    useCaseFactory.createSiteInfoUseCase(),
+                    useCaseFactory.getGliaSurveyUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -137,7 +141,8 @@ public class ControllerFactory {
                     useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
                     useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.getGliaSurveyUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -230,5 +235,15 @@ public class ControllerFactory {
                 useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
                 useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
         );
+    }
+
+    public SurveyContract.Controller getSurveyController() {
+        if (surveyController == null) {
+            surveyController = new SurveyController(
+                    useCaseFactory.getSurveyAnswerUseCase(),
+                    dialogController
+            );
+        }
+        return surveyController;
     }
 }

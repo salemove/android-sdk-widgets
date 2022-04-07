@@ -74,12 +74,15 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         @SuppressLint("CustomViewStyleable") TypedArray typedArray = this.getContext().obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes);
-        setDefaultTheme(typedArray);
+        setDefaultTheme(attrs, defStyleAttr, defStyleRes);
         typedArray.recycle();
     }
 
-    private void setDefaultTheme(TypedArray typedArray) {
+    private void setDefaultTheme(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        @SuppressLint("CustomViewStyleable") TypedArray typedArray =
+                this.getContext().obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes);
         this.theme = Utils.getThemeFromTypedArray(typedArray, this.getContext());
+        typedArray.recycle();
     }
 
     public void setTheme(UiTheme uiTheme) {

@@ -16,6 +16,7 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.dialog.DialogController;
@@ -24,15 +25,10 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.Dialogs;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
-public class SurveyView extends ConstraintLayout implements SurveyContract.View {
+public class SurveyView extends ConstraintLayout implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 
     private SurveyContract.Controller controller;
-    private DialogController.Callback dialogCallback = dialogsState -> {
-        if (dialogsState instanceof DialogsState.SubmitSurveyAnswersErrorDialog) {
-            post(this::showSubmitSurveyAnswersErrorDialog);
-        }
-    };
 
     private UiTheme theme;
 
@@ -91,7 +87,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
     }
 
     private void initAdapter() {
-        surveyAdapter = new SurveyAdapter( );
+        surveyAdapter = new SurveyAdapter(this);
         recyclerView.setAdapter(surveyAdapter);
     }
 
@@ -123,44 +119,23 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
     public void setController(SurveyContract.Controller controller) {
         this.controller = controller;
         this.controller.setView(this);
-
-        controller.setDialogCallback(dialogCallback);
     }
 
-    private void showSubmitSurveyAnswersErrorDialog() {
-        showAlertDialog(
-                R.string.glia_dialog_submit_survey_answers_error_title,
-                R.string.glia_dialog_submit_survey_answers_error_message,
-                v -> {
-                    dismissAlertDialog();
-                    if (controller != null) {
-                        controller.submitSurveyAnswersErrorDialogDismissed();
-                    }
-                }
-        );
-    }
-
-    private void showAlertDialog(@StringRes int title, @StringRes int message,
-                                 View.OnClickListener buttonClickListener) {
-        dismissAlertDialog();
-        alertDialog = Dialogs.showAlertDialog(
-                this.getContext(),
-                this.theme,
-                title,
-                message,
-                buttonClickListener);
-    }
-
-    private void dismissAlertDialog() {
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-            alertDialog = null;
+    @Override
+    public void onAnswer(@NonNull Survey.Answer answer) {
+        if (controller != null) {
+            controller.onAnswer(answer);
         }
     }
 
     @Override
     public void onStateUpdated(SurveyState state) {
-        surveyAdapter.setItems(state.questions);
+        surveyAdapter.submitList(state.questions);
+    }
+
+    @Override
+    public void scrollTo(int index) {
+        recyclerView.scrollToPosition(index);
     }
 
     @Override
@@ -171,7 +146,6 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
 
     public void onDestroyView() {
         if (controller != null) {
-            controller.removeDialogCallback(dialogCallback);
             controller.onDestroy();
             controller = null;
         }

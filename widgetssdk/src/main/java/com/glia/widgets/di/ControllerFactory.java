@@ -240,8 +240,7 @@ public class ControllerFactory {
     public SurveyContract.Controller getSurveyController() {
         if (surveyController == null) {
             surveyController = new SurveyController(
-                    useCaseFactory.getSurveyAnswerUseCase(),
-                    dialogController
+                    useCaseFactory.getSurveyAnswerUseCase()
             );
         }
         return surveyController;

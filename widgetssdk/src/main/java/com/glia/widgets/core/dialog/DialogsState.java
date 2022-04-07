@@ -48,7 +48,4 @@ public interface DialogsState {
     class EnableScreenSharingNotificationsAndStartSharingDialog implements DialogsState {
 
     }
-
-    class SubmitSurveyAnswersErrorDialog implements DialogsState {
-    }
 }

@@ -4,18 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:paddingBottom="@dimen/glia_large">
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_large_x_large"
+        android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_large_x_large"
-        android:textSize="@dimen/glia_survey_question_title_size"
+        android:textAppearance="?attr/textAppearanceBody1"
         android:text="@string/glia_survey_scale_item_title"
         android:textColor="?attr/gliaBaseDarkColor"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -24,21 +25,19 @@
         android:id="@+id/scale_1_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="1"
+        android:text="@string/glia_survey_scale_item_1"
         android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_large"
-        android:layout_marginBottom="@dimen/glia_large_x_large"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/scale_2_button"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@+id/scale_2_button"/>
 
     <com.glia.widgets.view.button.GliaSurveyOptionButton
         android:id="@+id/scale_2_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="2"
+        android:text="@string/glia_survey_scale_item_2"
         android:layout_marginEnd="@dimen/glia_large"
         app:layout_constraintTop_toTopOf="@id/scale_1_button"
         app:layout_constraintStart_toEndOf="@+id/scale_1_button"
@@ -49,7 +48,7 @@
         android:id="@+id/scale_3_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="3"
+        android:text="@string/glia_survey_scale_item_3"
         android:layout_marginEnd="@dimen/glia_large"
         app:layout_constraintTop_toTopOf="@id/scale_1_button"
         app:layout_constraintStart_toEndOf="@+id/scale_2_button"
@@ -60,7 +59,7 @@
         android:id="@+id/scale_4_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="4"
+        android:text="@string/glia_survey_scale_item_4"
         android:layout_marginEnd="@dimen/glia_large"
         app:layout_constraintTop_toTopOf="@id/scale_1_button"
         app:layout_constraintStart_toEndOf="@+id/scale_3_button"
@@ -71,11 +70,25 @@
         android:id="@+id/scale_5_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="5"
+        android:text="@string/glia_survey_scale_item_5"
         android:layout_marginEnd="@dimen/glia_large_x_large"
         app:layout_constraintTop_toTopOf="@id/scale_1_button"
         app:layout_constraintStart_toEndOf="@+id/scale_4_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/scale_1_button"/>
+
+    <TextView
+        android:id="@+id/required_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/glia_system_negative_color"
+        android:text="@string/glia_survey_required_error_message"
+        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginStart="@dimen/glia_large_x_large"
+        android:drawablePadding="@dimen/glia_small"
+        app:drawableStartCompat="@drawable/ic_attention"
+        app:layout_constraintTop_toBottomOf="@id/scale_1_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

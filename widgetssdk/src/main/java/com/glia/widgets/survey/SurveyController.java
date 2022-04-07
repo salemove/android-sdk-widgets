@@ -4,28 +4,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.engagement.Survey;
-import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.helper.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SurveyController implements SurveyContract.Controller {
     private static final String TAG = SurveyController.class.getSimpleName();
 
+    public interface AnswerCallback {
+        void answerCallback(boolean showError);
+    }
+
     private SurveyContract.View view;
     private Survey survey;
     private SurveyState state = new SurveyState();
 
     private final GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
-    private final DialogController dialogController;
 
-    public SurveyController(GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase,
-                            DialogController dialogController) {
+    public SurveyController(GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase) {
         this.gliaSurveyAnswerUseCase = gliaSurveyAnswerUseCase;
-        this.dialogController = dialogController;
     }
 
     @Override
@@ -41,10 +39,10 @@ public class SurveyController implements SurveyContract.Controller {
     }
 
     private void setQuestions(@NonNull Survey survey) {
-        List<QuestionItem> items = survey.getQuestions().stream()
+        List<QuestionItem> questionItems = survey.getQuestions().stream()
                 .map(this::makeQuestionItem)
                 .collect(Collectors.toList());
-        setState(new SurveyState(items));
+        setState(new SurveyState(questionItems));
     }
 
     private QuestionItem makeQuestionItem(Survey.Question question) {
@@ -71,20 +69,29 @@ public class SurveyController implements SurveyContract.Controller {
     }
 
     @Override
-    public void setDialogCallback(DialogController.Callback callback) {
-        dialogController.addCallback(callback);
-    }
-
-    @Override
-    public void removeDialogCallback(DialogController.Callback callback) {
-        dialogController.removeCallback(callback);
-    }
-
-    @Override
-    public void onBackClicked() {
-        if (view != null) {
-            view.finish();
+    public void onAnswer(@NonNull Survey.Answer answer) {
+        if (state.questions == null) {
+            return;
         }
+        state.questions.stream()
+                .filter(item -> item.getQuestion().getId().equals(answer.getQuestionId()))
+                .findFirst()
+                .ifPresent(item -> {
+                    item.setAnswer(answer);
+                    if (item.isShowError()) {
+                        boolean showError;
+                        try {
+                            gliaSurveyAnswerUseCase.validate(item);
+                            showError = false;
+                        } catch (SurveyValidationException ignore) {
+                            showError = true;
+                        }
+                        item.setShowError(showError);
+                        if (item.getAnswerCallback() != null) {
+                            item.getAnswerCallback().answerCallback(showError);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -96,16 +103,26 @@ public class SurveyController implements SurveyContract.Controller {
 
     @Override
     public void onSubmitClicked() {
-        gliaSurveyAnswerUseCase.execute(state.questions, survey, exception -> {
+        List<QuestionItem> questionItems = state.questions;
+        if (questionItems == null) {
+            return;
+        }
+        gliaSurveyAnswerUseCase.submit(questionItems, survey, exception -> {
             if (exception == null) {
-                Logger.d(TAG, "Answers submitted: success");
                 if (view != null) {
                     view.finish();
                 }
                 return;
             }
-            Logger.e(TAG, "Answers submitted: " + exception);
-            dialogController.showSubmitSurveyAnswersErrorDialog();
+            questionItems.forEach(item -> {
+                if (item.getAnswerCallback() != null) {
+                    item.getAnswerCallback().answerCallback(item.isShowError());
+                }
+            });
+            questionItems.stream()
+                    .filter(QuestionItem::isShowError)
+                    .findFirst()
+                    .ifPresent(item -> view.scrollTo(questionItems.indexOf(item)));
         });
     }
 
@@ -114,12 +131,6 @@ public class SurveyController implements SurveyContract.Controller {
         if (view != null) {
             view.onStateUpdated(state);
         }
-    }
-
-    @Override
-    public void submitSurveyAnswersErrorDialogDismissed() {
-        Logger.d(TAG, "submitSurveyAnswersErrorDialogDismissed");
-        dialogController.dismissDialogs();
     }
 
     @Override

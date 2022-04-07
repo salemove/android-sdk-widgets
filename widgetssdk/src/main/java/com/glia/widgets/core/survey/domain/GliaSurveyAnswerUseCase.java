@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 public class GliaSurveyAnswerUseCase {
 
+    static class ValidationException extends RuntimeException {}
+
     private final GliaSurveyRepository repository;
 
     public GliaSurveyAnswerUseCase(GliaSurveyRepository repository) {
@@ -23,7 +25,13 @@ public class GliaSurveyAnswerUseCase {
 
     public void execute(@Nullable List<QuestionItem> questions,
                         @NonNull Survey survey,
-                        @NonNull Consumer<GliaException> callback) {
+                        @NonNull Consumer<RuntimeException> callback) {
+        try {
+            validate(questions);
+        } catch (ValidationException exception) {
+            callback.accept(exception);
+            return;
+        }
         List<Survey.Answer> answers;
         if (questions != null) {
             answers = questions.stream()
@@ -34,6 +42,26 @@ public class GliaSurveyAnswerUseCase {
         }
         String surveyId = survey.getId();
         String engagementId = survey.getEngagementId();
-        repository.submitSurveyAnswers(answers, surveyId, engagementId, callback);
+        repository.submitSurveyAnswers(answers, surveyId, engagementId, ignore -> {
+            callback.accept(ignore); // ignore the Glia exception
+        });
+    }
+
+    private void validate(@Nullable List<QuestionItem> questions) throws ValidationException {
+        if (questions == null) {
+            return;
+        }
+        boolean error = false;
+        for (QuestionItem item : questions) {
+            if (item.getQuestion().isRequired() && item.getAnswer() == null) {
+                item.setShowError(true);
+                error = true;
+            } else {
+                item.setShowError(false);
+            }
+        }
+        if (error) {
+            throw new ValidationException();
+        }
     }
 }

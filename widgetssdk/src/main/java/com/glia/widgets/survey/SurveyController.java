@@ -96,7 +96,8 @@ public class SurveyController implements SurveyContract.Controller {
 
     @Override
     public void onSubmitClicked() {
-        gliaSurveyAnswerUseCase.execute(state.questions, survey, exception -> {
+        List<QuestionItem> questions = state.questions;
+        gliaSurveyAnswerUseCase.execute(questions, survey, exception -> {
             if (exception == null) {
                 Logger.d(TAG, "Answers submitted: success");
                 if (view != null) {
@@ -105,6 +106,7 @@ public class SurveyController implements SurveyContract.Controller {
                 return;
             }
             Logger.e(TAG, "Answers submitted: " + exception);
+            setState(state);
             dialogController.showSubmitSurveyAnswersErrorDialog();
         });
     }

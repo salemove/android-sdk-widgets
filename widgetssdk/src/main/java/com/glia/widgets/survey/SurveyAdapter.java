@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -37,8 +38,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private List<QuestionItem> items;
 
+    @SuppressLint("NotifyDataSetChanged") // DataSet shouldn't change often
     public void setItems(List<QuestionItem> items) {
         this.items = items;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -78,7 +81,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         } else if (getItemViewType(position) == SURVEY_YES_NO) {
             bindYesNo(questionItem, question, answer, (SurveyYesNoViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_OPEN_TEXT) {
-            bindOpenText(question, answer, (SurveyOpenTextViewHolder) viewHolder);
+            bindOpenText(questionItem, question, answer, (SurveyOpenTextViewHolder) viewHolder);
         }
     }
 
@@ -91,12 +94,16 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             setAnswer(questionItem, value);
             scaleViewHolder.setSelected(value);
         };
+
+        scaleViewHolder.showRequiredError(questionItem.isShowError());
     }
 
     private void bindSingle(QuestionItem questionItem, Survey.Question question, SurveySingleChoiceViewHolder singleChoiceViewHolder) {
         setItemTitle(singleChoiceViewHolder.title, question.getText(), question.isRequired());
 
         singleChoiceViewHolder.singleChoice(question.getOptions(), questionItem);
+
+        singleChoiceViewHolder.showRequiredError(questionItem.isShowError());
     }
 
     private void bindYesNo(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyYesNoViewHolder yesNoViewHolder) {
@@ -108,14 +115,18 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             setAnswer(questionItem, value);
             yesNoViewHolder.setSelected(value);
         };
+
+        yesNoViewHolder.showRequiredError(questionItem.isShowError());
     }
 
-    private void bindOpenText(Survey.Question question, Survey.Answer answer, SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
+    private void bindOpenText(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
         setItemTitle(surveyOpenTextViewHolder.titleComment, question.getText(), question.isRequired());
         EditText comment = surveyOpenTextViewHolder.comment;
         if (answer != null) {
             comment.setText(answer.getResponse());
         }
+
+        surveyOpenTextViewHolder.showRequiredError(questionItem.isShowError());
     }
 
     private void setItemTitle(TextView textView, String title, boolean require) {
@@ -169,11 +180,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         TextView titleTextView;
         List<Button> buttons;
+        View requiredError;
         OnSurveyScaleClickListener listener;
 
         public SurveyScaleViewHolder(@NonNull View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.tv_title);
+            requiredError = itemView.findViewById(R.id.required_error);
             Button scale1Button = itemView.findViewById(R.id.scale_1_button);
             Button scale2Button = itemView.findViewById(R.id.scale_2_button);
             Button scale3Button = itemView.findViewById(R.id.scale_3_button);
@@ -209,6 +222,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         void unselectAll() {
             setSelected(0);
         }
+
+        void showRequiredError(boolean error) {
+            if (error) {
+                requiredError.setVisibility(View.VISIBLE);
+            } else {
+                requiredError.setVisibility(View.GONE);
+            }
+        }
     }
 
     public static class SurveyYesNoViewHolder extends RecyclerView.ViewHolder {
@@ -220,6 +241,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         TextView titleTextView;
         Button yesButton;
         Button noButton;
+        View requiredError;
         OnSurveyYesNoClickListener listener;
 
         public SurveyYesNoViewHolder(@NonNull View itemView) {
@@ -227,6 +249,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             titleTextView = itemView.findViewById(R.id.tv_title);
             yesButton = itemView.findViewById(R.id.yes_button);
             noButton = itemView.findViewById(R.id.no_button);
+            requiredError = itemView.findViewById(R.id.required_error);
 
             yesButton.setOnClickListener(view -> {
                 if (listener != null) {
@@ -258,6 +281,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             yesButton.setSelected(false);
             noButton.setSelected(false);
         }
+
+        void showRequiredError(boolean error) {
+            if (error) {
+                requiredError.setVisibility(View.VISIBLE);
+            } else {
+                requiredError.setVisibility(View.GONE);
+            }
+        }
     }
 
     public class SurveySingleChoiceViewHolder extends RecyclerView.ViewHolder {
@@ -265,6 +296,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         LinearLayout containerView;
         TextView title;
         RadioGroup radioGroup;
+        View requiredError;
 
         public SurveySingleChoiceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -274,6 +306,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             int bkgColor = ContextCompat.getColor(itemView.getContext(), R.color.glia_base_light_color);
             containerView.setBackgroundColor(bkgColor);
+            requiredError = itemView.findViewById(R.id.required_error);
         }
 
         public void singleChoice(List<Survey.Question.Option> options, QuestionItem item) {
@@ -310,17 +343,27 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     }
             );
         }
+
+        void showRequiredError(boolean error) {
+            if (error) {
+                requiredError.setVisibility(View.VISIBLE);
+            } else {
+                requiredError.setVisibility(View.GONE);
+            }
+        }
     }
 
     public class SurveyOpenTextViewHolder extends RecyclerView.ViewHolder {
 
         TextView titleComment;
         EditText comment;
+        View requiredError;
 
         public SurveyOpenTextViewHolder(@NonNull View itemView) {
             super(itemView);
             titleComment = itemView.findViewById(R.id.tv_title_text);
             comment = itemView.findViewById(R.id.et_comment);
+            requiredError = itemView.findViewById(R.id.required_error);
 
             comment.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -336,6 +379,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     setAnswer(items.get(getAdapterPosition()), s.toString());
                 }
             });
+        }
+
+        void showRequiredError(boolean error) {
+            if (error) {
+                requiredError.setVisibility(View.VISIBLE);
+            } else {
+                requiredError.setVisibility(View.GONE);
+            }
         }
     }
 }

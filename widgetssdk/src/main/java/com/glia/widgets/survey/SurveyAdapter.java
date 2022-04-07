@@ -113,7 +113,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (answer != null) {
             comment.setText(answer.getResponse());
         }
-        comment.setImeOptions(EditorInfo.IME_ACTION_DONE);
     }
 
     private void setItemTitle(TextView textView, String title, boolean require) {

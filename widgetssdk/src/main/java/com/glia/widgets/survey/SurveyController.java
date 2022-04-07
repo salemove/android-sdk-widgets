@@ -8,7 +8,6 @@ import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.helper.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,8 +105,11 @@ public class SurveyController implements SurveyContract.Controller {
                 return;
             }
             Logger.e(TAG, "Answers submitted: " + exception);
-            setState(state);
-            dialogController.showSubmitSurveyAnswersErrorDialog();
+            if (exception instanceof SurveyValidationException) {
+                view.scrollTo(((SurveyValidationException) exception).getFirstErrorPosition());
+            } else {
+                dialogController.showSubmitSurveyAnswersErrorDialog();
+            }
         });
     }
 

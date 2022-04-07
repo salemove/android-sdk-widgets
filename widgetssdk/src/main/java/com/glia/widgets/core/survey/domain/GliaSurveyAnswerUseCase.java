@@ -3,10 +3,10 @@ package com.glia.widgets.core.survey.domain;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.survey.QuestionItem;
+import com.glia.widgets.survey.SurveyValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +14,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class GliaSurveyAnswerUseCase {
-
-    static class ValidationException extends RuntimeException {}
 
     private final GliaSurveyRepository repository;
 
@@ -28,7 +26,7 @@ public class GliaSurveyAnswerUseCase {
                         @NonNull Consumer<RuntimeException> callback) {
         try {
             validate(questions);
-        } catch (ValidationException exception) {
+        } catch (SurveyValidationException exception) {
             callback.accept(exception);
             return;
         }
@@ -43,25 +41,28 @@ public class GliaSurveyAnswerUseCase {
         String surveyId = survey.getId();
         String engagementId = survey.getEngagementId();
         repository.submitSurveyAnswers(answers, surveyId, engagementId, ignore -> {
-            callback.accept(ignore); // ignore the Glia exception
+            callback.accept(null); // ignore the Glia exception
         });
     }
 
-    private void validate(@Nullable List<QuestionItem> questions) throws ValidationException {
+    private void validate(@Nullable List<QuestionItem> questions) throws SurveyValidationException {
         if (questions == null) {
             return;
         }
-        boolean error = false;
-        for (QuestionItem item : questions) {
+        Integer firstErrorIndex = null;
+        for (int i = 0; i < questions.size(); i++) {
+            QuestionItem item = questions.get(i);
             if (item.getQuestion().isRequired() && item.getAnswer() == null) {
                 item.setShowError(true);
-                error = true;
+                if (firstErrorIndex == null) {
+                    firstErrorIndex = i;
+                }
             } else {
                 item.setShowError(false);
             }
         }
-        if (error) {
-            throw new ValidationException();
+        if (firstErrorIndex != null) {
+            throw new SurveyValidationException(firstErrorIndex);
         }
     }
 }

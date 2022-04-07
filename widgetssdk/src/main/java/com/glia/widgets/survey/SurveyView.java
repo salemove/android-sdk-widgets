@@ -164,6 +164,12 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
     }
 
     @Override
+    public void scrollTo(int index) {
+        surveyAdapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(index);
+    }
+
+    @Override
     public void finish() {
         Activity activity = Utils.getActivity(getContext());
         if (activity != null) activity.finish();

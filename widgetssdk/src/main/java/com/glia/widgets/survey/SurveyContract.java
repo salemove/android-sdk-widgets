@@ -21,6 +21,7 @@ public interface SurveyContract {
 
     interface View extends BaseView<Controller> {
         void onStateUpdated(SurveyState state);
+        void scrollTo(int index);
         void finish();
     }
 }

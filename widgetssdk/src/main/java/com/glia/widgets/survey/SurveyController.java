@@ -50,25 +50,17 @@ public class SurveyController implements SurveyContract.Controller {
     private QuestionItem makeQuestionItem(Survey.Question question) {
         Survey.Answer answer = null;
         String questionId = question.getId();
-        switch (question.getType()) {
-            case SCALE:
-                answer = Survey.Answer.makeAnswer(questionId, 0);
-                break;
-            case BOOLEAN:
-                answer = Survey.Answer.makeAnswer(questionId, false);
-                break;
-            case SINGLE_CHOICE:
-                List<Survey.Question.Option> options = question.getOptions();
-                if (options != null) {
-                    Survey.Question.Option option = options.stream()
-                            .filter(Survey.Question.Option::isDefault)
-                            .findFirst()
-                            .orElse(null);
-                    if (option != null) {
-                        answer = Survey.Answer.makeAnswer(questionId, option.getId());
-                    }
+        if (question.getType() == Survey.Question.QuestionType.SINGLE_CHOICE) {
+            List<Survey.Question.Option> options = question.getOptions();
+            if (options != null) {
+                Survey.Question.Option option = options.stream()
+                        .filter(Survey.Question.Option::isDefault)
+                        .findFirst()
+                        .orElse(null);
+                if (option != null) {
+                    answer = Survey.Answer.makeAnswer(questionId, option.getId());
                 }
-                break;
+            }
         }
         return new QuestionItem(question, answer);
     }

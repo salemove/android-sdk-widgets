@@ -20,6 +20,13 @@ public class QuestionItem {
         this.showError = false;
     }
 
+    private QuestionItem(@NonNull Survey.Question question,
+                         @Nullable Survey.Answer answer, boolean showError) {
+        this.question = question;
+        this.answer = answer;
+        this.showError = showError;
+    }
+
     public void setAnswer(@Nullable Survey.Answer answer) {
         this.answer = answer;
     }
@@ -40,6 +47,10 @@ public class QuestionItem {
 
     public boolean isShowError() {
         return showError;
+    }
+
+    public QuestionItem copy() {
+        return new QuestionItem(question, answer, showError);
     }
 
     @Override

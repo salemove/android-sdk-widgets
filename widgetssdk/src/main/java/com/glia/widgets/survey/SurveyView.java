@@ -16,6 +16,7 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.dialog.DialogController;
@@ -24,7 +25,7 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.Dialogs;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
-public class SurveyView extends ConstraintLayout implements SurveyContract.View {
+public class SurveyView extends ConstraintLayout implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 
     private SurveyContract.Controller controller;
@@ -91,7 +92,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
     }
 
     private void initAdapter() {
-        surveyAdapter = new SurveyAdapter( );
+        surveyAdapter = new SurveyAdapter(this);
         recyclerView.setAdapter(surveyAdapter);
     }
 
@@ -159,13 +160,19 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
     }
 
     @Override
+    public void onAnswer(@NonNull Survey.Answer answer) {
+        if (controller != null) {
+            controller.onAnswer(answer);
+        }
+    }
+
+    @Override
     public void onStateUpdated(SurveyState state) {
-        surveyAdapter.setItems(state.questions);
+        surveyAdapter.submitList(state.questions);
     }
 
     @Override
     public void scrollTo(int index) {
-        surveyAdapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(index);
     }
 

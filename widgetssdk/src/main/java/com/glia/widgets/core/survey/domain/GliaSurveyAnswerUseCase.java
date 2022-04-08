@@ -1,5 +1,7 @@
 package com.glia.widgets.core.survey.domain;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -21,9 +23,9 @@ public class GliaSurveyAnswerUseCase {
         this.repository = repository;
     }
 
-    public void execute(@Nullable List<QuestionItem> questions,
-                        @NonNull Survey survey,
-                        @NonNull Consumer<RuntimeException> callback) {
+    public void submit(@Nullable List<QuestionItem> questions,
+                       @NonNull Survey survey,
+                       @NonNull Consumer<RuntimeException> callback) {
         try {
             validate(questions);
         } catch (SurveyValidationException exception) {
@@ -52,17 +54,32 @@ public class GliaSurveyAnswerUseCase {
         Integer firstErrorIndex = null;
         for (int i = 0; i < questions.size(); i++) {
             QuestionItem item = questions.get(i);
-            if (item.getQuestion().isRequired() && item.getAnswer() == null) {
+            try {
+                validate(item);
+                item.setShowError(false);
+            } catch (SurveyValidationException ignore) {
                 item.setShowError(true);
                 if (firstErrorIndex == null) {
                     firstErrorIndex = i;
                 }
-            } else {
-                item.setShowError(false);
             }
         }
         if (firstErrorIndex != null) {
             throw new SurveyValidationException(firstErrorIndex);
+        }
+    }
+
+    public void validate(QuestionItem item) throws SurveyValidationException {
+        if (item.getQuestion().isRequired()) {
+            if (item.getQuestion().getType() == Survey.Question.QuestionType.TEXT) {
+                if (item.getAnswer() == null || TextUtils.isEmpty(item.getAnswer().getResponse())) {
+                    throw new SurveyValidationException();
+                }
+            } else {
+                if (item.getAnswer() == null) {
+                    throw new SurveyValidationException();
+                }
+            }
         }
     }
 }

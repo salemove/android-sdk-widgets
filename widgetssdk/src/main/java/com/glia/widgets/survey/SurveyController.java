@@ -16,6 +16,7 @@ public class SurveyController implements SurveyContract.Controller {
 
     private SurveyContract.View view;
     private Survey survey;
+    private List<QuestionItem> questionItems;
     private SurveyState state = new SurveyState();
 
     private final GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
@@ -40,10 +41,10 @@ public class SurveyController implements SurveyContract.Controller {
     }
 
     private void setQuestions(@NonNull Survey survey) {
-        List<QuestionItem> items = survey.getQuestions().stream()
+        questionItems = survey.getQuestions().stream()
                 .map(this::makeQuestionItem)
                 .collect(Collectors.toList());
-        setState(new SurveyState(items));
+        setState(new SurveyState(questionItems));
     }
 
     private QuestionItem makeQuestionItem(Survey.Question question) {
@@ -80,10 +81,22 @@ public class SurveyController implements SurveyContract.Controller {
     }
 
     @Override
-    public void onBackClicked() {
-        if (view != null) {
-            view.finish();
-        }
+    public void onAnswer(@NonNull Survey.Answer answer) {
+        questionItems.stream()
+                .filter(item -> item.getQuestion().getId().equals(answer.getQuestionId()))
+                .findFirst()
+                .ifPresent(item -> {
+                    item.setAnswer(answer);
+                    if (item.isShowError()) {
+                        try {
+                            gliaSurveyAnswerUseCase.validate(item);
+                            item.setShowError(false);
+                        } catch (SurveyValidationException ignore) {
+                            item.setShowError(true);
+                        }
+                    }
+                    setState(new SurveyState(questionItems));
+                });
     }
 
     @Override
@@ -95,8 +108,7 @@ public class SurveyController implements SurveyContract.Controller {
 
     @Override
     public void onSubmitClicked() {
-        List<QuestionItem> questions = state.questions;
-        gliaSurveyAnswerUseCase.execute(questions, survey, exception -> {
+        gliaSurveyAnswerUseCase.submit(questionItems, survey, exception -> {
             if (exception == null) {
                 Logger.d(TAG, "Answers submitted: success");
                 if (view != null) {
@@ -106,6 +118,7 @@ public class SurveyController implements SurveyContract.Controller {
             }
             Logger.e(TAG, "Answers submitted: " + exception);
             if (exception instanceof SurveyValidationException) {
+                setState(new SurveyState(questionItems));
                 view.scrollTo(((SurveyValidationException) exception).getFirstErrorPosition());
             } else {
                 dialogController.showSubmitSurveyAnswersErrorDialog();

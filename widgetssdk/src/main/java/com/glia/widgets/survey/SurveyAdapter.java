@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -22,26 +21,53 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 
 import java.util.List;
+import java.util.Optional;
 
 public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    interface SurveyAdapterListener {
+        void onAnswer(@NonNull Survey.Answer answer);
+    }
+
+    private final AsyncListDiffer<QuestionItem> differ = new AsyncListDiffer<>(this, DIFF_CALLBACK);
+
+    public static final DiffUtil.ItemCallback<QuestionItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<QuestionItem>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull QuestionItem oldItem, @NonNull QuestionItem newItem) {
+            return oldItem.getQuestion().getId().equals(newItem.getQuestion().getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull QuestionItem oldItem, @NonNull QuestionItem newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
 
     private static final int SURVEY_SCALE = 1;
     private static final int SURVEY_YES_NO = 2;
     private static final int SURVEY_SINGLE_CHOICE = 3;
     private static final int SURVEY_OPEN_TEXT = 4;
 
-    private List<QuestionItem> items;
+    private final SurveyAdapterListener listener;
 
-    @SuppressLint("NotifyDataSetChanged") // DataSet shouldn't change often
-    public void setItems(List<QuestionItem> items) {
-        this.items = items;
-        notifyDataSetChanged();
+    public SurveyAdapter(SurveyAdapterListener listener) {
+        this.listener = listener;
+    }
+
+    public void submitList(List<QuestionItem> items) {
+        differ.submitList(items);
+    }
+
+    public QuestionItem getItem(int position) {
+        return differ.getCurrentList().get(position);
     }
 
     @Override
@@ -70,62 +96,58 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
 
-        QuestionItem questionItem = this.items.get(position);
+        QuestionItem questionItem = getItem(position);
         Survey.Question question = questionItem.getQuestion();
         Survey.Answer answer = questionItem.getAnswer();
 
         if (getItemViewType(position) == SURVEY_SCALE) {
-            bindScale(questionItem, question, answer, (SurveyScaleViewHolder) viewHolder);
+            bindScale(questionItem, question, (SurveyScaleViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_SINGLE_CHOICE) {
             bindSingle(questionItem, question, (SurveySingleChoiceViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_YES_NO) {
-            bindYesNo(questionItem, question, answer, (SurveyYesNoViewHolder) viewHolder);
+            bindYesNo(questionItem, question, (SurveyYesNoViewHolder) viewHolder);
         } else if (getItemViewType(position) == SURVEY_OPEN_TEXT) {
-            bindOpenText(questionItem, question, answer, (SurveyOpenTextViewHolder) viewHolder);
+            bindOpenText(questionItem, question, (SurveyOpenTextViewHolder) viewHolder);
         }
     }
 
-    private void bindScale(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyScaleViewHolder scaleViewHolder) {
+    private void bindScale(QuestionItem questionItem,
+                           Survey.Question question,
+                           SurveyScaleViewHolder scaleViewHolder) {
         setItemTitle(scaleViewHolder.titleTextView, question.getText(), question.isRequired());
-
-        scaleViewHolder.setAnswer(answer);
-
+        scaleViewHolder.setAnswer(questionItem.getAnswer());
         scaleViewHolder.listener = value -> {
             setAnswer(questionItem, value);
             scaleViewHolder.setSelected(value);
         };
-
         scaleViewHolder.showRequiredError(questionItem.isShowError());
     }
 
-    private void bindSingle(QuestionItem questionItem, Survey.Question question, SurveySingleChoiceViewHolder singleChoiceViewHolder) {
+    private void bindSingle(QuestionItem questionItem,
+                            Survey.Question question,
+                            SurveySingleChoiceViewHolder singleChoiceViewHolder) {
         setItemTitle(singleChoiceViewHolder.title, question.getText(), question.isRequired());
-
-        singleChoiceViewHolder.singleChoice(question.getOptions(), questionItem);
-
+        singleChoiceViewHolder.singleChoice(questionItem);
         singleChoiceViewHolder.showRequiredError(questionItem.isShowError());
     }
 
-    private void bindYesNo(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyYesNoViewHolder yesNoViewHolder) {
+    private void bindYesNo(QuestionItem questionItem,
+                           Survey.Question question,
+                           SurveyYesNoViewHolder yesNoViewHolder) {
         setItemTitle(yesNoViewHolder.titleTextView, question.getText(), question.isRequired());
-
-        yesNoViewHolder.setAnswer(answer);
-
+        yesNoViewHolder.setAnswer(questionItem.getAnswer());
         yesNoViewHolder.listener = value -> {
             setAnswer(questionItem, value);
             yesNoViewHolder.setSelected(value);
         };
-
         yesNoViewHolder.showRequiredError(questionItem.isShowError());
     }
 
-    private void bindOpenText(QuestionItem questionItem, Survey.Question question, Survey.Answer answer, SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
+    private void bindOpenText(QuestionItem questionItem,
+                              Survey.Question question,
+                              SurveyOpenTextViewHolder surveyOpenTextViewHolder) {
         setItemTitle(surveyOpenTextViewHolder.titleComment, question.getText(), question.isRequired());
-        EditText comment = surveyOpenTextViewHolder.comment;
-        if (answer != null) {
-            comment.setText(answer.getResponse());
-        }
-
+        surveyOpenTextViewHolder.setAnswer(questionItem.getAnswer());
         surveyOpenTextViewHolder.showRequiredError(questionItem.isShowError());
     }
 
@@ -142,20 +164,30 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     private void setAnswer(QuestionItem questionItem, int response) {
-        questionItem.setAnswer(Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response));
+        Survey.Answer answer = Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response);
+        questionItem.setAnswer(answer);
+        onAnswer(answer);
     }
 
     private void setAnswer(QuestionItem questionItem, boolean response) {
-        questionItem.setAnswer(Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response));
+        Survey.Answer answer = Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response);
+        questionItem.setAnswer(answer);
+        onAnswer(answer);
     }
 
     private void setAnswer(QuestionItem questionItem, String response) {
-        questionItem.setAnswer(Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response));
+        Survey.Answer answer = Survey.Answer.makeAnswer(questionItem.getQuestion().getId(), response);
+        questionItem.setAnswer(answer);
+        onAnswer(answer);
+    }
+
+    private void onAnswer(Survey.Answer answer) {
+        listener.onAnswer(answer);
     }
 
     @Override
     public int getItemViewType(int position) {
-        switch (items.get(position).getQuestion().getType()) {
+        switch (getItem(position).getQuestion().getType()) {
             case TEXT:
                 return SURVEY_OPEN_TEXT;
             case BOOLEAN:
@@ -169,7 +201,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        return items == null ? 0 : items.size();
+        return differ.getCurrentList().size();
     }
 
     public static class SurveyScaleViewHolder extends RecyclerView.ViewHolder {
@@ -309,18 +341,23 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             requiredError = itemView.findViewById(R.id.required_error);
         }
 
-        public void singleChoice(List<Survey.Question.Option> options, QuestionItem item) {
+        public void singleChoice(QuestionItem item) {
+            String selectedId = Optional.ofNullable(item.getAnswer())
+                    .map(answer -> (String) answer.getResponse())
+                    .orElse(null);
+            List<Survey.Question.Option> options = item.getQuestion().getOptions();
             if (options == null) {
                 return;
             }
 
+            radioGroup.removeAllViews();
             for (int i = 0; i < options.size(); i++) {
                 Survey.Question.Option option = options.get(i);
 
                 RadioButton radioButton = new RadioButton(itemView.getContext());
                 radioButton.setId(View.generateViewId());
                 radioButton.setText(option.getLabel());
-                radioButton.setContentDescription("survey_question_single_choice_" + option.getId());
+                radioButton.setChecked(option.getId().equals(selectedId));
                 radioButton.setOnClickListener(v -> setAnswer(item, option.getId()));
                 ColorStateList colorStateList = getRadioButtonColor();
                 radioButton.setButtonTintList(colorStateList);
@@ -376,9 +413,18 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    setAnswer(items.get(getAdapterPosition()), s.toString());
+                    SurveyAdapter.this.setAnswer(getItem(getAdapterPosition()), s.toString());
                 }
             });
+        }
+
+        void setAnswer(@Nullable Survey.Answer answer) {
+            if (answer != null) {
+                String value = answer.getResponse();
+                comment.setText(value);
+            } else {
+                comment.setText("");
+            }
         }
 
         void showRequiredError(boolean error) {

@@ -29,7 +29,7 @@
         <activity
             android:name=".survey.SurveyActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Application.Glia.Chat.Activity" />
+            android:theme="@style/Application.Glia.Translucent.Activity" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

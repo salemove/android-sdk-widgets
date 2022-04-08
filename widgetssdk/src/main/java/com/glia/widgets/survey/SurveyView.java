@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +22,6 @@ import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.DialogsState;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.Dialogs;
-import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class SurveyView extends ConstraintLayout implements SurveyContract.View {
@@ -37,7 +37,6 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
     private UiTheme theme;
 
     private AlertDialog alertDialog;
-    private AppBarView appBar;
     private RecyclerView recyclerView;
     private Button submitButton;
     private Button cancelButton;
@@ -95,21 +94,16 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View 
 
     private void initView() {
         View view = View.inflate(getContext(), R.layout.survey_view, this);
-        appBar = view.findViewById(R.id.app_bar_view);
-        appBar.setTitle(getContext().getString(R.string.glia_survey_engagement_ended_title));
-        appBar.hideLeaveButtons();
 
         recyclerView = view.findViewById(R.id.survey_list);
         submitButton = view.findViewById(R.id.btn_submit);
         cancelButton = view.findViewById(R.id.btn_cancel);
+
+        CardView cardView = view.findViewById(R.id.card_view);
+        cardView.setBackgroundResource(R.drawable.bg_survey);
     }
 
     private void initCallbacks() {
-        appBar.setOnBackClickedListener(() -> {
-            if (controller != null) {
-                controller.onBackClicked();
-            }
-        });
         submitButton.setOnClickListener((view) -> {
             if (controller != null) {
                 controller.onSubmitClicked();

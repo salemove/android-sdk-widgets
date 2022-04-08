@@ -4,7 +4,7 @@
         <item name="android:forceDarkAllowed">false</item>
     </style>
 
-    <style name="Application.Glia.Call.Activity" parent="Application.Glia.Activity.Style">
+    <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

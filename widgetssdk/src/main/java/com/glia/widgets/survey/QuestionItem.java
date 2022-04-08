@@ -13,18 +13,13 @@ public class QuestionItem {
     @Nullable
     private Survey.Answer answer;
     private boolean showError;
+    @Nullable
+    private SurveyController.AnswerCallback answerCallback;
 
     public QuestionItem(@NonNull Survey.Question question, @Nullable Survey.Answer answer) {
         this.question = question;
         this.answer = answer;
         this.showError = false;
-    }
-
-    private QuestionItem(@NonNull Survey.Question question,
-                         @Nullable Survey.Answer answer, boolean showError) {
-        this.question = question;
-        this.answer = answer;
-        this.showError = showError;
     }
 
     public void setAnswer(@Nullable Survey.Answer answer) {
@@ -49,8 +44,13 @@ public class QuestionItem {
         return showError;
     }
 
-    public QuestionItem copy() {
-        return new QuestionItem(question, answer, showError);
+    @Nullable
+    public SurveyController.AnswerCallback getAnswerCallback() {
+        return answerCallback;
+    }
+
+    public void setAnswerCallback(@Nullable SurveyController.AnswerCallback answerCallback) {
+        this.answerCallback = answerCallback;
     }
 
     @Override

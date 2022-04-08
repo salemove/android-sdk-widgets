@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 public class SurveyController implements SurveyContract.Controller {
     private static final String TAG = SurveyController.class.getSimpleName();
 
+    public interface AnswerCallback {
+        void answerCallback(boolean showError);
+    }
+
     private SurveyContract.View view;
     private Survey survey;
     private List<QuestionItem> questionItems;
@@ -91,8 +95,14 @@ public class SurveyController implements SurveyContract.Controller {
                         try {
                             gliaSurveyAnswerUseCase.validate(item);
                             item.setShowError(false);
+                            if (item.getAnswerCallback() != null) {
+                                item.getAnswerCallback().answerCallback(false);
+                            }
                         } catch (SurveyValidationException ignore) {
                             item.setShowError(true);
+                            if (item.getAnswerCallback() != null) {
+                                item.getAnswerCallback().answerCallback(true);
+                            }
                         }
                     }
                     setState(new SurveyState(questionItems));
@@ -110,15 +120,17 @@ public class SurveyController implements SurveyContract.Controller {
     public void onSubmitClicked() {
         gliaSurveyAnswerUseCase.submit(questionItems, survey, exception -> {
             if (exception == null) {
-                Logger.d(TAG, "Answers submitted: success");
                 if (view != null) {
                     view.finish();
                 }
                 return;
             }
-            Logger.e(TAG, "Answers submitted: " + exception);
             if (exception instanceof SurveyValidationException) {
-                setState(new SurveyState(questionItems));
+                questionItems.forEach(item -> {
+                    if (item.getAnswerCallback() != null) {
+                        item.getAnswerCallback().answerCallback(item.isShowError());
+                    }
+                });
                 view.scrollTo(((SurveyValidationException) exception).getFirstErrorPosition());
             } else {
                 dialogController.showSubmitSurveyAnswersErrorDialog();

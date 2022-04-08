@@ -12,12 +12,9 @@ public interface SurveyContract {
     interface Controller extends BaseController {
         void init(@Nullable Survey survey);
         void setView(View view);
-        void setDialogCallback(DialogController.Callback callback);
-        void removeDialogCallback(DialogController.Callback callback);
         void onAnswer(@NonNull Survey.Answer answer);
         void onCancelClicked();
         void onSubmitClicked();
-        void submitSurveyAnswersErrorDialogDismissed();
     }
 
     interface View extends BaseView<Controller> {

@@ -29,11 +29,6 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private static final String TAG = SurveyView.class.getSimpleName();
 
     private SurveyContract.Controller controller;
-    private DialogController.Callback dialogCallback = dialogsState -> {
-        if (dialogsState instanceof DialogsState.SubmitSurveyAnswersErrorDialog) {
-            post(this::showSubmitSurveyAnswersErrorDialog);
-        }
-    };
 
     private UiTheme theme;
 
@@ -124,39 +119,6 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     public void setController(SurveyContract.Controller controller) {
         this.controller = controller;
         this.controller.setView(this);
-
-        controller.setDialogCallback(dialogCallback);
-    }
-
-    private void showSubmitSurveyAnswersErrorDialog() {
-        showAlertDialog(
-                R.string.glia_dialog_submit_survey_answers_error_title,
-                R.string.glia_dialog_submit_survey_answers_error_message,
-                v -> {
-                    dismissAlertDialog();
-                    if (controller != null) {
-                        controller.submitSurveyAnswersErrorDialogDismissed();
-                    }
-                }
-        );
-    }
-
-    private void showAlertDialog(@StringRes int title, @StringRes int message,
-                                 View.OnClickListener buttonClickListener) {
-        dismissAlertDialog();
-        alertDialog = Dialogs.showAlertDialog(
-                this.getContext(),
-                this.theme,
-                title,
-                message,
-                buttonClickListener);
-    }
-
-    private void dismissAlertDialog() {
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-            alertDialog = null;
-        }
     }
 
     @Override
@@ -184,7 +146,6 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
 
     public void onDestroyView() {
         if (controller != null) {
-            controller.removeDialogCallback(dialogCallback);
             controller.onDestroy();
             controller = null;
         }

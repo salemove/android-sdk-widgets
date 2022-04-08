@@ -4,9 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.engagement.Survey;
-import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.helper.Logger;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,12 +22,9 @@ public class SurveyController implements SurveyContract.Controller {
     private SurveyState state = new SurveyState();
 
     private final GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
-    private final DialogController dialogController;
 
-    public SurveyController(GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase,
-                            DialogController dialogController) {
+    public SurveyController(GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase) {
         this.gliaSurveyAnswerUseCase = gliaSurveyAnswerUseCase;
-        this.dialogController = dialogController;
     }
 
     @Override
@@ -72,16 +67,6 @@ public class SurveyController implements SurveyContract.Controller {
     @Override
     public void setView(SurveyContract.View view) {
         this.view = view;
-    }
-
-    @Override
-    public void setDialogCallback(DialogController.Callback callback) {
-        dialogController.addCallback(callback);
-    }
-
-    @Override
-    public void removeDialogCallback(DialogController.Callback callback) {
-        dialogController.removeCallback(callback);
     }
 
     @Override
@@ -132,8 +117,6 @@ public class SurveyController implements SurveyContract.Controller {
                     }
                 });
                 view.scrollTo(((SurveyValidationException) exception).getFirstErrorPosition());
-            } else {
-                dialogController.showSubmitSurveyAnswersErrorDialog();
             }
         });
     }
@@ -143,12 +126,6 @@ public class SurveyController implements SurveyContract.Controller {
         if (view != null) {
             view.onStateUpdated(state);
         }
-    }
-
-    @Override
-    public void submitSurveyAnswersErrorDialogDismissed() {
-        Logger.d(TAG, "submitSurveyAnswersErrorDialogDismissed");
-        dialogController.dismissDialogs();
     }
 
     @Override

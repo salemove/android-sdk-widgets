@@ -11,6 +11,8 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 
 public class GliaSurveyOptionButton extends BaseConfigurableButton {
+    private boolean isError = false;
+
     @Override
     public ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme) {
         return theme.getGliaNeutralButtonConfiguration();
@@ -20,22 +22,37 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         super(context, attrs, R.attr.buttonSurveyOptionButtonStyle);
     }
 
+    public void setError(boolean error) {
+        isError = error;
+        applyView();
+    }
+
     @Override
     public void setSelected(boolean selected) {
         super.setSelected(selected);
+        applyView();
+    }
 
+    private void applyView() {
         // TODO: get colors from theme
-        ColorStateList actionButtonBackgroundColor =
-                selected ?
+        ColorStateList strokeColor =
+                isError ? ContextCompat.getColorStateList(getContext(), R.color.glia_system_negative_color) :
+                        isSelected() ?
+                                ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
+                                ContextCompat.getColorStateList(getContext(), R.color.glia_stroke_gray);
+
+        ColorStateList backgroundColor =
+                isSelected() ?
                         ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
                         ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color);
 
-        ColorStateList actionButtonTextColor =
-                selected ?
+        ColorStateList textColor =
+                isSelected() ?
                         ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color) :
                         ContextCompat.getColorStateList(getContext(), R.color.glia_base_dark_color);
 
-        setBackgroundTintList(actionButtonBackgroundColor);
-        setTextColor(actionButtonTextColor);
+        setStrokeColor(strokeColor);
+        setBackgroundTintList(backgroundColor);
+        setTextColor(textColor);
     }
 }

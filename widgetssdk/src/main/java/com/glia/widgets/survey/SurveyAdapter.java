@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
+import com.glia.widgets.view.button.GliaSurveyOptionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,16 +179,16 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public static class SurveyScaleViewHolder extends SurveyViewHolder {
-        List<Button> buttons;
+        List<GliaSurveyOptionButton> buttons;
 
         public SurveyScaleViewHolder(@NonNull View itemView) {
             super(itemView);
-            Button scale1Button = itemView.findViewById(R.id.scale_1_button);
-            Button scale2Button = itemView.findViewById(R.id.scale_2_button);
-            Button scale3Button = itemView.findViewById(R.id.scale_3_button);
-            Button scale4Button = itemView.findViewById(R.id.scale_4_button);
-            Button scale5Button = itemView.findViewById(R.id.scale_5_button);
-            buttons = asList(scale1Button, scale2Button, scale3Button, scale4Button, scale5Button);
+            buttons = asList(
+                    itemView.findViewById(R.id.scale_1_button),
+                    itemView.findViewById(R.id.scale_2_button),
+                    itemView.findViewById(R.id.scale_3_button),
+                    itemView.findViewById(R.id.scale_4_button),
+                    itemView.findViewById(R.id.scale_5_button));
         }
 
         @Override
@@ -224,11 +225,18 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         void unselectAll() {
             setSelected(0);
         }
+
+        @Override
+        void showRequiredError(boolean error) {
+            super.showRequiredError(error);
+
+            buttons.forEach(button -> button.setError(error));
+        }
     }
 
     public static class SurveyYesNoViewHolder extends SurveyViewHolder {
-        Button yesButton;
-        Button noButton;
+        GliaSurveyOptionButton yesButton;
+        GliaSurveyOptionButton noButton;
 
         public SurveyYesNoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -266,6 +274,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         void unselectAll() {
             yesButton.setSelected(false);
             noButton.setSelected(false);
+        }
+
+        @Override
+        void showRequiredError(boolean error) {
+            super.showRequiredError(error);
+
+            yesButton.setError(error);
+            noButton.setError(error);
         }
     }
 

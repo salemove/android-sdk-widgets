@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -397,6 +398,24 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             } else {
                 comment.setText(null);
+            }
+        }
+
+        @Override
+        void showRequiredError(boolean error) {
+            super.showRequiredError(error);
+
+            Context context = comment.getContext();
+
+            GradientDrawable shape = (GradientDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_edit_text);
+            if (shape != null) {
+                // TODO: get colors from theme
+                ColorStateList strokeColor =
+                        error ? ContextCompat.getColorStateList(context, R.color.glia_system_negative_color) :
+                                ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
+                int width = (int) context.getResources().getDimension(R.dimen.glia_px);
+                shape.setStroke(width, strokeColor);
+                comment.setBackground(shape);
             }
         }
     }

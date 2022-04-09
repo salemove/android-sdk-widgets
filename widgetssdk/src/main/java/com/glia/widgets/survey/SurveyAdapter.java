@@ -413,7 +413,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 ColorStateList strokeColor =
                         error ? ContextCompat.getColorStateList(context, R.color.glia_system_negative_color) :
                                 ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
-                int width = (int) context.getResources().getDimension(R.dimen.glia_px);
+                int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
                 shape.setStroke(width, strokeColor);
                 comment.setBackground(shape);
             }

@@ -18,7 +18,6 @@ public class SurveyController implements SurveyContract.Controller {
 
     private SurveyContract.View view;
     private Survey survey;
-    private List<QuestionItem> questionItems;
     private SurveyState state = new SurveyState();
 
     private final GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
@@ -40,7 +39,7 @@ public class SurveyController implements SurveyContract.Controller {
     }
 
     private void setQuestions(@NonNull Survey survey) {
-        questionItems = survey.getQuestions().stream()
+        List<QuestionItem> questionItems = survey.getQuestions().stream()
                 .map(this::makeQuestionItem)
                 .collect(Collectors.toList());
         setState(new SurveyState(questionItems));
@@ -71,26 +70,27 @@ public class SurveyController implements SurveyContract.Controller {
 
     @Override
     public void onAnswer(@NonNull Survey.Answer answer) {
-        questionItems.stream()
+        if (state.questions == null) {
+            return;
+        }
+        state.questions.stream()
                 .filter(item -> item.getQuestion().getId().equals(answer.getQuestionId()))
                 .findFirst()
                 .ifPresent(item -> {
                     item.setAnswer(answer);
                     if (item.isShowError()) {
+                        boolean showError;
                         try {
                             gliaSurveyAnswerUseCase.validate(item);
-                            item.setShowError(false);
-                            if (item.getAnswerCallback() != null) {
-                                item.getAnswerCallback().answerCallback(false);
-                            }
+                            showError = false;
                         } catch (SurveyValidationException ignore) {
-                            item.setShowError(true);
-                            if (item.getAnswerCallback() != null) {
-                                item.getAnswerCallback().answerCallback(true);
-                            }
+                            showError = true;
+                        }
+                        item.setShowError(showError);
+                        if (item.getAnswerCallback() != null) {
+                            item.getAnswerCallback().answerCallback(showError);
                         }
                     }
-                    setState(new SurveyState(questionItems));
                 });
     }
 
@@ -103,6 +103,10 @@ public class SurveyController implements SurveyContract.Controller {
 
     @Override
     public void onSubmitClicked() {
+        List<QuestionItem> questionItems = state.questions;
+        if (questionItems == null) {
+            return;
+        }
         gliaSurveyAnswerUseCase.submit(questionItems, survey, exception -> {
             if (exception == null) {
                 if (view != null) {
@@ -110,14 +114,15 @@ public class SurveyController implements SurveyContract.Controller {
                 }
                 return;
             }
-            if (exception instanceof SurveyValidationException) {
-                questionItems.forEach(item -> {
-                    if (item.getAnswerCallback() != null) {
-                        item.getAnswerCallback().answerCallback(item.isShowError());
-                    }
-                });
-                view.scrollTo(((SurveyValidationException) exception).getFirstErrorPosition());
-            }
+            questionItems.forEach(item -> {
+                if (item.getAnswerCallback() != null) {
+                    item.getAnswerCallback().answerCallback(item.isShowError());
+                }
+            });
+            questionItems.stream()
+                    .filter(QuestionItem::isShowError)
+                    .findFirst()
+                    .ifPresent(item -> view.scrollTo(questionItems.indexOf(item)));
         });
     }
 

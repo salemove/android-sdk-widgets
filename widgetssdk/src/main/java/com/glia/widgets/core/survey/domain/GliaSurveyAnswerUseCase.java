@@ -51,7 +51,7 @@ public class GliaSurveyAnswerUseCase {
         if (questions == null) {
             return;
         }
-        Integer firstErrorIndex = null;
+        boolean isError = false;
         for (int i = 0; i < questions.size(); i++) {
             QuestionItem item = questions.get(i);
             try {
@@ -59,13 +59,11 @@ public class GliaSurveyAnswerUseCase {
                 item.setShowError(false);
             } catch (SurveyValidationException ignore) {
                 item.setShowError(true);
-                if (firstErrorIndex == null) {
-                    firstErrorIndex = i;
-                }
+                isError = true;
             }
         }
-        if (firstErrorIndex != null) {
-            throw new SurveyValidationException(firstErrorIndex);
+        if (isError) {
+            throw new SurveyValidationException();
         }
     }
 

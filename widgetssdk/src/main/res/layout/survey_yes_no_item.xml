@@ -50,6 +50,8 @@
         android:layout_marginTop="@dimen/glia_medium"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginBottom="@dimen/glia_large_x_large"
+        android:drawablePadding="@dimen/glia_small"
+        app:drawableStartCompat="@drawable/ic_attention"
         app:layout_constraintTop_toBottomOf="@id/yes_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

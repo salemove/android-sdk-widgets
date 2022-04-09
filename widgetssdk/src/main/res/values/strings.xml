@@ -198,7 +198,7 @@
     <string name="glia_survey_yes_no_item_title">Would you use our chat again?</string>
     <string name="glia_survey_yes_no_item_yes">Yes</string>
     <string name="glia_survey_yes_no_item_no">No</string>
-    <string name="glia_survey_require_label"><![CDATA[<b>%1$s\u00A0<font color=#%2$s>*</font></b>]]></string>
+    <string name="glia_survey_require_label"><![CDATA[%1$s\u00A0<font color=#%2$s>*</font>]]></string>
     <string name="glia_survey_required_error_message">Please provide an answer.</string>
 
 </resources>

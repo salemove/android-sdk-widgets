@@ -4,18 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:paddingBottom="@dimen/glia_large">
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_large_x_large"
+        android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_large_x_large"
-        android:textSize="@dimen/glia_survey_question_title_size"
+        android:textAppearance="?attr/textAppearanceBody1"
         android:text="@string/glia_survey_scale_item_title"
         android:textColor="?attr/gliaBaseDarkColor"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -28,7 +29,6 @@
         android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_large"
-        android:layout_marginBottom="@dimen/glia_large_x_large"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/scale_2_button"/>
@@ -85,7 +85,6 @@
         android:text="@string/glia_survey_required_error_message"
         android:layout_marginTop="@dimen/glia_medium"
         android:layout_marginStart="@dimen/glia_large_x_large"
-        android:layout_marginBottom="@dimen/glia_large_x_large"
         android:drawablePadding="@dimen/glia_small"
         app:drawableStartCompat="@drawable/ic_attention"
         app:layout_constraintTop_toBottomOf="@id/scale_1_button"

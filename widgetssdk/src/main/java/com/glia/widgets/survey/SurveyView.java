@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class SurveyView extends ConstraintLayout implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
@@ -30,10 +32,12 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private UiTheme theme;
 
     private CardView cardView;
-    private LinearLayout buttonPanel;
+    private TextView title;
     private RecyclerView recyclerView;
+    private LinearLayout buttonPanel;
     private Button submitButton;
     private Button cancelButton;
+
     private SurveyAdapter surveyAdapter;
 
     public SurveyView(Context context) {
@@ -69,9 +73,14 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        cardView.setCardBackgroundColor(Color.parseColor(theme.getSurveyStyle().getBgColor()));
+
+        SurveyStyle surveyStyle = theme.getSurveyStyle();
+
+        cardView.setCardBackgroundColor(Color.parseColor(surveyStyle.getBgColor()));
+        String titleColorString = surveyStyle.getTitle().normalColor;
+        title.setTextColor(Color.parseColor(titleColorString));
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
-        buttonPanel.setBackgroundColor(Color.parseColor(theme.getSurveyStyle().getBgColor()));
+        buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getBgColor()));
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -100,11 +109,12 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private void initView() {
         View view = View.inflate(getContext(), R.layout.survey_view, this);
 
+        cardView = view.findViewById(R.id.card_view);
+        title = view.findViewById(R.id.survey_title);
         recyclerView = view.findViewById(R.id.survey_list);
+        buttonPanel = view.findViewById(R.id.button_panel);
         submitButton = view.findViewById(R.id.btn_submit);
         cancelButton = view.findViewById(R.id.btn_cancel);
-        cardView = view.findViewById(R.id.card_view);
-        buttonPanel = view.findViewById(R.id.button_panel);
     }
 
     private void initCallbacks() {

@@ -31,7 +31,6 @@
                     android:text="@string/glia_survey_screen_title"
                     android:gravity="center"
                     android:textSize="20sp"
-                    android:textColor="@color/glia_base_dark_color"
                     app:layout_constraintTop_toTopOf="parent"
                     />
 

@@ -1,10 +1,12 @@
 package com.glia.widgets.view.configuration.survey;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
+import com.glia.widgets.view.configuration.FontConfiguration;
 import com.glia.widgets.view.configuration.TextRuntimeConfiguration;
 
 public class SurveyStyle implements Parcelable {
@@ -56,9 +58,14 @@ public class SurveyStyle implements Parcelable {
         private SurveySingleOptionConfiguration singleOption;
         private SurveyInputOptionConfiguration inputOption;
 
+        @SuppressLint("ResourceType")
         public Builder(ResourceProvider resourceProvider) {
-            // Default values
+            // Default survey background
             this.bgColor = resourceProvider.getString(R.color.glia_base_light_color);
+            // Default survey title configuration
+            FontConfiguration font = new FontConfiguration(FontConfiguration.FontSize.HEADER, FontConfiguration.FontWeight.REGULAR);
+            String titleColorString = resourceProvider.getString(R.color.glia_base_dark_color);
+            this.title = new TextRuntimeConfiguration(font, titleColorString, titleColorString);
         }
 
         public Builder bgColor(String bgColor) {

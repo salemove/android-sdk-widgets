@@ -323,7 +323,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 radioButton.setOnClickListener(v -> setAnswer(option.getId()));
                 LayerDrawable drawable = (LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_radio_button);
                 if (drawable != null) {
-                    // TODO: get colors from theme
                     // Set color for the center dot
                     Drawable centerDot = drawable.findDrawableByLayerId(R.id.center_item);
                     ColorStateList colorStateList = getRadioButtonColor();

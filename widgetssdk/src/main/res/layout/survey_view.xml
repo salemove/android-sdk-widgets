@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/glia_x_large"
+        android:layout_marginBottom="-24dp"
         card_view:cardBackgroundColor="@android:color/transparent"
         card_view:cardCornerRadius="0dp">
         <!-- Solution for making CardView only have corner radius at the top -->
@@ -48,29 +49,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginBottom="24dp"
+                    android:elevation="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.781"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintVertical_bias="1.0">
 
-                    <Button
+                    <com.glia.widgets.view.button.GliaNegativeButton
                         android:id="@+id/btn_cancel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/glia_medium"
                         android:layout_weight="1"
-                        android:text="@string/glia_survey_cancel_label"
-                        tools:ignore="ButtonStyle" />
+                        android:text="@string/glia_survey_cancel_label" />
 
-                    <Button
+                    <com.glia.widgets.view.button.GliaPositiveButton
                         android:id="@+id/btn_submit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/glia_medium"
                         android:layout_weight="1"
-                        android:text="@string/glia_survey_submit_label"
-                        tools:ignore="ButtonStyle" />
+                        android:text="@string/glia_survey_submit_label" />
 
                 </LinearLayout>
 

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private UiTheme theme;
 
     private CardView cardView;
+    private LinearLayout buttonPanel;
     private RecyclerView recyclerView;
     private Button submitButton;
     private Button cancelButton;
@@ -68,6 +70,8 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         cardView.setCardBackgroundColor(Color.parseColor(theme.getSurveyStyle().getBgColor()));
+        // The elevated view (buttonPanel) needs to have a background to cast a shadow
+        buttonPanel.setBackgroundColor(Color.parseColor(theme.getSurveyStyle().getBgColor()));
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -100,6 +104,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
         submitButton = view.findViewById(R.id.btn_submit);
         cancelButton = view.findViewById(R.id.btn_cancel);
         cardView = view.findViewById(R.id.card_view);
+        buttonPanel = view.findViewById(R.id.button_panel);
     }
 
     private void initCallbacks() {

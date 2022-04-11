@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/border_item"
+        android:width="@dimen/glia_large_x_large"
+        android:height="@dimen/glia_large_x_large" >
+        <shape android:shape="oval">
+            <stroke android:width="@dimen/glia_px" android:color="@color/glia_base_shade_color"/>
+        </shape>
+    </item>
+
+    <item
+        android:id="@+id/center_item"
+        android:top="5.25dp"
+        android:start="5.25dp"
+        android:end="5.25dp"
+        android:bottom="5.25dp" >
+        <shape android:shape="oval" >
+            <solid android:color="@color/glia_brand_primary_color" />
+        </shape>
+    </item>
+</layer-list>

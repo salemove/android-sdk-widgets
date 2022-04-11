@@ -4,7 +4,9 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -322,13 +324,31 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             for (int i = 0; i < options.size(); i++) {
                 Survey.Question.Option option = options.get(i);
 
-                RadioButton radioButton = new RadioButton(itemView.getContext());
+                Context context = itemView.getContext();
+                RadioButton radioButton = new RadioButton(context);
                 radioButton.setId(View.generateViewId());
                 radioButton.setText(option.getLabel());
                 radioButton.setChecked(option.getId().equals(selectedId));
                 radioButton.setOnClickListener(v -> setAnswer(option.getId()));
-                ColorStateList colorStateList = getRadioButtonColor();
-                radioButton.setButtonTintList(colorStateList);
+                LayerDrawable drawable = (LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_radio_button);
+                if (drawable != null) {
+                    // TODO: get colors from theme
+                    // Set color for the center dot
+                    Drawable centerDot = drawable.findDrawableByLayerId(R.id.center_item);
+                    ColorStateList colorStateList = getRadioButtonColor();
+                    centerDot.setTintList(colorStateList);
+
+                    // Set color for the border
+                    GradientDrawable border = (GradientDrawable) drawable.findDrawableByLayerId(R.id.border_item);
+                    ColorStateList strokeColor = ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
+                    int width = Math.round(context.getResources().getDimension(R.dimen.glia_px));
+                    border.setStroke(width, strokeColor);
+                }
+                radioButton.setButtonDrawable(drawable);
+                int start = Math.round(context.getResources().getDimension(R.dimen.glia_medium));
+                int vertical = Math.round(context.getResources().getDimension(R.dimen.glia_pre_large));
+                boolean isRtl = context.getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+                radioButton.setPadding(isRtl ? 0 : start, vertical , isRtl ? start : 0, vertical);
                 radioGroup.addView(radioButton);
             }
         }
@@ -342,7 +362,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     },
                     new int[]{
                             ContextCompat.getColor(containerView.getContext(),
-                                    R.color.glia_base_shade_color), //disabled
+                                    android.R.color.transparent), //disabled
                             ContextCompat.getColor(containerView.getContext(),
                                     R.color.glia_brand_primary_color) //enabled
                     }

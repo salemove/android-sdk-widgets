@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
+import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 public class SurveyActivity extends AppCompatActivity {
     private static final String TAG = SurveyActivity.class.getSimpleName();
@@ -18,18 +18,21 @@ public class SurveyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.survey_activity);
+        prepareSurveyView();
+    }
 
+    private void prepareSurveyView() {
         surveyView = findViewById(R.id.survey_view);
 
         SurveyContract.Controller surveyController =
                 Dependencies.getControllerFactory().getSurveyController();
         surveyView.setController(surveyController);
-
         Bundle extras = getIntent().getExtras();
-        Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
+        UiTheme uiTheme = extras.getParcelable(GliaWidgets.UI_THEME);
+        surveyView.setTheme(uiTheme);
 
+        Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
         surveyController.init(survey);
     }
 

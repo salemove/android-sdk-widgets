@@ -4,72 +4,79 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_view"
-        android:layout_height="match_parent"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:backgroundTint="@color/glia_base_light_color"
-        android:layout_marginTop="@dimen/glia_x_large" >
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/content_view"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/glia_x_large"
+        card_view:cardBackgroundColor="@android:color/transparent"
+        card_view:cardCornerRadius="0dp">
+        <!-- Solution for making CardView only have corner radius at the top -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_width="match_parent">
+            card_view:cardCornerRadius="24dp">
 
-            <TextView
-                android:id="@+id/survey_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/glia_large_x_large"
-                android:text="@string/glia_survey_screen_title"
-                android:gravity="center"
-                android:textSize="20sp"
-                android:textColor="@color/glia_base_dark_color"
-                app:layout_constraintTop_toTopOf="parent"
-                />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/content_view"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/survey_list"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/survey_scale_item"
-                app:layout_constraintTop_toBottomOf="@id/survey_title"
-                app:layout_constraintBottom_toTopOf="@+id/button_panel"/>
-
-            <LinearLayout
-                android:id="@+id/button_panel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.781"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintVertical_bias="1.0">
-
-                <Button
-                    android:id="@+id/btn_cancel"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/survey_title"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/glia_medium"
-                    android:layout_weight="1"
-                    android:text="@string/glia_survey_cancel_label"
-                    tools:ignore="ButtonStyle" />
+                    android:layout_marginTop="@dimen/glia_large_x_large"
+                    android:text="@string/glia_survey_screen_title"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textColor="@color/glia_base_dark_color"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
 
-                <Button
-                    android:id="@+id/btn_submit"
-                    android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/survey_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/survey_scale_item"
+                    app:layout_constraintTop_toBottomOf="@id/survey_title"
+                    app:layout_constraintBottom_toTopOf="@+id/button_panel"/>
+
+                <LinearLayout
+                    android:id="@+id/button_panel"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/glia_medium"
-                    android:layout_weight="1"
-                    android:text="@string/glia_survey_submit_label"
-                    tools:ignore="ButtonStyle" />
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.781"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintVertical_bias="1.0">
 
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/btn_cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/glia_medium"
+                        android:layout_weight="1"
+                        android:text="@string/glia_survey_cancel_label"
+                        tools:ignore="ButtonStyle" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <Button
+                        android:id="@+id/btn_submit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/glia_medium"
+                        android:layout_weight="1"
+                        android:text="@string/glia_survey_submit_label"
+                        tools:ignore="ButtonStyle" />
 
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
     </androidx.cardview.widget.CardView>
 
 </merge>

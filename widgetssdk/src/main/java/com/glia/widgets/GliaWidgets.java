@@ -28,11 +28,6 @@ public class GliaWidgets {
     public static final String UI_THEME = "ui_theme";
 
     /**
-     * Use with {@link android.os.Bundle} to pass in a {@link SurveyStyle}
-     * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     */
-    public static final String SURVEY_STYLE = "survey_style";
-    /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */

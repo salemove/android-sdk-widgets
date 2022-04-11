@@ -24,6 +24,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
+import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.io.File;
 import java.io.IOException;
@@ -607,6 +608,12 @@ public class Utils {
                         oldTheme.getChatHeadConfiguration()
                 );
 
+        SurveyStyle surveyStyle =
+                getConfiguration(
+                        newTheme.getSurveyStyle(),
+                        oldTheme.getSurveyStyle()
+                );
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColorRes);
@@ -659,6 +666,7 @@ public class Utils {
         builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
         builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
         builder.setChatHeadConfiguration(chatHeadConfiguration);
+        builder.setSurveyStyle(surveyStyle);
         return builder.build();
     }
 

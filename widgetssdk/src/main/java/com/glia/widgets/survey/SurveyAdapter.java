@@ -1,8 +1,9 @@
 package com.glia.widgets.survey;
 
+import static java.util.Arrays.asList;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -29,7 +30,6 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
-import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +46,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int SURVEY_SINGLE_CHOICE = 3;
     private static final int SURVEY_OPEN_TEXT = 4;
 
-    private SurveyStyle style;
+    private final SurveyStyle style;
     private final List<QuestionItem> questionItems = new ArrayList<>();
     private final SurveyAdapterListener listener;
 
-    public SurveyAdapter(SurveyAdapterListener listener) {
+    public SurveyAdapter(SurveyAdapterListener listener, SurveyStyle style) {
         this.listener = listener;
+        this.style = style;
     }
 
     public void submitList(List<QuestionItem> items) {
@@ -183,7 +184,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static class SurveyScaleViewHolder extends SurveyViewHolder {
         List<GliaSurveyOptionButton> buttons;
 
-        public SurveyScaleViewHolder(@NonNull View itemView) {
+        public SurveyScaleViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
@@ -238,7 +239,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         GliaSurveyOptionButton yesButton;
         GliaSurveyOptionButton noButton;
 
-        public SurveyYesNoViewHolder(@NonNull View itemView) {
+        public SurveyYesNoViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             yesButton = itemView.findViewById(R.id.yes_button);
             noButton = itemView.findViewById(R.id.no_button);
@@ -292,9 +293,6 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             containerView = itemView.findViewById(R.id.single_choice_view);
             radioGroup = itemView.findViewById(R.id.radio_group);
             requiredError = itemView.findViewById(R.id.required_error);
-
-            int bkgColor = ContextCompat.getColor(itemView.getContext(), R.color.glia_base_light_color);
-            containerView.setBackgroundColor(Color.parseColor(style.getBgColor()));
         }
 
         @Override
@@ -304,7 +302,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             singleChoice(questionItem);
         }
 
-        void singleChoice(QuestionItem item, SurveyStyle style) {
+        void singleChoice(QuestionItem item) {
             String selectedId = Optional.ofNullable(item.getAnswer())
                     .map(answer -> (String) answer.getResponse())
                     .orElse(null);
@@ -367,7 +365,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         EditText comment;
         View requiredError;
 
-        public SurveyOpenTextViewHolder(@NonNull View itemView) {
+        public SurveyOpenTextViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);

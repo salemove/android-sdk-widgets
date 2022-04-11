@@ -7,6 +7,7 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.FontRes;
 
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
@@ -548,6 +549,11 @@ public class UiTheme implements Parcelable {
 
         private
         SurveyStyle surveyStyle;
+
+        public UiThemeBuilder() {
+            // Default values
+            this.surveyStyle = new SurveyStyle.Builder(Dependencies.getResourceProvider()).build();
+        }
 
         public void setAppBarTitle(String appBarTitle) {
             this.appBarTitle = appBarTitle;

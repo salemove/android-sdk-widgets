@@ -371,18 +371,21 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public static class SurveyOpenTextViewHolder extends SurveyViewHolder {
+        TextView title;
         EditText comment;
         View requiredError;
         SurveyStyle style;
 
         public SurveyOpenTextViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
+            title = itemView.findViewById(R.id.tv_title);
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
             this.style = style;
 
-            comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
+            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
 
+            comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
             comment.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -433,6 +436,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 Color.parseColor(inputOptionConfig.getBorderColor());
                 int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
                 shape.setStroke(width, strokeColor);
+                shape.setColor(Color.parseColor(inputOptionConfig.getTitle().normalColor));
                 comment.setBackground(shape);
             }
         }

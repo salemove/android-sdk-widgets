@@ -64,17 +64,14 @@ public class SurveyStyle implements Parcelable {
             this.bgColor = resourceProvider.getString(R.color.glia_base_light_color);
 
             // Default survey title configuration
-            FontConfiguration font = new FontConfiguration(FontConfiguration.FontSize.HEADER, FontConfiguration.FontWeight.REGULAR);
+            FontConfiguration font = new FontConfiguration(
+                    FontConfiguration.FontSize.HEADER,
+                    FontConfiguration.FontWeight.REGULAR);
             String titleColorString = resourceProvider.getString(R.color.glia_base_dark_color);
             this.title = new TextRuntimeConfiguration(font, titleColorString, titleColorString);
 
             // Default input option configuration
-            SurveyInputOptionConfiguration.Builder inputOptionConfigBuilder =
-                    new SurveyInputOptionConfiguration.Builder();
-            this.inputOption = inputOptionConfigBuilder
-                    .borderColor(resourceProvider.getString(R.color.glia_base_shade_color))
-                    .highlightedColor(resourceProvider.getString(R.color.glia_system_negative_color))
-                    .build();
+            this.inputOption = new SurveyInputOptionConfiguration.Builder(resourceProvider).build();
         }
 
         public Builder bgColor(String bgColor) {

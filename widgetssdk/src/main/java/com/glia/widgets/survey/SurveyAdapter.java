@@ -332,12 +332,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     // Set color for the border
                     GradientDrawable border = (GradientDrawable) drawable.findDrawableByLayerId(R.id.border_item);
                     ColorStateList strokeColor = ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
-                    int width = Math.round(context.getResources().getDimension(R.dimen.glia_px));
+                    int width = context.getResources().getDimensionPixelSize(R.dimen.glia_px);
                     border.setStroke(width, strokeColor);
                 }
                 radioButton.setButtonDrawable(drawable);
-                int start = Math.round(context.getResources().getDimension(R.dimen.glia_medium));
-                int vertical = Math.round(context.getResources().getDimension(R.dimen.glia_pre_large));
+                int start = context.getResources().getDimensionPixelSize(R.dimen.glia_medium);
+                int vertical = context.getResources().getDimensionPixelSize(R.dimen.glia_pre_large);
                 boolean isRtl = context.getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
                 radioButton.setPadding(isRtl ? 0 : start, vertical , isRtl ? start : 0, vertical);
                 radioGroup.addView(radioButton);
@@ -422,7 +422,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 ColorStateList strokeColor =
                         error ? ContextCompat.getColorStateList(context, R.color.glia_system_negative_color) :
                                 ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
-                int width = Math.round(context.getResources().getDimension(R.dimen.glia_px));
+                int width = context.getResources().getDimensionPixelSize(R.dimen.glia_px);
                 shape.setStroke(width, strokeColor);
                 comment.setBackground(shape);
             }

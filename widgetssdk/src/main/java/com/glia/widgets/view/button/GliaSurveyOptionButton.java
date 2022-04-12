@@ -55,7 +55,7 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
 
         int textColor = isSelected() ?
                 ContextCompat.getColor(getContext(), R.color.glia_base_light_color) :
-                ContextCompat.getColor(getContext(), R.color.glia_base_dark_color);
+                Color.parseColor(surveyStyle.getTitle().normalColor);
 
         setStrokeColor(strokeColor);
         setBackgroundColor(backgroundColor);

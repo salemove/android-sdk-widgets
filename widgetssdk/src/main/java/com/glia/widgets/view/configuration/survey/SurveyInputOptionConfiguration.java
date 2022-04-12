@@ -12,6 +12,22 @@ public class SurveyInputOptionConfiguration implements Parcelable {
     private String highlightedColor; /* use for border and not-selected option on validation */
     private FontConfiguration textFieldFont;
 
+    public TextRuntimeConfiguration getTitle() {
+        return title;
+    }
+
+    public String getBorderColor() {
+        return borderColor;
+    }
+
+    public String getHighlightedColor() {
+        return highlightedColor;
+    }
+
+    public FontConfiguration getTextFieldFont() {
+        return textFieldFont;
+    }
+
     private SurveyInputOptionConfiguration(Builder builder) {
         this.title = builder.title;
         this.borderColor = builder.borderColor;

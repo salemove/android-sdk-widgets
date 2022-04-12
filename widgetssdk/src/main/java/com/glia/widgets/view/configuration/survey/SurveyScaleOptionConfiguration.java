@@ -19,6 +19,22 @@ public class SurveyScaleOptionConfiguration implements Parcelable {
         this.textFieldFont = builder.textFieldFont;
     }
 
+    public TextRuntimeConfiguration getTitle() {
+        return title;
+    }
+
+    public String getBorderColor() {
+        return borderColor;
+    }
+
+    public String getHighlightedColor() {
+        return highlightedColor;
+    }
+
+    public FontConfiguration getTextFieldFont() {
+        return textFieldFont;
+    }
+
     public static class Builder {
         private TextRuntimeConfiguration title;
         private String borderColor;

@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -29,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
+import com.glia.widgets.view.configuration.survey.SurveyInputOptionConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.ArrayList;
@@ -46,13 +48,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int SURVEY_SINGLE_CHOICE = 3;
     private static final int SURVEY_OPEN_TEXT = 4;
 
-    private final SurveyStyle style;
+    private SurveyStyle style;
     private final List<QuestionItem> questionItems = new ArrayList<>();
     private final SurveyAdapterListener listener;
 
-    public SurveyAdapter(SurveyAdapterListener listener, SurveyStyle style) {
+    public SurveyAdapter(SurveyAdapterListener listener) {
         this.listener = listener;
-        this.style = style;
     }
 
     public void submitList(List<QuestionItem> items) {
@@ -62,6 +63,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public QuestionItem getItem(int position) {
         return questionItems.get(position);
+    }
+
+    public void setStyle(SurveyStyle style) {
+        this.style = style;
     }
 
     @Override
@@ -183,6 +188,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public static class SurveyScaleViewHolder extends SurveyViewHolder {
         List<GliaSurveyOptionButton> buttons;
+        SurveyStyle style;
 
         public SurveyScaleViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
@@ -192,6 +198,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     itemView.findViewById(R.id.scale_3_button),
                     itemView.findViewById(R.id.scale_4_button),
                     itemView.findViewById(R.id.scale_5_button));
+            this.style = style;
         }
 
         @Override
@@ -238,12 +245,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static class SurveyYesNoViewHolder extends SurveyViewHolder {
         GliaSurveyOptionButton yesButton;
         GliaSurveyOptionButton noButton;
+        SurveyStyle style;
 
         public SurveyYesNoViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             yesButton = itemView.findViewById(R.id.yes_button);
             noButton = itemView.findViewById(R.id.no_button);
-
+            this.style = style;
             yesButton.setOnClickListener(view -> setAnswer(true));
             noButton.setOnClickListener(view -> setAnswer(false));
         }
@@ -287,12 +295,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static class SurveySingleChoiceViewHolder extends SurveyViewHolder {
         LinearLayout containerView;
         RadioGroup radioGroup;
+        SurveyStyle style;
 
         public SurveySingleChoiceViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             containerView = itemView.findViewById(R.id.single_choice_view);
             radioGroup = itemView.findViewById(R.id.radio_group);
             requiredError = itemView.findViewById(R.id.required_error);
+            this.style = style;
         }
 
         @Override
@@ -363,15 +373,15 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static class SurveyOpenTextViewHolder extends SurveyViewHolder {
         EditText comment;
         View requiredError;
+        SurveyStyle style;
 
         public SurveyOpenTextViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
+            this.style = style;
 
-            comment.setOnFocusChangeListener((v, hasFocus) -> {
-                setAnswer(comment.getText().toString());
-            });
+            comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
 
             comment.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -417,11 +427,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             GradientDrawable shape = (GradientDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_edit_text);
             if (shape != null) {
-                // TODO: get colors from theme
-                ColorStateList strokeColor =
-                        error ? ContextCompat.getColorStateList(context, R.color.glia_system_negative_color) :
-                                ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
-                int width = context.getResources().getDimensionPixelSize(R.dimen.glia_px);
+                SurveyInputOptionConfiguration inputOptionConfig = style.getInputOption();
+                int strokeColor =
+                        error ? Color.parseColor(inputOptionConfig.getHighlightedColor()) :
+                                Color.parseColor(inputOptionConfig.getBorderColor());
+                int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
                 shape.setStroke(width, strokeColor);
                 comment.setBackground(shape);
             }

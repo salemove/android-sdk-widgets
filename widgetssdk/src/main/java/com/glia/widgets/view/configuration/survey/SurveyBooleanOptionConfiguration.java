@@ -19,6 +19,22 @@ public class SurveyBooleanOptionConfiguration implements Parcelable {
         this.font = builder.font;
     }
 
+    public TextRuntimeConfiguration getTitle() {
+        return title;
+    }
+
+    public String getSelectedColor() {
+        return selectedColor;
+    }
+
+    public String getHighlightedColor() {
+        return highlightedColor;
+    }
+
+    public FontConfiguration getFont() {
+        return font;
+    }
+
     public static class Builder {
         private TextRuntimeConfiguration title;
         private String selectedColor;    /* use for border and background for selected option */

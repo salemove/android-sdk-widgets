@@ -73,12 +73,15 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        applyStyle(theme.getSurveyStyle());
+    }
 
-        SurveyStyle surveyStyle = theme.getSurveyStyle();
-
+    private void applyStyle(SurveyStyle surveyStyle) {
         cardView.setCardBackgroundColor(Color.parseColor(surveyStyle.getBgColor()));
+
         String titleColorString = surveyStyle.getTitle().normalColor;
         title.setTextColor(Color.parseColor(titleColorString));
+
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
         buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getBgColor()));
     }
@@ -99,10 +102,11 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     public void setTheme(UiTheme uiTheme) {
         if (uiTheme == null) return;
         this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+        surveyAdapter.setStyle(theme.getSurveyStyle());
     }
 
     private void initAdapter() {
-        surveyAdapter = new SurveyAdapter(this, theme.getSurveyStyle());
+        surveyAdapter = new SurveyAdapter(this);
         recyclerView.setAdapter(surveyAdapter);
     }
 

@@ -17,6 +17,18 @@ public class SurveySingleOptionConfiguration implements Parcelable {
         this.textFieldFont = builder.textFieldFont;
     }
 
+    public TextRuntimeConfiguration getTitle() {
+        return title;
+    }
+
+    public String getHighlightedColor() {
+        return highlightedColor;
+    }
+
+    public FontConfiguration getTextFieldFont() {
+        return textFieldFont;
+    }
+
     public static class Builder {
         private TextRuntimeConfiguration title;
         private String highlightedColor; /* use for border and not-selected option on validation */

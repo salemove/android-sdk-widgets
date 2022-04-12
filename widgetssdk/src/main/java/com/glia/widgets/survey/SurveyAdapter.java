@@ -78,7 +78,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return new SurveyScaleViewHolder(view, style);
         } else if (viewType == SURVEY_YES_NO) {
             view = createNewLayout(parent, R.layout.survey_yes_no_item);
-            return new SurveyYesNoViewHolder(view, style);
+            return new SurveyBooleanViewHolder(view, style);
         } else if (viewType == SURVEY_SINGLE_CHOICE) {
             view = createNewLayout(parent, R.layout.survey_single_choice_item);
             return new SurveySingleChoiceViewHolder(view, style);
@@ -192,13 +192,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public SurveyScaleViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
+            this.style = style;
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
                     itemView.findViewById(R.id.scale_2_button),
                     itemView.findViewById(R.id.scale_3_button),
                     itemView.findViewById(R.id.scale_4_button),
                     itemView.findViewById(R.id.scale_5_button));
-            this.style = style;
+            buttons.forEach(button -> button.setSurveyStyle(style));
         }
 
         @Override
@@ -242,16 +243,18 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class SurveyYesNoViewHolder extends SurveyViewHolder {
+    public static class SurveyBooleanViewHolder extends SurveyViewHolder {
         GliaSurveyOptionButton yesButton;
         GliaSurveyOptionButton noButton;
         SurveyStyle style;
 
-        public SurveyYesNoViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public SurveyBooleanViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
+            this.style = style;
             yesButton = itemView.findViewById(R.id.yes_button);
             noButton = itemView.findViewById(R.id.no_button);
-            this.style = style;
+            yesButton.setSurveyStyle(style);
+            noButton.setSurveyStyle(style);
             yesButton.setOnClickListener(view -> setAnswer(true));
             noButton.setOnClickListener(view -> setAnswer(false));
         }
@@ -299,10 +302,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public SurveySingleChoiceViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
+            this.style = style;
             containerView = itemView.findViewById(R.id.single_choice_view);
             radioGroup = itemView.findViewById(R.id.radio_group);
             requiredError = itemView.findViewById(R.id.required_error);
-            this.style = style;
         }
 
         @Override
@@ -378,10 +381,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public SurveyOpenTextViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
+            this.style = style;
             title = itemView.findViewById(R.id.tv_title);
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
-            this.style = style;
 
             title.setTextColor(Color.parseColor(style.getTitle().normalColor));
 
@@ -436,7 +439,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 Color.parseColor(inputOptionConfig.getBorderColor());
                 int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
                 shape.setStroke(width, strokeColor);
-                shape.setColor(Color.parseColor(inputOptionConfig.getTitle().normalColor));
+                shape.setColor(ContextCompat.getColor(context, R.color.glia_base_light_color));
                 comment.setBackground(shape);
             }
         }

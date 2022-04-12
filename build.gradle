@@ -29,7 +29,7 @@ task clean(type: Delete) {
 apply from: "${rootDir}/scripts/publish-settings.gradle"
 
 ext {
-    gliaSdkVersion = '0.24.1'
+    gliaSdkVersion = '0.24.2'
 
     appCompatVersion = '1.4.1'
     materialVersion = '1.5.0'

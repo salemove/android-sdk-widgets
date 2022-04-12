@@ -45,7 +45,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int SURVEY_SINGLE_CHOICE = 3;
     private static final int SURVEY_OPEN_TEXT = 4;
 
-    private final List<QuestionItem> list = new ArrayList<>();
+    private final List<QuestionItem> questionItems = new ArrayList<>();
     private final SurveyAdapterListener listener;
 
     public SurveyAdapter(SurveyAdapterListener listener) {
@@ -53,12 +53,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void submitList(List<QuestionItem> items) {
-        list.clear();
-        list.addAll(items);
+        questionItems.clear();
+        questionItems.addAll(items);
     }
 
     public QuestionItem getItem(int position) {
-        return list.get(position);
+        return questionItems.get(position);
     }
 
     @Override
@@ -88,10 +88,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
 
         QuestionItem questionItem = getItem(position);
-        Survey.Question question = questionItem.getQuestion();
-        Survey.Answer answer = questionItem.getAnswer();
 
-        ((SurveyViewHolder) viewHolder).onBind(questionItem, question, answer, listener);
+        ((SurveyViewHolder) viewHolder).onBind(questionItem, listener);
     }
 
     @Override
@@ -110,7 +108,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return questionItems.size();
     }
 
     abstract static class SurveyViewHolder extends RecyclerView.ViewHolder implements SurveyController.AnswerCallback {
@@ -126,27 +124,26 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         void onBind(QuestionItem questionItem,
-                    Survey.Question question,
-                    Survey.Answer answer,
                     SurveyAdapterListener listener) {
             this.questionItem = questionItem;
             this.listener = listener;
             this.questionItem.setAnswerCallback(this);
-            setItemTitle(question.getText(), question.isRequired());
+            setItemTitle(questionItem.getQuestion());
             showRequiredError(questionItem.isShowError());
         }
 
         void applyAnswer(@Nullable Survey.Answer answer) {}
 
-        private void setItemTitle(String title, boolean require) {
-            if (require) {
+        private void setItemTitle(Survey.Question question) {
+            if (question.isRequired()) {
                 Context context = titleTextView.getContext();
                 int color = ContextCompat.getColor(context, R.color.glia_system_negative_color);
                 String colorString = String.format("%X", color).substring(2);
-                String source = context.getString(R.string.glia_survey_require_label, title, colorString);
+                String source = context.getString(
+                        R.string.glia_survey_require_label, question.getText(), colorString);
                 titleTextView.setText(Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY));
             } else {
-                titleTextView.setText(title);
+                titleTextView.setText(question.getText());
             }
         }
 
@@ -196,10 +193,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         @Override
         void onBind(QuestionItem questionItem,
-                    Survey.Question question,
-                    Survey.Answer answer,
                     SurveyAdapterListener listener) {
-            super.onBind(questionItem, question, answer, listener);
+            super.onBind(questionItem, listener);
             applyAnswer(questionItem.getAnswer());
             buttons.forEach(button -> button.setOnClickListener(view ->
                     setAnswer(buttons.indexOf(button) + 1)
@@ -252,10 +247,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         @Override
         void onBind(QuestionItem questionItem,
-                    Survey.Question question,
-                    Survey.Answer answer,
                     SurveyAdapterListener listener) {
-            super.onBind(questionItem, question, answer, listener);
+            super.onBind(questionItem, listener);
             applyAnswer(questionItem.getAnswer());
         }
 
@@ -304,10 +297,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         @Override
         void onBind(QuestionItem questionItem,
-                    Survey.Question question,
-                    Survey.Answer answer,
                     SurveyAdapterListener listener) {
-            super.onBind(questionItem, question, answer, listener);
+            super.onBind(questionItem, listener);
             singleChoice(questionItem);
         }
 
@@ -401,11 +392,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         @Override
         void onBind(QuestionItem questionItem,
-                    Survey.Question question,
-                    Survey.Answer answer,
                     SurveyAdapterListener listener) {
-            super.onBind(questionItem, question, answer, listener);
-            applyAnswer(answer);
+            super.onBind(questionItem, listener);
+            applyAnswer(questionItem.getAnswer());
         }
 
         @Override
@@ -433,7 +422,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 ColorStateList strokeColor =
                         error ? ContextCompat.getColorStateList(context, R.color.glia_system_negative_color) :
                                 ContextCompat.getColorStateList(context, R.color.glia_base_shade_color);
-                int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
+                int width = Math.round(context.getResources().getDimension(R.dimen.glia_px));
                 shape.setStroke(width, strokeColor);
                 comment.setBackground(shape);
             }

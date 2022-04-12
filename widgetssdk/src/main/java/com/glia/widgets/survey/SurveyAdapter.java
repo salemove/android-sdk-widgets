@@ -187,12 +187,17 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public static class SurveyScaleViewHolder extends SurveyViewHolder {
+        TextView title;
         List<GliaSurveyOptionButton> buttons;
         SurveyStyle style;
 
         public SurveyScaleViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
+
+            title = itemView.findViewById(R.id.tv_title);
+            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
+
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
                     itemView.findViewById(R.id.scale_2_button),
@@ -244,6 +249,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public static class SurveyBooleanViewHolder extends SurveyViewHolder {
+        TextView title;
         GliaSurveyOptionButton yesButton;
         GliaSurveyOptionButton noButton;
         SurveyStyle style;
@@ -251,11 +257,16 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public SurveyBooleanViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
+
+            title = itemView.findViewById(R.id.tv_title);
+            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
+
             yesButton = itemView.findViewById(R.id.yes_button);
-            noButton = itemView.findViewById(R.id.no_button);
             yesButton.setSurveyStyle(style);
-            noButton.setSurveyStyle(style);
             yesButton.setOnClickListener(view -> setAnswer(true));
+
+            noButton = itemView.findViewById(R.id.no_button);
+            noButton.setSurveyStyle(style);
             noButton.setOnClickListener(view -> setAnswer(false));
         }
 
@@ -297,15 +308,20 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public static class SurveySingleChoiceViewHolder extends SurveyViewHolder {
         LinearLayout containerView;
+        TextView title;
         RadioGroup radioGroup;
         SurveyStyle style;
 
         public SurveySingleChoiceViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
+
             containerView = itemView.findViewById(R.id.single_choice_view);
+            title = itemView.findViewById(R.id.tv_title);
             radioGroup = itemView.findViewById(R.id.radio_group);
             requiredError = itemView.findViewById(R.id.required_error);
+
+            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
         }
 
         @Override

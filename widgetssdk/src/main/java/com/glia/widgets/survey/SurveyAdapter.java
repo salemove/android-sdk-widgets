@@ -348,6 +348,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 RadioButton radioButton = new RadioButton(context);
                 radioButton.setId(View.generateViewId());
                 radioButton.setText(option.getLabel());
+                radioButton.setTextColor(Color.parseColor(style.getTitle().normalColor));
                 radioButton.setChecked(option.getId().equals(selectedId));
                 radioButton.setOnClickListener(v -> setAnswer(option.getId()));
                 LayerDrawable drawable = (LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_radio_button);

@@ -1,7 +1,6 @@
 buildscript {
     repositories {
         google()
-        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'
@@ -15,7 +14,9 @@ plugins {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+//        Needed for some libraries e.g. Webrtc
+        maven { url 'https://plugins.gradle.org/m2/' }
         flatDir {
             dirs '../libs'
         }
@@ -29,7 +30,7 @@ task clean(type: Delete) {
 apply from: "${rootDir}/scripts/publish-settings.gradle"
 
 ext {
-    gliaSdkVersion = '0.24.1'
+    gliaSdkVersion = '0.24.2'
 
     appCompatVersion = '1.4.1'
     materialVersion = '1.5.0'

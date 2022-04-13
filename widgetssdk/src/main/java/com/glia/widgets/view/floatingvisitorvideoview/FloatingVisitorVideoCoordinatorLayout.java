@@ -88,12 +88,12 @@ public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implement
 
     @Override
     public void showOnHold() {
-        // TODO- will be implemented in next task
+        post(() -> floatingVisitorVideoContainer.showOnHold());
     }
 
     @Override
     public void hideOnHold() {
-        // TODO- will be implemented in next task
+        post(() -> floatingVisitorVideoContainer.hideOnHold());
     }
 
     private void init() {

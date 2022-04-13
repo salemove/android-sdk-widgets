@@ -15,6 +15,7 @@ import com.glia.widgets.R;
 public class FloatingVisitorVideoView extends ConstraintLayout {
     private VideoView videoView;
     private FrameLayout videoContainer;
+    private ConstraintLayout onHoldOverlay;
 
     public FloatingVisitorVideoView(@NonNull Context context) {
         this(context, null);
@@ -58,9 +59,24 @@ public class FloatingVisitorVideoView extends ConstraintLayout {
         videoContainer.invalidate();
     }
 
+    public void showOnHold() {
+        pauseVideoStream();
+        onHoldOverlay.setVisibility(VISIBLE);
+    }
+
+    public void hideOnHold() {
+        resumeVideoStream();
+        onHoldOverlay.setVisibility(GONE);
+    }
+
+    public boolean hasVideo() {
+        return videoView != null;
+    }
+
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_floating_view, this);
         videoContainer = findViewById(R.id.visitor_video_container);
+        onHoldOverlay = findViewById(R.id.on_hold_overlay);
     }
 
     private void releaseVideoStream() {
@@ -80,9 +96,5 @@ public class FloatingVisitorVideoView extends ConstraintLayout {
         if (videoView != null) {
             videoView.resumeRendering();
         }
-    }
-
-    public boolean hasVideo() {
-        return videoView != null;
     }
 }

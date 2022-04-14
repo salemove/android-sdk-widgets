@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -447,13 +448,19 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             Context context = comment.getContext();
 
-            GradientDrawable shape = (GradientDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_edit_text);
+            GradientDrawable shape = (GradientDrawable) ContextCompat.getDrawable(
+                    context,
+                    R.drawable.bg_survey_edit_text);
             if (shape != null) {
                 InputQuestionConfiguration inputQuestionConfig = style.getInputQuestion();
+                String errorColorString = inputQuestionConfig.getOptionButton().getHighlightedLayer().getBorderColor();
+                int errorColor = Color.parseColor(errorColorString);
+                String normalColorString = inputQuestionConfig.getOptionButton().getNormalLayer().getBorderColor();
+                int normalColor = Color.parseColor(normalColorString);
                 ColorStateList strokeColor =
-                        error ? inputQuestionConfig.getOptionButton().getHighlightedText().getTextColor() :
-                                inputQuestionConfig.getOptionButton().getNormalText().getTextColor();
-                int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
+                        error ? ColorStateList.valueOf(errorColor) :
+                                ColorStateList.valueOf(normalColor);
+                int width = context.getResources().getDimensionPixelSize(R.dimen.glia_px);
                 shape.setStroke(width, strokeColor);
                 shape.setColor(ContextCompat.getColor(context, R.color.glia_base_light_color));
                 comment.setBackground(shape);

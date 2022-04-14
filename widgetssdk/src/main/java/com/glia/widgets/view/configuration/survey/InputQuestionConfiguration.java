@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
+import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
@@ -36,7 +37,21 @@ public class InputQuestionConfiguration implements Parcelable {
             // Default configuration
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
             this.title = new TextConfiguration.Builder().textColor(color).build();
-            this.optionButton = new OptionButtonConfiguration.Builder(resourceProvider).build();
+
+            String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
+            LayerConfiguration normalLayer = new LayerConfiguration.Builder(resourceProvider)
+                    .borderColor(normalColor)
+                    .build();
+
+            String errorColor = resourceProvider.getString(R.color.glia_system_negative_color);
+            LayerConfiguration errorLayer = new LayerConfiguration.Builder(resourceProvider)
+                    .borderColor(errorColor)
+                    .build();
+
+            this.optionButton = new OptionButtonConfiguration.Builder(resourceProvider)
+                    .normalLayer(normalLayer)
+                    .highlightedLayer(errorLayer)
+                    .build();
         }
 
         public Builder title(TextConfiguration title) {

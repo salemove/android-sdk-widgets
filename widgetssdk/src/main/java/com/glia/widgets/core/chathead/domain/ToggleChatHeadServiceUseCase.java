@@ -40,7 +40,7 @@ public class ToggleChatHeadServiceUseCase {
         }
     }
 
-    public boolean isBubbleEnabled() {
+    private boolean isBubbleEnabled() {
         return configurationManager.isUseOverlay();
     }
 

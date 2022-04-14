@@ -1,106 +1,144 @@
 package com.glia.widgets.view.configuration.survey;
 
 import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
-import com.glia.widgets.view.configuration.FontConfiguration;
-import com.glia.widgets.view.configuration.TextRuntimeConfiguration;
+import com.glia.widgets.view.configuration.ButtonConfiguration;
+import com.glia.widgets.view.configuration.LayerConfiguration;
+import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class SurveyStyle implements Parcelable {
-    private String bgColor;
-    private TextRuntimeConfiguration title;
-    private SurveyBooleanOptionConfiguration booleanOption;
-    private SurveyScaleOptionConfiguration scaleOption;
-    private SurveySingleOptionConfiguration singleOption;
-    private SurveyInputOptionConfiguration inputOption;
+    // Layer style.
+    private LayerConfiguration layer;
+    // Header text style.
+    private TextConfiguration title;
+    // Submit button style.
+    private ButtonConfiguration submitButton;
+    // Cancel button style.
+    private ButtonConfiguration cancelButton;
+    // "Boolean" question view style.
+    private BooleanQuestionConfiguration booleanQuestion;
+    // "Scale" question view style.
+    private ScaleQuestionConfiguration scaleQuestion;
+    // "Single" question view style.
+    private SingleQuestionConfiguration singleQuestion;
+    // "Input" question view style.
+    private InputQuestionConfiguration inputQuestion;
 
-    public String getBgColor() {
-        return bgColor;
+    public LayerConfiguration getLayer() {
+        return layer;
     }
 
-    public TextRuntimeConfiguration getTitle() {
+    public TextConfiguration getTitle() {
         return title;
     }
 
-    public SurveyBooleanOptionConfiguration getBooleanOption() {
-        return booleanOption;
+    public BooleanQuestionConfiguration getBooleanQuestion() {
+        return booleanQuestion;
     }
 
-    public SurveyScaleOptionConfiguration getScaleOption() {
-        return scaleOption;
+    public ScaleQuestionConfiguration getScaleQuestion() {
+        return scaleQuestion;
     }
 
-    public SurveySingleOptionConfiguration getSingleOption() {
-        return singleOption;
+    public SingleQuestionConfiguration getSingleQuestion() {
+        return singleQuestion;
     }
 
-    public SurveyInputOptionConfiguration getInputOption() {
-        return inputOption;
+    public InputQuestionConfiguration getInputQuestion() {
+        return inputQuestion;
     }
 
     private SurveyStyle(Builder builder) {
-        this.bgColor = builder.bgColor;
+        this.layer = builder.layerConfiguration;
         this.title = builder.title;
-        this.booleanOption = builder.booleanOption;
-        this.scaleOption = builder.scaleOption;
-        this.singleOption = builder.singleOption;
-        this.inputOption = builder.inputOption;
+        this.submitButton = builder.submitButton;
+        this.cancelButton = builder.cancelButton;
+        this.booleanQuestion = builder.booleanQuestion;
+        this.scaleQuestion = builder.scaleQuestion;
+        this.singleQuestion = builder.singleQuestion;
+        this.inputQuestion = builder.inputQuestion;
     }
 
     public static class Builder {
-        private String bgColor;
-        private TextRuntimeConfiguration title;
-        private SurveyBooleanOptionConfiguration booleanOption;
-        private SurveyScaleOptionConfiguration scaleOption;
-        private SurveySingleOptionConfiguration singleOption;
-        private SurveyInputOptionConfiguration inputOption;
+        // Layer style.
+        private LayerConfiguration layerConfiguration;
+        // Header text style.
+        private TextConfiguration title;
+        // Submit button style.
+        private ButtonConfiguration submitButton;
+        // Cancel button style.
+        private ButtonConfiguration cancelButton;
+        // "Boolean" question view style.
+        private BooleanQuestionConfiguration booleanQuestion;
+        // "Scale" question view style.
+        private ScaleQuestionConfiguration scaleQuestion;
+        // "Single" question view style.
+        private SingleQuestionConfiguration singleQuestion;
+        // "Input" question view style.
+        private InputQuestionConfiguration inputQuestion;
 
         @SuppressLint("ResourceType")
         public Builder(ResourceProvider resourceProvider) {
             // Default survey background
-            this.bgColor = resourceProvider.getString(R.color.glia_base_light_color);
+            this.layerConfiguration = new LayerConfiguration.Builder(resourceProvider).build();
 
             // Default survey title configuration
-            FontConfiguration font = new FontConfiguration(
-                    FontConfiguration.FontSize.HEADER,
-                    FontConfiguration.FontWeight.REGULAR);
-            String titleColorString = resourceProvider.getString(R.color.glia_base_dark_color);
-            this.title = new TextRuntimeConfiguration(font, titleColorString, titleColorString);
+            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            this.title = new TextConfiguration.Builder().textColor(color).build();
 
-            // Default input option configuration
-            this.inputOption = new SurveyInputOptionConfiguration.Builder(resourceProvider).build();
+            // Default buttons configuration
+            this.submitButton = new ButtonConfiguration.Builder().build();
+            this.cancelButton = new ButtonConfiguration.Builder().build();
+
+            // Default questions configuration
+            this.booleanQuestion = new BooleanQuestionConfiguration.Builder(resourceProvider).build();
+            this.inputQuestion = new InputQuestionConfiguration.Builder(resourceProvider).build();
+            this.scaleQuestion = new ScaleQuestionConfiguration.Builder(resourceProvider).build();
+            this.singleQuestion = new SingleQuestionConfiguration.Builder(resourceProvider).build();
         }
 
-        public Builder bgColor(String bgColor) {
-            this.bgColor = bgColor;
+        public Builder layer(LayerConfiguration layerConfiguration) {
+            this.layerConfiguration = layerConfiguration;
             return this;
         }
 
-        public Builder title(TextRuntimeConfiguration title) {
+        public Builder title(TextConfiguration title) {
             this.title = title;
             return this;
         }
 
-        public Builder booleanOption(SurveyBooleanOptionConfiguration booleanOption) {
-            this.booleanOption = booleanOption;
+        public Builder submitButton(ButtonConfiguration submitButton) {
+            this.submitButton = submitButton;
             return this;
         }
 
-        public Builder scaleOption(SurveyScaleOptionConfiguration scaleOption) {
-            this.scaleOption = scaleOption;
+        public Builder cancelButton(ButtonConfiguration cancelButton) {
+            this.cancelButton = cancelButton;
             return this;
         }
 
-        public Builder singleOption(SurveySingleOptionConfiguration singleOption) {
-            this.singleOption = singleOption;
+        public Builder booleanQuestion(BooleanQuestionConfiguration booleanQuestion) {
+            this.booleanQuestion = booleanQuestion;
             return this;
         }
 
-        public Builder inputOption(SurveyInputOptionConfiguration inputOption) {
-            this.inputOption = inputOption;
+        public Builder scaleQuestion(ScaleQuestionConfiguration scaleQuestion) {
+            this.scaleQuestion = scaleQuestion;
+            return this;
+        }
+
+        public Builder singleQuestion(SingleQuestionConfiguration singleQuestion) {
+            this.singleQuestion = singleQuestion;
+            return this;
+        }
+
+        public Builder inputQuestion(InputQuestionConfiguration inputQuestion) {
+            this.inputQuestion = inputQuestion;
             return this;
         }
 
@@ -117,30 +155,36 @@ public class SurveyStyle implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.bgColor);
+        dest.writeParcelable(this.layer, flags);
         dest.writeParcelable(this.title, flags);
-        dest.writeParcelable(this.booleanOption, flags);
-        dest.writeParcelable(this.scaleOption, flags);
-        dest.writeParcelable(this.singleOption, flags);
-        dest.writeParcelable(this.inputOption, flags);
+        dest.writeParcelable(this.submitButton, flags);
+        dest.writeParcelable(this.cancelButton, flags);
+        dest.writeParcelable(this.booleanQuestion, flags);
+        dest.writeParcelable(this.scaleQuestion, flags);
+        dest.writeParcelable(this.singleQuestion, flags);
+        dest.writeParcelable(this.inputQuestion, flags);
     }
 
     public void readFromParcel(Parcel source) {
-        this.bgColor = source.readString();
-        this.title = source.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
-        this.booleanOption = source.readParcelable(SurveyBooleanOptionConfiguration.class.getClassLoader());
-        this.scaleOption = source.readParcelable(SurveyScaleOptionConfiguration.class.getClassLoader());
-        this.singleOption = source.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
-        this.inputOption = source.readParcelable(SurveyInputOptionConfiguration.class.getClassLoader());
+        this.layer = source.readParcelable(LayerConfiguration.class.getClassLoader());
+        this.title = source.readParcelable(TextConfiguration.class.getClassLoader());
+        this.submitButton = source.readParcelable(ButtonConfiguration.class.getClassLoader());
+        this.cancelButton = source.readParcelable(ButtonConfiguration.class.getClassLoader());
+        this.booleanQuestion = source.readParcelable(BooleanQuestionConfiguration.class.getClassLoader());
+        this.scaleQuestion = source.readParcelable(ScaleQuestionConfiguration.class.getClassLoader());
+        this.singleQuestion = source.readParcelable(SingleQuestionConfiguration.class.getClassLoader());
+        this.inputQuestion = source.readParcelable(InputQuestionConfiguration.class.getClassLoader());
     }
 
     protected SurveyStyle(Parcel in) {
-        this.bgColor = in.readString();
-        this.title = in.readParcelable(TextRuntimeConfiguration.class.getClassLoader());
-        this.booleanOption = in.readParcelable(SurveyBooleanOptionConfiguration.class.getClassLoader());
-        this.scaleOption = in.readParcelable(SurveyScaleOptionConfiguration.class.getClassLoader());
-        this.singleOption = in.readParcelable(SurveySingleOptionConfiguration.class.getClassLoader());
-        this.inputOption = in.readParcelable(SurveyInputOptionConfiguration.class.getClassLoader());
+        this.layer = in.readParcelable(LayerConfiguration.class.getClassLoader());
+        this.title = in.readParcelable(TextConfiguration.class.getClassLoader());
+        this.submitButton = in.readParcelable(ButtonConfiguration.class.getClassLoader());
+        this.cancelButton = in.readParcelable(ButtonConfiguration.class.getClassLoader());
+        this.booleanQuestion = in.readParcelable(BooleanQuestionConfiguration.class.getClassLoader());
+        this.scaleQuestion = in.readParcelable(ScaleQuestionConfiguration.class.getClassLoader());
+        this.singleQuestion = in.readParcelable(SingleQuestionConfiguration.class.getClassLoader());
+        this.inputQuestion = in.readParcelable(InputQuestionConfiguration.class.getClassLoader());
     }
 
     public static final Creator<SurveyStyle> CREATOR = new Creator<SurveyStyle>() {

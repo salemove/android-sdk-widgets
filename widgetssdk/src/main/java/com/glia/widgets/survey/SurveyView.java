@@ -77,13 +77,12 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     }
 
     private void applyStyle(SurveyStyle surveyStyle) {
-        cardView.setCardBackgroundColor(Color.parseColor(surveyStyle.getBgColor()));
+        cardView.setCardBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));
 
-        String titleColorString = surveyStyle.getTitle().normalColor;
-        title.setTextColor(Color.parseColor(titleColorString));
+        title.setTextColor(surveyStyle.getTitle().getTextColor());
 
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
-        buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getBgColor()));
+        buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {

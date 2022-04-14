@@ -47,18 +47,18 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
                                 ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
                                 ContextCompat.getColorStateList(getContext(), R.color.glia_stroke_gray);
 
-        int backgroundColor = isSelected() ?
-                ContextCompat.getColor(getContext(), R.color.glia_brand_primary_color) :
+        ColorStateList backgroundColor = isSelected() ?
+                ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
                 surveyStyle != null ?
-                        Color.parseColor(surveyStyle.getBgColor()) :
-                        ContextCompat.getColor(getContext(), R.color.glia_base_light_color);
+                        ColorStateList.valueOf(Color.parseColor(surveyStyle.getLayer().getBackgroundColor())) :
+                        ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color);
 
-        int textColor = isSelected() ?
-                ContextCompat.getColor(getContext(), R.color.glia_base_light_color) :
-                Color.parseColor(surveyStyle.getTitle().normalColor);
+        ColorStateList textColor = isSelected() ?
+                ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color) :
+                surveyStyle.getTitle().getTextColor();
 
         setStrokeColor(strokeColor);
-        setBackgroundColor(backgroundColor);
+        setBackgroundTintList(backgroundColor);
         setTextColor(textColor);
     }
 }

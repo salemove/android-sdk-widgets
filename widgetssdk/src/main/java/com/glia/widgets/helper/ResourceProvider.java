@@ -1,6 +1,7 @@
 package com.glia.widgets.helper;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.ColorInt;
@@ -8,6 +9,7 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.lang.ref.WeakReference;
@@ -35,6 +37,11 @@ public class ResourceProvider implements IResourceProvider {
         return ResourcesCompat.getColor((weakContext.get()).getResources(), id, null);
     }
 
+    @Override
+    public ColorStateList getColorStateList(int id) {
+        return ContextCompat.getColorStateList(weakContext.get(), id);
+    }
+
     @Nullable
     @Override
     public Drawable getDrawable(int id) {
@@ -50,6 +57,8 @@ interface IResourceProvider {
 
     @ColorInt
     Integer getColor(@ColorRes int id);
+
+    ColorStateList getColorStateList(int id);
 
     @Nullable
     Drawable getDrawable(@DrawableRes int id);

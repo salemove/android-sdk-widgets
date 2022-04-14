@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
-import com.glia.widgets.view.configuration.survey.SurveyInputOptionConfiguration;
+import com.glia.widgets.view.configuration.survey.InputQuestionConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.util.ArrayList;
@@ -196,7 +196,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.style = style;
 
             title = itemView.findViewById(R.id.tv_title);
-            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
+            title.setTextColor(style.getTitle().getTextColor());
 
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
@@ -259,7 +259,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.style = style;
 
             title = itemView.findViewById(R.id.tv_title);
-            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
+            title.setTextColor(style.getTitle().getTextColor());
 
             yesButton = itemView.findViewById(R.id.yes_button);
             yesButton.setSurveyStyle(style);
@@ -321,7 +321,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             radioGroup = itemView.findViewById(R.id.radio_group);
             requiredError = itemView.findViewById(R.id.required_error);
 
-            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
+            title.setTextColor(style.getSingleQuestion().getTitle().getTextColor());
         }
 
         @Override
@@ -348,7 +348,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 RadioButton radioButton = new RadioButton(context);
                 radioButton.setId(View.generateViewId());
                 radioButton.setText(option.getLabel());
-                radioButton.setTextColor(Color.parseColor(style.getTitle().normalColor));
+                radioButton.setTextColor(style.getTitle().getTextColor());
                 radioButton.setChecked(option.getId().equals(selectedId));
                 radioButton.setOnClickListener(v -> setAnswer(option.getId()));
                 LayerDrawable drawable = (LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_radio_button);
@@ -403,7 +403,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
 
-            title.setTextColor(Color.parseColor(style.getTitle().normalColor));
+            title.setTextColor(style.getTitle().getTextColor());
 
             comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
             comment.addTextChangedListener(new TextWatcher() {
@@ -450,10 +450,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             GradientDrawable shape = (GradientDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_edit_text);
             if (shape != null) {
-                SurveyInputOptionConfiguration inputOptionConfig = style.getInputOption();
-                int strokeColor =
-                        error ? Color.parseColor(inputOptionConfig.getHighlightedColor()) :
-                                Color.parseColor(inputOptionConfig.getBorderColor());
+                InputQuestionConfiguration inputQuestionConfig = style.getInputQuestion();
+                ColorStateList strokeColor =
+                        error ? inputQuestionConfig.getOptionButton().getHighlightedText().getTextColor() :
+                                inputQuestionConfig.getOptionButton().getNormalText().getTextColor();
                 int width = (int) Math.round(context.getResources().getDimension(R.dimen.glia_px));
                 shape.setStroke(width, strokeColor);
                 shape.setColor(ContextCompat.getColor(context, R.color.glia_base_light_color));

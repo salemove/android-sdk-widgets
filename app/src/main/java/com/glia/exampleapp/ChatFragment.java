@@ -61,7 +61,7 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onResume() {
-        chatView.onResume(true);
+        chatView.onResume();
         super.onResume();
     }
 

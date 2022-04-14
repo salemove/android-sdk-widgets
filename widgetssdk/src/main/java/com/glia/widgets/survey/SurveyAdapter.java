@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -75,16 +74,16 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         View view;
         if (viewType == SURVEY_SCALE) {
             view = createNewLayout(parent, R.layout.survey_scale_item);
-            return new SurveyScaleViewHolder(view, style);
+            return new ScaleQuestionViewHolder(view, style);
         } else if (viewType == SURVEY_YES_NO) {
             view = createNewLayout(parent, R.layout.survey_yes_no_item);
-            return new SurveyBooleanViewHolder(view, style);
+            return new BooleanQuestionViewHolder(view, style);
         } else if (viewType == SURVEY_SINGLE_CHOICE) {
             view = createNewLayout(parent, R.layout.survey_single_choice_item);
-            return new SurveySingleChoiceViewHolder(view, style);
+            return new SingleQuestionViewHolder(view, style);
         } else {
             view = createNewLayout(parent, R.layout.survey_open_text_item);
-            return new SurveyOpenTextViewHolder(view, style);
+            return new InputQuestionViewHolder(view, style);
         }
     }
 
@@ -186,12 +185,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class SurveyScaleViewHolder extends SurveyViewHolder {
+    public static class ScaleQuestionViewHolder extends SurveyViewHolder {
         TextView title;
         List<GliaSurveyOptionButton> buttons;
         SurveyStyle style;
 
-        public SurveyScaleViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public ScaleQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
 
@@ -248,13 +247,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class SurveyBooleanViewHolder extends SurveyViewHolder {
+    public static class BooleanQuestionViewHolder extends SurveyViewHolder {
         TextView title;
         GliaSurveyOptionButton yesButton;
         GliaSurveyOptionButton noButton;
         SurveyStyle style;
 
-        public SurveyBooleanViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public BooleanQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
 
@@ -306,13 +305,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class SurveySingleChoiceViewHolder extends SurveyViewHolder {
+    public static class SingleQuestionViewHolder extends SurveyViewHolder {
         LinearLayout containerView;
         TextView title;
         RadioGroup radioGroup;
         SurveyStyle style;
 
-        public SurveySingleChoiceViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public SingleQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
 
@@ -390,13 +389,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public static class SurveyOpenTextViewHolder extends SurveyViewHolder {
+    public static class InputQuestionViewHolder extends SurveyViewHolder {
         TextView title;
         EditText comment;
         View requiredError;
         SurveyStyle style;
 
-        public SurveyOpenTextViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public InputQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
             super(itemView);
             this.style = style;
             title = itemView.findViewById(R.id.tv_title);

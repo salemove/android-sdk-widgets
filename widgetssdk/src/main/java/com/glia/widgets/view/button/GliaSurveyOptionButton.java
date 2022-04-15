@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
@@ -61,8 +62,10 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         setStrokeColor(strokeColor);
         setBackgroundTintList(backgroundColor);
         setTextColor(textColor);
-        Float textSize = buttonConfiguration.getNormalText().getTextSize();
-        if (textSize != null) setTextSize(textSize);
-        setCornerRadius(normalLayer.getCornerRadius());
+        float textSize = buttonConfiguration.getNormalText().getTextSize();
+        setTextSize(textSize);
+        int radiusDp = normalLayer.getCornerRadius();
+        int radiusPx = Math.round(Dependencies.getResourceProvider().convertDpToPixel(radiusDp));
+        setCornerRadius(radiusPx);
     }
 }

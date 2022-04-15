@@ -3,9 +3,12 @@ package com.glia.widgets.view.configuration;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
 
 public class OptionButtonConfiguration implements Parcelable {
+    public static final float DEFAULT_TEXT_SIZE = 16f;
+
     // Title text for normal state.
     private TextConfiguration normalText;
     // Option layer for normal state.
@@ -68,11 +71,20 @@ public class OptionButtonConfiguration implements Parcelable {
 
         public Builder(ResourceProvider resourceProvider) {
             // Default configuration
-            this.normalText = new TextConfiguration.Builder().build();
+            this.normalText = new TextConfiguration.Builder()
+                    .textColor(resourceProvider.getColorStateList(R.color.glia_base_dark_color))
+                    .textSize(DEFAULT_TEXT_SIZE)
+                    .build();
             this.normalLayer = new LayerConfiguration.Builder(resourceProvider).build();
-            this.selectedText = new TextConfiguration.Builder().build();
+            this.selectedText = new TextConfiguration.Builder()
+                    .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
+                    .textSize(DEFAULT_TEXT_SIZE)
+                    .build();
             this.selectedLayer = new LayerConfiguration.Builder(resourceProvider).build();
-            this.highlightedText = new TextConfiguration.Builder().build();
+            this.highlightedText = new TextConfiguration.Builder()
+                    .textColor(resourceProvider.getColorStateList(R.color.glia_base_dark_color))
+                    .textSize(DEFAULT_TEXT_SIZE)
+                    .build();
             this.highlightedLayer = new LayerConfiguration.Builder(resourceProvider).build();
         }
 

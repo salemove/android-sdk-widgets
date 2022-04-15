@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
@@ -84,9 +86,11 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
         float cornerRadius = resourceProvider.convertDpToPixel(surveyStyle.getLayer().getCornerRadius());
         cardView.setRadius(cornerRadius);
 
-        title.setTextColor(surveyStyle.getTitle().getTextColor());
-        Float textSize = theme.getSurveyStyle().getTitle().getTextSize();
-        if (textSize != null) title.setTextSize(textSize);
+        TextConfiguration titleStyle = surveyStyle.getTitle();
+        this.title.setTextColor(titleStyle.getTextColor());
+        float textSize = titleStyle.getTextSize();
+        this.title.setTextSize(textSize);
+        if (titleStyle.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
 
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
         buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));

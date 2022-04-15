@@ -13,7 +13,7 @@ import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class SurveyStyle implements Parcelable {
     public static final float DEFAULT_TITLE_SIZE = 20f;
-    public static final int DEFAULT_CORNER_RADIUS = 24;
+    public static final int DEFAULT_CORNER_RADIUS_DP = 24;
 
     // Layer style.
     private LayerConfiguration layer;
@@ -89,7 +89,7 @@ public class SurveyStyle implements Parcelable {
         public Builder(ResourceProvider resourceProvider) {
             // Default survey background
             this.layerConfiguration = new LayerConfiguration.Builder(resourceProvider)
-                    .cornerRadius(DEFAULT_CORNER_RADIUS)
+                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
                     .build();
 
             // Default survey title configuration

@@ -9,7 +9,7 @@ import com.glia.widgets.helper.ResourceProvider;
 
 public class LayerConfiguration implements Parcelable {
     private static final int DEFAULT_BORDER_WIDTH = 1;
-    private static final int DEFAULT_CORNER_RADIUS = 0;
+    private static final int DEFAULT_CORNER_RADIUS_DP = 4;
 
     // Background hex color.
     private String backgroundColor;
@@ -59,7 +59,7 @@ public class LayerConfiguration implements Parcelable {
             this.backgroundColor = resourceProvider.getString(R.color.glia_base_light_color);
             this.borderColor = resourceProvider.getString(R.color.glia_stroke_gray);
             this.borderWidth = DEFAULT_BORDER_WIDTH;
-            this.cornerRadius = DEFAULT_CORNER_RADIUS;
+            this.cornerRadius = DEFAULT_CORNER_RADIUS_DP;
         }
 
         public Builder backgroundColor(String backgroundColor) {

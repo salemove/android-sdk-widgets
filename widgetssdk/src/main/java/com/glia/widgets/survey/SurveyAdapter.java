@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -201,8 +202,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             title = itemView.findViewById(R.id.tv_title);
             TextConfiguration titleConfiguration = style.getScaleQuestion().getTitle();
             this.title.setTextColor(titleConfiguration.getTextColor());
-            Float textSize = titleConfiguration.getTextSize();
-            if (textSize != null) this.title.setTextSize(textSize);
+            float textSize = titleConfiguration.getTextSize();
+            this.title.setTextSize(textSize);
+            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
 
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
@@ -267,10 +269,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             BooleanQuestionConfiguration questionStyle = style.getBooleanQuestion();
 
             title = itemView.findViewById(R.id.tv_title);
-            TextConfiguration titleConfigursstion = questionStyle.getTitle();
-            this.title.setTextColor(titleConfigursstion.getTextColor());
-            Float textSize = titleConfigursstion.getTextSize();
-            if (textSize != null) this.title.setTextSize(textSize);
+            TextConfiguration titleConfiguration = questionStyle.getTitle();
+            this.title.setTextColor(titleConfiguration.getTextColor());
+            float textSize = titleConfiguration.getTextSize();
+            this.title.setTextSize(textSize);
+            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
 
             OptionButtonConfiguration buttonConfiguration = questionStyle.getOptionButton();
 
@@ -334,9 +337,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             radioGroup = itemView.findViewById(R.id.radio_group);
             requiredError = itemView.findViewById(R.id.required_error);
 
-            title.setTextColor(style.getSingleQuestion().getTitle().getTextColor());
-            Float textSize = style.getSingleQuestion().getTitle().getTextSize();
-            if (textSize != null) title.setTextSize(textSize);
+            TextConfiguration titleConfiguration = style.getSingleQuestion().getTitle();
+            this.title.setTextColor(titleConfiguration.getTextColor());
+            float textSize = titleConfiguration.getTextSize();
+            this.title.setTextSize(textSize);
+            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
         }
 
         @Override
@@ -364,8 +369,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 radioButton.setId(View.generateViewId());
                 radioButton.setText(option.getLabel());
                 radioButton.setTextColor(style.getSingleQuestion().getTitle().getTextColor());
-                Float textSize = style.getSingleQuestion().getOptionText().getTextSize();
-                if (textSize != null) radioButton.setTextSize(textSize);
+                float textSize = style.getSingleQuestion().getOptionText().getTextSize();
+                radioButton.setTextSize(textSize);
                 radioButton.setChecked(option.getId().equals(selectedId));
                 radioButton.setOnClickListener(v -> setAnswer(option.getId()));
                 LayerDrawable drawable = (LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_radio_button);
@@ -420,9 +425,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
 
-            title.setTextColor(style.getInputQuestion().getTitle().getTextColor());
-            Float textSize = style.getInputQuestion().getTitle().getTextSize();
-            if (textSize != null) title.setTextSize(textSize);
+            TextConfiguration titleConfiguration = style.getInputQuestion().getTitle();
+            this.title.setTextColor(titleConfiguration.getTextColor());
+            float textSize = titleConfiguration.getTextSize();
+            this.title.setTextSize(textSize);
+            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
 
             comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
             comment.addTextChangedListener(new TextWatcher() {

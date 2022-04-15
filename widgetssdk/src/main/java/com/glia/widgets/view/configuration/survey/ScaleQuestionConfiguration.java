@@ -14,7 +14,7 @@ import com.glia.widgets.view.configuration.TextConfiguration;
 public class ScaleQuestionConfiguration implements Parcelable {
     public static final float DEFAULT_TITLE_SIZE = 16f;
     public static final float DEFAULT_TEXT_SIZE = 16f;
-    public static final int DEFAULT_CORNER_RADIUS = 4;
+    public static final int DEFAULT_CORNER_RADIUS_DP = 4;
 
     private TextConfiguration title;
     private OptionButtonConfiguration optionButton;
@@ -62,17 +62,17 @@ public class ScaleQuestionConfiguration implements Parcelable {
             LayerConfiguration normalLayer = new LayerConfiguration.Builder(resourceProvider)
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
-                    .cornerRadius(Math.round(resourceProvider.convertDpToPixel(DEFAULT_CORNER_RADIUS)))
+                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
                     .build();
             LayerConfiguration selectedLayer = new LayerConfiguration.Builder(resourceProvider)
                     .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
                     .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
-                    .cornerRadius(Math.round(resourceProvider.convertDpToPixel(DEFAULT_CORNER_RADIUS)))
+                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
                     .build();
             LayerConfiguration highlightedLayer = new LayerConfiguration.Builder(resourceProvider)
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
-                    .cornerRadius(Math.round(resourceProvider.convertDpToPixel(DEFAULT_CORNER_RADIUS)))
+                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
                     .build();
 
             this.optionButton = new OptionButtonConfiguration.Builder(resourceProvider)

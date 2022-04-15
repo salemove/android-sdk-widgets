@@ -4,17 +4,18 @@ import android.content.res.ColorStateList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.Nullable;
-
 public class TextConfiguration implements Parcelable {
-    private final Float textSize;
-    private final Integer textTypeFaceStyle;
-    private final ColorStateList textColor;
-    private final ColorStateList textColorHint;
-    private final ColorStateList textColorLink;
-    private final Integer textColorHighlight;
-    private final Integer fontFamily;
-    private final Boolean allCaps;
+    public static final float DEFAULT_TEXT_SIZE = 16f;
+
+    private float textSize;
+    private int textTypeFaceStyle;
+    private ColorStateList textColor;
+    private ColorStateList textColorHint;
+    private ColorStateList textColorLink;
+    private int textColorHighlight;
+    private int fontFamily;
+    private boolean bold;
+    private boolean allCaps;
 
     private TextConfiguration(
             Builder builder
@@ -23,130 +24,47 @@ public class TextConfiguration implements Parcelable {
         this.textTypeFaceStyle = builder.textTypeFaceStyle;
         this.textColor = builder.textColor;
         this.textColorHint = builder.textColorHint;
-        this.textColorHighlight = builder.textColorHighlight;
         this.textColorLink = builder.textColorLink;
+        this.textColorHighlight = builder.textColorHighlight;
         this.fontFamily = builder.fontFamily;
+        this.bold = builder.bold;
         this.allCaps = builder.allCaps;
     }
 
-    protected TextConfiguration(Parcel in) {
-        if (in.readByte() == 0) {
-            textSize = null;
-        } else {
-            textSize = in.readFloat();
-        }
-        if (in.readByte() == 0) {
-            textTypeFaceStyle = null;
-        } else {
-            textTypeFaceStyle = in.readInt();
-        }
-        textColor = in.readParcelable(ColorStateList.class.getClassLoader());
-        textColorHint = in.readParcelable(ColorStateList.class.getClassLoader());
-        textColorLink = in.readParcelable(ColorStateList.class.getClassLoader());
-        if (in.readByte() == 0) {
-            textColorHighlight = null;
-        } else {
-            textColorHighlight = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            fontFamily = null;
-        } else {
-            fontFamily = in.readInt();
-        }
-        byte tmpAllCaps = in.readByte();
-        allCaps = tmpAllCaps == 0 ? null : tmpAllCaps == 1;
+    public float getTextSize() {
+        return textSize;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (textSize == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeFloat(textSize);
-        }
-        if (textTypeFaceStyle == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(textTypeFaceStyle);
-        }
-        dest.writeParcelable(textColor, flags);
-        dest.writeParcelable(textColorHint, flags);
-        dest.writeParcelable(textColorLink, flags);
-        if (textColorHighlight == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(textColorHighlight);
-        }
-        if (fontFamily == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(fontFamily);
-        }
-        dest.writeByte((byte) (allCaps == null ? 0 : allCaps ? 1 : 2));
+    public int getTextTypeFaceStyle() {
+        return textTypeFaceStyle;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<TextConfiguration> CREATOR = new Creator<TextConfiguration>() {
-        @Override
-        public TextConfiguration createFromParcel(Parcel in) {
-            return new TextConfiguration(in);
-        }
-
-        @Override
-        public TextConfiguration[] newArray(int size) {
-            return new TextConfiguration[size];
-        }
-    };
-
-    @Nullable
-    public Float getTextSize() {
-        return this.textSize;
-    }
-
-    @Nullable
-    public Integer getTextTypeFaceStyle() {
-        return this.textTypeFaceStyle;
-    }
-
-    @Nullable
     public ColorStateList getTextColor() {
-        return this.textColor;
+        return textColor;
     }
 
-    @Nullable
     public ColorStateList getTextColorHint() {
-        return this.textColorHint;
+        return textColorHint;
     }
 
-    public Integer getTextColorHighlight() {
-        return this.textColorHighlight;
-    }
-
-    @Nullable
     public ColorStateList getTextColorLink() {
-        return this.textColorLink;
+        return textColorLink;
     }
 
-    @Nullable
-    public Integer getFontFamily() {
-        return this.fontFamily;
+    public int getTextColorHighlight() {
+        return textColorHighlight;
     }
 
-    @Nullable
-    public Boolean getAllCaps() {
-        return this.allCaps;
+    public int getFontFamily() {
+        return fontFamily;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public boolean isBold() {
+        return this.bold;
+    }
+
+    public boolean isAllCaps() {
+        return allCaps;
     }
 
     public static class Builder {
@@ -157,33 +75,49 @@ public class TextConfiguration implements Parcelable {
         private ColorStateList textColorLink;
         private int textColorHighlight;
         private int fontFamily;
+        private boolean bold;
         private boolean allCaps;
 
         public Builder() {
+            // Default configuration
+            this.textSize = DEFAULT_TEXT_SIZE;
+            this.bold = false;
+            this.allCaps = false;
         }
 
-        public Builder(TextConfiguration buildTime) {
-            this.textSize = buildTime.textSize;
-            this.textTypeFaceStyle = buildTime.textTypeFaceStyle;
-            this.textColor = buildTime.textColor;
-            this.textColorHint = buildTime.textColorHint;
-            this.textColorHighlight = buildTime.textColorHighlight;
-            this.textColorLink = buildTime.textColorLink;
-            this.fontFamily = buildTime.fontFamily;
-            this.allCaps = buildTime.allCaps;
+        public static Builder builder() {
+            return new Builder();
         }
 
-        public TextConfiguration build() {
-            return new TextConfiguration(this);
+        public Builder(TextConfiguration textConfiguration) {
+            this.textSize = textConfiguration.textSize;
+            this.textTypeFaceStyle = textConfiguration.textTypeFaceStyle;
+            this.textColor = textConfiguration.textColor;
+            this.textColorHint = textConfiguration.textColorHint;
+            this.textColorLink = textConfiguration.textColorLink;
+            this.textColorHighlight = textConfiguration.textColorHighlight;
+            this.fontFamily = textConfiguration.fontFamily;
+            this.bold = textConfiguration.bold;
+            this.allCaps = textConfiguration.allCaps;
         }
 
-        public Builder allCaps(boolean allCaps) {
-            this.allCaps = allCaps;
+        public Builder textSize(float textSize) {
+            this.textSize = textSize;
             return this;
         }
 
-        public Builder fontFamily(int fontFamily) {
-            this.fontFamily = fontFamily;
+        public Builder textTypeFaceStyle(int textTypeFaceStyle) {
+            this.textTypeFaceStyle = textTypeFaceStyle;
+            return this;
+        }
+
+        public Builder textColor(ColorStateList textColor) {
+            this.textColor = textColor;
+            return this;
+        }
+
+        public Builder textColorHint(ColorStateList textColorHint) {
+            this.textColorHint = textColorHint;
             return this;
         }
 
@@ -197,24 +131,79 @@ public class TextConfiguration implements Parcelable {
             return this;
         }
 
-        public Builder textColorHint(ColorStateList textColorHint) {
-            this.textColorHint = textColorHint;
+        public Builder fontFamily(int fontFamily) {
+            this.fontFamily = fontFamily;
             return this;
         }
 
-        public Builder textColor(ColorStateList textColor) {
-            this.textColor = textColor;
+        public Builder bold(boolean bold) {
+            this.bold = bold;
             return this;
         }
 
-        public Builder textTypeFaceStyle(int textTypeFaceStyle) {
-            this.textTypeFaceStyle = textTypeFaceStyle;
+        public Builder allCaps(boolean allCaps) {
+            this.allCaps = allCaps;
             return this;
         }
 
-        public Builder textSize(Float textSize) {
-            this.textSize = textSize;
-            return this;
+        public TextConfiguration build() {
+            return new TextConfiguration(this);
         }
     }
+
+    /* BEGIN: Parcelable related */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeFloat(this.textSize);
+        dest.writeInt(this.textTypeFaceStyle);
+        dest.writeParcelable(this.textColor, flags);
+        dest.writeParcelable(this.textColorHint, flags);
+        dest.writeParcelable(this.textColorLink, flags);
+        dest.writeInt(this.textColorHighlight);
+        dest.writeInt(this.fontFamily);
+        dest.writeByte(this.bold ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.allCaps ? (byte) 1 : (byte) 0);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this.textSize = source.readFloat();
+        this.textTypeFaceStyle = source.readInt();
+        this.textColor = source.readParcelable(ColorStateList.class.getClassLoader());
+        this.textColorHint = source.readParcelable(ColorStateList.class.getClassLoader());
+        this.textColorLink = source.readParcelable(ColorStateList.class.getClassLoader());
+        this.textColorHighlight = source.readInt();
+        this.fontFamily = source.readInt();
+        this.bold = source.readByte() != 0;
+        this.allCaps = source.readByte() != 0;
+    }
+
+    protected TextConfiguration(Parcel in) {
+        this.textSize = in.readFloat();
+        this.textTypeFaceStyle = in.readInt();
+        this.textColor = in.readParcelable(ColorStateList.class.getClassLoader());
+        this.textColorHint = in.readParcelable(ColorStateList.class.getClassLoader());
+        this.textColorLink = in.readParcelable(ColorStateList.class.getClassLoader());
+        this.textColorHighlight = in.readInt();
+        this.fontFamily = in.readInt();
+        this.bold = in.readByte() != 0;
+        this.allCaps = in.readByte() != 0;
+    }
+
+    public static final Creator<TextConfiguration> CREATOR = new Creator<TextConfiguration>() {
+        @Override
+        public TextConfiguration createFromParcel(Parcel source) {
+            return new TextConfiguration(source);
+        }
+
+        @Override
+        public TextConfiguration[] newArray(int size) {
+            return new TextConfiguration[size];
+        }
+    };
+    /* END: Parcelable related */
 }

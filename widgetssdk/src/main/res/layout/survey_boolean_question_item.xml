@@ -15,7 +15,6 @@
         android:textAppearance="?attr/textAppearanceBody1"
         android:text="@string/glia_survey_scale_item_title"
         android:textColor="?attr/gliaBaseDarkColor"
-        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

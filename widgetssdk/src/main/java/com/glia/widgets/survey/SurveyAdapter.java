@@ -77,16 +77,16 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         if (viewType == SURVEY_SCALE) {
-            view = createNewLayout(parent, R.layout.survey_scale_item);
+            view = createNewLayout(parent, R.layout.survey_scale_question_item);
             return new ScaleQuestionViewHolder(view, style);
         } else if (viewType == SURVEY_YES_NO) {
-            view = createNewLayout(parent, R.layout.survey_yes_no_item);
+            view = createNewLayout(parent, R.layout.survey_boolean_question_item);
             return new BooleanQuestionViewHolder(view, style);
         } else if (viewType == SURVEY_SINGLE_CHOICE) {
-            view = createNewLayout(parent, R.layout.survey_single_choice_item);
+            view = createNewLayout(parent, R.layout.survey_single_question_item);
             return new SingleQuestionViewHolder(view, style);
         } else {
-            view = createNewLayout(parent, R.layout.survey_open_text_item);
+            view = createNewLayout(parent, R.layout.survey_input_question_item);
             return new InputQuestionViewHolder(view, style);
         }
     }

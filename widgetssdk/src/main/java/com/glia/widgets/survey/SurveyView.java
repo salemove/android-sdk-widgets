@@ -3,6 +3,7 @@ package com.glia.widgets.survey;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -24,6 +25,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -94,6 +96,16 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
 
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
         buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));
+
+        applyButtonStyle(surveyStyle.getSubmitButton(), submitButton);
+        applyButtonStyle(surveyStyle.getCancelButton(), cancelButton);
+    }
+
+    private void applyButtonStyle(ButtonConfiguration configuration, Button button) {
+        ColorStateList backgroundColor = configuration.getBackgroundColor();
+        button.setBackgroundTintList(backgroundColor);
+        ColorStateList textColor = configuration.getTextConfiguration().getTextColor();
+        button.setTextColor(textColor);
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {

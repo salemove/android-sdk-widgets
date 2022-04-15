@@ -40,6 +40,14 @@ public class SurveyStyle implements Parcelable {
         return title;
     }
 
+    public ButtonConfiguration getSubmitButton() {
+        return submitButton;
+    }
+
+    public ButtonConfiguration getCancelButton() {
+        return cancelButton;
+    }
+
     public BooleanQuestionConfiguration getBooleanQuestion() {
         return booleanQuestion;
     }
@@ -100,8 +108,15 @@ public class SurveyStyle implements Parcelable {
                     .build();
 
             // Default buttons configuration
-            this.submitButton = new ButtonConfiguration.Builder().build();
-            this.cancelButton = new ButtonConfiguration.Builder().build();
+            ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
+            this.submitButton = new ButtonConfiguration.Builder()
+                    .backgroundColor(resourceProvider.getColorStateList(R.color.glia_brand_primary_color))
+                    .textConfiguration(new TextConfiguration.Builder().textColor(buttonTexColor).build())
+                    .build();
+            this.cancelButton = new ButtonConfiguration.Builder()
+                    .backgroundColor(resourceProvider.getColorStateList(R.color.glia_system_negative_color))
+                    .textConfiguration(new TextConfiguration.Builder().textColor(buttonTexColor).build())
+                    .build();
 
             // Default questions configuration
             this.booleanQuestion = new BooleanQuestionConfiguration.Builder(resourceProvider).build();

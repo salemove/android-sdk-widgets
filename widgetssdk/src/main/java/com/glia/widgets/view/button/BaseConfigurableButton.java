@@ -59,8 +59,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
     }
 
     private void createBuildTimeConfiguration() {
-        TextConfiguration textConfiguration = TextConfiguration
-                .builder()
+        TextConfiguration textConfiguration = new TextConfiguration.Builder()
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .textColorHint(getHintTextColors())

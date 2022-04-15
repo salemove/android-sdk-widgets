@@ -5,16 +5,15 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.util.AttributeSet;
 
-import androidx.core.content.ContextCompat;
-
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
-import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.glia.widgets.view.configuration.LayerConfiguration;
+import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 
 public class GliaSurveyOptionButton extends BaseConfigurableButton {
     private boolean isError = false;
-    private SurveyStyle surveyStyle;
+    private OptionButtonConfiguration buttonConfiguration;
 
     @Override
     public ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme) {
@@ -36,29 +35,34 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         applyView();
     }
 
-    public void setSurveyStyle(SurveyStyle surveyStyle) {
-        this.surveyStyle = surveyStyle;
+    public void setStyle(OptionButtonConfiguration buttonConfiguration) {
+        this.buttonConfiguration = buttonConfiguration;
     }
 
     private void applyView() {
+        LayerConfiguration normalLayer = buttonConfiguration.getNormalLayer();
+        LayerConfiguration selectedLayer = buttonConfiguration.getSelectedLayer();
+        LayerConfiguration highlightedLayer = buttonConfiguration.getHighlightedLayer();
+
         ColorStateList strokeColor =
-                isError ? ContextCompat.getColorStateList(getContext(), R.color.glia_system_negative_color) :
+                isError ? ColorStateList.valueOf(Color.parseColor(highlightedLayer.getBorderColor())) :
                         isSelected() ?
-                                ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
-                                ContextCompat.getColorStateList(getContext(), R.color.glia_stroke_gray);
+                                ColorStateList.valueOf(Color.parseColor(selectedLayer.getBorderColor())) :
+                                ColorStateList.valueOf(Color.parseColor(normalLayer.getBorderColor()));
 
         ColorStateList backgroundColor = isSelected() ?
-                ContextCompat.getColorStateList(getContext(), R.color.glia_brand_primary_color) :
-                surveyStyle != null ?
-                        ColorStateList.valueOf(Color.parseColor(surveyStyle.getLayer().getBackgroundColor())) :
-                        ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color);
+                ColorStateList.valueOf(Color.parseColor(selectedLayer.getBackgroundColor())) :
+                ColorStateList.valueOf(Color.parseColor(normalLayer.getBackgroundColor()));
 
         ColorStateList textColor = isSelected() ?
-                ContextCompat.getColorStateList(getContext(), R.color.glia_base_light_color) :
-                surveyStyle.getTitle().getTextColor();
+                buttonConfiguration.getSelectedText().getTextColor() :
+                buttonConfiguration.getNormalText().getTextColor();
 
         setStrokeColor(strokeColor);
         setBackgroundTintList(backgroundColor);
         setTextColor(textColor);
+        Float textSize = buttonConfiguration.getNormalText().getTextSize();
+        if (textSize != null) setTextSize(textSize);
+        setCornerRadius(normalLayer.getCornerRadius());
     }
 }

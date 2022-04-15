@@ -12,6 +12,8 @@ import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class InputQuestionConfiguration implements Parcelable {
+    public static final float DEFAULT_TITLE_SIZE = 16f;
+
     private TextConfiguration title;
     private OptionButtonConfiguration optionButton;
 
@@ -36,7 +38,10 @@ public class InputQuestionConfiguration implements Parcelable {
         public Builder(ResourceProvider resourceProvider) {
             // Default configuration
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder().textColor(color).build();
+            this.title = new TextConfiguration.Builder()
+                    .textColor(color)
+                    .textSize(DEFAULT_TITLE_SIZE)
+                    .build();
 
             String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
             LayerConfiguration normalLayer = new LayerConfiguration.Builder(resourceProvider)

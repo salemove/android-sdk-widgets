@@ -10,6 +10,8 @@ import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class SingleQuestionConfiguration implements Parcelable {
+    public static final float DEFAULT_TEXT_SIZE = 16f;
+
     private TextConfiguration title;
     private TextConfiguration optionText;
 
@@ -34,9 +36,15 @@ public class SingleQuestionConfiguration implements Parcelable {
         public Builder(ResourceProvider resourceProvider) {
             // Default configuration
             ColorStateList titleColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder().textColor(titleColor).build();
+            this.title = new TextConfiguration.Builder()
+                    .textColor(titleColor)
+                    .textSize(DEFAULT_TEXT_SIZE)
+                    .build();
             ColorStateList optionTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.optionText = new TextConfiguration.Builder().textColor(optionTextColor).build();
+            this.optionText = new TextConfiguration.Builder()
+                    .textColor(optionTextColor)
+                    .textSize(DEFAULT_TEXT_SIZE)
+                    .build();
         }
 
         public Builder title(TextConfiguration title) {

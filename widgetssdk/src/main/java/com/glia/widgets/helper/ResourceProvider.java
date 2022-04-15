@@ -3,6 +3,7 @@ package com.glia.widgets.helper;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -46,6 +47,10 @@ public class ResourceProvider implements IResourceProvider {
     @Override
     public Drawable getDrawable(int id) {
         return ResourcesCompat.getDrawable((weakContext.get()).getResources(), id, null);
+    }
+
+    public float convertDpToPixel(int dp){
+        return dp * ((float) weakContext.get().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }
 

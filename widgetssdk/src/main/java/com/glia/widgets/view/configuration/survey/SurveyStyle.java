@@ -12,6 +12,9 @@ import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class SurveyStyle implements Parcelable {
+    public static final float DEFAULT_TITLE_SIZE = 20f;
+    public static final int DEFAULT_CORNER_RADIUS = 24;
+
     // Layer style.
     private LayerConfiguration layer;
     // Header text style.
@@ -85,11 +88,16 @@ public class SurveyStyle implements Parcelable {
         @SuppressLint("ResourceType")
         public Builder(ResourceProvider resourceProvider) {
             // Default survey background
-            this.layerConfiguration = new LayerConfiguration.Builder(resourceProvider).build();
+            this.layerConfiguration = new LayerConfiguration.Builder(resourceProvider)
+                    .cornerRadius(DEFAULT_CORNER_RADIUS)
+                    .build();
 
             // Default survey title configuration
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder().textColor(color).build();
+            this.title = new TextConfiguration.Builder()
+                    .textColor(color)
+                    .textSize(DEFAULT_TITLE_SIZE)
+                    .build();
 
             // Default buttons configuration
             this.submitButton = new ButtonConfiguration.Builder().build();

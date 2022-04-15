@@ -30,6 +30,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
+import com.glia.widgets.view.configuration.OptionButtonConfiguration;
+import com.glia.widgets.view.configuration.TextConfiguration;
+import com.glia.widgets.view.configuration.survey.BooleanQuestionConfiguration;
 import com.glia.widgets.view.configuration.survey.InputQuestionConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
@@ -196,7 +199,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.style = style;
 
             title = itemView.findViewById(R.id.tv_title);
-            title.setTextColor(style.getTitle().getTextColor());
+            TextConfiguration titleConfiguration = style.getScaleQuestion().getTitle();
+            this.title.setTextColor(titleConfiguration.getTextColor());
+            Float textSize = titleConfiguration.getTextSize();
+            if (textSize != null) this.title.setTextSize(textSize);
 
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
@@ -204,7 +210,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     itemView.findViewById(R.id.scale_3_button),
                     itemView.findViewById(R.id.scale_4_button),
                     itemView.findViewById(R.id.scale_5_button));
-            buttons.forEach(button -> button.setSurveyStyle(style));
+            buttons.forEach(button -> button.setStyle(style.getScaleQuestion().getOptionButton()));
         }
 
         @Override
@@ -258,15 +264,22 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             super(itemView);
             this.style = style;
 
+            BooleanQuestionConfiguration questionStyle = style.getBooleanQuestion();
+
             title = itemView.findViewById(R.id.tv_title);
-            title.setTextColor(style.getTitle().getTextColor());
+            TextConfiguration titleConfigursstion = questionStyle.getTitle();
+            this.title.setTextColor(titleConfigursstion.getTextColor());
+            Float textSize = titleConfigursstion.getTextSize();
+            if (textSize != null) this.title.setTextSize(textSize);
+
+            OptionButtonConfiguration buttonConfiguration = questionStyle.getOptionButton();
 
             yesButton = itemView.findViewById(R.id.yes_button);
-            yesButton.setSurveyStyle(style);
+            yesButton.setStyle(buttonConfiguration);
             yesButton.setOnClickListener(view -> setAnswer(true));
 
             noButton = itemView.findViewById(R.id.no_button);
-            noButton.setSurveyStyle(style);
+            noButton.setStyle(buttonConfiguration);
             noButton.setOnClickListener(view -> setAnswer(false));
         }
 
@@ -322,6 +335,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             requiredError = itemView.findViewById(R.id.required_error);
 
             title.setTextColor(style.getSingleQuestion().getTitle().getTextColor());
+            Float textSize = style.getSingleQuestion().getTitle().getTextSize();
+            if (textSize != null) title.setTextSize(textSize);
         }
 
         @Override
@@ -348,7 +363,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 RadioButton radioButton = new RadioButton(context);
                 radioButton.setId(View.generateViewId());
                 radioButton.setText(option.getLabel());
-                radioButton.setTextColor(style.getTitle().getTextColor());
+                radioButton.setTextColor(style.getSingleQuestion().getTitle().getTextColor());
+                Float textSize = style.getSingleQuestion().getOptionText().getTextSize();
+                if (textSize != null) radioButton.setTextSize(textSize);
                 radioButton.setChecked(option.getId().equals(selectedId));
                 radioButton.setOnClickListener(v -> setAnswer(option.getId()));
                 LayerDrawable drawable = (LayerDrawable) ContextCompat.getDrawable(context, R.drawable.bg_survey_radio_button);
@@ -403,7 +420,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
 
-            title.setTextColor(style.getTitle().getTextColor());
+            title.setTextColor(style.getInputQuestion().getTitle().getTextColor());
+            Float textSize = style.getInputQuestion().getTitle().getTextSize();
+            if (textSize != null) title.setTextSize(textSize);
 
             comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
             comment.addTextChangedListener(new TextWatcher() {

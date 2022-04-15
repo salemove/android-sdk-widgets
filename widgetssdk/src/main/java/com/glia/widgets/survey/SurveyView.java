@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -78,8 +80,13 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
 
     private void applyStyle(SurveyStyle surveyStyle) {
         cardView.setCardBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));
+        ResourceProvider resourceProvider = Dependencies.getResourceProvider();
+        float cornerRadius = resourceProvider.convertDpToPixel(surveyStyle.getLayer().getCornerRadius());
+        cardView.setRadius(cornerRadius);
 
         title.setTextColor(surveyStyle.getTitle().getTextColor());
+        Float textSize = theme.getSurveyStyle().getTitle().getTextSize();
+        if (textSize != null) title.setTextSize(textSize);
 
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
         buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));

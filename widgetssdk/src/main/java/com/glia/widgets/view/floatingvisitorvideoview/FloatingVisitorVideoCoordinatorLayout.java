@@ -52,7 +52,9 @@ public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implement
     public void show(VisitorMediaState state) {
         post(() -> {
             if (!floatingVisitorVideoContainer.hasVideo()) {
-                floatingVisitorVideoContainer.showVisitorVideo(state.getVideo().createVideoView(activity));
+                floatingVisitorVideoContainer.showVisitorVideo(
+                        state.getVideo().createVideoView(activity)
+                );
             }
             setVisibility(VISIBLE);
         });
@@ -104,7 +106,7 @@ public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implement
     @SuppressLint("ClickableViewAccessibility")
     private void setVisitorVideoContainerTouchListener() {
         floatingVisitorVideoContainer.setOnTouchListener(
-                new ViewHelpers.ChatHeadOnTouchListener(
+                new ViewHelpers.OnTouchListener(
                         this::getViewLocation,
                         this::onViewDragged,
                         (view) -> { // no-op

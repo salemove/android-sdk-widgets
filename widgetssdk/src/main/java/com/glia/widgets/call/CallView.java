@@ -785,7 +785,6 @@ public class CallView extends ConstraintLayout {
         setVisibility(INVISIBLE);
         Activity activity = Utils.getActivity(this.getContext());
         hideOperatorVideo();
-        floatingVisitorVideoCoordinatorLayout.setVisibility(GONE);
         floatingVisitorVideoCoordinatorLayout.hide();
         if (defaultStatusbarColor != null && activity != null) {
             activity.getWindow().setStatusBarColor(defaultStatusbarColor);
@@ -1007,8 +1006,6 @@ public class CallView extends ConstraintLayout {
         if (operatorMediaState != null && operatorMediaState.getVideo() != null) {
             Logger.d(TAG, "Starting video operator");
             operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
-            operatorVideoView.setZ(10);
-            operatorVideoView.setZOrderMediaOverlay(true);
             operatorVideoContainer.removeAllViews();
             operatorVideoContainer.addView(operatorVideoView);
             operatorVideoContainer.invalidate();

@@ -83,6 +83,7 @@ public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implement
     @Override
     public void onDestroy() {
         floatingVisitorVideoContainer.onDestroy();
+        controller.onDestroy();
     }
 
     @Override

@@ -333,7 +333,7 @@ public class ChatView extends ConstraintLayout implements
      * Use this method to notify the view when your activity or fragment is back in its resumed
      * state.
      */
-    public void onResume(boolean needToInitialize) {
+    public void onResume() {
         if (controller != null) {
             controller.onResume();
         }
@@ -344,7 +344,7 @@ public class ChatView extends ConstraintLayout implements
         if (dialogController != null) {
             dialogController.addCallback(dialogCallback);
         }
-        if (needToInitialize && serviceChatHeadController != null) {
+        if (serviceChatHeadController != null) {
             serviceChatHeadController.onResume(this);
         }
     }
@@ -358,6 +358,9 @@ public class ChatView extends ConstraintLayout implements
         }
         if (dialogController != null) {
             dialogController.removeCallback(dialogCallback);
+        }
+        if (serviceChatHeadController != null) {
+            serviceChatHeadController.onPause(this);
         }
     }
 

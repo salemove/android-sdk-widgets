@@ -72,6 +72,15 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
     private GliaSdkConfiguration sdkConfiguration;
     private UiTheme buildTimeTheme;
 
+    /*
+     * We need to keep track of the currently active (topmost) view. This can be either ChatView
+     * or CallView. CallView has translucent theme and this changes the usual lifecycle of an activity.
+     * When the translucent CallActivity is on top of the ChatActivity and config change happens (e.g screen rotation)
+     * then ChatActivity onResume and onPause are called right after CallActivity's onResume. Current
+     * solution ignores such onResume calls because another activity is already in resumed state.
+     */
+    private String resumedViewName = null;
+
     public ServiceChatHeadController(
             ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase,
             ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase,
@@ -100,7 +109,16 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
 
     @Override
     public void onResume(View view) {
+        setResumedViewName(view);
+
+        // see the comment on resumedViewName field declaration above
+        if (!isResumedView(view)) return;
+
         toggleChatHeadServiceUseCase.execute(view);
+    }
+
+    public void onPause(View view) {
+        clearResumedViewName(view);
     }
 
     @Override
@@ -196,6 +214,22 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
             default:
                 chatHeadView.showPlaceholder();
         }
+    }
+
+    private void setResumedViewName(View view) {
+        if (resumedViewName == null) {
+            resumedViewName = view.getClass().getSimpleName();
+        }
+    }
+
+    private void clearResumedViewName(View view) {
+        if (isResumedView(view)) {
+            resumedViewName = null;
+        }
+    }
+
+    private boolean isResumedView(View view) {
+        return resumedViewName.equals(view.getClass().getSimpleName());
     }
 
     private enum State {

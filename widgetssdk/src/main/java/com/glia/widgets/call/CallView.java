@@ -262,6 +262,9 @@ public class CallView extends ConstraintLayout {
         if (dialogController != null) {
             dialogController.removeCallback(dialogCallback);
         }
+        if (serviceChatHeadController != null) {
+            serviceChatHeadController.onPause(this);
+        }
     }
 
     private void destroyControllers(boolean isFinishing) {

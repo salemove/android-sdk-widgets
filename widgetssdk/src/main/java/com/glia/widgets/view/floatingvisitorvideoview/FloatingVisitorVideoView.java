@@ -47,6 +47,7 @@ public class FloatingVisitorVideoView extends ConstraintLayout {
 
     public void showVisitorVideo(VideoView newVideoView) {
         videoView = newVideoView;
+        videoView.setZOrderMediaOverlay(true);
         videoContainer.addView(videoView);
         videoContainer.invalidate();
     }

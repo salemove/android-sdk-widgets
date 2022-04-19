@@ -115,7 +115,7 @@ class Utils {
                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_blue))
                 )
                 .textConfiguration(
-                        new TextConfiguration.Builder()
+                        TextConfiguration.builder()
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
@@ -131,7 +131,7 @@ class Utils {
                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_white))
                 )
                 .textConfiguration(
-                        new TextConfiguration.Builder()
+                        TextConfiguration.builder()
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
@@ -156,7 +156,7 @@ class Utils {
     }
 
     private static TextConfiguration getChoiceCardContentTextConfiguration(Context context) {
-        return new TextConfiguration.Builder()
+        return TextConfiguration.builder()
                 .textSize(16f)      // in sp
                 .fontFamily(R.font.tangerine)
                 .textColor(ContextCompat.getColorStateList(context, R.color.color_dark_cyan))

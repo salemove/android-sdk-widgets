@@ -67,6 +67,10 @@ public class TextConfiguration implements Parcelable {
         return allCaps;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private float textSize;
         private int textTypeFaceStyle;

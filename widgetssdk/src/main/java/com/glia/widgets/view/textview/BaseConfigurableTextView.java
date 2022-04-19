@@ -39,7 +39,8 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     public abstract TextConfiguration getTextConfigurationFromTheme(UiTheme theme);
 
     private void createBuildTimeConfiguration() {
-        textConfiguration = new TextConfiguration.Builder()
+        textConfiguration = TextConfiguration
+                .builder()
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .textColorHint(getHintTextColors())

@@ -15,7 +15,6 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class ChatActivity extends AppCompatActivity {
-    private static final String KEY_WAS_ACTIVITY_FINISHING = "was_activity_finishing";
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
@@ -28,8 +27,6 @@ public class ChatActivity extends AppCompatActivity {
             };
 
     private GliaSdkConfiguration configuration;
-
-    private boolean wasActivityFinishing = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,7 +54,7 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        chatView.onResume(wasActivityFinishing);
+        chatView.onResume();
         super.onResume();
     }
 
@@ -74,18 +71,6 @@ public class ChatActivity extends AppCompatActivity {
         onNavigateToCallListener = null;
         chatView.onDestroyView(isFinishing());
         super.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putBoolean(KEY_WAS_ACTIVITY_FINISHING, isFinishing());
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        wasActivityFinishing = savedInstanceState.getBoolean(KEY_WAS_ACTIVITY_FINISHING, true);
-        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.glia.widgets.call;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -196,7 +198,7 @@ class CallState {
                                 callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
                                 callStatus.getVisitorMediaState()))
-                .setLandscapeLayoutControlsVisible(false)
+                .setLandscapeLayoutControlsVisible(true)
                 .createCallState();
     }
 
@@ -227,14 +229,14 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState newStartedCallTimerValue(String formatedTimeValue) {
+    public CallState newStartedCallTimerValue(String formattedTimeValue) {
         if (isAudioCall()) {
             return new Builder()
                     .copyFrom(this)
                     .setCallStatus(
                             new CallStatus.StartedAudioCall(
                                     callStatus.getOperatorName(),
-                                    formatedTimeValue,
+                                    formattedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
                                     callStatus.getVisitorMediaState()
@@ -247,7 +249,7 @@ class CallState {
                     .setCallStatus(
                             new CallStatus.StartedVideoCall(
                                     callStatus.getOperatorName(),
-                                    formatedTimeValue,
+                                    formattedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
                                     callStatus.getVisitorMediaState()
@@ -305,6 +307,7 @@ class CallState {
                 .createCallState();
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "CallState{" +

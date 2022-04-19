@@ -359,7 +359,6 @@ public class CallController implements
         if (viewCallback != null) {
             viewCallback.emitState(callState);
         }
-        emitViewState(callState.landscapeControlsVisibleChanged(!callState.isVideoCall()));
     }
 
     public void endEngagementDialogYesClicked() {
@@ -426,13 +425,8 @@ public class CallController implements
     public void onResume() {
         Logger.d(TAG, "onResume\n");
 
-        if (hasCallNotificationChannelEnabledUseCase.execute()) {
-            if (callState.isVideoCall() || callState.is2WayVideoCall()) {
-                showVideoCallNotificationUseCase.execute();
-            } else if (callState.isAudioCall()) {
-                showAudioCallNotificationUseCase.execute();
-            }
-        }
+        showCallNotification();
+        showLandscapeControls();
     }
 
     public void chatButtonClicked() {
@@ -448,9 +442,9 @@ public class CallController implements
         if (callTimerStatusListener == null) {
             callTimerStatusListener = new TimeCounter.FormattedTimerStatusListener() {
                 @Override
-                public void onNewFormattedTimerValue(String formatedValue) {
+                public void onNewFormattedTimerValue(String formattedValue) {
                     if (callState.isMediaEngagementStarted()) {
-                        emitViewState(callState.newStartedCallTimerValue(formatedValue));
+                        emitViewState(callState.newStartedCallTimerValue(formattedValue));
                     }
                 }
 
@@ -482,9 +476,7 @@ public class CallController implements
     }
 
     public void onUserInteraction() {
-        emitViewState(callState.landscapeControlsVisibleChanged(true));
-        Logger.d(TAG, "onUserInteraction, restartingInactivityTimer");
-        restartInactivityTimeCounter();
+        showLandscapeControls();
     }
 
     public void minimizeButtonClicked() {
@@ -614,13 +606,13 @@ public class CallController implements
 
     private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: video");
-        String formatedTime = Utils.toMmSs(0L);
+        String formattedTime = Utils.toMmSs(0L);
         if (callState.isCallOngoingAndOperatorConnected()) {
-            formatedTime = callState.callStatus.getTime();
+            formattedTime = callState.callStatus.getTime();
         }
         emitViewState(callState.videoCallOperatorVideoStarted(
                 operatorMediaState,
-                formatedTime
+                formattedTime
         ));
         showVideoCallNotificationUseCase.execute();
         connectingTimerCounter.stop();
@@ -628,13 +620,13 @@ public class CallController implements
 
     private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: audio");
-        String formatedTime = Utils.toMmSs(0L);
+        String formattedTime = Utils.toMmSs(0L);
         if (callState.isCallOngoingAndOperatorConnected())
-            formatedTime = callState.callStatus.getTime();
+            formattedTime = callState.callStatus.getTime();
 
         emitViewState(callState.audioCallStarted(
                 operatorMediaState,
-                formatedTime
+                formattedTime
         ));
 
         showAudioCallNotificationUseCase.execute();
@@ -689,5 +681,20 @@ public class CallController implements
 
     public boolean shouldShowMediaEngagementView() {
         return shouldShowMediaEngagementViewUseCase.execute();
+    }
+
+    private void showCallNotification() {
+        if (hasCallNotificationChannelEnabledUseCase.execute()) {
+            if (callState.isVideoCall() || callState.is2WayVideoCall()) {
+                showVideoCallNotificationUseCase.execute();
+            } else if (callState.isAudioCall()) {
+                showAudioCallNotificationUseCase.execute();
+            }
+        }
+    }
+
+    private void showLandscapeControls() {
+        emitViewState(callState.landscapeControlsVisibleChanged(true));
+        restartInactivityTimeCounter();
     }
 }

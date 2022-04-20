@@ -2,6 +2,7 @@ package com.glia.widgets.helper;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 
@@ -47,6 +48,11 @@ public class ResourceProvider implements IResourceProvider {
     @Override
     public Drawable getDrawable(int id) {
         return ResourcesCompat.getDrawable((weakContext.get()).getResources(), id, null);
+    }
+
+    public int getDimension(int dimensionId){
+        Resources resources = weakContext.get().getResources();
+        return (int) (resources.getDimension(dimensionId)/ resources.getDisplayMetrics().density);
     }
 
     public float convertDpToPixel(int dp){

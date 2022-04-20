@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private UiTheme theme;
 
     private CardView cardView;
+    private CardView cutBottomCornersCardView;
     private TextView title;
     private RecyclerView recyclerView;
     private LinearLayout buttonPanel;
@@ -87,6 +89,16 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
         ResourceProvider resourceProvider = Dependencies.getResourceProvider();
         float cornerRadius = resourceProvider.convertDpToPixel(surveyStyle.getLayer().getCornerRadius());
         cardView.setRadius(cornerRadius);
+        ViewGroup.MarginLayoutParams layoutParams =
+                (ViewGroup.MarginLayoutParams) cutBottomCornersCardView.getLayoutParams();
+        int marginTopDp = resourceProvider.getDimension(R.dimen.glia_x_large);
+        int marginTopPx = (int) resourceProvider.convertDpToPixel(marginTopDp);
+        layoutParams.setMargins(
+                0,
+                marginTopPx,
+                0,
+                (int) -cornerRadius); // Solution for making CardView only have corner radius at the top
+        cutBottomCornersCardView.requestLayout();
 
         TextConfiguration titleStyle = surveyStyle.getTitle();
         this.title.setTextColor(titleStyle.getTextColor());
@@ -135,6 +147,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private void initView() {
         View view = View.inflate(getContext(), R.layout.survey_view, this);
 
+        cutBottomCornersCardView = view.findViewById(R.id.cut_bottom_corners_card_view);
         cardView = view.findViewById(R.id.card_view);
         title = view.findViewById(R.id.survey_title);
         recyclerView = view.findViewById(R.id.survey_list);

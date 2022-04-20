@@ -12,6 +12,8 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -39,8 +41,9 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     public abstract TextConfiguration getTextConfigurationFromTheme(UiTheme theme);
 
     private void createBuildTimeConfiguration() {
+        ResourceProvider resourceProvider = Dependencies.getResourceProvider();
         textConfiguration = TextConfiguration
-                .builder()
+                .builder(resourceProvider)
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .textColorHint(getHintTextColors())

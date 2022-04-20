@@ -12,10 +12,6 @@ import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class BooleanQuestionConfiguration implements Parcelable {
-    public static final float DEFAULT_TITLE_SIZE = 16f;
-    public static final float DEFAULT_TEXT_SIZE = 16f;
-    public static final int DEFAULT_CORNER_RADIUS_DP = 4;
-
     private TextConfiguration title;
     private OptionButtonConfiguration optionButton;
 
@@ -40,39 +36,39 @@ public class BooleanQuestionConfiguration implements Parcelable {
         public Builder(ResourceProvider resourceProvider){
             // Default configuration
             ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder()
+            this.title = new TextConfiguration.Builder(resourceProvider)
                     .textColor(normalTextColor)
-                    .textSize(DEFAULT_TITLE_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
                     .build();
 
             ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
-            TextConfiguration normalText = new TextConfiguration.Builder()
+            TextConfiguration normalText = new TextConfiguration.Builder(resourceProvider)
                     .textColor(normalTextColor)
-                    .textSize(DEFAULT_TEXT_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
-            TextConfiguration selectedText = new TextConfiguration.Builder()
+            TextConfiguration selectedText = new TextConfiguration.Builder(resourceProvider)
                     .textColor(selectedTextColor)
-                    .textSize(DEFAULT_TEXT_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
-            TextConfiguration highlightedText = new TextConfiguration.Builder()
+            TextConfiguration highlightedText = new TextConfiguration.Builder(resourceProvider)
                     .textColor(normalTextColor)
-                    .textSize(DEFAULT_TEXT_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
 
             LayerConfiguration normalLayer = new LayerConfiguration.Builder(resourceProvider)
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
-                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             LayerConfiguration selectedLayer = new LayerConfiguration.Builder(resourceProvider)
                     .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
                     .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
-                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             LayerConfiguration highlightedLayer = new LayerConfiguration.Builder(resourceProvider)
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
-                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
 
             this.optionButton = new OptionButtonConfiguration.Builder(resourceProvider)

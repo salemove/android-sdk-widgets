@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
@@ -115,7 +116,7 @@ class Utils {
                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_blue))
                 )
                 .textConfiguration(
-                        TextConfiguration.builder()
+                        TextConfiguration.builder(Dependencies.getResourceProvider())
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
@@ -131,7 +132,7 @@ class Utils {
                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_white))
                 )
                 .textConfiguration(
-                        TextConfiguration.builder()
+                        TextConfiguration.builder(Dependencies.getResourceProvider())
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
@@ -156,7 +157,7 @@ class Utils {
     }
 
     private static TextConfiguration getChoiceCardContentTextConfiguration(Context context) {
-        return TextConfiguration.builder()
+        return TextConfiguration.builder(Dependencies.getResourceProvider())
                 .textSize(16f)      // in sp
                 .fontFamily(R.font.tangerine)
                 .textColor(ContextCompat.getColorStateList(context, R.color.color_dark_cyan))

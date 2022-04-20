@@ -4,9 +4,10 @@ import android.content.res.ColorStateList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class TextConfiguration implements Parcelable {
-    public static final float DEFAULT_TEXT_SIZE = 16f;
+import com.glia.widgets.R;
+import com.glia.widgets.helper.ResourceProvider;
 
+public class TextConfiguration implements Parcelable {
     private float textSize;
     private int textTypeFaceStyle;
     private ColorStateList textColor;
@@ -67,8 +68,8 @@ public class TextConfiguration implements Parcelable {
         return allCaps;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(ResourceProvider resourceProvider) {
+        return new Builder(resourceProvider);
     }
 
     public static class Builder {
@@ -82,15 +83,15 @@ public class TextConfiguration implements Parcelable {
         private boolean bold;
         private boolean allCaps;
 
-        public Builder() {
+        public Builder(ResourceProvider resourceProvider) {
             // Default configuration
-            this.textSize = DEFAULT_TEXT_SIZE;
+            this.textSize = resourceProvider.getDimension(R.dimen.glia_survey_default_text_size);
             this.bold = false;
             this.allCaps = false;
         }
 
-        public static Builder builder() {
-            return new Builder();
+        public static Builder builder(ResourceProvider resourceProvider) {
+            return new Builder(resourceProvider);
         }
 
         public Builder(TextConfiguration textConfiguration) {

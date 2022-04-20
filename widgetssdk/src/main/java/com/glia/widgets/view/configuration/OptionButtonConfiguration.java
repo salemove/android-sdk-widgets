@@ -7,8 +7,6 @@ import com.glia.widgets.R;
 import com.glia.widgets.helper.ResourceProvider;
 
 public class OptionButtonConfiguration implements Parcelable {
-    public static final float DEFAULT_TEXT_SIZE = 16f;
-
     // Title text for normal state.
     private TextConfiguration normalText;
     // Option layer for normal state.
@@ -71,19 +69,19 @@ public class OptionButtonConfiguration implements Parcelable {
 
         public Builder(ResourceProvider resourceProvider) {
             // Default configuration
-            this.normalText = new TextConfiguration.Builder()
+            this.normalText = new TextConfiguration.Builder(resourceProvider)
                     .textColor(resourceProvider.getColorStateList(R.color.glia_base_dark_color))
-                    .textSize(DEFAULT_TEXT_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
             this.normalLayer = new LayerConfiguration.Builder(resourceProvider).build();
-            this.selectedText = new TextConfiguration.Builder()
+            this.selectedText = new TextConfiguration.Builder(resourceProvider)
                     .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
-                    .textSize(DEFAULT_TEXT_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
             this.selectedLayer = new LayerConfiguration.Builder(resourceProvider).build();
-            this.highlightedText = new TextConfiguration.Builder()
+            this.highlightedText = new TextConfiguration.Builder(resourceProvider)
                     .textColor(resourceProvider.getColorStateList(R.color.glia_base_dark_color))
-                    .textSize(DEFAULT_TEXT_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
             this.highlightedLayer = new LayerConfiguration.Builder(resourceProvider).build();
         }

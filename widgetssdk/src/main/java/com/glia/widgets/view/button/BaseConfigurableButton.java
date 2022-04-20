@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.button.MaterialButton;
@@ -59,8 +61,9 @@ public abstract class BaseConfigurableButton extends MaterialButton {
     }
 
     private void createBuildTimeConfiguration() {
+        ResourceProvider resourceProvider = Dependencies.getResourceProvider();
         TextConfiguration textConfiguration = TextConfiguration
-                .builder()
+                .builder(resourceProvider)
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .textColorHint(getHintTextColors())

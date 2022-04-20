@@ -12,9 +12,6 @@ import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class SurveyStyle implements Parcelable {
-    public static final float DEFAULT_TITLE_SIZE = 20f;
-    public static final int DEFAULT_CORNER_RADIUS_DP = 24;
-
     // Layer style.
     private LayerConfiguration layer;
     // Header text style.
@@ -97,25 +94,27 @@ public class SurveyStyle implements Parcelable {
         public Builder(ResourceProvider resourceProvider) {
             // Default survey background
             this.layerConfiguration = new LayerConfiguration.Builder(resourceProvider)
-                    .cornerRadius(DEFAULT_CORNER_RADIUS_DP)
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
                     .build();
 
             // Default survey title configuration
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder()
+            this.title = new TextConfiguration.Builder(resourceProvider)
                     .textColor(color)
-                    .textSize(DEFAULT_TITLE_SIZE)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
                     .build();
 
             // Default buttons configuration
             ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
+            TextConfiguration textConfiguration =
+                    new TextConfiguration.Builder(resourceProvider).textColor(buttonTexColor).build();
             this.submitButton = new ButtonConfiguration.Builder()
                     .backgroundColor(resourceProvider.getColorStateList(R.color.glia_brand_primary_color))
-                    .textConfiguration(new TextConfiguration.Builder().textColor(buttonTexColor).build())
+                    .textConfiguration(textConfiguration)
                     .build();
             this.cancelButton = new ButtonConfiguration.Builder()
                     .backgroundColor(resourceProvider.getColorStateList(R.color.glia_system_negative_color))
-                    .textConfiguration(new TextConfiguration.Builder().textColor(buttonTexColor).build())
+                    .textConfiguration(textConfiguration)
                     .build();
 
             // Default questions configuration

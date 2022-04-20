@@ -93,21 +93,21 @@ public class SurveyStyle implements Parcelable {
         @SuppressLint("ResourceType")
         public Builder(ResourceProvider resourceProvider) {
             // Default survey background
-            this.layerConfiguration = new LayerConfiguration.Builder(resourceProvider)
+            this.layerConfiguration = new LayerConfiguration.Builder()
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
-                    .build();
+                    .build(resourceProvider);
 
             // Default survey title configuration
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder(resourceProvider)
+            this.title = new TextConfiguration.Builder()
                     .textColor(color)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
-                    .build();
+                    .build(resourceProvider);
 
             // Default buttons configuration
             ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
             TextConfiguration textConfiguration =
-                    new TextConfiguration.Builder(resourceProvider).textColor(buttonTexColor).build();
+                    new TextConfiguration.Builder().textColor(buttonTexColor).build(resourceProvider);
             this.submitButton = new ButtonConfiguration.Builder()
                     .backgroundColor(resourceProvider.getColorStateList(R.color.glia_brand_primary_color))
                     .textConfiguration(textConfiguration)
@@ -118,10 +118,10 @@ public class SurveyStyle implements Parcelable {
                     .build();
 
             // Default questions configuration
-            this.booleanQuestion = new BooleanQuestionConfiguration.Builder(resourceProvider).build();
-            this.inputQuestion = new InputQuestionConfiguration.Builder(resourceProvider).build();
-            this.scaleQuestion = new ScaleQuestionConfiguration.Builder(resourceProvider).build();
-            this.singleQuestion = new SingleQuestionConfiguration.Builder(resourceProvider).build();
+            this.booleanQuestion = new BooleanQuestionConfiguration.Builder().build(resourceProvider);
+            this.inputQuestion = new InputQuestionConfiguration.Builder().build(resourceProvider);
+            this.scaleQuestion = new ScaleQuestionConfiguration.Builder().build(resourceProvider);
+            this.singleQuestion = new SingleQuestionConfiguration.Builder().build(resourceProvider);
         }
 
         public Builder layer(LayerConfiguration layerConfiguration) {

@@ -63,12 +63,12 @@ public abstract class BaseConfigurableButton extends MaterialButton {
     private void createBuildTimeConfiguration() {
         ResourceProvider resourceProvider = Dependencies.getResourceProvider();
         TextConfiguration textConfiguration = TextConfiguration
-                .builder(resourceProvider)
+                .builder()
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .textColorHint(getHintTextColors())
                 .textSize(getTextSize())
-                .build();
+                .build(resourceProvider);
 
         buttonConfiguration = ButtonConfiguration
                 .builder()

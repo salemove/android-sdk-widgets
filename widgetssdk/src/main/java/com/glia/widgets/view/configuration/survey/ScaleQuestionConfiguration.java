@@ -32,55 +32,6 @@ public class ScaleQuestionConfiguration implements Parcelable {
         private TextConfiguration title;
         private OptionButtonConfiguration optionButton;
 
-        @SuppressLint("ResourceType")
-        public Builder(ResourceProvider resourceProvider){
-            // Default configuration
-            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(normalTextColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build();
-
-            ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
-            TextConfiguration normalText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(normalTextColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-            TextConfiguration selectedText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(selectedTextColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-            TextConfiguration highlightedText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(normalTextColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-
-            LayerConfiguration normalLayer = new LayerConfiguration.Builder(resourceProvider)
-                    .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
-                    .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
-                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
-                    .build();
-            LayerConfiguration selectedLayer = new LayerConfiguration.Builder(resourceProvider)
-                    .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
-                    .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
-                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
-                    .build();
-            LayerConfiguration highlightedLayer = new LayerConfiguration.Builder(resourceProvider)
-                    .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
-                    .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
-                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
-                    .build();
-
-            this.optionButton = new OptionButtonConfiguration.Builder(resourceProvider)
-                    .normalText(normalText)
-                    .normalLayer(normalLayer)
-                    .selectedText(selectedText)
-                    .selectedLayer(selectedLayer)
-                    .highlightedText(highlightedText)
-                    .highlightedLayer(highlightedLayer)
-                    .build();
-        }
-
         public Builder title(TextConfiguration title) {
             this.title = title;
             return this;
@@ -91,8 +42,66 @@ public class ScaleQuestionConfiguration implements Parcelable {
             return this;
         }
 
-        public ScaleQuestionConfiguration build() {
+        public ScaleQuestionConfiguration build(ResourceProvider resourceProvider) {
+            if (this.title == null) {
+                this.title = prepareDefaultTitleConfiguration(resourceProvider);
+            }
+            if (this.optionButton == null) {
+                this.optionButton = prepareDefaultButtonConfiguration(resourceProvider);
+            }
             return new ScaleQuestionConfiguration(this);
+        }
+
+        @SuppressLint("ResourceType")
+        private OptionButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider) {
+            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
+            TextConfiguration normalText = new TextConfiguration.Builder()
+                    .textColor(normalTextColor)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                    .build(resourceProvider);
+            TextConfiguration selectedText = new TextConfiguration.Builder()
+                    .textColor(selectedTextColor)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                    .build(resourceProvider);
+            TextConfiguration highlightedText = new TextConfiguration.Builder()
+                    .textColor(normalTextColor)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                    .build(resourceProvider);
+
+            LayerConfiguration normalLayer = new LayerConfiguration.Builder()
+                    .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
+                    .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
+                    .build(resourceProvider);
+            LayerConfiguration selectedLayer = new LayerConfiguration.Builder()
+                    .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
+                    .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
+                    .build(resourceProvider);
+            LayerConfiguration highlightedLayer = new LayerConfiguration.Builder()
+                    .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
+                    .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
+                    .build(resourceProvider);
+
+            return new OptionButtonConfiguration.Builder()
+                    .normalText(normalText)
+                    .normalLayer(normalLayer)
+                    .selectedText(selectedText)
+                    .selectedLayer(selectedLayer)
+                    .highlightedText(highlightedText)
+                    .highlightedLayer(highlightedLayer)
+                    .build(resourceProvider);
+        }
+
+        private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
+            ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            return new TextConfiguration.Builder()
+                    .textColor(normalTextColor)
+                    .bold(true)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
+                    .build(resourceProvider);
         }
     }
 

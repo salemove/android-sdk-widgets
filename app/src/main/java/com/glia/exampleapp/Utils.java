@@ -116,11 +116,11 @@ class Utils {
                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_blue))
                 )
                 .textConfiguration(
-                        TextConfiguration.builder(Dependencies.getResourceProvider())
+                        TextConfiguration.builder()
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
-                                .build()
+                                .build(Dependencies.getResourceProvider())
                 )
                 .build();
     }
@@ -132,11 +132,11 @@ class Utils {
                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_white))
                 )
                 .textConfiguration(
-                        TextConfiguration.builder(Dependencies.getResourceProvider())
+                        TextConfiguration.builder()
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
-                                .build()
+                                .build(Dependencies.getResourceProvider())
                 )
                 .strokeWidth(1)
                 .strokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black)))
@@ -157,11 +157,11 @@ class Utils {
     }
 
     private static TextConfiguration getChoiceCardContentTextConfiguration(Context context) {
-        return TextConfiguration.builder(Dependencies.getResourceProvider())
+        return TextConfiguration.builder()
                 .textSize(16f)      // in sp
                 .fontFamily(R.font.tangerine)
                 .textColor(ContextCompat.getColorStateList(context, R.color.color_dark_cyan))
-                .build();
+                .build(Dependencies.getResourceProvider());
     }
 
     public static Integer getColorValueFromPrefs(@StringRes int keyValue, SharedPreferences sharedPreferences, Resources resources) {

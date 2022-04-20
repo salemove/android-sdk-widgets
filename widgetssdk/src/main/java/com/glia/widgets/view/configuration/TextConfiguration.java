@@ -15,8 +15,8 @@ public class TextConfiguration implements Parcelable {
     private ColorStateList textColorLink;
     private int textColorHighlight;
     private int fontFamily;
-    private boolean bold;
-    private boolean allCaps;
+    private Boolean bold;
+    private Boolean allCaps;
 
     private TextConfiguration(
             Builder builder
@@ -60,16 +60,16 @@ public class TextConfiguration implements Parcelable {
         return fontFamily;
     }
 
-    public boolean isBold() {
+    public Boolean isBold() {
         return this.bold;
     }
 
-    public boolean isAllCaps() {
+    public Boolean isAllCaps() {
         return allCaps;
     }
 
-    public static Builder builder(ResourceProvider resourceProvider) {
-        return new Builder(resourceProvider);
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
@@ -80,18 +80,10 @@ public class TextConfiguration implements Parcelable {
         private ColorStateList textColorLink;
         private int textColorHighlight;
         private int fontFamily;
-        private boolean bold;
-        private boolean allCaps;
+        private Boolean bold;
+        private Boolean allCaps;
 
-        public Builder(ResourceProvider resourceProvider) {
-            // Default configuration
-            this.textSize = resourceProvider.getDimension(R.dimen.glia_survey_default_text_size);
-            this.bold = false;
-            this.allCaps = false;
-        }
-
-        public static Builder builder(ResourceProvider resourceProvider) {
-            return new Builder(resourceProvider);
+        public Builder() {
         }
 
         public Builder(TextConfiguration textConfiguration) {
@@ -141,17 +133,27 @@ public class TextConfiguration implements Parcelable {
             return this;
         }
 
-        public Builder bold(boolean bold) {
+        public Builder bold(Boolean bold) {
             this.bold = bold;
             return this;
         }
 
-        public Builder allCaps(boolean allCaps) {
+        public Builder allCaps(Boolean allCaps) {
             this.allCaps = allCaps;
             return this;
         }
 
-        public TextConfiguration build() {
+        public TextConfiguration build(ResourceProvider resourceProvider) {
+            // Default configuration
+            if (this.textSize == 0) {
+                this.textSize = resourceProvider.getDimension(R.dimen.glia_survey_default_text_size);
+            }
+            if (this.bold == null) {
+                this.bold = false;
+            }
+            if (this.allCaps == null) {
+                this.allCaps = false;
+            }
             return new TextConfiguration(this);
         }
     }

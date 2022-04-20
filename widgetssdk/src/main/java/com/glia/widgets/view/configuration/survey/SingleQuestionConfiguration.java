@@ -30,21 +30,6 @@ public class SingleQuestionConfiguration implements Parcelable {
         private TextConfiguration title;
         private TextConfiguration optionText;
 
-        @SuppressLint("ResourceType")
-        public Builder(ResourceProvider resourceProvider) {
-            // Default configuration
-            ColorStateList titleColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(titleColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-            ColorStateList optionTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.optionText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(optionTextColor)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-        }
-
         public Builder title(TextConfiguration title) {
             this.title = title;
             return this;
@@ -55,8 +40,31 @@ public class SingleQuestionConfiguration implements Parcelable {
             return this;
         }
 
-        public SingleQuestionConfiguration build() {
+        public SingleQuestionConfiguration build(ResourceProvider resourceProvider) {
+            if (this.title == null) {
+                this.title = prepareDefaultTitleConfiguration(resourceProvider);
+            }
+            if (this.optionText == null) {
+                this.optionText = prepareDefaultTextConfiguration(resourceProvider);
+            }
             return new SingleQuestionConfiguration(this);
+        }
+
+        private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider) {
+            ColorStateList optionTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            return new TextConfiguration.Builder()
+                    .textColor(optionTextColor)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                    .build(resourceProvider);
+        }
+
+        private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
+            ColorStateList titleColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            return new TextConfiguration.Builder()
+                    .textColor(titleColor)
+                    .bold(true)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                    .build(resourceProvider);
         }
     }
 

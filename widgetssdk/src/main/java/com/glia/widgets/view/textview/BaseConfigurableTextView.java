@@ -43,12 +43,12 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     private void createBuildTimeConfiguration() {
         ResourceProvider resourceProvider = Dependencies.getResourceProvider();
         textConfiguration = TextConfiguration
-                .builder(resourceProvider)
+                .builder()
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .textColorHint(getHintTextColors())
                 .textSize(pxToSp(getContext(), getTextSize()))
-                .build();
+                .build(resourceProvider);
     }
 
     public void setTheme(UiTheme theme) {
@@ -68,7 +68,7 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
         if (runTimeConfiguration.getFontFamily() != textConfiguration.getFontFamily())
             builder.fontFamily(runTimeConfiguration.getFontFamily());
 
-        textConfiguration = builder.build();
+        textConfiguration = builder.build(Dependencies.getResourceProvider());
         updateView();
     }
 

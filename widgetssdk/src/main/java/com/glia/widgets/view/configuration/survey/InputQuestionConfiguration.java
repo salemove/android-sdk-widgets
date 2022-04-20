@@ -32,31 +32,6 @@ public class InputQuestionConfiguration implements Parcelable {
         private TextConfiguration title;
         private OptionButtonConfiguration optionButton;
 
-        @SuppressLint("ResourceType")
-        public Builder(ResourceProvider resourceProvider) {
-            // Default configuration
-            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(color)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build();
-
-            String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
-            LayerConfiguration normalLayer = new LayerConfiguration.Builder(resourceProvider)
-                    .borderColor(normalColor)
-                    .build();
-
-            String errorColor = resourceProvider.getString(R.color.glia_system_negative_color);
-            LayerConfiguration errorLayer = new LayerConfiguration.Builder(resourceProvider)
-                    .borderColor(errorColor)
-                    .build();
-
-            this.optionButton = new OptionButtonConfiguration.Builder(resourceProvider)
-                    .normalLayer(normalLayer)
-                    .highlightedLayer(errorLayer)
-                    .build();
-        }
-
         public Builder title(TextConfiguration title) {
             this.title = title;
             return this;
@@ -67,8 +42,40 @@ public class InputQuestionConfiguration implements Parcelable {
             return this;
         }
 
-        public InputQuestionConfiguration build() {
+        public InputQuestionConfiguration build(ResourceProvider resourceProvider) {
+            if (this.title == null) {
+                this.title = prepareDefaultTitleConfiguration(resourceProvider);
+            }
+            if (this.optionButton == null) {
+                this.optionButton = prepareDefaultButtonConfiguration(resourceProvider);
+            }
             return new InputQuestionConfiguration(this);
+        }
+
+        @SuppressLint("ResourceType")
+        private OptionButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider) {
+            String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
+            LayerConfiguration normalLayer = new LayerConfiguration.Builder()
+                    .borderColor(normalColor)
+                    .build(resourceProvider);
+
+            String errorColor = resourceProvider.getString(R.color.glia_system_negative_color);
+            LayerConfiguration errorLayer = new LayerConfiguration.Builder()
+                    .borderColor(errorColor)
+                    .build(resourceProvider);
+            return new OptionButtonConfiguration.Builder()
+                    .normalLayer(normalLayer)
+                    .highlightedLayer(errorLayer)
+                    .build(resourceProvider);
+        }
+
+        private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
+            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            return new TextConfiguration.Builder()
+                    .textColor(color)
+                    .bold(true)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
+                    .build(resourceProvider);
         }
     }
 

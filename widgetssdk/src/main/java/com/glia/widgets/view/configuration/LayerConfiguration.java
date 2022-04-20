@@ -50,15 +50,6 @@ public class LayerConfiguration implements Parcelable {
         // Layer corner radius.
         private int cornerRadius;
 
-        @SuppressLint("ResourceType")
-        public Builder(ResourceProvider resourceProvider) {
-            // Default configuration
-            this.backgroundColor = resourceProvider.getString(R.color.glia_base_light_color);
-            this.borderColor = resourceProvider.getString(R.color.glia_stroke_gray);
-            this.borderWidth = resourceProvider.getDimension(R.dimen.glia_survey_default_border_width);
-            this.cornerRadius = resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius);
-        }
-
         public Builder backgroundColor(String backgroundColor) {
             this.backgroundColor = backgroundColor;
             return this;
@@ -76,7 +67,21 @@ public class LayerConfiguration implements Parcelable {
             return this;
         }
 
-        public LayerConfiguration build() {
+        @SuppressLint("ResourceType")
+        public LayerConfiguration build(ResourceProvider resourceProvider) {
+            // Default configuration
+            if (this.backgroundColor == null) {
+                this.backgroundColor = resourceProvider.getString(R.color.glia_base_light_color);
+            }
+            if (this.borderColor == null) {
+                this.borderColor = resourceProvider.getString(R.color.glia_stroke_gray);
+            }
+            if (this.borderWidth == 0) {
+                this.borderWidth = resourceProvider.getDimension(R.dimen.glia_survey_default_border_width);
+            }
+            if (this.cornerRadius == 0) {
+                this.cornerRadius = resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius);
+            }
             return new LayerConfiguration(this);
         }
     }

@@ -67,25 +67,6 @@ public class OptionButtonConfiguration implements Parcelable {
         // Layer style when option is highlighted.
         private LayerConfiguration highlightedLayer;
 
-        public Builder(ResourceProvider resourceProvider) {
-            // Default configuration
-            this.normalText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(resourceProvider.getColorStateList(R.color.glia_base_dark_color))
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-            this.normalLayer = new LayerConfiguration.Builder(resourceProvider).build();
-            this.selectedText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-            this.selectedLayer = new LayerConfiguration.Builder(resourceProvider).build();
-            this.highlightedText = new TextConfiguration.Builder(resourceProvider)
-                    .textColor(resourceProvider.getColorStateList(R.color.glia_base_dark_color))
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build();
-            this.highlightedLayer = new LayerConfiguration.Builder(resourceProvider).build();
-        }
-
         public Builder normalText(TextConfiguration normalText) {
             this.normalText = normalText;
             return this;
@@ -116,8 +97,37 @@ public class OptionButtonConfiguration implements Parcelable {
             return this;
         }
 
-        public OptionButtonConfiguration build() {
+        public OptionButtonConfiguration build(ResourceProvider resourceProvider) {
+            if (this.normalText == null) {
+                this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
+            }
+            if (this.normalLayer == null) {
+                this.normalLayer = prepareDefaultLayerConfiguration(resourceProvider);
+            }
+            if (this.selectedText == null) {
+                this.selectedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_light_color);
+            }
+            if (this.selectedLayer == null) {
+                this.selectedLayer = prepareDefaultLayerConfiguration(resourceProvider);
+            }
+            if (this.highlightedText == null) {
+                this.highlightedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
+            }
+            if (this.highlightedLayer == null) {
+                this.highlightedLayer = prepareDefaultLayerConfiguration(resourceProvider);
+            }
             return new OptionButtonConfiguration(this);
+        }
+
+        private LayerConfiguration prepareDefaultLayerConfiguration(ResourceProvider resourceProvider) {
+            return new LayerConfiguration.Builder().build(resourceProvider);
+        }
+
+        private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider, int textColor) {
+            return new TextConfiguration.Builder()
+                    .textColor(resourceProvider.getColorStateList(textColor))
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
+                    .build(resourceProvider);
         }
     }
 

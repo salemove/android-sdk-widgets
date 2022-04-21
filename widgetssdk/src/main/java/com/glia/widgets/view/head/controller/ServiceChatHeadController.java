@@ -229,7 +229,8 @@ public class ServiceChatHeadController implements ChatHeadContract.Controller {
     }
 
     private boolean isResumedView(View view) {
-        return resumedViewName.equals(view.getClass().getSimpleName());
+        return resumedViewName != null &&
+                resumedViewName.equals(view.getClass().getSimpleName());
     }
 
     private enum State {

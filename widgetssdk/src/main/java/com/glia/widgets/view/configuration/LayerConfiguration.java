@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 
 public class LayerConfiguration implements Parcelable {
@@ -68,7 +69,8 @@ public class LayerConfiguration implements Parcelable {
         }
 
         @SuppressLint("ResourceType")
-        public LayerConfiguration build(ResourceProvider resourceProvider) {
+        public LayerConfiguration build() {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.backgroundColor == null) {
                 this.backgroundColor = resourceProvider.getString(R.color.glia_base_light_color);

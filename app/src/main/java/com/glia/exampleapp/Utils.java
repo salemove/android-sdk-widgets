@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat;
 
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
@@ -120,7 +119,7 @@ class Utils {
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
-                                .build(Dependencies.getResourceProvider())
+                                .build()
                 )
                 .build();
     }
@@ -136,7 +135,7 @@ class Utils {
                                 .textColor(
                                         ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black))
                                 )
-                                .build(Dependencies.getResourceProvider())
+                                .build()
                 )
                 .strokeWidth(1)
                 .strokeColor(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.color_black)))
@@ -161,7 +160,7 @@ class Utils {
                 .textSize(16f)      // in sp
                 .fontFamily(R.font.tangerine)
                 .textColor(ContextCompat.getColorStateList(context, R.color.color_dark_cyan))
-                .build(Dependencies.getResourceProvider());
+                .build();
     }
 
     public static Integer getColorValueFromPrefs(@StringRes int keyValue, SharedPreferences sharedPreferences, Resources resources) {

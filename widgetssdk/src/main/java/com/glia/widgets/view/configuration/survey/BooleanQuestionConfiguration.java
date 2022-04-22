@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
@@ -42,7 +43,8 @@ public class BooleanQuestionConfiguration implements Parcelable {
             return this;
         }
 
-        public BooleanQuestionConfiguration build(ResourceProvider resourceProvider) {
+        public BooleanQuestionConfiguration build() {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
             }
@@ -59,31 +61,31 @@ public class BooleanQuestionConfiguration implements Parcelable {
             TextConfiguration normalText = new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                    .build();
             TextConfiguration selectedText = new TextConfiguration.Builder()
                     .textColor(selectedTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                    .build();
             TextConfiguration highlightedText = new TextConfiguration.Builder()
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                    .build();
 
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
-                    .build(resourceProvider);
+                    .build();
             LayerConfiguration selectedLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
                     .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
-                    .build(resourceProvider);
+                    .build();
             LayerConfiguration highlightedLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
-                    .build(resourceProvider);
+                    .build();
             return new OptionButtonConfiguration.Builder()
                     .normalText(normalText)
                     .normalLayer(normalLayer)
@@ -91,7 +93,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
                     .selectedLayer(selectedLayer)
                     .highlightedText(highlightedText)
                     .highlightedLayer(highlightedLayer)
-                    .build(resourceProvider);
+                    .build();
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
@@ -100,7 +102,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
                     .textColor(normalTextColor)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build(resourceProvider);
+                    .build();
         }
     }
 

@@ -1,11 +1,11 @@
 package com.glia.widgets.view.configuration.survey;
 
-import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
@@ -40,7 +40,8 @@ public class SingleQuestionConfiguration implements Parcelable {
             return this;
         }
 
-        public SingleQuestionConfiguration build(ResourceProvider resourceProvider) {
+        public SingleQuestionConfiguration build() {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
             }
@@ -55,7 +56,7 @@ public class SingleQuestionConfiguration implements Parcelable {
             return new TextConfiguration.Builder()
                     .textColor(optionTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                    .build();
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
@@ -64,7 +65,7 @@ public class SingleQuestionConfiguration implements Parcelable {
                     .textColor(titleColor)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                    .build();
         }
     }
 

@@ -1,11 +1,11 @@
 package com.glia.widgets.view.configuration.survey;
 
-import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
@@ -90,40 +90,6 @@ public class SurveyStyle implements Parcelable {
         // "Input" question view style.
         private InputQuestionConfiguration inputQuestion;
 
-        @SuppressLint("ResourceType")
-        public Builder(ResourceProvider resourceProvider) {
-            // Default survey background
-            this.layerConfiguration = new LayerConfiguration.Builder()
-                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
-                    .build(resourceProvider);
-
-            // Default survey title configuration
-            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
-            this.title = new TextConfiguration.Builder()
-                    .textColor(color)
-                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
-                    .build(resourceProvider);
-
-            // Default buttons configuration
-            ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
-            TextConfiguration textConfiguration =
-                    new TextConfiguration.Builder().textColor(buttonTexColor).build(resourceProvider);
-            this.submitButton = new ButtonConfiguration.Builder()
-                    .backgroundColor(resourceProvider.getColorStateList(R.color.glia_brand_primary_color))
-                    .textConfiguration(textConfiguration)
-                    .build();
-            this.cancelButton = new ButtonConfiguration.Builder()
-                    .backgroundColor(resourceProvider.getColorStateList(R.color.glia_system_negative_color))
-                    .textConfiguration(textConfiguration)
-                    .build();
-
-            // Default questions configuration
-            this.booleanQuestion = new BooleanQuestionConfiguration.Builder().build(resourceProvider);
-            this.inputQuestion = new InputQuestionConfiguration.Builder().build(resourceProvider);
-            this.scaleQuestion = new ScaleQuestionConfiguration.Builder().build(resourceProvider);
-            this.singleQuestion = new SingleQuestionConfiguration.Builder().build(resourceProvider);
-        }
-
         public Builder layer(LayerConfiguration layerConfiguration) {
             this.layerConfiguration = layerConfiguration;
             return this;
@@ -165,7 +131,61 @@ public class SurveyStyle implements Parcelable {
         }
 
         public SurveyStyle build() {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
+
+            if (this.layerConfiguration == null) {
+                this.layerConfiguration = prepareDefaultBackgroundConfiguration(resourceProvider);
+            }
+            if (this.title == null) {
+                this.title = prepareDefaultTitleConfiguration(resourceProvider);
+            }
+            // Default buttons configuration
+            if (this.submitButton == null) {
+                this.submitButton = prepareDefaultButtonConfiguration(resourceProvider, R.color.glia_brand_primary_color);
+            }
+            if (this.cancelButton == null) {
+                this.cancelButton = prepareDefaultButtonConfiguration(resourceProvider, R.color.glia_system_negative_color);
+            }
+            // Default questions configuration
+            if (this.booleanQuestion == null) {
+                this.booleanQuestion = new BooleanQuestionConfiguration.Builder().build();
+            }
+            if (this.inputQuestion == null) {
+                this.inputQuestion = new InputQuestionConfiguration.Builder().build();
+            }
+            if (this.scaleQuestion == null) {
+                this.scaleQuestion = new ScaleQuestionConfiguration.Builder().build();
+            }
+            if (this.singleQuestion == null) {
+                this.singleQuestion = new SingleQuestionConfiguration.Builder().build();
+            }
+
             return new SurveyStyle(this);
+        }
+
+        private ButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider,
+                                                                      int backgroundColorId) {
+            ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
+            TextConfiguration textConfiguration =
+                    new TextConfiguration.Builder().textColor(buttonTexColor).build();
+            return new ButtonConfiguration.Builder()
+                    .backgroundColor(resourceProvider.getColorStateList(backgroundColorId))
+                    .textConfiguration(textConfiguration)
+                    .build();
+        }
+
+        private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
+            ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            return new TextConfiguration.Builder()
+                    .textColor(color)
+                    .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_title_text_size))
+                    .build();
+        }
+
+        private LayerConfiguration prepareDefaultBackgroundConfiguration(ResourceProvider resourceProvider) {
+            return new LayerConfiguration.Builder()
+                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
+                    .build();
         }
     }
 

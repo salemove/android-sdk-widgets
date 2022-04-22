@@ -552,7 +552,7 @@ public class UiTheme implements Parcelable {
 
         public UiThemeBuilder() {
             // Default values
-            this.surveyStyle = new SurveyStyle.Builder(Dependencies.getResourceProvider()).build();
+            this.surveyStyle = new SurveyStyle.Builder().build();
         }
 
         public void setAppBarTitle(String appBarTitle) {

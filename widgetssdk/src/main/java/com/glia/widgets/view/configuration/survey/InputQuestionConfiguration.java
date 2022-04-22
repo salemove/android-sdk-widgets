@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
@@ -42,7 +43,8 @@ public class InputQuestionConfiguration implements Parcelable {
             return this;
         }
 
-        public InputQuestionConfiguration build(ResourceProvider resourceProvider) {
+        public InputQuestionConfiguration build() {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
             }
@@ -57,16 +59,16 @@ public class InputQuestionConfiguration implements Parcelable {
             String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
                     .borderColor(normalColor)
-                    .build(resourceProvider);
+                    .build();
 
             String errorColor = resourceProvider.getString(R.color.glia_system_negative_color);
             LayerConfiguration errorLayer = new LayerConfiguration.Builder()
                     .borderColor(errorColor)
-                    .build(resourceProvider);
+                    .build();
             return new OptionButtonConfiguration.Builder()
                     .normalLayer(normalLayer)
                     .highlightedLayer(errorLayer)
-                    .build(resourceProvider);
+                    .build();
         }
 
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
@@ -75,7 +77,7 @@ public class InputQuestionConfiguration implements Parcelable {
                     .textColor(color)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))
-                    .build(resourceProvider);
+                    .build();
         }
     }
 

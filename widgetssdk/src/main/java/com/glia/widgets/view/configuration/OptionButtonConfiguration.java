@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 
 public class OptionButtonConfiguration implements Parcelable {
@@ -97,37 +98,38 @@ public class OptionButtonConfiguration implements Parcelable {
             return this;
         }
 
-        public OptionButtonConfiguration build(ResourceProvider resourceProvider) {
+        public OptionButtonConfiguration build() {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.normalText == null) {
                 this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
             }
             if (this.normalLayer == null) {
-                this.normalLayer = prepareDefaultLayerConfiguration(resourceProvider);
+                this.normalLayer = prepareDefaultLayerConfiguration();
             }
             if (this.selectedText == null) {
                 this.selectedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_light_color);
             }
             if (this.selectedLayer == null) {
-                this.selectedLayer = prepareDefaultLayerConfiguration(resourceProvider);
+                this.selectedLayer = prepareDefaultLayerConfiguration();
             }
             if (this.highlightedText == null) {
                 this.highlightedText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
             }
             if (this.highlightedLayer == null) {
-                this.highlightedLayer = prepareDefaultLayerConfiguration(resourceProvider);
+                this.highlightedLayer = prepareDefaultLayerConfiguration();
             }
             return new OptionButtonConfiguration(this);
         }
 
-        private LayerConfiguration prepareDefaultLayerConfiguration(ResourceProvider resourceProvider) {
-            return new LayerConfiguration.Builder().build(resourceProvider);
+        private LayerConfiguration prepareDefaultLayerConfiguration() {
+            return new LayerConfiguration.Builder().build();
         }
 
         private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider, int textColor) {
             return new TextConfiguration.Builder()
                     .textColor(resourceProvider.getColorStateList(textColor))
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
-                    .build(resourceProvider);
+                    .build();
         }
     }
 

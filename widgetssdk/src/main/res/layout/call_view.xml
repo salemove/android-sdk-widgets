@@ -38,19 +38,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/glia_large" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/visitor_video_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/glia_large"
-        android:contentDescription="@string/glia_call_visitor_video_content_description"
-        android:visibility="gone"
-        app:cardCornerRadius="@dimen/glia_medium"
-        app:layout_constraintBottom_toTopOf="@id/operator_video_container"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toEndOf="@id/operator_data_barrier"
-        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
-
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/operator_data_barrier"
         android:layout_width="wrap_content"
@@ -157,11 +144,13 @@
 
     <FrameLayout
         android:id="@+id/operator_video_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="@dimen/glia_call_video_height"
         android:contentDescription="@string/glia_call_operator_video_content_description"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/call_timer_view" />
 
     <TextView
@@ -176,6 +165,16 @@
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         tools:text="@string/glia_call_continue_browsing" />
+
+    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoCoordinatorLayout
+        android:id="@+id/floating_visitor_video"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/glia_call_visitor_video_content_description"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
 
     <View
         android:id="@+id/buttons_layout_bg"

@@ -134,20 +134,6 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/visitor_video_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/glia_large_x_large"
-        android:layout_marginEnd="@dimen/glia_large_x_large"
-        android:contentDescription="@string/glia_call_visitor_video_content_description"
-        android:visibility="gone"
-        app:cardCornerRadius="@dimen/glia_medium"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintHeight_percent="0.45"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.15" />
-
     <com.glia.widgets.view.header.AppBarView
         android:id="@+id/top_app_bar"
         android:layout_width="0dp"
@@ -181,6 +167,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/buttons_top_space" />
+
+    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoCoordinatorLayout
+        android:id="@+id/floating_visitor_video"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/glia_call_visitor_video_content_description"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Space
         android:id="@+id/buttons_top_space"

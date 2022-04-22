@@ -194,7 +194,7 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     @SuppressLint("ClickableViewAccessibility")
     private void setupViewActions() {
         chatHeadView.setOnTouchListener(
-                new ViewHelpers.ChatHeadOnTouchListener(
+                new ViewHelpers.OnTouchListener(
                         this::getChatHeadViewPosition,
                         this::onChatHeadDragged,
                         this::onChatHeadClicked

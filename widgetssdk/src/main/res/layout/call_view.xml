@@ -166,7 +166,7 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         tools:text="@string/glia_call_continue_browsing" />
 
-    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoCoordinatorLayout
+    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoConstraintLayout
         android:id="@+id/floating_visitor_video"
         android:layout_width="0dp"
         android:layout_height="0dp"

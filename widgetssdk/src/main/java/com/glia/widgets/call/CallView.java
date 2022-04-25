@@ -50,7 +50,7 @@ import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.header.AppBarView;
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoCoordinatorLayout;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoConstraintLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import com.google.android.material.transition.MaterialFade;
@@ -89,7 +89,7 @@ public class CallView extends ConstraintLayout {
     private TextView minimizeButtonLabel;
     private View buttonsLayoutBackground;
     private View buttonsLayout;
-    private FloatingVisitorVideoCoordinatorLayout floatingVisitorVideoCoordinatorLayout;
+    private FloatingVisitorVideoConstraintLayout floatingVisitorVideoConstraintLayout;
     private FloatingActionButton chatButton;
     private FloatingActionButton videoButton;
     private FloatingActionButton muteButton;
@@ -209,7 +209,7 @@ public class CallView extends ConstraintLayout {
 
     public void onDestroy(boolean isFinishing) {
         releaseOperatorVideoStream();
-        floatingVisitorVideoCoordinatorLayout.onDestroy();
+        floatingVisitorVideoConstraintLayout.onDestroy();
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
@@ -222,7 +222,7 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onResume() {
-        floatingVisitorVideoCoordinatorLayout.onResume();
+        floatingVisitorVideoConstraintLayout.onResume();
         if (callController != null) {
             callController.onResume();
             if (operatorVideoView != null) {
@@ -242,7 +242,7 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onPause() {
-        floatingVisitorVideoCoordinatorLayout.onPause();
+        floatingVisitorVideoConstraintLayout.onPause();
         if (operatorVideoView != null) {
             operatorVideoView.pauseRendering();
         }
@@ -741,8 +741,7 @@ public class CallView extends ConstraintLayout {
         buttonsLayout = findViewById(R.id.buttons_layout);
         onHoldTextView = findViewById(R.id.on_hold_text);
 
-        floatingVisitorVideoCoordinatorLayout = findViewById(R.id.floating_visitor_video);
-        floatingVisitorVideoCoordinatorLayout.setActivity(Utils.getActivity(getContext()));
+        floatingVisitorVideoConstraintLayout = findViewById(R.id.floating_visitor_video);
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -785,7 +784,7 @@ public class CallView extends ConstraintLayout {
         setVisibility(INVISIBLE);
         Activity activity = Utils.getActivity(this.getContext());
         hideOperatorVideo();
-        floatingVisitorVideoCoordinatorLayout.hide();
+        floatingVisitorVideoConstraintLayout.hide();
         if (defaultStatusbarColor != null && activity != null) {
             activity.getWindow().setStatusBarColor(defaultStatusbarColor);
             defaultStatusbarColor = null;

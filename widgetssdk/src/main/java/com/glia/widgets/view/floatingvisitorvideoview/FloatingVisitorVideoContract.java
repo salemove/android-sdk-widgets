@@ -16,8 +16,6 @@ public interface FloatingVisitorVideoContract {
     }
 
     interface View extends BaseView<Controller> {
-        void setActivity(Activity activity);
-
         void show(VisitorMediaState state);
 
         void hide();

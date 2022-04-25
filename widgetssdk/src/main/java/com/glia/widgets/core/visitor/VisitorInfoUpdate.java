@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.Map;
+
 public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
 
     public String name;
@@ -80,6 +82,9 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
     public LinkedTreeMap<String, String> getCustomAttributes() {
         return customAttributes;
     }
+
+    @Override
+    public Map<String, String> getCustomAttributesMap() { return customAttributes; }
 
     @Override
     public String getExternalId() {

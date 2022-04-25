@@ -3,6 +3,8 @@ package com.glia.widgets.core.visitor;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.Map;
+
 public class GliaVisitorInfo implements VisitorInfo {
     public String name;
     public String email;
@@ -50,6 +52,11 @@ public class GliaVisitorInfo implements VisitorInfo {
 
     @Override
     public LinkedTreeMap<String, String> getCustomAttributes() {
+        return customAttributes;
+    }
+
+    @Override
+    public Map<String, String> getCustomAttributesMap() {
         return customAttributes;
     }
 

@@ -7,22 +7,28 @@ import com.glia.androidsdk.comms.VisitorMediaState;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.reactivex.Completable;
+import io.reactivex.Single;
+
 public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
     private final Set<VisitorMediaUpdatesListener> visitorMediaUpdatesListeners = new HashSet<>();
 
     private VisitorMediaState currentMediaState = null;
+    private Media.Status savedVideoStatus = null;
+    private Media.Status savedAudioStatus = null;
     private boolean isOnHold = false;
 
     @Override
     public void onNewVisitorMediaState(VisitorMediaState state) {
-        updateVisitorMediaState(state);
+        notifyVisitorMediaStateChanged(state);
         setAudioOnHoldListener();
         setVideoOnHoldListener();
     }
 
     @Override
-    public void onHoldChanged(boolean newOnHold) {
-        notifyOnHoldStateChange(newOnHold);
+    public void onHoldChanged(boolean isOnHold) {
+        notifyOnHoldStateChange(isOnHold);
+        visitorMediaStatusOnHold(isOnHold);
     }
 
     public void onEngagementStarted(Engagement engagement) {
@@ -37,7 +43,7 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
 
     public void addVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {
         visitorMediaUpdatesListeners.add(listener);
-        updateVisitorMediaState(currentMediaState);
+        notifyVisitorMediaStateChanged(currentMediaState);
         notifyOnHoldStateChange(isOnHold);
     }
 
@@ -45,7 +51,67 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
         visitorMediaUpdatesListeners.remove(listener);
     }
 
-    private void updateVisitorMediaState(VisitorMediaState state) {
+    public Completable muteVisitorAudio() {
+        currentMediaState.getAudio().mute();
+        notifyVisitorMediaStateChanged(currentMediaState);
+        return Completable.complete();
+    }
+
+    public Completable unmuteVisitorAudio() {
+        currentMediaState.getAudio().unmute();
+        notifyVisitorMediaStateChanged(currentMediaState);
+        return Completable.complete();
+    }
+
+    public Completable resumeVisitorVideo() {
+        currentMediaState.getVideo().resume();
+        notifyVisitorMediaStateChanged(currentMediaState);
+        return Completable.complete();
+    }
+
+    public Completable pauseVisitorVideo() {
+        currentMediaState.getVideo().pause();
+        notifyVisitorMediaStateChanged(currentMediaState);
+        return Completable.complete();
+    }
+
+    public Single<Media.Status> getVisitorAudioStatus() {
+        return Single.just(currentMediaState.getAudio().getStatus());
+    }
+
+    public Single<Media.Status> getVisitorVideoStatus() {
+        return Single.just(currentMediaState.getVideo().getStatus());
+    }
+
+    public Single<Boolean> hasVisitorVideoMedia() {
+        return Single.just(currentMediaState != null && currentMediaState.getVideo() != null);
+    }
+
+    public Single<Boolean> hasVisitorAudioMedia() {
+        return Single.just(currentMediaState != null && currentMediaState.getAudio() != null);
+    }
+
+    private void setVideoOnHoldListener() {
+        if (hasVisitorVideoMedia().blockingGet()) {
+            currentMediaState.getVideo().setOnHoldHandler(this::onHoldChanged);
+        }
+    }
+
+    private void setAudioOnHoldListener() {
+        if (hasVisitorAudioMedia().blockingGet()) {
+            currentMediaState.getAudio().setOnHoldHandler(this::onHoldChanged);
+        }
+    }
+
+    private void visitorMediaStatusOnHold(boolean isOnHold) {
+        if (isOnHold) {
+            saveVisitorMediaStatus();
+        } else {
+            restoreVisitorMediaStatus();
+        }
+    }
+
+    private void notifyVisitorMediaStateChanged(VisitorMediaState state) {
         currentMediaState = state;
         visitorMediaUpdatesListeners.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
     }
@@ -55,23 +121,55 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
         visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
     }
 
-    private boolean hasVisitorVideoMedia() {
-        return currentMediaState != null && currentMediaState.getVideo() != null;
-    }
-
-    private boolean hasVisitorAudioMedia() {
-        return currentMediaState != null && currentMediaState.getAudio() != null;
-    }
-
-    private void setVideoOnHoldListener() {
-        if (hasVisitorVideoMedia()) {
-            currentMediaState.getVideo().setOnHoldHandler(this::onHoldChanged);
+    private void saveVisitorMediaStatus() {
+        if (currentMediaState.getVideo() != null) {
+            saveVisitorVideoStatus();
+            pauseVisitorVideo();
+        }
+        if (currentMediaState.getAudio() != null) {
+            saveVisitorAudioStatus();
+            muteVisitorAudio();
         }
     }
 
-    private void setAudioOnHoldListener() {
-        if (hasVisitorAudioMedia()) {
-            currentMediaState.getAudio().setOnHoldHandler(this::onHoldChanged);
+    private void restoreVisitorMediaStatus() {
+        restoreVisitorVideoStatus();
+        restoreVisitorAudioStatus();
+    }
+
+    private void saveVisitorVideoStatus() {
+        savedVideoStatus = currentMediaState.getVideo().getStatus();
+    }
+
+    private void restoreVisitorVideoStatus() {
+        if (savedVideoStatus != null) {
+            if (currentMediaState.getVideo() != null) {
+                if (savedVideoStatus.equals(Media.Status.PAUSED)) {
+                    currentMediaState.getVideo().pause();
+                    notifyVisitorMediaStateChanged(currentMediaState);
+                } else if (savedVideoStatus.equals(Media.Status.PLAYING)) {
+                    currentMediaState.getVideo().resume();
+                    notifyVisitorMediaStateChanged(currentMediaState);
+                }
+            }
+            savedVideoStatus = null;
+        }
+    }
+
+    private void saveVisitorAudioStatus() {
+        savedAudioStatus = currentMediaState.getAudio().getStatus();
+    }
+
+    private void restoreVisitorAudioStatus() {
+        if (savedAudioStatus != null) {
+            if (currentMediaState.getAudio() != null) {
+                if (savedAudioStatus.equals(Media.Status.PAUSED)) {
+                    muteVisitorAudio();
+                } else if (savedAudioStatus.equals(Media.Status.PLAYING)) {
+                    unmuteVisitorAudio();
+                }
+            }
+            savedAudioStatus = null;
         }
     }
 }

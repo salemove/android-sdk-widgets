@@ -15,6 +15,7 @@ import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
+import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class Dependencies {
@@ -38,7 +39,8 @@ public class Dependencies {
                 new PermissionDialogManager(application),
                 notificationManager,
                 sdkConfigurationManager,
-                new ChatHeadManager(application)
+                new ChatHeadManager(application),
+                new GliaWidgetsSchedulers()
         );
 
         controllerFactory = new ControllerFactory(

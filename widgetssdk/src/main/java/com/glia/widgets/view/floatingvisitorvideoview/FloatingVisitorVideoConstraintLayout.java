@@ -1,40 +1,35 @@
 package com.glia.widgets.view.floatingvisitorvideoview;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.util.Pair;
 
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.ViewHelpers;
 
-public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implements FloatingVisitorVideoContract.View {
+public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout implements FloatingVisitorVideoContract.View {
     private FloatingVisitorVideoContract.Controller controller;
     private FloatingVisitorVideoView floatingVisitorVideoContainer;
-    private Activity activity;
 
-    public FloatingVisitorVideoCoordinatorLayout(@NonNull Context context) {
+    public FloatingVisitorVideoConstraintLayout(@NonNull Context context) {
         this(context, null);
     }
 
-    public FloatingVisitorVideoCoordinatorLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public FloatingVisitorVideoConstraintLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FloatingVisitorVideoCoordinatorLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public FloatingVisitorVideoCoordinatorLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+    public FloatingVisitorVideoConstraintLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         init();
     }
 
@@ -44,16 +39,11 @@ public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implement
     }
 
     @Override
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    @Override
     public void show(VisitorMediaState state) {
         post(() -> {
             if (!floatingVisitorVideoContainer.hasVideo()) {
                 floatingVisitorVideoContainer.showVisitorVideo(
-                        state.getVideo().createVideoView(activity)
+                        state.getVideo().createVideoView(Utils.getActivity(getContext()))
                 );
             }
             setVisibility(VISIBLE);
@@ -88,12 +78,12 @@ public class FloatingVisitorVideoCoordinatorLayout extends FrameLayout implement
 
     @Override
     public void showOnHold() {
-        // TODO- will be implemented in next task
+        post(() -> floatingVisitorVideoContainer.showOnHold());
     }
 
     @Override
     public void hideOnHold() {
-        // TODO- will be implemented in next task
+        post(() -> floatingVisitorVideoContainer.hideOnHold());
     }
 
     private void init() {

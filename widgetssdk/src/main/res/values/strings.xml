@@ -118,6 +118,7 @@
     <string name="glia_call_continue_browsing">You can continue browsing and we will connect you automatically.</string>
     <string name="glia_call_on_hold">On Hold</string>
     <string name="glia_call_continue_browsing_on_hold">You can continue browsing while you are on hold</string>
+    <string name="glia_call_visitor_video_on_hold_text">You</string>
 
     <plurals name="glia_call_chat_content_description">
         <item quantity="one">@string/glia_call_chat_one_content_description</item>

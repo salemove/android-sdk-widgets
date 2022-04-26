@@ -38,9 +38,9 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
     }
 
     public void addVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {
-        listener.onNewVisitorMediaState(currentMediaState);
-        listener.onHoldChanged(isOnHold);
         visitorMediaUpdatesListeners.add(listener);
+        updateVisitorMediaState(currentMediaState);
+        updateOnHoldState(isOnHold);
     }
 
     public void removeVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {

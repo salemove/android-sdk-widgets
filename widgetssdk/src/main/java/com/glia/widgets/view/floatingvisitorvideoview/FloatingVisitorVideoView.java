@@ -3,18 +3,18 @@ package com.glia.widgets.view.floatingvisitorvideoview;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.R;
+import com.google.android.material.card.MaterialCardView;
 
-public class FloatingVisitorVideoView extends ConstraintLayout {
+public class FloatingVisitorVideoView extends MaterialCardView {
     private VideoView videoView;
-    private FrameLayout videoContainer;
+    private TextView onHoldOverlay;
 
     public FloatingVisitorVideoView(@NonNull Context context) {
         this(context, null);
@@ -25,11 +25,7 @@ public class FloatingVisitorVideoView extends ConstraintLayout {
     }
 
     public FloatingVisitorVideoView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public FloatingVisitorVideoView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         init();
     }
 
@@ -48,19 +44,31 @@ public class FloatingVisitorVideoView extends ConstraintLayout {
     public void showVisitorVideo(VideoView newVideoView) {
         videoView = newVideoView;
         videoView.setZOrderMediaOverlay(true);
-        videoContainer.addView(videoView);
-        videoContainer.invalidate();
+        addView(videoView, 0);
     }
 
     public void hideVisitorVideo() {
+        removeView(videoView);
         releaseVideoStream();
-        videoContainer.removeAllViews();
-        videoContainer.invalidate();
+    }
+
+    public void showOnHold() {
+        pauseVideoStream();
+        onHoldOverlay.setVisibility(VISIBLE);
+    }
+
+    public void hideOnHold() {
+        resumeVideoStream();
+        onHoldOverlay.setVisibility(GONE);
+    }
+
+    public boolean hasVideo() {
+        return videoView != null;
     }
 
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_floating_view, this);
-        videoContainer = findViewById(R.id.visitor_video_container);
+        onHoldOverlay = findViewById(R.id.on_hold_textview);
     }
 
     private void releaseVideoStream() {
@@ -80,9 +88,5 @@ public class FloatingVisitorVideoView extends ConstraintLayout {
         if (videoView != null) {
             videoView.resumeRendering();
         }
-    }
-
-    public boolean hasVideo() {
-        return videoView != null;
     }
 }

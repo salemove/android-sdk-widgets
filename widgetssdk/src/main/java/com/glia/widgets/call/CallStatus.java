@@ -15,13 +15,13 @@ public interface CallStatus {
     String getOperatorProfileImageUrl();
 
     /**
-     * In case of {@link OngoingNoOperator} the time displays the time it takes to upgrade to
-     * {@link StartedVideoCall} or {@link StartedAudioCall}.
-     * In case of {@link StartedVideoCall} or {@link StartedAudioCall} the time is the ongoing
+     * In case of {@link EngagementOngoingOperatorIsConnecting} the time displays the time it takes to upgrade to
+     * {@link EngagementOngoingVideoCallStarted} or {@link EngagementOngoingAudioCallStarted}.
+     * In case of {@link EngagementOngoingVideoCallStarted} or {@link EngagementOngoingAudioCallStarted} the time is the ongoing
      * call duration
      *
-     * @return A string value of the time. Either 0,1,2,3 in case of {@link OngoingNoOperator}
-     * or MM:ss in case of {@link StartedAudioCall} or {@link StartedVideoCall}
+     * @return A string value of the time. Either 0,1,2,3 in case of {@link EngagementOngoingOperatorIsConnecting}
+     * or MM:ss in case of {@link EngagementOngoingAudioCallStarted} or {@link EngagementOngoingVideoCallStarted}
      */
     String getTime();
 
@@ -31,10 +31,10 @@ public interface CallStatus {
 
     void setVisitorMediaState(VisitorMediaState visitorMediaState);
 
-    class NotOngoing implements CallStatus {
+    class EngagementNotOngoing implements CallStatus {
         private VisitorMediaState visitorMediaState;
 
-        public NotOngoing(VisitorMediaState visitorMediaState) {
+        public EngagementNotOngoing(VisitorMediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 
@@ -77,7 +77,7 @@ public interface CallStatus {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            NotOngoing that = (NotOngoing) o;
+            EngagementNotOngoing that = (EngagementNotOngoing) o;
             return Objects.equals(visitorMediaState, that.visitorMediaState);
         }
 
@@ -88,22 +88,22 @@ public interface CallStatus {
 
         @Override
         public String toString() {
-            return "NotOngoing{" +
+            return "EngagementNotOngoing{" +
                     "visitorMediaState=" + visitorMediaState +
                     '}';
         }
     }
 
-    class OngoingNoOperator implements CallStatus {
+    class EngagementOngoingOperatorIsConnecting implements CallStatus {
         private final String operatorName;
         private final String time;
         private final String operatorProfileImgUrl;
         private VisitorMediaState visitorMediaState;
 
-        public OngoingNoOperator(String operatorName,
-                                 String time,
-                                 String operatorProfileImgUrl,
-                                 VisitorMediaState visitorMediaState
+        public EngagementOngoingOperatorIsConnecting(String operatorName,
+                                                     String time,
+                                                     String operatorProfileImgUrl,
+                                                     VisitorMediaState visitorMediaState
         ) {
             this.operatorName = operatorName;
             this.time = time;
@@ -138,7 +138,7 @@ public interface CallStatus {
 
         @Override
         public VisitorMediaState getVisitorMediaState() {
-            return null;
+            return visitorMediaState;
         }
 
         @Override
@@ -150,7 +150,7 @@ public interface CallStatus {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            OngoingNoOperator that = (OngoingNoOperator) o;
+            EngagementOngoingOperatorIsConnecting that = (EngagementOngoingOperatorIsConnecting) o;
             return Objects.equals(operatorName, that.operatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
@@ -164,7 +164,7 @@ public interface CallStatus {
 
         @Override
         public String toString() {
-            return "OngoingNoOperator{" +
+            return "EngagementOngoingOperatorIsConnecting{" +
                     "operatorName='" + operatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
@@ -173,14 +173,14 @@ public interface CallStatus {
         }
     }
 
-    class StartedAudioCall implements CallStatus {
+    class EngagementOngoingAudioCallStarted implements CallStatus {
         private final String operatorName;
         private final String time;
         private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
         private VisitorMediaState visitorMediaState;
 
-        public StartedAudioCall(
+        public EngagementOngoingAudioCallStarted(
                 String operatorName,
                 String time,
                 String operatorProfileImgUrl,
@@ -233,7 +233,7 @@ public interface CallStatus {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            StartedAudioCall that = (StartedAudioCall) o;
+            EngagementOngoingAudioCallStarted that = (EngagementOngoingAudioCallStarted) o;
             return Objects.equals(operatorName, that.operatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
@@ -248,7 +248,7 @@ public interface CallStatus {
 
         @Override
         public String toString() {
-            return "StartedAudioCall{" +
+            return "EngagementOngoingAudioCallStarted{" +
                     "operatorName='" + operatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
@@ -258,14 +258,14 @@ public interface CallStatus {
         }
     }
 
-    class StartedVideoCall implements CallStatus {
+    class EngagementOngoingVideoCallStarted implements CallStatus {
         private final String operatorName;
         private final String time;
         private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
         private VisitorMediaState visitorMediaState;
 
-        public StartedVideoCall(
+        public EngagementOngoingVideoCallStarted(
                 String operatorName,
                 String time,
                 String operatorProfileImgUrl,
@@ -318,7 +318,7 @@ public interface CallStatus {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            StartedVideoCall that = (StartedVideoCall) o;
+            EngagementOngoingVideoCallStarted that = (EngagementOngoingVideoCallStarted) o;
             return Objects.equals(operatorName, that.operatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
@@ -333,11 +333,81 @@ public interface CallStatus {
 
         @Override
         public String toString() {
-            return "StartedVideoCall{" +
+            return "EngagementOngoingVideoCallStarted{" +
                     "operatorName='" + operatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                     ", operatorMediaState=" + operatorMediaState +
+                    ", visitorMediaState=" + visitorMediaState +
+                    '}';
+        }
+    }
+
+    class EngagementOngoingTransferring implements CallStatus {
+        private final String time;
+        private VisitorMediaState visitorMediaState;
+
+        public EngagementOngoingTransferring(
+                String time,
+                VisitorMediaState visitorMediaState
+        ) {
+            setVisitorMediaState(visitorMediaState);
+            this.time = time;
+        }
+
+        @Override
+        public String getOperatorName() {
+            return null;
+        }
+
+        @Override
+        public String getFormattedOperatorName() {
+            return null;
+        }
+
+        @Override
+        public String getOperatorProfileImageUrl() {
+            return null;
+        }
+
+        @Override
+        public String getTime() {
+            return time;
+        }
+
+        @Override
+        public OperatorMediaState getOperatorMediaState() {
+            return null;
+        }
+
+        @Override
+        public VisitorMediaState getVisitorMediaState() {
+            return visitorMediaState;
+        }
+
+        @Override
+        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+            this.visitorMediaState = visitorMediaState;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            EngagementOngoingTransferring that = (EngagementOngoingTransferring) o;
+            return Objects.equals(time, that.time) &&
+                    Objects.equals(visitorMediaState, that.visitorMediaState);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(time, visitorMediaState);
+        }
+
+        @Override
+        public String toString() {
+            return "EngagementOngoingTransferring{" +
+                    ", time='" + time + '\'' +
                     ", visitorMediaState=" + visitorMediaState +
                     '}';
         }

@@ -31,6 +31,7 @@
     <string name="glia_chat_operator_file_content_description">Operator\'s attached file %1$s, size %2$s</string>
     <string name="glia_chat_attachment_item_content_description">Attachment %1$s, size %2$s. %3$s</string>
     <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
+    <string name="glia_chat_visitor_status_transferring">Transferring</string>
 
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>

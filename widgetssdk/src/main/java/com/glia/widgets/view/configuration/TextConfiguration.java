@@ -150,6 +150,9 @@ public class TextConfiguration implements Parcelable {
             if (this.textSize == 0) {
                 this.textSize = resourceProvider.getDimension(R.dimen.glia_survey_default_text_size);
             }
+            if (this.textColor == null) {
+                this.textColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
+            }
             if (this.bold == null) {
                 this.bold = false;
             }

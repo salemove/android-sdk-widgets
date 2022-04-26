@@ -6,6 +6,10 @@ import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
+import com.glia.widgets.R;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.ResourceProvider;
+
 public class ButtonConfiguration implements Parcelable {
     private final ColorStateList backgroundColor;
     private final ColorStateList strokeColor;
@@ -118,6 +122,12 @@ public class ButtonConfiguration implements Parcelable {
         }
 
         public ButtonConfiguration build() {
+            if (textConfiguration == null) {
+                ResourceProvider resourceProvider = Dependencies.getResourceProvider();
+                textConfiguration = new TextConfiguration.Builder()
+                        .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
+                        .build();
+            }
             return new ButtonConfiguration(this);
         }
     }

@@ -123,7 +123,7 @@ public class DialogController {
 
     public void showEngagementEndedDialog() {
         if (isNoDialogShown()) {
-            Logger.d(TAG, "Show Engagement Ended Dialog");
+            Logger.d(TAG, "Show Engagement EngagementEndedEvent Dialog");
             emitDialogState(new DialogsState.EngagementEndedDialog());
         }
     }

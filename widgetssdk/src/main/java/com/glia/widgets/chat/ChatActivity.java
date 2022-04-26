@@ -22,11 +22,14 @@ public class ChatActivity extends AppCompatActivity {
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
     };
+
+    // TODO deprecate UiTheme pass GliaSdkConfiguration instead (remove global sdk configuration holder in ChatActivity)
     private ChatView.OnNavigateToCallListener onNavigateToCallListener =
             (UiTheme theme, String mediaType) -> {
-                navigateToCall(theme, mediaType);
+                navigateToCall(mediaType);
                 chatView.navigateToCallSuccess();
             };
+    // TODO deprecate UiTheme pass GliaSdkConfiguration instead (remove global sdk configuration holder in ChatActivity)
     private ChatView.OnNavigateToSurveyListener onNavigateToSurveyListener =
             (UiTheme theme, Survey survey) -> {
                 navigateToSurvey(theme, survey);
@@ -113,15 +116,15 @@ public class ChatActivity extends AppCompatActivity {
                 .build();
     }
 
-    private void navigateToCall(UiTheme theme, String mediaType) {
-        Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
-        newIntent.putExtra(GliaWidgets.UI_THEME, theme);
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
-        newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
-        startActivity(newIntent);
+    private void navigateToCall(String mediaType) {
+        startActivity(
+                CallActivity.getIntent(
+                        getApplicationContext(),
+                        configuration,
+                        mediaType,
+                        true
+                )
+        );
     }
 
     private void navigateToSurvey(UiTheme theme, Survey survey) {

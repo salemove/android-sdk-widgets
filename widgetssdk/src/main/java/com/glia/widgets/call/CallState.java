@@ -18,7 +18,6 @@ class CallState {
     public final boolean landscapeLayoutControlsVisible;
     public final boolean isMuted;
     public final boolean hasVideo;
-    public final String queueTicketId;
     public final String companyName;
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
@@ -35,7 +34,6 @@ class CallState {
                 ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
                 ", isMuted=" + isMuted +
                 ", hasVideo=" + hasVideo +
-                ", queueTicketId: " + queueTicketId +
                 ", companyName: " + companyName +
                 ", requestedMediaType: " + requestedMediaType +
                 ", isSpeakerOn: " + isSpeakerOn +
@@ -55,7 +53,6 @@ class CallState {
                 isMuted == callState.isMuted &&
                 hasVideo == callState.hasVideo &&
                 Objects.equals(callStatus, callState.callStatus) &&
-                Objects.equals(queueTicketId, callState.queueTicketId) &&
                 Objects.equals(companyName, callState.companyName) &&
                 Objects.equals(requestedMediaType, callState.requestedMediaType) &&
                 isSpeakerOn == callState.isSpeakerOn &&
@@ -65,45 +62,40 @@ class CallState {
     @Override
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
-                callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo, queueTicketId,
+                callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
                 companyName, requestedMediaType, isSpeakerOn, isOnHold);
     }
 
     public boolean showOperatorStatusView() {
-        return isCallNotOngoing() || isCallOngoingAndOperatorIsConnecting() || isAudioCall() || isOnHold;
+        return isCallNotOngoing() || isCallOngoingAndOperatorIsConnecting() || isAudioCall() || showOnHold() || isTransferring();
     }
 
     public boolean isMediaEngagementStarted() {
-        return isCallOngoingAndOperatorIsConnecting() || isCallOngoingAndOperatorConnected();
+        return isCallOngoingAndOperatorIsConnecting() || isCallOngoingAndOperatorConnected() || isTransferring();
     }
 
     public boolean isCallNotOngoing() {
-        return callStatus instanceof CallStatus.NotOngoing;
+        return callStatus instanceof CallStatus.EngagementNotOngoing;
     }
 
     public boolean isCallOngoingAndOperatorIsConnecting() {
-        return callStatus instanceof CallStatus.OngoingNoOperator;
+        return callStatus instanceof CallStatus.EngagementOngoingOperatorIsConnecting;
     }
 
     public boolean isCallOngoingAndOperatorConnected() {
         return isAudioCall() || isVideoCall();
     }
 
+    public boolean isTransferring() {
+        return callStatus instanceof CallStatus.EngagementOngoingTransferring;
+    }
+
     public boolean isVideoCall() {
-        return callStatus instanceof CallStatus.StartedVideoCall;
+        return callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted;
     }
 
     public boolean is2WayVideoCall() {
-        return callStatus instanceof CallStatus.StartedVideoCall && isVisitorVideoAvailable();
-    }
-
-    public boolean is2WayVideoCallAndVisitorVideoIsConnected() {
-        if (is2WayVideoCall()) {
-            Video visitorVideo = callStatus.getVisitorMediaState().getVideo();
-            return visitorVideo.getStatus() == Media.Status.PLAYING || visitorVideo.getStatus() == Media.Status.PAUSED;
-        } else {
-            return false;
-        }
+        return callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted && isVisitorVideoAvailable();
     }
 
     public boolean isVideoCallAndOperatorVideoIsConnected() {
@@ -116,7 +108,7 @@ class CallState {
     }
 
     public boolean isAudioCall() {
-        return callStatus instanceof CallStatus.StartedAudioCall;
+        return callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted;
     }
 
     public CallState initCall(String companyName, Engagement.MediaType requestedMediaType) {
@@ -124,15 +116,9 @@ class CallState {
                 .copyFrom(this)
                 .setIntegratorCallStarted(true)
                 .setVisible(true)
+                .setIsOnHold(false)
                 .setCompanyName(companyName)
                 .setRequestedMediaType(requestedMediaType)
-                .createCallState();
-    }
-
-    public CallState ticketLoaded(String queueTicketId) {
-        return new Builder()
-                .copyFrom(this)
-                .setQueueTicketId(queueTicketId)
                 .createCallState();
     }
 
@@ -141,7 +127,8 @@ class CallState {
                 .copyFrom(this)
                 .setIntegratorCallStarted(false)
                 .setVisible(false)
-                .setCallStatus(new CallStatus.NotOngoing(callStatus.getVisitorMediaState()))
+                .setIsOnHold(false)
+                .setCallStatus(new CallStatus.EngagementNotOngoing(callStatus.getVisitorMediaState()))
                 .createCallState();
     }
 
@@ -159,20 +146,23 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState engagementStarted(
-            String operatorName,
-            String operatorProfileImgUrl
-    ) {
+    public CallState operatorConnecting(String name, String url) {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.OngoingNoOperator(
-                                operatorName,
+                        new CallStatus.EngagementOngoingOperatorIsConnecting(
+                                name,
                                 "0",
-                                operatorProfileImgUrl,
-                                callStatus.getVisitorMediaState())
-                )
-                .setQueueTicketId(null)
+                                url,
+                                callStatus.getVisitorMediaState()
+                        )
+                ).createCallState();
+    }
+
+    public CallState engagementStarted() {
+        return new Builder()
+                .copyFrom(this)
+                .setIsOnHold(false)
                 .createCallState();
     }
 
@@ -180,7 +170,7 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.OngoingNoOperator(
+                        new CallStatus.EngagementOngoingOperatorIsConnecting(
                                 callStatus.getOperatorName(),
                                 "0",
                                 callStatus.getOperatorProfileImageUrl(),
@@ -204,7 +194,7 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.StartedVideoCall(
+                        new CallStatus.EngagementOngoingVideoCallStarted(
                                 callStatus.getOperatorName(),
                                 formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
@@ -227,7 +217,7 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
-                        new CallStatus.StartedAudioCall(
+                        new CallStatus.EngagementOngoingAudioCallStarted(
                                 callStatus.getOperatorName(),
                                 formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
@@ -243,7 +233,7 @@ class CallState {
             return new Builder()
                     .copyFrom(this)
                     .setCallStatus(
-                            new CallStatus.StartedAudioCall(
+                            new CallStatus.EngagementOngoingAudioCallStarted(
                                     callStatus.getOperatorName(),
                                     formattedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
@@ -256,11 +246,21 @@ class CallState {
             return new Builder()
                     .copyFrom(this)
                     .setCallStatus(
-                            new CallStatus.StartedVideoCall(
+                            new CallStatus.EngagementOngoingVideoCallStarted(
                                     callStatus.getOperatorName(),
                                     formattedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
+                                    callStatus.getVisitorMediaState()
+                            )
+                    )
+                    .createCallState();
+        } else if (isTransferring()) {
+            return new Builder()
+                    .copyFrom(this)
+                    .setCallStatus(
+                            new CallStatus.EngagementOngoingTransferring(
+                                    formattedTimeValue,
                                     callStatus.getVisitorMediaState()
                             )
                     )
@@ -275,7 +275,7 @@ class CallState {
             return new Builder()
                     .copyFrom(this)
                     .setCallStatus(
-                            new CallStatus.OngoingNoOperator(
+                            new CallStatus.EngagementOngoingOperatorIsConnecting(
                                     callStatus.getOperatorName(),
                                     timeValue,
                                     callStatus.getOperatorProfileImageUrl(),
@@ -295,13 +295,6 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState hasVideoChanged(boolean hasVideo) {
-        return new Builder()
-                .copyFrom(this)
-                .setHasVideo(hasVideo)
-                .createCallState();
-    }
-
     public CallState speakerValueChanged(boolean isSpeakerOn) {
         return new Builder()
                 .copyFrom(this)
@@ -316,28 +309,56 @@ class CallState {
                 .createCallState();
     }
 
+    public CallState setTransferring() {
+        return new Builder()
+                .copyFrom(this)
+                .setCallStatus(
+                        new CallStatus.EngagementOngoingTransferring(
+                                callStatus.getTime(),
+                                callStatus.getVisitorMediaState()
+                        )
+                )
+                .createCallState();
+    }
+
     public boolean isMuteButtonEnabled() {
-        return (isAudioCall() || is2WayVideoCall()) && !isOnHold;
+        return (isAudioCall() || is2WayVideoCall()) && !showOnHold();
     }
 
     public boolean isVideoButtonEnabled() {
-        return is2WayVideoCall() && !isOnHold;
+        return is2WayVideoCall() && !showOnHold();
     }
 
     public boolean isSpeakerButtonEnabled() {
         return isAudioCall() || is2WayVideoCall();
     }
 
-    public boolean isShowCallTimerView() {
-        return isCallOngoingAndOperatorConnected() && !isOnHold;
+    public boolean showCallTimerView() {
+        return isCallOngoingAndOperatorConnected() && !showOnHold() || isTransferring();
     }
 
     public boolean showOperatorVideo() {
-        return isVideoCallAndOperatorVideoIsConnected() && !isOnHold;
+        return isVideoCallAndOperatorVideoIsConnected() && !showOnHold();
     }
 
     public boolean showContinueBrowsingView() {
-        return isCallOngoingAndOperatorIsConnecting() || isCallNotOngoing() || isOnHold;
+        return isCallOngoingAndOperatorIsConnecting() || isCallNotOngoing() || showOnHold();
+    }
+
+    public boolean showOperatorNameView() {
+        return isCallOngoingAndOperatorConnected() || isTransferring();
+    }
+
+    public boolean showCompanyNameView() {
+        return !isMediaEngagementStarted();
+    }
+
+    public boolean showOperatorStatusViewRippleAnimation() {
+        return isCallNotOngoing() || isCallOngoingAndOperatorIsConnecting() || isTransferring();
+    }
+
+    public boolean showOnHold() {
+        return isOnHold && !isTransferring() && !isCallOngoingAndOperatorIsConnecting();
     }
 
     private boolean isVisitorVideoAvailable() {
@@ -370,7 +391,6 @@ class CallState {
         private boolean landscapeLayoutControlsVisible;
         private boolean isMuted;
         private boolean hasVideo;
-        private String queueTicketId;
         private String companyName;
         private Engagement.MediaType requestedMediaType;
         private boolean isSpeakerOn;
@@ -411,11 +431,6 @@ class CallState {
             return this;
         }
 
-        public Builder setQueueTicketId(String queueTicketId) {
-            this.queueTicketId = queueTicketId;
-            return this;
-        }
-
         public Builder setCompanyName(String companyName) {
             this.companyName = companyName;
             return this;
@@ -444,7 +459,6 @@ class CallState {
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
             isMuted = callState.isMuted;
             hasVideo = callState.hasVideo;
-            queueTicketId = callState.queueTicketId;
             companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
@@ -465,7 +479,6 @@ class CallState {
         this.landscapeLayoutControlsVisible = builder.landscapeLayoutControlsVisible;
         this.isMuted = builder.isMuted;
         this.hasVideo = builder.hasVideo;
-        this.queueTicketId = builder.queueTicketId;
         this.companyName = builder.companyName;
         this.requestedMediaType = builder.requestedMediaType;
         this.isSpeakerOn = builder.isSpeakerOn;

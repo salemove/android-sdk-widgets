@@ -1,6 +1,7 @@
 package com.glia.widgets.call;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
+import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
@@ -54,7 +56,7 @@ public class CallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
-        if (!callView.shouldShowMediaEngagementView()) {
+        if (!callView.shouldShowMediaEngagementView(isUpgrade())) {
             finishAndRemoveTask();
             return;
         }
@@ -203,6 +205,10 @@ public class CallActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isUpgrade() {
+        return getIntent().getBooleanExtra(GliaWidgets.IS_UPGRADE_TO_CALL, false);
+    }
+
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class);
@@ -220,5 +226,32 @@ public class CallActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
         newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
+    }
+
+    // TODO create builder class
+    public static Intent getIntent(
+            Context applicationContext,
+            GliaSdkConfiguration sdkConfiguration,
+            String mediaType
+    ) {
+        return getIntent(applicationContext, sdkConfiguration, mediaType, false);
+    }
+
+    public static Intent getIntent(
+            Context applicationContext,
+            GliaSdkConfiguration sdkConfiguration,
+            String mediaType,
+            boolean isUpgradeToCall
+    ) {
+        Intent intent = new Intent(applicationContext, CallActivity.class);
+        intent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
+        intent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
+        intent.putExtra(GliaWidgets.CONTEXT_URL, sdkConfiguration.getContextUrl());
+        intent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
+        intent.putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay());
+        intent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
+        intent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
+        intent.putExtra(GliaWidgets.IS_UPGRADE_TO_CALL, isUpgradeToCall);
+        return intent;
     }
 }

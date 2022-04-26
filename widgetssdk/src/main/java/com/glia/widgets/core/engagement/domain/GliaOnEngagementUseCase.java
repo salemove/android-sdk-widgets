@@ -2,6 +2,7 @@ package com.glia.widgets.core.engagement.domain;
 
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
@@ -18,18 +19,21 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final GliaQueueRepository gliaQueueRepository;
     private final GliaVisitorMediaRepository gliaVisitorMediaRepository;
+    private final GliaEngagementStateRepository gliaEngagementStateRepository;
     private Listener listener;
 
     public GliaOnEngagementUseCase(
             GliaEngagementRepository gliaRepository,
             GliaOperatorMediaRepository operatorMediaRepository,
             GliaQueueRepository gliaQueueRepository,
-            GliaVisitorMediaRepository gliaVisitorMediaRepository
+            GliaVisitorMediaRepository gliaVisitorMediaRepository,
+            GliaEngagementStateRepository gliaEngagementStateRepository
     ) {
         this.gliaRepository = gliaRepository;
         this.operatorMediaRepository = operatorMediaRepository;
         this.gliaQueueRepository = gliaQueueRepository;
         this.gliaVisitorMediaRepository = gliaVisitorMediaRepository;
+        this.gliaEngagementStateRepository = gliaEngagementStateRepository;
     }
 
     public void execute(Listener listener) {
@@ -39,12 +43,14 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
 
     @Override
     public void accept(OmnicoreEngagement engagement) {
+        operatorMediaRepository.onEngagementStarted(engagement);
+        gliaVisitorMediaRepository.onEngagementStarted(engagement);
+        gliaEngagementStateRepository.onEngagementStarted(engagement);
+        gliaQueueRepository.onEngagementStarted();
+        gliaEngagementStateRepository.onEngagementStarted(engagement);
         if (this.listener != null) {
             listener.newEngagementLoaded(engagement);
         }
-        operatorMediaRepository.startListening(engagement);
-        gliaVisitorMediaRepository.onEngagementStarted(engagement);
-        gliaQueueRepository.onEngagementStarted();
     }
 
     public void unregisterListener(Listener listener) {

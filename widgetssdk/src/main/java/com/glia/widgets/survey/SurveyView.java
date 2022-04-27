@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,6 +28,9 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.MaterialShapeDrawable;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
 public class SurveyView extends ConstraintLayout implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
@@ -85,20 +87,7 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     }
 
     private void applyStyle(SurveyStyle surveyStyle) {
-        cardView.setCardBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));
-        ResourceProvider resourceProvider = Dependencies.getResourceProvider();
-        float cornerRadius = resourceProvider.convertDpToPixel(surveyStyle.getLayer().getCornerRadius());
-        cardView.setRadius(cornerRadius);
-        ViewGroup.MarginLayoutParams layoutParams =
-                (ViewGroup.MarginLayoutParams) cutBottomCornersCardView.getLayoutParams();
-        int marginTopDp = resourceProvider.getDimension(R.dimen.glia_x_large);
-        int marginTopPx = (int) resourceProvider.convertDpToPixel(marginTopDp);
-        layoutParams.setMargins(
-                0,
-                marginTopPx,
-                0,
-                (int) -cornerRadius); // Solution for making CardView only have corner radius at the top
-        cutBottomCornersCardView.requestLayout();
+        setupCardView(surveyStyle);
 
         TextConfiguration titleStyle = surveyStyle.getTitle();
         this.title.setTextColor(titleStyle.getTextColor());
@@ -111,6 +100,23 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
 
         applyButtonStyle(surveyStyle.getSubmitButton(), submitButton);
         applyButtonStyle(surveyStyle.getCancelButton(), cancelButton);
+    }
+
+    private void setupCardView(SurveyStyle surveyStyle) {
+        ResourceProvider resourceProvider = Dependencies.getResourceProvider();
+        float cornerRadius = resourceProvider.convertDpToPixel(surveyStyle.getLayer().getCornerRadius());
+        ShapeAppearanceModel.Builder cardViewShapeBuilder = new ShapeAppearanceModel().toBuilder();
+        cardViewShapeBuilder.setTopLeftCorner(
+                CornerFamily.ROUNDED,
+                bounds -> cornerRadius);
+        cardViewShapeBuilder.setTopRightCorner(
+                CornerFamily.ROUNDED,
+                bounds -> cornerRadius);
+
+        MaterialShapeDrawable background = new MaterialShapeDrawable(cardViewShapeBuilder.build());
+        int backgroundColor = Color.parseColor(surveyStyle.getLayer().getBackgroundColor());
+        background.setFillColor(ColorStateList.valueOf(backgroundColor));
+        cardView.setBackground(background);
     }
 
     private void applyButtonStyle(ButtonConfiguration configuration, Button button) {
@@ -147,7 +153,6 @@ public class SurveyView extends ConstraintLayout implements SurveyContract.View,
     private void initView() {
         View view = View.inflate(getContext(), R.layout.survey_view, this);
 
-        cutBottomCornersCardView = view.findViewById(R.id.cut_bottom_corners_card_view);
         cardView = view.findViewById(R.id.card_view);
         title = view.findViewById(R.id.survey_title);
         recyclerView = view.findViewById(R.id.survey_list);

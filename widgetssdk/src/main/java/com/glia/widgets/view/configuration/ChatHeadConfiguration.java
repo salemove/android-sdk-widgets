@@ -10,10 +10,8 @@ public class ChatHeadConfiguration implements Parcelable {
     private final Integer badgeBackgroundTintList;
     private final Integer badgeTextColor;
     private final Integer backgroundColorRes;
-
     private final Integer iconOnHold;
     private final Integer iconOnHoldTintList;
-
 
     private ChatHeadConfiguration(
             Builder builder

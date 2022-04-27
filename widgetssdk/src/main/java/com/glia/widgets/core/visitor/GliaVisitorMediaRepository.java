@@ -22,9 +22,7 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
 
     @Override
     public void onHoldChanged(boolean newOnHold) {
-        if (isOnHold != newOnHold) {
-            updateOnHoldState(newOnHold);
-        }
+        notifyOnHoldStateChange(newOnHold);
     }
 
     public void onEngagementStarted(Engagement engagement) {
@@ -40,7 +38,7 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
     public void addVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {
         visitorMediaUpdatesListeners.add(listener);
         updateVisitorMediaState(currentMediaState);
-        updateOnHoldState(isOnHold);
+        notifyOnHoldStateChange(isOnHold);
     }
 
     public void removeVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {
@@ -52,9 +50,11 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
         visitorMediaUpdatesListeners.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
     }
 
-    private void updateOnHoldState(boolean newOnHold) {
-        isOnHold = newOnHold;
-        visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
+    private void notifyOnHoldStateChange(boolean newOnHold) {
+        if (isOnHold != newOnHold) {
+            isOnHold = newOnHold;
+            visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
+        }
     }
 
     private boolean hasVisitorVideoMedia() {

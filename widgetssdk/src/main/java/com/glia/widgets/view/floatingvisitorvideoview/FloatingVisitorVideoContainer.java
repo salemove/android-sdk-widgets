@@ -16,19 +16,19 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.ViewHelpers;
 
-public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout implements FloatingVisitorVideoContract.View {
+public class FloatingVisitorVideoContainer extends ConstraintLayout implements FloatingVisitorVideoContract.View {
     private FloatingVisitorVideoContract.Controller controller;
-    private FloatingVisitorVideoView floatingVisitorVideoContainer;
+    private FloatingVisitorVideoView floatingVisitorVideoView;
 
-    public FloatingVisitorVideoConstraintLayout(@NonNull Context context) {
+    public FloatingVisitorVideoContainer(@NonNull Context context) {
         this(context, null);
     }
 
-    public FloatingVisitorVideoConstraintLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public FloatingVisitorVideoContainer(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FloatingVisitorVideoConstraintLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public FloatingVisitorVideoContainer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
@@ -41,8 +41,8 @@ public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout imple
     @Override
     public void show(VisitorMediaState state) {
         post(() -> {
-            if (!floatingVisitorVideoContainer.hasVideo()) {
-                floatingVisitorVideoContainer.showVisitorVideo(
+            if (!floatingVisitorVideoView.hasVideo()) {
+                floatingVisitorVideoView.showVisitorVideo(
                         state.getVideo().createVideoView(Utils.getActivity(getContext()))
                 );
             }
@@ -53,42 +53,42 @@ public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout imple
     @Override
     public void hide() {
         post(() -> {
-            floatingVisitorVideoContainer.hideVisitorVideo();
+            floatingVisitorVideoView.hideVisitorVideo();
             setVisibility(GONE);
         });
     }
 
     @Override
     public void onResume() {
-        floatingVisitorVideoContainer.onResume();
+        floatingVisitorVideoView.onResume();
         controller.onResume();
     }
 
     @Override
     public void onPause() {
-        floatingVisitorVideoContainer.onPause();
+        floatingVisitorVideoView.onPause();
         controller.onPause();
     }
 
     @Override
     public void onDestroy() {
-        floatingVisitorVideoContainer.onDestroy();
+        floatingVisitorVideoView.onDestroy();
         controller.onDestroy();
     }
 
     @Override
     public void showOnHold() {
-        post(() -> floatingVisitorVideoContainer.showOnHold());
+        post(() -> floatingVisitorVideoView.showOnHold());
     }
 
     @Override
     public void hideOnHold() {
-        post(() -> floatingVisitorVideoContainer.hideOnHold());
+        post(() -> floatingVisitorVideoView.hideOnHold());
     }
 
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_layout_view, this);
-        floatingVisitorVideoContainer = findViewById(R.id.visitor_video_card);
+        floatingVisitorVideoView = findViewById(R.id.visitor_video_card);
         setController(Dependencies.getControllerFactory().getFloatingVisitorVideoController());
         controller.setView(this);
         setVisitorVideoContainerTouchListener();
@@ -96,7 +96,7 @@ public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout imple
 
     @SuppressLint("ClickableViewAccessibility")
     private void setVisitorVideoContainerTouchListener() {
-        floatingVisitorVideoContainer.setOnTouchListener(
+        floatingVisitorVideoView.setOnTouchListener(
                 new ViewHelpers.OnTouchListener(
                         this::getViewLocation,
                         this::onViewDragged,
@@ -108,8 +108,8 @@ public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout imple
 
     private Pair<Integer, Integer> getViewLocation() {
         return new Pair<>(
-                Float.valueOf(floatingVisitorVideoContainer.getX()).intValue(),
-                Float.valueOf(floatingVisitorVideoContainer.getY()).intValue()
+                Float.valueOf(floatingVisitorVideoView.getX()).intValue(),
+                Float.valueOf(floatingVisitorVideoView.getY()).intValue()
         );
     }
 
@@ -120,18 +120,18 @@ public class FloatingVisitorVideoConstraintLayout extends ConstraintLayout imple
         if (newPositionY < 0) {
             newPositionY = 0;
         }
-        if (newPositionX > getWidth() - floatingVisitorVideoContainer.getWidth()) {
-            newPositionX = getWidth() - floatingVisitorVideoContainer.getWidth();
+        if (newPositionX > getWidth() - floatingVisitorVideoView.getWidth()) {
+            newPositionX = getWidth() - floatingVisitorVideoView.getWidth();
         }
-        if (newPositionY > getHeight() - floatingVisitorVideoContainer.getHeight()) {
-            newPositionY = getHeight() - floatingVisitorVideoContainer.getHeight();
+        if (newPositionY > getHeight() - floatingVisitorVideoView.getHeight()) {
+            newPositionY = getHeight() - floatingVisitorVideoView.getHeight();
         }
         setFloatingViewPosition(newPositionX, newPositionY);
     }
 
     private void setFloatingViewPosition(float newPositionX, float newPositionY) {
-        floatingVisitorVideoContainer.setX(newPositionX);
-        floatingVisitorVideoContainer.setY(newPositionY);
-        floatingVisitorVideoContainer.invalidate();
+        floatingVisitorVideoView.setX(newPositionX);
+        floatingVisitorVideoView.setY(newPositionY);
+        floatingVisitorVideoView.invalidate();
     }
 }

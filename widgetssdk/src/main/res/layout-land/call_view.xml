@@ -168,7 +168,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/buttons_top_space" />
 
-    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoConstraintLayout
+    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
         android:id="@+id/floating_visitor_video"
         android:layout_width="0dp"
         android:layout_height="0dp"

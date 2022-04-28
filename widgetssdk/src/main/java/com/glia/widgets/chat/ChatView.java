@@ -135,6 +135,7 @@ public class ChatView extends ConstraintLayout implements
     private Integer defaultStatusbarColor;
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
+    private OnMinimizeListener onMinimizeListener;
     private OnNavigateToCallListener onNavigateToCallListener;
     private OnNavigateToSurveyListener onNavigateToSurveyListener;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
@@ -318,6 +319,10 @@ public class ChatView extends ConstraintLayout implements
         this.onEndListener = onEndListener;
     }
 
+    public void setOnMinimizeListener(OnMinimizeListener onMinimizeListener) {
+        this.onMinimizeListener = onMinimizeListener;
+    }
+
     /**
      * Add a listener here for when the user has accepted an audio or video call and should navigate
      * to a call.
@@ -494,6 +499,13 @@ public class ChatView extends ConstraintLayout implements
             public void destroyView() {
                 if (onEndListener != null) {
                     onEndListener.onEnd();
+                }
+            }
+
+            @Override
+            public void minimizeView() {
+                if (onMinimizeListener != null) {
+                    onMinimizeListener.onMinimize();
                 }
             }
 
@@ -1359,6 +1371,10 @@ public class ChatView extends ConstraintLayout implements
          * on the end engagement button or the leave queue button.
          */
         void onEnd();
+    }
+
+    public interface OnMinimizeListener {
+        void onMinimize();
     }
 
     public interface OnNavigateToCallListener {

@@ -102,6 +102,7 @@ public class CallView extends ConstraintLayout {
 
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
+    private OnMinimizeListener onMinimizeListener;
     private OnNavigateToChatListener onNavigateToChatListener;
     private CallView.OnNavigateToSurveyListener onNavigateToSurveyListener;
 
@@ -171,9 +172,6 @@ public class CallView extends ConstraintLayout {
         minimizeButton.setOnClickListener(v -> {
             if (callController != null) {
                 callController.minimizeButtonClicked();
-            }
-            if (onEndListener != null) {
-                onEndListener.onEnd();
             }
         });
         muteButton.setOnClickListener(v -> {
@@ -380,6 +378,13 @@ public class CallView extends ConstraintLayout {
             public void destroyView() {
                 if (onEndListener != null) {
                     onEndListener.onEnd();
+                }
+            }
+
+            @Override
+            public void minimizeView() {
+                if (onMinimizeListener != null) {
+                    onMinimizeListener.onMinimize();
                 }
             }
         };
@@ -781,6 +786,10 @@ public class CallView extends ConstraintLayout {
         this.onEndListener = onEndListener;
     }
 
+    public void setOnMinimizeListener(OnMinimizeListener onMinimizeListener) {
+        this.onMinimizeListener = onMinimizeListener;
+    }
+
     public void setOnNavigateToChatListener(OnNavigateToChatListener onNavigateToChatListener) {
         this.onNavigateToChatListener = onNavigateToChatListener;
     }
@@ -1059,6 +1068,10 @@ public class CallView extends ConstraintLayout {
 
     public interface OnEndListener {
         void onEnd();
+    }
+
+    public interface OnMinimizeListener {
+        void onMinimize();
     }
 
     public interface OnNavigateToChatListener {

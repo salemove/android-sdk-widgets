@@ -24,6 +24,8 @@ public interface ChatViewCallback {
 
     void destroyView();
 
+    void minimizeView();
+
     void smoothScrollToBottom();
 
     void scrollToBottomImmediate();

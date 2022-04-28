@@ -102,7 +102,6 @@ public class ChatController implements
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener timerStatusListener;
-    private MinimizeHandler.OnMinimizeCalledListener minimizeCalledListener;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final MinimizeHandler minimizeHandler;
@@ -348,9 +347,8 @@ public class ChatController implements
         loadHistoryUseCase.execute(this);
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver);
         initMediaUpgradeCallback();
-        initMinimizeCallback();
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
-        minimizeHandler.addListener(minimizeCalledListener);
+        minimizeHandler.addListener(this::minimizeView);
         createNewTimerCallback();
         callTimer.addFormattedValueListener(timerStatusListener);
         subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
@@ -367,10 +365,6 @@ public class ChatController implements
                 chatState.queueId,
                 chatState.contextUrl
         );
-    }
-
-    private void initMinimizeCallback() {
-        this.minimizeCalledListener = () -> onDestroy(true);
     }
 
     private synchronized void emitViewState(ChatState state) {
@@ -405,7 +399,6 @@ public class ChatController implements
             mediaUpgradeOfferRepositoryCallback = null;
             timerStatusListener = null;
             callTimer.clear();
-            minimizeCalledListener = null;
             minimizeHandler.clear();
 
             loadHistoryUseCase.unregisterListener(this);
@@ -727,6 +720,10 @@ public class ChatController implements
             Logger.d(TAG, "destroyingView");
             viewCallback.destroyView();
         }
+    }
+
+    private void minimizeView() {
+        if (viewCallback != null) viewCallback.minimizeView();
     }
 
     private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {

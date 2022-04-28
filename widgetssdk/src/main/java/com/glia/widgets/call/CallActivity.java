@@ -38,12 +38,11 @@ public class CallActivity extends AppCompatActivity {
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = this::finish;
-    private CallView.OnEndListener onEndListener = this::finish;
     private CallView.OnNavigateToChatListener onNavigateToChatListener = () -> {
         navigateToChat();
         finish();
     };
-    private CallView.OnNavigateToSurveyListener onNavigateToSurveyListener = (Survey survey) -> {
+    private final CallView.OnNavigateToSurveyListener onNavigateToSurveyListener = (Survey survey) -> {
         navigateToSurvey(survey);
         finish();
     };
@@ -56,7 +55,7 @@ public class CallActivity extends AppCompatActivity {
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
         if (!callView.shouldShowMediaEngagementView()) {
-            finish();
+            finishAndRemoveTask();
             return;
         }
 
@@ -64,7 +63,13 @@ public class CallActivity extends AppCompatActivity {
         callView.setConfiguration(configuration);
         callView.setTheme(configuration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
-        callView.setOnEndListener(onEndListener);
+
+        // In case the engagement ends, Activity is removed from the device's Recents menu
+        // to avoid app users to accidentally start queueing for another call when they resume
+        // the app from the Recents menu and the app's backstack was empty.
+        callView.setOnEndListener(this::finishAndRemoveTask);
+
+        callView.setOnMinimizeListener(this::finish);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
         callView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
 
@@ -91,7 +96,6 @@ public class CallActivity extends AppCompatActivity {
             permissionSubjectDisposable.dispose();
         }
         onBackClickedListener = null;
-        onEndListener = null;
         onNavigateToChatListener = null;
         callView.onDestroy(isFinishing());
         super.onDestroy();

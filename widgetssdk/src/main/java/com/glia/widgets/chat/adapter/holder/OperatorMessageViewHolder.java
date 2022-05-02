@@ -38,7 +38,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
 
     private void setupOperatorStatusView() {
         operatorStatusView.setTheme(uiTheme);
-        operatorStatusView.isRippleAnimationShowing(false);
+        operatorStatusView.setShowRippleAnimation(false);
     }
 
     public void bind(
@@ -123,7 +123,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
         if (item.operatorProfileImgUrl != null) {
             operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
         } else {
-            operatorStatusView.showPlaceHolder();
+            operatorStatusView.showPlaceHolderWithIconPadding();
         }
     }
 }

@@ -7,7 +7,7 @@ import androidx.core.util.Pair;
 
 public class ViewHelpers {
 
-    public static class ChatHeadOnTouchListener implements View.OnTouchListener {
+    public static class OnTouchListener implements View.OnTouchListener {
         private static final int DIFF_THRESHOLD = 20;
         private int initialX;
         private int initialY;
@@ -17,7 +17,7 @@ public class ViewHelpers {
         private final OnMoveListener onMoveListener;
         private final View.OnClickListener onChatHeadClickedListener;
 
-        public ChatHeadOnTouchListener(
+        public OnTouchListener(
                 OnRequestInitialCoordinates onRequestInitialCoordinates,
                 OnMoveListener onMoveListener,
                 View.OnClickListener onChatHeadClickedListener

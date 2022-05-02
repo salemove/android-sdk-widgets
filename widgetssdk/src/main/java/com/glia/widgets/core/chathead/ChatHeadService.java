@@ -70,7 +70,7 @@ public class ChatHeadService extends Service {
         chatHeadView = ChatHeadView.getInstance(this);
         chatHeadView.setController(controller);
         chatHeadView.setOnTouchListener(
-                new ViewHelpers.ChatHeadOnTouchListener(
+                new ViewHelpers.OnTouchListener(
                         () -> new Pair<>(layoutParams.x, layoutParams.y),
                         (x, y) -> {
                             layoutParams.x = Float.valueOf(x).intValue();

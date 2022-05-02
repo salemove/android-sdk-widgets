@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoView
+        android:id="@+id/visitor_video_card"
+        android:layout_width="@dimen/glia_visitor_video_width"
+        android:layout_height="@dimen/glia_visitor_video_height"
+        android:layout_margin="@dimen/glia_large"
+        android:contentDescription="@string/glia_call_visitor_video_content_description"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="0dp"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.05" />
+
+</merge>

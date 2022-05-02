@@ -52,7 +52,7 @@ import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.header.AppBarView;
-import com.google.android.material.card.MaterialCardView;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import com.google.android.material.transition.MaterialFade;
@@ -84,8 +84,6 @@ public class CallView extends ConstraintLayout {
     private TextView continueBrowsingView;
     private FrameLayout operatorVideoContainer;
     private VideoView operatorVideoView;
-    private MaterialCardView visitorVideoContainer;
-    private VideoView visitorVideoView;
     private TextView chatButtonLabel;
     private TextView videoButtonLabel;
     private TextView muteButtonLabel;
@@ -93,12 +91,14 @@ public class CallView extends ConstraintLayout {
     private TextView minimizeButtonLabel;
     private View buttonsLayoutBackground;
     private View buttonsLayout;
+    private FloatingVisitorVideoContainer floatingVisitorVideoContainer;
     private FloatingActionButton chatButton;
     private FloatingActionButton videoButton;
     private FloatingActionButton muteButton;
     private FloatingActionButton speakerButton;
     private FloatingActionButton minimizeButton;
     private TextView chatButtonBadgeView;
+    private TextView onHoldTextView;
 
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
@@ -211,14 +211,8 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onDestroy(boolean isFinishing) {
-        if (operatorVideoView != null) {
-            operatorVideoView.release();
-            operatorVideoView = null;
-        }
-        if (visitorVideoView != null) {
-            visitorVideoView.release();
-            visitorVideoView = null;
-        }
+        releaseOperatorVideoStream();
+        floatingVisitorVideoContainer.onDestroy();
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;
@@ -232,13 +226,11 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onResume() {
+        floatingVisitorVideoContainer.onResume();
         if (callController != null) {
             callController.onResume();
             if (operatorVideoView != null) {
                 operatorVideoView.resumeRendering();
-            }
-            if (visitorVideoView != null) {
-                visitorVideoView.resumeRendering();
             }
         }
         if (screenSharingController != null) {
@@ -254,14 +246,9 @@ public class CallView extends ConstraintLayout {
     }
 
     public void onPause() {
-        if (callController != null) {
-            callController.onPause();
-        }
+        floatingVisitorVideoContainer.onPause();
         if (operatorVideoView != null) {
             operatorVideoView.pauseRendering();
-        }
-        if (visitorVideoView != null) {
-            visitorVideoView.resumeRendering();
         }
         if (screenSharingController != null) {
             screenSharingController.removeViewCallback(screenSharingViewCallback);
@@ -271,6 +258,9 @@ public class CallView extends ConstraintLayout {
         }
         if (serviceChatHeadController != null) {
             serviceChatHeadController.onPause(this);
+        }
+        if (callController != null) {
+            callController.onPause();
         }
     }
 
@@ -299,19 +289,6 @@ public class CallView extends ConstraintLayout {
                     } else {
                         appBar.setTitle(resources.getString(R.string.glia_call_audio_app_bar_title));
                     }
-                    operatorStatusView.isRippleAnimationShowing(
-                            callState.isCallNotOngoing() ||
-                                    callState.isCallOngoingAndOperatorIsConnecting()
-                    );
-
-                    if (callState.isCallOngoingAndOperatorConnected() && callState.callStatus.getOperatorProfileImageUrl() != null) {
-                        operatorStatusView.showProfileImage(
-                                callState.callStatus.getOperatorProfileImageUrl());
-                    } else if (callState.isCallOngoingAndOperatorIsConnecting() && callState.callStatus.getOperatorProfileImageUrl() != null) {
-                        operatorStatusView.showDefaultSizeProfileImage(callState.callStatus.getOperatorProfileImageUrl());
-                    } else {
-                        operatorStatusView.showDefaultSizePlaceHolder();
-                    }
                     operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
                     connectingView.setText(resources.getString(
                             R.string.glia_call_connecting_with,
@@ -327,12 +304,7 @@ public class CallView extends ConstraintLayout {
                         companyNameView.setText(callState.companyName);
                         msrView.setText(R.string.glia_call_in_queue_message);
                     }
-                    if (callState.callStatus.getTime() != null) {
-                        callTimerView.setText(callState.callStatus.getTime());
-                    }
                     chatButtonBadgeView.setText(String.valueOf(callState.messagesNotSeen));
-
-
                     if (resources.getConfiguration().orientation == ORIENTATION_LANDSCAPE &&
                             callState.isVideoCall()) {
                         ColorStateList blackTransparentColorStateList =
@@ -344,9 +316,9 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
-                    muteButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
-                    speakerButton.setEnabled(callState.isAudioCall() || callState.is2WayVideoCall());
-                    videoButton.setEnabled(callState.is2WayVideoCall());
+                    muteButton.setEnabled(callState.isMuteButtonEnabled());
+                    speakerButton.setEnabled(callState.isSpeakerButtonEnabled());
+                    videoButton.setEnabled(callState.isVideoButtonEnabled());
                     setButtonActivated(videoButton, theme.getIconCallVideoOn(),
                             theme.getIconCallVideoOff(), callState.hasVideo);
                     setButtonActivated(
@@ -367,15 +339,15 @@ public class CallView extends ConstraintLayout {
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
-                    operatorStatusView.setVisibility(callState.showOperatorStatusView() ? VISIBLE : GONE);
                     operatorNameView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
                     companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
                     msrView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
-                    callTimerView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() ? VISIBLE : GONE);
-                    continueBrowsingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() || callState.isCallNotOngoing() ? VISIBLE : GONE);
+                    onHoldTextView.setVisibility(callState.isOnHold ? VISIBLE : GONE);
+                    handleCallTimerView(callState);
+                    handleContinueBrowsingView(callState);
+                    handleOperatorStatusViewState(callState);
                     handleOperatorVideoState(callState);
-                    handleVisitorVideoState(callState);
                     handleControlsVisibility(callState);
                     onIsSpeakerOnStateChanged(callState.isSpeakerOn);
                     if (callState.isVisible) {
@@ -461,21 +433,65 @@ public class CallView extends ConstraintLayout {
                 .getChatHeadController();
     }
 
-    private void handleVisitorVideoState(CallState state) {
-        if (state.is2WayVideoCallAndVisitorVideoIsConnected() && visitorVideoContainer.getVisibility() == GONE) {
-            visitorVideoContainer.setVisibility(VISIBLE);
-            showVisitorVideo(state.callStatus.getVisitorMediaState());
-        } else if (!state.is2WayVideoCall() && visitorVideoContainer.getVisibility() == VISIBLE) {
-            visitorVideoContainer.setVisibility(GONE);
-            hideVisitorVideo();
+    private void handleCallTimerView(CallState callState) {
+        callTimerView.setVisibility(callState.isShowCallTimerView() ? VISIBLE : GONE);
+        if (callState.callStatus.getTime() != null) {
+            callTimerView.setText(callState.callStatus.getTime());
+        }
+    }
+
+    private void handleContinueBrowsingView(CallState callState) {
+        continueBrowsingView.setVisibility(
+                resources.getConfiguration().orientation != ORIENTATION_LANDSCAPE &&
+                        callState.showContinueBrowsingView() ? VISIBLE : GONE
+        );
+        continueBrowsingView.setText(
+                getResources().getString(
+                        callState.isOnHold ?
+                                R.string.glia_call_continue_browsing_on_hold :
+                                R.string.glia_call_continue_browsing
+                )
+        );
+    }
+
+    private void handleOperatorStatusViewState(CallState state) {
+        operatorStatusView.setShowRippleAnimation(state.isCallNotOngoing() || state.isCallOngoingAndOperatorIsConnecting());
+        handleOperatorStatusViewOperatorImage(state);
+        operatorStatusView.setVisibility(state.showOperatorStatusView() ? VISIBLE : GONE);
+        operatorStatusView.setShowOnHold(state.isOnHold);
+    }
+
+    private void handleOperatorStatusViewOperatorImage(CallState state) {
+        if (state.isCallOngoingAndOperatorConnected()) {
+            showOperatorProfileImageOnConnected(state);
+        } else if (state.isCallOngoingAndOperatorIsConnecting()) {
+            showOperatorProfileImageOnConnecting(state);
+        } else {
+            operatorStatusView.showPlaceHolderWithIconPadding();
+        }
+    }
+
+    private void showOperatorProfileImageOnConnected(CallState state) {
+        if (state.callStatus.getOperatorProfileImageUrl() != null) {
+            operatorStatusView.showProfileImageOnConnect(state.callStatus.getOperatorProfileImageUrl());
+        } else {
+            operatorStatusView.showPlaceHolderWithIconPaddingOnConnect();
+        }
+    }
+
+    private void showOperatorProfileImageOnConnecting(CallState state) {
+        if (state.callStatus.getOperatorProfileImageUrl() != null) {
+            operatorStatusView.showProfileImage(state.callStatus.getOperatorProfileImageUrl());
+        } else {
+            operatorStatusView.showPlaceHolderWithIconPadding();
         }
     }
 
     private void handleOperatorVideoState(CallState state) {
-        if (state.isVideoCallAndOperatorVideoIsConnected() && operatorVideoContainer.getVisibility() == GONE) {
+        if (state.showOperatorVideo() && operatorVideoContainer.getVisibility() == GONE) {
             operatorVideoContainer.setVisibility(VISIBLE);
             showOperatorVideo(state.callStatus.getOperatorMediaState());
-        } else if (!state.isVideoCall() && operatorVideoContainer.getVisibility() == VISIBLE) {
+        } else if (!state.showOperatorVideo() && operatorVideoContainer.getVisibility() == VISIBLE) {
             operatorVideoContainer.setVisibility(GONE);
             hideOperatorVideo();
         }
@@ -662,18 +678,19 @@ public class CallView extends ConstraintLayout {
     private void setupViewAppearance() {
         setAppBarTheme();
         // icons
-        operatorStatusView.setTheme(this.theme);
-        chatButton.setImageResource(this.theme.getIconCallChat());
-        videoButton.setImageResource(this.theme.getIconCallVideoOn());
-        muteButton.setImageResource(this.theme.getIconCallAudioOn());
-        speakerButton.setImageResource(this.theme.getIconCallSpeakerOn());
-        minimizeButton.setImageResource(this.theme.getIconCallMinimize());
-        chatButtonBadgeView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), this.theme.getBrandPrimaryColor()));
+        operatorStatusView.setTheme(theme);
+        chatButton.setImageResource(theme.getIconCallChat());
+        videoButton.setImageResource(theme.getIconCallVideoOn());
+        muteButton.setImageResource(theme.getIconCallAudioOn());
+        speakerButton.setImageResource(theme.getIconCallSpeakerOn());
+        minimizeButton.setImageResource(theme.getIconCallMinimize());
+        chatButtonBadgeView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), theme.getBrandPrimaryColor()));
         // fonts
-        if (this.theme.getFontRes() != null) {
+        if (theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(
-                    this.getContext(),
-                    this.theme.getFontRes());
+                    getContext(),
+                    theme.getFontRes()
+            );
             operatorNameView.setTypeface(fontFamily);
             companyNameView.setTypeface(fontFamily);
             msrView.setTypeface(fontFamily);
@@ -719,7 +736,6 @@ public class CallView extends ConstraintLayout {
         connectingView = findViewById(R.id.connecting_view);
         continueBrowsingView = findViewById(R.id.continue_browsing_view);
         operatorVideoContainer = findViewById(R.id.operator_video_container);
-        visitorVideoContainer = findViewById(R.id.visitor_video_container);
         chatButtonLabel = findViewById(R.id.chat_button_label);
         videoButtonLabel = findViewById(R.id.video_button_label);
         chatButtonBadgeView = findViewById(R.id.chat_button_badge);
@@ -734,6 +750,9 @@ public class CallView extends ConstraintLayout {
 
         buttonsLayoutBackground = findViewById(R.id.buttons_layout_bg);
         buttonsLayout = findViewById(R.id.buttons_layout);
+        onHoldTextView = findViewById(R.id.on_hold_text);
+
+        floatingVisitorVideoContainer = findViewById(R.id.floating_visitor_video);
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -993,10 +1012,7 @@ public class CallView extends ConstraintLayout {
     }
 
     private void showOperatorVideo(MediaState operatorMediaState) {
-        if (operatorVideoView != null) {
-            operatorVideoView.release();
-            operatorVideoView = null;
-        }
+        releaseOperatorVideoStream();
         if (operatorMediaState != null && operatorMediaState.getVideo() != null) {
             Logger.d(TAG, "Starting video operator");
             operatorVideoView = operatorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
@@ -1006,36 +1022,21 @@ public class CallView extends ConstraintLayout {
         }
     }
 
-    private void showVisitorVideo(MediaState visitorMediaState) {
-        if (visitorVideoView != null) {
-            visitorVideoView.release();
-            visitorVideoView = null;
-        }
-        if (visitorMediaState != null && visitorMediaState.getVideo() != null) {
-            Logger.d(TAG, "Starting video visitor");
-            visitorVideoView = visitorMediaState.getVideo().createVideoView(Utils.getActivity(this.getContext()));
-            visitorVideoContainer.removeAllViews();
-            visitorVideoContainer.addView(visitorVideoView);
-            visitorVideoContainer.invalidate();
-        }
-    }
-
-    private void hideVisitorVideo() {
-        visitorVideoContainer.removeAllViews();
-        visitorVideoContainer.invalidate();
-        if (visitorVideoView != null) {
-            visitorVideoView.release();
-            visitorVideoView = null;
+    private void releaseOperatorVideoStream() {
+        if (operatorVideoView != null) {
+            operatorVideoView.release();
+            operatorVideoView = null;
         }
     }
 
     private void hideOperatorVideo() {
         operatorVideoContainer.removeAllViews();
         operatorVideoContainer.invalidate();
-        if (operatorVideoView != null) {
-            operatorVideoView.release();
-            operatorVideoView = null;
-        }
+        releaseOperatorVideoStream();
+    }
+
+    private void hideVisitorVideo() {
+        floatingVisitorVideoContainer.hide();
     }
 
     public void onUserInteraction() {

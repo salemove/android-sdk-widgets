@@ -9,6 +9,7 @@ import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
+import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 
 public class GliaOnEngagementEndUseCase implements
         GliaOnEngagementUseCase.Listener {
@@ -25,6 +26,7 @@ public class GliaOnEngagementEndUseCase implements
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
     private final GliaSurveyRepository surveyRepository;
+    private final GliaVisitorMediaRepository gliaVisitorMediaRepository;
 
     private Listener listener;
 
@@ -48,6 +50,7 @@ public class GliaOnEngagementEndUseCase implements
             fileAttachmentRepository.detachAllFiles();
             removeScreenSharingNotificationUseCase.execute();
             removeCallNotificationUseCase.execute();
+            gliaVisitorMediaRepository.onEngagementEnded(engagement);
         }
     }
 
@@ -61,7 +64,8 @@ public class GliaOnEngagementEndUseCase implements
             GliaOnEngagementUseCase engagementUseCase,
             RemoveCallNotificationUseCase removeCallNotificationUseCase,
             RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase,
-            GliaSurveyRepository surveyRepository
+            GliaSurveyRepository surveyRepository,
+            GliaVisitorMediaRepository gliaVisitorMediaRepository
     ) {
         this.repository = repository;
         this.engagementUseCase = engagementUseCase;
@@ -71,6 +75,7 @@ public class GliaOnEngagementEndUseCase implements
         this.operatorMediaRepository = operatorMediaRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
         this.surveyRepository = surveyRepository;
+        this.gliaVisitorMediaRepository = gliaVisitorMediaRepository;
     }
 
     public void execute(Listener listener) {

@@ -10,8 +10,14 @@
     <dimen name="glia_x_large">32dp</dimen>
     <dimen name="glia_xx_large">64dp</dimen>
 
+    <dimen name="glia_visitor_video_height">182dp</dimen>
+    <dimen name="glia_visitor_video_width">104dp</dimen>
+    <dimen name="glia_visitor_video_corner_radius">@dimen/glia_medium</dimen>
+
     <dimen name="glia_ripple_animation_size">142dp</dimen>
     <dimen name="glia_chat_profile_picture_size">80dp</dimen>
+    <dimen name="glia_chat_profile_picture_content_padding">20dp</dimen>
+    <dimen name="glia_operator_status_view_content_padding">40dp</dimen>
 
     <dimen name="glia_app_bar_end_button_width">60dp</dimen>
 
@@ -37,7 +43,8 @@
     <dimen name="glia_chat_attachment_menu_min_width">250dp</dimen>
 
     <dimen name="glia_chat_head_size">64dp</dimen>
-    <dimen name="glia_hat_head_placeholder_size">32dp</dimen>
+    <dimen name="glia_chat_head_placeholder_size">32dp</dimen>
+    <dimen name="glia_chat_head_content_padding">16dp</dimen>
 
     <dimen name="glia_chat_head_badge_size">18sp</dimen>
     <dimen name="glia_chat_head_badge_elevation">6dp</dimen>

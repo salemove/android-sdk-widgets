@@ -4,10 +4,10 @@ import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
 
+import com.glia.androidsdk.SiteApiKey;
 import com.glia.exampleapp.auth.AuthorizationType;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.GliaWidgetsConfig;
-import com.glia.androidsdk.SiteApiKey;
 
 public class Application extends android.app.Application {
 

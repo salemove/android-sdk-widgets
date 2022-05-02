@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="glia_black_color">#000000</color>
+
     <color name="glia_brand_primary_color">#0F6BFF</color>
     <color name="glia_base_dark_color">#2C0735</color>
     <color name="glia_base_light_color">#FFFFFF</color>
@@ -9,10 +11,11 @@
     <color name="glia_system_agent_bubble_color">#F3F3F3</color>
 
     <color name="glia_transparent_black_bg">#B3000000</color>
-    <color name="glia_transparent_black_buttons_bg">#000000</color>
+    <color name="glia_transparent_black_buttons_bg">@color/glia_black_color</color>
 
     <color name="glia_stroke_gray">#4D6C7683</color>
     <color name="glia_separator_gray">#5C3C3C43</color>
     <color name="glia_attachment_menu_bg">#F2F2F2</color>
     <color name="glia_chat_background_color">#FFFFFF</color>
+    <color name="glia_dark_transparent_bg">#99000000</color>
 </resources>

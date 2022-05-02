@@ -18,6 +18,8 @@ import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
 
 public class ControllerFactory {
 
@@ -133,7 +135,6 @@ public class ControllerFactory {
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
-                    useCaseFactory.createGliaOnVisitorMediaStateUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
                     useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
@@ -142,7 +143,9 @@ public class ControllerFactory {
                     useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.getGliaSurveyUseCase()
+                    useCaseFactory.getGliaSurveyUseCase(),
+                    useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -219,6 +222,8 @@ public class ControllerFactory {
                     messagesNotSeenHandler,
                     useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                    useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     chatHeadPosition
             );
         }
@@ -233,7 +238,9 @@ public class ControllerFactory {
                 useCaseFactory.createOnEngagementEndUseCase(),
                 messagesNotSeenHandler,
                 useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase()
+                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
+                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
         );
     }
 
@@ -244,5 +251,12 @@ public class ControllerFactory {
             );
         }
         return surveyController;
+    }
+
+    public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {
+        return new FloatingVisitorVideoController(
+                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
+        );
     }
 }

@@ -4,6 +4,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
+import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 
 import java.util.function.Consumer;
 
@@ -16,16 +17,19 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
     private final GliaEngagementRepository gliaRepository;
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final GliaQueueRepository gliaQueueRepository;
+    private final GliaVisitorMediaRepository gliaVisitorMediaRepository;
     private Listener listener;
 
     public GliaOnEngagementUseCase(
             GliaEngagementRepository gliaRepository,
             GliaOperatorMediaRepository operatorMediaRepository,
-            GliaQueueRepository gliaQueueRepository
+            GliaQueueRepository gliaQueueRepository,
+            GliaVisitorMediaRepository gliaVisitorMediaRepository
     ) {
         this.gliaRepository = gliaRepository;
         this.operatorMediaRepository = operatorMediaRepository;
         this.gliaQueueRepository = gliaQueueRepository;
+        this.gliaVisitorMediaRepository = gliaVisitorMediaRepository;
     }
 
     public void execute(Listener listener) {
@@ -39,6 +43,7 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
             listener.newEngagementLoaded(engagement);
         }
         operatorMediaRepository.startListening(engagement);
+        gliaVisitorMediaRepository.onEngagementStarted(engagement);
         gliaQueueRepository.onEngagementStarted();
     }
 

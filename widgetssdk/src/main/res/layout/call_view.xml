@@ -38,19 +38,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/glia_large" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/visitor_video_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/glia_large"
-        android:visibility="gone"
-        android:contentDescription="@string/glia_call_visitor_video_content_description"
-        app:cardCornerRadius="@dimen/glia_medium"
-        app:layout_constraintBottom_toTopOf="@id/operator_video_container"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toEndOf="@id/operator_data_barrier"
-        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
-
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/operator_data_barrier"
         android:layout_width="wrap_content"
@@ -65,7 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_call_operator_status_image_margin_top"
         android:visibility="gone"
-        app:imageSize="@dimen/glia_call_operator_status_image_size"
+        app:imageSize="@dimen/glia_chat_profile_picture_size"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/top_app_bar"
@@ -76,12 +63,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"
+        android:accessibilityLiveRegion="polite"
         android:gravity="center"
         android:lineSpacingExtra="@dimen/glia_medium"
         android:textAppearance="?attr/textAppearanceHeadline2"
         android:textColor="@color/glia_base_light_color"
         android:visibility="gone"
-        android:accessibilityLiveRegion="polite"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
@@ -92,14 +79,27 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large"
         android:gravity="center"
+        android:hint="@string/glia_call_operator_name_hint"
         android:textAppearance="?attr/textAppearanceHeadline1"
         android:textColor="@color/glia_base_light_color"
         android:visibility="gone"
-        android:hint="@string/glia_call_operator_name_hint"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_status_view"
         app:layout_goneMarginTop="@dimen/glia_call_operator_name_gone_margin_top" />
+
+    <TextView
+        android:id="@+id/on_hold_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/glia_medium"
+        android:gravity="center"
+        android:text="@string/glia_call_on_hold"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:textColor="@color/glia_base_light_color"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@id/operator_name_view" />
 
     <TextView
         android:id="@+id/company_name_view"
@@ -107,10 +107,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large"
         android:gravity="center"
+        android:hint="@string/glia_call_company_name_hint"
         android:textAppearance="?attr/textAppearanceHeadline1"
         android:textColor="@color/glia_base_light_color"
         android:visibility="gone"
-        android:hint="@string/glia_call_company_name_hint"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
@@ -134,21 +134,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
+        android:hint="@string/glia_call_call_duration_hint"
         android:textAppearance="?attr/textAppearanceBody1"
         android:textColor="@color/glia_base_light_color"
         android:visibility="gone"
-        android:hint="@string/glia_call_call_duration_hint"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_name_view" />
 
     <FrameLayout
         android:id="@+id/operator_video_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="@dimen/glia_call_video_height"
-        android:visibility="gone"
         android:contentDescription="@string/glia_call_operator_video_content_description"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/call_timer_view" />
 
     <TextView
@@ -157,13 +159,22 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_x_large"
         android:gravity="center"
-        android:text="@string/glia_call_continue_browsing"
         android:textAppearance="?attr/textAppearanceBody1"
         android:textColor="@color/glia_base_light_color"
-        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/buttons_layout"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toStartOf="@id/start_guideline" />
+        app:layout_constraintStart_toStartOf="@id/start_guideline"
+        tools:text="@string/glia_call_continue_browsing" />
+
+    <com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
+        android:id="@+id/floating_visitor_video"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/glia_call_visitor_video_content_description"
+        app:layout_constraintBottom_toTopOf="@id/buttons_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
 
     <View
         android:id="@+id/buttons_layout_bg"

@@ -78,6 +78,16 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     }
 
     @Override
+    public void showOnHold() {
+        chatHeadView.showOnHold();
+    }
+
+    @Override
+    public void hideOnHold() {
+        chatHeadView.hideOnHold();
+    }
+
+    @Override
     public void navigateToChat() {
         if (navigationCallback != null) {
             navigationCallback.onNavigateToChat();
@@ -184,7 +194,7 @@ public class ChatHeadLayout extends FrameLayout implements ChatHeadLayoutContrac
     @SuppressLint("ClickableViewAccessibility")
     private void setupViewActions() {
         chatHeadView.setOnTouchListener(
-                new ViewHelpers.ChatHeadOnTouchListener(
+                new ViewHelpers.OnTouchListener(
                         this::getChatHeadViewPosition,
                         this::onChatHeadDragged,
                         this::onChatHeadClicked

@@ -19,8 +19,8 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.ViewHelpers;
-import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.head.ChatHeadView;
+import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class ChatHeadService extends Service {
     private static final String TAG = ChatHeadService.class.getSimpleName();

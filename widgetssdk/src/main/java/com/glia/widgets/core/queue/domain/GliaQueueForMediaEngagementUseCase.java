@@ -3,7 +3,6 @@ package com.glia.widgets.core.queue.domain;
 import com.glia.androidsdk.Engagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
-import com.glia.widgets.core.queue.QueueTicketsEventsListener;
 
 public class GliaQueueForMediaEngagementUseCase {
 

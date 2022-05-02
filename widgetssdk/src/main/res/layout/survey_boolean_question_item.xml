@@ -17,7 +17,7 @@
         android:textColor="?attr/gliaBaseDarkColor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.glia.widgets.view.button.GliaSurveyOptionButton
         android:id="@+id/yes_button"
@@ -27,7 +27,7 @@
         android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.glia.widgets.view.button.GliaSurveyOptionButton
         android:id="@+id/no_button"
@@ -37,7 +37,7 @@
         android:layout_marginStart="@dimen/glia_large"
         app:layout_constraintTop_toTopOf="@id/yes_button"
         app:layout_constraintStart_toEndOf="@+id/yes_button"
-        app:layout_constraintBottom_toBottomOf="@id/yes_button"/>
+        app:layout_constraintBottom_toBottomOf="@id/yes_button" />
 
     <TextView
         android:id="@+id/required_error"
@@ -51,6 +51,6 @@
         app:drawableStartCompat="@drawable/ic_attention"
         app:layout_constraintTop_toBottomOf="@id/yes_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

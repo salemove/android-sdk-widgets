@@ -23,7 +23,7 @@ public class ChatHeadManager {
             applicationContext.startService(chatHeadServiceIntent);
         }
     }
-    
+
     public void stopChatHeadService() {
         if (isServiceStarted) {
             isServiceStarted = false;

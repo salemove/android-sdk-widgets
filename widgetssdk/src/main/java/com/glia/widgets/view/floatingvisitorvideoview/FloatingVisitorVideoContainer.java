@@ -16,7 +16,8 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.ViewHelpers;
 
-public class FloatingVisitorVideoContainer extends ConstraintLayout implements FloatingVisitorVideoContract.View {
+public class FloatingVisitorVideoContainer extends ConstraintLayout
+        implements FloatingVisitorVideoContract.View {
     private FloatingVisitorVideoContract.Controller controller;
     private FloatingVisitorVideoView floatingVisitorVideoView;
 

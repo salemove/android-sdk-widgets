@@ -1,18 +1,18 @@
 package com.glia.widgets.di;
 
-import com.glia.widgets.core.survey.GliaSurveyRepository;
-import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
-import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
+import com.glia.widgets.chat.data.GliaChatRepository;
+import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
+import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
+import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepositoryImpl;
-import com.glia.widgets.core.fileupload.FileAttachmentRepository;
-import com.glia.widgets.chat.data.GliaChatRepository;
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
+import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
+import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 
 public class RepositoryFactory {
 

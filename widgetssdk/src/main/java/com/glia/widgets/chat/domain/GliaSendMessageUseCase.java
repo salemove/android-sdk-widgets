@@ -5,10 +5,10 @@ import com.glia.androidsdk.chat.FilesAttachment;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.engagement.EngagementFile;
+import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.chat.data.GliaChatRepository;
 
 import java.util.List;
 

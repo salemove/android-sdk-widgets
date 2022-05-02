@@ -1,7 +1,6 @@
 package com.glia.widgets.core.mediaupgradeoffer;
 
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 
 public interface MediaUpgradeOfferRepositoryCallback {
 

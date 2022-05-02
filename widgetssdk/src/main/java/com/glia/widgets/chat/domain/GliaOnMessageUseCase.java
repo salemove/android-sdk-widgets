@@ -2,8 +2,8 @@ package com.glia.widgets.chat.domain;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.chat.data.GliaChatRepository;
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 
 public class GliaOnMessageUseCase implements
         GliaOnEngagementUseCase.Listener,

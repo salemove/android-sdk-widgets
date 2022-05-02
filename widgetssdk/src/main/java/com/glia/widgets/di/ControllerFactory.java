@@ -14,12 +14,12 @@ import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
+import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
-import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
 
 public class ControllerFactory {
 

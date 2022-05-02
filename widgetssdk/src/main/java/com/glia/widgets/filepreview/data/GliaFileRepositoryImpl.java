@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
+import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException;
 
 import java.io.InputStream;

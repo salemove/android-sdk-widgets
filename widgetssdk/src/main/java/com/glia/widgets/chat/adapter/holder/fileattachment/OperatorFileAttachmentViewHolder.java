@@ -56,7 +56,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
 
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
                         = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                                AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
+                        AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
                 info.addAction(actionClick);
             }
         });

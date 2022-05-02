@@ -4,6 +4,7 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
@@ -15,11 +16,11 @@ import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
-import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 
 import java.util.Optional;
 
-public class ApplicationChatHeadLayoutController implements ChatHeadLayoutContract.Controller, VisitorMediaUpdatesListener {
+public class ApplicationChatHeadLayoutController
+        implements ChatHeadLayoutContract.Controller, VisitorMediaUpdatesListener {
     private final IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
     private final ResolveChatHeadNavigationUseCase navigationDestinationUseCase;
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;

@@ -22,7 +22,8 @@ import com.glia.widgets.helper.Utils;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.squareup.picasso.Picasso;
 
-public class UploadAttachmentAdapter extends ListAdapter<FileAttachment, UploadAttachmentAdapter.ViewHolder> {
+public class UploadAttachmentAdapter
+        extends ListAdapter<FileAttachment, UploadAttachmentAdapter.ViewHolder> {
     public UploadAttachmentAdapter() {
         super(new DiffUtil.ItemCallback<FileAttachment>() {
             @Override

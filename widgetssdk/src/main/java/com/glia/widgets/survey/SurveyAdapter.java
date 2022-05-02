@@ -123,7 +123,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return questionItems.size();
     }
 
-    abstract static class SurveyViewHolder extends RecyclerView.ViewHolder implements SurveyController.AnswerCallback {
+    abstract static class SurveyViewHolder extends RecyclerView.ViewHolder
+            implements SurveyController.AnswerCallback {
         TextView titleTextView;
         View requiredError;
         QuestionItem questionItem;
@@ -144,7 +145,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             showRequiredError(questionItem.isShowError());
         }
 
-        void applyAnswer(@Nullable Survey.Answer answer) {}
+        void applyAnswer(@Nullable Survey.Answer answer) {
+        }
 
         private void setItemTitle(Survey.Question question) {
             if (question.isRequired()) {
@@ -390,7 +392,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 int start = context.getResources().getDimensionPixelSize(R.dimen.glia_medium);
                 int vertical = context.getResources().getDimensionPixelSize(R.dimen.glia_pre_large);
                 boolean isRtl = context.getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-                radioButton.setPadding(isRtl ? 0 : start, vertical , isRtl ? start : 0, vertical);
+                radioButton.setPadding(isRtl ? 0 : start, vertical, isRtl ? start : 0, vertical);
                 radioGroup.addView(radioButton);
             }
         }

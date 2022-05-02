@@ -8,7 +8,8 @@ import com.glia.widgets.helper.Logger;
 
 import io.reactivex.disposables.Disposable;
 
-public class FilePreviewController implements FilePreviewContract.Controller, GliaOnEngagementEndUseCase.Listener {
+public class FilePreviewController
+        implements FilePreviewContract.Controller, GliaOnEngagementEndUseCase.Listener {
     private static final String TAG = FilePreviewController.class.getSimpleName();
 
     private FilePreviewContract.View view;

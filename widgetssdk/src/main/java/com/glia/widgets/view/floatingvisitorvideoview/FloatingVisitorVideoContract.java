@@ -1,7 +1,5 @@
 package com.glia.widgets.view.floatingvisitorvideoview;
 
-import android.app.Activity;
-
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.base.BaseController;
 import com.glia.widgets.base.BaseView;

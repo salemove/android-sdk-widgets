@@ -1,3 +1,4 @@
 package com.glia.widgets.survey;
 
-public class SurveyValidationException extends RuntimeException {}
+public class SurveyValidationException extends RuntimeException {
+}

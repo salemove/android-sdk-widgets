@@ -15,7 +15,7 @@ public class MinimizeHandler {
         listeners.add(listener);
     }
 
-    public void removeListener(OnMinimizeCalledListener listener){
+    public void removeListener(OnMinimizeCalledListener listener) {
         listeners.remove(listener);
     }
 

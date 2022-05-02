@@ -10,7 +10,7 @@ public class GliaEndEngagementUseCase {
         this.engagementRepository = engagementRepository;
     }
 
-    public void execute(){
+    public void execute() {
         engagementRepository.endEngagement();
     }
 }

@@ -50,8 +50,8 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         String name = item.attachmentFile.getName();
         String byteSize = Formatter.formatFileSize(itemView.getContext(), item.attachmentFile.getSize());
         itemView.setContentDescription(itemView.getResources().getString(item.showDelivered
-                ? R.string.glia_chat_visitor_file_delivered_content_description
-                : R.string.glia_chat_visitor_file_content_description,
+                        ? R.string.glia_chat_visitor_file_delivered_content_description
+                        : R.string.glia_chat_visitor_file_content_description,
                 name, byteSize));
 
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {

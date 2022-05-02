@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Application.Glia.Header.EndButton" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">?attr/gliaSystemNegativeColor</item>
         <item name="android:strokeColor">?attr/gliaSystemNegativeColor</item>

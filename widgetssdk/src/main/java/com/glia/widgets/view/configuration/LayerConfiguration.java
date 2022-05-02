@@ -55,14 +55,17 @@ public class LayerConfiguration implements Parcelable {
             this.backgroundColor = backgroundColor;
             return this;
         }
+
         public Builder borderColor(String borderColor) {
             this.borderColor = borderColor;
             return this;
         }
+
         public Builder borderWidth(int borderWidth) {
             this.borderWidth = borderWidth;
             return this;
         }
+
         public Builder cornerRadius(int cornerRadius) {
             this.cornerRadius = cornerRadius;
             return this;

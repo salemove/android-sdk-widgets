@@ -33,7 +33,8 @@ import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
-public class SurveyView extends ConstraintLayout implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
+public class SurveyView extends ConstraintLayout
+        implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 
     private SurveyContract.Controller controller;

@@ -26,7 +26,8 @@ import com.glia.widgets.view.head.ChatHeadPosition;
 
 import java.util.Optional;
 
-public class ServiceChatHeadController implements ChatHeadContract.Controller, VisitorMediaUpdatesListener {
+public class ServiceChatHeadController
+        implements ChatHeadContract.Controller, VisitorMediaUpdatesListener {
     private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
     private final ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 

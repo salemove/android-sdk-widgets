@@ -1,5 +1,8 @@
 package com.glia.widgets.core.notification.device;
 
+import static com.glia.widgets.core.notification.NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID;
+import static com.glia.widgets.core.notification.NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID;
+
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.content.Context;
@@ -14,9 +17,6 @@ import androidx.core.app.NotificationManagerCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.core.notification.NotificationFactory;
 import com.glia.widgets.core.screensharing.MediaProjectionService;
-
-import static com.glia.widgets.core.notification.NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID;
-import static com.glia.widgets.core.notification.NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID;
 
 public class NotificationManager implements INotificationManager {
     private final Context applicationContext;

@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.view.View;
 import android.widget.TextView;

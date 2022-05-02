@@ -50,12 +50,12 @@ public class ResourceProvider implements IResourceProvider {
         return ResourcesCompat.getDrawable((weakContext.get()).getResources(), id, null);
     }
 
-    public int getDimension(int dimensionId){
+    public int getDimension(int dimensionId) {
         Resources resources = weakContext.get().getResources();
-        return (int) (resources.getDimension(dimensionId)/ resources.getDisplayMetrics().density);
+        return (int) (resources.getDimension(dimensionId) / resources.getDisplayMetrics().density);
     }
 
-    public float convertDpToPixel(int dp){
+    public float convertDpToPixel(int dp) {
         return dp * ((float) weakContext.get().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

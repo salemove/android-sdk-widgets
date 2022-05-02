@@ -7,7 +7,8 @@ import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 
-public class FloatingVisitorVideoController implements FloatingVisitorVideoContract.Controller, VisitorMediaUpdatesListener {
+public class FloatingVisitorVideoController
+        implements FloatingVisitorVideoContract.Controller, VisitorMediaUpdatesListener {
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
 

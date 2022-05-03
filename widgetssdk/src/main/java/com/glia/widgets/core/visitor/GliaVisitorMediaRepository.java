@@ -51,10 +51,8 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
     }
 
     private void notifyOnHoldStateChange(boolean newOnHold) {
-        if (isOnHold != newOnHold) {
-            isOnHold = newOnHold;
-            visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
-        }
+        isOnHold = newOnHold;
+        visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
     }
 
     private boolean hasVisitorVideoMedia() {

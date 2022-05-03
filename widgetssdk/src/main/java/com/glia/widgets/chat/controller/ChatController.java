@@ -1178,10 +1178,10 @@ public class ChatController implements
 
         if (viewCallback != null && survey != null) {
             viewCallback.navigateToSurvey(survey);
+            Dependencies.getControllerFactory().destroyControllers();
         } else {
             dialogController.showEngagementEndedDialog();
         }
-        Dependencies.getControllerFactory().destroyControllers();
     }
 
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {

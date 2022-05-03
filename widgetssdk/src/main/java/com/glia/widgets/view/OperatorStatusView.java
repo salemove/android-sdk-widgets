@@ -1,7 +1,6 @@
 package com.glia.widgets.view;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
@@ -32,10 +31,14 @@ public class OperatorStatusView extends ConstraintLayout {
     // On Hold status view on top of main view - displayed when on hold status changes
     private final ShapeableImageView onHoldOverlayView;
 
-    private final int placeHolderViewContentPadding;
+    private final int IMAGE_SIZE_DEFAULT;
+    private final int IMAGE_SIZE_LARGE;
+    private final int PLACEHOLDER_ICON_PADDING_DEFAULT;
+    private final int PLACEHOLDER_ICON_PADDING_LARGE;
+    private final int NO_PADDING = 0;
 
-    private int primaryColor;
     private boolean isOnHold = false;
+    private ColorDrawable profilePictureBackgroundColorDrawable = null;
 
     public OperatorStatusView(@NonNull Context context) {
         this(context, null);
@@ -63,14 +66,16 @@ public class OperatorStatusView extends ConstraintLayout {
             );
         }
 
-        int imageSize = (int) typedArray.getDimensionPixelSize(
-                R.styleable.OperatorStatusView_imageSize,
-                (int) getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_size)
-        );
-        profilePictureView.getLayoutParams().width = imageSize;
-        profilePictureView.getLayoutParams().height = imageSize;
+        IMAGE_SIZE_LARGE = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
+        PLACEHOLDER_ICON_PADDING_LARGE = IMAGE_SIZE_LARGE / 4;
 
-        placeHolderViewContentPadding = imageSize / 4;
+        IMAGE_SIZE_DEFAULT = typedArray.getDimensionPixelSize(
+                R.styleable.OperatorStatusView_imageSize,
+                getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_size)
+        );
+
+        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
+        PLACEHOLDER_ICON_PADDING_DEFAULT = IMAGE_SIZE_DEFAULT / 4;
 
         typedArray.recycle();
         setOnHoldVisibility();
@@ -82,57 +87,67 @@ public class OperatorStatusView extends ConstraintLayout {
         setOnHoldIcon(theme);
 
         // colors
-        ColorStateList backgroundColor = ContextCompat.getColorStateList(
-                this.getContext(), theme.getBaseLightColor()
-        );
-        primaryColor = ContextCompat.getColor(
-                this.getContext(), theme.getBrandPrimaryColor()
+        profilePictureBackgroundColorDrawable = new ColorDrawable(
+                ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor())
         );
         rippleAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
                 frameInfo -> new SimpleColorFilter(this.getContext().getColor(theme.getBrandPrimaryColor()))
         );
-        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
-        placeholderView.setImageTintList(backgroundColor);
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        placeholderView.setImageTintList(
+                ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor())
+        );
     }
 
     public void showPlaceHolder() {
-        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
-        placeholderView.setContentPadding(0, 0, 0, 0);
-        placeholderView.setVisibility(VISIBLE);
-    }
-
-    public void showPlaceHolderWithIconPadding() {
-        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
-        placeholderView.setVisibility(VISIBLE);
-        placeholderView.post(() -> placeholderView.setContentPadding(placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding));
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
+        updatePlaceholderView(
+                IMAGE_SIZE_DEFAULT,
+                NO_PADDING,
+                VISIBLE
+        );
     }
 
     public void showPlaceHolderWithIconPaddingOnConnect() {
-        int imageSize = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
-        profilePictureView.getLayoutParams().width = imageSize;
-        profilePictureView.getLayoutParams().height = imageSize;
-        showPlaceHolderWithIconPadding();
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        updateProfilePictureViewSize(IMAGE_SIZE_LARGE);
+        updatePlaceholderView(
+                IMAGE_SIZE_LARGE,
+                PLACEHOLDER_ICON_PADDING_LARGE,
+                VISIBLE
+        );
     }
 
     public void showProfileImageOnConnect(String profileImgUrl) {
-        int imageSize = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
-        profilePictureView.getLayoutParams().width = imageSize;
-        profilePictureView.getLayoutParams().height = imageSize;
-        showProfileImage(profileImgUrl);
+        updateProfilePictureViewSize(IMAGE_SIZE_LARGE);
+        Picasso.get().load(profileImgUrl).into(profilePictureView);
+        updatePlaceholderView(
+                IMAGE_SIZE_LARGE,
+                NO_PADDING,
+                GONE
+        );
     }
 
     public void showProfileImage(String profileImgUrl) {
+        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
         Picasso.get().load(profileImgUrl).into(profilePictureView);
-        placeholderView.setVisibility(GONE);
-        placeholderView.post(() ->
-                placeholderView.setContentPadding(
-                        placeHolderViewContentPadding,
-                        placeHolderViewContentPadding,
-                        placeHolderViewContentPadding,
-                        placeHolderViewContentPadding
-                )
+        updatePlaceholderView(
+                IMAGE_SIZE_DEFAULT,
+                NO_PADDING,
+                GONE
+        );
+    }
+
+    public void showPlaceHolderWithIconPadding() {
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
+        updatePlaceholderView(
+                IMAGE_SIZE_DEFAULT,
+                PLACEHOLDER_ICON_PADDING_DEFAULT,
+                VISIBLE
         );
     }
 
@@ -149,6 +164,29 @@ public class OperatorStatusView extends ConstraintLayout {
         } else {
             hideRippleAnimation();
         }
+    }
+
+    private void updatePlaceholderView(
+            int size,
+            int contentPadding,
+            int visibility
+    ) {
+        placeholderView.post(() -> {
+            placeholderView.getLayoutParams().width = size;
+            placeholderView.getLayoutParams().height = size;
+            placeholderView.setContentPadding(
+                    contentPadding,
+                    contentPadding,
+                    contentPadding,
+                    contentPadding
+            );
+            placeholderView.setVisibility(visibility);
+        });
+    }
+
+    private void updateProfilePictureViewSize(int size) {
+        profilePictureView.getLayoutParams().width = size;
+        profilePictureView.getLayoutParams().height = size;
     }
 
     private void showRippleAnimation() {

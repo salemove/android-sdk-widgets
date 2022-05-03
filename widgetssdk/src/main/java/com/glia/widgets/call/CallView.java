@@ -212,7 +212,6 @@ public class CallView extends ConstraintLayout {
 
     public void onDestroy(boolean isFinishing) {
         releaseOperatorVideoStream();
-        floatingVisitorVideoContainer.onDestroy();
         if (alertDialog != null) {
             alertDialog.dismiss();
             alertDialog = null;

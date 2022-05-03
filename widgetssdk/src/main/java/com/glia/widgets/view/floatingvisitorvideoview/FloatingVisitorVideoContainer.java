@@ -72,12 +72,6 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     }
 
     @Override
-    public void onDestroy() {
-        floatingVisitorVideoView.onDestroy();
-        controller.onDestroy();
-    }
-
-    @Override
     public void showOnHold() {
         post(() -> floatingVisitorVideoView.showOnHold());
     }
@@ -85,6 +79,12 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     @Override
     public void hideOnHold() {
         post(() -> floatingVisitorVideoView.hideOnHold());
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        controller.onDestroy();
     }
 
     private void init() {

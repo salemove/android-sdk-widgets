@@ -66,6 +66,7 @@
     <dimen name="glia_survey_default_text_size">16sp</dimen>
     <dimen name="glia_survey_default_survey_title_text_size">20sp</dimen>
     <dimen name="glia_survey_default_title_text_size">16sp</dimen>
+    <dimen name="glia_survey_radio_button_height">48dp</dimen>
 
     <dimen name="glia_single_choice_card_image_height">200dp</dimen>
 </resources>

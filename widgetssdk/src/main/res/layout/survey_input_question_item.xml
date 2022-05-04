@@ -7,7 +7,9 @@
     android:paddingTop="@dimen/glia_large"
     android:paddingStart="@dimen/glia_large_x_large"
     android:paddingEnd="@dimen/glia_large_x_large"
-    android:paddingBottom="@dimen/glia_large">
+    android:paddingBottom="@dimen/glia_large"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <TextView
         android:id="@+id/tv_title"

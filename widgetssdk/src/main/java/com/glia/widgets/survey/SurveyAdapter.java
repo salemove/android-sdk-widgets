@@ -152,21 +152,31 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         private void setItemTitle(Survey.Question question) {
+            String questionText = question.getText();
             if (question.isRequired()) {
                 Context context = titleTextView.getContext();
                 int color = ContextCompat.getColor(context, R.color.glia_system_negative_color);
                 String colorString = String.format("%X", color).substring(2);
                 String source = context.getString(
-                        R.string.glia_survey_require_label, question.getText(), colorString);
+                        R.string.glia_survey_require_label, questionText, colorString);
                 titleTextView.setText(Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY));
+                titleTextView.setContentDescription(
+                        context.getString(
+                                R.string.glia_survey_require_label_content_description,
+                                questionText
+                        )
+                );
             } else {
-                titleTextView.setText(question.getText());
+                titleTextView.setText(questionText);
+                titleTextView.setContentDescription(null);
             }
         }
 
         void showRequiredError(boolean error) {
             if (error) {
                 requiredError.setVisibility(View.VISIBLE);
+                itemView.announceForAccessibility(requiredError.getContext()
+                        .getString(R.string.glia_survey_required_error_message));
             } else {
                 requiredError.setVisibility(View.GONE);
             }
@@ -393,9 +403,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
                 radioButton.setButtonDrawable(drawable);
                 int start = context.getResources().getDimensionPixelSize(R.dimen.glia_medium);
-                int vertical = context.getResources().getDimensionPixelSize(R.dimen.glia_pre_large);
                 boolean isRtl = context.getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
-                radioButton.setPadding(isRtl ? 0 : start, vertical, isRtl ? start : 0, vertical);
+                radioButton.setPadding(isRtl ? 0 : start, 0, isRtl ? start : 0, 0);
+                int height = context.getResources().getDimensionPixelSize(R.dimen.glia_survey_radio_button_height);
+                radioButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
                 radioGroup.addView(radioButton);
             }
         }

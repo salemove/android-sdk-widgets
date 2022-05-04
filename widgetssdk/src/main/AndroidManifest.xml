@@ -29,7 +29,8 @@
         <activity
             android:name=".survey.SurveyActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Application.Glia.Translucent.Activity" />
+            android:theme="@style/Application.Glia.Translucent.Activity"
+            android:windowSoftInputMode="stateHidden" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

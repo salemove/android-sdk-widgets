@@ -10,7 +10,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 
-public class SurveyActivity extends AppCompatActivity {
+public class SurveyActivity extends AppCompatActivity implements SurveyView.Callback {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private SurveyView surveyView;
@@ -24,7 +24,7 @@ public class SurveyActivity extends AppCompatActivity {
 
     private void prepareSurveyView() {
         surveyView = findViewById(R.id.survey_view);
-
+        surveyView.setCallback(this);
         SurveyContract.Controller surveyController =
                 Dependencies.getControllerFactory().getSurveyController();
         surveyView.setController(surveyController);
@@ -34,6 +34,11 @@ public class SurveyActivity extends AppCompatActivity {
 
         Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
         surveyController.init(survey);
+    }
+
+    @Override
+    public void onTitleUpdated(String title) {
+        setTitle(title);
     }
 
     @Override

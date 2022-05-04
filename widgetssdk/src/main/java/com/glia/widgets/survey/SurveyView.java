@@ -37,12 +37,13 @@ public class SurveyView extends ConstraintLayout
         implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 
+    private Callback callback;
+
     private SurveyContract.Controller controller;
 
     private UiTheme theme;
 
     private CardView cardView;
-    private CardView cutBottomCornersCardView;
     private TextView title;
     private RecyclerView recyclerView;
     private LinearLayout buttonPanel;
@@ -85,6 +86,10 @@ public class SurveyView extends ConstraintLayout
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         applyStyle(theme.getSurveyStyle());
+    }
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
     }
 
     private void applyStyle(SurveyStyle surveyStyle) {
@@ -190,6 +195,9 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void onStateUpdated(SurveyState state) {
+        if (callback != null) {
+            callback.onTitleUpdated(state.title);
+        }
         title.setText(state.title);
         surveyAdapter.submitList(state.questions);
     }
@@ -210,5 +218,9 @@ public class SurveyView extends ConstraintLayout
             controller.onDestroy();
             controller = null;
         }
+    }
+
+    public interface Callback {
+        void onTitleUpdated(String title);
     }
 }

@@ -190,6 +190,7 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void onStateUpdated(SurveyState state) {
+        title.setText(state.title);
         surveyAdapter.submitList(state.questions);
     }
 

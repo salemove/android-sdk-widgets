@@ -18,7 +18,7 @@ public class SurveyController implements SurveyContract.Controller {
 
     private SurveyContract.View view;
     private Survey survey;
-    private SurveyState state = new SurveyState();
+    private SurveyState state = new SurveyState.Builder().createSurveyState();
 
     private final GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
 
@@ -35,14 +35,27 @@ public class SurveyController implements SurveyContract.Controller {
             }
             return;
         }
+        setTitle(survey.getTitle());
         setQuestions(survey);
+    }
+
+    private void setTitle(String title) {
+        setState(new SurveyState.Builder()
+                .copyFrom(state)
+                .setTitle(title)
+                .createSurveyState()
+        );
     }
 
     private void setQuestions(@NonNull Survey survey) {
         List<QuestionItem> questionItems = survey.getQuestions().stream()
                 .map(this::makeQuestionItem)
                 .collect(Collectors.toList());
-        setState(new SurveyState(questionItems));
+        setState(new SurveyState.Builder()
+                .copyFrom(state)
+                .setQuestions(questionItems)
+                .createSurveyState()
+        );
     }
 
     private QuestionItem makeQuestionItem(Survey.Question question) {

@@ -187,7 +187,6 @@
     <string name="glia_preview_activity_image_content_description">Preview content</string>
 
     <!--    Survey-->
-    <string name="glia_survey_screen_title">Visitor Survey</string>
     <string name="glia_survey_cancel_label">Cancel</string>
     <string name="glia_survey_submit_label">Submit</string>
     <string name="glia_survey_open_text_item_title">Additional thoughts?</string>

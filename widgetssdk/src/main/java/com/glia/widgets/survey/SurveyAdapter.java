@@ -60,8 +60,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.listener = listener;
     }
 
-    public void submitList(List<QuestionItem> items) {
+    public void submitList(@Nullable List<QuestionItem> items) {
         questionItems.clear();
+        if (items == null) {
+            return;
+        }
         questionItems.addAll(items);
     }
 

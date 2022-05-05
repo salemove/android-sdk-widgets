@@ -21,7 +21,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/glia_large_x_large"
                 android:gravity="center"
-                android:text="@string/glia_survey_screen_title"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView

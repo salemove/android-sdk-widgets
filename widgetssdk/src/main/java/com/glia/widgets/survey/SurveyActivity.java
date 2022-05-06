@@ -11,7 +11,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Utils;
 
-public class SurveyActivity extends AppCompatActivity implements SurveyView.Callback {
+public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFinishListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private SurveyView surveyView;
@@ -41,11 +41,6 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
     }
 
     @Override
-    public void onTitleUpdated(String title) {
-        setTitle(title);
-    }
-
-    @Override
     public void onFinish() {
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
@@ -60,7 +55,8 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
 
     private void prepareSurveyView() {
         surveyView = findViewById(R.id.survey_view);
-        surveyView.setCallback(this);
+        surveyView.setOnTitleUpdatedListener(this::setTitle);
+        surveyView.setOnFinishListener(this);
         SurveyContract.Controller surveyController =
                 Dependencies.getControllerFactory().getSurveyController();
         surveyView.setController(surveyController);

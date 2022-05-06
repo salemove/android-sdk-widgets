@@ -22,8 +22,6 @@ public interface FloatingVisitorVideoContract {
 
         void onPause();
 
-        void onDestroy();
-
         void showOnHold();
 
         void hideOnHold();

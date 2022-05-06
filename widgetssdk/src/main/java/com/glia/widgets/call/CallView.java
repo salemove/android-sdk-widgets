@@ -105,6 +105,7 @@ public class CallView extends ConstraintLayout {
     private OnMinimizeListener onMinimizeListener;
     private OnNavigateToChatListener onNavigateToChatListener;
     private CallView.OnNavigateToSurveyListener onNavigateToSurveyListener;
+    private OnTitleUpdatedListener onTitleUpdatedListener;
 
     private UiTheme theme;
 
@@ -282,9 +283,9 @@ public class CallView extends ConstraintLayout {
                         appBar.showXButton();
                     }
                     if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
-                        appBar.setTitle(resources.getString(R.string.glia_call_video_app_bar_title));
+                        setTitle(resources.getString(R.string.glia_call_video_app_bar_title));
                     } else {
-                        appBar.setTitle(resources.getString(R.string.glia_call_audio_app_bar_title));
+                        setTitle(resources.getString(R.string.glia_call_audio_app_bar_title));
                     }
                     operatorNameView.setText(callState.callStatus.getFormattedOperatorName());
                     connectingView.setText(resources.getString(
@@ -435,6 +436,13 @@ public class CallView extends ConstraintLayout {
         serviceChatHeadController = Dependencies
                 .getControllerFactory()
                 .getChatHeadController();
+    }
+
+    private void setTitle(String title) {
+        if (onTitleUpdatedListener != null) {
+            onTitleUpdatedListener.onTitleUpdated(title);
+        }
+        appBar.setTitle(title);
     }
 
     private void handleCallTimerView(CallState callState) {
@@ -798,6 +806,10 @@ public class CallView extends ConstraintLayout {
         this.onNavigateToSurveyListener = onNavigateToSurveyListener;
     }
 
+    public void setOnTitleUpdatedListener(OnTitleUpdatedListener onTitleUpdatedListener) {
+        this.onTitleUpdatedListener = onTitleUpdatedListener;
+    }
+
     private void showUIOnCallOngoing() {
         setVisibility(VISIBLE);
         handleStatusbarColor();
@@ -1080,6 +1092,10 @@ public class CallView extends ConstraintLayout {
 
     public interface OnNavigateToSurveyListener {
         void onSurvey(@NonNull Survey survey);
+    }
+
+    public interface OnTitleUpdatedListener {
+        void onTitleUpdated(String title);
     }
 
     public boolean shouldShowMediaEngagementView() {

@@ -133,6 +133,7 @@ public class ChatView extends ConstraintLayout implements
     private UiTheme theme;
     // needed for setting status bar color back when view is gone
     private Integer defaultStatusbarColor;
+    private OnTitleUpdatedListener onTitleUpdatedListener;
     private OnBackClickedListener onBackClickedListener;
     private OnEndListener onEndListener;
     private OnMinimizeListener onMinimizeListener;
@@ -298,6 +299,10 @@ public class ChatView extends ConstraintLayout implements
     public boolean backPressed() {
         if (controller != null) controller.onBackArrowClicked();
         return true;
+    }
+
+    public void setOnTitleUpdatedListener(OnTitleUpdatedListener onTitleUpdatedListener) {
+        this.onTitleUpdatedListener = onTitleUpdatedListener;
     }
 
     /**
@@ -734,6 +739,9 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void showToolbar(String title) {
+        if (onTitleUpdatedListener != null) {
+            onTitleUpdatedListener.onTitleUpdated(title);
+        }
         appBar.setTitle(title);
         appBar.showToolbar();
     }
@@ -1390,5 +1398,9 @@ public class ChatView extends ConstraintLayout implements
 
     public interface OnNavigateToSurveyListener {
         void onSurvey(UiTheme theme, @NonNull Survey survey);
+    }
+
+    public interface OnTitleUpdatedListener {
+        void onTitleUpdated(String title);
     }
 }

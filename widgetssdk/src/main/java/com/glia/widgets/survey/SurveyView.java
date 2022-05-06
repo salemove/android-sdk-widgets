@@ -36,7 +36,8 @@ public class SurveyView extends ConstraintLayout
         implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 
-    private Callback callback;
+    private OnTitleUpdatedListener onTitleUpdatedListener;
+    private OnFinishListener onFinishListener;
 
     private SurveyContract.Controller controller;
 
@@ -87,8 +88,12 @@ public class SurveyView extends ConstraintLayout
         applyStyle(theme.getSurveyStyle());
     }
 
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    public void setOnTitleUpdatedListener(OnTitleUpdatedListener onTitleUpdatedListener) {
+        this.onTitleUpdatedListener = onTitleUpdatedListener;
+    }
+
+    public void setOnFinishListener(OnFinishListener onFinishListener) {
+        this.onFinishListener = onFinishListener;
     }
 
     private void applyStyle(SurveyStyle surveyStyle) {
@@ -194,8 +199,8 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void onStateUpdated(SurveyState state) {
-        if (callback != null) {
-            callback.onTitleUpdated(state.title);
+        if (onTitleUpdatedListener != null) {
+            onTitleUpdatedListener.onTitleUpdated(state.title);
         }
         title.setText(state.title);
         surveyAdapter.submitList(state.questions);
@@ -213,8 +218,8 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void finish() {
-        if (callback != null) {
-            callback.onFinish();
+        if (onFinishListener != null) {
+            onFinishListener.onFinish();
         }
     }
 
@@ -225,9 +230,11 @@ public class SurveyView extends ConstraintLayout
         }
     }
 
-    public interface Callback {
+    public interface OnTitleUpdatedListener {
         void onTitleUpdated(String title);
+    }
 
+    public interface OnFinishListener {
         void onFinish();
     }
 }

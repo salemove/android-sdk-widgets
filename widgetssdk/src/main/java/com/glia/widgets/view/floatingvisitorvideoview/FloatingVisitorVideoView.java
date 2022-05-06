@@ -29,16 +29,18 @@ public class FloatingVisitorVideoView extends MaterialCardView {
         init();
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        releaseVideoStream();
+    }
+
     public void onResume() {
         resumeVideoStream();
     }
 
     public void onPause() {
         pauseVideoStream();
-    }
-
-    public void onDestroy() {
-        releaseVideoStream();
     }
 
     public void showVisitorVideo(VideoView newVideoView) {

@@ -21,15 +21,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/glia_chat_visitor_margin_end" />
 
-    <!-- no-op -->
-    <com.glia.widgets.view.OperatorStatusView
-        android:id="@+id/chat_head_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <include
         android:id="@+id/attachment_file_view"
         layout="@layout/chat_attachment_file_item"

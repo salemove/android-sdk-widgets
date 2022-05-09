@@ -21,6 +21,8 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.squareup.picasso.Picasso;
 
 public class OperatorStatusView extends ConstraintLayout {
+    private static final int NO_PADDING = 0;
+
     // Animation behind the view
     private final LottieAnimationView rippleAnimation;
 
@@ -35,7 +37,6 @@ public class OperatorStatusView extends ConstraintLayout {
     private final int operatorImageContentPadding;
     private final int operatorImageLargeSize;
     private final int operatorImageLargeContentPadding;
-    private final int NO_PADDING = 0;
 
     private boolean isOnHold = false;
     private ColorDrawable profilePictureBackgroundColorDrawable = null;

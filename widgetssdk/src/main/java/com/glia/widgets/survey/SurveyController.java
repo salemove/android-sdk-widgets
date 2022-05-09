@@ -90,21 +90,36 @@ public class SurveyController implements SurveyContract.Controller {
                 .filter(item -> item.getQuestion().getId().equals(answer.getQuestionId()))
                 .findFirst()
                 .ifPresent(item -> {
-                    item.setAnswer(answer);
-                    if (item.isShowError()) {
-                        boolean showError;
-                        try {
-                            gliaSurveyAnswerUseCase.validate(item);
-                            showError = false;
-                        } catch (SurveyValidationException ignore) {
-                            showError = true;
-                        }
-                        item.setShowError(showError);
-                        if (item.getAnswerCallback() != null) {
-                            item.getAnswerCallback().answerCallback(showError);
-                        }
-                    }
+                    setAnswer(item, answer);
+                    hideSoftKeyboardIfNeeds(item);
                 });
+    }
+
+    private void hideSoftKeyboardIfNeeds(QuestionItem item) {
+        if (item.getQuestion().getType() != Survey.Question.QuestionType.TEXT) {
+            view.hideSoftKeyboard();
+        }
+    }
+
+    private void setAnswer(QuestionItem item, Survey.Answer answer) {
+        item.setAnswer(answer);
+        if (item.isShowError()) {
+            validate(item);
+        }
+    }
+
+    private void validate(QuestionItem item) {
+        boolean showError;
+        try {
+            gliaSurveyAnswerUseCase.validate(item);
+            showError = false;
+        } catch (SurveyValidationException ignore) {
+            showError = true;
+        }
+        item.setShowError(showError);
+        if (item.getAnswerCallback() != null) {
+            item.getAnswerCallback().answerCallback(showError);
+        }
     }
 
     @Override

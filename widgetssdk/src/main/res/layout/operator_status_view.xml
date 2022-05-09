@@ -57,6 +57,7 @@
         android:contentDescription="@string/glia_call_operator_status_on_hold_description"
         android:scaleType="fitCenter"
         android:tint="?attr/gliaBaseLightColor"
+        app:contentPadding="@dimen/glia_chat_profile_picture_large_content_padding"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"

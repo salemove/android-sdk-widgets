@@ -123,7 +123,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
         if (item.operatorProfileImgUrl != null) {
             operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
         } else {
-            operatorStatusView.showPlaceHolderWithIconPadding();
+            operatorStatusView.showPlaceholder();
         }
     }
 }

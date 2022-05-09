@@ -67,7 +67,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
         if (item.operatorProfileImgUrl != null) {
             operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
         } else {
-            operatorStatusView.showPlaceHolderWithIconPadding();
+            operatorStatusView.showPlaceholder();
         }
     }
 }

@@ -52,6 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_call_operator_status_image_margin_top"
         android:visibility="gone"
+        app:imageContentPadding="@dimen/glia_chat_profile_picture_content_padding"
         app:imageSize="@dimen/glia_chat_profile_picture_size"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"

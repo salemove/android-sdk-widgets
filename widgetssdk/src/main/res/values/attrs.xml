@@ -204,6 +204,7 @@
 
     <declare-styleable name="OperatorStatusView">
         <attr name="imageSize" format="dimension" />
+        <attr name="imageContentPadding" format="dimension" />
         <attr name="rippleTint" format="reference" />
     </declare-styleable>
 

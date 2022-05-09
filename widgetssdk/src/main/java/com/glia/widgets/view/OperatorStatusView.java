@@ -1,7 +1,6 @@
 package com.glia.widgets.view;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
@@ -22,6 +21,8 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.squareup.picasso.Picasso;
 
 public class OperatorStatusView extends ConstraintLayout {
+    private static final int NO_PADDING = 0;
+
     // Animation behind the view
     private final LottieAnimationView rippleAnimation;
 
@@ -32,10 +33,13 @@ public class OperatorStatusView extends ConstraintLayout {
     // On Hold status view on top of main view - displayed when on hold status changes
     private final ShapeableImageView onHoldOverlayView;
 
-    private final int placeHolderViewContentPadding;
+    private final int operatorImageSize;
+    private final int operatorImageContentPadding;
+    private final int operatorImageLargeSize;
+    private final int operatorImageLargeContentPadding;
 
-    private int primaryColor;
     private boolean isOnHold = false;
+    private ColorDrawable profilePictureBackgroundColorDrawable = null;
 
     public OperatorStatusView(@NonNull Context context) {
         this(context, null);
@@ -63,15 +67,18 @@ public class OperatorStatusView extends ConstraintLayout {
             );
         }
 
-        int imageSize = (int) typedArray.getDimensionPixelSize(
+        operatorImageLargeSize = getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_size);
+        operatorImageLargeContentPadding = getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_content_padding);
+
+        operatorImageSize = typedArray.getDimensionPixelSize(
                 R.styleable.OperatorStatusView_imageSize,
-                (int) getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_size)
+                getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_size)
         );
-        profilePictureView.getLayoutParams().width = imageSize;
-        profilePictureView.getLayoutParams().height = imageSize;
-
-        placeHolderViewContentPadding = imageSize / 4;
-
+        operatorImageContentPadding = typedArray.getDimensionPixelSize(
+                R.styleable.OperatorStatusView_imageContentPadding,
+                getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_content_padding)
+        );
+        updateProfilePictureViewSize(operatorImageSize);
         typedArray.recycle();
         setOnHoldVisibility();
     }
@@ -82,57 +89,57 @@ public class OperatorStatusView extends ConstraintLayout {
         setOnHoldIcon(theme);
 
         // colors
-        ColorStateList backgroundColor = ContextCompat.getColorStateList(
-                this.getContext(), theme.getBaseLightColor()
-        );
-        primaryColor = ContextCompat.getColor(
-                this.getContext(), theme.getBrandPrimaryColor()
+        profilePictureBackgroundColorDrawable = new ColorDrawable(
+                ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor())
         );
         rippleAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
                 frameInfo -> new SimpleColorFilter(this.getContext().getColor(theme.getBrandPrimaryColor()))
         );
-        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
-        placeholderView.setImageTintList(backgroundColor);
-    }
-
-    public void showPlaceHolder() {
-        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
-        placeholderView.setContentPadding(0, 0, 0, 0);
-        placeholderView.setVisibility(VISIBLE);
-    }
-
-    public void showPlaceHolderWithIconPadding() {
-        profilePictureView.setImageDrawable(new ColorDrawable(primaryColor));
-        placeholderView.setVisibility(VISIBLE);
-        placeholderView.post(() -> placeholderView.setContentPadding(placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding, placeHolderViewContentPadding));
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        placeholderView.setImageTintList(
+                ContextCompat.getColorStateList(this.getContext(), theme.getBaseLightColor())
+        );
     }
 
     public void showPlaceHolderWithIconPaddingOnConnect() {
-        int imageSize = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
-        profilePictureView.getLayoutParams().width = imageSize;
-        profilePictureView.getLayoutParams().height = imageSize;
-        showPlaceHolderWithIconPadding();
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        updateProfilePictureViewSize(operatorImageLargeSize);
+        updatePlaceholderView(
+                operatorImageLargeSize,
+                operatorImageLargeContentPadding,
+                VISIBLE
+        );
     }
 
     public void showProfileImageOnConnect(String profileImgUrl) {
-        int imageSize = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
-        profilePictureView.getLayoutParams().width = imageSize;
-        profilePictureView.getLayoutParams().height = imageSize;
-        showProfileImage(profileImgUrl);
+        updateProfilePictureViewSize(operatorImageLargeSize);
+        Picasso.get().load(profileImgUrl).into(profilePictureView);
+        updatePlaceholderView(
+                operatorImageLargeSize,
+                NO_PADDING,
+                GONE
+        );
     }
 
     public void showProfileImage(String profileImgUrl) {
+        updateProfilePictureViewSize(operatorImageSize);
         Picasso.get().load(profileImgUrl).into(profilePictureView);
-        placeholderView.setVisibility(GONE);
-        placeholderView.post(() ->
-                placeholderView.setContentPadding(
-                        placeHolderViewContentPadding,
-                        placeHolderViewContentPadding,
-                        placeHolderViewContentPadding,
-                        placeHolderViewContentPadding
-                )
+        updatePlaceholderView(
+                operatorImageSize,
+                NO_PADDING,
+                GONE
+        );
+    }
+
+    public void showPlaceholder() {
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        updateProfilePictureViewSize(operatorImageSize);
+        updatePlaceholderView(
+                operatorImageSize,
+                operatorImageContentPadding,
+                VISIBLE
         );
     }
 
@@ -149,6 +156,33 @@ public class OperatorStatusView extends ConstraintLayout {
         } else {
             hideRippleAnimation();
         }
+    }
+
+    private void updatePlaceholderView(
+            int size,
+            int contentPadding,
+            int visibility
+    ) {
+        placeholderView.getLayoutParams().width = size;
+        placeholderView.getLayoutParams().height = size;
+        placeholderView.setVisibility(visibility);
+        setPlaceholderViewContentPadding(contentPadding);
+    }
+
+    private void setPlaceholderViewContentPadding(int contentPadding) {
+        // post here is used because of the issue with .setContentPadding
+        // see: https://github.com/material-components/material-components-android/issues/2063
+        placeholderView.post(() -> placeholderView.setContentPadding(
+                contentPadding,
+                contentPadding,
+                contentPadding,
+                contentPadding
+        ));
+    }
+
+    private void updateProfilePictureViewSize(int size) {
+        profilePictureView.getLayoutParams().width = size;
+        profilePictureView.getLayoutParams().height = size;
     }
 
     private void showRippleAnimation() {

@@ -25,6 +25,8 @@ public interface SurveyContract {
 
         void scrollTo(int index);
 
+        void hideSoftKeyboard();
+
         void finish();
     }
 }

@@ -446,12 +446,8 @@ public class ChatView extends ConstraintLayout implements
                     newMessagesLayout.setVisibility(
                             chatState.showMessagesUnseenIndicator() ? VISIBLE : GONE
                     );
-                    newMessagesOperatorStatusView.showPlaceHolder();
-                    if (chatState.operatorProfileImgUrl != null) {
-                        newMessagesOperatorStatusView.showProfileImage(chatState.operatorProfileImgUrl);
-                    } else {
-                        newMessagesOperatorStatusView.showPlaceHolder();
-                    }
+
+                    updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl);
                     isInBottom = chatState.isChatInBottom;
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
 
@@ -528,6 +524,14 @@ public class ChatView extends ConstraintLayout implements
                 chatEditText.addTextChangedListener(textWatcher);
             }
         };
+    }
+
+    private void updateNewMessageOperatorStatusView(String operatorProfileImgUrl) {
+        if (operatorProfileImgUrl != null) {
+            newMessagesOperatorStatusView.showProfileImage(operatorProfileImgUrl);
+        } else {
+            newMessagesOperatorStatusView.showPlaceholder();
+        }
     }
 
     private void setupDialogCallback() {

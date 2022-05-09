@@ -466,7 +466,7 @@ public class CallView extends ConstraintLayout {
         } else if (state.isCallOngoingAndOperatorIsConnecting()) {
             showOperatorProfileImageOnConnecting(state);
         } else {
-            operatorStatusView.showPlaceHolderWithIconPadding();
+            operatorStatusView.showPlaceholder();
         }
     }
 
@@ -482,7 +482,7 @@ public class CallView extends ConstraintLayout {
         if (state.callStatus.getOperatorProfileImageUrl() != null) {
             operatorStatusView.showProfileImage(state.callStatus.getOperatorProfileImageUrl());
         } else {
-            operatorStatusView.showPlaceHolderWithIconPadding();
+            operatorStatusView.showPlaceholder();
         }
     }
 

@@ -31,10 +31,10 @@ public class OperatorStatusView extends ConstraintLayout {
     // On Hold status view on top of main view - displayed when on hold status changes
     private final ShapeableImageView onHoldOverlayView;
 
-    private final int IMAGE_SIZE_DEFAULT;
-    private final int IMAGE_SIZE_LARGE;
-    private final int PLACEHOLDER_ICON_PADDING_DEFAULT;
-    private final int PLACEHOLDER_ICON_PADDING_LARGE;
+    private final int operatorImageSize;
+    private final int operatorImageContentPadding;
+    private final int operatorImageLargeSize;
+    private final int operatorImageLargeContentPadding;
     private final int NO_PADDING = 0;
 
     private boolean isOnHold = false;
@@ -66,17 +66,18 @@ public class OperatorStatusView extends ConstraintLayout {
             );
         }
 
-        IMAGE_SIZE_LARGE = getResources().getDimensionPixelSize(R.dimen.glia_ripple_animation_size);
-        PLACEHOLDER_ICON_PADDING_LARGE = IMAGE_SIZE_LARGE / 4;
+        operatorImageLargeSize = getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_size);
+        operatorImageLargeContentPadding = getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_content_padding);
 
-        IMAGE_SIZE_DEFAULT = typedArray.getDimensionPixelSize(
+        operatorImageSize = typedArray.getDimensionPixelSize(
                 R.styleable.OperatorStatusView_imageSize,
                 getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_size)
         );
-
-        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
-        PLACEHOLDER_ICON_PADDING_DEFAULT = IMAGE_SIZE_DEFAULT / 4;
-
+        operatorImageContentPadding = typedArray.getDimensionPixelSize(
+                R.styleable.OperatorStatusView_imageContentPadding,
+                getResources().getDimensionPixelSize(R.dimen.glia_chat_profile_picture_content_padding)
+        );
+        updateProfilePictureViewSize(operatorImageSize);
         typedArray.recycle();
         setOnHoldVisibility();
     }
@@ -101,52 +102,42 @@ public class OperatorStatusView extends ConstraintLayout {
         );
     }
 
-    public void showPlaceHolder() {
-        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
-        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
-        updatePlaceholderView(
-                IMAGE_SIZE_DEFAULT,
-                NO_PADDING,
-                VISIBLE
-        );
-    }
-
     public void showPlaceHolderWithIconPaddingOnConnect() {
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
-        updateProfilePictureViewSize(IMAGE_SIZE_LARGE);
+        updateProfilePictureViewSize(operatorImageLargeSize);
         updatePlaceholderView(
-                IMAGE_SIZE_LARGE,
-                PLACEHOLDER_ICON_PADDING_LARGE,
+                operatorImageLargeSize,
+                operatorImageLargeContentPadding,
                 VISIBLE
         );
     }
 
     public void showProfileImageOnConnect(String profileImgUrl) {
-        updateProfilePictureViewSize(IMAGE_SIZE_LARGE);
+        updateProfilePictureViewSize(operatorImageLargeSize);
         Picasso.get().load(profileImgUrl).into(profilePictureView);
         updatePlaceholderView(
-                IMAGE_SIZE_LARGE,
+                operatorImageLargeSize,
                 NO_PADDING,
                 GONE
         );
     }
 
     public void showProfileImage(String profileImgUrl) {
-        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
+        updateProfilePictureViewSize(operatorImageSize);
         Picasso.get().load(profileImgUrl).into(profilePictureView);
         updatePlaceholderView(
-                IMAGE_SIZE_DEFAULT,
+                operatorImageSize,
                 NO_PADDING,
                 GONE
         );
     }
 
-    public void showPlaceHolderWithIconPadding() {
+    public void showPlaceholder() {
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
-        updateProfilePictureViewSize(IMAGE_SIZE_DEFAULT);
+        updateProfilePictureViewSize(operatorImageSize);
         updatePlaceholderView(
-                IMAGE_SIZE_DEFAULT,
-                PLACEHOLDER_ICON_PADDING_DEFAULT,
+                operatorImageSize,
+                operatorImageContentPadding,
                 VISIBLE
         );
     }
@@ -171,17 +162,21 @@ public class OperatorStatusView extends ConstraintLayout {
             int contentPadding,
             int visibility
     ) {
-        placeholderView.post(() -> {
-            placeholderView.getLayoutParams().width = size;
-            placeholderView.getLayoutParams().height = size;
-            placeholderView.setContentPadding(
-                    contentPadding,
-                    contentPadding,
-                    contentPadding,
-                    contentPadding
-            );
-            placeholderView.setVisibility(visibility);
-        });
+        placeholderView.getLayoutParams().width = size;
+        placeholderView.getLayoutParams().height = size;
+        placeholderView.setVisibility(visibility);
+        setPlaceholderViewContentPadding(contentPadding);
+    }
+
+    private void setPlaceholderViewContentPadding(int contentPadding) {
+        // post here is used because of the issue with .setContentPadding
+        // see: https://github.com/material-components/material-components-android/issues/2063
+        placeholderView.post(() -> placeholderView.setContentPadding(
+                contentPadding,
+                contentPadding,
+                contentPadding,
+                contentPadding
+        ));
     }
 
     private void updateProfilePictureViewSize(int size) {

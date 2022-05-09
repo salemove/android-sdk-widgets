@@ -88,7 +88,7 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     public void bind(OperatorStatusItem item) {
         chatStartingHeadingView.setText(item.getCompanyName());
         if (item.getStatus() == OperatorStatusItem.Status.IN_QUEUE) {
-            statusPictureView.showPlaceHolderWithIconPadding();
+            statusPictureView.showPlaceholder();
             chatStartingHeadingView.setVisibility(View.VISIBLE);
             chatStartingCaptionView.setVisibility(View.VISIBLE);
             chatStartedNameView.setVisibility(View.GONE);
@@ -98,7 +98,7 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             if (item.getProfileImgUrl() != null) {
                 statusPictureView.showProfileImage(item.getProfileImgUrl());
             } else {
-                statusPictureView.showPlaceHolderWithIconPadding();
+                statusPictureView.showPlaceholder();
             }
             chatStartedNameView.setText(item.getOperatorName());
             chatStartedCaptionView.setText(context.getString(R.string.glia_chat_operator_has_joined, item.getOperatorName()));

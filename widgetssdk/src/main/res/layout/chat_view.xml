@@ -44,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:clipChildren="true"
+                app:imageContentPadding="0dp"
                 app:imageSize="@dimen/glia_chat_new_messages_image_size"
                 app:srcCompat="?attr/gliaIconPlaceholder" />
 

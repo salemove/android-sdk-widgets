@@ -38,7 +38,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         if (item.operatorProfileImgUrl != null) {
             operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
         } else {
-            operatorStatusView.showPlaceHolderWithIconPadding();
+            operatorStatusView.showPlaceholder();
         }
 
         String name = item.attachmentFile.getName();

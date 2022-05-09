@@ -179,7 +179,7 @@ public class ApplicationChatHeadLayoutController
     private void updateChatHeadViewState(ChatHeadLayoutContract.View view) {
         switch (state) {
             case ENGAGEMENT:
-                view.showOperatorImage(operatorProfileImgUrl);
+                showOperatorImageOrPlaceholder(view);
                 break;
             case QUEUEING:
                 view.showQueueing();
@@ -187,6 +187,14 @@ public class ApplicationChatHeadLayoutController
             case ENDED:
             default:
                 view.showPlaceholder();
+        }
+    }
+
+    private void showOperatorImageOrPlaceholder(ChatHeadLayoutContract.View view) {
+        if (operatorProfileImgUrl != null) {
+            view.showOperatorImage(operatorProfileImgUrl);
+        } else {
+            view.showPlaceholder();
         }
     }
 

@@ -22,6 +22,7 @@ import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadContract;
+import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 
 import java.util.Optional;
@@ -229,7 +230,7 @@ public class ServiceChatHeadController
     private void updateChatHeadViewState() {
         switch (state) {
             case ENGAGEMENT:
-                chatHeadView.showOperatorImage(operatorProfileImgUrl);
+                showOperatorImageOrPlaceholder();
                 break;
             case QUEUEING:
                 chatHeadView.showQueueing();
@@ -237,6 +238,14 @@ public class ServiceChatHeadController
             case ENDED:
             default:
                 chatHeadView.showPlaceholder();
+        }
+    }
+
+    private void showOperatorImageOrPlaceholder() {
+        if (operatorProfileImgUrl != null) {
+            chatHeadView.showOperatorImage(operatorProfileImgUrl);
+        } else {
+            chatHeadView.showPlaceholder();
         }
     }
 

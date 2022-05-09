@@ -208,6 +208,11 @@ public class SurveyView extends ConstraintLayout
     }
 
     @Override
+    public void hideSoftKeyboard() {
+        Utils.hideSoftKeyboard(getContext(), getWindowToken());
+    }
+
+    @Override
     public void finish() {
         Activity activity = Utils.getActivity(getContext());
         if (activity != null) activity.finish();

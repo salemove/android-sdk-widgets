@@ -2,6 +2,7 @@ package com.glia.widgets.survey;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
@@ -17,8 +18,12 @@ public class SurveyController implements SurveyContract.Controller {
     }
 
     private SurveyContract.View view;
-    private Survey survey;
-    private SurveyState state = new SurveyState.Builder().createSurveyState();
+
+    @VisibleForTesting
+    Survey survey;
+
+    @VisibleForTesting
+    SurveyState state = new SurveyState.Builder().createSurveyState();
 
     private final GliaSurveyAnswerUseCase gliaSurveyAnswerUseCase;
 
@@ -28,15 +33,38 @@ public class SurveyController implements SurveyContract.Controller {
 
     @Override
     public void init(@Nullable Survey survey) {
+        if (isAlreadyInit(survey)) {
+            setState(state);
+            return;
+        }
+
         this.survey = survey;
         if (survey == null) {
             if (view != null) {
                 view.finish();
+                resetController();
             }
             return;
         }
         setTitle(survey.getTitle());
         setQuestions(survey);
+    }
+
+    @VisibleForTesting
+    boolean isAlreadyInit(@Nullable Survey survey) {
+        if (this.survey == null || survey == null) {
+            return false;
+        }
+        return isEqualsSurveys(this.survey, survey) && isStateContainQuestions(state);
+    }
+
+    private boolean isEqualsSurveys(@NonNull Survey survey, @NonNull Survey otherSurvey) {
+        return survey.getId().equals(otherSurvey.getId())
+                && survey.getEngagementId().equals(otherSurvey.getEngagementId());
+    }
+
+    private boolean isStateContainQuestions(@NonNull SurveyState state) {
+        return state.questions != null && !state.questions.isEmpty();
     }
 
     private void setTitle(String title) {
@@ -111,6 +139,7 @@ public class SurveyController implements SurveyContract.Controller {
     public void onCancelClicked() {
         if (view != null) {
             view.finish();
+            resetController();
         }
     }
 
@@ -124,6 +153,7 @@ public class SurveyController implements SurveyContract.Controller {
             if (exception == null) {
                 if (view != null) {
                     view.finish();
+                    resetController();
                 }
                 return;
             }
@@ -149,5 +179,10 @@ public class SurveyController implements SurveyContract.Controller {
     @Override
     public void onDestroy() {
         this.view = null;
+    }
+
+    private void resetController() {
+        state = new SurveyState.Builder().createSurveyState();
+        survey = null;
     }
 }

@@ -170,14 +170,12 @@ public class OperatorStatusView extends ConstraintLayout {
     }
 
     private void setPlaceholderViewContentPadding(int contentPadding) {
-        // post here is used because of the issue with .setContentPadding
-        // see: https://github.com/material-components/material-components-android/issues/2063
-        placeholderView.post(() -> placeholderView.setContentPadding(
+        placeholderView.setPaddingRelative(
                 contentPadding,
                 contentPadding,
                 contentPadding,
                 contentPadding
-        ));
+        );
     }
 
     private void updateProfilePictureViewSize(int size) {

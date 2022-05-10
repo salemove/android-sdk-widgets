@@ -110,14 +110,15 @@
             android:id="@+id/chat_edit_text"
             style="@style/Application.Glia.Chat.Edittext"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/glia_medium"
-            android:layout_marginStart="@dimen/glia_medium"
+            android:layout_height="match_parent"
+            android:minHeight="@dimen/glia_chat_edit_text_min_height"
+            android:paddingStart="@dimen/glia_large"
             android:layout_weight="1"
             android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
             android:textColor="?attr/gliaBaseDarkColor"
-            android:textColorHint="?attr/gliaBaseNormalColor" />
+            android:textColorHint="?attr/gliaBaseNormalColor"
+            tools:ignore="RtlSymmetry" />
 
         <ImageButton
             android:id="@+id/add_attachment_button"

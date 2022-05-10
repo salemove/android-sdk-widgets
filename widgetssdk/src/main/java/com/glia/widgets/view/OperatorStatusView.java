@@ -18,6 +18,7 @@ import com.airbnb.lottie.model.KeyPath;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 public class OperatorStatusView extends ConstraintLayout {
@@ -115,22 +116,40 @@ public class OperatorStatusView extends ConstraintLayout {
 
     public void showProfileImageOnConnect(String profileImgUrl) {
         updateProfilePictureViewSize(operatorImageLargeSize);
-        Picasso.get().load(profileImgUrl).into(profilePictureView);
-        updatePlaceholderView(
-                operatorImageLargeSize,
-                NO_PADDING,
-                GONE
-        );
+        Picasso.get().load(profileImgUrl).into(profilePictureView, new Callback() {
+            @Override
+            public void onSuccess() {
+                updatePlaceholderView(
+                        operatorImageLargeSize,
+                        NO_PADDING,
+                        GONE
+                );
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
 
     public void showProfileImage(String profileImgUrl) {
         updateProfilePictureViewSize(operatorImageSize);
-        Picasso.get().load(profileImgUrl).into(profilePictureView);
-        updatePlaceholderView(
-                operatorImageSize,
-                NO_PADDING,
-                GONE
-        );
+        Picasso.get().load(profileImgUrl).into(profilePictureView, new Callback() {
+            @Override
+            public void onSuccess() {
+                updatePlaceholderView(
+                        operatorImageSize,
+                        NO_PADDING,
+                        GONE
+                );
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
 
     public void showPlaceholder() {

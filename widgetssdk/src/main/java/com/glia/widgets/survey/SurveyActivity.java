@@ -9,6 +9,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Utils;
 
 public class SurveyActivity extends AppCompatActivity implements SurveyView.Callback {
     private static final String TAG = SurveyActivity.class.getSimpleName();
@@ -20,6 +21,11 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
         prepareSurveyView();
+        hideSoftKeyboard();
+    }
+
+    private void hideSoftKeyboard() {
+        Utils.hideSoftKeyboard(this, getWindow().getDecorView().getWindowToken());
     }
 
     private void prepareSurveyView() {

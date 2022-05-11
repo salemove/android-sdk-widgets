@@ -199,7 +199,7 @@ public class ApplicationChatHeadLayoutController
     }
 
     private void updateOnHold() {
-        if (isOnHold) {
+        if (isOnHold && state == State.ENGAGEMENT) {
             chatHeadLayout.showOnHold();
         } else {
             chatHeadLayout.hideOnHold();

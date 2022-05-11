@@ -267,7 +267,7 @@ public class ServiceChatHeadController
     }
 
     private void updateOnHold() {
-        if (isOnHold) {
+        if (isOnHold && state == State.ENGAGEMENT) {
             chatHeadView.showOnHold();
         } else {
             chatHeadView.hideOnHold();

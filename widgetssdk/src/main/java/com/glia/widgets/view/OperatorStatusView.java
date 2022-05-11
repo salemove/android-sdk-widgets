@@ -84,6 +84,12 @@ public class OperatorStatusView extends ConstraintLayout {
         setOnHoldVisibility();
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Picasso.get().cancelRequest(profilePictureView);
+    }
+
     public void setTheme(UiTheme theme) {
         // icons
         setPlaceHolderIcon(theme);

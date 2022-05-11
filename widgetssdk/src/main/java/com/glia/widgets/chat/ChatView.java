@@ -807,6 +807,7 @@ public class ChatView extends ConstraintLayout implements
                 ))
                 .build();
         newMessagesOperatorStatusView.setShowRippleAnimation(false);
+        newMessagesOperatorStatusView.setTheme(theme);
         newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
         newMessagesCountBadgeView.setBackgroundTintList(
                 ContextCompat.getColorStateList(

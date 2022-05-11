@@ -441,27 +441,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             comment = itemView.findViewById(R.id.et_comment);
             requiredError = itemView.findViewById(R.id.required_error);
 
-            TextConfiguration titleConfiguration = style.getInputQuestion().getTitle();
-            this.title.setTextColor(titleConfiguration.getTextColor());
-            float textSize = titleConfiguration.getTextSize();
-            this.title.setTextSize(textSize);
-            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
-
-            comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
-            comment.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    setAnswer(s.toString());
-                }
-            });
+            InputQuestionConfiguration inputQuestionConfig = style.getInputQuestion();
+            setupTitle(inputQuestionConfig);
+            setupInputBoxText(inputQuestionConfig.getOptionButton());
         }
 
         @Override
@@ -504,9 +486,40 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 ColorStateList.valueOf(normalColor);
                 int width = context.getResources().getDimensionPixelSize(R.dimen.glia_px);
                 shape.setStroke(width, strokeColor);
-                shape.setColor(ContextCompat.getColor(context, R.color.glia_base_light_color));
+                shape.setColor(Color.parseColor(inputQuestionConfig.getOptionButton().getNormalLayer().getBackgroundColor()));
                 comment.setBackground(shape);
             }
+        }
+
+        private void setupTitle(InputQuestionConfiguration inputQuestionConfig) {
+            TextConfiguration titleConfiguration = inputQuestionConfig.getTitle();
+            this.title.setTextColor(titleConfiguration.getTextColor());
+            float textSize = titleConfiguration.getTextSize();
+            this.title.setTextSize(textSize);
+            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
+        }
+
+        private void setupInputBoxText(OptionButtonConfiguration optionButtonStyle) {
+            comment.setTextColor(optionButtonStyle.getNormalText().getTextColor());
+            if (optionButtonStyle.getNormalText().isBold()) this.comment.setTypeface(Typeface.DEFAULT_BOLD);
+            comment.setHintTextColor(ContextCompat.getColor(comment.getContext(), R.color.glia_base_shade_color));
+            float textSize = optionButtonStyle.getNormalText().getTextSize();
+            comment.setTextSize(textSize);
+            comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
+            comment.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    setAnswer(s.toString());
+                }
+            });
         }
     }
 }

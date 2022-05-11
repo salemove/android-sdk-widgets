@@ -43,6 +43,11 @@ public class InputQuestionConfiguration implements Parcelable {
             return this;
         }
 
+        /**
+         * Use this method to configure the input box style
+         *
+         * @param optionButton - input box style
+         */
         public Builder optionButton(OptionButtonConfiguration optionButton) {
             this.optionButton = optionButton;
             return this;

@@ -21,7 +21,6 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.survey_activity);
         prepareSurveyView();
-        hideSoftKeyboard();
     }
 
     private void hideSoftKeyboard() {
@@ -49,6 +48,7 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
 
     @Override
     protected void onDestroy() {
+        hideSoftKeyboard();
         if (surveyView != null) {
             surveyView.onDestroyView();
         }

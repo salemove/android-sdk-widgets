@@ -94,9 +94,11 @@ public class GliaSurveyAnswerUseCase {
                     break;
                 }
                 String response = ((String) item.getAnswer().getResponse()).trim();
-                if (TextUtils.isEmpty(response)) {
-                    item.setAnswer(null);
+                Survey.Answer trimmedAnswer = null;
+                if (!TextUtils.isEmpty(response)) {
+                    trimmedAnswer = Survey.Answer.makeAnswer(item.getQuestion().getId(), response);
                 }
+                item.setAnswer(trimmedAnswer);
             }
         }
     }

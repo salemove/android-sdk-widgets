@@ -145,7 +145,9 @@ public class ControllerFactory {
                     useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.getGliaSurveyUseCase(),
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
+                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createToggleVisitorAudioMediaMuteUseCase(),
+                    useCaseFactory.createToggleVisitorVideoUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -256,7 +258,9 @@ public class ControllerFactory {
     public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {
         return new FloatingVisitorVideoController(
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
+                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
+                useCaseFactory.createIsShowVideoUseCase(),
+                useCaseFactory.createIsShowOnHoldUseCase()
         );
     }
 }

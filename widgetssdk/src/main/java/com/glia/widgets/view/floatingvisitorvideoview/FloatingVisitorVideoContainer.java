@@ -41,22 +41,18 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
 
     @Override
     public void show(VisitorMediaState state) {
-        post(() -> {
-            if (!floatingVisitorVideoView.hasVideo()) {
-                floatingVisitorVideoView.showVisitorVideo(
-                        state.getVideo().createVideoView(Utils.getActivity(getContext()))
-                );
-            }
-            setVisibility(VISIBLE);
-        });
+        if (!floatingVisitorVideoView.hasVideo()) {
+            floatingVisitorVideoView.showVisitorVideo(
+                    state.getVideo().createVideoView(Utils.getActivity(getContext()))
+            );
+        }
+        setVisibility(VISIBLE);
     }
 
     @Override
     public void hide() {
-        post(() -> {
-            floatingVisitorVideoView.hideVisitorVideo();
-            setVisibility(GONE);
-        });
+        floatingVisitorVideoView.hideVisitorVideo();
+        setVisibility(GONE);
     }
 
     @Override
@@ -73,12 +69,12 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
 
     @Override
     public void showOnHold() {
-        post(() -> floatingVisitorVideoView.showOnHold());
+        floatingVisitorVideoView.showOnHold();
     }
 
     @Override
     public void hideOnHold() {
-        post(() -> floatingVisitorVideoView.hideOnHold());
+        floatingVisitorVideoView.hideOnHold();
     }
 
     @Override

@@ -1,25 +1,34 @@
 package com.glia.widgets.view.floatingvisitorvideoview;
 
-import com.glia.androidsdk.comms.Media;
-import com.glia.androidsdk.comms.Video;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase;
+import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 public class FloatingVisitorVideoController
         implements FloatingVisitorVideoContract.Controller, VisitorMediaUpdatesListener {
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
+    private final IsShowVideoUseCase isShowVideoUseCase;
+    private final IsShowOnHoldUseCase isShowOnHoldUseCase;
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
     private FloatingVisitorVideoContract.View view;
 
     public FloatingVisitorVideoController(
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
-            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase
+            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
+            IsShowVideoUseCase isShowVideoUseCase,
+            IsShowOnHoldUseCase isShowOnHoldUseCase
     ) {
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
+        this.isShowOnHoldUseCase = isShowOnHoldUseCase;
+        this.isShowVideoUseCase = isShowVideoUseCase;
     }
 
     @Override
@@ -34,6 +43,7 @@ public class FloatingVisitorVideoController
 
     @Override
     public void onDestroy() {
+        disposables.dispose();
     }
 
     @Override
@@ -43,8 +53,20 @@ public class FloatingVisitorVideoController
 
     @Override
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
-        if (hasVideoAvailable(visitorMediaState)) {
-            view.show(visitorMediaState);
+        disposables.add(
+                isShowVideoUseCase
+                        .execute(visitorMediaState)
+                        .subscribe(
+                                isShow -> showVisitorVideo(isShow, visitorMediaState),
+                                error -> { // no-op
+                                }
+                        )
+        );
+    }
+
+    private void showVisitorVideo(boolean isShow, VisitorMediaState mediaState) {
+        if (isShow) {
+            view.show(mediaState);
         } else {
             view.hide();
         }
@@ -52,21 +74,22 @@ public class FloatingVisitorVideoController
 
     @Override
     public void onHoldChanged(boolean isOnHold) {
-        if (isOnHold) {
+        disposables.add(
+                isShowOnHoldUseCase
+                        .execute(isOnHold)
+                        .subscribe(
+                                this::showOnHold,
+                                error -> { // no-op
+                                }
+                        )
+        );
+    }
+
+    private void showOnHold(boolean isShow) {
+        if (isShow) {
             view.showOnHold();
         } else {
             view.hideOnHold();
         }
-    }
-
-    private boolean hasVideoAvailable(VisitorMediaState visitorMediaState) {
-        return visitorMediaState != null &&
-                visitorMediaState.getVideo() != null &&
-                isVideoFeedActiveStatus(visitorMediaState.getVideo());
-    }
-
-    private boolean isVideoFeedActiveStatus(Video video) {
-        return video.getStatus() == Media.Status.PLAYING ||
-                video.getStatus() == Media.Status.PAUSED;
     }
 }

@@ -201,6 +201,7 @@ public class ChatController implements
     private final SiteInfoUseCase siteInfoUseCase;
     private final GliaSurveyUseCase surveyUseCase;
 
+    private boolean isVisitorEndEngagement = false;
     private Disposable disposable = null;
 
     // TODO pending photoCaptureFileUri - need to move some place better
@@ -545,6 +546,7 @@ public class ChatController implements
 
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
+        isVisitorEndEngagement = true;
         stop();
         dialogController.dismissDialogs();
     }
@@ -1176,8 +1178,10 @@ public class ChatController implements
         if (viewCallback != null && survey != null) {
             viewCallback.navigateToSurvey(survey);
             Dependencies.getControllerFactory().destroyControllers();
-        } else {
+        } else if (!isVisitorEndEngagement) {
             dialogController.showEngagementEndedDialog();
+        } else {
+            Dependencies.getControllerFactory().destroyControllers();
         }
     }
 

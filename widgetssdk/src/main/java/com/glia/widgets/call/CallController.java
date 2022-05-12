@@ -125,6 +125,7 @@ public class CallController implements
 
     private final String TAG = "CallController";
     private volatile CallState callState;
+    private boolean isVisitorEndEngagement = false;
 
     private final CompositeDisposable disposables = new CompositeDisposable();
 
@@ -324,6 +325,7 @@ public class CallController implements
 
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
+        isVisitorEndEngagement = true;
         stop();
         dialogController.dismissDialogs();
     }
@@ -464,8 +466,10 @@ public class CallController implements
         if (viewCallback != null && survey != null) {
             viewCallback.navigateToSurvey(survey);
             Dependencies.getControllerFactory().destroyControllers();
-        } else {
+        } else if (!isVisitorEndEngagement) {
             dialogController.showEngagementEndedDialog();
+        } else {
+            Dependencies.getControllerFactory().destroyControllers();
         }
     }
 

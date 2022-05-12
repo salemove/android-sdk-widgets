@@ -29,7 +29,7 @@ public class ToggleVisitorAudioMediaMuteUseCase {
     }
 
     private Single<Media.Status> getVisitorAudioMediaStatusIfHasMedia() {
-        return repository.hasVisitorVideoMedia()
+        return repository.hasVisitorAudioMedia()
                 .flatMap(this::getVisitorAudioMediaStatus);
     }
 

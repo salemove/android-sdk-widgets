@@ -10,7 +10,7 @@ import java.util.Set;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
+public class GliaVisitorMediaRepository {
     private final Set<VisitorMediaUpdatesListener> visitorMediaUpdatesListeners = new HashSet<>();
 
     private VisitorMediaState currentMediaState = null;
@@ -18,14 +18,12 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
     private Media.Status savedAudioStatus = null;
     private boolean isOnHold = false;
 
-    @Override
     public void onNewVisitorMediaState(VisitorMediaState state) {
         notifyVisitorMediaStateChanged(state);
         setAudioOnHoldListener();
         setVideoOnHoldListener();
     }
 
-    @Override
     public void onHoldChanged(boolean isOnHold) {
         notifyOnHoldStateChange(isOnHold);
         visitorMediaStatusOnHold(isOnHold);

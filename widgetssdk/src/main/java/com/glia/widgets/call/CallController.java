@@ -282,8 +282,9 @@ public class CallController implements
             viewCallback.destroyView();
         }
         viewCallback = null;
-        disposables.dispose();
+
         if (!retain) {
+            disposables.dispose();
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
             if (callTimerStatusListener != null) {
@@ -409,10 +410,11 @@ public class CallController implements
         disposables.add(
                 toggleVisitorAudioMediaMuteUseCase
                         .execute()
-                        .doOnError(error ->
-                                Logger.e(TAG, "Muting failed with error: " + error.toString())
+                        .subscribe(
+                                () -> { // no-op
+                                },
+                                error -> Logger.e(TAG, "Muting failed with error: " + error.toString())
                         )
-                        .subscribe()
         );
     }
 
@@ -420,10 +422,11 @@ public class CallController implements
         disposables.add(
                 toggleVisitorVideoUseCase
                         .execute()
-                        .doOnError(error ->
-                                Logger.e(TAG, "error" + error.toString())
+                        .subscribe(
+                                () -> { // no-op
+                                },
+                                error -> Logger.e(TAG, "Toggling visitor video error: " + error.toString())
                         )
-                        .subscribe()
         );
     }
 

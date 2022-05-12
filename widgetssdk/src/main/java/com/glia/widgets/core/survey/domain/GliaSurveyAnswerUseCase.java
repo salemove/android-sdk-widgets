@@ -12,6 +12,7 @@ import com.glia.widgets.survey.SurveyValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public class GliaSurveyAnswerUseCase {
     public void submit(@Nullable List<QuestionItem> questions,
                        @NonNull Survey survey,
                        @NonNull Consumer<RuntimeException> callback) {
+        trim(questions);
         try {
             validate(questions);
         } catch (SurveyValidationException exception) {
@@ -36,6 +38,7 @@ public class GliaSurveyAnswerUseCase {
         if (questions != null) {
             answers = questions.stream()
                     .map(QuestionItem::getAnswer)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         } else {
             answers = new ArrayList<>();
@@ -76,6 +79,23 @@ public class GliaSurveyAnswerUseCase {
             } else {
                 if (item.getAnswer() == null) {
                     throw new SurveyValidationException();
+                }
+            }
+        }
+    }
+
+    public void trim(@Nullable List<QuestionItem> questions) {
+        if (questions == null) {
+            return;
+        }
+        for (QuestionItem item : questions) {
+            if (item.getQuestion().getType() == Survey.Question.QuestionType.TEXT) {
+                if (item.getAnswer() == null) {
+                    break;
+                }
+                String response = ((String) item.getAnswer().getResponse()).trim();
+                if (TextUtils.isEmpty(response)) {
+                    item.setAnswer(null);
                 }
             }
         }

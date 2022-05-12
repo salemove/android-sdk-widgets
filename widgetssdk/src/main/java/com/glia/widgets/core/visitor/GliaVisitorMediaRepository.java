@@ -57,7 +57,7 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
         return Completable.complete();
     }
 
-    public Completable unmuteVisitorAudio() {
+    public Completable unMuteVisitorAudio() {
         currentMediaState.getAudio().unmute();
         notifyVisitorMediaStateChanged(currentMediaState);
         return Completable.complete();
@@ -113,7 +113,9 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
 
     private void notifyVisitorMediaStateChanged(VisitorMediaState state) {
         currentMediaState = state;
-        visitorMediaUpdatesListeners.forEach(listener -> listener.onNewVisitorMediaState(currentMediaState));
+        visitorMediaUpdatesListeners.forEach(listener ->
+                listener.onNewVisitorMediaState(currentMediaState)
+        );
     }
 
     private void notifyOnHoldStateChange(boolean newOnHold) {
@@ -166,7 +168,7 @@ public class GliaVisitorMediaRepository implements VisitorMediaUpdatesListener {
                 if (savedAudioStatus.equals(Media.Status.PAUSED)) {
                     muteVisitorAudio();
                 } else if (savedAudioStatus.equals(Media.Status.PLAYING)) {
-                    unmuteVisitorAudio();
+                    unMuteVisitorAudio();
                 }
             }
             savedAudioStatus = null;

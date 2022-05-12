@@ -10,8 +10,8 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 
 public class ToggleVisitorVideoUseCase {
-    private final GliaVisitorMediaRepository repository;
     private final Schedulers schedulers;
+    private final GliaVisitorMediaRepository repository;
 
     public ToggleVisitorVideoUseCase(
             Schedulers schedulers,

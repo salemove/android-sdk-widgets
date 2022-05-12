@@ -15,7 +15,7 @@ public class IsShowVideoUseCase {
     }
 
     public Single<Boolean> execute(VisitorMediaState visitorMediaState) {
-        return toSingle(hasVideoAvailable(visitorMediaState))
+        return Single.just(hasVideoAvailable(visitorMediaState))
                 .subscribeOn(schedulers.getComputationScheduler())
                 .observeOn(schedulers.getMainScheduler());
     }
@@ -29,9 +29,5 @@ public class IsShowVideoUseCase {
     private boolean isVideoFeedActiveStatus(Video video) {
         return video.getStatus() == Media.Status.PLAYING ||
                 video.getStatus() == Media.Status.PAUSED;
-    }
-
-    private <T> Single<T> toSingle(T object) {
-        return Single.just(object);
     }
 }

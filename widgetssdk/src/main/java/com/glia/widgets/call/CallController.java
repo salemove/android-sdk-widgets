@@ -92,7 +92,7 @@ public class CallController implements
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final DialogController dialogController;
     private final GliaSurveyUseCase surveyUseCase;
-    private final ToggleVisitorAudioMediaMuteUseCase toggleAudioMuteStateUseCase;
+    private final ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase;
     private final ToggleVisitorVideoUseCase toggleVisitorVideoUseCase;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
@@ -156,7 +156,7 @@ public class CallController implements
             GliaSurveyUseCase surveyUseCase,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
-            ToggleVisitorAudioMediaMuteUseCase toggleAudioMuteStateUseCase,
+            ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
             ToggleVisitorVideoUseCase toggleVisitorVideoUseCase
     ) {
         Logger.d(TAG, "constructor");
@@ -197,7 +197,7 @@ public class CallController implements
         this.surveyUseCase = surveyUseCase;
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
-        this.toggleAudioMuteStateUseCase = toggleAudioMuteStateUseCase;
+        this.toggleVisitorAudioMediaMuteUseCase = toggleVisitorAudioMediaMuteUseCase;
         this.toggleVisitorVideoUseCase = toggleVisitorVideoUseCase;
     }
 
@@ -406,26 +406,24 @@ public class CallController implements
     }
 
     public void muteButtonClicked() {
-        Logger.d(TAG, "muteButtonClicked");
         disposables.add(
-                toggleAudioMuteStateUseCase
+                toggleVisitorAudioMediaMuteUseCase
                         .execute()
-                        .subscribe(
-                                () -> Logger.d(TAG, "mute changed"),
-                                error -> Logger.e(TAG, "error" + error.toString())
+                        .doOnError(error ->
+                                Logger.e(TAG, "Muting failed with error: " + error.toString())
                         )
+                        .subscribe()
         );
     }
 
     public void videoButtonClicked() {
-        Logger.d(TAG, "videoButtonClicked");
         disposables.add(
                 toggleVisitorVideoUseCase
                         .execute()
-                        .subscribe(
-                                () -> Logger.d(TAG, "display video changed"),
-                                error -> Logger.e(TAG, "error" + error.toString())
+                        .doOnError(error ->
+                                Logger.e(TAG, "error" + error.toString())
                         )
+                        .subscribe()
         );
     }
 

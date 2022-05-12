@@ -10,8 +10,8 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 
 public class ToggleVisitorAudioMediaMuteUseCase {
-    private final GliaVisitorMediaRepository repository;
     private final Schedulers schedulers;
+    private final GliaVisitorMediaRepository repository;
 
     public ToggleVisitorAudioMediaMuteUseCase(
             Schedulers schedulers,
@@ -46,7 +46,7 @@ public class ToggleVisitorAudioMediaMuteUseCase {
             case PLAYING:
                 return repository.muteVisitorAudio();
             case PAUSED:
-                return repository.unmuteVisitorAudio();
+                return repository.unMuteVisitorAudio();
             case DISCONNECTED:
             default:
                 return Completable.error(new UnexpectedAudioStatusException(status));

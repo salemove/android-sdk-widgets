@@ -12,12 +12,8 @@ public class IsShowOnHoldUseCase {
     }
 
     public Single<Boolean> execute(boolean isOnHold) {
-        return toSingle(isOnHold)
+        return Single.just(isOnHold)
                 .subscribeOn(schedulers.getComputationScheduler())
                 .observeOn(schedulers.getMainScheduler());
-    }
-
-    private <T> Single<T> toSingle(T object) {
-        return Single.just(object);
     }
 }

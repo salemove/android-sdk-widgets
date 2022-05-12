@@ -215,7 +215,12 @@ public class SurveyView extends ConstraintLayout
     @Override
     public void finish() {
         Activity activity = Utils.getActivity(getContext());
-        if (activity != null) activity.finish();
+        if (activity != null) {
+            // In case the engagement ends, Activity is removed from the device's Recents menu
+            // to avoid app users to accidentally start queueing for another call when they resume
+            // the app from the Recents menu and the app's backstack was empty.
+            activity.finishAndRemoveTask();
+        }
     }
 
     public void onDestroyView() {

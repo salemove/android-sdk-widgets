@@ -84,14 +84,14 @@ public class GliaSurveyAnswerUseCase {
         }
     }
 
-    public void trim(@Nullable List<QuestionItem> questions) {
+    private void trim(@Nullable List<QuestionItem> questions) {
         if (questions == null) {
             return;
         }
         for (QuestionItem item : questions) {
             if (item.getQuestion().getType() == Survey.Question.QuestionType.TEXT) {
                 if (item.getAnswer() == null) {
-                    break;
+                    continue;
                 }
                 String response = ((String) item.getAnswer().getResponse()).trim();
                 Survey.Answer trimmedAnswer = null;

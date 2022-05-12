@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
+import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
@@ -56,6 +58,9 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
+import com.glia.widgets.helper.rx.Schedulers;
+import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase;
+import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
 
 public class UseCaseFactory {
     private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
@@ -75,13 +80,15 @@ public class UseCaseFactory {
     private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
+    private final Schedulers schedulers;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
                           PermissionManager permissionManager,
                           PermissionDialogManager permissionDialogManager,
                           INotificationManager notificationManager,
                           GliaSdkConfigurationManager gliaSdkConfigurationManager,
-                          ChatHeadManager chatHeadManager
+                          ChatHeadManager chatHeadManager,
+                          Schedulers schedulers
     ) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
@@ -89,6 +96,7 @@ public class UseCaseFactory {
         this.notificationManager = notificationManager;
         this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
         this.chatHeadManager = chatHeadManager;
+        this.schedulers = schedulers;
     }
 
     public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
@@ -384,5 +392,27 @@ public class UseCaseFactory {
 
     public RemoveVisitorMediaStateListenerUseCase createRemoveVisitorMediaStateListenerUseCase() {
         return new RemoveVisitorMediaStateListenerUseCase(repositoryFactory.getGliaVisitorMediaRepository());
+    }
+
+    public ToggleVisitorAudioMediaMuteUseCase createToggleVisitorAudioMediaMuteUseCase() {
+        return new ToggleVisitorAudioMediaMuteUseCase(
+                schedulers,
+                repositoryFactory.getGliaVisitorMediaRepository()
+        );
+    }
+
+    public ToggleVisitorVideoUseCase createToggleVisitorVideoUseCase() {
+        return new ToggleVisitorVideoUseCase(
+                schedulers,
+                repositoryFactory.getGliaVisitorMediaRepository()
+        );
+    }
+
+    public IsShowVideoUseCase createIsShowVideoUseCase() {
+        return new IsShowVideoUseCase(schedulers);
+    }
+
+    public IsShowOnHoldUseCase createIsShowOnHoldUseCase() {
+        return new IsShowOnHoldUseCase(schedulers);
     }
 }

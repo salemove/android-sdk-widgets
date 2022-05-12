@@ -4,7 +4,6 @@ import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -12,6 +11,8 @@ import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
+import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
+import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
@@ -46,6 +47,8 @@ import com.glia.widgets.view.MinimizeHandler;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 public class CallController implements
         GliaOnEngagementUseCase.Listener,
@@ -89,6 +92,8 @@ public class CallController implements
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final DialogController dialogController;
     private final GliaSurveyUseCase surveyUseCase;
+    private final ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase;
+    private final ToggleVisitorVideoUseCase toggleVisitorVideoUseCase;
 
     private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
         @Override
@@ -122,6 +127,8 @@ public class CallController implements
     private final String TAG = "CallController";
     private volatile CallState callState;
 
+    private final CompositeDisposable disposables = new CompositeDisposable();
+
     public CallController(
             MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
             TimeCounter sharedTimer,
@@ -148,7 +155,9 @@ public class CallController implements
             UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
             GliaSurveyUseCase surveyUseCase,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
-            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase
+            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
+            ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
+            ToggleVisitorVideoUseCase toggleVisitorVideoUseCase
     ) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
@@ -188,12 +197,16 @@ public class CallController implements
         this.surveyUseCase = surveyUseCase;
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
+        this.toggleVisitorAudioMediaMuteUseCase = toggleVisitorAudioMediaMuteUseCase;
+        this.toggleVisitorVideoUseCase = toggleVisitorVideoUseCase;
     }
 
     @Override
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
         Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState);
-        emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
+        emitViewState(
+                callState.visitorMediaStateChanged(visitorMediaState)
+        );
     }
 
     @Override
@@ -269,6 +282,7 @@ public class CallController implements
             viewCallback.destroyView();
         }
         viewCallback = null;
+        disposables.dispose();
         if (!retain) {
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
@@ -392,41 +406,25 @@ public class CallController implements
     }
 
     public void muteButtonClicked() {
-        Logger.d(TAG, "muteButtonClicked");
-        VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
-        if (currentMediaState != null && currentMediaState.getAudio() != null) {
-            Logger.d(TAG, "muteButton status:" + currentMediaState.getAudio().getStatus().toString());
-            if (currentMediaState.getAudio().getStatus() == Media.Status.PAUSED) {
-                currentMediaState.getAudio().unmute();
-                if (currentMediaState.getAudio().getStatus() == Media.Status.PLAYING) {
-                    emitViewState(callState.muteStatusChanged(false));
-                }
-            } else if (currentMediaState.getAudio().getStatus() == Media.Status.PLAYING) {
-                currentMediaState.getAudio().mute();
-                if (currentMediaState.getAudio().getStatus() == Media.Status.PAUSED) {
-                    emitViewState(callState.muteStatusChanged(true));
-                }
-            }
-        }
+        disposables.add(
+                toggleVisitorAudioMediaMuteUseCase
+                        .execute()
+                        .doOnError(error ->
+                                Logger.e(TAG, "Muting failed with error: " + error.toString())
+                        )
+                        .subscribe()
+        );
     }
 
     public void videoButtonClicked() {
-        Logger.d(TAG, "videoButtonClicked");
-        if (callState.isCallOngoingAndOperatorConnected()) {
-            VisitorMediaState currentMediaState = callState.callStatus.getVisitorMediaState();
-            Logger.d(TAG, "videoButton status:" + currentMediaState.getVideo().getStatus().toString());
-            if (currentMediaState.getVideo().getStatus() == Media.Status.PAUSED) {
-                currentMediaState.getVideo().resume();
-                if (currentMediaState.getVideo().getStatus() == Media.Status.PLAYING) {
-                    emitViewState(callState.hasVideoChanged(true));
-                }
-            } else if (currentMediaState.getVideo().getStatus() == Media.Status.PLAYING) {
-                currentMediaState.getVideo().pause();
-                if (currentMediaState.getVideo().getStatus() == Media.Status.PAUSED) {
-                    emitViewState(callState.hasVideoChanged(false));
-                }
-            }
-        }
+        disposables.add(
+                toggleVisitorVideoUseCase
+                        .execute()
+                        .doOnError(error ->
+                                Logger.e(TAG, "error" + error.toString())
+                        )
+                        .subscribe()
+        );
     }
 
     public void notificationsDialogDismissed() {

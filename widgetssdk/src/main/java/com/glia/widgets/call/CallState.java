@@ -219,7 +219,7 @@ class CallState {
         return new Builder()
                 .copyFrom(this)
                 .setHasVideo(isVisitorVideoPlaying(visitorMediaState))
-                .setIsMuted(false)
+                .setIsMuted(isMuted(visitorMediaState))
                 .createCallState();
     }
 
@@ -295,13 +295,6 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState muteStatusChanged(boolean isMuted) {
-        return new Builder()
-                .copyFrom(this)
-                .setIsMuted(isMuted)
-                .createCallState();
-    }
-
     public CallState hasVideoChanged(boolean hasVideo) {
         return new Builder()
                 .copyFrom(this)
@@ -361,6 +354,12 @@ class CallState {
         return visitorMediaState != null &&
                 visitorMediaState.getVideo() != null &&
                 visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
+    }
+
+    private boolean isMuted(VisitorMediaState visitorMediaState) {
+        return visitorMediaState == null ||
+                visitorMediaState.getAudio() == null ||
+                visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
     }
 
     public static class Builder {

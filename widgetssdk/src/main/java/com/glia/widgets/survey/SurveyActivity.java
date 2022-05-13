@@ -23,22 +23,13 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
         prepareSurveyView();
     }
 
-    private void hideSoftKeyboard() {
-        Utils.hideSoftKeyboard(this, getWindow().getDecorView().getWindowToken());
-    }
-
-    private void prepareSurveyView() {
-        surveyView = findViewById(R.id.survey_view);
-        surveyView.setCallback(this);
-        SurveyContract.Controller surveyController =
-                Dependencies.getControllerFactory().getSurveyController();
-        surveyView.setController(surveyController);
-        Bundle extras = getIntent().getExtras();
-        UiTheme uiTheme = extras.getParcelable(GliaWidgets.UI_THEME);
-        surveyView.setTheme(uiTheme);
-
-        Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
-        surveyController.init(survey);
+    @Override
+    protected void onDestroy() {
+        hideSoftKeyboard();
+        if (surveyView != null) {
+            surveyView.onDestroyView();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -63,12 +54,21 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
         finishAndRemoveTask();
     }
 
-    @Override
-    protected void onDestroy() {
-        hideSoftKeyboard();
-        if (surveyView != null) {
-            surveyView.onDestroyView();
-        }
-        super.onDestroy();
+    private void hideSoftKeyboard() {
+        Utils.hideSoftKeyboard(this, getWindow().getDecorView().getWindowToken());
+    }
+
+    private void prepareSurveyView() {
+        surveyView = findViewById(R.id.survey_view);
+        surveyView.setCallback(this);
+        SurveyContract.Controller surveyController =
+                Dependencies.getControllerFactory().getSurveyController();
+        surveyView.setController(surveyController);
+        Bundle extras = getIntent().getExtras();
+        UiTheme uiTheme = extras.getParcelable(GliaWidgets.UI_THEME);
+        surveyView.setTheme(uiTheme);
+
+        Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
+        surveyController.init(survey);
     }
 }

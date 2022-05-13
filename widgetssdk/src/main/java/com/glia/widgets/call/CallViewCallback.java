@@ -13,4 +13,6 @@ public interface CallViewCallback {
     void navigateToSurvey(@NonNull Survey survey);
 
     void destroyView();
+
+    void minimizeView();
 }

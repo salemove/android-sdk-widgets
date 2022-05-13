@@ -22,7 +22,6 @@ public class ChatActivity extends AppCompatActivity {
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
     };
-    private ChatView.OnEndListener onEndListener = this::finish;
     private ChatView.OnNavigateToCallListener onNavigateToCallListener =
             (UiTheme theme, String mediaType) -> {
                 navigateToCall(theme, mediaType);
@@ -49,7 +48,13 @@ public class ChatActivity extends AppCompatActivity {
         chatView.setConfiguration(configuration);
         chatView.setTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);
-        chatView.setOnEndListener(onEndListener);
+
+        // In case the engagement ends, Activity is removed from the device's Recents menu
+        // to avoid app users to accidentally start queueing for another call when they resume
+        // the app from the Recents menu and the app's backstack was empty.
+        chatView.setOnEndListener(this::finishAndRemoveTask);
+
+        chatView.setOnMinimizeListener(this::finish);
         chatView.setOnNavigateToCallListener(onNavigateToCallListener);
         chatView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
         chatView.startChat(
@@ -76,7 +81,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         onBackClickedListener = null;
-        onEndListener = null;
         onNavigateToCallListener = null;
         onNavigateToSurveyListener = null;
         chatView.onDestroyView(isFinishing());

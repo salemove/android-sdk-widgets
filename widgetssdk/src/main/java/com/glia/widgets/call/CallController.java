@@ -61,7 +61,6 @@ public class CallController implements
     private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
     private TimeCounter.RawTimerStatusListener inactivityTimerStatusListener;
     private TimeCounter.RawTimerStatusListener connectingTimerStatusListener;
-    private MinimizeHandler.OnMinimizeCalledListener minimizeCalledListener;
     private MessagesNotSeenHandler.MessagesNotSeenHandlerListener messagesNotSeenHandlerListener;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
@@ -262,7 +261,6 @@ public class CallController implements
         emitViewState(callState.initCall(companyName, mediaType));
         createNewTimerStatusCallback();
         initControllerCallbacks();
-        initMinimizeCallback();
         initMessagesNotSeenCallback();
         onEngagementUseCase.execute(this);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
@@ -271,7 +269,7 @@ public class CallController implements
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
         connectingTimerCounter.addRawValueListener(connectingTimerStatusListener);
-        minimizeHandler.addListener(minimizeCalledListener);
+        minimizeHandler.addListener(this::minimizeView);
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener);
     }
 
@@ -295,7 +293,6 @@ public class CallController implements
             inactivityTimeCounter.clear();
             connectingTimerCounter.clear();
             inactivityTimerStatusListener = null;
-            minimizeCalledListener = null;
             minimizeHandler.clear();
             messagesNotSeenHandler.removeListener(messagesNotSeenHandlerListener);
             messagesNotSeenHandlerListener = null;
@@ -615,10 +612,6 @@ public class CallController implements
                 emitViewState(callState.changeNumberOfMessages(count));
     }
 
-    private void initMinimizeCallback() {
-        minimizeCalledListener = () -> onDestroy(true);
-    }
-
     private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {
         if (callState.isMediaEngagementStarted()) {
             dialogController.showUpgradeAudioDialog(mediaUpgradeOffer, callState.callStatus.getFormattedOperatorName());
@@ -734,5 +727,9 @@ public class CallController implements
     private void showLandscapeControls() {
         emitViewState(callState.landscapeControlsVisibleChanged(true));
         restartInactivityTimeCounter();
+    }
+
+    private void minimizeView() {
+        if (viewCallback != null) viewCallback.minimizeView();
     }
 }

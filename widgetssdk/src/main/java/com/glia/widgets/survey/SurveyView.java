@@ -1,7 +1,6 @@
 package com.glia.widgets.survey;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -214,8 +213,9 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void finish() {
-        Activity activity = Utils.getActivity(getContext());
-        if (activity != null) activity.finish();
+        if (callback != null) {
+            callback.onFinish();
+        }
     }
 
     public void onDestroyView() {
@@ -227,5 +227,7 @@ public class SurveyView extends ConstraintLayout
 
     public interface Callback {
         void onTitleUpdated(String title);
+
+        void onFinish();
     }
 }

@@ -15,10 +15,6 @@ public class MinimizeHandler {
         listeners.add(listener);
     }
 
-    public void removeListener(OnMinimizeCalledListener listener) {
-        listeners.remove(listener);
-    }
-
     public void clear() {
         Logger.d(TAG, "clear");
         listeners.clear();

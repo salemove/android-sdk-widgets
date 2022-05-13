@@ -1,7 +1,6 @@
 package com.glia.widgets.survey;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -214,12 +213,8 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void finish() {
-        Activity activity = Utils.getActivity(getContext());
-        if (activity != null) {
-            // In case the engagement ends, Activity is removed from the device's Recents menu
-            // to avoid app users to accidentally start queueing for another call when they resume
-            // the app from the Recents menu and the app's backstack was empty.
-            activity.finishAndRemoveTask();
+        if (callback != null) {
+            callback.onFinish();
         }
     }
 
@@ -232,5 +227,7 @@ public class SurveyView extends ConstraintLayout
 
     public interface Callback {
         void onTitleUpdated(String title);
+
+        void onFinish();
     }
 }

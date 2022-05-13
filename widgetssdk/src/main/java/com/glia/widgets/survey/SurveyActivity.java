@@ -42,8 +42,25 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.Call
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // Back press behaves the same way as Callback.onFinish(). See the comment below.
+        finishAndRemoveTask();
+    }
+
+    @Override
     public void onTitleUpdated(String title) {
         setTitle(title);
+    }
+
+    @Override
+    public void onFinish() {
+
+        // In case the engagement ends, Activity is removed from the device's Recents menu
+        // to avoid app users to accidentally start queueing for another call when they resume
+        // the app from the Recents menu and the app's backstack was empty.
+        finishAndRemoveTask();
     }
 
     @Override

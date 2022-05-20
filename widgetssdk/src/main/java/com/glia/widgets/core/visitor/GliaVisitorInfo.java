@@ -1,16 +1,21 @@
 package com.glia.widgets.core.visitor;
 
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.Map;
 
+/**
+ * @deprecated since 1.9.0 use @see {@link VisitorInfo}
+ */
+@Deprecated
 public class GliaVisitorInfo implements VisitorInfo {
     public String name;
     public String email;
     public String phone;
     public String note;
-    public LinkedTreeMap<String, String> customAttributes;
+    public Map<String, String> customAttributes;
     public String generatedName;
     public boolean banned;
     public String href;
@@ -22,7 +27,7 @@ public class GliaVisitorInfo implements VisitorInfo {
         this.email = visitorInfo.getEmail();
         this.phone = visitorInfo.getPhone();
         this.note = visitorInfo.getNote();
-        this.customAttributes = visitorInfo.getCustomAttributes();
+        this.customAttributes = visitorInfo.getCustomAttributesMap();
         this.generatedName = visitorInfo.getGeneratedName();
         this.banned = visitorInfo.getBanned();
         this.href = visitorInfo.getHref();
@@ -52,7 +57,9 @@ public class GliaVisitorInfo implements VisitorInfo {
 
     @Override
     public LinkedTreeMap<String, String> getCustomAttributes() {
-        return customAttributes;
+        LinkedTreeMap<String, String> attrs = new LinkedTreeMap<>();
+        attrs.putAll(customAttributes);
+        return attrs;
     }
 
     @Override

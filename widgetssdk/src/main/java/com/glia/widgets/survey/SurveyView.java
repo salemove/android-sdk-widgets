@@ -9,13 +9,13 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.engagement.Survey;
@@ -32,7 +32,7 @@ import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
-public class SurveyView extends ConstraintLayout
+public class SurveyView extends FrameLayout
         implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 

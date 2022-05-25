@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.glia.androidsdk.GliaConfig;
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
@@ -185,7 +186,7 @@ public class GliaWidgets {
         Logger.d(TAG, "endEngagement");
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
             if (e != null) {
-                Logger.e(TAG, "Ending engagement error: " + e.toString());
+                Logger.e(TAG, "Ending engagement error: " + e);
             }
         }));
         Dependencies.getControllerFactory().destroyControllers();
@@ -195,7 +196,10 @@ public class GliaWidgets {
      * Updates the visitor's information
      * <p>
      * Updates the visitor's information stored on the server. This information will also be displayed to the operator.
+     *
+     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#updateVisitorInfo(VisitorInfoUpdateRequest, Consumer)}
      */
+    @Deprecated
     public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
         Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
                 .setName(visitorInfoUpdate.getName())
@@ -218,7 +222,10 @@ public class GliaWidgets {
      * Fetches the visitor's information
      * <p>
      * If visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
+     *
+     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#getVisitorInfo(RequestCallback)}
      */
+    @Deprecated
     public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
         Dependencies.glia().getVisitorInfo((visitorInfo, e) -> {
             if (visitorInfo != null) {

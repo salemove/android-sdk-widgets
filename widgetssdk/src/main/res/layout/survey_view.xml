@@ -23,10 +23,7 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="@dimen/glia_large_x_large"
                 android:layout_marginEnd="24dp"
-                android:layout_gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_gravity="center" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/survey_list"
@@ -35,8 +32,6 @@
                 android:scrollbars="horizontal"
                 android:layout_weight="1"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toTopOf="@+id/button_panel"
-                app:layout_constraintTop_toBottomOf="@id/survey_title"
                 tools:listitem="@layout/survey_scale_question_item" />
 
             <LinearLayout
@@ -44,12 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="4dp"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.781"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintVertical_bias="1.0">
+                android:orientation="horizontal">
 
                 <com.glia.widgets.view.button.GliaNegativeButton
                     android:id="@+id/btn_cancel"

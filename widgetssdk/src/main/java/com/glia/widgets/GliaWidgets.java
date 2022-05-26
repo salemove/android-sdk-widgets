@@ -12,7 +12,11 @@ import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
+import java.io.IOException;
 import java.util.function.Consumer;
+
+import io.reactivex.exceptions.UndeliverableException;
+import io.reactivex.plugins.RxJavaPlugins;
 
 /**
  * This class is a starting point for integration with Glia Widgets SDK
@@ -95,6 +99,7 @@ public class GliaWidgets {
     public synchronized static void onAppCreate(Application application) {
         Dependencies.glia().onAppCreate(application);
         Dependencies.onAppCreate(application);
+        setupRxErrorHandler();
         Logger.d(TAG, "onAppCreate");
     }
 
@@ -253,5 +258,49 @@ public class GliaWidgets {
      */
     public static String getWidgetsCoreSdkVersion() {
         return BuildConfig.GLIA_CORE_SDK_VERSION;
+    }
+
+    // More info about global Rx error handler:
+    //     https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling
+    private static void setupRxErrorHandler() {
+        RxJavaPlugins.setErrorHandler(e -> {
+            if (e instanceof UndeliverableException) {
+                e = e.getCause();
+            }
+            if (e instanceof IOException) {
+                // fine, irrelevant network problem or API that throws on cancellation
+                return;
+            }
+            if (e instanceof InterruptedException) {
+                // fine, some blocking code was interrupted by a dispose call
+                return;
+            }
+            if ((e instanceof NullPointerException) || (e instanceof IllegalArgumentException)) {
+                // that's likely a bug in the application
+                throwUncaughtException(e);
+                return;
+            }
+            if (e instanceof IllegalStateException) {
+                // that's a bug in RxJava or in a custom operator
+                throwUncaughtException(e);
+                return;
+            }
+
+            logUndeliverableException(e);
+        });
+    }
+
+    private static void throwUncaughtException(Throwable e) {
+        Thread.UncaughtExceptionHandler handler =
+                Thread.currentThread().getUncaughtExceptionHandler();
+        if (handler != null) {
+            handler.uncaughtException(Thread.currentThread(), e);
+        }
+    }
+
+    private static void logUndeliverableException(Throwable e) {
+        String message = "Exception message: ";
+        if (e != null) message += e.getMessage();
+        Logger.e("RxErrorHandler", "Undeliverable exception received, not sure what to do. " + message);
     }
 }

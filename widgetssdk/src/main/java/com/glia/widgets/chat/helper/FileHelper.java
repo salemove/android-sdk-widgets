@@ -26,6 +26,14 @@ public class FileHelper {
     public static Maybe<Bitmap> decodeSampledBitmapFromInputStream(InputStream inputStream) {
         return Maybe.create(emitter -> {
                     Bitmap rawBitmap = BitmapFactory.decodeStream(inputStream);
+
+                    if (rawBitmap == null) {
+                        emitter.onError(
+                                new IOException("InputStream could not be decoded")
+                        );
+                        return;
+                    }
+
                     int rawHeight = rawBitmap.getHeight();
                     int rawWidth = rawBitmap.getWidth();
 

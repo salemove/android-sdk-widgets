@@ -2,11 +2,5 @@
 <resources>
 
     <string name="glia_outlined_options_icon_content_description">Outlined options icon description</string>
-    <string name="glia_chat_media_upgrade_item_mic_content_description">Timer microphone </string>
-    <string name="glia_chat_alert_dialog_close_content_description">Close button content description</string>
-    <string name="glia_chat_glia_logo_content_description">Glia logo content description</string>
-    <string name="glia_chat_audio_icon_content_description">Audio icon content description</string>
-
-    <string name="glia_screensharing_dialog_icon_content_description">Screen sharing icon content description</string>
 
 </resources>

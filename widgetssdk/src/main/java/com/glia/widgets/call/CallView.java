@@ -317,22 +317,26 @@ public class CallView extends ConstraintLayout {
                     muteButton.setEnabled(callState.isMuteButtonEnabled());
                     speakerButton.setEnabled(callState.isSpeakerButtonEnabled());
                     videoButton.setEnabled(callState.isVideoButtonEnabled());
-                    setButtonActivated(videoButton, theme.getIconCallVideoOn(),
-                            theme.getIconCallVideoOff(), callState.hasVideo);
+                    setButtonActivated(
+                            videoButton,
+                            theme.getIconCallVideoOn(),
+                            theme.getIconCallVideoOff(),
+                            R.string.glia_call_video_on_content_description,
+                            R.string.glia_call_video_off_content_description,
+                            callState.hasVideo
+                    );
                     setButtonActivated(
                             muteButton,
                             theme.getIconCallAudioOff(),    // mute (eg. mic-off) button activated icon
                             theme.getIconCallAudioOn(),     // mute (eg. mic-off) button deactivated icon
+                            R.string.glia_call_mute_content_description,
+                            R.string.glia_call_unmute_content_description,
                             callState.isMuted
                     );
                     muteButtonLabel.setText(callState.isMuted ?
                             R.string.glia_call_mute_button_unmute :
                             R.string.glia_call_mute_button_mute
                     );
-                    muteButton.setContentDescription(resources.getString(callState.isMuted ?
-                            R.string.glia_call_mute_content_description :
-                            R.string.glia_call_unmute_content_description
-                    ));
 
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
@@ -513,12 +517,14 @@ public class CallView extends ConstraintLayout {
         if (isSpeakerOn != audioManager.isSpeakerphoneOn()) {
             post(() -> audioManager.setSpeakerphoneOn(isSpeakerOn));
         }
-        setButtonActivated(speakerButton, theme.getIconCallSpeakerOn(),
-                theme.getIconCallSpeakerOff(), isSpeakerOn);
-        speakerButton.setContentDescription(resources.getString(isSpeakerOn ?
-                R.string.glia_call_speaker_on_content_description :
-                R.string.glia_call_speaker_off_content_description
-        ));
+        setButtonActivated(
+                speakerButton,
+                theme.getIconCallSpeakerOn(),
+                theme.getIconCallSpeakerOff(),
+                R.string.glia_call_speaker_on_content_description,
+                R.string.glia_call_speaker_off_content_description,
+                isSpeakerOn
+        );
     }
 
     private void showExitQueueDialog() {
@@ -626,13 +632,15 @@ public class CallView extends ConstraintLayout {
     private void setButtonActivated(FloatingActionButton floatingActionButton,
                                     Integer activatedDrawableRes,
                                     Integer notActivatedDrawableRes,
+                                    @StringRes int activatedContentDescription,
+                                    @StringRes int notActivatedContentDescription,
                                     boolean isActivated
     ) {
         floatingActionButton.setActivated(isActivated);
         floatingActionButton.setImageResource(isActivated ? activatedDrawableRes : notActivatedDrawableRes);
         floatingActionButton.setContentDescription(resources.getString(isActivated ?
-                R.string.glia_call_video_on_content_description :
-                R.string.glia_call_video_off_content_description
+                activatedContentDescription :
+                notActivatedContentDescription
         ));
     }
 

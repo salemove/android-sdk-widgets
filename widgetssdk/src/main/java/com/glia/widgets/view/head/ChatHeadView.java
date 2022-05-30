@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieProperty;
@@ -208,6 +211,19 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
         badgeView = view.findViewById(R.id.chat_bubble_badge);
         queueingAnimation = view.findViewById(R.id.queueing_lottie_animation);
         onHoldView = view.findViewById(R.id.on_hold_icon);
+        setAccessibilityLabels(view);
+    }
+
+    private void setAccessibilityLabels(View view) {
+        view.setFocusable(true);
+        view.setContentDescription(view.getContext().getString(R.string.glia_chat_head_view_content_description));
+        ViewCompat.setAccessibilityDelegate(view, new AccessibilityDelegateCompat() {
+            @Override
+            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK);
+            }
+        });
     }
 
     private void updateOperatorPlaceholderImageView() {

@@ -248,11 +248,13 @@ public class Dialogs {
                     context.getString(R.string.glia_dialog_upgrade_audio_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeAudioDialog());
+            titleIconView.setContentDescription(context.getString(R.string.glia_chat_audio_icon_content_description));
         } else if (type instanceof DialogOfferType.VideoUpgradeOffer2Way) {
             titleView.setText(
                     context.getString(R.string.glia_dialog_upgrade_video_2_way_title, type.getOperatorName())
             );
             titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
+            titleIconView.setContentDescription(context.getString(R.string.glia_chat_video_icon_content_description));
         } else if (type instanceof DialogOfferType.VideoUpgradeOffer1Way) {
             titleView.setText(
                     context.getString(R.string.glia_dialog_upgrade_video_1_way_title, type.getOperatorName())

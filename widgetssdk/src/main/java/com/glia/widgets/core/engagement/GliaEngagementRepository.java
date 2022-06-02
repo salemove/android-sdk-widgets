@@ -16,9 +16,7 @@ public class GliaEngagementRepository {
     private final String TAG = GliaEngagementRepository.class.getSimpleName();
     private final GliaCore gliaCore;
 
-    public GliaEngagementRepository(
-            GliaCore gliaCore
-    ) {
+    public GliaEngagementRepository(GliaCore gliaCore) {
         this.gliaCore = gliaCore;
     }
 

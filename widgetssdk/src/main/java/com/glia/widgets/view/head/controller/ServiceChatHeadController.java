@@ -4,7 +4,6 @@ import android.view.View;
 
 import androidx.core.util.Pair;
 
-import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
@@ -18,18 +17,19 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
-
-import java.util.Optional;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class ServiceChatHeadController
         implements ChatHeadContract.Controller, VisitorMediaUpdatesListener {
+    private static final String TAG = ServiceChatHeadController.class.getSimpleName();
+
     private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
     private final ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
@@ -180,10 +180,11 @@ public class ServiceChatHeadController
     private void newEngagementLoaded(OmnicoreEngagement engagement) {
         state = State.ENGAGEMENT;
         if (operatorDisposable != null) operatorDisposable.dispose();
-        operatorDisposable = getOperatorFlowableUseCase.execute().subscribe(
-                this::operatorDataLoaded,
-                Throwable::printStackTrace
-        );
+        operatorDisposable = getOperatorFlowableUseCase.execute()
+                .subscribe(
+                        this::operatorDataLoaded,
+                        throwable -> Logger.e(TAG, throwable.getMessage())
+                );
         engagementDisposables.add(operatorDisposable);
         gliaOnEngagementEndUseCase.execute(this::engagementEnded);
         updateChatHeadView();

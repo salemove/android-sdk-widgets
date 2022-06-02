@@ -34,7 +34,6 @@ import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCas
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.core.queue.domain.exception.EngagementOngoingException;
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
 import com.glia.widgets.core.survey.OnSurveyListener;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
@@ -206,10 +205,13 @@ public class CallController implements
     }
 
     private void subscribeToEngagementStateChange() {
-        disposable.add(getGliaEngagementStateFlowableUseCase.execute().subscribe(
-                this::onEngagementStateChanged,
-                Throwable::printStackTrace
-        ));
+        disposable.add(
+                getGliaEngagementStateFlowableUseCase.execute()
+                        .subscribe(
+                                this::onEngagementStateChanged,
+                                throwable -> Logger.e(TAG, throwable.getMessage())
+                        )
+        );
     }
 
     private void onEngagementStateChanged(EngagementStateEvent engagementState) {
@@ -231,17 +233,14 @@ public class CallController implements
         }
     }
 
-    private void onEngagementOngoing(
-            Operator operator
-    ) {
-        if (!(callState.callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted) && !(callState.callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted)) {
+    private void onEngagementOngoing(Operator operator) {
+        if (!(callState.callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted) &&
+                !(callState.callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted)) {
             onOperatorConnected(operator);
         }
     }
 
-    private void onOperatorConnected(
-            Operator operator
-    ) {
+    private void onOperatorConnected(Operator operator) {
         String name = operator.getName();
         String imageUrl = Utils.getOperatorImageUrl(operator);
         operatorConnected(name, imageUrl);
@@ -284,10 +283,13 @@ public class CallController implements
         onEngagementUseCase.execute(this);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
         disposable.add(
-                gliaQueueForMediaEngagementUseCase.execute(queueId, contextUrl, mediaType).subscribe(
-                        this::queueForEngagementStarted,
-                        this::queueForEngagementError
-                ));
+                gliaQueueForMediaEngagementUseCase
+                        .execute(queueId, contextUrl, mediaType)
+                        .subscribe(
+                                this::queueForEngagementStarted,
+                                this::queueForEngagementError
+                        )
+        );
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
@@ -682,10 +684,13 @@ public class CallController implements
 
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
-        disposable.add(cancelQueueTicketUseCase.execute().subscribe(
-                this::queueForEngagementStopped,
-                Throwable::printStackTrace
-        ));
+        disposable.add(
+                cancelQueueTicketUseCase.execute()
+                        .subscribe(
+                                this::queueForEngagementStopped,
+                                throwable -> Logger.e(TAG, throwable.getMessage())
+                        )
+        );
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(callState.stop());

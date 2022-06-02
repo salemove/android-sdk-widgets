@@ -111,7 +111,6 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             itemView.setContentDescription(context.getString(R.string.glia_chat_operator_has_joined_content_description, item.getOperatorName()));
         } else if (item.getStatus() == OperatorStatusItem.Status.JOINED) {
             statusPictureView.setVisibility(View.GONE);
-
             chatStartedNameView.setText(item.getOperatorName());
             chatStartedCaptionView.setText(context.getString(R.string.glia_chat_operator_has_joined, item.getOperatorName()));
             chatStartingHeadingView.setVisibility(View.GONE);

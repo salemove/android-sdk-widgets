@@ -1113,8 +1113,9 @@ public class CallView extends ConstraintLayout {
     }
 
     public boolean shouldShowMediaEngagementView(boolean isUpgradeToCall) {
-        if (callController != null)
+        if (callController != null) {
             return callController.shouldShowMediaEngagementView(isUpgradeToCall);
+        }
         return false;
     }
 }

@@ -11,6 +11,7 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
@@ -19,6 +20,8 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class ApplicationChatHeadLayoutController
         implements ChatHeadLayoutContract.Controller, VisitorMediaUpdatesListener {
+    private static final String TAG = ApplicationChatHeadLayoutController.class.getSimpleName();
+
     private final IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
     private final ResolveChatHeadNavigationUseCase navigationDestinationUseCase;
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
@@ -109,11 +112,11 @@ public class ApplicationChatHeadLayoutController
     private void newEngagementLoaded(OmnicoreEngagement engagement) {
         state = State.ENGAGEMENT;
         engagementDisposables.add(
-                getOperatorFlowableUseCase.execute().subscribe(
-                        this::operatorDataLoaded,
-                        error -> { // no-op
-                        }
-                )
+                getOperatorFlowableUseCase.execute()
+                        .subscribe(
+                                this::operatorDataLoaded,
+                                throwable -> Logger.e(TAG, throwable.getMessage())
+                        )
         );
         updateChatHeadView();
     }

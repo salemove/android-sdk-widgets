@@ -37,9 +37,10 @@ public class GliaQueueForMediaEngagementUseCase {
         }
     }
 
-    private Completable startQueueing(String queueId,
-                                      String contextUrl,
-                                      Engagement.MediaType mediaType
+    private Completable startQueueing(
+            String queueId,
+            String contextUrl,
+            Engagement.MediaType mediaType
     ) {
         GliaQueueingState queueingState = repository.getQueueingState();
         if (queueingState instanceof GliaQueueingState.None) {

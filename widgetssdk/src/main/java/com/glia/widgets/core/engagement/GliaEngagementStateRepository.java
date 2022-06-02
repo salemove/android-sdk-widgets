@@ -40,7 +40,8 @@ public class GliaEngagementStateRepository {
                 engagementStateFlowable
                         .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
                         .doOnNext(this::notifyEngagementStateEventUpdate)
-                        .doOnNext(this::updateOperatorOnEngagementStateChanged).subscribe()
+                        .doOnNext(this::updateOperatorOnEngagementStateChanged)
+                        .subscribe()
         );
         engagement.on(Engagement.Events.STATE_UPDATE, this::notifyEngagementStateUpdate);
         engagement.on(Engagement.Events.END, () -> onEngagementEnded(engagement));
@@ -50,6 +51,7 @@ public class GliaEngagementStateRepository {
         engagement.off(Engagement.Events.STATE_UPDATE, this::notifyEngagementStateUpdate);
         engagementStateProcessor.onNext(Optional.empty());
         operatorProcessor.onNext(Optional.empty());
+        engagementStateEventProcessor.onNext(new EngagementStateEvent.EngagementEndedEvent());
         disposable.dispose();
     }
 

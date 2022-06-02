@@ -19,9 +19,7 @@ public class GliaQueueRepository {
     private final GliaCore gliaCore;
     private GliaQueueingState queueingState = new GliaQueueingState.None();
 
-    public GliaQueueRepository(
-            GliaCore gliaCore
-    ) {
+    public GliaQueueRepository(GliaCore gliaCore) {
         this.gliaCore = gliaCore;
     }
 
@@ -57,26 +55,42 @@ public class GliaQueueRepository {
     private Completable queueForMediaEngagement(String queueId,
                                                 VisitorContext visitorContext,
                                                 Engagement.MediaType mediaType) {
-        return Completable.create(emitter -> gliaCore.queueForEngagement(queueId, mediaType, visitorContext, MEDIA_PERMISSION_REQUEST_CODE, exception -> {
-            if (exception == null || exception.cause != GliaException.Cause.ALREADY_QUEUED) {
-                emitter.onComplete();
-            } else {
-                emitter.onError(exception);
-            }
-        }));
+        return Completable.create(emitter ->
+                gliaCore.queueForEngagement(
+                        queueId,
+                        mediaType,
+                        visitorContext,
+                        MEDIA_PERMISSION_REQUEST_CODE,
+                        exception -> {
+                            if (exception == null ||
+                                    exception.cause != GliaException.Cause.ALREADY_QUEUED) {
+                                emitter.onComplete();
+                            } else {
+                                emitter.onError(exception);
+                            }
+                        }
+                )
+        );
     }
 
     private Completable queueForEngagement(
             String queueId,
             VisitorContext visitorContext
     ) {
-        return Completable.create(emitter -> gliaCore.queueForEngagement(queueId, visitorContext, exception -> {
-            if (exception == null || exception.cause != GliaException.Cause.ALREADY_QUEUED) {
-                emitter.onComplete();
-            } else {
-                emitter.onError(exception);
-            }
-        }));
+        return Completable.create(emitter ->
+                gliaCore.queueForEngagement(
+                        queueId,
+                        visitorContext,
+                        exception -> {
+                            if (exception == null ||
+                                    exception.cause != GliaException.Cause.ALREADY_QUEUED) {
+                                emitter.onComplete();
+                            } else {
+                                emitter.onError(exception);
+                            }
+                        }
+                )
+        );
     }
 
     public Completable cancelTicket(String ticketId) {

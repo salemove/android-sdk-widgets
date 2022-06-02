@@ -133,5 +133,4 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
     }
-
 }

@@ -51,10 +51,6 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;
-import com.glia.widgets.core.queue.domain.exception.EngagementOngoingException;
-import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
-import com.glia.widgets.core.survey.OnSurveyListener;
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
@@ -71,6 +67,9 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
+import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
+import com.glia.widgets.core.survey.OnSurveyListener;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.helper.Logger;
@@ -110,6 +109,7 @@ public class ChatController implements
     private final MessagesNotSeenHandler messagesNotSeenHandler;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
+    private Disposable engagementStateEventDisposable = null;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
@@ -324,13 +324,15 @@ public class ChatController implements
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
         disposable.add(
-                queueForChatEngagementUseCase.execute(
-                        chatState.queueId,
-                        chatState.contextUrl
-                ).subscribe(
-                        this::queueForEngagementStarted,
-                        this::queueForEngagementError
-                )
+                queueForChatEngagementUseCase
+                        .execute(
+                                chatState.queueId,
+                                chatState.contextUrl
+                        )
+                        .subscribe(
+                                this::queueForEngagementStarted,
+                                this::queueForEngagementError
+                        )
         );
     }
 
@@ -565,15 +567,13 @@ public class ChatController implements
         subscribeToEngagementStateChange();
     }
 
-    private Disposable engagementStateEventDisposable = null;
-
     private void subscribeToEngagementStateChange() {
         if (engagementStateEventDisposable != null) engagementStateEventDisposable.dispose();
         engagementStateEventDisposable = getGliaEngagementStateFlowableUseCase
                 .execute()
                 .subscribe(
                         this::onEngagementStateChanged,
-                        Throwable::printStackTrace
+                        throwable -> Logger.e(TAG, throwable.getMessage())
                 );
         disposable.add(engagementStateEventDisposable);
     }
@@ -799,10 +799,13 @@ public class ChatController implements
 
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
-        disposable.add(cancelQueueTicketUseCase.execute().subscribe(
-                this::queueForEngagementStopped,
-                Throwable::printStackTrace
-        ));
+        disposable.add(
+                cancelQueueTicketUseCase.execute()
+                        .subscribe(
+                                this::queueForEngagementStopped,
+                                throwable -> Logger.e(TAG, throwable.getMessage())
+                        )
+        );
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(chatState.stop());

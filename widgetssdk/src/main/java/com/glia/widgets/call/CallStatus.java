@@ -100,10 +100,11 @@ public interface CallStatus {
         private final String operatorProfileImgUrl;
         private VisitorMediaState visitorMediaState;
 
-        public EngagementOngoingOperatorIsConnecting(String operatorName,
-                                                     String time,
-                                                     String operatorProfileImgUrl,
-                                                     VisitorMediaState visitorMediaState
+        public EngagementOngoingOperatorIsConnecting(
+                String operatorName,
+                String time,
+                String operatorProfileImgUrl,
+                VisitorMediaState visitorMediaState
         ) {
             this.operatorName = operatorName;
             this.time = time;

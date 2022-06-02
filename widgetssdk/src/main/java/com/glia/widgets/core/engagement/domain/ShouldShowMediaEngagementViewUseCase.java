@@ -21,7 +21,10 @@ public class ShouldShowMediaEngagementViewUseCase {
     }
 
     public boolean execute(boolean isUpgradeToCall) {
-        return hasNoQueueingAndEngagementOngoing() || hasMediaQueueingOngoing() || hasOngoingMediaEngagement() || isUpgradeToCall;
+        return hasNoQueueingAndEngagementOngoing() ||
+                hasMediaQueueingOngoing() ||
+                hasOngoingMediaEngagement() ||
+                isUpgradeToCall;
     }
 
     private boolean hasNoQueueingAndEngagementOngoing() {

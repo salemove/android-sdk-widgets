@@ -44,17 +44,13 @@ public class ResourceProvider implements IResourceProvider {
         return ContextCompat.getColorStateList(weakContext.get(), id);
     }
 
-    @Nullable
     @Override
-    public Drawable getDrawable(int id) {
-        return ResourcesCompat.getDrawable((weakContext.get()).getResources(), id, null);
-    }
-
     public int getDimension(int dimensionId) {
         Resources resources = weakContext.get().getResources();
         return (int) (resources.getDimension(dimensionId) / resources.getDisplayMetrics().density);
     }
 
+    @Override
     public float convertDpToPixel(int dp) {
         return dp * ((float) weakContext.get().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
@@ -71,6 +67,7 @@ interface IResourceProvider {
 
     ColorStateList getColorStateList(int id);
 
-    @Nullable
-    Drawable getDrawable(@DrawableRes int id);
+    int getDimension(int dimensionId);
+
+    float convertDpToPixel(int dp);
 }

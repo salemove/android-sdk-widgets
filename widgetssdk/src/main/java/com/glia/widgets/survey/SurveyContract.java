@@ -27,6 +27,8 @@ public interface SurveyContract {
 
         void hideSoftKeyboard();
 
+        void onNetworkTimeout();
+
         void finish();
     }
 }

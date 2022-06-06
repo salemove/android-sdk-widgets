@@ -192,7 +192,7 @@
     <string name="glia_preview_activity_menu_share_button">Share</string>
     <string name="glia_preview_activity_image_content_description">Preview content</string>
 
-    <!--    Survey-->
+    <!-- Survey -->
     <string name="glia_survey_cancel_label">Cancel</string>
     <string name="glia_survey_submit_label">Submit</string>
     <string name="glia_survey_open_text_item_title">Additional thoughts?</string>
@@ -211,7 +211,10 @@
     <string name="glia_survey_required_error_message">Please provide an answer.</string>
     <string name="glia_survey_require_label_content_description">%1$s. Required.</string>
 
-    <!-- ChatHeadView-->
+    <!-- ChatHeadView -->
     <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
+
+    <!-- General -->
+    <string name="glia_network_unavailable">Network unavailable. Please check connection and try again.</string>
 
 </resources>

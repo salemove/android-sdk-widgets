@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -214,6 +215,11 @@ public class SurveyView extends FrameLayout
     @Override
     public void hideSoftKeyboard() {
         Utils.hideSoftKeyboard(getContext(), getWindowToken());
+    }
+
+    @Override
+    public void onNetworkTimeout() {
+        Toast.makeText(getContext(), R.string.glia_network_unavailable, Toast.LENGTH_SHORT).show();
     }
 
     @Override

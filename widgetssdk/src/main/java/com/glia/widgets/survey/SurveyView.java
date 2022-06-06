@@ -125,12 +125,6 @@ public class SurveyView extends ConstraintLayout
     }
 
     private void applyButtonStyle(ButtonConfiguration configuration, Button button) {
-        if (configuration == null) {
-            // Default attributes from
-            // "Application.GliaAndroidSdkWidgetsExample.Button" styles
-            // will be in use
-            return;
-        }
         ColorStateList backgroundColor = configuration.getBackgroundColor();
         button.setBackgroundTintList(backgroundColor);
         ColorStateList textColor = configuration.getTextConfiguration().getTextColor();

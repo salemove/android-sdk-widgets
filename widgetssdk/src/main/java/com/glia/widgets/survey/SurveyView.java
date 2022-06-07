@@ -219,7 +219,7 @@ public class SurveyView extends FrameLayout
 
     @Override
     public void onNetworkTimeout() {
-        Toast.makeText(getContext(), R.string.glia_network_unavailable, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), R.string.glia_survey_network_unavailable, Toast.LENGTH_LONG).show();
     }
 
     @Override

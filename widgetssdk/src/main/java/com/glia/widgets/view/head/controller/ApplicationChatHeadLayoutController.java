@@ -115,7 +115,7 @@ public class ApplicationChatHeadLayoutController
                 getOperatorFlowableUseCase.execute()
                         .subscribe(
                                 this::operatorDataLoaded,
-                                throwable -> Logger.e(TAG, throwable.getMessage())
+                                throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
                         )
         );
         updateChatHeadView();

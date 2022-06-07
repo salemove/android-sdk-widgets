@@ -803,7 +803,7 @@ public class ChatController implements
                 cancelQueueTicketUseCase.execute()
                         .subscribe(
                                 this::queueForEngagementStopped,
-                                throwable -> Logger.e(TAG, throwable.getMessage())
+                                throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
                         )
         );
         endEngagementUseCase.execute();

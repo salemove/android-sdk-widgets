@@ -209,7 +209,7 @@ public class CallController implements
                 getGliaEngagementStateFlowableUseCase.execute()
                         .subscribe(
                                 this::onEngagementStateChanged,
-                                throwable -> Logger.e(TAG, throwable.getMessage())
+                                throwable -> Logger.e(TAG, "subscribeToEngagementStateChange error: " + throwable.getMessage())
                         )
         );
     }
@@ -688,7 +688,7 @@ public class CallController implements
                 cancelQueueTicketUseCase.execute()
                         .subscribe(
                                 this::queueForEngagementStopped,
-                                throwable -> Logger.e(TAG, throwable.getMessage())
+                                throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
                         )
         );
         endEngagementUseCase.execute();

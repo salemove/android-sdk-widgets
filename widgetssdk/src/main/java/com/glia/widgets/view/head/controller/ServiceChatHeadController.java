@@ -183,7 +183,7 @@ public class ServiceChatHeadController
         operatorDisposable = getOperatorFlowableUseCase.execute()
                 .subscribe(
                         this::operatorDataLoaded,
-                        throwable -> Logger.e(TAG, throwable.getMessage())
+                        throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
                 );
         engagementDisposables.add(operatorDisposable);
         gliaOnEngagementEndUseCase.execute(this::engagementEnded);

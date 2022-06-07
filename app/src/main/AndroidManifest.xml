@@ -21,6 +21,22 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter android:label="Deep Link Runner">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:scheme="glia"
+                    android:host="widgets"
+                    android:pathPrefix="/token" />
+
+                <data
+                    android:scheme="glia"
+                    android:host="widgets"
+                    android:pathPrefix="/secret" />
+
+            </intent-filter>
         </activity-alias>
     </application>
 </manifest>

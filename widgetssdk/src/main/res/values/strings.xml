@@ -215,6 +215,6 @@
     <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
 
     <!-- General -->
-    <string name="glia_network_unavailable">Network unavailable. Please check connection and try again.</string>
+    <string name="glia_network_unavailable">The survey could not be submitted due to a network error. Please try again.</string>
 
 </resources>

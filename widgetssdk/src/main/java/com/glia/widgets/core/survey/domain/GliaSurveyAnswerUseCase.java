@@ -46,9 +46,7 @@ public class GliaSurveyAnswerUseCase {
         }
         String surveyId = survey.getId();
         String engagementId = survey.getEngagementId();
-        repository.submitSurveyAnswers(answers, surveyId, engagementId, ignore -> {
-            callback.accept(null); // ignore the Glia exception
-        });
+        repository.submitSurveyAnswers(answers, surveyId, engagementId, callback::accept);
     }
 
     @VisibleForTesting

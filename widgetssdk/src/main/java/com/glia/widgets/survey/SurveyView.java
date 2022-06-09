@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,6 +27,7 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
@@ -48,8 +48,8 @@ public class SurveyView extends FrameLayout
     private TextView title;
     private RecyclerView recyclerView;
     private LinearLayout buttonPanel;
-    private Button submitButton;
-    private Button cancelButton;
+    private MaterialButton submitButton;
+    private MaterialButton cancelButton;
 
     private SurveyAdapter surveyAdapter;
 
@@ -130,7 +130,7 @@ public class SurveyView extends FrameLayout
         cardView.setBackground(background);
     }
 
-    private void applyButtonStyle(ButtonConfiguration configuration, Button button) {
+    private void applyButtonStyle(ButtonConfiguration configuration, MaterialButton button) {
         if (configuration == null) {
             // Default attributes from
             // "Application.GliaAndroidSdkWidgetsExample.Button" styles
@@ -141,6 +141,10 @@ public class SurveyView extends FrameLayout
         button.setBackgroundTintList(backgroundColor);
         ColorStateList textColor = configuration.getTextConfiguration().getTextColor();
         button.setTextColor(textColor);
+        button.setTextSize(configuration.getTextConfiguration().getTextSize());
+        button.setStrokeColor(configuration.getStrokeColor());
+        if (configuration.getStrokeWidth() != null) button.setStrokeWidth(configuration.getStrokeWidth());
+        if (configuration.getTextConfiguration().isBold()) button.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {

@@ -3,6 +3,7 @@ package com.glia.widgets.view.button;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 
 import com.glia.widgets.R;
@@ -11,6 +12,7 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
+import com.glia.widgets.view.configuration.TextConfiguration;
 
 public class GliaSurveyOptionButton extends BaseConfigurableButton {
     private boolean isError = false;
@@ -60,12 +62,24 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
                 buttonConfiguration.getNormalText().getTextColor();
 
         setStrokeColor(strokeColor);
+        setStrokeWidth(normalLayer.getBorderWidth());
         setBackgroundTintList(backgroundColor);
         setTextColor(textColor);
         float textSize = buttonConfiguration.getNormalText().getTextSize();
         setTextSize(textSize);
+        setupTypeFace();
         int radiusDp = normalLayer.getCornerRadius();
         int radiusPx = Math.round(Dependencies.getResourceProvider().convertDpToPixel(radiusDp));
         setCornerRadius(radiusPx);
+    }
+
+    private void setupTypeFace() {
+        TextConfiguration textConfiguration;
+        if (isSelected()) {
+            textConfiguration = buttonConfiguration.getSelectedText();
+        } else {
+            textConfiguration = buttonConfiguration.getNormalText();
+        }
+        if (textConfiguration.isBold()) setTypeface(Typeface.DEFAULT_BOLD);
     }
 }

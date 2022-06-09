@@ -392,7 +392,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 if (drawable != null) {
                     // Set color for the center dot
                     Drawable centerDot = drawable.findDrawableByLayerId(R.id.center_item);
-                    ColorStateList colorStateList = getRadioButtonColor();
+                    ColorStateList colorStateList = getRadioButtonColors(style.getSingleQuestion().getTintColor());
                     centerDot.setTintList(colorStateList);
 
                     // Set color for the border
@@ -412,7 +412,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         @NonNull
-        private ColorStateList getRadioButtonColor() {
+        private ColorStateList getRadioButtonColors(String radiobuttonColor) {
             return new ColorStateList(
                     new int[][]{
                             new int[]{-android.R.attr.state_checked},
@@ -421,8 +421,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     new int[]{
                             ContextCompat.getColor(containerView.getContext(),
                                     android.R.color.transparent), //disabled
-                            ContextCompat.getColor(containerView.getContext(),
-                                    R.color.glia_brand_primary_color) //enabled
+                            Color.parseColor(radiobuttonColor) //enabled
                     }
             );
         }
@@ -477,16 +476,17 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     R.drawable.bg_survey_edit_text);
             if (shape != null) {
                 InputQuestionConfiguration inputQuestionConfig = style.getInputQuestion();
-                String errorColorString = inputQuestionConfig.getOptionButton().getHighlightedLayer().getBorderColor();
+                OptionButtonConfiguration optionButtonConfig = inputQuestionConfig.getOptionButton();
+                String errorColorString = optionButtonConfig.getHighlightedLayer().getBorderColor();
                 int errorColor = Color.parseColor(errorColorString);
-                String normalColorString = inputQuestionConfig.getOptionButton().getNormalLayer().getBorderColor();
+                String normalColorString = optionButtonConfig.getNormalLayer().getBorderColor();
                 int normalColor = Color.parseColor(normalColorString);
                 ColorStateList strokeColor =
                         error ? ColorStateList.valueOf(errorColor) :
                                 ColorStateList.valueOf(normalColor);
-                int width = context.getResources().getDimensionPixelSize(R.dimen.glia_px);
+                int width = optionButtonConfig.getNormalLayer().getBorderWidth();
                 shape.setStroke(width, strokeColor);
-                shape.setColor(Color.parseColor(inputQuestionConfig.getOptionButton().getNormalLayer().getBackgroundColor()));
+                shape.setColor(Color.parseColor(optionButtonConfig.getNormalLayer().getBackgroundColor()));
                 comment.setBackground(shape);
             }
         }

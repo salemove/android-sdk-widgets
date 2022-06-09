@@ -1,6 +1,7 @@
 package com.glia.widgets.view.configuration;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,7 +13,7 @@ public class TextConfiguration implements Parcelable {
     private float textSize;
     private int textTypeFaceStyle;
     private ColorStateList textColor;
-    private ColorStateList textColorHint;
+    private ColorStateList hintColor;
     private ColorStateList textColorLink;
     private int textColorHighlight;
     private int fontFamily;
@@ -25,7 +26,7 @@ public class TextConfiguration implements Parcelable {
         this.textSize = builder.textSize;
         this.textTypeFaceStyle = builder.textTypeFaceStyle;
         this.textColor = builder.textColor;
-        this.textColorHint = builder.textColorHint;
+        this.hintColor = builder.hintColor;
         this.textColorLink = builder.textColorLink;
         this.textColorHighlight = builder.textColorHighlight;
         this.fontFamily = builder.fontFamily;
@@ -45,8 +46,8 @@ public class TextConfiguration implements Parcelable {
         return textColor;
     }
 
-    public ColorStateList getTextColorHint() {
-        return textColorHint;
+    public ColorStateList getHintColor() {
+        return hintColor;
     }
 
     public ColorStateList getTextColorLink() {
@@ -77,7 +78,7 @@ public class TextConfiguration implements Parcelable {
         private float textSize;
         private int textTypeFaceStyle;
         private ColorStateList textColor;
-        private ColorStateList textColorHint;
+        private ColorStateList hintColor;
         private ColorStateList textColorLink;
         private int textColorHighlight;
         private int fontFamily;
@@ -91,7 +92,7 @@ public class TextConfiguration implements Parcelable {
             this.textSize = textConfiguration.textSize;
             this.textTypeFaceStyle = textConfiguration.textTypeFaceStyle;
             this.textColor = textConfiguration.textColor;
-            this.textColorHint = textConfiguration.textColorHint;
+            this.hintColor = textConfiguration.hintColor;
             this.textColorLink = textConfiguration.textColorLink;
             this.textColorHighlight = textConfiguration.textColorHighlight;
             this.fontFamily = textConfiguration.fontFamily;
@@ -114,8 +115,18 @@ public class TextConfiguration implements Parcelable {
             return this;
         }
 
-        public Builder textColorHint(ColorStateList textColorHint) {
-            this.textColorHint = textColorHint;
+        public Builder textColor(String textColor) {
+            this.textColor = ColorStateList.valueOf(Color.parseColor(textColor));
+            return this;
+        }
+
+        public Builder hintColor(ColorStateList hintColor) {
+            this.hintColor = hintColor;
+            return this;
+        }
+
+        public Builder hintColor(String hintColor) {
+            this.hintColor = ColorStateList.valueOf(Color.parseColor(hintColor));
             return this;
         }
 
@@ -174,7 +185,7 @@ public class TextConfiguration implements Parcelable {
         dest.writeFloat(this.textSize);
         dest.writeInt(this.textTypeFaceStyle);
         dest.writeParcelable(this.textColor, flags);
-        dest.writeParcelable(this.textColorHint, flags);
+        dest.writeParcelable(this.hintColor, flags);
         dest.writeParcelable(this.textColorLink, flags);
         dest.writeInt(this.textColorHighlight);
         dest.writeInt(this.fontFamily);
@@ -186,7 +197,7 @@ public class TextConfiguration implements Parcelable {
         this.textSize = source.readFloat();
         this.textTypeFaceStyle = source.readInt();
         this.textColor = source.readParcelable(ColorStateList.class.getClassLoader());
-        this.textColorHint = source.readParcelable(ColorStateList.class.getClassLoader());
+        this.hintColor = source.readParcelable(ColorStateList.class.getClassLoader());
         this.textColorLink = source.readParcelable(ColorStateList.class.getClassLoader());
         this.textColorHighlight = source.readInt();
         this.fontFamily = source.readInt();
@@ -198,7 +209,7 @@ public class TextConfiguration implements Parcelable {
         this.textSize = in.readFloat();
         this.textTypeFaceStyle = in.readInt();
         this.textColor = in.readParcelable(ColorStateList.class.getClassLoader());
-        this.textColorHint = in.readParcelable(ColorStateList.class.getClassLoader());
+        this.hintColor = in.readParcelable(ColorStateList.class.getClassLoader());
         this.textColorLink = in.readParcelable(ColorStateList.class.getClassLoader());
         this.textColorHighlight = in.readInt();
         this.fontFamily = in.readInt();

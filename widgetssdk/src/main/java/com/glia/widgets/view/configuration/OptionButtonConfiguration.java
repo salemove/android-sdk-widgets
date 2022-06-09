@@ -14,11 +14,11 @@ public class OptionButtonConfiguration implements Parcelable {
     private LayerConfiguration normalLayer;
     // Title text style when option is selected.
     private TextConfiguration selectedText;
-    // Layer style when option is selected.
+    // Option layer for selected state.
     private LayerConfiguration selectedLayer;
     // Title text style when option is highlighted.
     private TextConfiguration highlightedText;
-    // Layer style when option is highlighted.
+    // Option layer for highlighted state.
     private LayerConfiguration highlightedLayer;
 
     public OptionButtonConfiguration(Builder builder) {
@@ -61,11 +61,11 @@ public class OptionButtonConfiguration implements Parcelable {
         private LayerConfiguration normalLayer;
         // Title text style when option is selected.
         private TextConfiguration selectedText;
-        // Layer style when option is selected.
+        // Option layer for selected state.
         private LayerConfiguration selectedLayer;
         // Title text style when option is highlighted.
         private TextConfiguration highlightedText;
-        // Layer style when option is highlighted.
+        // Option layer for highlighted state.
         private LayerConfiguration highlightedLayer;
 
         public Builder normalText(TextConfiguration normalText) {

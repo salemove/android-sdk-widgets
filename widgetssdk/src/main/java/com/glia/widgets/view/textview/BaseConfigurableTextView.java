@@ -43,7 +43,7 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
                 .builder()
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
-                .textColorHint(getHintTextColors())
+                .hintColor(getHintTextColors())
                 .textSize(pxToSp(getContext(), getTextSize()))
                 .build();
     }
@@ -58,8 +58,8 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
             builder.textColor(runTimeConfiguration.getTextColor());
         if (runTimeConfiguration.getTextColorHighlight() != textConfiguration.getTextColorHighlight())
             builder.textColorHighlight(runTimeConfiguration.getTextColorHighlight());
-        if (runTimeConfiguration.getTextColorHint() != null)
-            builder.textColorHint(runTimeConfiguration.getTextColorHint());
+        if (runTimeConfiguration.getHintColor() != null)
+            builder.hintColor(runTimeConfiguration.getHintColor());
         if (runTimeConfiguration.getTextSize() != textConfiguration.getTextSize())
             builder.textSize(runTimeConfiguration.getTextSize());
         if (runTimeConfiguration.getFontFamily() != textConfiguration.getFontFamily())
@@ -72,7 +72,7 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     private void updateView() {
         setTextSize(TypedValue.COMPLEX_UNIT_SP, textConfiguration.getTextSize());
         setTextColor(textConfiguration.getTextColor());
-        setHintTextColor(textConfiguration.getTextColorHint());
+        setHintTextColor(textConfiguration.getHintColor());
         setLinkTextColor(textConfiguration.getTextColorLink());
         setHighlightColor(textConfiguration.getTextColorHighlight());
         if (textConfiguration.getFontFamily() != 0)

@@ -10,6 +10,7 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
+import com.glia.widgets.di.Dependencies;
 
 public class GliaOnEngagementEndUseCase implements
         GliaOnEngagementUseCase.Listener {
@@ -55,6 +56,12 @@ public class GliaOnEngagementEndUseCase implements
     }
 
     private EndEngagementRunnable endEngagementRunnable = null;
+    private final GliaEngagementRepository.EndEngagementErrorListener engagementEndErrorListener = exception -> {
+        if (endEngagementRunnable != null) {
+            endEngagementRunnable.run();
+        }
+        Dependencies.getControllerFactory().destroyControllers();
+    };
 
     public GliaOnEngagementEndUseCase(
             GliaEngagementRepository repository,
@@ -89,6 +96,7 @@ public class GliaOnEngagementEndUseCase implements
             engagementUseCase.unregisterListener(this);
             endEngagementRunnable = null;
             this.listener = null;
+            repository.unregisterOnEndEngagementErrorListener(engagementEndErrorListener);
         }
     }
 
@@ -96,5 +104,6 @@ public class GliaOnEngagementEndUseCase implements
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
         endEngagementRunnable = new EndEngagementRunnable(engagement);
         repository.listenForEngagementEnd(engagement, endEngagementRunnable);
+        repository.registerOnEndEngagementErrorListener(engagementEndErrorListener);
     }
 }

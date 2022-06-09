@@ -11,11 +11,19 @@ import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class GliaEngagementRepository {
     private final String TAG = GliaEngagementRepository.class.getSimpleName();
     private EngagementType engagementType = EngagementType.NONE;
+
+    public interface EndEngagementErrorListener {
+        void onEndEngagementErrorListener(Exception exception);
+    }
+
+    private final Set<EndEngagementErrorListener> endEngagementErrorListeners = new HashSet<>();
 
     public GliaEngagementRepository() {
     }
@@ -58,11 +66,23 @@ public class GliaEngagementRepository {
         });
     }
 
+    public void registerOnEndEngagementErrorListener(EndEngagementErrorListener listener) {
+        endEngagementErrorListeners.add(listener);
+    }
+
+    public void unregisterOnEndEngagementErrorListener(EndEngagementErrorListener listener) {
+        endEngagementErrorListeners.remove(listener);
+    }
+
     public void endEngagement() {
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> {
             engagement.end(e -> {
                 if (e != null) {
                     Logger.e(TAG, "Ending engagement error: " + e);
+                    Set<EndEngagementErrorListener> listenersCopy = new HashSet<>(endEngagementErrorListeners);
+                    for(EndEngagementErrorListener listener : listenersCopy) {
+                        listener.onEndEngagementErrorListener(e);
+                    }
                 }
             });
         });

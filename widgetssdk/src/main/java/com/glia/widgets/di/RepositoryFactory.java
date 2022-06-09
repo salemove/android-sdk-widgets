@@ -1,6 +1,7 @@
 package com.glia.widgets.di;
 
 import com.glia.widgets.chat.data.GliaChatRepository;
+import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
@@ -27,6 +28,7 @@ public class RepositoryFactory {
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
+    private final FileHelper fileHelper = new FileHelper();
 
     public RepositoryFactory(GliaCore gliaCore, DownloadsFolderDataSource downloadsFolderDataSource) {
         this.gliaCore = gliaCore;
@@ -85,7 +87,12 @@ public class RepositoryFactory {
 
     public GliaFileRepository getGliaFileRepository() {
         if (gliaFileRepository == null) {
-            gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), downloadsFolderDataSource);
+            gliaFileRepository = new GliaFileRepositoryImpl(
+                    InAppBitmapCache.getInstance(),
+                    downloadsFolderDataSource,
+                    gliaCore,
+                    fileHelper
+            );
         }
         return gliaFileRepository;
     }

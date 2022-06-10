@@ -40,48 +40,22 @@ public class FilePreviewController
         onEngagementEndUseCase.execute(this);
     }
 
-    private synchronized void setState(State state) {
-        this.state = state;
-        if (view != null) view.onStateUpdated(state);
+    @Override
+    public void onImageDataReceived(String bitmapId, String bitmapName) {
+        setState(state.setImageData(bitmapId, bitmapName));
     }
 
     @Override
     public void onImageRequested() {
-        Logger.d(TAG, "onImageRequested - loadFrom downloads: " + state.getImageIdName());
         setState(state.setImageLoadingFromDownloads());
         disposable = getImageFileFromDownloadsUseCase.execute(state.getImageIdName())
                 .subscribe(
-                        image -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom downloads success: " + state.getImageIdName());
-                            setState(state.setImageLoadedFromDownloads().setLoadedImage(image));
-                        },
-                        error -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom downloads failed: " + state.getImageIdName());
-                            onRequestImageFromCache();
-                        }
+                        image -> setState(
+                                state.setImageLoadedFromDownloads()
+                                        .setLoadedImage(image)
+                        ),
+                        error -> onRequestImageFromCache()
                 );
-    }
-
-    private void onRequestImageFromCache() {
-        Logger.d(TAG, "onImageRequested - loadFrom cache: " + state.getImageIdName());
-        setState(state.setImageLoadingFromCache());
-        disposable = getImageFileFromCacheUseCase.execute(state.getImageIdName())
-                .subscribe(
-                        image -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom cache success: " + state.getImageIdName());
-                            setState(state.setImageLoadedFromCache().setLoadedImage(image));
-                        },
-                        error -> {
-                            Logger.d(TAG, "onImageRequested - loadFrom cache failed: " + state.getImageIdName());
-                            view.showOnImageLoadingFailed();
-                            setState(state.setImageLoadingFailure());
-                        }
-                );
-    }
-
-    @Override
-    public void onImageDataReceived(String bitmapId, String bitmapName) {
-        setState(state.setImageData(bitmapId, bitmapName));
     }
 
     @Override
@@ -113,5 +87,22 @@ public class FilePreviewController
     public void engagementEnded() {
         Logger.d(TAG, "engagementEndedByOperator");
         view.engagementEnded();
+    }
+
+    private synchronized void setState(State state) {
+        this.state = state;
+        if (view != null) view.onStateUpdated(state);
+    }
+
+    private void onRequestImageFromCache() {
+        setState(state.setImageLoadingFromCache());
+        disposable = getImageFileFromCacheUseCase.execute(state.getImageIdName())
+                .subscribe(
+                        image -> setState(state.setImageLoadedFromCache().setLoadedImage(image)),
+                        error -> {
+                            view.showOnImageLoadingFailed();
+                            setState(state.setImageLoadingFailure());
+                        }
+                );
     }
 }

@@ -25,22 +25,28 @@ public class FileHelper {
 
     public Maybe<Bitmap> decodeSampledBitmapFromInputStream(InputStream inputStream) {
         return Maybe.create(emitter -> {
-            Bitmap rawBitmap = BitmapFactory.decodeStream(inputStream);
-
-            if (rawBitmap == null) {
-                emitter.onError(
-                        new IOException("InputStream could not be decoded")
-                );
-                return;
-            }
+                    Bitmap rawBitmap = BitmapFactory.decodeStream(inputStream);
+                    if (rawBitmap == null) {
+                        emitter.onError(
+                                new IOException("InputStream could not be decoded")
+                        );
+                        return;
+                    }
 
                     int rawHeight = rawBitmap.getHeight();
                     int rawWidth = rawBitmap.getWidth();
-
                     double ratio = ((double) rawWidth) / ((double) rawHeight);
-                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(rawBitmap, (int) (DESIRED_IMAGE_SIZE * ratio), DESIRED_IMAGE_SIZE, false);
-                    if (scaledBitmap != null) emitter.onSuccess(scaledBitmap);
-                    else emitter.onError(new Exception());
+                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(
+                            rawBitmap,
+                            (int) (DESIRED_IMAGE_SIZE * ratio),
+                            DESIRED_IMAGE_SIZE,
+                            false
+                    );
+                    if (scaledBitmap != null) {
+                        emitter.onSuccess(scaledBitmap);
+                    } else {
+                        emitter.onError(new Exception());
+                    }
                 }
         );
     }

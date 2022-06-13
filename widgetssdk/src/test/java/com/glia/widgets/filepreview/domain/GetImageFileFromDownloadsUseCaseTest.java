@@ -27,21 +27,21 @@ public class GetImageFileFromDownloadsUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnError_whenFileNameIsNull() {
+    public void execute_emitFileNameMissingException_whenFileNameIsNull() {
         useCase.execute(null)
                 .test()
                 .assertError(FileNameMissingException.class);
     }
 
     @Test
-    public void execute_returnOnError_whenFileNameIsEmpty() {
+    public void execute_emitFileNameMissingException_whenFileNameIsEmpty() {
         useCase.execute(NAME_EMPTY)
                 .test()
                 .assertError(FileNameMissingException.class);
     }
 
     @Test
-    public void execute_returnOnComplete() {
+    public void execute_successfullyCompletes_whenValidArgument() {
         when(fileRepository.loadImageFromDownloads(any()))
                 .thenReturn(Maybe.just(BITMAP));
         useCase.execute(NAME)

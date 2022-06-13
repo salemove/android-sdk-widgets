@@ -2,6 +2,7 @@ package com.glia.widgets.filepreview.ui;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -51,12 +52,12 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void setView() {
+    public void setView_endsEngagement() {
         verify(onEngagementEndUseCase).execute(filePreviewController);
     }
 
     @Test
-    public void onImageDataReceived_stateUpdated() {
+    public void onImageDataReceived_updatesState_whenNonNullArguments() {
         ArgumentCaptor<State> argument = ArgumentCaptor.forClass(State.class);
 
         filePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME);
@@ -67,7 +68,18 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void onImageRequested_whenLoadingFromDownloadsSuccess() {
+    public void onImageDataReceived_updatesState_whenNullArguments() {
+        ArgumentCaptor<State> argument = ArgumentCaptor.forClass(State.class);
+
+        filePreviewController.onImageDataReceived(null, null);
+
+        verify(view).onStateUpdated(argument.capture());
+        assertNull(argument.getValue().getImageName());
+        assertNull(argument.getValue().getImageId());
+    }
+
+    @Test
+    public void onImageRequested_updatesState_whenLoadingFromDownloadsSuccess() {
         when(getImageFileFromDownloadsUseCase.execute(any()))
                 .thenReturn(Maybe.just(BITMAP));
         ArgumentCaptor<State> argument = ArgumentCaptor.forClass(State.class);
@@ -84,7 +96,6 @@ public class FilePreviewControllerTest {
         assertFalse(state1.getIsShowShareButton());
         assertFalse(state1.getIsShowDownloadButton());
 
-
         State state2 = argument.getAllValues().get(1);
         assertEquals(
                 State.ImageLoadingState.SUCCESS_FROM_DOWNLOADS,
@@ -96,7 +107,7 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void onImageRequested_whenLoadingFromDownloadsError_whenLoadingFromCacheSuccess() {
+    public void onImageRequested_updatesState_whenLoadingFromCacheSuccess() {
         ArgumentCaptor<State> argument = ArgumentCaptor.forClass(State.class);
 
         when(getImageFileFromDownloadsUseCase.execute(any()))
@@ -135,7 +146,7 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void onImageRequested_whenLoadingFromDownloadsError_whenLoadingFromCacheError() {
+    public void onImageRequested_updatesState_whenLoadingFails() {
         ArgumentCaptor<State> argument = ArgumentCaptor.forClass(State.class);
 
         when(getImageFileFromDownloadsUseCase.execute(any()))
@@ -172,14 +183,35 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void onSharePressed() {
+    public void onSharePressed_callsShareImageFile_whenValidArguments() {
         filePreviewController.onImageDataReceived(BITMAP_ID, BITMAP_NAME);
         filePreviewController.onSharePressed();
         verify(view).shareImageFile(BITMAP_ID);
     }
 
     @Test
-    public void onDownloadPressed_success() {
+    public void onSharePressed_callsShareImageFile_whenBitmapIdArgumentNull() {
+        filePreviewController.onImageDataReceived(null, BITMAP_NAME);
+        filePreviewController.onSharePressed();
+        verify(view).shareImageFile("null");
+    }
+
+    @Test
+    public void onSharePressed_callsShareImageFile_whenBitmapNameArgumentNull() {
+        filePreviewController.onImageDataReceived(BITMAP_ID, null);
+        filePreviewController.onSharePressed();
+        verify(view).shareImageFile(BITMAP_ID);
+    }
+
+    @Test
+    public void onSharePressed_callsShareImageFile_whenArgumentsNull() {
+        filePreviewController.onImageDataReceived(null, null);
+        filePreviewController.onSharePressed();
+        verify(view).shareImageFile("null");
+    }
+
+    @Test
+    public void onDownloadPressed_updatesState_whenDownloadSuccessful() {
         ArgumentCaptor<State> argument = ArgumentCaptor.forClass(State.class);
         when(putImageFileToDownloadsUseCase.execute(any(), any()))
                 .thenReturn(Completable.complete());
@@ -198,7 +230,7 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void onDownloadPressed_error() {
+    public void onDownloadPressed_callsShowOnImageSaveFailed_whenDownloadFails() {
         when(putImageFileToDownloadsUseCase.execute(any(), any()))
                 .thenReturn(Completable.error(EXCEPTION));
         filePreviewController.onDownloadPressed();
@@ -206,13 +238,13 @@ public class FilePreviewControllerTest {
     }
 
     @Test
-    public void onDestroy() {
+    public void onDestroy_endsEngagement() {
         filePreviewController.onDestroy();
         verify(onEngagementEndUseCase).unregisterListener(any());
     }
 
     @Test
-    public void engagementEnded() {
+    public void engagementEnded_callsEngagementEnded() {
         filePreviewController.engagementEnded();
         verify(view).engagementEnded();
     }

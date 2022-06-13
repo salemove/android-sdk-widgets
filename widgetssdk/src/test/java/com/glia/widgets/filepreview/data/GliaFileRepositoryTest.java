@@ -1,6 +1,5 @@
 package com.glia.widgets.filepreview.data;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
@@ -16,6 +15,7 @@ import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
+import com.glia.widgets.filepreview.domain.exception.CacheFileNotFoundException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,74 +48,96 @@ public class GliaFileRepositoryTest {
     }
 
     @Test
-    public void loadImageFromCache_returnsMaybeOnSuccess() {
-        when(bitmapCache.getBitmapById(FILENAME)).thenReturn(BITMAP);
+    public void loadImageFromCache_emitsBitmap_whenImageWasCached() {
+        when(bitmapCache.getBitmapById(any())).thenReturn(BITMAP);
         Maybe<Bitmap> result = gliaFileRepository.loadImageFromCache(FILENAME);
         result.test().assertResult(BITMAP);
     }
 
     @Test
-    public void loadImageFromCache_returnsMaybeOnError() {
-        doThrow(RUNTIME_EXCEPTION).when(bitmapCache).getBitmapById(FILENAME);
+    public void loadImageFromCache_emitsCacheFileNotFoundException_whenImageWasNotCached() {
+        when(bitmapCache.getBitmapById(any())).thenReturn(null);
         Maybe<Bitmap> result = gliaFileRepository.loadImageFromCache(FILENAME);
-        result.test().assertError(RUNTIME_EXCEPTION);
+        result.test().assertError(CacheFileNotFoundException.class);
     }
 
     @Test
-    public void putImageToCache_returnsCompletableOnComplete() {
+    public void loadImageFromCache_emitsCacheFileNotFoundException_whenNullArgument() {
+        when(bitmapCache.getBitmapById(any())).thenReturn(null);
+        Maybe<Bitmap> result = gliaFileRepository.loadImageFromCache(null);
+        result.test().assertError(CacheFileNotFoundException.class);
+    }
+
+    @Test
+    public void putImageToCache_completesSuccessfully_whenValidArguments() {
         Completable result = gliaFileRepository.putImageToCache(FILENAME, BITMAP);
         result.test().assertComplete();
     }
 
     @Test
-    public void putImageToCache_returnsCompletableOnError() {
-        doThrow(RUNTIME_EXCEPTION).when(bitmapCache).putBitmap(FILENAME, BITMAP);
+    public void putImageToCache_completesSuccessfully_whenFileNameArgumentNull() {
+        Completable result = gliaFileRepository.putImageToCache(null, BITMAP);
+        result.test().assertComplete();
+    }
+
+    @Test
+    public void putImageToCache_completesSuccessfully_whenBitmapArgumentNull() {
+        Completable result = gliaFileRepository.putImageToCache(FILENAME, null);
+        result.test().assertComplete();
+    }
+
+    @Test
+    public void putImageToCache_completesSuccessfully_whenArgumentsNull() {
+        Completable result = gliaFileRepository.putImageToCache(null, null);
+        result.test().assertComplete();
+    }
+
+    @Test
+    public void putImageToCache_emitsException_whenSomethingGoesWrong() {
+        doThrow(RUNTIME_EXCEPTION).when(bitmapCache).putBitmap(any(), any());
         Completable result = gliaFileRepository.putImageToCache(FILENAME, BITMAP);
-        result.test().assertError(RUNTIME_EXCEPTION);
+        result.test().assertError(RuntimeException.class);
     }
 
     @Test
-    public void loadImageFromDownloads_returnsMaybe() {
-        when(downloadsFolderDataSource.getImageFromDownloadsFolder(FILENAME))
-                .thenReturn(MAYBE_BITMAP);
-        Maybe<Bitmap> result = gliaFileRepository.loadImageFromDownloads(FILENAME);
-        assertEquals(MAYBE_BITMAP, result);
-    }
-
-    @Test
-    public void putImageToDownloads_returnsCompletable() {
-        when(downloadsFolderDataSource.putImageToDownloads(FILENAME, BITMAP))
-                .thenReturn(COMPLETABLE);
-        Completable result = gliaFileRepository.putImageToDownloads(FILENAME, BITMAP);
-        assertEquals(COMPLETABLE, result);
-    }
-
-    @Test
-    public void loadImageFileFromNetwork_returnsMaybeOnSuccess() {
-        when(fileHelper.decodeSampledBitmapFromInputStream(INPUT_STREAM))
+    public void loadImageFileFromNetwork_emitsBitmap_whenValidArguments() {
+        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
                 .thenReturn(MAYBE_BITMAP);
         doAnswer(invocation -> {
             RequestCallback<InputStream> callback = invocation.getArgument(1);
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        Maybe<Bitmap> result = gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE);
-        result.test().assertResult(BITMAP);
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertResult(BITMAP);
     }
 
     @Test
-    public void loadImageFileFromNetwork_returnsMaybeOnError() {
+    public void loadImageFileFromNetwork_emitsGliaException_whenGliaCoreReturnsException() {
         doAnswer(invocation -> {
             RequestCallback<InputStream> callback = invocation.getArgument(1);
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        Maybe<Bitmap> result = gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE);
-        result.test().assertError(GLIA_EXCEPTION);
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertError(GLIA_EXCEPTION);
     }
 
     @Test
-    public void downloadFileFromNetwork_returnsCompletableOnComplete() {
+    public void loadImageFileFromNetwork_emitsException_whenBitmapDecodingThrows() {
+        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
+                .thenReturn(MAYBE_EXCEPTION);
+        doAnswer(invocation -> {
+            RequestCallback<InputStream> callback = invocation.getArgument(1);
+            callback.onResult(INPUT_STREAM, null);
+            return null;
+        }).when(gliaCore).fetchFile(any(), any());
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertError(EXCEPTION.getClass());
+    }
+
+    @Test
+    public void downloadFileFromNetwork_completesSuccessfully_whenValidArguments() {
         when(downloadsFolderDataSource.downloadFileToDownloads(any(), any(), any()))
                 .thenReturn(COMPLETABLE);
         doAnswer(invocation -> {
@@ -123,19 +145,19 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        Completable result = gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE);
-        result.test().assertComplete();
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertComplete();
     }
 
     @Test
-    public void downloadFileFromNetwork_returnsCompletableOnError() {
+    public void downloadFileFromNetwork_emitsGliaException_whenGliaCoreReturnsException() {
         doAnswer(invocation -> {
             RequestCallback<InputStream> callback = invocation.getArgument(1);
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        Completable result = gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE);
-        result.test().assertError(GLIA_EXCEPTION);
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertError(GLIA_EXCEPTION.getClass());
     }
 
     private static final String FILENAME = "FILENAME";
@@ -146,4 +168,6 @@ public class GliaFileRepositoryTest {
     private static final Maybe<Bitmap> MAYBE_BITMAP = Maybe.just(BITMAP);
     private static final RuntimeException RUNTIME_EXCEPTION = new RuntimeException();
     private static final GliaException GLIA_EXCEPTION = mock(GliaException.class);
+    private static final Exception EXCEPTION = mock(Exception.class);
+    private static final Maybe<Bitmap> MAYBE_EXCEPTION = Maybe.error(EXCEPTION);
 }

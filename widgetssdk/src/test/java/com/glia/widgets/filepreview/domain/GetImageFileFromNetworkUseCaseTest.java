@@ -32,14 +32,14 @@ public class GetImageFileFromNetworkUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnError_whenFileIsNull() {
+    public void execute_emitsFileNameMissingException_whenFileIsNull() {
         useCase.execute(null)
                 .test()
                 .assertError(FileNameMissingException.class);
     }
 
     @Test
-    public void execute_returnOnError_whenFileNameIsEmpty() {
+    public void execute_emitsFileNameMissingException_whenFileNameIsEmpty() {
         when(attachmentFile.getName()).thenReturn(NAME_EMPTY);
         useCase.execute(attachmentFile)
                 .test()
@@ -47,7 +47,7 @@ public class GetImageFileFromNetworkUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnError_whenFileIsDeleted() {
+    public void execute_emitsRemoteFileIsDeletedException_whenFileIsDeleted() {
         when(attachmentFile.getName()).thenReturn(NAME);
         when(attachmentFile.isDeleted()).thenReturn(true);
         useCase.execute(attachmentFile)
@@ -56,7 +56,7 @@ public class GetImageFileFromNetworkUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnSuccess() {
+    public void execute_successfullyCompletes_whenValidArgument() {
         when(fileRepository.loadImageFileFromNetwork(any()))
                 .thenReturn(Maybe.just(BITMAP));
         when(fileRepository.putImageToCache(any(), any()))

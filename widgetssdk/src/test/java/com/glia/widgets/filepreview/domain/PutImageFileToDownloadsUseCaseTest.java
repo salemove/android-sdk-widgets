@@ -27,21 +27,21 @@ public class PutImageFileToDownloadsUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnError_whenFileNameIsNull() {
+    public void execute_emitsFileNameMissingException_whenFileNameIsNull() {
         useCase.execute(null, BITMAP)
                 .test()
                 .assertError(FileNameMissingException.class);
     }
 
     @Test
-    public void execute_returnOnError_whenFileNameIsEmpty() {
+    public void execute_emitsFileNameMissingException_whenFileNameIsEmpty() {
         useCase.execute(NAME_EMPTY, BITMAP)
                 .test()
                 .assertError(FileNameMissingException.class);
     }
 
     @Test
-    public void execute_returnOnComplete() {
+    public void execute_successfullyCompletes_whenValidArgument() {
         when(fileRepository.putImageToDownloads(any(), any()))
                 .thenReturn(Completable.complete());
         useCase.execute(NAME, BITMAP)
@@ -50,7 +50,7 @@ public class PutImageFileToDownloadsUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnComplete_whenBitmapIsNull() {
+    public void execute_successfullyCompletes_whenBitmapIsNull() {
         when(fileRepository.putImageToDownloads(any(), any()))
                 .thenReturn(Completable.complete());
         useCase.execute(NAME, null)

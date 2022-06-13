@@ -29,14 +29,14 @@ public class DownloadFileUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnError_whenFileIsNull() {
+    public void execute_emitsFileNameMissingException_whenFileIsNull() {
         useCase.execute(null)
                 .test()
                 .assertError(FileNameMissingException.class);
     }
 
     @Test
-    public void execute_returnOnError_whenFileNameIsEmpty() {
+    public void execute_emitsFileNameMissingException_whenFileNameIsEmpty() {
         when(attachmentFile.getName()).thenReturn(NAME_EMPTY);
         useCase.execute(attachmentFile)
                 .test()
@@ -44,7 +44,7 @@ public class DownloadFileUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnError_whenFileIsDeleted() {
+    public void execute_emitsRemoteFileIsDeletedException_whenFileIsDeleted() {
         when(attachmentFile.getName()).thenReturn(NAME);
         when(attachmentFile.isDeleted()).thenReturn(true);
         useCase.execute(attachmentFile)
@@ -53,7 +53,7 @@ public class DownloadFileUseCaseTest {
     }
 
     @Test
-    public void execute_returnOnComplete() {
+    public void execute_successfullyCompletes_whenValidArgument() {
         when(fileRepository.downloadFileFromNetwork(any()))
                 .thenReturn(Completable.complete());
         when(attachmentFile.getName()).thenReturn(NAME);

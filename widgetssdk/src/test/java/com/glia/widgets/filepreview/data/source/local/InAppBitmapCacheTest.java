@@ -19,20 +19,42 @@ public class InAppBitmapCacheTest {
     }
 
     @Test
-    public void getInstance_returnsSame() {
-        InAppBitmapCache result = cache = InAppBitmapCache.getInstance();
+    public void getInstance_returnsSameInstance_whenCalledMoreThanOnce() {
+        InAppBitmapCache result = InAppBitmapCache.getInstance();
         assertEquals(cache, result);
     }
 
     @Test
-    public void putBitmap_getBitmapById_returnsTheSameBitmap() {
+    public void putBitmap_successful_whenValidArguments() {
+        cache.putBitmap(ID, BITMAP);
+    }
+
+    @Test
+    public void putBitmap_successful_whenIdArgumentNull() {
+        cache.putBitmap(null, BITMAP);
+    }
+
+    @Test
+    public void putBitmap_successful_whenBitmapArgumentNull() {
+        cache.putBitmap(ID, null);
+    }
+
+    @Test
+    public void putBitmap_successful_whenArgumentsNull() {
+        cache.putBitmap(null, null);
+    }
+
+    @Test
+    public void getBitmapById_returnsBitmap_whenBitmapInCache() {
+        cache.clear();
         cache.putBitmap(ID, BITMAP);
         Bitmap result = cache.getBitmapById(ID);
         assertEquals(BITMAP, result);
     }
 
     @Test
-    public void putBitmap_getBitmapById_returnsTheSameBitmap_whenBitmapUpdated() {
+    public void getBitmapById_returnsBitmap_whenBitmapUpdated() {
+        cache.clear();
         cache.putBitmap(ID, BITMAP);
         cache.putBitmap(ID, BITMAP_2);
         Bitmap result = cache.getBitmapById(ID);
@@ -40,8 +62,7 @@ public class InAppBitmapCacheTest {
     }
 
     @Test
-    public void putBitmap_getBitmapById_returnsNull_whenCleared() {
-        cache.putBitmap(ID, BITMAP);
+    public void getBitmapById_returnsNull_whenEmpty() {
         cache.clear();
         Bitmap result = cache.getBitmapById(ID);
         assertNull(result);
@@ -50,7 +71,16 @@ public class InAppBitmapCacheTest {
     @Test
     public void getBitmapById_returnsNull_whenCleared() {
         cache.clear();
+        cache.putBitmap(ID, BITMAP);
+        cache.clear();
         Bitmap result = cache.getBitmapById(ID);
+        assertNull(result);
+    }
+
+    @Test
+    public void getBitmapById_returnsNull_whenIdArgumentNull() {
+        cache.clear();
+        Bitmap result = cache.getBitmapById(null);
         assertNull(result);
     }
 

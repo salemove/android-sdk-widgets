@@ -325,7 +325,7 @@ public class CallActivityTest {
         callViewCallback.emitState(callState.makeCallState());
 
         String expected = appContext.getString(R.string.glia_call_visitor_video_content_description);
-        onView(withId(R.id.visitor_video_container)).check(matches(withContentDescription(expected)));
+        onView(withId(R.id.floating_visitor_video)).check(matches(withContentDescription(expected)));
     }
 
     @Test

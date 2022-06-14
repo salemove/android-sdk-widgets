@@ -10,8 +10,6 @@ import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededExcep
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
 public class AddFileToAttachmentAndUploadUseCase {
-    private final static long SUPPORTED_FILE_COUNT = 25;
-    private final static long SUPPORTED_FILE_SIZE_25MB = 26214400L;
 
     private final GliaEngagementRepository gliaEngagementRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
@@ -20,8 +18,8 @@ public class AddFileToAttachmentAndUploadUseCase {
             GliaEngagementRepository gliaEngagementRepository,
             FileAttachmentRepository fileAttachmentRepository
     ) {
-        this.fileAttachmentRepository = fileAttachmentRepository;
         this.gliaEngagementRepository = gliaEngagementRepository;
+        this.fileAttachmentRepository = fileAttachmentRepository;
     }
 
     public void execute(FileAttachment file, Listener listener) {
@@ -82,4 +80,7 @@ public class AddFileToAttachmentAndUploadUseCase {
 
         void onSecurityCheckFinished(EngagementFile.ScanResult scanResult);
     }
+
+    private final static long SUPPORTED_FILE_COUNT = 25;
+    private final static long SUPPORTED_FILE_SIZE_25MB = 26214400L;
 }

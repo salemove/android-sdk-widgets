@@ -14,7 +14,7 @@ import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.di.GliaCore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +26,14 @@ import java.util.stream.Stream;
 public class FileAttachmentRepository {
 
     private final ObservableFileAttachmentList observable = new ObservableFileAttachmentList();
+    private final GliaCore gliaCore;
+
+    public FileAttachmentRepository(GliaCore gliaCore) {
+        this.gliaCore = gliaCore;
+    }
 
     public long getAttachedFilesCount() {
-        return observable
-                .fileAttachments
-                .size();
+        return observable.fileAttachments.size();
     }
 
     public boolean isFileAttached(Uri uri) {
@@ -48,7 +51,7 @@ public class FileAttachmentRepository {
     }
 
     public void uploadFile(FileAttachment file, AddFileToAttachmentAndUploadUseCase.Listener listener) {
-        Engagement engagement = Dependencies.glia().getCurrentEngagement().orElse(null);
+        Engagement engagement = gliaCore.getCurrentEngagement().orElse(null);
         if (engagement != null) {
             engagement.uploadFile(file.getUri(), (engagementFile, e) -> {
                 if (engagementFile != null) {
@@ -58,7 +61,7 @@ public class FileAttachmentRepository {
                         onUploadFileSecurityScanRequired(file.getUri(), engagementFile, listener);
                     }
                 } else if (e != null) {
-                    onUploadFileError(file.getUri(), e);
+                    setFileAttachmentStatus(file.getUri(), getAttachmentStatus(e));
                     listener.onError(e);
                 }
             });
@@ -69,36 +72,15 @@ public class FileAttachmentRepository {
     }
 
     public void setFileAttachmentTooLarge(Uri uri) {
-        observable.notifyUpdate(
-                observable.fileAttachments.stream()
-                        .map(fileAttachment -> fileAttachment.getUri() == uri
-                                ? fileAttachment.setAttachmentStatus(ERROR_FILE_TOO_LARGE)
-                                : fileAttachment
-                        )
-                        .collect(Collectors.toList())
-        );
+        setFileAttachmentStatus(uri, ERROR_FILE_TOO_LARGE);
     }
 
     public void setSupportedFileAttachmentCountExceeded(Uri uri) {
-        observable.notifyUpdate(
-                observable.fileAttachments.stream()
-                        .map(fileAttachment -> fileAttachment.getUri() == uri
-                                ? fileAttachment.setAttachmentStatus(ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED)
-                                : fileAttachment
-                        )
-                        .collect(Collectors.toList())
-        );
+        setFileAttachmentStatus(uri, ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED);
     }
 
     public void setFileAttachmentEngagementMissing(Uri uri) {
-        observable.notifyUpdate(
-                observable.fileAttachments.stream()
-                        .map(fileAttachment -> fileAttachment.getUri() == uri
-                                ? fileAttachment.setAttachmentStatus(ERROR_ENGAGEMENT_MISSING)
-                                : fileAttachment
-                        )
-                        .collect(Collectors.toList())
-        );
+        setFileAttachmentStatus(uri, ERROR_ENGAGEMENT_MISSING);
     }
 
     public void detachFile(FileAttachment attachment) {
@@ -151,7 +133,7 @@ public class FileAttachmentRepository {
             EngagementFile engagementFile,
             AddFileToAttachmentAndUploadUseCase.Listener listener
     ) {
-        setFileAttachmentSecurityCheckInProgress(uri);
+        setFileAttachmentStatus(uri, SECURITY_SCAN);
         listener.onSecurityCheckStarted();
 
         engagementFile.on(EngagementFile.Events.SCAN_RESULT, scanResult -> {
@@ -170,7 +152,7 @@ public class FileAttachmentRepository {
         if (scanResult == EngagementFile.ScanResult.CLEAN && engagementFile != null) {
             onUploadFileSuccess(uri, engagementFile, listener);
         } else {
-            setFileAttachmentSecurityCheckFailed(uri);
+            setFileAttachmentStatus(uri, ERROR_SECURITY_SCAN_FAILED);
             listener.onFinished();
         }
     }
@@ -184,33 +166,24 @@ public class FileAttachmentRepository {
         listener.onFinished();
     }
 
-    private void setFileAttachmentSecurityCheckInProgress(Uri uri) {
+    private void setFileAttachmentStatus(Uri uri, FileAttachment.Status status) {
         observable.notifyUpdate(
                 observable.fileAttachments.stream()
                         .map(fileAttachment -> fileAttachment.getUri() == uri
-                                ? fileAttachment.setAttachmentStatus(SECURITY_SCAN)
+                                ? fileAttachment.setAttachmentStatus(status)
                                 : fileAttachment
                         )
                         .collect(Collectors.toList())
         );
     }
 
-    private void setFileAttachmentSecurityCheckFailed(Uri uri) {
-        observable.notifyUpdate(
-                observable.fileAttachments.stream()
-                        .map(fileAttachment -> fileAttachment.getUri() == uri
-                                ? fileAttachment.setAttachmentStatus(ERROR_SECURITY_SCAN_FAILED)
-                                : fileAttachment
-                        )
-                        .collect(Collectors.toList())
-        );
-    }
-
-    private void onUploadFileError(Uri uri, GliaException exception) {
+    private void onEngagementFileReceived(Uri uri, EngagementFile engagementFile) {
         observable.notifyUpdate(
                 observable.fileAttachments.stream()
                         .map(attachment -> attachment.getUri().equals(uri)
-                                ? attachment.setAttachmentStatus(getAttachmentStatus(exception))
+                                ? attachment
+                                .setEngagementFile(engagementFile)
+                                .setAttachmentStatus(FileAttachment.Status.READY_TO_SEND)
                                 : attachment
                         )
                         .collect(Collectors.toList())
@@ -236,19 +209,6 @@ public class FileAttachmentRepository {
             default:
                 return FileAttachment.Status.ERROR_UNKNOWN;
         }
-    }
-
-    private void onEngagementFileReceived(Uri uri, EngagementFile engagementFile) {
-        observable.notifyUpdate(
-                observable.fileAttachments.stream()
-                        .map(attachment -> attachment.getUri().equals(uri)
-                                ? attachment
-                                .setEngagementFile(engagementFile)
-                                .setAttachmentStatus(FileAttachment.Status.READY_TO_SEND)
-                                : attachment
-                        )
-                        .collect(Collectors.toList())
-        );
     }
 
     private static class ObservableFileAttachmentList extends Observable {

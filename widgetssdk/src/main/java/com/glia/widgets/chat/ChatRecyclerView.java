@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ChatRecyclerView extends RecyclerView {
     private int oldHeight;
+    private boolean isInBottom;
 
     public ChatRecyclerView(Context context) {
         super(context);
@@ -24,8 +25,12 @@ public class ChatRecyclerView extends RecyclerView {
         super.onLayout(changed, l, t, r, b);
         int delta = b - t - this.oldHeight;
         this.oldHeight = b - t;
-        if (delta < 0) {
+        if (isInBottom && delta < 0) {
             this.scrollBy(0, -delta);
         }
+    }
+
+    public void setInBottom(boolean isInBottom) {
+        this.isInBottom = isInBottom;
     }
 }

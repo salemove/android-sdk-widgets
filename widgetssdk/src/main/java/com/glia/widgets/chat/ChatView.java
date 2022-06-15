@@ -459,6 +459,7 @@ public class ChatView extends ConstraintLayout implements
 
                     updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl);
                     isInBottom = chatState.isChatInBottom;
+                    chatRecyclerView.setInBottom(isInBottom);
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
 
                     if (chatState.isVisible) {

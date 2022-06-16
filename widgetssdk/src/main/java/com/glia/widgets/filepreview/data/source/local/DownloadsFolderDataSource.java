@@ -64,8 +64,11 @@ public class DownloadsFolderDataSource {
 
                 Uri contentUri = ContentUris.withAppendedId(downloadsContentUri, id);
                 Bitmap bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(contentUri));
-                if (bitmap != null) emitter.onSuccess(bitmap);
-                else emitter.onError(new FileNotFoundException());
+                if (bitmap != null) {
+                    emitter.onSuccess(bitmap);
+                } else {
+                    emitter.onError(new FileNotFoundException());
+                }
             } catch (FileNotFoundException e) {
                 emitter.onError(e);
             }
@@ -74,11 +77,25 @@ public class DownloadsFolderDataSource {
 
     private Maybe<Bitmap> getImageFromDownloadsFolderOld(String imageName) {
         return Maybe.create(emitter -> {
-            File imageFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(), imageName);
-            Uri uri = FileProvider.getUriForFile(context, FileHelper.getFileProviderAuthority(context), imageFile);
-            Bitmap bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri));
-            if (bitmap == null) emitter.onError(new FileNotFoundException());
-            else emitter.onSuccess(bitmap);
+            File imageFile = new File(
+                    Environment
+                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            .toString(),
+                    imageName
+            );
+            Uri uri = FileProvider.getUriForFile(
+                    context,
+                    FileHelper.getFileProviderAuthority(context),
+                    imageFile
+            );
+            Bitmap bitmap = BitmapFactory.decodeStream(
+                    context.getContentResolver().openInputStream(uri)
+            );
+            if (bitmap == null) {
+                emitter.onError(new FileNotFoundException());
+            } else {
+                emitter.onSuccess(bitmap);
+            }
         });
     }
 

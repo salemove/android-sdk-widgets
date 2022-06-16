@@ -15,8 +15,10 @@ public class PutImageFileToDownloadsUseCase {
     }
 
     public Completable execute(String fileName, Bitmap bitmap) {
-        if (fileName == null || fileName.isEmpty())
+        if (fileName == null || fileName.isEmpty()) {
             return Completable.error(new FileNameMissingException());
+        }
+
         return gliaFileRepository
                 .putImageToDownloads(fileName, bitmap);
     }

@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
-import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -25,7 +24,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
 
-    private static final String TAG = ChatAdapter.class.getSimpleName();
+    private static final String TAG = ImageAttachmentViewHolder.class.getSimpleName();
 
     private final ShapeableImageView imageView;
 

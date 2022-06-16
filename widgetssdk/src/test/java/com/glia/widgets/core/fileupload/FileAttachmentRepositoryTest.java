@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -32,7 +33,6 @@ import com.glia.widgets.di.GliaCore;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -184,8 +184,6 @@ public class FileAttachmentRepositoryTest {
 
     @Test
     public void uploadFile_fails_whenMissingEngagement() {
-        ArgumentCaptor<EngagementMissingException> argument =
-                ArgumentCaptor.forClass(EngagementMissingException.class);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(gliaCore.getCurrentEngagement()).thenReturn(Optional.empty());
@@ -195,7 +193,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
 
-        verify(listener).onError(argument.capture());
+        verify(listener).onError(isA(EngagementMissingException.class));
         verify(FILE_ATTACHMENT_1).setAttachmentStatus(ERROR_ENGAGEMENT_MISSING);
     }
 

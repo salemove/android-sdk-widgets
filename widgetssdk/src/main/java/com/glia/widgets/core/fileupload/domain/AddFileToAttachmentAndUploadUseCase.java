@@ -44,17 +44,13 @@ public class AddFileToAttachmentAndUploadUseCase {
         if (isSupportedFileCountExceeded()) {
             fileAttachmentRepository.setSupportedFileAttachmentCountExceeded(file.getUri());
             listener.onError(new SupportedFileCountExceededException());
-        } else if (isSupportedFileSizeExceeded(file)) {
+        } else if (isSupportedFileSizeLargerThen25MB(file)) {
             fileAttachmentRepository.setFileAttachmentTooLarge(file.getUri());
             listener.onError(new SupportedFileSizeExceededException());
         } else {
             listener.onStarted();
             fileAttachmentRepository.uploadFile(file, listener);
         }
-    }
-
-    private boolean isSupportedFileSizeExceeded(FileAttachment file) {
-        return isSupportedFileSizeLargerThen25MB(file);
     }
 
     private boolean isSupportedFileSizeLargerThen25MB(FileAttachment file) {

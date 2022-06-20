@@ -7,11 +7,14 @@ import android.os.Parcelable;
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
+import com.google.gson.annotations.SerializedName;
 
 public class LayerConfiguration implements Parcelable {
     // Background hex color.
+    @SerializedName("background")
     private String backgroundColor;
     // Border hex color.
+    @SerializedName("border")
     private String borderColor;
     // Border width.
     private int borderWidth;

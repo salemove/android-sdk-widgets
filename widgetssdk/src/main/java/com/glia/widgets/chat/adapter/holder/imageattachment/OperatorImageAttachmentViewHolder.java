@@ -15,24 +15,28 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 
 public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder {
     private final OperatorStatusView operatorStatusView;
+    private final ChatStyle chatStyle;
 
     public OperatorImageAttachmentViewHolder(
             @NonNull View itemView,
+            ChatStyle chatStyle,
             UiTheme uiTheme,
             GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
             GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
             GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
     ) {
         super(itemView, getImageFileFromCacheUseCase, getImageFileFromDownloadsUseCase, getImageFileFromNetworkUseCase);
+        this.chatStyle = chatStyle;
         operatorStatusView = itemView.findViewById(R.id.chat_head_view);
         setupOperatorStatus(uiTheme);
     }
 
     private void setupOperatorStatus(UiTheme uiTheme) {
-        operatorStatusView.setTheme(uiTheme);
+        operatorStatusView.setTheme(uiTheme, chatStyle);
         operatorStatusView.setShowRippleAnimation(false);
     }
 

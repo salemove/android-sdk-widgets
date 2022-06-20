@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -37,6 +38,7 @@ import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -712,7 +714,7 @@ public class CallView extends ConstraintLayout {
     private void setupViewAppearance() {
         setAppBarTheme();
         // icons
-        operatorStatusView.setTheme(theme);
+        operatorStatusView.setTheme(theme, null);
         chatButton.setImageResource(theme.getIconCallChat());
         videoButton.setImageResource(theme.getIconCallVideoOn());
         muteButton.setImageResource(theme.getIconCallAudioOn());
@@ -749,7 +751,7 @@ public class CallView extends ConstraintLayout {
         builder.setGliaChatHeaderHomeButtonTintColor(android.R.color.white);
         builder.setGliaChatHeaderExitQueueButtonTintColor(android.R.color.white);
         builder.setFontRes(theme.getFontRes());
-        appBar.setTheme(builder.build());
+        appBar.setTheme(builder.build(), null);
     }
 
     private void initConfigurations() {
@@ -842,7 +844,10 @@ public class CallView extends ConstraintLayout {
         Activity activity = Utils.getActivity(this.getContext());
         hideOperatorVideo();
         hideVisitorVideo();
-        if (defaultStatusbarColor != null && activity != null) {
+        if (activity != null && GliaWidgets.chatStyle != null) {
+            int color = Color.parseColor(GliaWidgets.chatStyle.navigationBar.layer.getBackgroundColor());
+            activity.getWindow().setStatusBarColor(color);
+        } else if (defaultStatusbarColor != null && activity != null) {
             activity.getWindow().setStatusBarColor(defaultStatusbarColor);
             defaultStatusbarColor = null;
         }
@@ -851,7 +856,10 @@ public class CallView extends ConstraintLayout {
 
     private void handleStatusbarColor() {
         Activity activity = Utils.getActivity(this.getContext());
-        if (activity != null && defaultStatusbarColor == null) {
+        if (activity != null && GliaWidgets.chatStyle != null) {
+            int color = Color.parseColor(GliaWidgets.chatStyle.navigationBar.layer.getBackgroundColor());
+            activity.getWindow().setStatusBarColor(color);
+        } else if (activity != null && defaultStatusbarColor == null) {
             defaultStatusbarColor = activity.getWindow().getStatusBarColor();
             activity.getWindow().setStatusBarColor(ContextCompat.getColor(
                     this.getContext(), R.color.glia_transparent_black_bg));

@@ -2,7 +2,9 @@ package com.glia.widgets.chat.adapter.holder;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,18 +20,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.OperatorMessageItem;
+import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 
 public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
     private final FrameLayout contentLayout;
+    private final ChatStyle chatStyle;
     private final UiTheme uiTheme;
     private final Context context;
     private final OperatorStatusView operatorStatusView;
 
-    public OperatorMessageViewHolder(@NonNull View itemView, UiTheme uiTheme) {
+    public OperatorMessageViewHolder(@NonNull View itemView, ChatStyle chatStyle, UiTheme uiTheme) {
         super(itemView);
         context = itemView.getContext();
+        this.chatStyle = chatStyle;
         this.uiTheme = uiTheme;
         contentLayout = itemView.findViewById(R.id.content_layout);
         operatorStatusView = itemView.findViewById(R.id.chat_head_view);
@@ -37,7 +44,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setupOperatorStatusView() {
-        operatorStatusView.setTheme(uiTheme);
+        operatorStatusView.setTheme(uiTheme, chatStyle);
         operatorStatusView.setShowRippleAnimation(false);
     }
 
@@ -67,7 +74,8 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 item.singleChoiceOptions,
                 item.selectedChoiceIndex,
                 uiTheme,
-                getAdapterPosition()
+                getAdapterPosition(),
+                chatStyle
         );
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -105,10 +113,18 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
     private TextView getMessageContentView() {
         TextView contentView = (TextView) LayoutInflater.from(context)
                 .inflate(R.layout.chat_receive_message_content, contentLayout, false);
-        ColorStateList operatorBgColor =
-                ContextCompat.getColorStateList(context, uiTheme.getOperatorMessageBackgroundColor());
-        contentView.setBackgroundTintList(operatorBgColor);
-        contentView.setTextColor(ContextCompat.getColor(context, uiTheme.getOperatorMessageTextColor()));
+        contentView.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(chatStyle.operatorMessage.layer.getBackgroundColor())));
+
+        // Set corner radius
+        GradientDrawable drawable = (GradientDrawable) ContextCompat.getDrawable(context, R.drawable.bg_message);
+        if (drawable != null) {
+            ResourceProvider resourceProvider = Dependencies.getResourceProvider();
+            drawable.setCornerRadius(resourceProvider.convertDpToPixel(chatStyle.operatorMessage.layer.getCornerRadius()));
+        }
+        contentView.setBackground(drawable);
+
+        contentView.setTextColor(Color.parseColor(chatStyle.operatorMessage.text.foregroundColor));
+        contentView.setTextSize(chatStyle.operatorMessage.text.getTextSize());
         contentView.setLinkTextColor(ContextCompat.getColor(context, uiTheme.getOperatorMessageTextColor()));
         contentView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         if (uiTheme.getFontRes() != null) {

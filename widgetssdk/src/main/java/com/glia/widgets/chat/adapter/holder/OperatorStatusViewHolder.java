@@ -1,6 +1,7 @@
 package com.glia.widgets.chat.adapter.holder;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.View;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 
 public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     private final OperatorStatusView statusPictureView;
@@ -22,9 +24,11 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     private final TextView chatStartedNameView;
     private final TextView chatStartedCaptionView;
     private final Context context;
+    private final ChatStyle chatStyle;
 
-    public OperatorStatusViewHolder(@NonNull View itemView, UiTheme uiTheme) {
+    public OperatorStatusViewHolder(@NonNull View itemView, UiTheme uiTheme, ChatStyle chatStyle) {
         super(itemView);
+        this.chatStyle = chatStyle;
         this.statusPictureView = itemView.findViewById(R.id.status_picture_view);
         this.chatStartingHeadingView = itemView.findViewById(R.id.chat_starting_heading_view);
         this.chatStartingCaptionView = itemView.findViewById(R.id.chat_starting_caption_view);
@@ -33,10 +37,8 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
 
         context = itemView.getContext();
 
-        statusPictureView.setTheme(uiTheme);
+        statusPictureView.setTheme(uiTheme , chatStyle);
 
-        setStartingHeadingTextColor(uiTheme);
-        setStartingCaptionTextColor(uiTheme);
         setStartedHeadingTextColor(uiTheme);
         setStartedCaptionTextColor(uiTheme);
 
@@ -47,24 +49,10 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             chatStartedNameView.setTypeface(fontFamily, Typeface.BOLD);
             chatStartedCaptionView.setTypeface(fontFamily);
         }
-    }
 
-    private void setStartingHeadingTextColor(UiTheme uiTheme) {
-        chatStartingHeadingView.setTextColor(
-                ContextCompat.getColor(
-                        context,
-                        uiTheme.getGliaChatStartingHeadingTextColor()
-                )
-        );
-    }
-
-    private void setStartingCaptionTextColor(UiTheme uiTheme) {
-        chatStartingCaptionView.setTextColor(
-                ContextCompat.getColor(
-                        context,
-                        uiTheme.getGliaChatStartingCaptionTextColor()
-                )
-        );
+        chatStartingCaptionView.setText(chatStyle.welcomeView.descriptionValue);
+        chatStartingCaptionView.setTextColor(Color.parseColor(chatStyle.welcomeView.description.foregroundColor));
+        chatStartingCaptionView.setTextSize(chatStyle.welcomeView.description.getTextSize());
     }
 
     private void setStartedHeadingTextColor(UiTheme uiTheme) {
@@ -86,7 +74,9 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(OperatorStatusItem item) {
-        chatStartingHeadingView.setText(item.getCompanyName());
+        chatStartingHeadingView.setText(chatStyle.welcomeView.titleValue);
+        chatStartingHeadingView.setTextColor(Color.parseColor(chatStyle.welcomeView.title.foregroundColor));
+        chatStartingHeadingView.setTextSize(chatStyle.welcomeView.title.getTextSize());
         if (item.getStatus() == OperatorStatusItem.Status.IN_QUEUE) {
             statusPictureView.showPlaceholder();
             chatStartingHeadingView.setVisibility(View.VISIBLE);

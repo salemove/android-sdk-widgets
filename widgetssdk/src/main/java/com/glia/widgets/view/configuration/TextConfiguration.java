@@ -8,10 +8,14 @@ import android.os.Parcelable;
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
+import com.google.gson.annotations.SerializedName;
 
 public class TextConfiguration implements Parcelable {
+    @SerializedName("fontSize")
     private float textSize;
     private int textTypeFaceStyle;
+    @SerializedName("foreground")
+    public String foregroundColor;
     private ColorStateList textColor;
     private ColorStateList hintColor;
     private ColorStateList textColorLink;

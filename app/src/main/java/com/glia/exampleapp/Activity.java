@@ -24,4 +24,10 @@ public class Activity extends AppCompatActivity {
             GliaWidgets.init(GliaWidgetsConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()));
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GliaWidgets.getChatStyle();
+    }
 }

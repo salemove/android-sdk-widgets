@@ -3,6 +3,7 @@ package com.glia.widgets.view.header;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 import com.glia.widgets.view.header.button.GliaEndButton;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -125,7 +127,7 @@ public class AppBarView extends AppBarLayout {
         }
     }
 
-    public void setTheme(UiTheme uiTheme) {
+    public void setTheme(UiTheme uiTheme, @Nullable ChatStyle chatStyle) {
         if (uiTheme == null) return;
         this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
 
@@ -134,10 +136,15 @@ public class AppBarView extends AppBarLayout {
         materialToolbar.getMenu().findItem(R.id.leave_queue_button).setIcon(theme.getIconLeaveQueue());
 
         // colors
-        materialToolbar.setBackgroundTintList(
-                ContextCompat.getColorStateList(
-                        this.getContext(),
-                        theme.getBrandPrimaryColor()));
+        if (chatStyle != null && chatStyle.navigationBar.layer.getBackgroundColor() != null) {
+            materialToolbar.setBackgroundTintList(
+                    ColorStateList.valueOf(Color.parseColor(chatStyle.navigationBar.layer.getBackgroundColor())));
+        } else {
+            materialToolbar.setBackgroundTintList(
+                    ContextCompat.getColorStateList(
+                            this.getContext(),
+                            theme.getBrandPrimaryColor()));
+        }
 
         DrawableCompat.setTint(materialToolbar.getMenu().findItem(R.id.leave_queue_button).getIcon(),
                 ResourcesCompat.getColor(
@@ -146,6 +153,9 @@ public class AppBarView extends AppBarLayout {
                         this.getContext().getTheme()));
 
         titleView.setTextColor(ContextCompat.getColorStateList(getContext(), theme.getGliaChatHeaderTitleTintColor()));
+        if (chatStyle != null) {
+            titleView.setTextSize(chatStyle.navigationBar.text.getTextSize());
+        }
         materialToolbar.getNavigationIcon().setTint(ContextCompat.getColor(this.getContext(), theme.getGliaChatHeaderHomeButtonTintColor()));
         gliaEndButton.setTheme(theme);
         DrawableCompat.setTint(

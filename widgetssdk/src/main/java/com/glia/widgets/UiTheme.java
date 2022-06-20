@@ -9,6 +9,7 @@ import androidx.annotation.FontRes;
 
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
@@ -289,6 +290,7 @@ public class UiTheme implements Parcelable {
 
     private final ChatHeadConfiguration chatHeadConfiguration;
     private final SurveyStyle surveyStyle;
+    private final ChatStyle chatStyle;
 
     private UiTheme(UiThemeBuilder builder) {
         this.appBarTitle = builder.appBarTitle;
@@ -344,6 +346,7 @@ public class UiTheme implements Parcelable {
         this.choiceCardContentTextConfiguration = builder.choiceCardContentTextConfiguration;
         this.chatHeadConfiguration = builder.chatHeadConfiguration;
         this.surveyStyle = builder.surveyStyle;
+        this.chatStyle = builder.chatStyle;
     }
 
     public static class UiThemeBuilder {
@@ -600,9 +603,13 @@ public class UiTheme implements Parcelable {
         private
         SurveyStyle surveyStyle;
 
+        private
+        ChatStyle chatStyle;
+
         public UiThemeBuilder() {
             // Default values
             this.surveyStyle = new SurveyStyle.Builder().build();
+            this.chatStyle = new ChatStyle();
         }
 
         public void setAppBarTitle(String appBarTitle) {
@@ -821,6 +828,10 @@ public class UiTheme implements Parcelable {
             this.surveyStyle = surveyStyle;
         }
 
+        public void setChatStyle(ChatStyle chatStyle) {
+            this.chatStyle = chatStyle;
+        }
+
         public void setTheme(UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -874,6 +885,7 @@ public class UiTheme implements Parcelable {
             this.choiceCardContentTextConfiguration = theme.choiceCardContentTextConfiguration;
             this.chatHeadConfiguration = theme.chatHeadConfiguration;
             this.surveyStyle = theme.surveyStyle;
+            this.chatStyle = theme.chatStyle;
         }
 
         public UiTheme build() {
@@ -1109,6 +1121,7 @@ public class UiTheme implements Parcelable {
         neutralButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         chatHeadConfiguration = in.readParcelable(ChatHeadConfiguration.class.getClassLoader());
         surveyStyle = in.readParcelable(SurveyStyle.class.getClassLoader());
+        chatStyle = in.readParcelable(ChatStyle.class.getClassLoader());
     }
 
     @Override
@@ -1381,6 +1394,7 @@ public class UiTheme implements Parcelable {
         dest.writeParcelable(neutralButtonConfiguration, flags);
         dest.writeParcelable(chatHeadConfiguration, flags);
         dest.writeParcelable(surveyStyle, flags);
+        dest.writeParcelable(chatStyle, flags);
     }
 
     @Override
@@ -1610,5 +1624,9 @@ public class UiTheme implements Parcelable {
 
     public SurveyStyle getSurveyStyle() {
         return surveyStyle;
+    }
+
+    public ChatStyle getChatStyle() {
+        return chatStyle;
     }
 }

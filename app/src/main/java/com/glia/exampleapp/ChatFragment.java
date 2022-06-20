@@ -16,6 +16,7 @@ import androidx.preference.PreferenceManager;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 
 public class ChatFragment extends Fragment {
 
@@ -50,7 +51,7 @@ public class ChatFragment extends Fragment {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         chatView = view.findViewById(R.id.chat_view);
         UiTheme theme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
-        chatView.setTheme(theme);
+        chatView.setTheme(theme, GliaWidgets.chatStyle);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.startChat(

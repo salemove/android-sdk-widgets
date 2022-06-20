@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
@@ -25,7 +26,9 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -50,6 +53,7 @@ import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
@@ -74,6 +78,8 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
+import com.glia.widgets.view.configuration.chat.RemoteUiConfigApi;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.card.MaterialCardView;
@@ -85,6 +91,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ChatView extends ConstraintLayout implements
         ChatAdapter.OnFileItemClickListener,
@@ -167,6 +179,8 @@ public class ChatView extends ConstraintLayout implements
 
     private final Resources resources;
 
+    private ChatStyle chatStyle;
+
     private final RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onItemRangeInserted(int positionStart, int itemCount) {
@@ -229,6 +243,9 @@ public class ChatView extends ConstraintLayout implements
         initConfigurations();
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
+//        getRemoteUiConfigAndSetupViewAppearance();
+        Log.d("andrews", "setupViewAppearance()");
+        chatStyle = GliaWidgets.chatStyle;
         setupViewAppearance();
         setupViewActions();
         setupControllers();
@@ -238,10 +255,12 @@ public class ChatView extends ConstraintLayout implements
      * @param uiTheme sets this view's appearance using the parameters provided in the
      *                {@link com.glia.widgets.UiTheme}
      */
-    public void setTheme(UiTheme uiTheme) {
+    public void setTheme(UiTheme uiTheme, ChatStyle chatStyle) {
         if (uiTheme == null) return;
         this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+        this.chatStyle = chatStyle;
         setupViewAppearance();
+//        getRemoteUiConfigAndSetupViewAppearance();
         if (getVisibility() == VISIBLE) {
             handleStatusbarColor();
         }
@@ -756,7 +775,10 @@ public class ChatView extends ConstraintLayout implements
     private void hideChat() {
         setVisibility(INVISIBLE);
         Activity activity = Utils.getActivity(this.getContext());
-        if (defaultStatusbarColor != null && activity != null) {
+        if (activity != null && GliaWidgets.chatStyle != null) {
+            int color = Color.parseColor(GliaWidgets.chatStyle.navigationBar.layer.getBackgroundColor());
+            activity.getWindow().setStatusBarColor(color);
+        } else if (defaultStatusbarColor != null && activity != null) {
             activity.getWindow().setStatusBarColor(defaultStatusbarColor);
             defaultStatusbarColor = null;
         }
@@ -812,7 +834,11 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void setupViewAppearance() {
+//        String config = getUiConfigString();
+//        Gson gson = new Gson();
+//        ChatStyle chatStyle = gson.fromJson(config, ChatStyle.class);
         adapter = new ChatAdapter(
+                chatStyle,
                 this.theme,
                 this.onOptionClickedListener,
                 this,
@@ -839,9 +865,12 @@ public class ChatView extends ConstraintLayout implements
         attachmentsRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
         attachmentsRecyclerView.setAdapter(uploadAttachmentAdapter);
 
-        appBar.setTheme(this.theme);
+        appBar.setTheme(this.theme, chatStyle);
 
         //icons
+//        Drawable drawable = AppCompatResources.getDrawable(getContext(), this.theme.getIconSendMessage()); // not working
+//        if (drawable != null) drawable.setTint(Color.parseColor(chatStyle.textField.tintColor));
+//        sendButton.setBackground(drawable);
         sendButton.setImageResource(this.theme.getIconSendMessage());
 
         // new messages indicator shape
@@ -852,7 +881,7 @@ public class ChatView extends ConstraintLayout implements
                 ))
                 .build();
         newMessagesOperatorStatusView.setShowRippleAnimation(false);
-        newMessagesOperatorStatusView.setTheme(theme);
+        newMessagesOperatorStatusView.setTheme(theme, chatStyle);
         newMessagesCardView.setShapeAppearanceModel(shapeAppearanceModel);
         newMessagesCountBadgeView.setBackgroundTintList(
                 ContextCompat.getColorStateList(
@@ -864,19 +893,25 @@ public class ChatView extends ConstraintLayout implements
         );
 
         // colors
-        dividerView.setBackgroundColor(ContextCompat.getColor(
-                this.getContext(),
-                this.theme.getBaseShadeColor()));
+        if (chatStyle != null && chatStyle.separator != null) dividerView.setBackgroundColor(Color.parseColor(chatStyle.separator.getBackgroundColor()));
+        ViewGroup.LayoutParams params = dividerView.getLayoutParams();
+        params.height = chatStyle.separator.getBorderWidth();
+        dividerView.setLayoutParams(params);
         sendButton.setImageTintList(
                 ContextCompat.getColorStateList(
                         this.getContext(),
                         this.theme.getSendMessageButtonTintColor()));
-        chatEditText.setTextColor(ContextCompat.getColor(
-                this.getContext(), this.theme.getBaseDarkColor()));
+        if (chatStyle.textField.text.foregroundColor != null) {
+            chatEditText.setTextColor(Color.parseColor(chatStyle.textField.text.foregroundColor));
+            chatEditText.setTextSize(chatStyle.textField.text.getTextSize());
+        } else {
+            chatEditText.setTextColor(ContextCompat.getColor(
+                    this.getContext(), this.theme.getBaseDarkColor()));
+        }
         chatEditText.setHintTextColor(ContextCompat.getColor(
                 this.getContext(), this.theme.getBaseNormalColor()));
         setBackgroundColor(
-                ContextCompat.getColor(this.getContext(), this.theme.getGliaChatBackgroundColor()));
+                (Color.parseColor(chatStyle.layer.getBackgroundColor())));
         // fonts
         if (this.theme.getFontRes() != null) {
             Typeface fontFamily = ResourcesCompat.getFont(
@@ -897,9 +932,96 @@ public class ChatView extends ConstraintLayout implements
         );
     }
 
+    private void getRemoteUiConfigAndSetupViewAppearance() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://cached-app.herokuapp.com/cached/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RemoteUiConfigApi service = retrofit.create(RemoteUiConfigApi.class);
+        Call<ChatStyle> call = service.getChatConfig("59686f3b-c17f-4e97-bbc2-c0df7ad288ff");
+
+        call.enqueue(new Callback<ChatStyle>() {
+            @Override
+            public void onResponse(Call<ChatStyle> call, Response<ChatStyle> response) {
+                chatStyle = response.body();
+                setupViewAppearance();
+            }
+
+            @Override
+            public void onFailure(Call<ChatStyle> call, Throwable t) {
+                Toast.makeText(getContext(), "An error has occurred when requesting chat config", Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+
+    @NonNull
+    private String getUiConfigString() {
+        return  "{\n" +
+                "  \"navigationBar\": {\n" +
+                "    \"layer\": {\n" +
+                "      \"cornerRadius\": 0,\n" +
+                "      \"border\": null,\n" +
+                "      \"borderWidth\": 0,\n" +
+                "      \"background\": \"#F7DF1A\"\n" +
+                "    },\n" +
+                "    \"title\": {\n" +
+                "      \"foreground\": \"#0C0C0C\",\n" +
+                "      \"fontSize\": 36\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"layer\": {\n" +
+                "    \"cornerRadius\": 0,\n" +
+                "    \"border\": null,\n" +
+                "    \"borderWidth\": 0,\n" +
+                "    \"background\": \"#D0D0D0\"\n" +
+                "  },\n" +
+                "  \"separator\": {\n" +
+                "    \"cornerRadius\": 0,\n" +
+                "    \"border\": null,\n" +
+                "    \"borderWidth\": 16,\n" +
+                "    \"background\": \"#209D0E\"\n" +
+                "  },\n" +
+                "  \"textField\": {\n" +
+                "    \"text\": {\n" +
+                "      \"foreground\": \"#A4A4A4\",\n" +
+                "      \"fontSize\": 20\n" +
+                "    },\n" +
+                "    \"tintColor\": \"#F73751\"\n" +
+                "  },\n" +
+                "  \"operatorMessage\": {\n" +
+                "    \"layer\": {\n" +
+                "      \"cornerRadius\": 10,\n" +
+                "      \"border\": null,\n" +
+                "      \"borderWidth\": 0,\n" +
+                "      \"background\": \"#98989D\"\n" +
+                "    },\n" +
+                "    \"text\": {\n" +
+                "      \"foreground\": \"#0A84FF\",\n" +
+                "      \"fontSize\": 24\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"visitorMessage\": {\n" +
+                "    \"layer\": {\n" +
+                "      \"cornerRadius\": 20,\n" +
+                "      \"border\": null,\n" +
+                "      \"borderWidth\": 0,\n" +
+                "      \"background\": \"#0A84FF\"\n" +
+                "    },\n" +
+                "    \"text\": {\n" +
+                "      \"foreground\": \"#FFFFFF\",\n" +
+                "      \"fontSize\": 18\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+    }
+
     private void handleStatusbarColor() {
         Activity activity = Utils.getActivity(this.getContext());
-        if (activity != null && defaultStatusbarColor == null) {
+        if (activity != null && GliaWidgets.chatStyle != null) {
+            int color = Color.parseColor(GliaWidgets.chatStyle.navigationBar.layer.getBackgroundColor());
+            activity.getWindow().setStatusBarColor(color);
+        } else if (activity != null && defaultStatusbarColor == null) {
             defaultStatusbarColor = activity.getWindow().getStatusBarColor();
             if (controller != null && controller.isChatVisible()) {
                 activity.getWindow().setStatusBarColor(ContextCompat.getColor(

@@ -131,7 +131,7 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
 
     private void setupViewAppearance() {
         setBackgroundColor(ContextCompat.getColor(getContext(), theme.getBaseLightColor()));
-        appBar.setTheme(this.theme);
+        appBar.setTheme(this.theme, null);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.glia.widgets.view;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,6 +20,7 @@ import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.helper.Utils;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 import com.glia.widgets.view.textview.ChoiceCardContentTextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -58,9 +60,10 @@ public class SingleChoiceCardView extends FrameLayout {
             List<SingleChoiceOption> options,
             Integer selectedIndex,
             UiTheme theme,
-            int adapterPosition
+            int adapterPosition,
+            ChatStyle chatStyle // Need to pass it via constructor
     ) {
-        setupCardView(theme);
+        setupCardView(theme, chatStyle);
         setupImage(imageUrl);
         setupText(content, theme);
         setupButtons(id, options, selectedIndex, theme, adapterPosition);
@@ -78,7 +81,7 @@ public class SingleChoiceCardView extends FrameLayout {
         );
     }
 
-    private void setupCardView(UiTheme theme) {
+    private void setupCardView(UiTheme theme, ChatStyle chatStyle) {
         int gliaBaseLightColor = ContextCompat.getColor(
                 this.getContext(), theme.getBaseLightColor()
         );
@@ -86,7 +89,7 @@ public class SingleChoiceCardView extends FrameLayout {
                 this.getContext(), theme.getBrandPrimaryColor()
         );
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
-        materialCardView.setBackgroundColor(gliaBaseLightColor);
+        materialCardView.setBackgroundColor(Color.parseColor(chatStyle.layer.getBackgroundColor()));
     }
 
     private void setupImage(String imageUrl) {

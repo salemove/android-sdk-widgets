@@ -2,6 +2,7 @@ package com.glia.widgets.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.airbnb.lottie.SimpleColorFilter;
 import com.airbnb.lottie.model.KeyPath;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -90,19 +92,24 @@ public class OperatorStatusView extends ConstraintLayout {
         Picasso.get().cancelRequest(profilePictureView);
     }
 
-    public void setTheme(UiTheme theme) {
+    public void setTheme(UiTheme theme, @Nullable ChatStyle chatStyle) { // shouldn't be nullable
         // icons
         setPlaceHolderIcon(theme);
         setOnHoldIcon(theme);
 
         // colors
-        profilePictureBackgroundColorDrawable = new ColorDrawable(
-                ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor())
-        );
+        int color;
+        if (chatStyle != null) {
+            color = Color.parseColor(chatStyle.welcomeView.tintColor);
+        } else {
+            color = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
+        }
+        profilePictureBackgroundColorDrawable =
+                new ColorDrawable(color);
         rippleAnimation.addValueCallback(
                 new KeyPath("**"),
                 LottieProperty.COLOR_FILTER,
-                frameInfo -> new SimpleColorFilter(this.getContext().getColor(theme.getBrandPrimaryColor()))
+                frameInfo -> new SimpleColorFilter(color)
         );
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
         placeholderView.setImageTintList(

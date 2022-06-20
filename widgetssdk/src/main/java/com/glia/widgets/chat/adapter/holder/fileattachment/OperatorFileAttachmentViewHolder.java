@@ -13,12 +13,15 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 
 public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     private final OperatorStatusView operatorStatusView;
+    private final ChatStyle chatStyle;
 
-    public OperatorFileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme) {
+    public OperatorFileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme, ChatStyle chatStyle) {
         super(itemView);
+        this.chatStyle =  chatStyle;
         operatorStatusView = itemView.findViewById(R.id.chat_head_view);
         setupOperatorStatusView(uiTheme);
     }
@@ -29,7 +32,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     }
 
     private void setupOperatorStatusView(UiTheme uiTheme) {
-        operatorStatusView.setTheme(uiTheme);
+        operatorStatusView.setTheme(uiTheme, chatStyle);
         operatorStatusView.setShowRippleAnimation(false);
     }
 

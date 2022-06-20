@@ -2,6 +2,8 @@ package com.glia.widgets;
 
 import android.app.Application;
 import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.RequestCallback;
@@ -11,12 +13,19 @@ import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
+import com.glia.widgets.view.configuration.chat.RemoteUiConfigApi;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.plugins.RxJavaPlugins;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * This class is a starting point for integration with Glia Widgets SDK
@@ -103,6 +112,8 @@ public class GliaWidgets {
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
+
+    public static ChatStyle chatStyle;
 
     /**
      * Should be called when the application is starting in {@link Application}.onCreate()
@@ -316,4 +327,28 @@ public class GliaWidgets {
         if (e != null) message += e.getMessage();
         Logger.e("RxErrorHandler", "Undeliverable exception received, not sure what to do. " + message);
     }
+
+    public static void getChatStyle() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://cached-app.herokuapp.com/cached/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RemoteUiConfigApi service = retrofit.create(RemoteUiConfigApi.class);
+        Call<ChatStyle> call = service.getChatConfig("59686f3b-c17f-4e97-bbc2-c0df7ad288ff");
+
+        call.enqueue(new Callback<ChatStyle>() {
+            @Override
+            public void onResponse(Call<ChatStyle> call, Response<ChatStyle> response) {
+                chatStyle = response.body();
+                Log.d("andrews", "onResponse");
+            }
+
+            @Override
+            public void onFailure(Call<ChatStyle> call, Throwable t) {
+                Log.d("andrews", "An error has occurred when requesting chat config");
+            }
+
+        });
+    }
+
 }

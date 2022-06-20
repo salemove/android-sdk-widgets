@@ -1,8 +1,10 @@
 package com.glia.widgets.chat;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,6 +44,11 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity);
+        Log.d("andrews", "getChatStyle()");
+        if (GliaWidgets.chatStyle != null) {
+            int color = Color.parseColor(GliaWidgets.chatStyle.navigationBar.layer.getBackgroundColor());
+            getWindow().setStatusBarColor(color);
+        }
         chatView = findViewById(R.id.chat_view);
         ChatHeadLayout chatHeadLayout = findViewById(R.id.chat_head_layout);
         chatHeadLayout.setIsChatView(true);
@@ -50,7 +57,7 @@ public class ChatActivity extends AppCompatActivity {
         configuration = createConfiguration(getIntent());
         chatHeadLayout.setConfiguration(configuration);
         chatView.setConfiguration(configuration);
-        chatView.setTheme(configuration.getRunTimeTheme());
+        chatView.setTheme(configuration.getRunTimeTheme(), GliaWidgets.chatStyle);
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnBackToCallListener(this::backToCall);
 

@@ -32,6 +32,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.view.SingleChoiceCardView;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 
 import java.util.List;
 
@@ -75,6 +76,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int VISITOR_IMAGE_VIEW_TYPE = 7;
 
     private final UiTheme uiTheme;
+    private final ChatStyle chatStyle;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener;
     private final OnFileItemClickListener onFileItemClickListener;
     private final OnImageItemClickListener onImageItemClickListener;
@@ -84,6 +86,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase;
 
     public ChatAdapter(
+            ChatStyle chatStyle,
             UiTheme uiTheme,
             SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
             OnFileItemClickListener onFileItemClickListener,
@@ -92,6 +95,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
             GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
     ) {
+        this.chatStyle = chatStyle;
         this.uiTheme = uiTheme;
         this.onOptionClickedListener = onOptionClickedListener;
         this.onFileItemClickListener = onFileItemClickListener;
@@ -106,7 +110,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == OPERATOR_STATUS_VIEW_TYPE) {
-            return new OperatorStatusViewHolder(inflater.inflate(R.layout.chat_operator_status_layout, parent, false), uiTheme);
+            return new OperatorStatusViewHolder(inflater.inflate(R.layout.chat_operator_status_layout, parent, false), uiTheme, chatStyle);
         } else if (viewType == VISITOR_FILE_VIEW_TYPE) {
             View view = inflater.inflate(R.layout.chat_attachment_visitor_file_layout, parent, false);
             return new VisitorFileAttachmentViewHolder(view, uiTheme);
@@ -119,19 +123,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     getImageFileFromNetworkUseCase
             );
         } else if (viewType == VISITOR_MESSAGE_TYPE) {
-            return new VisitorMessageViewHolder(inflater.inflate(R.layout.chat_visitor_message_layout, parent, false), uiTheme);
+            return new VisitorMessageViewHolder(inflater.inflate(R.layout.chat_visitor_message_layout, parent, false), chatStyle, uiTheme);
         } else if (viewType == OPERATOR_IMAGE_VIEW_TYPE) {
             return new OperatorImageAttachmentViewHolder(
                     inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false),
+                    chatStyle,
                     uiTheme,
                     getImageFileFromCacheUseCase,
                     getImageFileFromDownloadsUseCase,
                     getImageFileFromNetworkUseCase
             );
         } else if (viewType == OPERATOR_FILE_VIEW_TYPE) {
-            return new OperatorFileAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_file_layout, parent, false), uiTheme);
+            return new OperatorFileAttachmentViewHolder(inflater.inflate(R.layout.chat_attachment_operator_file_layout, parent, false), uiTheme, chatStyle);
         } else if (viewType == OPERATOR_MESSAGE_VIEW_TYPE) {
-            return new OperatorMessageViewHolder(inflater.inflate(R.layout.chat_operator_message_layout, parent, false), uiTheme);
+            return new OperatorMessageViewHolder(inflater.inflate(R.layout.chat_operator_message_layout, parent, false), chatStyle, uiTheme);
         } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
             return new MediaUpgradeStartedViewHolder(inflater.inflate(R.layout.chat_media_upgrade_layout, parent, false), uiTheme);
         } else {

@@ -16,6 +16,7 @@ public class GliaWidgetsConfig {
     private final Context context;
     private final String region;
     private final int requestCode;
+//    private final String uiConfigPath; // TODO: 16.06.2022 finish adding it
 
     /**
      * @deprecated Deprecated since SDK version 1.6.5. Please use {@link GliaWidgetsConfig#GliaWidgetsConfig(String, String, Context, String, int)} instead.
@@ -151,6 +152,7 @@ public class GliaWidgetsConfig {
         Context context;
         String region;
         int requestCode;
+        String uiConfigPath;
 
         public Builder() {
             requestCode = 45554442;
@@ -210,6 +212,11 @@ public class GliaWidgetsConfig {
 
         public Builder setRequestCode(int requestCode) {
             this.requestCode = requestCode;
+            return this;
+        }
+
+        public Builder setUiConfigPath(String path) {
+            this.uiConfigPath = path;
             return this;
         }
 

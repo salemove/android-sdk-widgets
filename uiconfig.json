@@ -1,0 +1,57 @@
+{
+  "navigationBar": {
+    "layer": {
+      "cornerRadius": 0,
+      "border": null,
+      "borderWidth": 0,
+      "background": "0x0A84FF"
+    },
+    "title": {
+      "foreground": "0xFFFFFF",
+      "fontSize": 18
+    }
+  },
+  "layer": {
+    "cornerRadius": 0,
+    "border": null,
+    "borderWidth": 0,
+    "background": "0xFFFFFF"
+  },
+  "separator": {
+    "cornerRadius": 0,
+    "border": null,
+    "borderWidth": 1,
+    "background": "0x98989D"
+  },
+  "textField": {
+    "text": {
+      "foreground": "0x000000",
+      "fontSize": 18
+    },
+    "tintColor": "0x0A84FF"
+  },
+  "operatorMessage": {
+    "layer": {
+      "cornerRadius": 10,
+      "border": null,
+      "borderWidth": 0,
+      "background": "0x98989D"
+    },
+    "text": {
+      "foreground": "0x0A84FF",
+      "fontSize": 18
+    }
+  },
+  "visitorMessage": {
+    "layer": {
+      "cornerRadius": 10,
+      "border": null,
+      "borderWidth": 0,
+      "background": "0x0A84FF"
+    },
+    "text": {
+      "foreground": "0xFFFFFF",
+      "fontSize": 18
+    }
+  }
+}

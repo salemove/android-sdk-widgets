@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 
@@ -171,6 +172,12 @@ public class SurveyController implements SurveyContract.Controller {
                     resetController();
                 }
                 return;
+            } else if (exception instanceof GliaException) {
+                GliaException gliaException = (GliaException) exception;
+                if (gliaException.cause == GliaException.Cause.NETWORK_TIMEOUT) {
+                    view.onNetworkTimeout();
+                }
+                // Ignore other Glia exceptions
             }
             questionItems.forEach(item -> {
                 if (item.getAnswerCallback() != null) {

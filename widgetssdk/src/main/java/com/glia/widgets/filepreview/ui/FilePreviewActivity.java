@@ -50,6 +50,8 @@ public class FilePreviewActivity extends AppCompatActivity {
         this.theme = filePreviewView.setTheme(runtimeTheme);
         filePreviewView.setOnEndListener(onEndListener);
         handleStatusBarColor();
+
+        setTitle(R.string.glia_preview_activity_toolbar_title);
     }
 
     private void handleStatusBarColor() {

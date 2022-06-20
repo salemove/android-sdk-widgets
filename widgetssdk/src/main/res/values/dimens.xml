@@ -34,6 +34,7 @@
     <dimen name="glia_chat_new_messages_bottom_edge_radius">17dp</dimen>
     <dimen name="glia_chat_new_messages_card_corner_radius">21dp</dimen>
     <dimen name="glia_chat_new_messages_elevation">2dp</dimen>
+    <dimen name="glia_chat_edit_text_min_height">48dp</dimen>
 
     <dimen name="glia_chat_attachment_corner_radius">4dp</dimen>
     <dimen name="glia_chat_attachment_stroke_width">1dp</dimen>
@@ -45,6 +46,7 @@
 
     <dimen name="glia_chat_attachment_menu_corner_radius">14dp</dimen>
     <dimen name="glia_chat_attachment_menu_min_width">250dp</dimen>
+    <dimen name="glia_chat_attachment_menu_min_height">48dp</dimen>
 
     <dimen name="glia_chat_head_size">64dp</dimen>
     <dimen name="glia_chat_head_placeholder_size">32dp</dimen>

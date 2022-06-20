@@ -179,13 +179,6 @@ public class SurveyStyle implements Parcelable {
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
             }
-            // Default buttons configuration
-            if (this.submitButton == null) {
-                this.submitButton = prepareDefaultButtonConfiguration(resourceProvider, R.color.glia_brand_primary_color);
-            }
-            if (this.cancelButton == null) {
-                this.cancelButton = prepareDefaultButtonConfiguration(resourceProvider, R.color.glia_system_negative_color);
-            }
             // Default questions configuration
             if (this.booleanQuestion == null) {
                 this.booleanQuestion = new BooleanQuestionConfiguration.Builder().build();

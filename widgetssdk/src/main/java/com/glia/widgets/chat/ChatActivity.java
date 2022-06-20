@@ -43,6 +43,7 @@ public class ChatActivity extends AppCompatActivity {
         ChatHeadLayout chatHeadLayout = findViewById(R.id.chat_head_layout);
         chatHeadLayout.setIsChatView(true);
 
+        chatView.setOnTitleUpdatedListener(this::setTitle);
         configuration = createConfiguration(getIntent());
         chatHeadLayout.setConfiguration(configuration);
         chatView.setConfiguration(configuration);

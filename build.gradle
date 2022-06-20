@@ -41,7 +41,7 @@ ext {
     rxJava = '2.2.6'
     gson = '2.8.6'
     preferenceVersion = '1.1.1'
-    picassoVersion = '2.71828'
+    picassoVersion = '2.8'
     lottieVersion = '4.1.0'
 
     leakCanaryVersion = '2.6'

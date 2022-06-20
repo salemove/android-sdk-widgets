@@ -104,6 +104,11 @@ public class Dependencies {
         Dependencies.sdkConfigurationManager = sdkConfigurationManager;
     }
 
+    @VisibleForTesting
+    public static void setResourceProvider(ResourceProvider resourceProvider) {
+        Dependencies.resourceProvider = resourceProvider;
+    }
+
     private static void initApplicationLifecycleObserver(
             ApplicationLifecycleManager lifecycleManager,
             ServiceChatHeadController chatBubbleController

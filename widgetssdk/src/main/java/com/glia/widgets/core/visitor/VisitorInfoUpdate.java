@@ -1,17 +1,22 @@
 package com.glia.widgets.core.visitor;
 
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.Map;
 
+/**
+ * @deprecated since 1.9.0 use @see {@link VisitorInfoUpdateRequest}
+ */
+@Deprecated
 public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
 
     public String name;
     public String email;
     public String phone;
     public String note;
-    public LinkedTreeMap<String, String> customAttributes;
+    public Map<String, String> customAttributes;
     public VisitorInfoUpdateRequest.NoteUpdateMethod noteUpdateMethod = VisitorInfoUpdateRequest.NoteUpdateMethod.APPEND;
     public VisitorInfoUpdateRequest.CustomAttributesUpdateMethod customAttrsUpdateMethod = VisitorInfoUpdateRequest.CustomAttributesUpdateMethod.MERGE;
     public String externalId;
@@ -32,7 +37,7 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
         this.note = note;
     }
 
-    public void setCustomAttributes(LinkedTreeMap<String, String> customAttributes) {
+    public void setCustomAttributes(Map<String, String> customAttributes) {
         this.customAttributes = customAttributes;
     }
 
@@ -80,7 +85,9 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
 
     @Override
     public LinkedTreeMap<String, String> getCustomAttributes() {
-        return customAttributes;
+        LinkedTreeMap<String, String> attrs = new LinkedTreeMap<>();
+        attrs.putAll(customAttributes);
+        return attrs;
     }
 
     @Override

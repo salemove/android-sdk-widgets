@@ -8,14 +8,14 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.engagement.Survey;
@@ -27,16 +27,18 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.shape.ShapeAppearanceModel;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 
-public class SurveyView extends ConstraintLayout
+public class SurveyView extends FrameLayout
         implements SurveyContract.View, SurveyAdapter.SurveyAdapterListener {
     private static final String TAG = SurveyView.class.getSimpleName();
 
-    private Callback callback;
+    private OnTitleUpdatedListener onTitleUpdatedListener;
+    private OnFinishListener onFinishListener;
 
     private SurveyContract.Controller controller;
 
@@ -46,8 +48,8 @@ public class SurveyView extends ConstraintLayout
     private TextView title;
     private RecyclerView recyclerView;
     private LinearLayout buttonPanel;
-    private Button submitButton;
-    private Button cancelButton;
+    private MaterialButton submitButton;
+    private MaterialButton cancelButton;
 
     private SurveyAdapter surveyAdapter;
 
@@ -87,8 +89,12 @@ public class SurveyView extends ConstraintLayout
         applyStyle(theme.getSurveyStyle());
     }
 
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    public void setOnTitleUpdatedListener(OnTitleUpdatedListener onTitleUpdatedListener) {
+        this.onTitleUpdatedListener = onTitleUpdatedListener;
+    }
+
+    public void setOnFinishListener(OnFinishListener onFinishListener) {
+        this.onFinishListener = onFinishListener;
     }
 
     private void applyStyle(SurveyStyle surveyStyle) {
@@ -124,11 +130,21 @@ public class SurveyView extends ConstraintLayout
         cardView.setBackground(background);
     }
 
-    private void applyButtonStyle(ButtonConfiguration configuration, Button button) {
+    private void applyButtonStyle(ButtonConfiguration configuration, MaterialButton button) {
+        if (configuration == null) {
+            // Default attributes from
+            // "Application.GliaAndroidSdkWidgetsExample.Button" styles
+            // will be in use
+            return;
+        }
         ColorStateList backgroundColor = configuration.getBackgroundColor();
         button.setBackgroundTintList(backgroundColor);
         ColorStateList textColor = configuration.getTextConfiguration().getTextColor();
         button.setTextColor(textColor);
+        button.setTextSize(configuration.getTextConfiguration().getTextSize());
+        button.setStrokeColor(configuration.getStrokeColor());
+        if (configuration.getStrokeWidth() != null) button.setStrokeWidth(configuration.getStrokeWidth());
+        if (configuration.getTextConfiguration().isBold()) button.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -194,8 +210,8 @@ public class SurveyView extends ConstraintLayout
 
     @Override
     public void onStateUpdated(SurveyState state) {
-        if (callback != null) {
-            callback.onTitleUpdated(state.title);
+        if (onTitleUpdatedListener != null) {
+            onTitleUpdatedListener.onTitleUpdated(state.title);
         }
         title.setText(state.title);
         surveyAdapter.submitList(state.questions);
@@ -212,9 +228,14 @@ public class SurveyView extends ConstraintLayout
     }
 
     @Override
+    public void onNetworkTimeout() {
+        Toast.makeText(getContext(), R.string.glia_survey_network_unavailable, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public void finish() {
-        if (callback != null) {
-            callback.onFinish();
+        if (onFinishListener != null) {
+            onFinishListener.onFinish();
         }
     }
 
@@ -225,9 +246,11 @@ public class SurveyView extends ConstraintLayout
         }
     }
 
-    public interface Callback {
+    public interface OnTitleUpdatedListener {
         void onTitleUpdated(String title);
+    }
 
+    public interface OnFinishListener {
         void onFinish();
     }
 }

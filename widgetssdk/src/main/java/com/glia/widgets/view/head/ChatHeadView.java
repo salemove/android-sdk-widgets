@@ -143,13 +143,15 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
 
     @Override
     public void navigateToCall() {
-        getContext().startActivity(
-                getNavigationIntent(
-                        getContext(),
-                        CallActivity.class,
-                        sdkConfiguration
-                )
-        );
+        CallActivity.Configuration activityConfig =
+                CallActivity.Configuration.Builder.builder()
+                        .setWidgetsConfiguration(sdkConfiguration)
+                        .build();
+
+        Intent intent = CallActivity.getIntent(getContext(), activityConfig);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        getContext().startActivity(intent);
     }
 
     private ChatHeadConfiguration createBuildTimeConfiguration(UiTheme buildTimeTheme) {

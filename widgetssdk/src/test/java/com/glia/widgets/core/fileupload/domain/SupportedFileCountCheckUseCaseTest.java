@@ -1,5 +1,6 @@
 package com.glia.widgets.core.fileupload.domain;
 
+import static com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -43,9 +44,9 @@ public class SupportedFileCountCheckUseCaseTest {
     }
 
     @Test
-    public void execute_returnsTrue_when25FileAttachments() {
+    public void execute_returnsTrue_whenSupportedFileAttachmentsCount() {
         List<FileAttachment> fileAttachmentList = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
+        for (int i = 0; i < SUPPORTED_FILE_COUNT; i++) {
             fileAttachmentList.add(FILE_ATTACHMENT);
         }
         when(repository.getFileAttachments()).thenReturn(fileAttachmentList);
@@ -54,9 +55,9 @@ public class SupportedFileCountCheckUseCaseTest {
     }
 
     @Test
-    public void execute_returnsFalse_when26FileAttachments() {
+    public void execute_returnsFalse_whenMoreThanSupportedFileAttachments() {
         List<FileAttachment> fileAttachmentList = new ArrayList<>();
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < SUPPORTED_FILE_COUNT + 1; i++) {
             fileAttachmentList.add(FILE_ATTACHMENT);
         }
         when(repository.getFileAttachments()).thenReturn(fileAttachmentList);

@@ -1,5 +1,9 @@
 package com.glia.widgets.core.fileupload.domain;
 
+import static com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT;
+
+import androidx.annotation.VisibleForTesting;
+
 import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
@@ -44,7 +48,7 @@ public class AddFileToAttachmentAndUploadUseCase {
         if (isSupportedFileCountExceeded()) {
             fileAttachmentRepository.setSupportedFileAttachmentCountExceeded(file.getUri());
             listener.onError(new SupportedFileCountExceededException());
-        } else if (isSupportedFileSizeLargerThen25MB(file)) {
+        } else if (isSupportedFileSizeExceeded(file)) {
             fileAttachmentRepository.setFileAttachmentTooLarge(file.getUri());
             listener.onError(new SupportedFileSizeExceededException());
         } else {
@@ -53,8 +57,8 @@ public class AddFileToAttachmentAndUploadUseCase {
         }
     }
 
-    private boolean isSupportedFileSizeLargerThen25MB(FileAttachment file) {
-        return file.getSize() >= SUPPORTED_FILE_SIZE_25MB;
+    private boolean isSupportedFileSizeExceeded(FileAttachment file) {
+        return file.getSize() >= SUPPORTED_FILE_SIZE;
     }
 
     private boolean isSupportedFileCountExceeded() {
@@ -77,6 +81,6 @@ public class AddFileToAttachmentAndUploadUseCase {
         void onSecurityCheckFinished(EngagementFile.ScanResult scanResult);
     }
 
-    private final static long SUPPORTED_FILE_COUNT = 25;
-    private final static long SUPPORTED_FILE_SIZE_25MB = 26214400L;
+    @VisibleForTesting
+    public final static long SUPPORTED_FILE_SIZE = 26214400L;
 }

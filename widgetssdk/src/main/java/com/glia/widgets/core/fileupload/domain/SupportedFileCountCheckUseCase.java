@@ -14,5 +14,5 @@ public class SupportedFileCountCheckUseCase {
         return repository.getFileAttachments().size() <= SUPPORTED_FILE_COUNT;
     }
 
-    private final static long SUPPORTED_FILE_COUNT = 25;
+    public final static long SUPPORTED_FILE_COUNT = 25;
 }

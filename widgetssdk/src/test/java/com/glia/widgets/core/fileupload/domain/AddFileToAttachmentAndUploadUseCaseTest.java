@@ -1,5 +1,7 @@
 package com.glia.widgets.core.fileupload.domain;
 
+import static com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase.SUPPORTED_FILE_SIZE;
+import static com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -64,7 +66,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
-        when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(26L);
+        when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(SUPPORTED_FILE_COUNT + 1);
         when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
 
         subjectUnderTest.execute(fileAttachment, listener);
@@ -80,7 +82,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
-        when(fileAttachment.getSize()).thenReturn(26214400L);
+        when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE);
 
         subjectUnderTest.execute(fileAttachment, listener);
 
@@ -95,7 +97,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
-        when(fileAttachment.getSize()).thenReturn(26214399L);
+        when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
 
         subjectUnderTest.execute(fileAttachment, listener);
 
@@ -116,8 +118,6 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
     @Test(expected = NullPointerException.class)
     public void execute_throwsNullPointerException_whenListenerIsNull() {
         FileAttachment fileAttachment = mock(FileAttachment.class);
-        AddFileToAttachmentAndUploadUseCase.Listener listener =
-                mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);

@@ -35,10 +35,10 @@ public class DownloadsFolderDataSourceTest {
     }
 
     @Test
-    public void putImageToDownloads_completesSuccessfully_whenNullImageNameArgument() {
+    public void putImageToDownloads_emitsNullPointerException_whenNullImageNameArgument() {
         dataSource.putImageToDownloads(null, BITMAP)
                 .test()
-                .assertComplete();
+                .assertError(NullPointerException.class);
     }
 
     @Test
@@ -63,10 +63,10 @@ public class DownloadsFolderDataSourceTest {
     }
 
     @Test
-    public void getImageFromDownloadsFolder_emitsIllegalArgumentException_whenNullArgument() {
+    public void getImageFromDownloadsFolder_emitsNullPointerException_whenNullArgument() {
         dataSource.getImageFromDownloadsFolder(null)
                 .test()
-                .assertError(IllegalArgumentException.class);
+                .assertError(NullPointerException.class);
     }
 
     @Test
@@ -81,14 +81,14 @@ public class DownloadsFolderDataSourceTest {
     }
 
     @Test
-    public void downloadFileToDownloads_completesSuccessfully_whenNullFileNameArgument() {
+    public void downloadFileToDownloads_emitsNullPointerException_whenNullFileNameArgument() {
         dataSource.downloadFileToDownloads(
                         null,
                         "content_type",
                         INPUT_STREAM
                 )
                 .test()
-                .assertComplete();
+                .assertError(NullPointerException.class);
     }
 
     @Test

@@ -80,7 +80,7 @@ public class RepositoryFactory {
 
     public FileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository();
+            fileAttachmentRepository = new FileAttachmentRepository(gliaCore);
         }
         return fileAttachmentRepository;
     }

@@ -14,12 +14,14 @@ import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.screensharing.ScreenSharingRequest;
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState;
 import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
-import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.helper.Logger;
 
 import java.util.function.Consumer;
 
 public class GliaScreenSharingRepository {
+
+    private final GliaCore gliaCore;
     private GliaScreenSharingCallback callback = null;
 
     // Consumers
@@ -32,11 +34,15 @@ public class GliaScreenSharingRepository {
     private ScreenSharingRequest screenSharingRequest = null;
     private ScreenSharing.Status screenSharingStatus = NOT_SHARING;
 
+    public GliaScreenSharingRepository(GliaCore gliaCore) {
+        this.gliaCore = gliaCore;
+    }
+
     public void init(GliaScreenSharingCallback gliaScreenSharingCallback) {
         Logger.d(TAG, "init screen sharing repository");
 
         this.callback = gliaScreenSharingCallback;
-        Dependencies.glia().on(Glia.Events.ENGAGEMENT, engagementConsumer);
+        gliaCore.on(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     public void onScreenSharingAccepted(
@@ -66,7 +72,7 @@ public class GliaScreenSharingRepository {
     }
 
     public void onDestroy() {
-        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> {
+        gliaCore.getCurrentEngagement().ifPresent(engagement -> {
             engagement.getScreenSharing().off(
                     ScreenSharing.Events.SCREEN_SHARING_REQUEST,
                     screenSharingRequestConsumer
@@ -77,7 +83,7 @@ public class GliaScreenSharingRepository {
             );
         });
 
-        Dependencies.glia().off(Glia.Events.ENGAGEMENT, engagementConsumer);
+        gliaCore.off(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     private void onEngagement(Engagement engagement) {

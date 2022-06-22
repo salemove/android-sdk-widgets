@@ -43,7 +43,7 @@ public class RepositoryFactory {
     }
 
     public GliaScreenSharingRepository getGliaScreenSharingRepository() {
-        return new GliaScreenSharingRepository();
+        return new GliaScreenSharingRepository(gliaCore);
     }
 
     public GliaChatRepository getGliaMessageRepository() {

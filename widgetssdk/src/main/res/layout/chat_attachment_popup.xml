@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
+            android:minHeight="@dimen/glia_chat_attachment_menu_min_height"
             android:minWidth="@dimen/glia_chat_attachment_menu_min_width"
             android:paddingTop="12dp">
 
@@ -64,6 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
+            android:minHeight="@dimen/glia_chat_attachment_menu_min_height"
             android:minWidth="@dimen/glia_chat_attachment_menu_min_width"
             android:paddingTop="12dp">
 
@@ -111,6 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
+            android:minHeight="@dimen/glia_chat_attachment_menu_min_height"
             android:minWidth="@dimen/glia_chat_attachment_menu_min_width"
             android:paddingTop="12dp">
 

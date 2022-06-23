@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
@@ -45,12 +46,11 @@ public class GliaSurveyAnswerUseCase {
         }
         String surveyId = survey.getId();
         String engagementId = survey.getEngagementId();
-        repository.submitSurveyAnswers(answers, surveyId, engagementId, ignore -> {
-            callback.accept(null); // ignore the Glia exception
-        });
+        repository.submitSurveyAnswers(answers, surveyId, engagementId, callback::accept);
     }
 
-    private void validate(@Nullable List<QuestionItem> questions) throws SurveyValidationException {
+    @VisibleForTesting
+    public void validate(@Nullable List<QuestionItem> questions) throws SurveyValidationException {
         if (questions == null) {
             return;
         }
@@ -84,7 +84,8 @@ public class GliaSurveyAnswerUseCase {
         }
     }
 
-    private void trim(@Nullable List<QuestionItem> questions) {
+    @VisibleForTesting
+    public void trim(@Nullable List<QuestionItem> questions) {
         if (questions == null) {
             return;
         }

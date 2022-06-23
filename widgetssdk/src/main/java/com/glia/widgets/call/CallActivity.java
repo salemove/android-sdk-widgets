@@ -59,6 +59,7 @@ public class CallActivity extends AppCompatActivity {
             return;
         }
 
+        callView.setOnTitleUpdatedListener(this::setTitle);
         configuration = createConfiguration(getIntent());
         callView.setConfiguration(configuration);
         callView.setTheme(configuration.getRunTimeTheme());
@@ -76,6 +77,16 @@ public class CallActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             startCallWithPermissions();
         }
+
+        setActivityTitle();
+    }
+
+    private void setActivityTitle() {
+        setTitle(
+                getMediaType() == Engagement.MediaType.AUDIO
+                        ? R.string.glia_call_audio_app_bar_title
+                        : R.string.glia_call_video_app_bar_title
+        );
     }
 
     @Override

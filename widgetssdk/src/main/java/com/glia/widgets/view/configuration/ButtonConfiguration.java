@@ -1,6 +1,7 @@
 package com.glia.widgets.view.configuration;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -94,11 +95,11 @@ public class ButtonConfiguration implements Parcelable {
         public Builder() {
         }
 
-        public Builder(ButtonConfiguration buildTime) {
-            backgroundColor = buildTime.backgroundColor;
-            strokeColor = buildTime.strokeColor;
-            strokeWidth = buildTime.strokeWidth;
-            textConfiguration = buildTime.textConfiguration;
+        public Builder(ButtonConfiguration buttonConfiguration) {
+            backgroundColor = buttonConfiguration.backgroundColor;
+            strokeColor = buttonConfiguration.strokeColor;
+            strokeWidth = buttonConfiguration.strokeWidth;
+            textConfiguration = buttonConfiguration.textConfiguration;
         }
 
         public Builder backgroundColor(ColorStateList colorStateList) {
@@ -106,8 +107,18 @@ public class ButtonConfiguration implements Parcelable {
             return this;
         }
 
+        public Builder backgroundColor(String colorString) {
+            this.backgroundColor = ColorStateList.valueOf(Color.parseColor(colorString));
+            return this;
+        }
+
         public Builder strokeColor(ColorStateList colorStateList) {
             this.strokeColor = colorStateList;
+            return this;
+        }
+
+        public Builder strokeColor(String colorString) {
+            this.strokeColor = ColorStateList.valueOf(Color.parseColor(colorString));
             return this;
         }
 

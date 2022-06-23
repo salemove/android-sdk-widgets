@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/glia_large"
-                android:contentDescription="@string/glia_chat_media_upgrade_item_mic_content_description"
+                android:contentDescription="@string/glia_chat_audio_icon_content_description"
                 android:src="?attr/gliaIconChatAudioUpgrade"
                 app:layout_constraintEnd_toEndOf="@id/end_guideline"
                 app:layout_constraintStart_toStartOf="@id/start_guideline"

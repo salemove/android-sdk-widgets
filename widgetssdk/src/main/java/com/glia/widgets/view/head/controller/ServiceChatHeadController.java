@@ -22,7 +22,6 @@ import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadContract;
-import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 
 import java.util.Optional;
@@ -205,6 +204,17 @@ public class ServiceChatHeadController
         operatorProfileImgUrl = null;
         unreadMessagesCount = 0;
         updateChatHeadView();
+        if (chatHeadView != null) {
+            // Navigate to chat or call screen when engagement is ended to ensure that survey
+            // was shown (if enabled).
+            // This prevents starting a new engagement with active survey to the previous engagement:
+            // - visitor starts new chat engagement
+            // - visitor minimizes engagement (chat bubble is shown)
+            // - operator ends the engagement [call to onChatHeadClicked() opens chat/call screen]
+            // - [if onChatHeadClicked() is removed] visitor doesn't tap chat bubble and can start
+            // new engagement of another type and it will eventually lead to displaying two surveys
+            onChatHeadClicked();
+        }
     }
 
     private void newEngagementLoaded(OmnicoreEngagement engagement) {

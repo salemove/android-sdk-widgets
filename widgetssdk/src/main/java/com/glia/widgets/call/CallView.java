@@ -1112,6 +1112,11 @@ public class CallView extends ConstraintLayout {
         void onTitleUpdated(String title);
     }
 
+    @Deprecated
+    public boolean shouldShowMediaEngagementView() {
+        return shouldShowMediaEngagementView(false);
+    }
+
     public boolean shouldShowMediaEngagementView(boolean isUpgradeToCall) {
         if (callController != null) {
             return callController.shouldShowMediaEngagementView(isUpgradeToCall);

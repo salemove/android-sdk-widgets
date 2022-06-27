@@ -10,7 +10,6 @@ public class CallStateHelper {
     public final boolean landscapeLayoutControlsVisible;
     public final boolean isMuted;
     public final boolean hasVideo;
-    public final String queueTicketId;
     public final String companyName;
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
@@ -33,7 +32,6 @@ public class CallStateHelper {
         this.landscapeLayoutControlsVisible = landscapeLayoutControlsVisible;
         this.isMuted = isMuted;
         this.hasVideo = hasVideo;
-        this.queueTicketId = queueTicketId;
         this.companyName = companyName;
         this.requestedMediaType = requestedMediaType;
         this.isSpeakerOn = isSpeakerOn;
@@ -115,7 +113,6 @@ public class CallStateHelper {
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
             isMuted = callState.isMuted;
             hasVideo = callState.hasVideo;
-            queueTicketId = callState.queueTicketId;
             companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
@@ -130,7 +127,6 @@ public class CallStateHelper {
             landscapeLayoutControlsVisible = callState.landscapeLayoutControlsVisible;
             isMuted = callState.isMuted;
             hasVideo = callState.hasVideo;
-            queueTicketId = callState.queueTicketId;
             companyName = callState.companyName;
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
@@ -163,7 +159,6 @@ public class CallStateHelper {
                 .setLandscapeLayoutControlsVisible(landscapeLayoutControlsVisible)
                 .setIsMuted(isMuted)
                 .setHasVideo(hasVideo)
-                .setQueueTicketId(queueTicketId)
                 .setCompanyName(companyName)
                 .setRequestedMediaType(requestedMediaType)
                 .setIsSpeakerOn(isSpeakerOn)

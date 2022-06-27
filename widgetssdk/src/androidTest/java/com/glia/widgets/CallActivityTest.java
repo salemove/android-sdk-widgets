@@ -11,6 +11,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -79,7 +80,7 @@ public class CallActivityTest {
 
     @Test
     public void testCallViewInvisible() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -97,7 +98,7 @@ public class CallActivityTest {
 
     @Test
     public void testCallViewVisible() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -115,7 +116,7 @@ public class CallActivityTest {
 
     @Test
     public void testMinimizeButtonContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -134,7 +135,7 @@ public class CallActivityTest {
 
     @Test
     public void testSpeakerButtonOnContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -154,7 +155,7 @@ public class CallActivityTest {
 
     @Test
     public void testSpeakerButtonOffContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -174,7 +175,7 @@ public class CallActivityTest {
 
     @Test
     public void testMuteButtonContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -194,7 +195,7 @@ public class CallActivityTest {
 
     @Test
     public void testUnmuteButtonContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -214,7 +215,7 @@ public class CallActivityTest {
 
     @Test
     public void testVideoButtonOnContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -234,7 +235,7 @@ public class CallActivityTest {
 
     @Test
     public void testVideoButtonOffContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -254,7 +255,7 @@ public class CallActivityTest {
 
     @Test
     public void testChatButtonZeroMessagesContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -274,7 +275,7 @@ public class CallActivityTest {
 
     @Test
     public void testChatButtonPluralsMessagesContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -294,7 +295,7 @@ public class CallActivityTest {
 
     @Test
     public void testConnectingViewContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -313,7 +314,7 @@ public class CallActivityTest {
 
     @Test
     public void testVisitorVideoContainerContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -332,7 +333,7 @@ public class CallActivityTest {
 
     @Test
     public void testOperatorVideoContainerContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -351,7 +352,7 @@ public class CallActivityTest {
 
     @Test
     public void testEndButtonContentDescription() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -370,7 +371,7 @@ public class CallActivityTest {
 
     @Test
     public void testNavigateUpButtonContentDescription() throws InterruptedException {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> scenario = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -392,7 +393,7 @@ public class CallActivityTest {
 
     @Test
     public void testCompanyNameHint() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -411,7 +412,7 @@ public class CallActivityTest {
 
     @Test
     public void testOperatorNameHint() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);
@@ -430,7 +431,7 @@ public class CallActivityTest {
 
     @Test
     public void testCallDurationHint() {
-        when(callController.shouldShowMediaEngagementView(any())).thenReturn(true);
+        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 
         try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
             CallStatus callStatus = mock(CallStatus.class);

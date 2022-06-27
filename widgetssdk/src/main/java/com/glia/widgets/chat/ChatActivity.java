@@ -23,13 +23,11 @@ public class ChatActivity extends AppCompatActivity {
         if (chatView.backPressed()) finish();
     };
 
-    // TODO deprecate UiTheme pass GliaSdkConfiguration instead (remove global sdk configuration holder in ChatActivity)
     private ChatView.OnNavigateToCallListener onNavigateToCallListener =
             (UiTheme theme, String mediaType) -> {
                 navigateToCall(mediaType);
                 chatView.navigateToCallSuccess();
             };
-    // TODO deprecate UiTheme pass GliaSdkConfiguration instead (remove global sdk configuration holder in ChatActivity)
     private ChatView.OnNavigateToSurveyListener onNavigateToSurveyListener =
             (UiTheme theme, Survey survey) -> {
                 navigateToSurvey(theme, survey);

@@ -17,9 +17,8 @@ class CallIntentReader {
         this.activity = activity;
     }
 
-    public CallActivity.Configuration getConfiguration() {
-        return CallActivity.Configuration.Builder
-                .builder()
+    public Configuration getConfiguration() {
+        return new Configuration.Builder()
                 .setWidgetsConfiguration(getSdkConfiguration())
                 .setMediaType(getMediaType())
                 .setIsUpgradeToCall(getIsUpgradeToCall())

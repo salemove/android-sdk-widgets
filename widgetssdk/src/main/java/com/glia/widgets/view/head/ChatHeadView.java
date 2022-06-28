@@ -23,6 +23,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
@@ -143,8 +144,8 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
 
     @Override
     public void navigateToCall() {
-        CallActivity.Configuration activityConfig =
-                new CallActivity.Configuration.Builder()
+        Configuration activityConfig =
+                new Configuration.Builder()
                         .setWidgetsConfiguration(sdkConfiguration)
                         .build();
 

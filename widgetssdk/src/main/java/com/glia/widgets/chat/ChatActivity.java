@@ -13,6 +13,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
@@ -119,8 +120,7 @@ public class ChatActivity extends AppCompatActivity {
         startActivity(
                 CallActivity.getIntent(
                         getApplicationContext(),
-                        CallActivity.Configuration.Builder
-                                .builder()
+                        new Configuration.Builder()
                                 .setWidgetsConfiguration(configuration)
                                 .setMediaType(Utils.toMediaType(mediaType))
                                 .setIsUpgradeToCall(true)

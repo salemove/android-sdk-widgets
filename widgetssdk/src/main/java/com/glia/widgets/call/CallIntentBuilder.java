@@ -10,7 +10,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 
 class CallIntentBuilder {
     private final Context context;
-    private CallActivity.Configuration configuration;
+    private Configuration configuration;
 
     private CallIntentBuilder(@NonNull Context context) {
         this.context = context;
@@ -20,7 +20,7 @@ class CallIntentBuilder {
         return new CallIntentBuilder(context);
     }
 
-    public CallIntentBuilder setConfiguration(@NonNull CallActivity.Configuration configuration) {
+    public CallIntentBuilder setConfiguration(@NonNull Configuration configuration) {
         this.configuration = configuration;
         return this;
     }

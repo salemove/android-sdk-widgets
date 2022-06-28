@@ -18,6 +18,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.head.ChatHeadLayout;
@@ -82,7 +83,7 @@ public class MainFragment extends Fragment {
     ) {
         GliaSdkConfiguration configuration = getConfiguration();
 
-        CallActivity.Configuration activityConfig = CallActivity.Configuration.Builder
+        Configuration activityConfig = Configuration.Builder
                 .builder()
                 .setWidgetsConfiguration(configuration)
                 .setMediaType(mediaType)

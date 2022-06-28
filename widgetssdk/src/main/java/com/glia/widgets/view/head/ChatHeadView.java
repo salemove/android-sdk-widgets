@@ -144,7 +144,7 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
     @Override
     public void navigateToCall() {
         CallActivity.Configuration activityConfig =
-                CallActivity.Configuration.Builder.builder()
+                new CallActivity.Configuration.Builder()
                         .setWidgetsConfiguration(sdkConfiguration)
                         .build();
 

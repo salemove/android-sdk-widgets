@@ -58,7 +58,7 @@ public class CallActivity extends AppCompatActivity {
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
         configuration =
-                IntentReader.from(this)
+                CallIntentReader.from(this)
                         .getConfiguration();
 
         if (!callView.shouldShowMediaEngagementView(configuration.isUpgradeToCall)) {
@@ -234,7 +234,7 @@ public class CallActivity extends AppCompatActivity {
             Context context,
             CallActivity.Configuration configuration
     ) {
-        return IntentBuilder
+        return CallIntentBuilder
                 .from(context)
                 .setConfiguration(configuration)
                 .getIntent();
@@ -318,88 +318,6 @@ public class CallActivity extends AppCompatActivity {
             public static Builder builder() {
                 return new Builder();
             }
-        }
-    }
-
-    private static class IntentBuilder {
-        private final Context context;
-        private Configuration configuration;
-
-        private IntentBuilder(@NonNull Context context) {
-            this.context = context;
-        }
-
-        public static IntentBuilder from(@NonNull Context context) {
-            return new IntentBuilder(context);
-        }
-
-        public IntentBuilder setConfiguration(@NonNull Configuration configuration) {
-            this.configuration = configuration;
-            return this;
-        }
-
-        public Intent getIntent() {
-            if (configuration == null) throw new RuntimeException("Configuration " +
-                    "missing");
-
-            Intent intent = new Intent(context, CallActivity.class);
-            intent.putExtra(GliaWidgets.COMPANY_NAME, configuration.sdkConfiguration.getCompanyName());
-            intent.putExtra(GliaWidgets.QUEUE_ID, configuration.sdkConfiguration.getQueueId());
-            intent.putExtra(GliaWidgets.CONTEXT_URL, configuration.sdkConfiguration.getContextUrl());
-            intent.putExtra(GliaWidgets.UI_THEME, configuration.sdkConfiguration.getRunTimeTheme());
-            intent.putExtra(GliaWidgets.USE_OVERLAY, configuration.sdkConfiguration.getUseOverlay());
-            intent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, configuration.sdkConfiguration.getScreenSharingMode());
-            intent.putExtra(GliaWidgets.MEDIA_TYPE, configuration.getMediaType());
-            intent.putExtra(GliaWidgets.IS_UPGRADE_TO_CALL, configuration.getIsUpgradeToCall());
-            return intent;
-        }
-    }
-
-    private static class IntentReader {
-        private final AppCompatActivity activity;
-
-        private IntentReader(@NonNull AppCompatActivity activity) {
-            this.activity = activity;
-        }
-
-        public Configuration getConfiguration() {
-            return Configuration.Builder
-                    .builder()
-                    .setWidgetsConfiguration(getSdkConfiguration())
-                    .setMediaType(getMediaType())
-                    .setIsUpgradeToCall(getIsUpgradeToCall())
-                    .build();
-        }
-
-        public static IntentReader from(@NonNull AppCompatActivity activity) {
-            return new IntentReader(activity);
-        }
-
-        @NonNull
-        private Intent getIntent() {
-            return activity.getIntent();
-        }
-
-        @Nullable
-        private GliaSdkConfiguration getSdkConfiguration() {
-            return new GliaSdkConfiguration
-                    .Builder()
-                    .intent(getIntent())
-                    .build();
-        }
-
-        private Engagement.MediaType getMediaType() {
-            if (getIntent().hasExtra(GliaWidgets.MEDIA_TYPE)) {
-                return (Engagement.MediaType) getIntent().getSerializableExtra(GliaWidgets.MEDIA_TYPE);
-            }
-            return Engagement.MediaType.AUDIO;
-        }
-
-        private Boolean getIsUpgradeToCall() {
-            if (getIntent().hasExtra(GliaWidgets.IS_UPGRADE_TO_CALL)) {
-                return getIntent().getBooleanExtra(GliaWidgets.IS_UPGRADE_TO_CALL, false);
-            }
-            return false;
         }
     }
 }

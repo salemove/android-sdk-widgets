@@ -1,7 +1,5 @@
 package com.glia.widgets.chat;
 
-import static com.glia.widgets.call.CallActivity.toMediaType;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -16,6 +14,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
@@ -123,7 +122,7 @@ public class ChatActivity extends AppCompatActivity {
                         CallActivity.Configuration.Builder
                                 .builder()
                                 .setWidgetsConfiguration(configuration)
-                                .setMediaType(toMediaType(mediaType))
+                                .setMediaType(Utils.toMediaType(mediaType))
                                 .setIsUpgradeToCall(true)
                                 .build()
                 )

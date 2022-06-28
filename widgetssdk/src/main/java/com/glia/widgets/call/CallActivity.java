@@ -21,6 +21,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 
 import java.security.InvalidParameterException;
@@ -225,7 +226,7 @@ public class CallActivity extends AppCompatActivity {
                 Configuration.Builder
                         .builder()
                         .setWidgetsConfiguration(sdkConfiguration)
-                        .setMediaType(toMediaType(mediaType))
+                        .setMediaType(Utils.toMediaType(mediaType))
                         .build()
         );
     }
@@ -238,17 +239,6 @@ public class CallActivity extends AppCompatActivity {
                 .from(context)
                 .setConfiguration(configuration)
                 .getIntent();
-    }
-
-    public static Engagement.MediaType toMediaType(String mediaType) {
-        switch (mediaType) {
-            case GliaWidgets.MEDIA_TYPE_VIDEO:
-                return Engagement.MediaType.VIDEO;
-            case GliaWidgets.MEDIA_TYPE_AUDIO:
-                return Engagement.MediaType.AUDIO;
-            default:
-                throw new InvalidParameterException("Invalid Media Type");
-        }
     }
 
     public static class Configuration {
@@ -290,7 +280,7 @@ public class CallActivity extends AppCompatActivity {
             }
 
             public Builder setMediaType(String mediaType) {
-                this.mediaType = toMediaType(mediaType);
+                this.mediaType = Utils.toMediaType(mediaType);
                 return this;
             }
 

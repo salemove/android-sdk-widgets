@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 public class GliaScreenSharingRepositoryTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     public void init_callsOnScreenSharingRequest_whenRequested() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
         GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
@@ -48,6 +49,7 @@ public class GliaScreenSharingRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void onScreenSharingAccepted_callsOnScreenSharingRequestSuccess_whenNoException() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
         GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
@@ -78,6 +80,7 @@ public class GliaScreenSharingRepositoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void onScreenSharingAccepted_callsOnScreenSharingRequestError_whenException() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
         GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);

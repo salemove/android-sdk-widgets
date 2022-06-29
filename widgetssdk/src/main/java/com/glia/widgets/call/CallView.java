@@ -473,12 +473,11 @@ public class CallView extends ConstraintLayout {
     private void handleOperatorStatusViewState(CallState state) {
         operatorStatusView.setShowRippleAnimation(state.showOperatorStatusViewRippleAnimation());
         operatorStatusView.setShowOnHold(state.showOnHold());
-        if (!state.isTransferring()) {
-            handleOperatorStatusViewOperatorImage(state);
-
-        } else {
+        if (state.isTransferring()) {
             operatorStatusView.showTransferring();
             operatorNameView.setText(R.string.glia_chat_visitor_status_transferring);
+        } else {
+            handleOperatorStatusViewOperatorImage(state);
         }
         operatorStatusView.setVisibility(state.showOperatorStatusView() ? VISIBLE : GONE);
     }

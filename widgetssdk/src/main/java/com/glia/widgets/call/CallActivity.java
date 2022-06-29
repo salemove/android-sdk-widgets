@@ -9,6 +9,7 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
@@ -17,10 +18,10 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
-import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class CallActivity extends AppCompatActivity {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private GliaSdkConfiguration configuration;
+    private Configuration configuration;
 
     private CallView callView;
     private CallView.OnBackClickedListener onBackClickedListener = this::finish;
@@ -56,15 +57,18 @@ public class CallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
-        if (!callView.shouldShowMediaEngagementView(isUpgrade())) {
+        configuration =
+                CallIntentReader.from(this)
+                        .getConfiguration();
+
+        if (!callView.shouldShowMediaEngagementView(configuration.getIsUpgradeToCall())) {
             finishAndRemoveTask();
             return;
         }
 
         callView.setOnTitleUpdatedListener(this::setTitle);
-        configuration = createConfiguration(getIntent());
-        callView.setConfiguration(configuration);
-        callView.setTheme(configuration.getRunTimeTheme());
+        callView.setConfiguration(configuration.getSdkConfiguration());
+        callView.setTheme(configuration.getSdkConfiguration().getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
@@ -80,15 +84,18 @@ public class CallActivity extends AppCompatActivity {
             startCallWithPermissions();
         }
 
-        setActivityTitle();
+        setTitle(getTitleText());
     }
 
-    private void setActivityTitle() {
-        setTitle(
-                getMediaType() == Engagement.MediaType.AUDIO
-                        ? R.string.glia_call_audio_app_bar_title
-                        : R.string.glia_call_video_app_bar_title
-        );
+    @StringRes
+    private int getTitleText() {
+        switch (configuration.getMediaType()) {
+            case VIDEO:
+                return R.string.glia_call_video_app_bar_title;
+            case AUDIO:
+            default:
+                return R.string.glia_call_audio_app_bar_title;
+        }
     }
 
     @Override
@@ -134,19 +141,12 @@ public class CallActivity extends AppCompatActivity {
         permissionSubject.onNext(new Pair<>(requestCode, convertedGrantResults));
     }
 
-    private GliaSdkConfiguration createConfiguration(Intent intent) {
-        return new GliaSdkConfiguration.Builder()
-                .intent(intent)
-                .build();
-    }
-
     private void startCallWithPermissions() {
         List<String> missingPermissions = new ArrayList<>();
-        Engagement.MediaType mediaType = getMediaType();
-        if (mediaType == Engagement.MediaType.VIDEO && missingPermission(Manifest.permission.CAMERA)) {
+        if (configuration.getMediaType() == Engagement.MediaType.VIDEO && missingPermission(Manifest.permission.CAMERA)) {
             missingPermissions.add(Manifest.permission.CAMERA);
         }
-        if ((mediaType == Engagement.MediaType.VIDEO || mediaType == Engagement.MediaType.AUDIO)
+        if ((configuration.getMediaType() == Engagement.MediaType.VIDEO || configuration.getMediaType() == Engagement.MediaType.AUDIO)
                 && missingPermission(Manifest.permission.RECORD_AUDIO)) {
             missingPermissions.add(Manifest.permission.RECORD_AUDIO);
         }
@@ -186,72 +186,58 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void onCallPermissionsAvailable() {
+        GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
         callView.startCall(
-                configuration.getCompanyName(),
-                configuration.getQueueId(),
-                configuration.getContextUrl(),
-                configuration.getUseOverlay(),
-                configuration.getScreenSharingMode(),
-                getMediaType()
+                sdkConfiguration.getCompanyName(),
+                sdkConfiguration.getQueueId(),
+                sdkConfiguration.getContextUrl(),
+                sdkConfiguration.getUseOverlay(),
+                sdkConfiguration.getScreenSharingMode(),
+                configuration.getMediaType()
         );
-    }
-
-    private Engagement.MediaType getMediaType() {
-        String mediaType = getIntent().getStringExtra(GliaWidgets.MEDIA_TYPE);
-        if (mediaType != null && mediaType.equals(GliaWidgets.MEDIA_TYPE_VIDEO)) {
-            return Engagement.MediaType.VIDEO;
-        } else {
-            return Engagement.MediaType.AUDIO;
-        }
-    }
-
-    private boolean isUpgrade() {
-        return getIntent().getBooleanExtra(GliaWidgets.IS_UPGRADE_TO_CALL, false);
     }
 
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
+        GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
-        newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
-        newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, configuration.getScreenSharingMode());
+        newIntent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
+        newIntent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
+        newIntent.putExtra(GliaWidgets.CONTEXT_URL, sdkConfiguration.getContextUrl());
+        newIntent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
+        newIntent.putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay());
+        newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
         startActivity(newIntent);
     }
 
     private void navigateToSurvey(Survey survey) {
         Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class);
-        newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getRunTimeTheme());
+        newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getSdkConfiguration().getRunTimeTheme());
         newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
     }
 
-    // TODO create builder class
+    @Deprecated
     public static Intent getIntent(
             Context applicationContext,
             GliaSdkConfiguration sdkConfiguration,
             String mediaType
     ) {
-        return getIntent(applicationContext, sdkConfiguration, mediaType, false);
+        return getIntent(applicationContext,
+                new Configuration.Builder()
+                        .setWidgetsConfiguration(sdkConfiguration)
+                        .setMediaType(Utils.toMediaType(mediaType))
+                        .build()
+        );
     }
 
     public static Intent getIntent(
-            Context applicationContext,
-            GliaSdkConfiguration sdkConfiguration,
-            String mediaType,
-            boolean isUpgradeToCall
+            Context context,
+            Configuration configuration
     ) {
-        Intent intent = new Intent(applicationContext, CallActivity.class);
-        intent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
-        intent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
-        intent.putExtra(GliaWidgets.CONTEXT_URL, sdkConfiguration.getContextUrl());
-        intent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
-        intent.putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay());
-        intent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
-        intent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
-        intent.putExtra(GliaWidgets.IS_UPGRADE_TO_CALL, isUpgradeToCall);
-        return intent;
+        return CallIntentBuilder
+                .from(context)
+                .setConfiguration(configuration)
+                .getIntent();
     }
 }

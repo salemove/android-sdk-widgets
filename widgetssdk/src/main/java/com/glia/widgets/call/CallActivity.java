@@ -217,6 +217,14 @@ public class CallActivity extends AppCompatActivity {
         startActivity(newIntent);
     }
 
+    /**
+     * Creates and fills out Intent for starting CallActivity
+     * @deprecated use {@link getIntent(Context, Configuration)} since 1.8.2
+     * @param applicationContext - application context
+     * @param sdkConfiguration - widgets sdk configuration
+     * @param mediaType - media type that should be started (in case media engagement not ongoing)
+     * @return Intent for starting CallActivity
+     */
     @Deprecated
     public static Intent getIntent(
             Context applicationContext,
@@ -231,6 +239,12 @@ public class CallActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Creates and fills out Intent for starting CallActivity
+     * @param context - Context object
+     * @param configuration - CallActivity configuration
+     * @return - Intent for Starting CallActivity
+     */
     public static Intent getIntent(
             Context context,
             Configuration configuration

@@ -110,6 +110,16 @@ public class OperatorStatusView extends ConstraintLayout {
         );
     }
 
+    public void showTransferring() {
+        profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
+        updateProfilePictureViewSize(operatorImageSize);
+        updatePlaceholderView(
+                operatorImageSize,
+                operatorImageContentPadding,
+                VISIBLE
+        );
+    }
+
     public void showPlaceHolderWithIconPaddingOnConnect() {
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable);
         updateProfilePictureViewSize(operatorImageLargeSize);

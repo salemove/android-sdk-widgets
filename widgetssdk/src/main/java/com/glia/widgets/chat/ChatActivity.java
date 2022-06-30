@@ -13,7 +13,9 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
@@ -22,9 +24,10 @@ public class ChatActivity extends AppCompatActivity {
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
     };
+
     private ChatView.OnNavigateToCallListener onNavigateToCallListener =
             (UiTheme theme, String mediaType) -> {
-                navigateToCall(theme, mediaType);
+                navigateToCall(mediaType);
                 chatView.navigateToCallSuccess();
             };
     private ChatView.OnNavigateToSurveyListener onNavigateToSurveyListener =
@@ -113,15 +116,17 @@ public class ChatActivity extends AppCompatActivity {
                 .build();
     }
 
-    private void navigateToCall(UiTheme theme, String mediaType) {
-        Intent newIntent = new Intent(getApplicationContext(), CallActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, configuration.getCompanyName());
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, configuration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, configuration.getContextUrl());
-        newIntent.putExtra(GliaWidgets.UI_THEME, theme);
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, configuration.getUseOverlay());
-        newIntent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
-        startActivity(newIntent);
+    private void navigateToCall(String mediaType) {
+        startActivity(
+                CallActivity.getIntent(
+                        getApplicationContext(),
+                        new Configuration.Builder()
+                                .setWidgetsConfiguration(configuration)
+                                .setMediaType(Utils.toMediaType(mediaType))
+                                .setIsUpgradeToCall(true)
+                                .build()
+                )
+        );
     }
 
     private void navigateToSurvey(UiTheme theme, Survey survey) {
@@ -130,5 +135,4 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
     }
-
 }

@@ -1,45 +1,46 @@
 package com.glia.widgets.core.engagement.domain;
 
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
+import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
+import com.glia.widgets.core.queue.model.GliaQueueingState;
 
 public class ShouldShowMediaEngagementViewUseCase {
     private final GliaEngagementRepository engagementRepository;
-    private final GliaOperatorMediaRepository operatorMediaRepository;
     private final GliaQueueRepository queueRepository;
+    private final GliaEngagementTypeRepository gliaEngagementTypeRepository;
 
     public ShouldShowMediaEngagementViewUseCase(
             GliaEngagementRepository repository,
-            GliaOperatorMediaRepository operatorMediaRepository,
-            GliaQueueRepository queueRepository
+            GliaQueueRepository queueRepository,
+            GliaEngagementTypeRepository gliaEngagementTypeRepository
     ) {
         this.engagementRepository = repository;
-        this.operatorMediaRepository = operatorMediaRepository;
         this.queueRepository = queueRepository;
+        this.gliaEngagementTypeRepository = gliaEngagementTypeRepository;
     }
 
-    public boolean execute() {
-        return isNoQueueingAndIsNoEngagementOrIsMediaEngagement() || isMediaQueueing();
-    }
-
-    private boolean isNoQueueingAndIsNoEngagementOrIsMediaEngagement() {
-        return isNoQueueing() && (
+    public boolean execute(boolean isUpgradeToCall) {
+        return hasNoQueueingAndEngagementOngoing() ||
+                hasMediaQueueingOngoing() ||
                 hasOngoingMediaEngagement() ||
-                        hasNoOngoingEngagement());
+                isUpgradeToCall;
     }
 
-    private boolean isNoQueueing() {
-        return queueRepository.isNoQueueingOngoing();
+    private boolean hasNoQueueingAndEngagementOngoing() {
+        return hasNoQueueingOngoing() && hasNoOngoingEngagement();
     }
 
-    private boolean isMediaQueueing() {
-        return queueRepository.isMediaQueueingOngoing();
+    private boolean hasNoQueueingOngoing() {
+        return queueRepository.getQueueingState() instanceof GliaQueueingState.None;
+    }
+
+    private boolean hasMediaQueueingOngoing() {
+        return queueRepository.getQueueingState() instanceof GliaQueueingState.Media;
     }
 
     private boolean hasOngoingMediaEngagement() {
-        return engagementRepository.hasOngoingEngagement() &&
-                (engagementRepository.isMediaEngagement() || operatorMediaRepository.isOperatorMediaState());
+        return gliaEngagementTypeRepository.isMediaEngagement();
     }
 
     private boolean hasNoOngoingEngagement() {

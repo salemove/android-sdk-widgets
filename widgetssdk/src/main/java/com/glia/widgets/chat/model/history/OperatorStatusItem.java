@@ -36,7 +36,10 @@ public class OperatorStatusItem extends ChatItem {
     }
 
     public enum Status {
-        IN_QUEUE, OPERATOR_CONNECTED
+        IN_QUEUE,
+        OPERATOR_CONNECTED,
+        JOINED,
+        TRANSFERRING
     }
 
     public static OperatorStatusItem QueueingStatusItem(String companyName) {
@@ -45,6 +48,14 @@ public class OperatorStatusItem extends ChatItem {
 
     public static OperatorStatusItem OperatorFoundStatusItem(String companyName, String operatorName, String profileImgUrl) {
         return new OperatorStatusItem(Status.OPERATOR_CONNECTED, companyName, operatorName, profileImgUrl);
+    }
+
+    public static OperatorStatusItem OperatorJoinedStatusItem(String companyName, String operatorName, String profileImgUrl) {
+        return new OperatorStatusItem(Status.JOINED, companyName, operatorName, profileImgUrl);
+    }
+
+    public static OperatorStatusItem TransferringStatusItem() {
+        return new OperatorStatusItem(Status.TRANSFERRING, null, null, null);
     }
 
     @Override

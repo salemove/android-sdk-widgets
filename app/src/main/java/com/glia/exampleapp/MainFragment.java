@@ -14,9 +14,13 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
+import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
@@ -74,11 +78,37 @@ public class MainFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void navigateToCall(String mediaType) {
-        Intent intent = new Intent(requireContext(), CallActivity.class);
-        setNavigationIntentData(intent);
-        intent.putExtra(GliaWidgets.MEDIA_TYPE, mediaType);
+    private void navigateToCall(
+            String mediaType
+    ) {
+        GliaSdkConfiguration configuration = getConfiguration();
+
+        Configuration activityConfig = Configuration.Builder
+                .builder()
+                .setWidgetsConfiguration(configuration)
+                .setMediaType(mediaType)
+                .build();
+
+        Intent intent = CallActivity.getIntent(
+                requireContext(),
+                activityConfig
+        );
+
         startActivity(intent);
+    }
+
+    private GliaSdkConfiguration getConfiguration() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(requireContext());
+
+        return new GliaSdkConfiguration.Builder()
+                .companyName(getCompanyNameFromPrefs(sharedPreferences))
+                .contextUrl(getContextUrlFromPrefs(sharedPreferences))
+                .queueId(getQueueIdFromPrefs(sharedPreferences))
+                .runTimeTheme(getRuntimeThemeFromPrefs(sharedPreferences))
+                .screenSharingMode(getScreenSharingModeFromPrefs(sharedPreferences))
+                .useOverlay(getUseOverlay(sharedPreferences))
+                .build();
     }
 
     private void setNavigationIntentData(Intent intent) {
@@ -87,42 +117,66 @@ public class MainFragment extends Fragment {
 
         intent.putExtra(
                 GliaWidgets.COMPANY_NAME,
-                Utils.getStringFromPrefs(
-                        R.string.pref_company_name,
-                        "",
-                        sharedPreferences,
-                        getResources()
-                )
+                getCompanyNameFromPrefs(sharedPreferences)
         );
         intent.putExtra(
                 GliaWidgets.QUEUE_ID,
-                Utils.getStringFromPrefs(
-                        R.string.pref_queue_id,
-                        getString(R.string.default_queue_id),
-                        sharedPreferences,
-                        getResources()
-                )
+                getQueueIdFromPrefs(sharedPreferences)
         );
         intent.putExtra(
                 GliaWidgets.CONTEXT_URL,
-                Utils.getStringFromPrefs(
-                        R.string.pref_context_url,
-                        getString(R.string.default_queue_id),
-                        sharedPreferences,
-                        getResources()
-                )
+                getContextUrlFromPrefs(sharedPreferences)
         );
         intent.putExtra(
                 GliaWidgets.UI_THEME,
-                Utils.getUiThemeByPrefs(sharedPreferences, getResources())
+                getRuntimeThemeFromPrefs(sharedPreferences)
         );
         intent.putExtra(
                 GliaWidgets.USE_OVERLAY,
-                Utils.getUseOverlay(sharedPreferences, getResources())
+                getUseOverlay(sharedPreferences)
         );
         intent.putExtra(
                 GliaWidgets.SCREEN_SHARING_MODE,
-                Utils.getScreenSharingModeFromPrefs(sharedPreferences, getResources())
+                getScreenSharingModeFromPrefs(sharedPreferences)
+        );
+    }
+
+    private Boolean getUseOverlay(SharedPreferences sharedPreferences) {
+        return Utils.getUseOverlay(sharedPreferences, getResources());
+    }
+
+    private ScreenSharing.Mode getScreenSharingModeFromPrefs(SharedPreferences sharedPreferences) {
+        return Utils.getScreenSharingModeFromPrefs(sharedPreferences, getResources());
+    }
+
+    private UiTheme getRuntimeThemeFromPrefs(SharedPreferences sharedPreferences) {
+        return Utils.getUiThemeByPrefs(sharedPreferences, getResources());
+    }
+
+    private String getQueueIdFromPrefs(SharedPreferences sharedPreferences) {
+        return Utils.getStringFromPrefs(
+                R.string.pref_queue_id,
+                getString(R.string.default_queue_id),
+                sharedPreferences,
+                getResources()
+        );
+    }
+
+    private String getContextUrlFromPrefs(SharedPreferences sharedPreferences) {
+        return Utils.getStringFromPrefs(
+                R.string.pref_context_url,
+                getString(R.string.default_queue_id),
+                sharedPreferences,
+                getResources()
+        );
+    }
+
+    private String getCompanyNameFromPrefs(SharedPreferences sharedPreferences) {
+        return Utils.getStringFromPrefs(
+                R.string.pref_company_name,
+                "",
+                sharedPreferences,
+                getResources()
         );
     }
 }

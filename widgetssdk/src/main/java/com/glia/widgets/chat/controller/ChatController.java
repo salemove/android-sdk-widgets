@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
@@ -44,10 +45,12 @@ import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorMessageItem;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.engagement.domain.OnUpgradeToMediaEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
+import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
@@ -62,12 +65,9 @@ import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCas
 import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
-import com.glia.widgets.core.queue.QueueTicketsEventsListener;
-import com.glia.widgets.core.queue.domain.GetIsQueueingOngoingUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
-import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
-import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
+import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
 import com.glia.widgets.core.survey.OnSurveyListener;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.di.Dependencies;
@@ -87,6 +87,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -107,32 +108,8 @@ public class ChatController implements
     private final MinimizeHandler minimizeHandler;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
 
-    private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
-        @Override
-        public void onTicketReceived(String ticketId) {
-            onQueueTicketReceived(ticketId);
-        }
-
-        @Override
-        public void started() {
-            queueForEngagementStarted();
-        }
-
-        @Override
-        public void ongoing() {
-            queueForEngagementOngoing();
-        }
-
-        @Override
-        public void stopped() {
-            queueForEngagementStopped();
-        }
-
-        @Override
-        public void error(GliaException exception) {
-            queueForEngagementError(exception);
-        }
-    };
+    private final CompositeDisposable disposable = new CompositeDisposable();
+    private Disposable engagementStateEventDisposable = null;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
@@ -174,7 +151,6 @@ public class ChatController implements
     private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
     private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private final GliaLoadHistoryUseCase loadHistoryUseCase;
-    private final GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase;
     private final GliaOnEngagementUseCase getEngagementUseCase;
     private final GliaOnEngagementEndUseCase engagementEndUseCase;
     private final GliaOnMessageUseCase onMessageUseCase;
@@ -185,7 +161,6 @@ public class ChatController implements
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final GliaQueueForChatEngagementUseCase queueForChatEngagementUseCase;
-    private final OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase;
     private final AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase;
     private final RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase;
     private final AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase;
@@ -196,13 +171,11 @@ public class ChatController implements
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final DownloadFileUseCase downloadFileUseCase;
     private final IsEnableChatEditTextUseCase isEnableChatEditTextUseCase;
-    private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
-    private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
     private final SiteInfoUseCase siteInfoUseCase;
     private final GliaSurveyUseCase surveyUseCase;
+    private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
 
     private boolean isVisitorEndEngagement = false;
-    private Disposable disposable = null;
 
     // TODO pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
@@ -227,9 +200,7 @@ public class ChatController implements
             GliaSendMessageUseCase gliaSendMessageUseCase,
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
-            GetIsQueueingOngoingUseCase getIsQueueingOngoingUseCase,
             GliaEndEngagementUseCase endEngagementUseCase,
-            OnUpgradeToMediaEngagementUseCase onUpgradeToMediaEngagementUseCase,
             AddFileToAttachmentAndUploadUseCase addFileToAttachmentAndUploadUseCase,
             AddFileAttachmentsObserverUseCase addFileAttachmentsObserverUseCase,
             RemoveFileAttachmentObserverUseCase removeFileAttachmentObserverUseCase,
@@ -240,10 +211,9 @@ public class ChatController implements
             IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
             DownloadFileUseCase downloadFileUseCase,
             IsEnableChatEditTextUseCase isEnableChatEditTextUseCase,
-            SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
-            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
             SiteInfoUseCase siteInfoUseCase,
-            GliaSurveyUseCase surveyUseCase
+            GliaSurveyUseCase surveyUseCase,
+            GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase
     ) {
         Logger.d(TAG, "constructor");
 
@@ -254,7 +224,6 @@ public class ChatController implements
         }
 
         this.chatState = new ChatState.Builder()
-                .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
                 .setCompanyName(null)
@@ -293,8 +262,6 @@ public class ChatController implements
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
-        this.getIsQueueingOngoingUseCase = getIsQueueingOngoingUseCase;
-        this.onUpgradeToMediaEngagementUseCase = onUpgradeToMediaEngagementUseCase;
         this.addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase;
         this.addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase;
         this.removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase;
@@ -305,10 +272,9 @@ public class ChatController implements
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.downloadFileUseCase = downloadFileUseCase;
         this.isEnableChatEditTextUseCase = isEnableChatEditTextUseCase;
-        this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
-        this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
         this.siteInfoUseCase = siteInfoUseCase;
         this.surveyUseCase = surveyUseCase;
+        this.getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -352,19 +318,21 @@ public class ChatController implements
         minimizeHandler.addListener(this::minimizeView);
         createNewTimerCallback();
         callTimer.addFormattedValueListener(timerStatusListener);
-        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
-        if (getIsQueueingOngoingUseCase.execute()) {
-            queueForEngagementOngoing();
-        }
-
         updateAllowFileSendState();
     }
 
     private void queueForEngagement() {
         Logger.d(TAG, "queueForEngagement");
-        queueForChatEngagementUseCase.execute(
-                chatState.queueId,
-                chatState.contextUrl
+        disposable.add(
+                queueForChatEngagementUseCase
+                        .execute(
+                                chatState.queueId,
+                                chatState.contextUrl
+                        )
+                        .subscribe(
+                                this::queueForEngagementStarted,
+                                this::queueForEngagementError
+                        )
         );
     }
 
@@ -394,8 +362,8 @@ public class ChatController implements
             viewCallback = null;
         }
 
-        if (disposable != null) disposable.dispose();
         if (!retain) {
+            disposable.dispose();
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
             timerStatusListener = null;
@@ -410,7 +378,6 @@ public class ChatController implements
             onMessageUseCase.unregisterListener();
             onOperatorTypingUseCase.unregisterListener();
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver);
-            unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         }
     }
 
@@ -597,6 +564,67 @@ public class ChatController implements
         Logger.d(TAG, "onResume\n");
         messagesNotSeenHandler.callChatButtonClicked();
         surveyUseCase.registerListener(this);
+        subscribeToEngagementStateChange();
+    }
+
+    private void subscribeToEngagementStateChange() {
+        if (engagementStateEventDisposable != null) engagementStateEventDisposable.dispose();
+        engagementStateEventDisposable = getGliaEngagementStateFlowableUseCase
+                .execute()
+                .subscribe(
+                        this::onEngagementStateChanged,
+                        throwable -> Logger.e(TAG, throwable.getMessage())
+                );
+        disposable.add(engagementStateEventDisposable);
+    }
+
+    private void onEngagementStateChanged(EngagementStateEvent engagementState) {
+        EngagementStateEventVisitor<Operator> visitor = new EngagementStateEventVisitor.OperatorVisitor();
+        switch (engagementState.getType()) {
+            case ENGAGEMENT_OPERATOR_CHANGED:
+                onOperatorChanged(visitor.visit(engagementState));
+                break;
+            case ENGAGEMENT_OPERATOR_CONNECTED:
+                onOperatorConnected(visitor.visit(engagementState));
+                break;
+            case ENGAGEMENT_TRANSFERRING:
+                onTransferring();
+                break;
+            case ENGAGEMENT_ONGOING:
+                onEngagementOngoing(visitor.visit(engagementState));
+                break;
+            case ENGAGEMENT_ENDED:
+                break;
+        }
+    }
+
+    private void onEngagementOngoing(Operator operator) {
+        String name = operator.getName();
+        String imageUrl = Utils.getOperatorImageUrl(operator);
+        emitViewState(chatState.operatorConnected(name, imageUrl));
+    }
+
+    private void onOperatorConnected(Operator operator) {
+        String name = operator.getName();
+        String imageUrl = Utils.getOperatorImageUrl(operator);
+        operatorConnected(name, imageUrl);
+    }
+
+    private void onOperatorChanged(Operator operator) {
+        String name = operator.getName();
+        String imageUrl = Utils.getOperatorImageUrl(operator);
+        operatorChanged(name, imageUrl);
+    }
+
+    private void onTransferring() {
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        if (chatState.operatorStatusItem != null) {
+            items.remove(chatState.operatorStatusItem);
+        }
+        OperatorStatusItem operatorStatusItem = OperatorStatusItem.TransferringStatusItem();
+        items.add(operatorStatusItem);
+        emitViewState(chatState.queueingStarted(operatorStatusItem));
+        emitChatItems(chatState.changeItems(items));
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -607,7 +635,6 @@ public class ChatController implements
 
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "upgradeToAudioClicked");
-        onUpgradeToMediaEngagementUseCase.execute();
         messagesNotSeenHandler.chatUpgradeOfferAccepted();
         mediaUpgradeOfferRepository.acceptOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
         dialogController.dismissDialogs();
@@ -728,31 +755,57 @@ public class ChatController implements
         if (viewCallback != null) viewCallback.minimizeView();
     }
 
-    private void operatorOnlineStartChatUi(String operatorName, String profileImgUrl) {
+    private void operatorConnected(String operatorName, String profileImgUrl) {
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         if (chatState.operatorStatusItem != null) {
             // remove previous operator status item
             int operatorStatusItemIndex = items.indexOf(chatState.operatorStatusItem);
             Logger.d(TAG, "operatorStatusItemIndex: " + operatorStatusItemIndex + ", size: " + items.size());
             items.remove(chatState.operatorStatusItem);
-            items.add(operatorStatusItemIndex,
+            items.add(
+                    operatorStatusItemIndex,
                     OperatorStatusItem.OperatorFoundStatusItem(
                             chatState.companyName,
                             Utils.formatOperatorName(operatorName),
-                            profileImgUrl));
+                            profileImgUrl
+                    )
+            );
         } else {
-            items.add(OperatorStatusItem.OperatorFoundStatusItem(
-                    chatState.companyName,
-                    Utils.formatOperatorName(operatorName),
-                    profileImgUrl));
+            items.add(
+                    OperatorStatusItem.OperatorFoundStatusItem(
+                            chatState.companyName,
+                            Utils.formatOperatorName(operatorName),
+                            profileImgUrl
+                    )
+            );
         }
-        emitViewState(chatState.engagementStarted(operatorName, profileImgUrl));
+        emitViewState(chatState.operatorConnected(operatorName, profileImgUrl));
         emitChatItems(chatState.changeItems(items));
+    }
+
+    private void operatorChanged(String operatorName, String profileImgUrl) {
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        OperatorStatusItem operatorStatusItem =
+                OperatorStatusItem.OperatorJoinedStatusItem(
+                        chatState.companyName,
+                        Utils.formatOperatorName(operatorName),
+                        profileImgUrl
+                );
+
+        items.add(operatorStatusItem);
+        emitChatItems(chatState.changeItems(items));
+        emitViewState(chatState.operatorConnected(operatorName, profileImgUrl));
     }
 
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
-        cancelQueueTicketUseCase.execute();
+        disposable.add(
+                cancelQueueTicketUseCase.execute()
+                        .subscribe(
+                                this::queueForEngagementStopped,
+                                throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
+                        )
+        );
         endEngagementUseCase.execute();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(chatState.stop());
@@ -1146,15 +1199,6 @@ public class ChatController implements
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
         Logger.d(TAG, "newEngagementLoaded");
-        String operatorProfileImgUrl = null;
-        try {
-            Optional<String> optionalUrl = engagement.getOperator().getPicture().getURL();
-            if (optionalUrl.isPresent()) {
-                operatorProfileImgUrl = optionalUrl.get();
-            }
-        } catch (Exception ignored) {
-        }
-        operatorOnlineStartChatUi(engagement.getOperator().getName(), operatorProfileImgUrl);
         onMessageUseCase.execute(this::onMessage);
         onOperatorTypingUseCase.execute(this::onOperatorTyping);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
@@ -1163,6 +1207,7 @@ public class ChatController implements
             sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
             Logger.d(TAG, "unsentMessage sent!");
         }
+        emitViewState(chatState.engagementStarted());
     }
 
     @Override
@@ -1225,11 +1270,6 @@ public class ChatController implements
         dialogController.dismissDialogs();
     }
 
-    public void onQueueTicketReceived(String ticket) {
-        Logger.d(TAG, "ticketLoaded");
-        emitViewState(chatState.queueTicketSuccess(ticket));
-    }
-
     public void queueForEngagementStarted() {
         Logger.d(TAG, "queueForEngagementStarted");
         viewInitQueueing();
@@ -1239,24 +1279,23 @@ public class ChatController implements
         Logger.d(TAG, "queueForEngagementStopped");
     }
 
-    public void queueForEngagementError(GliaException exception) {
+    public void queueForEngagementError(Throwable exception) {
         if (exception != null) {
-            Logger.e(TAG, exception.toString());
-            switch (exception.cause) {
-                case QUEUE_CLOSED:
-                case QUEUE_FULL:
-                    dialogController.showNoMoreOperatorsAvailableDialog();
-                    break;
-                default:
-                    dialogController.showUnexpectedErrorDialog();
+            if (exception instanceof GliaException) {
+                Logger.e(TAG, exception.toString());
+                switch (((GliaException) exception).cause) {
+                    case QUEUE_CLOSED:
+                    case QUEUE_FULL:
+                        dialogController.showNoMoreOperatorsAvailableDialog();
+                        break;
+                    default:
+                        dialogController.showUnexpectedErrorDialog();
+                }
+                emitViewState(chatState.stop());
+            } else if (exception instanceof QueueingOngoingException) {
+                queueForEngagementStarted();
             }
-            emitViewState(chatState.stop());
         }
-    }
-
-    public void queueForEngagementOngoing() {
-        Logger.d(TAG, "queueForEngagementOngoing");
-        viewInitQueueing();
     }
 
     public void onRemoveAttachment(FileAttachment attachment) {
@@ -1294,14 +1333,16 @@ public class ChatController implements
     }
 
     public void onFileDownloadClicked(AttachmentFile attachmentFile) {
-        disposable = downloadFileUseCase
-                .execute(attachmentFile)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        () -> fileDownloadSuccess(attachmentFile),
-                        error -> fileDownloadError(attachmentFile, error)
-                );
+        disposable.add(
+                downloadFileUseCase
+                        .execute(attachmentFile)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                () -> fileDownloadSuccess(attachmentFile),
+                                error -> fileDownloadError(attachmentFile, error)
+                        )
+        );
     }
 
     private void fileDownloadError(AttachmentFile attachmentFile, Throwable error) {

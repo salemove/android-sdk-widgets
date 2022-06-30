@@ -109,7 +109,28 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             chatStartedCaptionView.setVisibility(View.VISIBLE);
 
             itemView.setContentDescription(context.getString(R.string.glia_chat_operator_has_joined_content_description, item.getOperatorName()));
+        } else if (item.getStatus() == OperatorStatusItem.Status.JOINED) {
+            statusPictureView.setVisibility(View.GONE);
+            chatStartedNameView.setText(item.getOperatorName());
+            chatStartedCaptionView.setText(context.getString(R.string.glia_chat_operator_has_joined, item.getOperatorName()));
+            chatStartingHeadingView.setVisibility(View.GONE);
+            chatStartingCaptionView.setVisibility(View.GONE);
+            chatStartedNameView.setVisibility(View.VISIBLE);
+            chatStartedCaptionView.setVisibility(View.VISIBLE);
+            itemView.setContentDescription(context.getString(R.string.glia_chat_operator_has_joined_content_description, item.getOperatorName()));
+        } else if (item.getStatus() == OperatorStatusItem.Status.TRANSFERRING) {
+            statusPictureView.showPlaceholder();
+            chatStartingHeadingView.setVisibility(View.VISIBLE);
+            chatStartingCaptionView.setVisibility(View.VISIBLE);
+            chatStartedNameView.setVisibility(View.VISIBLE);
+            chatStartedNameView.setText(context.getString(R.string.glia_chat_visitor_status_transferring));
+            chatStartedCaptionView.setVisibility(View.GONE);
         }
-        statusPictureView.setShowRippleAnimation(item.getStatus() == OperatorStatusItem.Status.IN_QUEUE);
+        statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item));
+    }
+
+    private boolean isShowStatusViewRippleAnimation(OperatorStatusItem item) {
+        return item.getStatus() == OperatorStatusItem.Status.IN_QUEUE ||
+                item.getStatus() == OperatorStatusItem.Status.TRANSFERRING;
     }
 }

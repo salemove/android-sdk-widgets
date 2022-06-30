@@ -15,9 +15,13 @@ import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.AttrRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.StyleableRes;
 
+import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
@@ -28,6 +32,7 @@ import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -35,6 +40,21 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
+    public static String getOperatorImageUrl(Operator operator) {
+        return operator.getPicture() != null ? operator.getPicture().getURL().orElse(null) : null;
+    }
+
+    public static Engagement.MediaType toMediaType(@NonNull String mediaType) {
+        switch (mediaType) {
+            case GliaWidgets.MEDIA_TYPE_VIDEO:
+                return Engagement.MediaType.VIDEO;
+            case GliaWidgets.MEDIA_TYPE_AUDIO:
+                return Engagement.MediaType.AUDIO;
+            default:
+                throw new InvalidParameterException("Invalid Media Type");
+        }
+    }
+
     public static float pxFromDp(final Context context, final float dp) {
         return dp * context.getResources().getDisplayMetrics().density;
     }

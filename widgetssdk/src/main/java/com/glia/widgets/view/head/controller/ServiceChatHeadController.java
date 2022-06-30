@@ -4,7 +4,6 @@ import android.view.View;
 
 import androidx.core.util.Pair;
 
-import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
@@ -12,65 +11,37 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.queue.QueueTicketsEventsListener;
-import com.glia.widgets.core.queue.domain.SubscribeToQueueingStateChangeUseCase;
-import com.glia.widgets.core.queue.domain.UnsubscribeFromQueueingStateChangeUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadContract;
-import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 
-import java.util.Optional;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 public class ServiceChatHeadController
         implements ChatHeadContract.Controller, VisitorMediaUpdatesListener {
+    private static final String TAG = ServiceChatHeadController.class.getSimpleName();
+
     private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
     private final ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
-    private final SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase;
-    private final UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase;
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
+    private final GetOperatorFlowableUseCase getOperatorFlowableUseCase;
     private final ChatHeadPosition chatHeadPosition;
 
-    private final QueueTicketsEventsListener queueTicketsEventsListener = new QueueTicketsEventsListener() {
-        @Override
-        public void onTicketReceived(String ticketId) {
-            // no-op
-        }
-
-        @Override
-        public void started() {
-            state = State.QUEUEING;
-            updateChatHeadView();
-        }
-
-        @Override
-        public void ongoing() {
-            state = State.QUEUEING;
-            updateChatHeadView();
-        }
-
-        @Override
-        public void stopped() {
-            state = State.ENDED;
-            updateChatHeadView();
-        }
-
-        @Override
-        public void error(GliaException exception) {
-            state = State.ENDED;
-            updateChatHeadView();
-        }
-    };
+    private final CompositeDisposable engagementDisposables = new CompositeDisposable();
 
     private ChatHeadContract.View chatHeadView;
     private State state = State.ENDED;
@@ -96,28 +67,25 @@ public class ServiceChatHeadController
             GliaOnEngagementUseCase gliaOnEngagementUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler,
-            SubscribeToQueueingStateChangeUseCase subscribeToQueueingStateChangeUseCase,
-            UnsubscribeFromQueueingStateChangeUseCase unsubscribeFromQueueingStateChangeUseCase,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
-            ChatHeadPosition chatHeadPosition
+            ChatHeadPosition chatHeadPosition,
+            GetOperatorFlowableUseCase getOperatorFlowableUseCase
     ) {
         this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
         this.resolveChatHeadNavigationUseCase = resolveChatHeadNavigationUseCase;
         this.gliaOnEngagementUseCase = gliaOnEngagementUseCase;
         this.gliaOnEngagementEndUseCase = onEngagementEndUseCase;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
-        this.subscribeToQueueingStateChangeUseCase = subscribeToQueueingStateChangeUseCase;
-        this.unsubscribeFromQueueingStateChangeUseCase = unsubscribeFromQueueingStateChangeUseCase;
         this.chatHeadPosition = chatHeadPosition;
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
+        this.getOperatorFlowableUseCase = getOperatorFlowableUseCase;
     }
 
     @Override
     public void onDestroy() {
         toggleChatHeadServiceUseCase.execute(null);
-        unsubscribeFromQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
     }
 
     @Override
@@ -183,7 +151,6 @@ public class ServiceChatHeadController
     public void init() {
         gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
         messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
-        subscribeToQueueingStateChangeUseCase.execute(queueTicketsEventsListener);
         addVisitorMediaStateListenerUseCase.execute(this);
     }
 
@@ -204,12 +171,21 @@ public class ServiceChatHeadController
         state = State.ENDED;
         operatorProfileImgUrl = null;
         unreadMessagesCount = 0;
+        engagementDisposables.dispose();
         updateChatHeadView();
     }
 
+    private Disposable operatorDisposable = null;
+
     private void newEngagementLoaded(OmnicoreEngagement engagement) {
         state = State.ENGAGEMENT;
-        operatorDataLoaded(engagement.getOperator());
+        if (operatorDisposable != null) operatorDisposable.dispose();
+        operatorDisposable = getOperatorFlowableUseCase.execute()
+                .subscribe(
+                        this::operatorDataLoaded,
+                        throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
+                );
+        engagementDisposables.add(operatorDisposable);
         gliaOnEngagementEndUseCase.execute(this::engagementEnded);
         updateChatHeadView();
     }
@@ -220,11 +196,8 @@ public class ServiceChatHeadController
     }
 
     private void operatorDataLoaded(Operator operator) {
-        try {
-            Optional<String> operatorImageUrl = operator.getPicture().getURL();
-            operatorImageUrl.ifPresent(s -> operatorProfileImgUrl = s);
-        } catch (Exception ignored) {
-        }
+        operatorProfileImgUrl = Utils.getOperatorImageUrl(operator);
+        updateChatHeadView();
     }
 
     private void updateChatHeadViewState() {

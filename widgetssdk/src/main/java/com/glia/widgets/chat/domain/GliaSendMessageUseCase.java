@@ -6,7 +6,7 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.chat.data.GliaChatRepository;
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
@@ -27,16 +27,16 @@ public class GliaSendMessageUseCase {
 
     private final GliaChatRepository chatRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
-    private final GliaEngagementRepository engagementRepository;
+    private final GliaEngagementStateRepository engagementStateRepository;
 
     public GliaSendMessageUseCase(
             GliaChatRepository chatRepository,
             FileAttachmentRepository fileAttachmentRepository,
-            GliaEngagementRepository engagementRepository
+            GliaEngagementStateRepository engagementStateRepository
     ) {
         this.chatRepository = chatRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
-        this.engagementRepository = engagementRepository;
+        this.engagementStateRepository = engagementStateRepository;
     }
 
     private boolean hasFileAttachments(List<FileAttachment> fileAttachments) {
@@ -85,7 +85,7 @@ public class GliaSendMessageUseCase {
     }
 
     private boolean isOperatorOnline() {
-        return engagementRepository.isOperatorOnline();
+        return engagementStateRepository.isOperatorPresent();
     }
 
     private boolean canSendMessage(String message, int numOfAttachment) {

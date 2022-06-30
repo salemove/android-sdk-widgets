@@ -204,82 +204,6 @@ public class CallController implements
         emitViewState(callState.engagementStarted());
     }
 
-    private void subscribeToEngagementStateChange() {
-        disposable.add(
-                getGliaEngagementStateFlowableUseCase.execute()
-                        .subscribe(
-                                this::onEngagementStateChanged,
-                                throwable -> Logger.e(TAG, "subscribeToEngagementStateChange error: " + throwable.getMessage())
-                        )
-        );
-    }
-
-    private void onEngagementStateChanged(EngagementStateEvent engagementState) {
-        EngagementStateEventVisitor<Operator> visitor = new EngagementStateEventVisitor.OperatorVisitor();
-        switch (engagementState.getType()) {
-            case ENGAGEMENT_OPERATOR_CHANGED:
-                onOperatorChanged(visitor.visit(engagementState));
-                break;
-            case ENGAGEMENT_OPERATOR_CONNECTED:
-                onOperatorConnected(visitor.visit(engagementState));
-                break;
-            case ENGAGEMENT_TRANSFERRING:
-                onTransferring();
-                break;
-            case ENGAGEMENT_ONGOING:
-                onEngagementOngoing(visitor.visit(engagementState));
-            case ENGAGEMENT_ENDED:
-                break;
-        }
-    }
-
-    private void onEngagementOngoing(Operator operator) {
-        if (!(callState.callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted) &&
-                !(callState.callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted)) {
-            onOperatorConnected(operator);
-        }
-    }
-
-    private void onOperatorConnected(Operator operator) {
-        String name = operator.getName();
-        String imageUrl = Utils.getOperatorImageUrl(operator);
-        operatorConnected(name, imageUrl);
-    }
-
-    private void onOperatorChanged(Operator operator) {
-        String name = operator.getName();
-        String imageUrl = Utils.getOperatorImageUrl(operator);
-        operatorChanged(name, imageUrl);
-    }
-
-    private void operatorChanged(String operatorName, String profileImgUrl) {
-        emitViewState(callState.operatorConnecting(operatorName, profileImgUrl));
-    }
-
-    private void operatorConnected(String operatorName, String profileImgUrl) {
-        if (callState.isCallOngoingAndOperatorIsConnecting()) {
-            emitViewState(callState.operatorConnecting(operatorName, profileImgUrl));
-        } else {
-            if (callState.isAudioCall()) {
-                emitViewState(
-                        callState
-                                .operatorConnecting(operatorName, profileImgUrl)
-                                .audioCallStarted(callState.callStatus.getOperatorMediaState(), callState.callStatus.getTime())
-                );
-            } else {
-                emitViewState(
-                        callState
-                                .operatorConnecting(operatorName, profileImgUrl)
-                                .videoCallOperatorVideoStarted(callState.callStatus.getOperatorMediaState(), callState.callStatus.getTime())
-                );
-            }
-        }
-    }
-
-    private void onTransferring() {
-        emitViewState(callState.setTransferring());
-    }
-
     public void initCall(String companyName,
                          String queueId,
                          String contextUrl,
@@ -753,6 +677,96 @@ public class CallController implements
                     Constants.CALL_TIMER_INTERVAL_VALUE
             );
         }
+    }
+
+    private void subscribeToEngagementStateChange() {
+        disposable.add(
+                getGliaEngagementStateFlowableUseCase.execute()
+                        .subscribe(
+                                this::onEngagementStateChanged,
+                                throwable -> Logger.e(TAG, "subscribeToEngagementStateChange error: " + throwable.getMessage())
+                        )
+        );
+    }
+
+    private void onEngagementStateChanged(EngagementStateEvent engagementState) {
+        EngagementStateEventVisitor<Operator> visitor = new EngagementStateEventVisitor.OperatorVisitor();
+        switch (engagementState.getType()) {
+            case ENGAGEMENT_OPERATOR_CHANGED:
+                onOperatorChanged(visitor.visit(engagementState));
+                break;
+            case ENGAGEMENT_OPERATOR_CONNECTED:
+                onOperatorConnected(visitor.visit(engagementState));
+                break;
+            case ENGAGEMENT_TRANSFERRING:
+                onTransferring();
+                break;
+            case ENGAGEMENT_ONGOING:
+                onEngagementOngoing(visitor.visit(engagementState));
+            case ENGAGEMENT_ENDED:
+                break;
+        }
+    }
+
+    private void onEngagementOngoing(Operator operator) {
+        if (!(callState.callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted) &&
+                !(callState.callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted)) {
+            onOperatorConnected(operator);
+        }
+    }
+
+    private void onOperatorConnected(Operator operator) {
+        String name = operator.getName();
+        String imageUrl = Utils.getOperatorImageUrl(operator);
+        operatorConnected(name, imageUrl);
+    }
+
+    private void onOperatorChanged(Operator operator) {
+        String name = operator.getName();
+        String imageUrl = Utils.getOperatorImageUrl(operator);
+        operatorChanged(name, imageUrl);
+    }
+
+    private void operatorChanged(String operatorName, String profileImgUrl) {
+        emitViewState(callState.operatorConnecting(operatorName, profileImgUrl));
+    }
+
+    private void operatorConnected(String operatorName, String profileImgUrl) {
+        if (callState.isCallOngoingAndOperatorIsConnecting()) {
+            emitViewState(callState.operatorConnecting(operatorName, profileImgUrl));
+        } else {
+            if (callState.isAudioCall()) {
+                onOperatorConnectedAndAudioCallOngoing(operatorName, profileImgUrl);
+            } else {
+                onOperatorConnectedAndVideoCallOngoing(operatorName, profileImgUrl);
+            }
+        }
+    }
+
+    private void onOperatorConnectedAndVideoCallOngoing(String operatorName, String profileImgUrl) {
+        emitViewState(
+                callState
+                        .operatorConnecting(operatorName, profileImgUrl)
+                        .videoCallOperatorVideoStarted(
+                                callState.callStatus.getOperatorMediaState(),
+                                callState.callStatus.getTime()
+                        )
+        );
+    }
+
+    private void onOperatorConnectedAndAudioCallOngoing(String operatorName, String profileImgUrl) {
+        emitViewState(
+                callState
+                        .operatorConnecting(operatorName, profileImgUrl)
+                        .audioCallStarted(
+                                callState.callStatus.getOperatorMediaState(),
+                                callState.callStatus.getTime()
+                        )
+        );
+    }
+
+    private void onTransferring() {
+        emitViewState(callState.setTransferring());
     }
 
     private void showCallNotification() {

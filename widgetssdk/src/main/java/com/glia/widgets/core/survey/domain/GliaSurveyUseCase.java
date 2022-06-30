@@ -19,4 +19,8 @@ public class GliaSurveyUseCase {
         surveyRepository.unregisterListener(listener);
     }
 
+    public boolean hasResult() {
+        return surveyRepository.hasResult();
+    }
+
 }

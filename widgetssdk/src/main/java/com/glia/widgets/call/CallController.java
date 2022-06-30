@@ -269,6 +269,9 @@ public class CallController implements
                          String contextUrl,
                          Engagement.MediaType mediaType) {
         Logger.d(TAG, "initCall");
+        if (surveyUseCase.hasResult()) {
+            return;
+        }
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog();
         }

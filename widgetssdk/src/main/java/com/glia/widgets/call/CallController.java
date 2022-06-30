@@ -257,7 +257,23 @@ public class CallController implements
     }
 
     private void operatorConnected(String operatorName, String profileImgUrl) {
-        emitViewState(callState.operatorConnecting(operatorName, profileImgUrl));
+        if (callState.isCallOngoingAndOperatorIsConnecting()) {
+            emitViewState(callState.operatorConnecting(operatorName, profileImgUrl));
+        } else {
+            if (callState.isAudioCall()) {
+                emitViewState(
+                        callState
+                                .operatorConnecting(operatorName, profileImgUrl)
+                                .audioCallStarted(callState.callStatus.getOperatorMediaState(), callState.callStatus.getTime())
+                );
+            } else {
+                emitViewState(
+                        callState
+                                .operatorConnecting(operatorName, profileImgUrl)
+                                .videoCallOperatorVideoStarted(callState.callStatus.getOperatorMediaState(), callState.callStatus.getTime())
+                );
+            }
+        }
     }
 
     private void onTransferring() {

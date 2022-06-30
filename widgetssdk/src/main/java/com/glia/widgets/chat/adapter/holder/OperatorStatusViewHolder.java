@@ -110,7 +110,6 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
 
             itemView.setContentDescription(context.getString(R.string.glia_chat_operator_has_joined_content_description, item.getOperatorName()));
         } else if (item.getStatus() == OperatorStatusItem.Status.JOINED) {
-            statusPictureView.setVisibility(View.GONE);
             chatStartedNameView.setText(item.getOperatorName());
             chatStartedCaptionView.setText(context.getString(R.string.glia_chat_operator_has_joined, item.getOperatorName()));
             chatStartingHeadingView.setVisibility(View.GONE);
@@ -126,7 +125,12 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             chatStartedNameView.setText(context.getString(R.string.glia_chat_visitor_status_transferring));
             chatStartedCaptionView.setVisibility(View.GONE);
         }
+        statusPictureView.setVisibility(isShowStatusPictureView(item.getStatus()) ? View.VISIBLE : View.GONE);
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item));
+    }
+
+    private boolean isShowStatusPictureView(OperatorStatusItem.Status status) {
+        return status != OperatorStatusItem.Status.JOINED;
     }
 
     private boolean isShowStatusViewRippleAnimation(OperatorStatusItem item) {

@@ -125,7 +125,9 @@ public class OperatorStatusViewHolder extends RecyclerView.ViewHolder {
             chatStartedNameView.setText(context.getString(R.string.glia_chat_visitor_status_transferring));
             chatStartedCaptionView.setVisibility(View.GONE);
         }
-        statusPictureView.setVisibility(isShowStatusPictureView(item.getStatus()) ? View.VISIBLE : View.GONE);
+        statusPictureView.setVisibility(
+                isShowStatusPictureView(item.getStatus()) ? View.VISIBLE : View.GONE
+        );
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item));
     }
 

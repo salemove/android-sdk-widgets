@@ -25,19 +25,19 @@ public class GliaEngagementStateRepository {
                     .onBackpressureLatest();
 
     private final BehaviorProcessor<Optional<EngagementState>> engagementStateProcessor = BehaviorProcessor.createDefault(Optional.empty());
-    private final Flowable<Optional<EngagementState>> engagementStateFlowable = engagementStateProcessor
-            .onBackpressureLatest();
 
     private final BehaviorProcessor<EngagementStateEvent> engagementStateEventProcessor = BehaviorProcessor.createDefault(
             new EngagementStateEvent.EngagementEndedEvent()
     );
     private final Flowable<EngagementStateEvent> engagementStateEventFlowable = engagementStateEventProcessor.onBackpressureLatest();
 
-    private final CompositeDisposable disposable = new CompositeDisposable();
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     public void onEngagementStarted(Engagement engagement) {
+        disposable = new CompositeDisposable();
         disposable.add(
-                engagementStateFlowable
+                engagementStateProcessor
+                        .onBackpressureLatest()
                         .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
                         .doOnNext(this::notifyEngagementStateEventUpdate)
                         .doOnNext(this::updateOperatorOnEngagementStateChanged)

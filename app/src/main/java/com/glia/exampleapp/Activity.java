@@ -1,5 +1,6 @@
 package com.glia.exampleapp;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +15,13 @@ public class Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity);
 
-        initGliaWidgets();
+        initGliaWidgetsWithDeepLink();
     }
 
-    private void initGliaWidgets() {
-        if (Glia.isInitialized()) return;
-
-        GliaWidgets.init(GliaWidgetsConfigManager.obtainConfig(getIntent(), getApplicationContext()));
+    private void initGliaWidgetsWithDeepLink() {
+        Uri uri = getIntent().getData();
+        if (!Glia.isInitialized() && uri != null) {
+            GliaWidgets.init(GliaWidgetsConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()));
+        }
     }
 }

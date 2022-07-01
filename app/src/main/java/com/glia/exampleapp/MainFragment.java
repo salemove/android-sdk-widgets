@@ -1,5 +1,6 @@
 package com.glia.exampleapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,11 +10,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 
+import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
@@ -26,6 +29,12 @@ import com.glia.widgets.view.head.ChatHeadLayout;
 public class MainFragment extends Fragment {
 
     @Nullable
+    private ConstraintLayout containerView;
+
+    @Nullable
+    private ChatHeadLayout chatHeadLayout;
+
+    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -36,6 +45,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.containerView = (ConstraintLayout) view;
         NavController navController = NavHostFragment.findNavController(this);
         view.findViewById(R.id.settings_button).setOnClickListener(view1 ->
                 navController.navigate(R.id.settings));
@@ -49,8 +59,23 @@ public class MainFragment extends Fragment {
                 GliaWidgets.endEngagement());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
                 GliaWidgets.clearVisitorSession());
+    }
 
-        ChatHeadLayout chatHeadLayout = view.findViewById(R.id.chat_head_layout);
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!Glia.isInitialized() || chatHeadLayout != null) return;
+
+        Context context = getContext();
+        if (context == null) return;
+
+        chatHeadLayout = new ChatHeadLayout(context);
+        chatHeadLayout.setLayoutParams(new ConstraintLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                )
+        );
         chatHeadLayout.setNavigationCallback(
                 new ChatHeadLayout.NavigationCallback() {
                     @Override
@@ -64,6 +89,10 @@ public class MainFragment extends Fragment {
                     }
                 }
         );
+
+        if (containerView != null) {
+            containerView.addView(chatHeadLayout);
+        }
     }
 
     @Override

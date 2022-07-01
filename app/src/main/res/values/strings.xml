@@ -28,7 +28,6 @@
     <string name="settings_chat_system_agent_bubble_color">System agent bubble color</string>
     <string name="settings_chat_font_family">Chat message font family</string>
     <string name="settings_header_title">Title</string>
-    <string name="settings_app_token">App token</string>
     <string name="settings_site_api_key_id">Site Api Key id</string>
     <string name="settings_site_api_key_secret">Site Api Key Secret</string>
     <string name="settings_site_id">Site id (needs restart)</string>
@@ -66,9 +65,6 @@
     <string name="settings_screen_sharing_mode_title">Screen sharing mode</string>
     <string name="settings_screen_sharing_mode_unbounded">Unbounded</string>
     <string name="settings_screen_sharing_mode_app_bounded">App bounded</string>
-
-    <string name="authorization_app_token">App Token</string>
-    <string name="authorization_site_api_key">Site Api Key</string>
 
     <string name="main_open_settings">Open Settings</string>
     <string name="main_launch_activity">Launch Chat in Activity</string>

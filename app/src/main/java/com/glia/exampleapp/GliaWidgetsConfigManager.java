@@ -9,26 +9,19 @@ import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.SiteApiKey;
-import com.glia.exampleapp.auth.AuthorizationType;
 import com.glia.widgets.GliaWidgetsConfig;
 
 /**
  *Helper class to obtain Glia Config params from deep-link or preferences.
- *
- *for setup with app_token link must be -
- *      glia://widgets/token?site_id={site_id}&app_token={app_token}&queue_id={queue_id}&visitor_context_asset_id={visitor_context_asset_id}
- *      where all query params are mandatory except visitor_context_asset_id
  *
  *for setup with secret link must be
  *      glia://widgets/secret?site_id={site_id}&api_key_secret={api_key_secret}&api_key_id={api_key_id}&queue_id={queue_id}&visitor_context_asset_id={visitor_context_asset_id}
  *      where all query params are mandatory except visitor_context_asset_id
  */
 public class GliaWidgetsConfigManager {
-    private static final String TOKEN_KEY = "token";
     private static final String SECRET_KEY = "secret";
 
     private static final String SITE_ID_KEY = "site_id";
-    private static final String APP_TOKEN_KEY = "app_token";
     private static final String API_KEY_SECRET_KEY = "api_key_secret";
     private static final String API_KEY_ID_KEY = "api_key_id";
     private static final String QUEUE_ID_KEY = "queue_id";
@@ -55,11 +48,8 @@ public class GliaWidgetsConfigManager {
         if (SECRET_KEY.equals(data.getLastPathSegment())) {
             saveSiteApiKeyAuthToPrefs(data, applicationContext);
             return obtainConfigFromSecretDeepLink(data, applicationContext);
-        } else if (TOKEN_KEY.equals(data.getLastPathSegment())) {
-            saveAppTokenAuthToPrefs(data, applicationContext);
-            return obtainConfigFromAppTokenDeepLink(data, applicationContext);
         } else {
-            throw new RuntimeException("deep link must start with \"glia://widgets/app_token\" or \"glia://widgets/secret\"");
+            throw new RuntimeException("deep link must start with \"glia://widgets/secret\"");
         }
     }
 
@@ -93,19 +83,6 @@ public class GliaWidgetsConfigManager {
         sharedPreferences.edit().putString(applicationContext.getString(R.string.pref_site_id), siteId).apply();
     }
 
-    private static void saveAppTokenAuthToPrefs(@NonNull Uri data, @NonNull Context applicationContext) {
-        String appToken = data.getQueryParameter(APP_TOKEN_KEY);
-
-        if (appToken == null) return;
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-
-        sharedPreferences.edit()
-                .putString(applicationContext.getString(R.string.pref_app_token), appToken)
-                .putInt(applicationContext.getString(R.string.pref_authorization_type), AuthorizationType.APP_TOKEN)
-                .apply();
-    }
-
     private static void saveSiteApiKeyAuthToPrefs(@NonNull Uri data, @NonNull Context applicationContext) {
         String apiKeyId = data.getQueryParameter(API_KEY_ID_KEY);
         String apiKeySecret = data.getQueryParameter(API_KEY_SECRET_KEY);
@@ -117,19 +94,7 @@ public class GliaWidgetsConfigManager {
         sharedPreferences.edit()
                 .putString(applicationContext.getString(R.string.pref_api_key_id), apiKeyId)
                 .putString(applicationContext.getString(R.string.pref_api_key_secret), apiKeySecret)
-                .putInt(applicationContext.getString(R.string.pref_authorization_type), AuthorizationType.SITE_API_KEY)
                 .apply();
-    }
-
-    @NonNull
-    @SuppressWarnings("deprecation")
-    private static GliaWidgetsConfig obtainConfigFromAppTokenDeepLink(@NonNull Uri data, @NonNull Context applicationContext) {
-        return new GliaWidgetsConfig.Builder()
-                .setAppToken(data.getQueryParameter(APP_TOKEN_KEY))
-                .setSiteId(data.getQueryParameter(SITE_ID_KEY))
-                .setRegion(REGION_ACCEPTANCE)
-                .setContext(applicationContext)
-                .build();
     }
 
     @NonNull
@@ -145,25 +110,7 @@ public class GliaWidgetsConfigManager {
     @NonNull
     public static GliaWidgetsConfig createDefaultConfig(@NonNull Context applicationContext) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        int authorizationType = sharedPreferences.getInt(applicationContext.getString(R.string.pref_authorization_type), AuthorizationType.DEFAULT);
-
-        if (authorizationType == AuthorizationType.SITE_API_KEY)
-            return configWithSiteApiKeyAuth(sharedPreferences, applicationContext);
-        else
-            return configWithAppTokenAuth(sharedPreferences, applicationContext);
-    }
-
-    @NonNull
-    @SuppressWarnings("deprecation")
-    private static GliaWidgetsConfig configWithAppTokenAuth(@NonNull SharedPreferences preferences, @NonNull Context applicationContext) {
-        String appToken = preferences.getString(applicationContext.getString(R.string.pref_app_token), applicationContext.getString(R.string.app_token));
-        String siteId = preferences.getString(applicationContext.getString(R.string.pref_site_id), applicationContext.getString(R.string.site_id));
-        return new GliaWidgetsConfig.Builder()
-                .setAppToken(appToken)
-                .setSiteId(siteId)
-                .setRegion(REGION_BETA)
-                .setContext(applicationContext)
-                .build();
+        return configWithSiteApiKeyAuth(sharedPreferences, applicationContext);
     }
 
     @NonNull

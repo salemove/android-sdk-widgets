@@ -46,17 +46,21 @@ public class GliaWidgetsConfigManager {
     }
 
     @NonNull
-    private static GliaWidgetsConfig obtainConfigFromDeepLink(@NonNull Uri data, @NonNull Context applicationContext) {
+    public static GliaWidgetsConfig obtainConfigFromDeepLink(@NonNull Uri data, @NonNull Context applicationContext) {
         saveQueueIdToPrefs(data, applicationContext);
         saveVisitorContextAssetIdIfPresent(data, applicationContext);
+        saveSiteIdToPrefs(data, applicationContext);
 
 //        We're not checking availability for every query param separately because this is for acceptance tests and we assume that link would be correct
-        if (SECRET_KEY.equals(data.getLastPathSegment()))
+        if (SECRET_KEY.equals(data.getLastPathSegment())) {
+            saveSiteApiKeyAuthToPrefs(data, applicationContext);
             return obtainConfigFromSecretDeepLink(data, applicationContext);
-        else if (TOKEN_KEY.equals(data.getLastPathSegment()))
+        } else if (TOKEN_KEY.equals(data.getLastPathSegment())) {
+            saveAppTokenAuthToPrefs(data, applicationContext);
             return obtainConfigFromAppTokenDeepLink(data, applicationContext);
-        else
+        } else {
             throw new RuntimeException("deep link must start with \"glia://widgets/app_token\" or \"glia://widgets/secret\"");
+        }
     }
 
     private static void saveVisitorContextAssetIdIfPresent(Uri data, Context applicationContext) {
@@ -77,6 +81,44 @@ public class GliaWidgetsConfigManager {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
 
         sharedPreferences.edit().putString(applicationContext.getString(R.string.pref_queue_id), queueId).apply();
+    }
+
+    private static void saveSiteIdToPrefs(@NonNull Uri data, @NonNull Context applicationContext) {
+        String siteId = data.getQueryParameter(SITE_ID_KEY);
+
+        if (siteId == null) return;
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+
+        sharedPreferences.edit().putString(applicationContext.getString(R.string.pref_site_id), siteId).apply();
+    }
+
+    private static void saveAppTokenAuthToPrefs(@NonNull Uri data, @NonNull Context applicationContext) {
+        String appToken = data.getQueryParameter(APP_TOKEN_KEY);
+
+        if (appToken == null) return;
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+
+        sharedPreferences.edit()
+                .putString(applicationContext.getString(R.string.pref_app_token), appToken)
+                .putInt(applicationContext.getString(R.string.pref_authorization_type), AuthorizationType.APP_TOKEN)
+                .apply();
+    }
+
+    private static void saveSiteApiKeyAuthToPrefs(@NonNull Uri data, @NonNull Context applicationContext) {
+        String apiKeyId = data.getQueryParameter(API_KEY_ID_KEY);
+        String apiKeySecret = data.getQueryParameter(API_KEY_SECRET_KEY);
+
+        if (apiKeyId == null || apiKeySecret == null) return;
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+
+        sharedPreferences.edit()
+                .putString(applicationContext.getString(R.string.pref_api_key_id), apiKeyId)
+                .putString(applicationContext.getString(R.string.pref_api_key_secret), apiKeySecret)
+                .putInt(applicationContext.getString(R.string.pref_authorization_type), AuthorizationType.SITE_API_KEY)
+                .apply();
     }
 
     @NonNull
@@ -101,7 +143,7 @@ public class GliaWidgetsConfigManager {
     }
 
     @NonNull
-    private static GliaWidgetsConfig createDefaultConfig(@NonNull Context applicationContext) {
+    public static GliaWidgetsConfig createDefaultConfig(@NonNull Context applicationContext) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
         int authorizationType = sharedPreferences.getInt(applicationContext.getString(R.string.pref_authorization_type), AuthorizationType.DEFAULT);
 

@@ -16,8 +16,6 @@
     <string name="pref_header_title">header_title</string>
     <string name="pref_glia_core_sdk_version">glia_core_sdk_version</string>
     <string name="pref_glia_widgets_sdk_version">glia_widgets_sdk_version</string>
-    <string name="pref_authorization_type">authorization_type</string>
-    <string name="pref_app_token">app_token</string>
     <string name="pref_app_authorization">app_authorization</string>
     <string name="pref_site_id">site_id</string>
     <string name="pref_api_key_id">api_key</string>

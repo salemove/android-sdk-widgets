@@ -63,7 +63,7 @@ public class GliaQueueRepository {
                         MEDIA_PERMISSION_REQUEST_CODE,
                         exception -> {
                             if (exception == null ||
-                                    exception.cause != GliaException.Cause.ALREADY_QUEUED) {
+                                    exception.cause == GliaException.Cause.ALREADY_QUEUED) {
                                 emitter.onComplete();
                             } else {
                                 emitter.onError(exception);
@@ -83,7 +83,7 @@ public class GliaQueueRepository {
                         visitorContext,
                         exception -> {
                             if (exception == null ||
-                                    exception.cause != GliaException.Cause.ALREADY_QUEUED) {
+                                    exception.cause == GliaException.Cause.ALREADY_QUEUED) {
                                 emitter.onComplete();
                             } else {
                                 emitter.onError(exception);

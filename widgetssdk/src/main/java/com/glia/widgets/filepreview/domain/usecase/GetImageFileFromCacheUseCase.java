@@ -15,8 +15,10 @@ public class GetImageFileFromCacheUseCase {
     }
 
     public Maybe<Bitmap> execute(String fileName) {
-        if (fileName == null || fileName.isEmpty())
+        if (fileName == null || fileName.isEmpty()) {
             return Maybe.error(new FileNameMissingException());
+        }
+
         return gliaFileRepository.loadImageFromCache(fileName);
     }
 }

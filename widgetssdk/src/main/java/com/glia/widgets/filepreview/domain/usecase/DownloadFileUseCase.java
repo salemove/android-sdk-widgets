@@ -15,10 +15,12 @@ public class DownloadFileUseCase {
     }
 
     public Completable execute(AttachmentFile file) {
-        if (file == null || file.getName().isEmpty())
+        if (file == null || file.getName().isEmpty()) {
             return Completable.error(new FileNameMissingException());
-        if (file.isDeleted())
+        }
+        if (file.isDeleted()) {
             return Completable.error(new RemoteFileIsDeletedException());
+        }
 
         return this.fileRepository
                 .downloadFileFromNetwork(file);

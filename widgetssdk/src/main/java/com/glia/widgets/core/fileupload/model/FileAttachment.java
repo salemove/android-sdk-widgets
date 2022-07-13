@@ -4,7 +4,7 @@ import android.net.Uri;
 
 import com.glia.androidsdk.engagement.EngagementFile;
 
-final public class FileAttachment {
+public class FileAttachment {
     private final Uri uri;
     private final String mimeType;
     private final String displayName;

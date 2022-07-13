@@ -100,6 +100,7 @@ public class ChatController implements
     private final static String TAG = ChatController.class.getSimpleName();
     private final static String EMPTY_MESSAGE = "";
 
+    @Nullable
     private ChatViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener timerStatusListener;
@@ -121,7 +122,9 @@ public class ChatController implements
 
         @Override
         public void onMessageValidated() {
-            viewCallback.clearMessageInput();
+            if (viewCallback != null) {
+                viewCallback.clearMessageInput();
+            }
             emitViewState(
                     chatState
                             .setLastTypedText(EMPTY_MESSAGE)

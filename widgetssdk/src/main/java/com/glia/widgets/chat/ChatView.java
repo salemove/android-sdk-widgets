@@ -18,6 +18,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
@@ -119,6 +121,7 @@ public class ChatView extends ConstraintLayout implements
     private MaterialCardView newMessagesCardView;
     private OperatorStatusView newMessagesOperatorStatusView;
     private TextView newMessagesCountBadgeView;
+    private Handler mainThreadHandler;
 
     private boolean isInBottom = true;
 
@@ -220,6 +223,8 @@ public class ChatView extends ConstraintLayout implements
         );
 
         this.resources = getResources();
+
+        mainThreadHandler = new Handler(Looper.getMainLooper());
 
         initConfigurations();
         initViews();
@@ -537,9 +542,11 @@ public class ChatView extends ConstraintLayout implements
 
             @Override
             public void clearMessageInput() {
-                chatEditText.removeTextChangedListener(textWatcher);
-                chatEditText.getText().clear();
-                chatEditText.addTextChangedListener(textWatcher);
+                mainThreadHandler.post(() -> {
+                    chatEditText.removeTextChangedListener(textWatcher);
+                    chatEditText.getText().clear();
+                    chatEditText.addTextChangedListener(textWatcher);
+                });
             }
         };
     }

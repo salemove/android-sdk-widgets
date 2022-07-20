@@ -60,7 +60,7 @@
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
     <string name="settings_use_overlay">Use Overlay</string>
-    <string name="settings_context_url">Context url</string>
+    <string name="settings_visitor_context_asset_id">Visitor context asset id</string>
     <string name="settings_use_alert_dialog_button_vertical_alignment">Align AlertDialog Buttons Vertically</string>
     <string name="settings_screen_sharing_mode_title">Screen sharing mode</string>
     <string name="settings_screen_sharing_mode_unbounded">Unbounded</string>

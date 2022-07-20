@@ -45,8 +45,16 @@ public class GliaWidgets {
     /**
      * Use with {@link android.os.Bundle} to pass in a context url as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     * @deprecated Use {@link com.glia.widgets.GliaWidgets#CONTEXT_ASSET_ID}
      */
+    @Deprecated
     public static final String CONTEXT_URL = "context_url";
+
+    /**
+     * Use with {@link android.os.Bundle} to pass in a context asset ID as a navigation
+     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
+    public static final String CONTEXT_ASSET_ID = "context_asset_id";
 
     /**
      * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to

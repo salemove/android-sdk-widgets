@@ -64,7 +64,7 @@ public class ChatActivity extends AppCompatActivity {
         chatView.startChat(
                 configuration.getCompanyName(),
                 configuration.getQueueId(),
-                configuration.getContextUrl(),
+                configuration.getContextAssetId(),
                 configuration.getUseOverlay(),
                 configuration.getScreenSharingMode()
         );

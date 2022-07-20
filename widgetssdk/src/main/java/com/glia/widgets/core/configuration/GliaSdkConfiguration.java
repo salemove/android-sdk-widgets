@@ -14,7 +14,7 @@ public class GliaSdkConfiguration {
 
     private final String companyName;
     private final String queueId;
-    private final String contextUrl;
+    private final String contextAssetId;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
@@ -27,8 +27,8 @@ public class GliaSdkConfiguration {
         return this.queueId;
     }
 
-    public String getContextUrl() {
-        return this.contextUrl;
+    public String getContextAssetId() {
+        return this.contextAssetId;
     }
 
     public UiTheme getRunTimeTheme() {
@@ -46,7 +46,7 @@ public class GliaSdkConfiguration {
     public static class Builder {
         private String companyName;
         private String queueId;
-        private String contextUrl;
+        private String contextAssetId;
         private UiTheme runTimeTheme;
         private boolean useOverlay;
         private ScreenSharing.Mode screenSharingMode;
@@ -61,8 +61,8 @@ public class GliaSdkConfiguration {
             return this;
         }
 
-        public Builder contextUrl(String contextUrl) {
-            this.contextUrl = contextUrl;
+        public Builder contextAssetId(String contextAssetId) {
+            this.contextAssetId = contextAssetId;
             return this;
         }
 
@@ -85,7 +85,7 @@ public class GliaSdkConfiguration {
             this.companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
             this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
             this.runTimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
-            this.contextUrl = intent.getStringExtra(GliaWidgets.CONTEXT_URL);
+            this.contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID);
             this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
             this.screenSharingMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
                     ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
@@ -101,7 +101,7 @@ public class GliaSdkConfiguration {
     private GliaSdkConfiguration(Builder builder) {
         this.companyName = builder.companyName;
         this.queueId = builder.queueId;
-        this.contextUrl = builder.contextUrl;
+        this.contextAssetId = builder.contextAssetId;
         this.runTimeTheme = builder.runTimeTheme;
         this.useOverlay = builder.useOverlay;
         this.screenSharingMode = builder.screenSharingMode;

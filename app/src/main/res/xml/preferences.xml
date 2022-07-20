@@ -35,9 +35,9 @@
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:defaultValue="https://en.wikipedia.org/wiki/Hamburger"
-            app:key="@string/pref_context_url"
-            app:title="@string/settings_context_url"
+            app:defaultValue=""
+            app:key="@string/pref_context_asset_id"
+            app:title="@string/settings_visitor_context_asset_id"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreference

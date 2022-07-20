@@ -206,7 +206,7 @@ public class CallController implements
 
     public void initCall(String companyName,
                          String queueId,
-                         String contextUrl,
+                         String  visitorContextAssetId,
                          Engagement.MediaType mediaType) {
         Logger.d(TAG, "initCall");
         if (surveyUseCase.hasResult()) {
@@ -227,7 +227,7 @@ public class CallController implements
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
         disposable.add(
                 gliaQueueForMediaEngagementUseCase
-                        .execute(queueId, contextUrl, mediaType)
+                        .execute(queueId, visitorContextAssetId, mediaType)
                         .subscribe(
                                 this::queueForEngagementStarted,
                                 this::queueForEngagementError

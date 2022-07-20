@@ -24,19 +24,19 @@ public class GliaQueueForChatEngagementUseCase {
         this.schedulers = schedulers;
     }
 
-    public Completable execute(String queueId, String contextUrl) {
+    public Completable execute(String queueId, String  visitorContextAssetId) {
         if (engagementRepository.hasOngoingEngagement()) {
             return Completable.error(new EngagementOngoingException());
         } else {
-            return startQueueing(queueId, contextUrl);
+            return startQueueing(queueId, visitorContextAssetId);
         }
     }
 
-    private Completable startQueueing(String queueId, String contextUrl) {
+    private Completable startQueueing(String queueId, String visitorContextAssetId) {
         GliaQueueingState queueingState = repository.getQueueingState();
         if (queueingState instanceof GliaQueueingState.None) {
             return repository
-                    .startQueueingForEngagement(queueId, contextUrl)
+                    .startQueueingForEngagement(queueId, visitorContextAssetId)
                     .subscribeOn(schedulers.getComputationScheduler())
                     .observeOn(schedulers.getMainScheduler());
 

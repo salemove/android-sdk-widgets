@@ -1,0 +1,1 @@
+-keep class com.glia.widgets.core.fileupload.GliaFileProvider

@@ -50,7 +50,7 @@
         </receiver>
 
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name=".core.fileupload.GliaFileProvider"
             android:authorities="${applicationId}.com.glia.widgets.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

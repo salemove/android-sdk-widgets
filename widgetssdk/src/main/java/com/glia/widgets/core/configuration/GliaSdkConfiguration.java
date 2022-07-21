@@ -15,6 +15,8 @@ public class GliaSdkConfiguration {
     private final String companyName;
     private final String queueId;
     private final String contextAssetId;
+    @Deprecated
+    private final String contextUrl;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
@@ -25,6 +27,11 @@ public class GliaSdkConfiguration {
 
     public String getQueueId() {
         return this.queueId;
+    }
+
+    @Deprecated
+    public String getContextUrl() {
+        return this.contextUrl;
     }
 
     public String getContextAssetId() {
@@ -47,6 +54,8 @@ public class GliaSdkConfiguration {
         private String companyName;
         private String queueId;
         private String contextAssetId;
+        @Deprecated
+        private String contextUrl;
         private UiTheme runTimeTheme;
         private boolean useOverlay;
         private ScreenSharing.Mode screenSharingMode;
@@ -58,6 +67,12 @@ public class GliaSdkConfiguration {
 
         public Builder queueId(String queueId) {
             this.queueId = queueId;
+            return this;
+        }
+
+        @Deprecated
+        public Builder contextUrl(String contextUrl) {
+            this.contextUrl = contextUrl;
             return this;
         }
 
@@ -102,6 +117,7 @@ public class GliaSdkConfiguration {
         this.companyName = builder.companyName;
         this.queueId = builder.queueId;
         this.contextAssetId = builder.contextAssetId;
+        this.contextUrl = builder.contextUrl;
         this.runTimeTheme = builder.runTimeTheme;
         this.useOverlay = builder.useOverlay;
         this.screenSharingMode = builder.screenSharingMode;

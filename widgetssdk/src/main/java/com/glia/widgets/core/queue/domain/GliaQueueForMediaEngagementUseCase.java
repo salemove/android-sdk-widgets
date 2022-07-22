@@ -27,24 +27,24 @@ public class GliaQueueForMediaEngagementUseCase {
 
     public Completable execute(
             String queueId,
-            String contextUrl,
+            String visitorContextAssetId,
             Engagement.MediaType mediaType
     ) {
         if (engagementRepository.hasOngoingEngagement()) {
             return Completable.error(new EngagementOngoingException());
         } else {
-            return startQueueing(queueId, contextUrl, mediaType);
+            return startQueueing(queueId, visitorContextAssetId, mediaType);
         }
     }
 
     private Completable startQueueing(
             String queueId,
-            String contextUrl,
+            String  visitorContextAssetId,
             Engagement.MediaType mediaType
     ) {
         GliaQueueingState queueingState = repository.getQueueingState();
         if (queueingState instanceof GliaQueueingState.None) {
-            return repository.startQueueingForMediaEngagement(queueId, contextUrl, mediaType)
+            return repository.startQueueingForMediaEngagement(queueId, visitorContextAssetId, mediaType)
                     .subscribeOn(schedulers.getComputationScheduler())
                     .observeOn(schedulers.getMainScheduler());
         } else {

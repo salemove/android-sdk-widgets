@@ -231,7 +231,7 @@ public class ChatController implements
                 .setOperatorName(null)
                 .setCompanyName(null)
                 .setQueueId(null)
-                .setContextUrl(null)
+                .setVisitorContextAssetId(null)
                 .setIsVisible(false)
                 .setIntegratorChatStarted(false)
                 .setChatItems(new ArrayList<>())
@@ -306,14 +306,14 @@ public class ChatController implements
 
     public void initChat(String companyName,
                          String queueId,
-                         String contextUrl
+                         String visitorContextAssetId
     ) {
         if (isShowOverlayPermissionRequestDialogUseCase.execute())
             dialogController.showOverlayPermissionsDialog();
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
-        emitViewState(chatState.initChat(companyName, queueId, contextUrl));
+        emitViewState(chatState.initChat(companyName, queueId, visitorContextAssetId));
         loadHistoryUseCase.execute(this);
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver);
         initMediaUpgradeCallback();
@@ -330,7 +330,7 @@ public class ChatController implements
                 queueForChatEngagementUseCase
                         .execute(
                                 chatState.queueId,
-                                chatState.contextUrl
+                                chatState.visitorContextAssetId
                         )
                         .subscribe(
                                 this::queueForEngagementStarted,

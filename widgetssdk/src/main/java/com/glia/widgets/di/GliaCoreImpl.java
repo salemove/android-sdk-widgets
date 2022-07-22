@@ -9,10 +9,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.Operator;
-import com.glia.androidsdk.OutgoingEngagementRequest;
 import com.glia.androidsdk.RequestCallback;
-import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.comms.EngagementOptions;
@@ -93,39 +90,6 @@ class GliaCoreImpl implements GliaCore {
     }
 
     @Override
-    public void getOperators(final RequestCallback<Operator[]> requestCallback) {
-        Glia.getOperators(requestCallback);
-    }
-
-    @Override
-    public void requestEngagement(@NonNull String operatorId,
-                                  @NonNull VisitorContext visitorContext,
-                                  @NonNull RequestCallback<OutgoingEngagementRequest> requestCallback) {
-        Glia.requestEngagement(operatorId, visitorContext, requestCallback);
-    }
-
-    @Override
-    public void requestEngagement(@NonNull String operatorId,
-                                  @NonNull VisitorContext visitorContext,
-                                  @NonNull Engagement.MediaType mediaType,
-                                  int mediaPermissionRequestCode,
-                                  @NonNull RequestCallback<OutgoingEngagementRequest> requestCallback) {
-        Glia.requestEngagement(operatorId, visitorContext, mediaType,
-                mediaPermissionRequestCode, requestCallback);
-    }
-
-    @Override
-    public void requestEngagement(@NonNull String operatorId,
-                                  @NonNull VisitorContext visitorContext,
-                                  @NonNull Engagement.MediaType mediaType,
-                                  @Nullable EngagementOptions engagementOptions,
-                                  int mediaPermissionRequestCode,
-                                  @NonNull RequestCallback<OutgoingEngagementRequest> requestCallback) {
-        Glia.requestEngagement(operatorId, visitorContext, mediaType,
-                engagementOptions, mediaPermissionRequestCode, requestCallback);
-    }
-
-    @Override
     public void cancelEngagementRequest(@NonNull String engagementRequestId,
                                         Consumer<GliaException> callback) {
         Glia.cancelEngagementRequest(engagementRequestId, callback);
@@ -133,38 +97,19 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public void queueForEngagement(@NonNull String queueId,
-                                   @NonNull VisitorContext visitorContext,
+                                   @Nullable String visitorContextAssetId,
                                    Consumer<GliaException> callback) {
-        Glia.queueForEngagement(queueId, visitorContext, callback);
-    }
-
-    @Override
-    public void queueForEngagement(@NonNull String queueId,
-                                   Engagement.MediaType mediaType,
-                                   @NonNull VisitorContext visitorContext,
-                                   Consumer<GliaException> callback) {
-        Glia.queueForEngagement(queueId, mediaType, visitorContext, callback);
+        Glia.queueForEngagement(queueId, visitorContextAssetId, callback);
     }
 
     @Override
     public void queueForEngagement(@NonNull String queueId,
                                    @NonNull Engagement.MediaType mediaType,
-                                   @NonNull VisitorContext visitorContext,
-                                   int mediaPermissionRequestCode,
-                                   @NonNull Consumer<GliaException> callback) {
-        Glia.queueForEngagement(queueId, mediaType,
-                visitorContext, mediaPermissionRequestCode, callback);
-    }
-
-    @Override
-    public void queueForEngagement(@NonNull String queueId,
-                                   @NonNull Engagement.MediaType mediaType,
-                                   @NonNull VisitorContext visitorContext,
+                                   @Nullable String visitorContextAssetId,
                                    @Nullable EngagementOptions engagementOptions,
                                    int mediaPermissionRequestCode,
                                    @NonNull Consumer<GliaException> callback) {
-        Glia.queueForEngagement(queueId, mediaType, visitorContext,
-                engagementOptions, mediaPermissionRequestCode, callback);
+        Glia.queueForEngagement(queueId, mediaType, visitorContextAssetId, engagementOptions, mediaPermissionRequestCode, callback);
     }
 
     @Override

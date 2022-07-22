@@ -314,7 +314,7 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
         Intent newIntent = new Intent(context, cls);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
         newIntent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, sdkConfiguration.getContextUrl());
+        newIntent.putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId());
         newIntent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay());
         newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());

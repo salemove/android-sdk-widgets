@@ -190,7 +190,7 @@ public class CallActivity extends AppCompatActivity {
         callView.startCall(
                 sdkConfiguration.getCompanyName(),
                 sdkConfiguration.getQueueId(),
-                sdkConfiguration.getContextUrl(),
+                sdkConfiguration.getContextAssetId(),
                 sdkConfiguration.getUseOverlay(),
                 sdkConfiguration.getScreenSharingMode(),
                 configuration.getMediaType()
@@ -203,7 +203,7 @@ public class CallActivity extends AppCompatActivity {
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class);
         newIntent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
         newIntent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_URL, sdkConfiguration.getContextUrl());
+        newIntent.putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId());
         newIntent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
         newIntent.putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay());
         newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());

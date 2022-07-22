@@ -252,19 +252,19 @@ public class ChatView extends ConstraintLayout implements
      *
      * @param companyName Text shown in the chat while waiting in a queue.
      * @param queueId     The queue id to which you would like to queue to and speak to operators from.
-     * @param contextUrl  Provide some context as to from where are you initiating the chat from.
+     * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
      */
     public void startChat(
             String companyName,
             String queueId,
-            String contextUrl) {
-        startChat(companyName, queueId, contextUrl, false, null);
+            String visitorContextAssetId) {
+        startChat(companyName, queueId, visitorContextAssetId, false, null);
     }
 
     /**
      * @param companyName Text shown in the chat while waiting in a queue.
      * @param queueId     The queue id to which you would like to queue to and speak to operators from.
-     * @param contextUrl  Provide some context as to from where are you initiating the chat from.
+     * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
      * @param useOverlays Used to set if the user opted to use overlays or not.
      *                    See {@link com.glia.widgets.GliaWidgets}.USE_OVERLAY to see its full
      *                    usage description.
@@ -274,14 +274,14 @@ public class ChatView extends ConstraintLayout implements
     public void startChat(
             String companyName,
             String queueId,
-            String contextUrl,
+            String  visitorContextAssetId,
             boolean useOverlays,
             ScreenSharing.Mode screenSharingMode
     ) {
         Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
         Dependencies.getSdkConfigurationManager().setScreenSharingMode(screenSharingMode);
         if (controller != null) {
-            controller.initChat(companyName, queueId, contextUrl);
+            controller.initChat(companyName, queueId, visitorContextAssetId);
         }
         if (serviceChatHeadController != null) {
             serviceChatHeadController.init();

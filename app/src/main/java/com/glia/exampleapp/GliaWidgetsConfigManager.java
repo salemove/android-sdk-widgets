@@ -25,11 +25,10 @@ public class GliaWidgetsConfigManager {
     private static final String API_KEY_SECRET_KEY = "api_key_secret";
     private static final String API_KEY_ID_KEY = "api_key_id";
     private static final String QUEUE_ID_KEY = "queue_id";
+    public static final String VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id";
 
     private static final String REGION_BETA = "beta";
     private static final String REGION_ACCEPTANCE = "acceptance";
-
-    public static final String VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id";
 
     @NonNull
     public static GliaWidgetsConfig obtainConfig(@NonNull Intent intent, @NonNull Context applicationContext) {
@@ -60,7 +59,7 @@ public class GliaWidgetsConfigManager {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
 
-        sharedPreferences.edit().putString(VISITOR_CONTEXT_ASSET_ID_KEY, visitorContextAssetId).apply();
+        sharedPreferences.edit().putString(applicationContext.getString(R.string.pref_context_asset_id), visitorContextAssetId).apply();
     }
 
     private static void saveQueueIdToPrefs(@NonNull Uri data, @NonNull Context applicationContext) {

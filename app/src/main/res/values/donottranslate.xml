@@ -22,7 +22,7 @@
     <string name="pref_api_key_secret">api_key_secret</string>
     <string name="pref_company_name">company_name</string>
     <string name="pref_queue_id">queue_id</string>
-    <string name="pref_context_url">context_url</string>
+    <string name="pref_context_asset_id">context_asset_id</string>
     <string name="pref_white_label">white_label_toggle</string>
     <string name="pref_use_overlay">use_overlay</string>
     <string name="pref_use_alert_dialog_button_vertical_alignment">use_alert_dialog_button_vertical_alignment</string>

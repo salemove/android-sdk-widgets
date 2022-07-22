@@ -3,7 +3,6 @@ package com.glia.widgets.core.queue;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.VisitorContext;
 import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.di.GliaCore;
@@ -25,10 +24,9 @@ public class GliaQueueRepository {
 
     public Completable startQueueingForEngagement(
             String queueId,
-            String contextUrl
+            String  visitorContextAssetId
     ) {
-        return queueForEngagement(queueId,
-                new VisitorContext(VisitorContext.Type.PAGE, contextUrl))
+        return queueForEngagement(queueId, visitorContextAssetId)
                 .mergeWith(
                         awaitTicket()
                                 .flatMapCompletable(queueTicket -> setQueueingChat(queueId, queueTicket.getId()))
@@ -36,12 +34,10 @@ public class GliaQueueRepository {
     }
 
     public Completable startQueueingForMediaEngagement(String queueId,
-                                                       String contextUrl,
+                                                       String  visitorContextAssetId,
                                                        Engagement.MediaType mediaType
     ) {
-        return queueForMediaEngagement(queueId,
-                new VisitorContext(VisitorContext.Type.PAGE, contextUrl),
-                mediaType)
+        return queueForMediaEngagement(queueId, visitorContextAssetId, mediaType)
                 .mergeWith(
                         awaitTicket()
                                 .flatMapCompletable(queueTicket -> setQueueingMedia(queueId, queueTicket.getId()))
@@ -53,13 +49,14 @@ public class GliaQueueRepository {
     }
 
     private Completable queueForMediaEngagement(String queueId,
-                                                VisitorContext visitorContext,
+                                                String  visitorContextAssetId,
                                                 Engagement.MediaType mediaType) {
         return Completable.create(emitter ->
                 gliaCore.queueForEngagement(
                         queueId,
                         mediaType,
-                        visitorContext,
+                        visitorContextAssetId,
+                        null,
                         MEDIA_PERMISSION_REQUEST_CODE,
                         exception -> {
                             if (exception == null ||
@@ -75,12 +72,12 @@ public class GliaQueueRepository {
 
     private Completable queueForEngagement(
             String queueId,
-            VisitorContext visitorContext
+            String  visitorContextAssetId
     ) {
         return Completable.create(emitter ->
                 gliaCore.queueForEngagement(
                         queueId,
-                        visitorContext,
+                        visitorContextAssetId,
                         exception -> {
                             if (exception == null ||
                                     exception.cause == GliaException.Cause.ALREADY_QUEUED) {

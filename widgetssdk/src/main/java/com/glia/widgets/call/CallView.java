@@ -190,7 +190,7 @@ public class CallView extends ConstraintLayout {
 
     public void startCall(String companyName,
                           String queueId,
-                          String contextUrl,
+                          String  visitorContextAssetId,
                           boolean useOverlays,
                           ScreenSharing.Mode screenSharingMode,
                           Engagement.MediaType mediaType) {
@@ -200,7 +200,7 @@ public class CallView extends ConstraintLayout {
             callController.initCall(
                     companyName,
                     queueId,
-                    contextUrl,
+                    visitorContextAssetId,
                     mediaType
             );
         }

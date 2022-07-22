@@ -132,7 +132,7 @@ public class MainFragment extends Fragment {
 
         return new GliaSdkConfiguration.Builder()
                 .companyName(getCompanyNameFromPrefs(sharedPreferences))
-                .contextUrl(getContextUrlFromPrefs(sharedPreferences))
+                .contextAssetId(getContextAssetIdFromPrefs(sharedPreferences))
                 .queueId(getQueueIdFromPrefs(sharedPreferences))
                 .runTimeTheme(getRuntimeThemeFromPrefs(sharedPreferences))
                 .screenSharingMode(getScreenSharingModeFromPrefs(sharedPreferences))
@@ -153,8 +153,8 @@ public class MainFragment extends Fragment {
                 getQueueIdFromPrefs(sharedPreferences)
         );
         intent.putExtra(
-                GliaWidgets.CONTEXT_URL,
-                getContextUrlFromPrefs(sharedPreferences)
+                GliaWidgets.CONTEXT_ASSET_ID,
+                getContextAssetIdFromPrefs(sharedPreferences)
         );
         intent.putExtra(
                 GliaWidgets.UI_THEME,
@@ -191,10 +191,10 @@ public class MainFragment extends Fragment {
         );
     }
 
-    private String getContextUrlFromPrefs(SharedPreferences sharedPreferences) {
+    private String getContextAssetIdFromPrefs(SharedPreferences sharedPreferences) {
         return Utils.getStringFromPrefs(
-                R.string.pref_context_url,
-                getString(R.string.default_queue_id),
+                R.string.pref_context_asset_id,
+                null,
                 sharedPreferences,
                 getResources()
         );

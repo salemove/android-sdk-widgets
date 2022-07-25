@@ -154,6 +154,17 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState transferring() {
+        return new Builder()
+                .copyFrom(this)
+                .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
+                .setEngagementRequested(true)
+                .setOperatorStatusItem(OperatorStatusItem.TransferringStatusItem())
+                .disableChatPanel()
+                .createChatState();
+    }
+
     public ChatState allowSendAttachmentStateChanged(boolean isAttachmentAllowed) {
         return new Builder()
                 .copyFrom(this)
@@ -164,8 +175,7 @@ public class ChatState {
     public ChatState engagementStarted() {
         return new Builder()
                 .copyFrom(this)
-                .setChatInputMode(ChatInputMode.ENABLED)
-                .setIsAttachmentButtonNeeded(true)
+                .enableChatPanel()
                 .setEngagementRequested(true)
                 .createChatState();
     }
@@ -175,6 +185,7 @@ public class ChatState {
                 .copyFrom(this)
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
+                .enableChatPanel()
                 .createChatState();
     }
 
@@ -482,6 +493,19 @@ public class ChatState {
 
         public Builder setVisitorContextAssetId(String visitorContextAssetId) {
             this.visitorContextAssetId = visitorContextAssetId;
+            return this;
+        }
+
+        public Builder enableChatPanel() {
+            setChatInputMode(ChatInputMode.ENABLED);
+            setIsAttachmentButtonNeeded(true);
+            return this;
+        }
+
+        public Builder disableChatPanel() {
+            setChatInputMode(ChatInputMode.DISABLED);
+            setShowSendButton(false);
+            setIsAttachmentButtonNeeded(false);
             return this;
         }
     }

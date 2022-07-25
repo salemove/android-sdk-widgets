@@ -624,9 +624,8 @@ public class ChatController implements
         if (chatState.operatorStatusItem != null) {
             items.remove(chatState.operatorStatusItem);
         }
-        OperatorStatusItem operatorStatusItem = OperatorStatusItem.TransferringStatusItem();
-        items.add(operatorStatusItem);
-        emitViewState(chatState.queueingStarted(operatorStatusItem));
+        items.add(OperatorStatusItem.TransferringStatusItem());
+        emitViewState(chatState.transferring());
         emitChatItems(chatState.changeItems(items));
     }
 

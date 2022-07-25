@@ -649,8 +649,7 @@ public class ChatView extends ConstraintLayout implements
                 break;
         }
 
-        chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
-                chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
+        chatEditText.setEnabled(chatState.chatInputMode.isEnabled());
     }
 
     private void updateAppBar(ChatState chatState) {

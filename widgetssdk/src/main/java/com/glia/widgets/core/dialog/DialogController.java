@@ -18,6 +18,7 @@ public class DialogController {
 
     private final SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase;
     private final SetEnableCallNotificationChannelDialogShownUseCase setEnableCallNotificationChannelDialogShownUseCase;
+    private Runnable postponedOperation;
 
     public DialogController(
             SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase,
@@ -44,9 +45,14 @@ public class DialogController {
         return dialogsState instanceof DialogsState.NoDialog;
     }
 
+    public boolean isOverlayDialogShown() {
+        return dialogsState instanceof DialogsState.OverlayPermissionsDialog;
+    }
+
     public void dismissDialogs() {
         Logger.d(TAG, "Dismiss dialogs");
         emitDialogState(new DialogsState.NoDialog());
+        runPostponedOperation();
     }
 
     private synchronized void emitDialogState(DialogsState state) {
@@ -118,12 +124,14 @@ public class DialogController {
         if (isNoDialogShown()) {
             Logger.d(TAG, "Show No More Operators Dialog");
             emitDialogState(new DialogsState.NoMoreOperatorsDialog());
+        } else if (isOverlayDialogShown()) {
+            postponedOperation = this::showNoMoreOperatorsAvailableDialog;
         }
     }
 
     public void showEngagementEndedDialog() {
         if (isNoDialogShown()) {
-            Logger.d(TAG, "Show Engagement Ended Dialog");
+            Logger.d(TAG, "Show Engagement EngagementEndedEvent Dialog");
             emitDialogState(new DialogsState.EngagementEndedDialog());
         }
     }
@@ -173,6 +181,13 @@ public class DialogController {
     public void removeCallback(Callback callback) {
         Logger.d(TAG, "removeCallback");
         viewCallbacks.remove(callback);
+    }
+
+    private void runPostponedOperation() {
+        if (postponedOperation != null) {
+            postponedOperation.run();
+            postponedOperation = null;
+        }
     }
 
     public interface Callback {

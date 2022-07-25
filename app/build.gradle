@@ -37,12 +37,10 @@ android {
     } else {
         ext["GLIA_API_KEY_SECRET"] = System.getenv("GLIA_API_KEY_SECRET") as String
         ext["GLIA_API_KEY_ID"] = System.getenv("GLIA_API_KEY_ID") as String
-        ext["GLIA_APP_TOKEN"] = System.getenv("GLIA_APP_TOKEN") as String
         ext["GLIA_SITE_ID"] = System.getenv("GLIA_SITE_ID") as String
     }
     buildTypes {
         all {
-            resValue("string", "app_token", GLIA_APP_TOKEN ?: "")
             resValue("string", "site_id", GLIA_SITE_ID ?: "")
             resValue("string", "glia_api_key_id", GLIA_API_KEY_ID ?: "")
             resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET ?: "")

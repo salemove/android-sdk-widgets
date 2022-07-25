@@ -1,7 +1,10 @@
 package com.glia.widgets.di;
 
 import com.glia.widgets.chat.data.GliaChatRepository;
+import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
+import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
@@ -22,15 +25,21 @@ public class RepositoryFactory {
     private static GliaOperatorMediaRepository gliaOperatorMediaRepository;
     private static GliaQueueRepository gliaQueueRepository;
     private static GliaFileRepository gliaFileRepository;
-    private FileAttachmentRepository fileAttachmentRepository;
-    private GliaSurveyRepository gliaSurveyRepository;
+    private static GliaSurveyRepository gliaSurveyRepository;
+    private static GliaEngagementTypeRepository gliaEngagementTypeRepository;
+    private static GliaEngagementStateRepository gliaEngagementStateRepository;
+    private static FileAttachmentRepository fileAttachmentRepository;
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
+    private final FileHelper fileHelper = new FileHelper();
 
-    public RepositoryFactory(GliaCore gliaCore, DownloadsFolderDataSource downloadsFolderDataSource) {
-        this.gliaCore = gliaCore;
+    public RepositoryFactory(
+            GliaCore gliaCore,
+            DownloadsFolderDataSource downloadsFolderDataSource
+    ) {
         this.downloadsFolderDataSource = downloadsFolderDataSource;
+        this.gliaCore = gliaCore;
     }
 
     public MediaUpgradeOfferRepository getMediaUpgradeOfferRepository() {
@@ -41,7 +50,7 @@ public class RepositoryFactory {
     }
 
     public GliaScreenSharingRepository getGliaScreenSharingRepository() {
-        return new GliaScreenSharingRepository();
+        return new GliaScreenSharingRepository(gliaCore);
     }
 
     public GliaChatRepository getGliaMessageRepository() {
@@ -50,7 +59,9 @@ public class RepositoryFactory {
 
     public GliaEngagementRepository getGliaEngagementRepository() {
         if (gliaEngagementRepository == null) {
-            gliaEngagementRepository = new GliaEngagementRepository();
+            gliaEngagementRepository = new GliaEngagementRepository(
+                    gliaCore
+            );
         }
         return gliaEngagementRepository;
     }
@@ -71,21 +82,26 @@ public class RepositoryFactory {
 
     public GliaQueueRepository getGliaQueueRepository() {
         if (gliaQueueRepository == null) {
-            gliaQueueRepository = new GliaQueueRepository();
+            gliaQueueRepository = new GliaQueueRepository(gliaCore);
         }
         return gliaQueueRepository;
     }
 
     public FileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository();
+            fileAttachmentRepository = new FileAttachmentRepository(gliaCore);
         }
         return fileAttachmentRepository;
     }
 
     public GliaFileRepository getGliaFileRepository() {
         if (gliaFileRepository == null) {
-            gliaFileRepository = new GliaFileRepositoryImpl(InAppBitmapCache.getInstance(), downloadsFolderDataSource);
+            gliaFileRepository = new GliaFileRepositoryImpl(
+                    InAppBitmapCache.getInstance(),
+                    downloadsFolderDataSource,
+                    gliaCore,
+                    fileHelper
+            );
         }
         return gliaFileRepository;
     }
@@ -95,5 +111,24 @@ public class RepositoryFactory {
             gliaSurveyRepository = new GliaSurveyRepository(gliaCore);
         }
         return gliaSurveyRepository;
+    }
+
+    public GliaEngagementTypeRepository getGliaEngagementTypeRepository() {
+        if (gliaEngagementTypeRepository == null) {
+            gliaEngagementTypeRepository = new GliaEngagementTypeRepository(
+                    getGliaEngagementRepository(),
+                    getGliaVisitorMediaRepository(),
+                    getGliaOperatorMediaRepository(),
+                    getGliaEngagementStateRepository()
+            );
+        }
+        return gliaEngagementTypeRepository;
+    }
+
+    public GliaEngagementStateRepository getGliaEngagementStateRepository() {
+        if (gliaEngagementStateRepository == null) {
+            gliaEngagementStateRepository = new GliaEngagementStateRepository();
+        }
+        return gliaEngagementStateRepository;
     }
 }

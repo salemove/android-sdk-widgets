@@ -3,37 +3,52 @@ package com.glia.widgets.core.queue.domain;
 import com.glia.androidsdk.Engagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
+import com.glia.widgets.core.queue.domain.exception.EngagementOngoingException;
+import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
+import com.glia.widgets.core.queue.model.GliaQueueingState;
+import com.glia.widgets.helper.rx.Schedulers;
+
+import io.reactivex.Completable;
 
 public class GliaQueueForMediaEngagementUseCase {
-
+    private final Schedulers schedulers;
     private final GliaQueueRepository repository;
     private final GliaEngagementRepository engagementRepository;
 
     public GliaQueueForMediaEngagementUseCase(
+            Schedulers schedulers,
             GliaQueueRepository repository,
             GliaEngagementRepository engagementRepository
     ) {
         this.repository = repository;
         this.engagementRepository = engagementRepository;
+        this.schedulers = schedulers;
     }
 
-    public void execute(
+    public Completable execute(
             String queueId,
-            String contextUrl,
+            String visitorContextAssetId,
             Engagement.MediaType mediaType
     ) {
         if (engagementRepository.hasOngoingEngagement()) {
-            repository.onTicketReceived(repository.getQueueTicket());
+            return Completable.error(new EngagementOngoingException());
         } else {
-            startQueueing(queueId, contextUrl, mediaType);
+            return startQueueing(queueId, visitorContextAssetId, mediaType);
         }
     }
 
-    private void startQueueing(String queueId,
-                               String contextUrl,
-                               Engagement.MediaType mediaType
+    private Completable startQueueing(
+            String queueId,
+            String  visitorContextAssetId,
+            Engagement.MediaType mediaType
     ) {
-        engagementRepository.onMediaEngagement();
-        repository.startQueueingForMediaEngagement(queueId, contextUrl, mediaType);
+        GliaQueueingState queueingState = repository.getQueueingState();
+        if (queueingState instanceof GliaQueueingState.None) {
+            return repository.startQueueingForMediaEngagement(queueId, visitorContextAssetId, mediaType)
+                    .subscribeOn(schedulers.getComputationScheduler())
+                    .observeOn(schedulers.getMainScheduler());
+        } else {
+            return Completable.error(new QueueingOngoingException());
+        }
     }
 }

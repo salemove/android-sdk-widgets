@@ -190,7 +190,7 @@ public class CallView extends ConstraintLayout {
 
     public void startCall(String companyName,
                           String queueId,
-                          String contextUrl,
+                          String  visitorContextAssetId,
                           boolean useOverlays,
                           ScreenSharing.Mode screenSharingMode,
                           Engagement.MediaType mediaType) {
@@ -200,7 +200,7 @@ public class CallView extends ConstraintLayout {
             callController.initCall(
                     companyName,
                     queueId,
-                    contextUrl,
+                    visitorContextAssetId,
                     mediaType
             );
         }
@@ -341,11 +341,11 @@ public class CallView extends ConstraintLayout {
                     chatButtonBadgeView.setVisibility(callState.messagesNotSeen > 0 ? VISIBLE : GONE);
                     videoButton.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
                     videoButtonLabel.setVisibility(callState.is2WayVideoCall() ? VISIBLE : GONE);
-                    operatorNameView.setVisibility(callState.isCallOngoingAndOperatorConnected() ? VISIBLE : GONE);
-                    companyNameView.setVisibility(callState.isMediaEngagementStarted() ? GONE : VISIBLE);
+                    operatorNameView.setVisibility(callState.showOperatorNameView() ? VISIBLE : GONE);
+                    companyNameView.setVisibility(callState.showCompanyNameView() ? VISIBLE : GONE);
                     msrView.setVisibility(callState.isCallNotOngoing() ? VISIBLE : GONE);
                     connectingView.setVisibility(callState.isCallOngoingAndOperatorIsConnecting() ? VISIBLE : GONE);
-                    onHoldTextView.setVisibility(callState.isOnHold ? VISIBLE : GONE);
+                    onHoldTextView.setVisibility(callState.showOnHold() ? VISIBLE : GONE);
                     handleCallTimerView(callState);
                     handleContinueBrowsingView(callState);
                     handleOperatorStatusViewState(callState);
@@ -450,7 +450,7 @@ public class CallView extends ConstraintLayout {
     }
 
     private void handleCallTimerView(CallState callState) {
-        callTimerView.setVisibility(callState.isShowCallTimerView() ? VISIBLE : GONE);
+        callTimerView.setVisibility(callState.showCallTimerView() ? VISIBLE : GONE);
         if (callState.callStatus.getTime() != null) {
             callTimerView.setText(callState.callStatus.getTime());
         }
@@ -463,7 +463,7 @@ public class CallView extends ConstraintLayout {
         );
         continueBrowsingView.setText(
                 getResources().getString(
-                        callState.isOnHold ?
+                        callState.showOnHold() ?
                                 R.string.glia_call_continue_browsing_on_hold :
                                 R.string.glia_call_continue_browsing
                 )
@@ -471,10 +471,15 @@ public class CallView extends ConstraintLayout {
     }
 
     private void handleOperatorStatusViewState(CallState state) {
-        operatorStatusView.setShowRippleAnimation(state.isCallNotOngoing() || state.isCallOngoingAndOperatorIsConnecting());
-        handleOperatorStatusViewOperatorImage(state);
+        operatorStatusView.setShowRippleAnimation(state.showOperatorStatusViewRippleAnimation());
+        operatorStatusView.setShowOnHold(state.showOnHold());
+        if (state.isTransferring()) {
+            operatorStatusView.showTransferring();
+            operatorNameView.setText(R.string.glia_chat_visitor_status_transferring);
+        } else {
+            handleOperatorStatusViewOperatorImage(state);
+        }
         operatorStatusView.setVisibility(state.showOperatorStatusView() ? VISIBLE : GONE);
-        operatorStatusView.setShowOnHold(state.isOnHold);
     }
 
     private void handleOperatorStatusViewOperatorImage(CallState state) {
@@ -1106,8 +1111,15 @@ public class CallView extends ConstraintLayout {
         void onTitleUpdated(String title);
     }
 
+    @Deprecated
     public boolean shouldShowMediaEngagementView() {
-        if (callController != null) return callController.shouldShowMediaEngagementView();
+        return shouldShowMediaEngagementView(false);
+    }
+
+    public boolean shouldShowMediaEngagementView(boolean isUpgradeToCall) {
+        if (callController != null) {
+            return callController.shouldShowMediaEngagementView(isUpgradeToCall);
+        }
         return false;
     }
 }

@@ -18,6 +18,8 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
@@ -119,6 +121,7 @@ public class ChatView extends ConstraintLayout implements
     private MaterialCardView newMessagesCardView;
     private OperatorStatusView newMessagesOperatorStatusView;
     private TextView newMessagesCountBadgeView;
+    private Handler mainThreadHandler;
 
     private boolean isInBottom = true;
 
@@ -221,6 +224,8 @@ public class ChatView extends ConstraintLayout implements
 
         this.resources = getResources();
 
+        mainThreadHandler = new Handler(Looper.getMainLooper());
+
         initConfigurations();
         initViews();
         readTypedArray(attrs, defStyleAttr, defStyleRes);
@@ -247,19 +252,19 @@ public class ChatView extends ConstraintLayout implements
      *
      * @param companyName Text shown in the chat while waiting in a queue.
      * @param queueId     The queue id to which you would like to queue to and speak to operators from.
-     * @param contextUrl  Provide some context as to from where are you initiating the chat from.
+     * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
      */
     public void startChat(
             String companyName,
             String queueId,
-            String contextUrl) {
-        startChat(companyName, queueId, contextUrl, false, null);
+            String visitorContextAssetId) {
+        startChat(companyName, queueId, visitorContextAssetId, false, null);
     }
 
     /**
      * @param companyName Text shown in the chat while waiting in a queue.
      * @param queueId     The queue id to which you would like to queue to and speak to operators from.
-     * @param contextUrl  Provide some context as to from where are you initiating the chat from.
+     * @param visitorContextAssetId  Provide some context asset ID as to from where are you initiating the chat from.
      * @param useOverlays Used to set if the user opted to use overlays or not.
      *                    See {@link com.glia.widgets.GliaWidgets}.USE_OVERLAY to see its full
      *                    usage description.
@@ -269,14 +274,14 @@ public class ChatView extends ConstraintLayout implements
     public void startChat(
             String companyName,
             String queueId,
-            String contextUrl,
+            String  visitorContextAssetId,
             boolean useOverlays,
             ScreenSharing.Mode screenSharingMode
     ) {
         Dependencies.getSdkConfigurationManager().setUseOverlay(useOverlays);
         Dependencies.getSdkConfigurationManager().setScreenSharingMode(screenSharingMode);
         if (controller != null) {
-            controller.initChat(companyName, queueId, contextUrl);
+            controller.initChat(companyName, queueId, visitorContextAssetId);
         }
         if (serviceChatHeadController != null) {
             serviceChatHeadController.init();
@@ -459,6 +464,7 @@ public class ChatView extends ConstraintLayout implements
 
                     updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl);
                     isInBottom = chatState.isChatInBottom;
+                    chatRecyclerView.setInBottom(isInBottom);
                     newMessagesCountBadgeView.setText(String.valueOf(chatState.messagesNotSeen));
 
                     if (chatState.isVisible) {
@@ -536,9 +542,11 @@ public class ChatView extends ConstraintLayout implements
 
             @Override
             public void clearMessageInput() {
-                chatEditText.removeTextChangedListener(textWatcher);
-                chatEditText.getText().clear();
-                chatEditText.addTextChangedListener(textWatcher);
+                mainThreadHandler.post(() -> {
+                    chatEditText.removeTextChangedListener(textWatcher);
+                    chatEditText.getText().clear();
+                    chatEditText.addTextChangedListener(textWatcher);
+                });
             }
         };
     }
@@ -641,8 +649,7 @@ public class ChatView extends ConstraintLayout implements
                 break;
         }
 
-        chatEditText.setEnabled(chatState.chatInputMode == ChatInputMode.ENABLED ||
-                chatState.chatInputMode == ChatInputMode.ENABLED_NO_ENGAGEMENT);
+        chatEditText.setEnabled(chatState.chatInputMode.isEnabled());
     }
 
     private void updateAppBar(ChatState chatState) {

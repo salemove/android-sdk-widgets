@@ -3,11 +3,11 @@ package com.glia.widgets.core.engagement.domain;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
-import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 
@@ -22,7 +22,6 @@ public class GliaOnEngagementEndUseCase implements
     private final RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
     private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
     private final GliaEngagementRepository repository;
-    private final GliaQueueRepository gliaQueueRepository;
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
     private final GliaSurveyRepository surveyRepository;
@@ -43,9 +42,7 @@ public class GliaOnEngagementEndUseCase implements
             if (listener != null) {
                 listener.engagementEnded();
             }
-            gliaQueueRepository.onEngagementEnd();
             operatorMediaRepository.stopListening(engagement);
-            repository.clearEngagementType();
             fileAttachmentRepository.clearObservers();
             fileAttachmentRepository.detachAllFiles();
             removeScreenSharingNotificationUseCase.execute();
@@ -58,7 +55,6 @@ public class GliaOnEngagementEndUseCase implements
 
     public GliaOnEngagementEndUseCase(
             GliaEngagementRepository repository,
-            GliaQueueRepository gliaQueueRepository,
             GliaOperatorMediaRepository operatorMediaRepository,
             FileAttachmentRepository fileAttachmentRepository,
             GliaOnEngagementUseCase engagementUseCase,
@@ -71,7 +67,6 @@ public class GliaOnEngagementEndUseCase implements
         this.engagementUseCase = engagementUseCase;
         this.removeCallNotificationUseCase = removeCallNotificationUseCase;
         this.removeScreenSharingNotificationUseCase = removeScreenSharingNotificationUseCase;
-        this.gliaQueueRepository = gliaQueueRepository;
         this.operatorMediaRepository = operatorMediaRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;
         this.surveyRepository = surveyRepository;

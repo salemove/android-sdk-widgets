@@ -16,15 +16,13 @@
     <string name="pref_header_title">header_title</string>
     <string name="pref_glia_core_sdk_version">glia_core_sdk_version</string>
     <string name="pref_glia_widgets_sdk_version">glia_widgets_sdk_version</string>
-    <string name="pref_authorization_type">authorization_type</string>
-    <string name="pref_app_token">app_token</string>
     <string name="pref_app_authorization">app_authorization</string>
     <string name="pref_site_id">site_id</string>
     <string name="pref_api_key_id">api_key</string>
     <string name="pref_api_key_secret">api_key_secret</string>
     <string name="pref_company_name">company_name</string>
     <string name="pref_queue_id">queue_id</string>
-    <string name="pref_context_url">context_url</string>
+    <string name="pref_context_asset_id">context_asset_id</string>
     <string name="pref_white_label">white_label_toggle</string>
     <string name="pref_use_overlay">use_overlay</string>
     <string name="pref_use_alert_dialog_button_vertical_alignment">use_alert_dialog_button_vertical_alignment</string>

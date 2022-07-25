@@ -2,6 +2,8 @@ package com.glia.widgets.core.screensharing;
 
 import android.content.Context;
 
+import androidx.annotation.VisibleForTesting;
+
 import com.glia.androidsdk.GliaException;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
@@ -26,7 +28,8 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
     private final Set<ViewCallback> viewCallbacks = new HashSet<>();
 
-    private boolean hasPendingScreenSharingRequest = false;
+    @VisibleForTesting
+    public boolean hasPendingScreenSharingRequest = false;
 
     public ScreenSharingController(
             GliaScreenSharingRepository gliaScreenSharingRepository,

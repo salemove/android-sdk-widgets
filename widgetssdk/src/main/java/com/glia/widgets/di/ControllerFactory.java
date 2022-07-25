@@ -91,9 +91,7 @@ public class ControllerFactory {
                     useCaseFactory.createGliaSendMessageUseCase(),
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
                     useCaseFactory.createCancelQueueTicketUseCase(),
-                    useCaseFactory.createGetIsQueueingOngoingUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
-                    useCaseFactory.createOnUpgradeToMediaEngagementUseCase(),
                     useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                     useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                     useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
@@ -104,10 +102,9 @@ public class ControllerFactory {
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createDownloadFileUseCase(),
                     useCaseFactory.createIsEnableChatEditTextUseCase(),
-                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.createSiteInfoUseCase(),
-                    useCaseFactory.getGliaSurveyUseCase()
+                    useCaseFactory.getGliaSurveyUseCase(),
+                    useCaseFactory.createGetGliaEngagementStateFlowableUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -141,13 +138,12 @@ public class ControllerFactory {
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                     useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
                     useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
-                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.getGliaSurveyUseCase(),
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createToggleVisitorAudioMediaMuteUseCase(),
-                    useCaseFactory.createToggleVisitorVideoUseCase()
+                    useCaseFactory.createToggleVisitorVideoUseCase(),
+                    useCaseFactory.createGetGliaEngagementStateFlowableUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -222,11 +218,10 @@ public class ControllerFactory {
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     messagesNotSeenHandler,
-                    useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                    useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
-                    chatHeadPosition
+                    chatHeadPosition,
+                    useCaseFactory.createGetOperatorFlowableUseCase()
             );
         }
         return serviceChatHeadController;
@@ -239,10 +234,9 @@ public class ControllerFactory {
                 useCaseFactory.createOnEngagementUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase(),
                 messagesNotSeenHandler,
-                useCaseFactory.createSubscribeToQueueingStateChangeUseCase(),
-                useCaseFactory.createUnSubscribeToQueueingStateChangeUseCase(),
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase()
+                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
+                useCaseFactory.createGetOperatorFlowableUseCase()
         );
     }
 

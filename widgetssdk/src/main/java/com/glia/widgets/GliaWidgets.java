@@ -22,7 +22,6 @@ import io.reactivex.plugins.RxJavaPlugins;
  * This class is a starting point for integration with Glia Widgets SDK
  */
 public class GliaWidgets {
-
     private final static String TAG = "GliaWidgets";
 
     /**
@@ -46,8 +45,16 @@ public class GliaWidgets {
     /**
      * Use with {@link android.os.Bundle} to pass in a context url as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     * @deprecated Use {@link com.glia.widgets.GliaWidgets#CONTEXT_ASSET_ID}
      */
+    @Deprecated
     public static final String CONTEXT_URL = "context_url";
+
+    /**
+     * Use with {@link android.os.Bundle} to pass in a context asset ID as a navigation
+     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     */
+    public static final String CONTEXT_ASSET_ID = "context_asset_id";
 
     /**
      * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
@@ -81,6 +88,12 @@ public class GliaWidgets {
      * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
      */
     public static final String MEDIA_TYPE_VIDEO = "media_type_video";
+
+    /**
+     * Pass this parameter to call activity to tell it that upgrade to audio/video call is ongoing
+     * If no parameter is passed then will default to false
+     */
+    public static final String IS_UPGRADE_TO_CALL = "upgrade_to_call";
 
     public static final String SURVEY = "survey";
 

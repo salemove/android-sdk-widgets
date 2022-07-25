@@ -7,8 +7,10 @@ import com.glia.widgets.chat.ChatView;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.queue.GliaQueueRepository;
+import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.filepreview.ui.FilePreviewView;
 
 public class ToggleChatHeadServiceUseCase {
@@ -17,19 +19,22 @@ public class ToggleChatHeadServiceUseCase {
     private final ChatHeadManager chatHeadManager;
     private final PermissionManager permissionManager;
     private final GliaSdkConfigurationManager configurationManager;
+    private final GliaEngagementTypeRepository engagementTypeRepository;
 
     public ToggleChatHeadServiceUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository,
             ChatHeadManager chatHeadManager,
             PermissionManager permissionManager,
-            GliaSdkConfigurationManager configurationManager
+            GliaSdkConfigurationManager configurationManager,
+            GliaEngagementTypeRepository engagementTypeRepository
     ) {
         this.engagementRepository = engagementRepository;
         this.queueRepository = queueRepository;
         this.chatHeadManager = chatHeadManager;
         this.permissionManager = permissionManager;
         this.configurationManager = configurationManager;
+        this.engagementTypeRepository = engagementTypeRepository;
     }
 
     public void execute(View view) {
@@ -77,18 +82,19 @@ public class ToggleChatHeadServiceUseCase {
     }
 
     private boolean isMediaQueueingOngoing() {
-        return queueRepository.isMediaQueueingOngoing();
+        GliaQueueingState state = queueRepository.getQueueingState();
+        return state instanceof GliaQueueingState.Media;
     }
 
     private boolean isMediaEngagementOngoing() {
-        return engagementRepository.hasOngoingEngagement() && engagementRepository.isMediaEngagement();
+        return engagementRepository.hasOngoingEngagement() && engagementTypeRepository.isMediaEngagement();
     }
 
     private boolean isChatQueueingOngoing() {
-        return queueRepository.isChatQueueingOngoing();
+        return queueRepository.getQueueingState() instanceof GliaQueueingState.Chat;
     }
 
     private boolean isChatEngagementOngoing() {
-        return engagementRepository.hasOngoingEngagement() && engagementRepository.isChatEngagement();
+        return engagementRepository.hasOngoingEngagement() && engagementTypeRepository.isChatEngagement();
     }
 }

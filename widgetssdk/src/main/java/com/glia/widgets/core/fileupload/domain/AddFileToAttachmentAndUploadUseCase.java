@@ -1,5 +1,9 @@
 package com.glia.widgets.core.fileupload.domain;
 
+import static com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT;
+
+import androidx.annotation.VisibleForTesting;
+
 import com.glia.androidsdk.engagement.EngagementFile;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
@@ -10,8 +14,6 @@ import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededExcep
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
 public class AddFileToAttachmentAndUploadUseCase {
-    private final static long SUPPORTED_FILE_COUNT = 25;
-    private final static long SUPPORTED_FILE_SIZE_25MB = 26214400L;
 
     private final GliaEngagementRepository gliaEngagementRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
@@ -20,8 +22,8 @@ public class AddFileToAttachmentAndUploadUseCase {
             GliaEngagementRepository gliaEngagementRepository,
             FileAttachmentRepository fileAttachmentRepository
     ) {
-        this.fileAttachmentRepository = fileAttachmentRepository;
         this.gliaEngagementRepository = gliaEngagementRepository;
+        this.fileAttachmentRepository = fileAttachmentRepository;
     }
 
     public void execute(FileAttachment file, Listener listener) {
@@ -56,11 +58,7 @@ public class AddFileToAttachmentAndUploadUseCase {
     }
 
     private boolean isSupportedFileSizeExceeded(FileAttachment file) {
-        return isSupportedFileSizeLargerThen25MB(file);
-    }
-
-    private boolean isSupportedFileSizeLargerThen25MB(FileAttachment file) {
-        return file.getSize() >= SUPPORTED_FILE_SIZE_25MB;
+        return file.getSize() >= SUPPORTED_FILE_SIZE;
     }
 
     private boolean isSupportedFileCountExceeded() {
@@ -82,4 +80,7 @@ public class AddFileToAttachmentAndUploadUseCase {
 
         void onSecurityCheckFinished(EngagementFile.ScanResult scanResult);
     }
+
+    @VisibleForTesting
+    public final static long SUPPORTED_FILE_SIZE = 26214400L;
 }

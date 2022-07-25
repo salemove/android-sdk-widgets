@@ -2,25 +2,30 @@ package com.glia.widgets.core.chathead.domain;
 
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.queue.GliaQueueRepository;
+import com.glia.widgets.core.queue.model.GliaQueueingState;
 
 public class IsDisplayApplicationChatHeadUseCase {
     private final GliaEngagementRepository engagementRepository;
     private final GliaQueueRepository queueRepository;
     private final PermissionManager permissionManager;
     private final GliaSdkConfigurationManager configurationManager;
+    private final GliaEngagementTypeRepository engagementTypeRepository;
 
     public IsDisplayApplicationChatHeadUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository,
             PermissionManager permissionManager,
-            GliaSdkConfigurationManager configurationManager
+            GliaSdkConfigurationManager configurationManager,
+            GliaEngagementTypeRepository gliaEngagementTypeRepository
     ) {
         this.engagementRepository = engagementRepository;
         this.queueRepository = queueRepository;
         this.permissionManager = permissionManager;
         this.configurationManager = configurationManager;
+        this.engagementTypeRepository = gliaEngagementTypeRepository;
     }
 
     public boolean execute(
@@ -43,12 +48,12 @@ public class IsDisplayApplicationChatHeadUseCase {
     }
 
     private boolean isMediaQueueingOngoing() {
-        return queueRepository.isMediaQueueingOngoing();
+        GliaQueueingState state = queueRepository.getQueueingState();
+        return state instanceof GliaQueueingState.Media;
     }
 
     private boolean isMediaEngagementOngoing() {
-        return engagementRepository.hasOngoingEngagement() &&
-                engagementRepository.isMediaEngagement();
+        return engagementTypeRepository.isMediaEngagement();
     }
 
     private boolean isEngagementOngoing() {
@@ -56,7 +61,7 @@ public class IsDisplayApplicationChatHeadUseCase {
     }
 
     private boolean isQueueingOngoing() {
-        return !queueRepository.isNoQueueingOngoing();
+        return !(queueRepository.getQueueingState() instanceof GliaQueueingState.None);
     }
 
     private boolean isMediaEngagementOrQueueingInChat(boolean isChatView) {

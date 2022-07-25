@@ -7,9 +7,6 @@
     <fragment
         android:id="@+id/settings_fragment"
         android:name="com.glia.exampleapp.SettingsFragment">
-        <action
-            android:id="@+id/authorization"
-            app:destination="@id/authorization_fragment" />
     </fragment>
 
     <fragment
@@ -29,9 +26,5 @@
     <fragment
         android:id="@+id/chat_fragment"
         android:name="com.glia.exampleapp.ChatFragment" />
-
-    <fragment
-        android:id="@+id/authorization_fragment"
-        android:name="com.glia.exampleapp.auth.AuthorizationFragment" />
 
 </navigation>

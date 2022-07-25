@@ -18,15 +18,18 @@ public class GetImageFileFromNetworkUseCase {
     }
 
     public Maybe<Bitmap> execute(AttachmentFile file) {
-        if (file == null || file.getName().isEmpty())
+        if (file == null || file.getName().isEmpty()) {
             return Maybe.error(new FileNameMissingException());
-        if (file.isDeleted())
+        }
+        if (file.isDeleted()) {
             return Maybe.error(new RemoteFileIsDeletedException());
+        }
 
         return gliaFileRepository
                 .loadImageFileFromNetwork(file)
                 .flatMap(bitmap ->
-                        gliaFileRepository.putImageToCache(FileHelper.getFileName(file), bitmap)
+                        gliaFileRepository
+                                .putImageToCache(FileHelper.getFileName(file), bitmap)
                                 .andThen(Maybe.just(bitmap))
                 );
     }

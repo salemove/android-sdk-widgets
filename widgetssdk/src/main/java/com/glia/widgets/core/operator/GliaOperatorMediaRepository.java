@@ -8,39 +8,46 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class GliaOperatorMediaRepository {
-    public interface OperatorMediaStateListener {
-        void onNewState(OperatorMediaState state);
-    }
-
     private final ArrayList<OperatorMediaStateListener> eventListeners = new ArrayList<>();
 
     private final Consumer<OperatorMediaState> operatorMediaStateConsumer = operatorMediaState -> {
-        this.operatorMediaState = operatorMediaState;
+        this.currentMediaState = operatorMediaState;
         for (OperatorMediaStateListener listener : eventListeners) {
             listener.onNewState(operatorMediaState);
         }
     };
 
-    private OperatorMediaState operatorMediaState = null;
+    private OperatorMediaState currentMediaState = null;
 
     public void addMediaStateListener(OperatorMediaStateListener listener) {
         eventListeners.add(listener);
-        if (operatorMediaState != null) listener.onNewState(operatorMediaState);
+        if (currentMediaState != null) listener.onNewState(currentMediaState);
     }
 
-    public void startListening(Engagement engagement) {
+    public void onEngagementStarted(Engagement engagement) {
         engagement.getMedia()
                 .on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
     public void stopListening(Engagement engagement) {
-        operatorMediaState = null;
+        currentMediaState = null;
         eventListeners.clear();
         engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
-    public boolean isOperatorMediaState() {
-        return operatorMediaState != null &&
-                (operatorMediaState.getAudio() != null || operatorMediaState.getVideo() != null);
+    public boolean hasOperatorMedia() {
+        return hasOperatorAudioMedia() || hasOperatorVideoMedia();
+    }
+
+    public boolean hasOperatorAudioMedia() {
+        return currentMediaState != null && currentMediaState.getAudio() != null;
+    }
+
+    public boolean hasOperatorVideoMedia() {
+        return currentMediaState != null && currentMediaState.getVideo() != null;
+    }
+
+    public interface OperatorMediaStateListener {
+        void onNewState(OperatorMediaState state);
     }
 }

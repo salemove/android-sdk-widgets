@@ -17,13 +17,12 @@ public class ChatState {
     public final boolean isVisible;
     public final boolean isChatInBottom;
     public final Integer messagesNotSeen;
-    public final String queueTicketId;      // TODO unused
     public final boolean historyLoaded;     // TODO unused
     public final String operatorName;
     public final String operatorProfileImgUrl;
     public final String companyName;
     public final String queueId;
-    public final String contextUrl;
+    public final String visitorContextAssetId;
     public final MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
     public final List<ChatItem> chatItems;
     public final ChatInputMode chatInputMode;
@@ -46,12 +45,11 @@ public class ChatState {
         return integratorChatStarted == chatState.integratorChatStarted &&
                 isVisible == chatState.isVisible &&
                 historyLoaded == chatState.historyLoaded &&
-                Objects.equals(queueTicketId, chatState.queueTicketId) &&
                 Objects.equals(operatorName, chatState.operatorName) &&
                 Objects.equals(operatorProfileImgUrl, chatState.operatorProfileImgUrl) &&
                 Objects.equals(companyName, chatState.companyName) &&
                 Objects.equals(queueId, chatState.queueId) &&
-                Objects.equals(contextUrl, chatState.contextUrl) &&
+                Objects.equals(visitorContextAssetId, chatState.visitorContextAssetId) &&
                 Objects.equals(mediaUpgradeStartedTimerItem, chatState.mediaUpgradeStartedTimerItem) &&
                 Objects.equals(chatInputMode, chatState.chatInputMode) &&
                 Objects.equals(lastTypedText, chatState.lastTypedText) &&
@@ -71,7 +69,7 @@ public class ChatState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, queueTicketId, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, contextUrl, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonNeeded);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, visitorContextAssetId, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonNeeded);
     }
 
     @NonNull
@@ -80,13 +78,12 @@ public class ChatState {
         return "ChatState{" +
                 "integratorChatStarted=" + integratorChatStarted +
                 ", isVisible=" + isVisible +
-                ", queueTicketId='" + queueTicketId + '\'' +
                 ", historyLoaded=" + historyLoaded +
                 ", operatorName='" + operatorName + '\'' +
                 ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                 ", companyName='" + companyName + '\'' +
                 ", queueId='" + queueId + '\'' +
-                ", contextUrl='" + contextUrl + '\'' +
+                ", visitorContextAssetId='" + visitorContextAssetId + '\'' +
                 ", mediaUpgradeStartedTimerItem=" + mediaUpgradeStartedTimerItem +
                 ", chatInputMode=" + chatInputMode +
                 ", lastTypedText: " + lastTypedText +
@@ -132,13 +129,13 @@ public class ChatState {
 
     public ChatState initChat(String companyName,
                               String queueId,
-                              String contextUrl) {
+                              String visitorContextAssetId) {
         return new Builder()
                 .copyFrom(this)
                 .setIntegratorChatStarted(true)
                 .setCompanyName(companyName)
                 .setQueueId(queueId)
-                .setContextUrl(contextUrl)
+                .setVisitorContextAssetId(visitorContextAssetId)
                 .setIsVisible(true)
                 .setShowSendButton(false)
                 .setIsAttachmentButtonEnabled(true)
@@ -157,10 +154,14 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState queueTicketSuccess(String queueTicketId) {
+    public ChatState transferring() {
         return new Builder()
                 .copyFrom(this)
-                .setQueueTicketId(queueTicketId)
+                .setOperatorName(null)
+                .setOperatorProfileImgUrl(null)
+                .setEngagementRequested(true)
+                .setOperatorStatusItem(OperatorStatusItem.TransferringStatusItem())
+                .disableChatPanel()
                 .createChatState();
     }
 
@@ -171,21 +172,26 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState engagementStarted(String operatorName, String operatorProfileImgUrl) {
+    public ChatState engagementStarted() {
+        return new Builder()
+                .copyFrom(this)
+                .enableChatPanel()
+                .setEngagementRequested(true)
+                .createChatState();
+    }
+
+    public ChatState operatorConnected(String operatorName, String operatorProfileImgUrl) {
         return new Builder()
                 .copyFrom(this)
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
-                .setChatInputMode(ChatInputMode.ENABLED)
-                .setIsAttachmentButtonNeeded(true)
-                .setEngagementRequested(true)
+                .enableChatPanel()
                 .createChatState();
     }
 
     public ChatState stop() {
         return new Builder()
                 .copyFrom(this)
-                .setQueueTicketId(null)
                 .setHistoryLoaded(false)
                 .setOperatorName(null)
                 .setOperatorProfileImgUrl(null)
@@ -294,13 +300,12 @@ public class ChatState {
     }
 
     private ChatState(Builder builder) {
-        this.queueTicketId = builder.queueTicketId;
         this.historyLoaded = builder.historyLoaded;
         this.operatorName = builder.operatorName;
         this.operatorProfileImgUrl = builder.operatorProfileImgUrl;
         this.companyName = builder.companyName;
         this.queueId = builder.queueId;
-        this.contextUrl = builder.contextUrl;
+        this.visitorContextAssetId = builder.visitorContextAssetId;
         this.isVisible = builder.isVisible;
         this.integratorChatStarted = builder.integratorChatStarted;
         this.mediaUpgradeStartedTimerItem = builder.mediaUpgradeStartedTimerItem;
@@ -324,14 +329,12 @@ public class ChatState {
         public boolean isOperatorTyping;
         public boolean isAttachmentButtonEnabled;
         public boolean isAttachmentButtonNeeded;
-        private String queueTicketId;
         private boolean historyLoaded;
         private boolean isChatInBottom;
         private String operatorName;
         private String operatorProfileImgUrl;
         private String companyName;
         private String queueId;
-        private String contextUrl;
         private boolean isVisible;
         private boolean integratorChatStarted;
         private MediaUpgradeStartedTimerItem mediaUpgradeStartedTimerItem;
@@ -345,16 +348,16 @@ public class ChatState {
         private OperatorStatusItem operatorStatusItem;
         private boolean showSendButton;
         private boolean isAttachmentAllowed;
+        private String visitorContextAssetId;
 
         public Builder copyFrom(ChatState chatState) {
-            queueTicketId = chatState.queueTicketId;
             historyLoaded = chatState.historyLoaded;
             isChatInBottom = chatState.isChatInBottom;
             operatorName = chatState.operatorName;
             operatorProfileImgUrl = chatState.operatorProfileImgUrl;
             companyName = chatState.companyName;
             queueId = chatState.queueId;
-            contextUrl = chatState.contextUrl;
+            visitorContextAssetId = chatState.visitorContextAssetId;
             isVisible = chatState.isVisible;
             integratorChatStarted = chatState.integratorChatStarted;
             mediaUpgradeStartedTimerItem = chatState.mediaUpgradeStartedTimerItem;
@@ -371,11 +374,6 @@ public class ChatState {
             isAttachmentButtonEnabled = chatState.isAttachmentButtonEnabled;
             isAttachmentButtonNeeded = chatState.isAttachmentButtonNeeded;
             isAttachmentAllowed = chatState.isAttachmentAllowed;
-            return this;
-        }
-
-        public Builder setQueueTicketId(String queueTicketId) {
-            this.queueTicketId = queueTicketId;
             return this;
         }
 
@@ -401,11 +399,6 @@ public class ChatState {
 
         public Builder setQueueId(String queueId) {
             this.queueId = queueId;
-            return this;
-        }
-
-        public Builder setContextUrl(String contextUrl) {
-            this.contextUrl = contextUrl;
             return this;
         }
 
@@ -496,6 +489,24 @@ public class ChatState {
 
         public ChatState createChatState() {
             return new ChatState(this);
+        }
+
+        public Builder setVisitorContextAssetId(String visitorContextAssetId) {
+            this.visitorContextAssetId = visitorContextAssetId;
+            return this;
+        }
+
+        public Builder enableChatPanel() {
+            setChatInputMode(ChatInputMode.ENABLED);
+            setIsAttachmentButtonNeeded(true);
+            return this;
+        }
+
+        public Builder disableChatPanel() {
+            setChatInputMode(ChatInputMode.DISABLED);
+            setShowSendButton(false);
+            setIsAttachmentButtonNeeded(false);
+            return this;
         }
     }
 }

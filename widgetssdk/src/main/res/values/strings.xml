@@ -151,7 +151,7 @@
 
     <!--    statusbar notifications-->
     <string name="glia_notification_screen_sharing_channel_name">Screen sharing notification channel</string>
-    <string name="glia_notification_screen_sharing_title">You are currently sharing your sceen</string>
+    <string name="glia_notification_screen_sharing_title">You are currently sharing your screen</string>
     <string name="glia_notification_screen_sharing_message">To stop sharing your screen, select \'End Sharing\'.</string>
     <string name="glia_notification_call_channel_name">Call notification channel</string>
     <string name="glia_notification_audio_call_title">Ongoing Audio Call</string>

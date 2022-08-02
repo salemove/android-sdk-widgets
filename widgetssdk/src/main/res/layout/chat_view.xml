@@ -66,8 +66,8 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/operator_typing_animation_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginStart="@dimen/glia_medium"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,6 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/chat_typing_indicator"
-        app:lottie_scale="0.5"
         tools:visibility="gone" />
 
     <View

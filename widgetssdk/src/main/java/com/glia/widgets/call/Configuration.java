@@ -1,5 +1,7 @@
 package com.glia.widgets.call;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Utils;
@@ -42,6 +44,7 @@ public class Configuration {
             return this;
         }
 
+        @NonNull
         public Builder setMediaType(String mediaType) {
             this.mediaType = Utils.toMediaType(mediaType);
             return this;

@@ -42,7 +42,7 @@ ext {
     gson = '2.8.6'
     preferenceVersion = '1.1.1'
     picassoVersion = '2.8'
-    lottieVersion = '4.1.0'
+    lottieVersion = '5.2.0'
 
     leakCanaryVersion = '2.6'
     espressoVersion = '3.4.0'

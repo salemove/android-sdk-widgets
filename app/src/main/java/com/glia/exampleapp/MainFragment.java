@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,20 +109,18 @@ public class MainFragment extends Fragment {
     }
 
     private void navigateToCall(
-            String mediaType
+            @Nullable String mediaType
     ) {
-        GliaSdkConfiguration configuration = getConfiguration();
 
-        Configuration activityConfig = Configuration.Builder
+        Configuration.Builder configBuilder = Configuration.Builder
                 .builder()
-                .setWidgetsConfiguration(configuration)
-                .setMediaType(mediaType)
-                .build();
+                .setWidgetsConfiguration(getConfiguration());
 
-        Intent intent = CallActivity.getIntent(
-                requireContext(),
-                activityConfig
-        );
+        if (!TextUtils.isEmpty(mediaType)) {
+            configBuilder.setMediaType(mediaType);
+        }
+
+        Intent intent = CallActivity.getIntent(requireContext(), configBuilder.build());
 
         startActivity(intent);
     }

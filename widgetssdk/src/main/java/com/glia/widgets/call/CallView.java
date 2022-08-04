@@ -150,6 +150,8 @@ public class CallView extends ConstraintLayout {
 
     private void setupViewActions() {
         appBar.setOnBackClickedListener(() -> {
+            callController.onBackClicked();
+
             if (onBackClickedListener != null) {
                 onBackClickedListener.onBackClicked();
             }

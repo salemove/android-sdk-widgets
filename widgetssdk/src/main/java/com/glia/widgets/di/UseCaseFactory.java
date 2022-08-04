@@ -8,8 +8,10 @@ import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
+import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
@@ -393,5 +395,13 @@ public class UseCaseFactory {
 
     public GetOperatorFlowableUseCase createGetOperatorFlowableUseCase() {
         return new GetOperatorFlowableUseCase(repositoryFactory.getGliaEngagementStateRepository());
+    }
+
+    public IsFromCallScreenUseCase createIsFromCallScreenUseCase() {
+        return new IsFromCallScreenUseCase(repositoryFactory.getChatScreenRepository());
+    }
+
+    public UpdateFromCallScreenUseCase createUpdateFromCallScreenUseCase() {
+        return new UpdateFromCallScreenUseCase(repositoryFactory.getChatScreenRepository());
     }
 }

@@ -14,6 +14,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
@@ -93,6 +94,7 @@ public class CallController implements
     private final ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase;
     private final ToggleVisitorVideoUseCase toggleVisitorVideoUseCase;
     private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
+    private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
@@ -129,8 +131,8 @@ public class CallController implements
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
             ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
             ToggleVisitorVideoUseCase toggleVisitorVideoUseCase,
-            GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase
-    ) {
+            GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
+            UpdateFromCallScreenUseCase updateFromCallScreenUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
@@ -170,6 +172,7 @@ public class CallController implements
         this.toggleVisitorAudioMediaMuteUseCase = toggleVisitorAudioMediaMuteUseCase;
         this.toggleVisitorVideoUseCase = toggleVisitorVideoUseCase;
         this.getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase;
+        this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
     }
 
     @Override
@@ -334,6 +337,7 @@ public class CallController implements
 
     public void chatButtonClicked() {
         Logger.d(TAG, "chatButtonClicked");
+        updateFromCallScreenUseCase.updateFromCallScreen(true);
         if (viewCallback != null) {
             viewCallback.navigateToChat();
         }
@@ -789,5 +793,9 @@ public class CallController implements
 
     private void minimizeView() {
         if (viewCallback != null) viewCallback.minimizeView();
+    }
+
+    public void onBackClicked() {
+        updateFromCallScreenUseCase.updateFromCallScreen(false);
     }
 }

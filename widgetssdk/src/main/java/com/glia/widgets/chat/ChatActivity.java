@@ -52,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         chatView.setConfiguration(configuration);
         chatView.setTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);
+        chatView.setOnBackToCallListener(this::backToCall);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
         // to avoid app users to accidentally start queueing for another call when they resume
@@ -120,13 +121,21 @@ public class ChatActivity extends AppCompatActivity {
         startActivity(
                 CallActivity.getIntent(
                         getApplicationContext(),
-                        new Configuration.Builder()
-                                .setWidgetsConfiguration(configuration)
-                                .setMediaType(Utils.toMediaType(mediaType))
+                        getConfigurationBuilder().setMediaType(Utils.toMediaType(mediaType))
                                 .setIsUpgradeToCall(true)
                                 .build()
                 )
         );
+    }
+
+    private void backToCall() {
+        startActivity(CallActivity.getIntent(getApplicationContext(), getConfigurationBuilder().build()));
+
+        chatView.navigateToCallSuccess();
+    }
+
+    private Configuration.Builder getConfigurationBuilder() {
+        return new Configuration.Builder().setWidgetsConfiguration(configuration);
     }
 
     private void navigateToSurvey(UiTheme theme, Survey survey) {

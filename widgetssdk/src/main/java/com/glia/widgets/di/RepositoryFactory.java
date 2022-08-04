@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.chat.data.ChatScreenRepository;
+import com.glia.widgets.chat.data.ChatScreenRepositoryImpl;
 import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
@@ -20,6 +22,7 @@ import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 public class RepositoryFactory {
 
     private MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
+    private ChatScreenRepository chatScreenRepository;
     private static GliaEngagementRepository gliaEngagementRepository;
     private static GliaVisitorMediaRepository gliaVisitorMediaRepository;
     private static GliaOperatorMediaRepository gliaOperatorMediaRepository;
@@ -130,5 +133,12 @@ public class RepositoryFactory {
             gliaEngagementStateRepository = new GliaEngagementStateRepository();
         }
         return gliaEngagementStateRepository;
+    }
+
+    public ChatScreenRepository getChatScreenRepository() {
+        if (chatScreenRepository == null) {
+            chatScreenRepository = new ChatScreenRepositoryImpl();
+        }
+        return chatScreenRepository;
     }
 }

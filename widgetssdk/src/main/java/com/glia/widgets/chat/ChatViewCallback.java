@@ -20,6 +20,8 @@ public interface ChatViewCallback {
 
     void navigateToCall(String requestedMediaType);
 
+    void backToCall();
+
     void navigateToSurvey(@NonNull Survey survey);
 
     void destroyView();

@@ -200,26 +200,26 @@ public class CallActivity extends AppCompatActivity {
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
         GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
-        Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class);
-        newIntent.putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName());
-        newIntent.putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId());
-        newIntent.putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId());
-        newIntent.putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme());
-        newIntent.putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay());
-        newIntent.putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
+        Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class)
+                .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName())
+                .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
+                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
+                .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
+                .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
+                .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
         startActivity(newIntent);
     }
 
     private void navigateToSurvey(Survey survey) {
-        Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class);
-        newIntent.putExtra(GliaWidgets.UI_THEME, configuration.getSdkConfiguration().getRunTimeTheme());
-        newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
+        Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class)
+                .putExtra(GliaWidgets.UI_THEME, configuration.getSdkConfiguration().getRunTimeTheme())
+                .putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
     }
 
     /**
      * Creates and fills out Intent for starting CallActivity
-     * @deprecated use {@link getIntent(Context, Configuration)} since 1.8.2
+     * @deprecated use {@link #getIntent(Context, Configuration)} since 1.8.2
      * @param applicationContext - application context
      * @param sdkConfiguration - widgets sdk configuration
      * @param mediaType - media type that should be started (in case media engagement not ongoing)

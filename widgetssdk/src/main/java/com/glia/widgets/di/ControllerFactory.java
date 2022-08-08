@@ -104,8 +104,9 @@ public class ControllerFactory {
                     useCaseFactory.createIsEnableChatEditTextUseCase(),
                     useCaseFactory.createSiteInfoUseCase(),
                     useCaseFactory.getGliaSurveyUseCase(),
-                    useCaseFactory.createGetGliaEngagementStateFlowableUseCase()
-            );
+                    useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
+                    useCaseFactory.createIsFromCallScreenUseCase(),
+                    useCaseFactory.createUpdateFromCallScreenUseCase());
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -143,8 +144,8 @@ public class ControllerFactory {
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createToggleVisitorAudioMediaMuteUseCase(),
                     useCaseFactory.createToggleVisitorVideoUseCase(),
-                    useCaseFactory.createGetGliaEngagementStateFlowableUseCase()
-            );
+                    useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
+                    useCaseFactory.createUpdateFromCallScreenUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

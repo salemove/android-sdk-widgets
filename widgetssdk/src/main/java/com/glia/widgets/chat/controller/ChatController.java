@@ -24,6 +24,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.Constants;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.chat.ChatView;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
@@ -32,8 +33,10 @@ import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
+import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
@@ -177,6 +180,8 @@ public class ChatController implements
     private final SiteInfoUseCase siteInfoUseCase;
     private final GliaSurveyUseCase surveyUseCase;
     private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
+    private final IsFromCallScreenUseCase isFromCallScreenUseCase;
+    private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
 
     private boolean isVisitorEndEngagement = false;
 
@@ -186,7 +191,7 @@ public class ChatController implements
     public ChatController(
             MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
             TimeCounter sharedTimer,
-            ChatViewCallback chatViewCallback,
+            @Nullable ChatViewCallback chatViewCallback,
             MinimizeHandler minimizeHandler,
             DialogController dialogController,
             MessagesNotSeenHandler messagesNotSeenHandler,
@@ -216,8 +221,10 @@ public class ChatController implements
             IsEnableChatEditTextUseCase isEnableChatEditTextUseCase,
             SiteInfoUseCase siteInfoUseCase,
             GliaSurveyUseCase surveyUseCase,
-            GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase
-    ) {
+            GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
+            IsFromCallScreenUseCase isFromCallScreenUseCase, UpdateFromCallScreenUseCase updateFromCallScreenUseCase) {
+        this.isFromCallScreenUseCase = isFromCallScreenUseCase;
+        this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         Logger.d(TAG, "constructor");
 
         // viewCallback is accessed from multiple threads
@@ -500,6 +507,20 @@ public class ChatController implements
         Logger.d(TAG, "onBackArrowClicked");
         emitViewState(chatState.changeVisibility(false));
         messagesNotSeenHandler.chatOnBackClicked();
+    }
+
+    public void onBackArrowClicked(@Nullable ChatView.OnBackClickedListener onBackClickedListener) {
+        if (isFromCallScreenUseCase.isFromCallScreen()) {
+            if (viewCallback != null) {
+                viewCallback.backToCall();
+            }
+        } else {
+            if (onBackClickedListener!= null) {
+                onBackClickedListener.onBackClicked();
+            }
+        }
+
+        updateFromCallScreenUseCase.updateFromCallScreen(false);
     }
 
     public void noMoreOperatorsAvailableDismissed() {

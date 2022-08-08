@@ -56,7 +56,6 @@ import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.helper.FileHelper;
-import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
@@ -142,6 +141,7 @@ public class ChatView extends ConstraintLayout implements
     private OnMinimizeListener onMinimizeListener;
     private OnNavigateToCallListener onNavigateToCallListener;
     private OnNavigateToSurveyListener onNavigateToSurveyListener;
+    private OnBackToCallListener onBackToCallListener;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener = new SingleChoiceCardView.OnOptionClickedListener() {
         @Override
         public void onClicked(String id, int indexInList, int optionIndex) {
@@ -350,6 +350,10 @@ public class ChatView extends ConstraintLayout implements
         this.onNavigateToSurveyListener = onNavigateToSurveyListener;
     }
 
+    public void setOnBackToCallListener(OnBackToCallListener onBackToCallListener) {
+        this.onBackToCallListener = onBackToCallListener;
+    }
+
     /**
      * Use this method to notify the view when your activity or fragment is back in its resumed
      * state.
@@ -496,6 +500,13 @@ public class ChatView extends ConstraintLayout implements
             public void navigateToCall(String mediaType) {
                 if (onNavigateToCallListener != null) {
                     onNavigateToCallListener.call(theme, mediaType);
+                }
+            }
+
+            @Override
+            public void backToCall() {
+                if (onBackToCallListener != null) {
+                    onBackToCallListener.onBackToCall();
                 }
             }
 
@@ -902,11 +913,8 @@ public class ChatView extends ConstraintLayout implements
 
         setupAddAttachmentButton();
 
-        appBar.setOnBackClickedListener(() -> {
-            if (onBackClickedListener != null) {
-                onBackClickedListener.onBackClicked();
-            }
-        });
+        appBar.setOnBackClickedListener(() -> controller.onBackArrowClicked(onBackClickedListener));
+
         appBar.setOnEndChatClickedListener(() -> {
             if (controller != null) {
                 controller.leaveChatClicked();
@@ -1401,6 +1409,10 @@ public class ChatView extends ConstraintLayout implements
          *              to the activity which is being navigated to.
          */
         void call(UiTheme theme, String mediaType);
+    }
+
+    public interface OnBackToCallListener {
+        void onBackToCall();
     }
 
     public interface OnNavigateToSurveyListener {

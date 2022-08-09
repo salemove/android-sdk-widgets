@@ -97,7 +97,7 @@ public class ScreenSharingControllerTest {
 
         subjectUnderTest.onResume(mock(Context.class));
 
-        verify(dialogController).dismissDialogs();
+        verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).execute();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
@@ -117,7 +117,7 @@ public class ScreenSharingControllerTest {
     public void onScreenSharingAccepted_hidesDialogShowsNotificationAcceptsScreenSharing() {
         subjectUnderTest.onScreenSharingAccepted(mock(Context.class));
 
-        verify(dialogController).dismissDialogs();
+        verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).execute();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
@@ -126,7 +126,7 @@ public class ScreenSharingControllerTest {
     public void onScreenSharingDeclined_hidesDialogShowsNotificationAcceptsScreenSharing() {
         subjectUnderTest.onScreenSharingDeclined();
 
-        verify(dialogController).dismissDialogs();
+        verify(dialogController).dismissCurrentDialog();
         verify(gliaScreenSharingRepository).onScreenSharingDeclined();
     }
 

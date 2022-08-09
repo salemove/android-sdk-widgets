@@ -49,10 +49,20 @@ public class DialogController {
         return dialogsState instanceof DialogsState.OverlayPermissionsDialog;
     }
 
+    public boolean isExitQueueDialogShown() {
+        return dialogsState instanceof DialogsState.ExitQueueDialog;
+    }
+
+    public void dismissCurrentDialog() {
+        Logger.d(TAG, "Dismiss current dialog");
+        emitDialogState(new DialogsState.NoDialog());
+        runPostponedOperation();
+    }
+
     public void dismissDialogs() {
         Logger.d(TAG, "Dismiss dialogs");
         emitDialogState(new DialogsState.NoDialog());
-        runPostponedOperation();
+        postponedOperation = null;
     }
 
     private synchronized void emitDialogState(DialogsState state) {
@@ -124,7 +134,7 @@ public class DialogController {
         if (isNoDialogShown()) {
             Logger.d(TAG, "Show No More Operators Dialog");
             emitDialogState(new DialogsState.NoMoreOperatorsDialog());
-        } else if (isOverlayDialogShown()) {
+        } else if (isOverlayDialogShown() || isExitQueueDialogShown()) {
             postponedOperation = this::showNoMoreOperatorsAvailableDialog;
         }
     }

@@ -526,13 +526,13 @@ public class ChatController implements
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void endEngagementDialogYesClicked() {
@@ -544,7 +544,7 @@ public class ChatController implements
 
     public void endEngagementDialogDismissed() {
         Logger.d(TAG, "endEngagementDialogDismissed");
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void leaveChatClicked() {
@@ -652,7 +652,7 @@ public class ChatController implements
 
     public void overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed");
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
         emitViewState(chatState);
     }
 
@@ -660,13 +660,13 @@ public class ChatController implements
         Logger.d(TAG, "upgradeToAudioClicked");
         messagesNotSeenHandler.chatUpgradeOfferAccepted();
         mediaUpgradeOfferRepository.acceptOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void declineUpgradeOfferClicked(MediaUpgradeOffer offer) {
         Logger.d(TAG, "closeUpgradeDialogClicked");
         mediaUpgradeOfferRepository.declineOffer(offer, MediaUpgradeOfferRepository.Submitter.CHAT);
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void navigateToCallSuccess() {
@@ -741,7 +741,7 @@ public class ChatController implements
                         Logger.d(TAG, "navigateToCall");
                     }
                 }
-                dialogController.dismissDialogs();
+                dialogController.dismissCurrentDialog();
             }
 
             @Override
@@ -749,7 +749,7 @@ public class ChatController implements
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
-                dialogController.dismissDialogs();
+                dialogController.dismissCurrentDialog();
             }
         };
     }
@@ -1290,7 +1290,7 @@ public class ChatController implements
     }
 
     public void notificationsDialogDismissed() {
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void queueForEngagementStarted() {

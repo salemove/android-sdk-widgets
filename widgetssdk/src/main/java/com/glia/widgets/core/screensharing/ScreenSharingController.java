@@ -104,7 +104,7 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
 
     public void onScreenSharingAccepted(Context context) {
         Logger.d(TAG, "onScreenSharingAccepted");
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
         showScreenSharingEnabledNotification();
         repository.onScreenSharingAccepted(
                 Utils.getActivity(context),
@@ -115,7 +115,7 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
 
     public void onScreenSharingDeclined() {
         Logger.d(TAG, "onScreenSharingDeclined");
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
         repository.onScreenSharingDeclined();
         hasPendingScreenSharingRequest = false;
     }

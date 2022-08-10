@@ -300,24 +300,24 @@ public class CallController implements
 
     public void endEngagementDialogDismissed() {
         Logger.d(TAG, "endEngagementDialogDismissed");
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed");
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void leaveChatQueueClicked() {
@@ -351,7 +351,7 @@ public class CallController implements
                 mediaUpgradeOffer,
                 MediaUpgradeOfferRepository.Submitter.CALL
         );
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void declineUpgradeOfferClicked(MediaUpgradeOffer mediaUpgradeOffer) {
@@ -360,7 +360,7 @@ public class CallController implements
                 mediaUpgradeOffer,
                 MediaUpgradeOfferRepository.Submitter.CALL
         );
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void onUserInteraction() {
@@ -400,7 +400,7 @@ public class CallController implements
     }
 
     public void notificationsDialogDismissed() {
-        dialogController.dismissDialogs();
+        dialogController.dismissCurrentDialog();
     }
 
     public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
@@ -522,7 +522,7 @@ public class CallController implements
                     mediaType = Engagement.MediaType.AUDIO;
                 }
                 emitViewState(callState.changeRequestedMediaType(mediaType));
-                dialogController.dismissDialogs();
+                dialogController.dismissCurrentDialog();
             }
 
             @Override
@@ -530,7 +530,7 @@ public class CallController implements
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
-                dialogController.dismissDialogs();
+                dialogController.dismissCurrentDialog();
             }
         };
 

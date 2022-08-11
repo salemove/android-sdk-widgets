@@ -1,10 +1,12 @@
 package com.glia.widgets.view.head;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.util.AttributeSet;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,6 +65,12 @@ public class ChatHeadView extends ConstraintLayout implements ChatHeadContract.V
     }
 
     public static ChatHeadView getInstance(Context context) {
+        // ContextThemeWrapper modifies the given Context's theme with the one you specify in the constructor.
+        // Since a Service doesn't really have a theme, it just tacks yours onto the Service's Context.
+        // Otherwise this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.
+        if (context instanceof Service) {
+            context = new ContextThemeWrapper(context, R.style.Application_Glia_Chat);
+        }
         return new ChatHeadView(context);
     }
 

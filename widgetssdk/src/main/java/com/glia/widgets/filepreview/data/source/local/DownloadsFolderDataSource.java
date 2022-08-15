@@ -100,6 +100,8 @@ public class DownloadsFolderDataSource {
     }
 
     public Maybe<Bitmap> getImageFromDownloadsFolder(String imageName) {
+        if (imageName == null) return Maybe.error(new NullPointerException("Image name cannot be null"));
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return getImageFromDownloadsFolderAPI29(imageName);
         } else {
@@ -163,6 +165,8 @@ public class DownloadsFolderDataSource {
     }
 
     public Completable putImageToDownloads(String fileName, Bitmap bitmap) {
+        if (fileName == null) return Completable.error(new NullPointerException("File name cannot be null"));
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return putImageToDownloadsAPI29(fileName, bitmap);
         } else {
@@ -241,6 +245,8 @@ public class DownloadsFolderDataSource {
     }
 
     public Completable downloadFileToDownloads(String fileName, String contentType, InputStream inputStream) {
+        if (fileName == null) return Completable.error(new NullPointerException("File name cannot be null"));
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return downloadFileToDownloadsAPI29(fileName, contentType, inputStream);
         } else {

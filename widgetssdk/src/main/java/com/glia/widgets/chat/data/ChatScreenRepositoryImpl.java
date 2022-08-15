@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.data;
 
 public class ChatScreenRepositoryImpl implements ChatScreenRepository {
-    private boolean fromCallScreen = true;
+    private boolean fromCallScreen;
 
     @Override
     public boolean isFromCallScreen() {

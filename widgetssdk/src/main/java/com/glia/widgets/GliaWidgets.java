@@ -3,9 +3,13 @@ package com.glia.widgets;
 import android.app.Application;
 import android.content.Intent;
 
+import androidx.annotation.Nullable;
+
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
+import com.glia.widgets.chat.adapter.CustomCardAdapter;
+import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
@@ -103,6 +107,9 @@ public class GliaWidgets {
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
+
+    @Nullable
+    private static CustomCardAdapter customCardAdapter;
 
     /**
      * Should be called when the application is starting in {@link Application}.onCreate()
@@ -253,6 +260,25 @@ public class GliaWidgets {
                 exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
             }
         });
+    }
+
+    /**
+     * Allows configuring custom response cards based on metadata.
+     *
+     * @param customCardAdapter an instance of {@link CustomCardAdapter}.
+     * @see CustomCardAdapter
+     * @see WebViewCardAdapter
+     */
+    public static void setCustomCardAdapter(@Nullable CustomCardAdapter customCardAdapter) {
+        GliaWidgets.customCardAdapter = customCardAdapter;
+    }
+
+    /**
+     * @return current instance of {@link CustomCardAdapter}
+     */
+    @Nullable
+    public static CustomCardAdapter getCustomCardAdapter() {
+        return customCardAdapter;
     }
 
     /**

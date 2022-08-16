@@ -106,7 +106,8 @@ public class ControllerFactory {
                     useCaseFactory.getGliaSurveyUseCase(),
                     useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                     useCaseFactory.createIsFromCallScreenUseCase(),
-                    useCaseFactory.createUpdateFromCallScreenUseCase());
+                    useCaseFactory.createUpdateFromCallScreenUseCase(),
+                    useCaseFactory.createCustomCardTypeUseCase());
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);

@@ -50,10 +50,12 @@ import com.airbnb.lottie.model.KeyPath;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter;
+import com.glia.widgets.chat.adapter.holder.WebViewViewHolder;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.chat.model.ChatState;
@@ -130,6 +132,8 @@ public class ChatView extends ConstraintLayout implements
     private static final int CAMERA_PERMISSION_REQUEST = 1010;
     private static final int WRITE_PERMISSION_REQUEST = 1001001;
 
+    private static final int WEB_VIEW_INITIALIZATION_DELAY = 100;
+
     private AttachmentFile downloadFileHolder = null;
 
     private UiTheme theme;
@@ -164,6 +168,11 @@ public class ChatView extends ConstraintLayout implements
             }
         }
     };
+    private final ChatAdapter.OnCustomCardResponse onCustomCardResponse = (text, value) -> {
+        if (controller != null) {
+            controller.sendCustomCardResponse(text, value);
+        }
+    };
 
     private final Resources resources;
 
@@ -174,7 +183,14 @@ public class ChatView extends ConstraintLayout implements
             int totalItemCount = adapter.getItemCount();
             int lastIndex = totalItemCount - 1;
             if (isInBottom) {
-                chatRecyclerView.scrollToPosition(lastIndex);
+                RecyclerView.ViewHolder holder = chatRecyclerView.findViewHolderForAdapterPosition(lastIndex);
+                if (holder instanceof WebViewViewHolder) {
+                    // WebView needs time for calculating the height.
+                    // So to scroll to the bottom we need to do it with delay.
+                    postDelayed(() -> chatRecyclerView.scrollToPosition(lastIndex), WEB_VIEW_INITIALIZATION_DELAY);
+                } else {
+                    chatRecyclerView.scrollToPosition(lastIndex);
+                }
             }
         }
     };
@@ -813,11 +829,14 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void setupViewAppearance() {
+
         adapter = new ChatAdapter(
                 this.theme,
                 this.onOptionClickedListener,
                 this,
                 this,
+                onCustomCardResponse,
+                GliaWidgets.getCustomCardAdapter(),
                 Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
                 Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
                 Dependencies.getUseCaseFactory().createGetImageFileFromNetworkUseCase()

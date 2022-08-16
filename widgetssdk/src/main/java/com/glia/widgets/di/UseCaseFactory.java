@@ -1,7 +1,9 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
+import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
@@ -413,5 +415,9 @@ public class UseCaseFactory {
 
     public GetOperatorUseCase getOperatorUseCase() {
         return new GetOperatorUseCase(repositoryFactory.getOperatorRepository());
+    }
+
+    public CustomCardTypeUseCase createCustomCardTypeUseCase() {
+        return new CustomCardTypeUseCase(GliaWidgets.getCustomCardAdapter());
     }
 }

@@ -84,6 +84,10 @@ public class GliaSendMessageUseCase {
         chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener);
     }
 
+    public void execute(String message, SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
+        chatRepository.sendMessageWithAttachment(message, singleChoiceAttachment, listener);
+    }
+
     private boolean isOperatorOnline() {
         return engagementStateRepository.isOperatorPresent();
     }

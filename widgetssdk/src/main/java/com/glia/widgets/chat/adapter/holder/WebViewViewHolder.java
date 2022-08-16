@@ -1,0 +1,106 @@
+package com.glia.widgets.chat.adapter.holder;
+
+import android.annotation.SuppressLint;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.widgets.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * The implementation of {@link CustomCardViewHolder} allows
+ * displaying the card message as a WebView.
+ * <p>
+ * It can render HTML content if the {@link ChatMessage#getMetadata()}
+ * has an HTML body with the <code>html</code> key.
+ * <p>
+ * <b>Metadata example:</b>
+ * <pre>{@code
+ * { "html": "
+ *     <style>button {padding: 8px 16px;}p {color: green;}<\/style>
+ *     <p>Lorem ipsum dolor sit amet<\/p>
+ *     <p>
+ *         <button
+ *              type=\"button\"
+ *              onClick=\"sendResponse('Cancel', 'response_cancel')\">
+ *              Cancel
+ *         <\/button>
+ *         <button
+ *              type=\"button\"
+ *              onClick=\"sendResponse('OK', 'response_ok')\">
+ *              OK
+ *         <\/button>
+ *     <\/p>
+ * " }
+ * }<pre/>
+ * @see CustomCardViewHolder
+ */
+public class WebViewViewHolder extends CustomCardViewHolder {
+    private static final String MIME_TYPE = "text/html";
+    private static final String ENCODING = "UTF-8";
+    private static final String JS_SCRIPT = "<script type=\"text/javascript\">function sendResponse(text, value){Glia.response(text, value);}</script>";
+    private static final String METADATA_KEY = "html";
+
+    private final WebView webView;
+
+    @Nullable
+    private ResponseCallback responseCallback;
+
+    @SuppressLint("SetJavaScriptEnabled")
+    public WebViewViewHolder(@NonNull ViewGroup parent) {
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.web_view_layout, parent, false));
+
+        webView = itemView.findViewById(R.id.web_view);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new JavaScriptInterface(), "Glia");
+    }
+
+    /**
+     * @see CustomCardViewHolder#bind(ChatMessage, ResponseCallback)
+     */
+    @Override
+    public void bind(@NonNull ChatMessage message, @NonNull ResponseCallback callback) {
+        responseCallback = callback;
+
+        JSONObject metadata = message.getMetadata();
+        if (metadata != null) {
+            try {
+                String html = metadata.getString(METADATA_KEY);
+                webView.loadDataWithBaseURL("", html + JS_SCRIPT, MIME_TYPE, ENCODING, "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Allows checking if the message can be displayed using {@link WebViewViewHolder}.
+     * @param message the chat message with metadata.
+     * @return true if the message metadata has the <code>html</code> key.
+     */
+    public static boolean isWebViewType(@NonNull ChatMessage message) {
+        JSONObject metadata = message.getMetadata();
+        if (metadata == null) {
+            return false;
+        }
+        return metadata.has(METADATA_KEY);
+    }
+
+    private class JavaScriptInterface {
+
+        @JavascriptInterface
+        public void response(String text, String value) {
+            if (responseCallback != null) {
+                responseCallback.sendResponse(text, value);
+            }
+        }
+    }
+}

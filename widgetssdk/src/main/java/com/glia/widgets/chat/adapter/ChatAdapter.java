@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,12 +17,14 @@ import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder;
 import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder;
 import com.glia.widgets.chat.adapter.holder.VisitorMessageViewHolder;
+import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
 import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder;
 import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachmentViewHolder;
 import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder;
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder;
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder;
 import com.glia.widgets.chat.model.history.ChatItem;
+import com.glia.widgets.chat.model.history.CustomCardItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.model.history.OperatorMessageItem;
@@ -59,6 +62,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 return oldItem.equals(newItem);
             } else if (oldItem instanceof VisitorAttachmentItem && newItem instanceof VisitorAttachmentItem) {
                 return oldItem.equals(newItem);
+            } else if (oldItem instanceof CustomCardItem && newItem instanceof CustomCardItem) {
+                return oldItem.equals(newItem);
             } else {
                 return false;
             }
@@ -73,11 +78,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int OPERATOR_IMAGE_VIEW_TYPE = 5;
     public static final int VISITOR_FILE_VIEW_TYPE = 6;
     public static final int VISITOR_IMAGE_VIEW_TYPE = 7;
+    public static final int CUSTOM_CARD_TYPE = 8; // Should be the last type with the highest value
 
     private final UiTheme uiTheme;
     private final SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener;
     private final OnFileItemClickListener onFileItemClickListener;
     private final OnImageItemClickListener onImageItemClickListener;
+    private final OnCustomCardResponse onCustomCardResponse;
+
+    @Nullable
+    private final CustomCardAdapter customCardAdapter;
 
     private final GetImageFileFromCacheUseCase getImageFileFromCacheUseCase;
     private final GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase;
@@ -88,6 +98,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener,
             OnFileItemClickListener onFileItemClickListener,
             OnImageItemClickListener onImageItemClickListener,
+            OnCustomCardResponse onCustomCardResponse,
+            @Nullable CustomCardAdapter customCardAdapter,
             GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
             GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
             GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
@@ -96,6 +108,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.onOptionClickedListener = onOptionClickedListener;
         this.onFileItemClickListener = onFileItemClickListener;
         this.onImageItemClickListener = onImageItemClickListener;
+        this.onCustomCardResponse = onCustomCardResponse;
+        this.customCardAdapter = customCardAdapter;
         this.getImageFileFromCacheUseCase = getImageFileFromCacheUseCase;
         this.getImageFileFromDownloadsUseCase = getImageFileFromDownloadsUseCase;
         this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
@@ -135,7 +149,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (viewType == MEDIA_UPGRADE_ITEM_TYPE) {
             return new MediaUpgradeStartedViewHolder(inflater.inflate(R.layout.chat_media_upgrade_layout, parent, false), uiTheme);
         } else {
-            throw new IllegalArgumentException("Unknown view type: " + viewType);
+            CustomCardViewHolder customCardViewHolder = null;
+            if (customCardAdapter != null) {
+                customCardViewHolder = customCardAdapter.getCustomCardViewHolder(parent, inflater, uiTheme, viewType);
+            }
+            if (customCardViewHolder != null) {
+                return customCardViewHolder;
+            } else {
+                throw new IllegalArgumentException("Unknown view type: " + viewType);
+            }
         }
     }
 
@@ -173,6 +195,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 viewHolder.bind(item.attachmentFile, item.showDelivered);
                 viewHolder.itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.attachmentFile));
             }
+        } else if (chatItem instanceof CustomCardItem) {
+            ((CustomCardViewHolder) holder).bind(
+                    ((CustomCardItem) chatItem).getMessage(),
+                    onCustomCardResponse::onCustomCardResponse
+            );
         }
     }
 
@@ -216,5 +243,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface OnImageItemClickListener {
         void onImageItemClick(AttachmentFile item);
+    }
+
+    public interface OnCustomCardResponse {
+        void onCustomCardResponse(String text, String value);
     }
 }

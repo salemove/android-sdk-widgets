@@ -15,6 +15,7 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         GliaWidgets.onAppCreate(this);
+        GliaWidgets.setCustomCardAdapter(new ExampleCustomCardAdapter());
 
         initGliaWidgets();
     }

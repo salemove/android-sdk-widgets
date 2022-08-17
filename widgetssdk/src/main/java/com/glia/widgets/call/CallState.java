@@ -322,7 +322,7 @@ class CallState {
     }
 
     public boolean isMuteButtonEnabled() {
-        return (isAudioCall() || is2WayVideoCall()) && !showOnHold();
+        return (isAudioCall() || isVideoCall()) && !showOnHold();
     }
 
     public boolean isVideoButtonEnabled() {
@@ -330,7 +330,7 @@ class CallState {
     }
 
     public boolean isSpeakerButtonEnabled() {
-        return isAudioCall() || is2WayVideoCall();
+        return isAudioCall() || isVideoCall();
     }
 
     public boolean showCallTimerView() {

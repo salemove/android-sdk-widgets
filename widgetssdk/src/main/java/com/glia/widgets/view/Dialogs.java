@@ -17,6 +17,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.core.dialog.model.DialogState;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.button.BaseConfigurableButton;
 import com.glia.widgets.view.button.GliaNegativeButton;
@@ -204,7 +205,7 @@ public class Dialogs {
 
     public static AlertDialog showUpgradeDialog(Context context,
                                                 UiTheme theme,
-                                                DialogOfferType type,
+                                                DialogState.MediaUpgrade mediaUpgrade,
                                                 View.OnClickListener onAcceptOfferClickListener,
                                                 View.OnClickListener onCloseClickListener) {
         boolean isUseAlertDialogButtonVerticalAlignment = Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme);
@@ -243,23 +244,27 @@ public class Dialogs {
 
         logoView.setVisibility(theme.getWhiteLabel() ? View.GONE : View.VISIBLE);
 
-        if (type instanceof DialogOfferType.AudioUpgradeOffer) {
-            titleView.setText(
-                    context.getString(R.string.glia_dialog_upgrade_audio_title, type.getOperatorName())
-            );
-            titleIconView.setImageResource(theme.getIconUpgradeAudioDialog());
-            titleIconView.setContentDescription(context.getString(R.string.glia_chat_audio_icon_content_description));
-        } else if (type instanceof DialogOfferType.VideoUpgradeOffer2Way) {
-            titleView.setText(
-                    context.getString(R.string.glia_dialog_upgrade_video_2_way_title, type.getOperatorName())
-            );
-            titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
-            titleIconView.setContentDescription(context.getString(R.string.glia_chat_video_icon_content_description));
-        } else if (type instanceof DialogOfferType.VideoUpgradeOffer1Way) {
-            titleView.setText(
-                    context.getString(R.string.glia_dialog_upgrade_video_1_way_title, type.getOperatorName())
-            );
-            titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
+        switch (mediaUpgrade.getMediaUpgradeMode()) {
+            case DialogState.MediaUpgrade.MODE_AUDIO:
+                titleView.setText(
+                        context.getString(R.string.glia_dialog_upgrade_audio_title, mediaUpgrade.getOperatorName())
+                );
+                titleIconView.setImageResource(theme.getIconUpgradeAudioDialog());
+                titleIconView.setContentDescription(context.getString(R.string.glia_chat_audio_icon_content_description));
+                break;
+            case DialogState.MediaUpgrade.MODE_VIDEO_ONE_WAY:
+                titleView.setText(
+                        context.getString(R.string.glia_dialog_upgrade_video_1_way_title, mediaUpgrade.getOperatorName())
+                );
+                titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
+                break;
+            case DialogState.MediaUpgrade.MODE_VIDEO_TWO_WAY:
+                titleView.setText(
+                        context.getString(R.string.glia_dialog_upgrade_video_2_way_title, mediaUpgrade.getOperatorName())
+                );
+                titleIconView.setImageResource(theme.getIconUpgradeVideoDialog());
+                titleIconView.setContentDescription(context.getString(R.string.glia_chat_video_icon_content_description));
+                break;
         }
 
         positiveButton.setOnClickListener(onAcceptOfferClickListener);

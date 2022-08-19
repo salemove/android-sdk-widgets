@@ -61,8 +61,9 @@ import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.core.dialog.Dialog;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.core.dialog.DialogsState;
+import com.glia.widgets.core.dialog.model.DialogState;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
@@ -70,7 +71,6 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.ui.FilePreviewActivity;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.view.DialogOfferType;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
 import com.glia.widgets.view.SingleChoiceCardView;
@@ -571,34 +571,41 @@ public class ChatView extends ConstraintLayout implements
     }
 
     private void setupDialogCallback() {
-        dialogCallback = dialogsState -> {
-            if (dialogsState instanceof DialogsState.NoDialog) {
-                post(() -> {
-                    if (alertDialog != null) {
-                        alertDialog.dismiss();
-                        alertDialog = null;
-                    }
-                });
-            } else if (dialogsState instanceof DialogsState.UnexpectedErrorDialog) {
-                post(this::showUnexpectedErrorDialog);
-            } else if (dialogsState instanceof DialogsState.ExitQueueDialog) {
-                post(this::showExitQueueDialog);
-            } else if (dialogsState instanceof DialogsState.OverlayPermissionsDialog) {
-                post(this::showOverlayPermissionsDialog);
-            } else if (dialogsState instanceof DialogsState.EndEngagementDialog) {
-                post(() -> showEndEngagementDialog(((DialogsState.EndEngagementDialog) dialogsState).operatorName));
-            } else if (dialogsState instanceof DialogsState.UpgradeDialog) {
-                post(() -> showUpgradeDialog(((DialogsState.UpgradeDialog) dialogsState).type));
-            } else if (dialogsState instanceof DialogsState.NoMoreOperatorsDialog) {
-                post(this::showNoMoreOperatorsAvailableDialog);
-            } else if (dialogsState instanceof DialogsState.EngagementEndedDialog) {
-                post(this::showEngagementEndedDialog);
-            } else if (dialogsState instanceof DialogsState.StartScreenSharingDialog) {
-                post(this::showScreenSharingDialog);
-            } else if (dialogsState instanceof DialogsState.EnableNotificationChannelDialog) {
-                post(this::showAllowNotificationsDialog);
-            } else if (dialogsState instanceof DialogsState.EnableScreenSharingNotificationsAndStartSharingDialog) {
-                post(this::showAllowScreenSharingNotificationsAndStartSharingDialog);
+        dialogCallback = dialogState -> {
+            switch (dialogState.getMode()) {
+                case Dialog.MODE_NONE:
+                    dismissAlertDialog();
+                    break;
+                case Dialog.MODE_UNEXPECTED_ERROR:
+                    post(this::showUnexpectedErrorDialog);
+                    break;
+                case Dialog.MODE_EXIT_QUEUE:
+                    post(this::showExitQueueDialog);
+                    break;
+                case Dialog.MODE_OVERLAY_PERMISSION:
+                    post(this::showOverlayPermissionsDialog);
+                    break;
+                case Dialog.MODE_END_ENGAGEMENT:
+                    post(() -> showEndEngagementDialog(((DialogState.OperatorName) dialogState).getOperatorName()));
+                    break;
+                case Dialog.MODE_MEDIA_UPGRADE:
+                    post(() -> showUpgradeDialog(((DialogState.MediaUpgrade) dialogState)));
+                    break;
+                case Dialog.MODE_NO_MORE_OPERATORS:
+                    post(this::showNoMoreOperatorsAvailableDialog);
+                    break;
+                case Dialog.MODE_ENGAGEMENT_ENDED:
+                    post(this::showEngagementEndedDialog);
+                    break;
+                case Dialog.MODE_START_SCREEN_SHARING:
+                    post(this::showScreenSharingDialog);
+                    break;
+                case Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL:
+                    post(this::showAllowNotificationsDialog);
+                    break;
+                case Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING:
+                    post(this::showAllowScreenSharingNotificationsAndStartSharingDialog);
+                    break;
             }
         };
     }
@@ -1137,19 +1144,19 @@ public class ChatView extends ConstraintLayout implements
                 });
     }
 
-    private void showUpgradeDialog(DialogOfferType type) {
+    private void showUpgradeDialog(DialogState.MediaUpgrade mediaUpgrade) {
         alertDialog = Dialogs.showUpgradeDialog(
                 this.getContext(),
                 theme,
-                type,
+                mediaUpgrade,
                 v -> {
                     if (controller != null) {
-                        controller.acceptUpgradeOfferClicked(type.getUpgradeOffer());
+                        controller.acceptUpgradeOfferClicked(mediaUpgrade.getMediaUpgradeOffer());
                     }
                 },
                 v -> {
                     if (controller != null) {
-                        controller.declineUpgradeOfferClicked(type.getUpgradeOffer());
+                        controller.declineUpgradeOfferClicked(mediaUpgrade.getMediaUpgradeOffer());
                     }
                 });
     }

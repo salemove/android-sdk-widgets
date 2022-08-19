@@ -306,13 +306,13 @@ public class CallController implements
     public void noMoreOperatorsAvailableDismissed() {
         Logger.d(TAG, "noMoreOperatorsAvailableDismissed");
         stop();
-        dialogController.dismissCurrentDialog();
+        dialogController.dismissDialogs();
     }
 
     public void unexpectedErrorDialogDismissed() {
         Logger.d(TAG, "unexpectedErrorDialogDismissed");
         stop();
-        dialogController.dismissCurrentDialog();
+        dialogController.dismissDialogs();
     }
 
     public void overlayPermissionsDialogDismissed() {
@@ -522,7 +522,6 @@ public class CallController implements
                     mediaType = Engagement.MediaType.AUDIO;
                 }
                 emitViewState(callState.changeRequestedMediaType(mediaType));
-                dialogController.dismissCurrentDialog();
             }
 
             @Override
@@ -530,7 +529,6 @@ public class CallController implements
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
-                dialogController.dismissCurrentDialog();
             }
         };
 

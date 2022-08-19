@@ -184,6 +184,7 @@ public class ChatController implements
     private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
 
     private boolean isVisitorEndEngagement = false;
+    private volatile boolean isChatViewPaused = false;
 
     // TODO pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
@@ -392,6 +393,7 @@ public class ChatController implements
     }
 
     public void onPause() {
+        isChatViewPaused = true;
         messagesNotSeenHandler.onChatWentBackground();
         surveyUseCase.unregisterListener(this);
     }
@@ -585,6 +587,7 @@ public class ChatController implements
     }
 
     public void onResume() {
+        isChatViewPaused = false;
         Logger.d(TAG, "onResume\n");
         messagesNotSeenHandler.callChatButtonClicked();
         surveyUseCase.registerListener(this);
@@ -705,6 +708,8 @@ public class ChatController implements
         mediaUpgradeOfferRepositoryCallback = new MediaUpgradeOfferRepositoryCallback() {
             @Override
             public void newOffer(MediaUpgradeOffer offer) {
+                if (isChatViewPaused) return;
+
                 if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
                     // audio call
                     Logger.d(TAG, "audioUpgradeRequested");
@@ -741,7 +746,6 @@ public class ChatController implements
                         Logger.d(TAG, "navigateToCall");
                     }
                 }
-                dialogController.dismissCurrentDialog();
             }
 
             @Override
@@ -749,7 +753,6 @@ public class ChatController implements
                     MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
-                dialogController.dismissCurrentDialog();
             }
         };
     }

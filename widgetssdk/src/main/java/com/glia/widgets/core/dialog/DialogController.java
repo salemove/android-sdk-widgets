@@ -52,65 +52,69 @@ public class DialogController {
 
     public void showExitQueueDialog() {
         Logger.d(TAG, "Show Exit Queue Dialog");
-        dialogManager.offer(new DialogState(Dialog.MODE_EXIT_QUEUE));
+        dialogManager.addAndEmit(new DialogState(Dialog.MODE_EXIT_QUEUE));
     }
 
     public void showExitChatDialog(String operatorName) {
         Logger.d(TAG, "Show Exit Chat Dialog");
-        dialogManager.offer(new DialogState.OperatorName(Dialog.MODE_END_ENGAGEMENT, operatorName));
+        dialogManager.addAndEmit(new DialogState.OperatorName(Dialog.MODE_END_ENGAGEMENT, operatorName));
     }
 
     public void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer, String operatorName) {
         Logger.d(TAG, "Show Upgrade Audio Dialog");
-        dialogManager.offer(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_AUDIO));
+        dialogManager.addAndEmit(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_AUDIO));
     }
 
     public void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer, String operatorName) {
         Logger.d(TAG, "Show Upgrade 2WayVideo Dialog");
-        dialogManager.offer(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_VIDEO_TWO_WAY));
+        dialogManager.addAndEmit(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_VIDEO_TWO_WAY));
     }
 
     public void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer, String operatorName) {
         Logger.d(TAG, "Show Upgrade 1WayVide Dialog");
-        dialogManager.offer(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_VIDEO_ONE_WAY));
+        dialogManager.addAndEmit(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_VIDEO_ONE_WAY));
     }
 
     public void showNoMoreOperatorsAvailableDialog() {
-            Logger.d(TAG, "Show No More Operators Dialog");
-            dialogManager.offer(new DialogState(Dialog.MODE_NO_MORE_OPERATORS));
+        Logger.d(TAG, "Show No More Operators Dialog");
+        if (isOverlayDialogShown() || isExitQueueDialogShown()) {
+            dialogManager.add(new DialogState(Dialog.MODE_NO_MORE_OPERATORS));
+        } else {
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_NO_MORE_OPERATORS));
+        }
     }
 
     public void showEngagementEndedDialog() {
             Logger.d(TAG, "Show Engagement EngagementEndedEvent Dialog");
-            dialogManager.offer(new DialogState(Dialog.MODE_ENGAGEMENT_ENDED));
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENGAGEMENT_ENDED));
     }
 
     public void showUnexpectedErrorDialog() {
         // PRIORITISE THIS ERROR AS IT IS ENGAGEMENT FATAL ERROR INDICATOR (eg. GliaException:{"details":"Queue is closed","error":"Unprocessable entity"}) for example
         Logger.d(TAG, "Show Unexpected error Dialog");
-        dialogManager.offer(new DialogState(Dialog.MODE_UNEXPECTED_ERROR));
+        dialogManager.addAndEmit(new DialogState(Dialog.MODE_UNEXPECTED_ERROR));
     }
 
     public void showOverlayPermissionsDialog() {
             Logger.d(TAG, "Show Overlay permissions Dialog");
             setOverlayPermissionRequestDialogShownUseCase.execute();
-            dialogManager.offer(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
     }
 
     public void showStartScreenSharingDialog() {
             Logger.d(TAG, "Show Start Screen Sharing Dialog");
-            dialogManager.offer(new DialogState(Dialog.MODE_START_SCREEN_SHARING));
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_START_SCREEN_SHARING));
     }
 
     public void showEnableCallNotificationChannelDialog() {
             Logger.d(TAG, "Show Enable Notification Channel Dialog");
             setEnableCallNotificationChannelDialogShownUseCase.execute();
-            dialogManager.offer(new DialogState(Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL));
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL));
     }
 
     public void showEnableScreenSharingNotificationsAndStartSharingDialog() {
         Logger.d(TAG, "Show Enable Notification Channel Dialog");
-        dialogManager.offer(new DialogState(Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING));
+        dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING));
     }
 
     public void addCallback(Callback callback) {
@@ -124,6 +128,14 @@ public class DialogController {
     public void removeCallback(Callback callback) {
         Logger.d(TAG, "removeCallback");
         viewCallbacks.remove(callback);
+    }
+
+    private boolean isOverlayDialogShown() {
+        return Dialog.MODE_OVERLAY_PERMISSION == dialogManager.getCurrentMode();
+    }
+
+    private boolean isExitQueueDialogShown() {
+        return Dialog.MODE_EXIT_QUEUE == dialogManager.getCurrentMode();
     }
 
     public interface Callback {

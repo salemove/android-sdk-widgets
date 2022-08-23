@@ -36,7 +36,7 @@ public final class DialogManager {
         return stateDeque.peekLast();
     }
 
-    private void showNext() {
+    public void showNext() {
         if (stateDeque.isEmpty()) return;
 
         DialogState state = getCurrent();

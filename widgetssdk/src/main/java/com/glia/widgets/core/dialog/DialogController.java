@@ -109,13 +109,16 @@ public class DialogController {
     }
 
     public void showEnableScreenSharingNotificationsAndStartSharingDialog() {
-            Logger.d(TAG, "Show Enable Notification Channel Dialog");
+        Logger.d(TAG, "Show Enable Notification Channel Dialog");
         dialogManager.offer(new DialogState(Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING));
     }
 
     public void addCallback(Callback callback) {
         Logger.d(TAG, "addCallback");
         viewCallbacks.add(callback);
+        if (viewCallbacks.size() == 1) {
+            dialogManager.showNext();
+        }
     }
 
     public void removeCallback(Callback callback) {

@@ -136,7 +136,7 @@ workflows:
         is_expand: false
       INTEGRATOR_VARIANT: master
   publish_to_nexus:
-    description: Task builts a SDK and upload it to Nexus.
+    description: Task builds an SDK and uploads it to Nexus.
     steps:
     - activate-ssh-key@4: {}
     - git-clone@4: {}

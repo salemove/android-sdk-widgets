@@ -24,9 +24,11 @@ import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialo
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
+import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -166,7 +168,11 @@ public class UseCaseFactory {
     }
 
     public GliaLoadHistoryUseCase createGliaLoadHistoryUseCase() {
-        return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository());
+        return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository(), getMapOperatorUseCase());
+    }
+
+    public MapOperatorUseCase getMapOperatorUseCase() {
+        return new MapOperatorUseCase(getOperatorUseCase());
     }
 
     public GliaQueueForChatEngagementUseCase createQueueForChatEngagementUseCase() {
@@ -228,8 +234,8 @@ public class UseCaseFactory {
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
         return new GliaOnMessageUseCase(
                 repositoryFactory.getGliaMessageRepository(),
-                createOnEngagementUseCase()
-        );
+                createOnEngagementUseCase(),
+                getMapOperatorUseCase());
     }
 
     public GliaOnOperatorTypingUseCase createGliaOnOperatorTypingUseCase() {
@@ -403,5 +409,9 @@ public class UseCaseFactory {
 
     public UpdateFromCallScreenUseCase createUpdateFromCallScreenUseCase() {
         return new UpdateFromCallScreenUseCase(repositoryFactory.getChatScreenRepository());
+    }
+
+    public GetOperatorUseCase getOperatorUseCase() {
+        return new GetOperatorUseCase(repositoryFactory.getOperatorRepository());
     }
 }

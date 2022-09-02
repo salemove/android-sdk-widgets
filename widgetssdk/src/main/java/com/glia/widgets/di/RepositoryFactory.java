@@ -7,6 +7,7 @@ import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
+import com.glia.widgets.core.engagement.GliaOperatorRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
@@ -32,6 +33,7 @@ public class RepositoryFactory {
     private static GliaEngagementTypeRepository gliaEngagementTypeRepository;
     private static GliaEngagementStateRepository gliaEngagementStateRepository;
     private static FileAttachmentRepository fileAttachmentRepository;
+    private static GliaOperatorRepository operatorRepository;
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
@@ -130,7 +132,7 @@ public class RepositoryFactory {
 
     public GliaEngagementStateRepository getGliaEngagementStateRepository() {
         if (gliaEngagementStateRepository == null) {
-            gliaEngagementStateRepository = new GliaEngagementStateRepository();
+            gliaEngagementStateRepository = new GliaEngagementStateRepository(getOperatorRepository());
         }
         return gliaEngagementStateRepository;
     }
@@ -140,5 +142,13 @@ public class RepositoryFactory {
             chatScreenRepository = new ChatScreenRepositoryImpl();
         }
         return chatScreenRepository;
+    }
+
+    public GliaOperatorRepository getOperatorRepository() {
+        if (operatorRepository == null) {
+            operatorRepository = new GliaOperatorRepository(gliaCore);
+        }
+
+        return operatorRepository;
     }
 }

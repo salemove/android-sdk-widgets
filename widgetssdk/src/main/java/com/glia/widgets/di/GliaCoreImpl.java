@@ -9,6 +9,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.chat.ChatMessage;
@@ -168,4 +169,8 @@ class GliaCoreImpl implements GliaCore {
         Glia.clearVisitorSession();
     }
 
+    @Override
+    public void getOperator(@NonNull String operatorId, @NonNull RequestCallback<Operator> callback) {
+        Glia.getOperator(operatorId, callback);
+    }
 }

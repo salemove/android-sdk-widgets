@@ -1,17 +1,14 @@
 package com.glia.widgets.view;
 
-import com.glia.androidsdk.chat.Chat;
-import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
+import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessagesNotSeenHandler implements
-        GliaOnMessageUseCase.Listener,
-        GliaOnEngagementEndUseCase.Listener {
+public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listener {
 
     private final GliaOnMessageUseCase gliaOnMessageUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
@@ -30,7 +27,7 @@ public class MessagesNotSeenHandler implements
 
     public void init() {
         Logger.d(TAG, "init");
-        gliaOnMessageUseCase.execute(this);
+        gliaOnMessageUseCase.execute().doOnNext(this::onMessage).subscribe();
         gliaOnEngagementEndUseCase.execute(this);
     }
 
@@ -84,9 +81,8 @@ public class MessagesNotSeenHandler implements
         emitCount(0);
     }
 
-    @Override
-    public void onMessage(ChatMessage message) {
-        if (isCounting && message.getSender() == Chat.Participant.OPERATOR) {
+    public void onMessage(ChatMessageInternal messageInternal) {
+        if (isCounting && messageInternal.isOperator()) {
             emitCount(count + 1);
         }
     }

@@ -2,41 +2,40 @@ package com.glia.widgets.chat.domain;
 
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.data.GliaChatRepository;
+import com.glia.widgets.chat.model.history.ChatItem;
+import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal;
 
-public class GliaLoadHistoryUseCase implements GliaChatRepository.HistoryLoadedListener {
+import java.util.Comparator;
+import java.util.List;
 
-    public interface Listener {
-        void historyLoaded(ChatMessage[] messages);
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 
-        void error(Throwable error);
-    }
+public class GliaLoadHistoryUseCase {
 
     private final GliaChatRepository gliaChatRepository;
-    private Listener listener;
+    private final MapOperatorUseCase mapOperatorUseCase;
 
-    public GliaLoadHistoryUseCase(GliaChatRepository gliaChatRepository) {
+    public GliaLoadHistoryUseCase(GliaChatRepository gliaChatRepository, MapOperatorUseCase mapOperatorUseCase) {
         this.gliaChatRepository = gliaChatRepository;
+        this.mapOperatorUseCase = mapOperatorUseCase;
     }
 
-    public void execute(Listener listener) {
-        this.listener = listener;
-        gliaChatRepository.loadHistory(this);
+    public Single<List<ChatMessageInternal>> execute() {
+        return loadHistory().flatMapPublisher(Flowable::fromArray)
+                .concatMapSingle(mapOperatorUseCase::execute)
+                .toSortedList(Comparator.comparingLong(o -> o.getChatMessage().getTimestamp()));
     }
 
-    public void unregisterListener(Listener listener) {
-        if (this.listener == listener) {
-            this.listener = null;
-        }
-    }
-
-    @Override
-    public void loaded(ChatMessage[] messages, Throwable error) {
-        if (listener != null) {
+    private Single<ChatMessage[]> loadHistory() {
+        return Single.create(emitter -> gliaChatRepository.loadHistory((messages, error) -> {
             if (error != null) {
-                listener.error(error);
+                emitter.onError(error);
             } else {
-                listener.historyLoaded(messages);
+                emitter.onSuccess(messages);
             }
-        }
+        }));
     }
+
 }

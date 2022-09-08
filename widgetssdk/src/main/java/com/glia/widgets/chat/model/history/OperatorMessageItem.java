@@ -1,7 +1,5 @@
 package com.glia.widgets.chat.model.history;
 
-import androidx.annotation.NonNull;
-
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 
@@ -9,10 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class OperatorMessageItem extends ChatItem {
+public class OperatorMessageItem extends OperatorChatItem {
     public final String operatorName;
-    public final String operatorProfileImgUrl;
-    public final boolean showChatHead;
     public final String content;
     public final List<SingleChoiceOption> singleChoiceOptions;
     public final Integer selectedChoiceIndex;
@@ -26,12 +22,11 @@ public class OperatorMessageItem extends ChatItem {
             String content,
             List<SingleChoiceOption> singleChoiceOptions,
             Integer selectedChoiceIndex,
-            String choiceCardImageUrl
+            String choiceCardImageUrl,
+            String operatorId
     ) {
-        super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE);
+        super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE, showChatHead, operatorProfileImgUrl, operatorId);
         this.operatorName = operatorName;
-        this.operatorProfileImgUrl = operatorProfileImgUrl;
-        this.showChatHead = showChatHead;
         this.content = content;
         this.singleChoiceOptions = singleChoiceOptions != null ? Collections.unmodifiableList(singleChoiceOptions) : null;
         this.selectedChoiceIndex = selectedChoiceIndex;
@@ -41,33 +36,32 @@ public class OperatorMessageItem extends ChatItem {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof OperatorMessageItem)) return false;
         if (!super.equals(o)) return false;
         OperatorMessageItem that = (OperatorMessageItem) o;
-        return showChatHead == that.showChatHead &&
-                Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
-                Objects.equals(content, that.content) &&
-                Objects.equals(singleChoiceOptions, that.singleChoiceOptions) &&
-                Objects.equals(selectedChoiceIndex, that.selectedChoiceIndex) &&
-                Objects.equals(choiceCardImageUrl, that.choiceCardImageUrl);
+        return Objects.equals(operatorName, that.operatorName)
+                && Objects.equals(content, that.content)
+                && Objects.equals(singleChoiceOptions, that.singleChoiceOptions)
+                && Objects.equals(selectedChoiceIndex, that.selectedChoiceIndex)
+                && Objects.equals(choiceCardImageUrl, that.choiceCardImageUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), operatorProfileImgUrl, showChatHead, content, singleChoiceOptions, selectedChoiceIndex, choiceCardImageUrl);
+        return Objects.hash(super.hashCode(), operatorName, content, singleChoiceOptions, selectedChoiceIndex, choiceCardImageUrl);
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "OperatorMessageItem{" +
-                "operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
-                ", showChatHead=" + showChatHead +
-                ", chatItemId=" + getId() +
+                "showChatHead=" + showChatHead +
+                ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
+                ", operatorId='" + operatorId + '\'' +
+                ", operatorName='" + operatorName + '\'' +
                 ", content='" + content + '\'' +
                 ", singleChoiceOptions=" + singleChoiceOptions +
                 ", selectedChoiceIndex=" + selectedChoiceIndex +
                 ", choiceCardImageUrl='" + choiceCardImageUrl + '\'' +
-                '}';
+                "} " + super.toString();
     }
 }

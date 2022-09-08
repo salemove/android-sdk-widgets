@@ -4,38 +4,42 @@ import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal;
+
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 public class GliaOnMessageUseCase implements
         GliaOnEngagementUseCase.Listener,
         GliaChatRepository.MessageListener {
 
-    public interface Listener {
-        void onMessage(ChatMessage message);
-    }
-
     private final GliaOnEngagementUseCase onEngagementUseCase;
     private final GliaChatRepository messageRepository;
-    private Listener listener;
+    private final MapOperatorUseCase mapOperatorUseCase;
+    private final PublishSubject<ChatMessage> publishSubject;
 
     public GliaOnMessageUseCase(
             GliaChatRepository messageRepository,
-            GliaOnEngagementUseCase gliaOnEngagementUseCase
-    ) {
+            GliaOnEngagementUseCase gliaOnEngagementUseCase,
+            MapOperatorUseCase mapOperatorUseCase) {
         this.onEngagementUseCase = gliaOnEngagementUseCase;
         this.messageRepository = messageRepository;
+        this.mapOperatorUseCase = mapOperatorUseCase;
+        publishSubject = PublishSubject.create();
     }
 
-    public void execute(Listener listener) {
-        this.listener = listener;
+    public Observable<ChatMessageInternal> execute() {
         this.onEngagementUseCase.execute(this);
+        return publishSubject
+                .flatMapSingle(mapOperatorUseCase::execute)
+                .doOnError(Throwable::printStackTrace)
+                .share();
     }
 
     public void unregisterListener() {
-        if (this.listener != null) {
             messageRepository.unregisterMessageListener(this);
             onEngagementUseCase.unregisterListener(this);
-            this.listener = null;
-        }
     }
 
     @Override
@@ -45,8 +49,6 @@ public class GliaOnMessageUseCase implements
 
     @Override
     public void onMessage(ChatMessage chatMessage) {
-        if (this.listener != null) {
-            listener.onMessage(chatMessage);
-        }
+        publishSubject.onNext(chatMessage);
     }
 }

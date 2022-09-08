@@ -47,6 +47,7 @@ public class FileHelper {
                     } else {
                         emitter.onError(new Exception());
                     }
+            rawBitmap.recycle();
                 }
         );
     }

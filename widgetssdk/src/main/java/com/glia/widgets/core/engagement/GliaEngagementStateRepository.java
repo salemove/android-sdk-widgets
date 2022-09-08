@@ -33,6 +33,12 @@ public class GliaEngagementStateRepository {
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
+    private final GliaOperatorRepository operatorRepository;
+
+    public GliaEngagementStateRepository(GliaOperatorRepository operatorRepository) {
+        this.operatorRepository = operatorRepository;
+    }
+
     public void onEngagementStarted(Engagement engagement) {
         disposable = new CompositeDisposable();
         disposable.add(
@@ -68,6 +74,9 @@ public class GliaEngagementStateRepository {
     }
 
     private void notifyOperatorUpdate(Operator operator) {
+        if (operator != null) {
+            operatorRepository.addOrUpdateOperator(operator);
+        }
         operatorProcessor.onNext(Optional.ofNullable(operator));
     }
 

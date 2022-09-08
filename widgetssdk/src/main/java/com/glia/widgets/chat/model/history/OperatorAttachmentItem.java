@@ -7,19 +7,24 @@ import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
-public class OperatorAttachmentItem extends ChatItem {
+public class OperatorAttachmentItem extends OperatorChatItem {
 
-    public final boolean showChatHead;
     public final AttachmentFile attachmentFile;
-    public final String operatorProfileImgUrl;
     public final boolean isFileExists;
     public final boolean isDownloading;
 
-    public OperatorAttachmentItem(String chatItemId, int viewType, boolean showChatHead, AttachmentFile attachmentFile, String operatorProfileImgUrl, boolean isFileExists, boolean isDownloading) {
-        super(chatItemId, viewType);
-        this.showChatHead = showChatHead;
+    public OperatorAttachmentItem(
+            String chatItemId,
+            int viewType,
+            boolean showChatHead,
+            AttachmentFile attachmentFile,
+            String operatorProfileImgUrl,
+            boolean isFileExists,
+            boolean isDownloading,
+            String operatorId
+    ) {
+        super(chatItemId, viewType, showChatHead, operatorProfileImgUrl, operatorId);
         this.attachmentFile = attachmentFile;
-        this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.isFileExists = isFileExists;
         this.isDownloading = isDownloading;
     }
@@ -27,31 +32,26 @@ public class OperatorAttachmentItem extends ChatItem {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof OperatorAttachmentItem)) return false;
         if (!super.equals(o)) return false;
         OperatorAttachmentItem that = (OperatorAttachmentItem) o;
-        return showChatHead == that.showChatHead &&
-                Objects.equals(attachmentFile, that.attachmentFile) &&
-                Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
-                Objects.equals(isFileExists, that.isFileExists) &&
-                Objects.equals(isDownloading, that.isDownloading);
+        return isFileExists == that.isFileExists && isDownloading == that.isDownloading && Objects.equals(attachmentFile, that.attachmentFile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), showChatHead, attachmentFile, operatorProfileImgUrl, isFileExists, isDownloading);
+        return Objects.hash(super.hashCode(), attachmentFile, isFileExists, isDownloading);
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "OperatorAttachmentItem{" +
+                "attachmentFile=" + attachmentFile +
+                ", isFileExists=" + isFileExists +
+                ", isDownloading=" + isDownloading +
                 ", showChatHead=" + showChatHead +
-                ", attachmentFile=" + Utils.toString(attachmentFile) +
-                ", chatItemId='" + getId() + '\'' +
                 ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
-                ", isFileExists='" + isFileExists + '\'' +
-                ", isDownloading='" + isDownloading + '\'' +
-                +'}';
+                ", operatorId='" + operatorId + '\'' +
+                "} " + super.toString();
     }
 }

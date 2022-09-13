@@ -7,6 +7,7 @@ import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
@@ -16,7 +17,9 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StyleableRes;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Operator;
@@ -484,6 +487,19 @@ public class Utils {
         Resources.Theme theme = context.getTheme();
         theme.resolveAttribute(attrId, typedValue, true);
         return typedValue.resourceId;
+    }
+
+    @Nullable
+    public static Typeface getFont(TypedArray typedArray, Context context) {
+        int resId = getTypedArrayIntegerValue(
+                typedArray, context, R.styleable.GliaView_android_fontFamily, R.attr.fontFamily
+        );
+
+        if (resId > 0) {
+            return ResourcesCompat.getFont(context, resId);
+        }
+
+        return null;
     }
 
     public static Activity getActivity(Context context) {

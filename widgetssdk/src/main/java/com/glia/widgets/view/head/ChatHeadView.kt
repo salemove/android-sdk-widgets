@@ -1,0 +1,260 @@
+package com.glia.widgets.view.head
+
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.graphics.PorterDuff
+import android.util.AttributeSet
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
+import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.isVisible
+import com.glia.widgets.GliaWidgets
+import com.glia.widgets.R
+import com.glia.widgets.UiTheme
+import com.glia.widgets.call.CallActivity
+import com.glia.widgets.call.Configuration
+import com.glia.widgets.chat.ChatActivity
+import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.databinding.ChatHeadViewBinding
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.view.configuration.ChatHeadConfiguration
+import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
+import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
+import kotlin.properties.Delegates
+
+class ChatHeadView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.gliaChatStyle,
+    defStyleRes: Int = R.style.Application_Glia_Chat
+) : ConstraintLayout(
+    /*ContextThemeWrapper modifies the given Context's theme with the one you specify in the constructor.
+    Since a Service doesn't really have a theme, it just tacks yours onto the Service's Context.
+    Otherwise this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.*/
+    ContextThemeWrapper(context, R.style.Application_Glia_Chat),
+    attrs,
+    defStyleAttr,
+    defStyleRes
+), ChatHeadContract.View {
+    private val binding by lazy { ChatHeadViewBinding.inflate(LayoutInflater.from(context), this) }
+
+    private var sdkConfiguration: GliaSdkConfiguration? = null
+    private var configuration: ChatHeadConfiguration by Delegates.notNull()
+
+    private val bubbleTheme: BubbleTheme?
+        get() = Dependencies.getGliaThemeManager().theme?.run {
+            if (context is Service) bubbleTheme else chatTheme?.bubble
+        }
+
+    init {
+        setAccessibilityLabels()
+    }
+
+    override fun showUnreadMessageCount(unreadMessageCount: Int) {
+        post {
+            binding.chatBubbleBadge.apply {
+                text = unreadMessageCount.toString()
+                isVisible = isDisplayUnreadMessageBadge(unreadMessageCount)
+            }
+        }
+    }
+
+    override fun setController(controller: ChatHeadContract.Controller) {
+        //Unused
+    }
+
+    override fun showOperatorImage(operatorProfileImgUrl: String) {
+        post {
+            binding.apply {
+                queueingLottieAnimation.visibility = GONE
+                placeholderView.visibility = GONE
+                profilePictureView.load(operatorProfileImgUrl)
+            }
+        }
+    }
+
+    override fun showPlaceholder() {
+        post {
+            binding.apply {
+                queueingLottieAnimation.visibility = GONE
+                profilePictureView.setImageDrawable(null)
+                profilePictureView.backgroundTintList =
+                    getColorStateListCompat(configuration.backgroundColorRes)
+                placeholderView.visibility = VISIBLE
+            }
+        }
+    }
+
+    override fun showQueueing() {
+        post {
+            binding.apply {
+                placeholderView.visibility = GONE
+                profilePictureView.setImageDrawable(null)
+                profilePictureView.backgroundTintList =
+                    getColorStateListCompat(configuration.badgeTextColor)
+                queueingLottieAnimation.visibility = VISIBLE
+            }
+        }
+    }
+
+    override fun showOnHold() {
+        post { binding.onHoldIcon.visibility = VISIBLE }
+    }
+
+    override fun hideOnHold() {
+        post { binding.onHoldIcon.visibility = GONE }
+    }
+
+    override fun updateConfiguration(
+        buildTimeTheme: UiTheme, sdkConfiguration: GliaSdkConfiguration?
+    ) {
+        this.sdkConfiguration = sdkConfiguration
+        createHybridConfiguration(buildTimeTheme, sdkConfiguration)
+        post { updateView() }
+    }
+
+    private fun applyBubbleTheme() {
+        bubbleTheme?.badge?.text?.also(binding.chatBubbleBadge::applyTextTheme)
+        bubbleTheme?.onHoldOverlay.also(binding.onHoldIcon::applyImageColorTheme)
+        bubbleTheme?.userImage?.also(::applyUserImageTheme)
+    }
+
+    private fun applyUserImageTheme(userImageTheme: UserImageTheme?) {
+        userImageTheme?.imageBackgroundColor.also(binding.profilePictureView::applyColorTheme)
+        userImageTheme?.placeholderBackgroundColor.also(binding.placeholderView::applyColorTheme)
+        userImageTheme?.placeholderColor.also(binding.placeholderView::applyImageColorTheme)
+    }
+
+    override fun navigateToChat() = context.startActivity(
+        getNavigationIntent(context, ChatActivity::class.java, sdkConfiguration!!)
+    )
+
+    override fun navigateToCall() {
+        val activityConfig =
+            Configuration.Builder().setWidgetsConfiguration(sdkConfiguration).build()
+
+        val intent = CallActivity.getIntent(context, activityConfig)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
+
+    private fun createBuildTimeConfiguration(buildTimeTheme: UiTheme): ChatHeadConfiguration {
+        return ChatHeadConfiguration.builder()
+            .operatorPlaceholderBackgroundColor(buildTimeTheme.brandPrimaryColor)
+            .operatorPlaceholderIcon(buildTimeTheme.iconPlaceholder)
+            .operatorPlaceholderIconTintList(buildTimeTheme.baseLightColor)
+            .badgeTextColor(buildTimeTheme.baseLightColor)
+            .badgeBackgroundTintList(buildTimeTheme.brandPrimaryColor)
+            .backgroundColorRes(buildTimeTheme.brandPrimaryColor)
+            .iconOnHold(buildTimeTheme.iconOnHold)
+            .iconOnHoldTintList(buildTimeTheme.baseLightColor)
+            .build()
+    }
+
+    private fun createHybridConfiguration(
+        buildTimeTheme: UiTheme, sdkConfiguration: GliaSdkConfiguration?
+    ) {
+        configuration = createBuildTimeConfiguration(buildTimeTheme)
+
+        val runTimeTheme = sdkConfiguration?.runTimeTheme ?: return
+
+        val builder = ChatHeadConfiguration.builder(configuration)
+
+        runTimeTheme.chatHeadConfiguration?.apply {
+            operatorPlaceholderBackgroundColor?.also(builder::operatorPlaceholderBackgroundColor)
+            operatorPlaceholderIcon?.also(builder::operatorPlaceholderIcon)
+            operatorPlaceholderIconTintList?.also(builder::operatorPlaceholderIconTintList)
+            badgeBackgroundTintList?.also(builder::badgeBackgroundTintList)
+            badgeTextColor?.also(builder::badgeTextColor)
+            backgroundColorRes?.also(builder::backgroundColorRes)
+            iconOnHold?.also(builder::iconOnHold)
+            iconOnHoldTintList?.also(builder::iconOnHoldTintList)
+        }
+        configuration = builder.build()
+    }
+
+    private fun setAccessibilityLabels() {
+        val view = binding.root
+        view.isFocusable = true
+        view.contentDescription =
+            context.getString(R.string.glia_chat_head_view_content_description)
+
+        ViewCompat.setAccessibilityDelegate(view, object : AccessibilityDelegateCompat() {
+            override fun onInitializeAccessibilityNodeInfo(
+                host: View, info: AccessibilityNodeInfoCompat
+            ) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                info.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK)
+            }
+        })
+    }
+
+    private fun updateOperatorPlaceholderImageView() {
+        binding.placeholderView.apply {
+            setImageResource(configuration.operatorPlaceholderIcon)
+            setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
+            imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
+        }
+    }
+
+    private fun updateOnHoldImageView() {
+        binding.onHoldIcon.apply {
+            setImageResource(configuration.iconOnHold)
+            imageTintList = getColorStateListCompat(configuration.iconOnHoldTintList)
+        }
+    }
+
+    private fun updateBadgeView() {
+        binding.chatBubbleBadge.apply {
+            backgroundTintList = getColorStateListCompat(configuration.badgeBackgroundTintList)
+            setTextColor(getColorCompat(configuration.badgeTextColor))
+        }
+    }
+
+    private fun updateProfilePictureView() {
+        binding.profilePictureView.setBackgroundColor(getColorCompat(configuration.backgroundColorRes))
+    }
+
+    private fun updateQueueingAnimationView() {
+        binding.queueingLottieAnimation.addColorFilter(
+            color = getColorCompat(configuration.backgroundColorRes),
+            mode = PorterDuff.Mode.SRC_OVER
+        )
+    }
+
+    private fun updateView() {
+        updateOperatorPlaceholderImageView()
+        updateOnHoldImageView()
+        updateBadgeView()
+        updateProfilePictureView()
+        updateQueueingAnimationView()
+
+        applyBubbleTheme()
+    }
+
+    private fun isDisplayUnreadMessageBadge(unreadMessageCount: Int): Boolean =
+        unreadMessageCount > 0
+
+    companion object {
+        @JvmStatic
+        fun getInstance(context: Context): ChatHeadView = ChatHeadView(context)
+
+        @JvmStatic
+        private fun getNavigationIntent(
+            context: Context, cls: Class<*>, sdkConfiguration: GliaSdkConfiguration
+        ): Intent = Intent(context, cls)
+            .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.companyName)
+            .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.queueId)
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.contextAssetId)
+            .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.runTimeTheme)
+            .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.useOverlay)
+            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.screenSharingMode)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+}

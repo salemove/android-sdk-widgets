@@ -2,6 +2,8 @@ package com.glia.widgets;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import com.glia.androidsdk.SiteApiKey;
 
 /**
@@ -16,6 +18,7 @@ public class GliaWidgetsConfig {
     private final Context context;
     private final String region;
     private final int requestCode;
+    private final String uiJsonRemoteConfig;
 
     /**
      * @deprecated Deprecated since SDK version 1.6.5. Please use {@link GliaWidgetsConfig#GliaWidgetsConfig(String, String, Context, String, int)} instead.
@@ -53,14 +56,7 @@ public class GliaWidgetsConfig {
         this.context = builder.context;
         this.region = builder.region;
         this.requestCode = builder.requestCode;
-    }
-
-    /**
-     * Defines regions that can be applied to {@link GliaWidgetsConfig}.
-     */
-    public static class Regions {
-        public static String US = "us";
-        public static String EU = "eu";
+        this.uiJsonRemoteConfig = builder.uiJsonRemoteConfig;
     }
 
     public String getSiteId() {
@@ -83,6 +79,11 @@ public class GliaWidgetsConfig {
         return siteApiKey;
     }
 
+    @Nullable
+    public String getUiJsonRemoteConfig() {
+        return uiJsonRemoteConfig;
+    }
+
     /**
      * @deprecated API token is no longer needed for SDK to function correctly.
      * Deprecated since SDK version 1.6.5
@@ -94,6 +95,14 @@ public class GliaWidgetsConfig {
 
     public int getRequestCode() {
         return requestCode;
+    }
+
+    /**
+     * Defines regions that can be applied to {@link GliaWidgetsConfig}.
+     */
+    public static class Regions {
+        public static String US = "us";
+        public static String EU = "eu";
     }
 
     /**
@@ -151,6 +160,7 @@ public class GliaWidgetsConfig {
         Context context;
         String region;
         int requestCode;
+        String uiJsonRemoteConfig;
 
         public Builder() {
             requestCode = 45554442;
@@ -210,6 +220,11 @@ public class GliaWidgetsConfig {
 
         public Builder setRequestCode(int requestCode) {
             this.requestCode = requestCode;
+            return this;
+        }
+
+        public Builder setUiJsonRemoteConfig(@Nullable String uiJsonRemoteConfig) {
+            this.uiJsonRemoteConfig = uiJsonRemoteConfig;
             return this;
         }
 

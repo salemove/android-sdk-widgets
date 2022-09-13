@@ -2,50 +2,25 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.widget.FrameLayout">
+    tools:parentTag="com.google.android.material.card.MaterialCardView">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_view"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/glia_single_choice_card_image_height"
+        android:layout_marginHorizontal="@dimen/glia_large"
+        android:layout_marginBottom="@dimen/glia_medium"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/Application.Glia.Chat.ShapeAppearance.SmallComponent"
+        tools:ignore="ContentDescription"
+        tools:src="@tools:sample/backgrounds/scenic" />
+
+    <com.glia.widgets.view.textview.ChoiceCardContentTextView
+        android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/gliaBaseLightColor"
-        app:cardCornerRadius="@dimen/glia_medium"
-        app:strokeColor="?attr/gliaBrandPrimaryColor"
-        app:strokeWidth="@dimen/glia_px">
+        android:layout_marginHorizontal="@dimen/glia_large"
+        tools:text="What type of insurance are you interested in?" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/glia_pre_large"
-            android:layout_marginBottom="@dimen/glia_pre_large">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/image"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/glia_single_choice_card_image_height"
-                android:layout_marginHorizontal="@dimen/glia_large"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/Application.Glia.Chat.ShapeAppearance.SmallComponent"
-                tools:ignore="ContentDescription"
-                tools:src="@tools:sample/backgrounds/scenic" />
-
-            <com.glia.widgets.view.textview.ChoiceCardContentTextView
-                android:id="@+id/content_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/glia_large"
-                android:layout_marginTop="@dimen/glia_medium"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image"
-                app:layout_constraintWidth_default="spread"
-                app:layout_goneMarginTop="0dp"
-                tools:text="What type of insurance are you interested in?" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
 </merge>

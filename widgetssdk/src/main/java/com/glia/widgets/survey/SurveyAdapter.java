@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.R;
+import com.glia.widgets.helper.SimpleTextWatcher;
 import com.glia.widgets.view.button.GliaSurveyOptionButton;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
@@ -504,18 +505,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             float textSize = optionButtonStyle.getNormalText().getTextSize();
             comment.setTextSize(textSize);
             comment.setOnFocusChangeListener((v, hasFocus) -> setAnswer(comment.getText().toString()));
-            comment.addTextChangedListener(new TextWatcher() {
+            comment.addTextChangedListener(new SimpleTextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    setAnswer(s.toString());
+                public void afterTextChanged(@NonNull Editable editable) {
+                    setAnswer(editable.toString());
                 }
             });
         }

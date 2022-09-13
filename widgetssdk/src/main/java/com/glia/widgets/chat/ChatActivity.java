@@ -50,7 +50,7 @@ public class ChatActivity extends AppCompatActivity {
         configuration = createConfiguration(getIntent());
         chatHeadLayout.setConfiguration(configuration);
         chatView.setConfiguration(configuration);
-        chatView.setTheme(configuration.getRunTimeTheme());
+        chatView.setUiTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.setOnBackToCallListener(this::backToCall);
 

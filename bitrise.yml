@@ -144,7 +144,21 @@ workflows:
     - install-missing-android-tools@3:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
-    - script@1.1.6:
+    - android-build@1:
+        inputs:
+        - variant: $INTEGRATOR_VARIANT
+        - module: $EXAMPLE_APP_MODULE
+    - android-unit-test@1:
+        inputs:
+        - module: $WIDGET_SDK_MODULE
+        - variant: $SDK_VARIANT
+        - project_location: $PROJECT_LOCATION
+    - android-unit-test@1:
+        inputs:
+        - module: $EXAMPLE_APP_MODULE
+        - variant: $INTEGRATOR_VARIANT
+        - project_location: $PROJECT_LOCATION
+    - script@1:
         title: Publish Android SDK to Nexus Repository Manager (Staging)
         inputs:
         - content: >-
@@ -164,7 +178,7 @@ workflows:
 
             ./gradlew clean
             widgetssdk:publishReleasePublicationToSonatypeRepository
-    - cache-push@2.3: {}
+    - cache-push@2: {}
   pull_request:
     steps:
     - activate-ssh-key@4:

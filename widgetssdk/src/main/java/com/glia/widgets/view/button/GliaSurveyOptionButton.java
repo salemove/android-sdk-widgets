@@ -69,7 +69,7 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         setTextSize(textSize);
         setupTypeFace();
         int radiusDp = normalLayer.getCornerRadius();
-        int radiusPx = Math.round(Dependencies.getResourceProvider().convertDpToPixel(radiusDp));
+        int radiusPx = Dependencies.getResourceProvider().convertDpToIntPixel(radiusDp);
         setCornerRadius(radiusPx);
     }
 

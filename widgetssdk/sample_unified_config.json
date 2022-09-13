@@ -1,0 +1,160 @@
+{
+  "chatScreen": {
+    "background": {
+      "border": {
+        "type": "fill",
+        "value": [
+          "#FF121212"
+        ]
+      },
+      "borderWidth": 1,
+      "cornerRadius": 8,
+      "color": {
+        "type": "fill",
+        "value": [
+          "#FF121212"
+        ]
+      }
+    },
+    "endButton": {
+      "background": {
+        "type": "fill",
+        "value": [
+          "#FF121212"
+        ]
+      },
+      "text": {
+        "background": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "alignment": "center",
+        "font": {
+          "size": 15,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      }
+    },
+    "header": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "borderWidth": 1,
+        "cornerRadius": 8,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      },
+      "text": {
+        "background": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "alignment": "center",
+        "font": {
+          "size": 15,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      }
+    },
+    "operatorMessage": {
+      "text": {
+        "background": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "alignment": "center",
+        "font": {
+          "size": 15,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      },
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "borderWidth": 1,
+        "cornerRadius": 8,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      },
+      "alignment": "leading"
+    },
+    "visitorMessage": {
+      "text": {
+        "background": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "alignment": "center",
+        "font": {
+          "size": 15,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      },
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        },
+        "borderWidth": 1,
+        "cornerRadius": 8,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FF121212"
+          ]
+        }
+      },
+      "alignment": "leading"
+    }
+  }
+}

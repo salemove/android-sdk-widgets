@@ -50,17 +50,12 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.glia.widgets.view.head.BadgeTextView
             android:id="@+id/new_messages_badge_view"
-            android:layout_width="@dimen/glia_chat_head_badge_size"
-            android:layout_height="@dimen/glia_chat_head_badge_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignTop="@id/new_messages_indicator_card"
-            android:layout_alignEnd="@id/new_messages_indicator_card"
-            android:background="@drawable/bg_badge"
-            android:elevation="@dimen/glia_chat_new_messages_elevation"
-            android:gravity="center"
-            android:textAppearance="?attr/textAppearanceCaption"
-            android:textColor="?attr/gliaBaseLightColor" />
+            android:layout_alignEnd="@id/new_messages_indicator_card" />
 
     </RelativeLayout>
 

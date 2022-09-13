@@ -1,7 +1,6 @@
 package com.glia.exampleapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
@@ -29,13 +28,6 @@ public class GliaWidgetsConfigManager {
 
     private static final String REGION_BETA = "beta";
     private static final String REGION_ACCEPTANCE = "acceptance";
-
-    @NonNull
-    public static GliaWidgetsConfig obtainConfig(@NonNull Intent intent, @NonNull Context applicationContext) {
-        if (intent.getData() == null) return createDefaultConfig(applicationContext);
-
-        return obtainConfigFromDeepLink(intent.getData(), applicationContext);
-    }
 
     @NonNull
     public static GliaWidgetsConfig obtainConfigFromDeepLink(@NonNull Uri data, @NonNull Context applicationContext) {

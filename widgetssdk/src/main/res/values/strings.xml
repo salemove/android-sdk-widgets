@@ -180,6 +180,8 @@
     <string name="glia_chat_attachment_download_button_label">Download</string>
     <string name="glia_chat_attachment_open_button_label">Open</string>
     <string name="glia_chat_attachment_downloading_label">Downloading file…</string>
+    <string name="glia_chat_select_picture_title">Select Picture</string>
+    <string name="glia_chat_select_file_title">Select file</string>
 
     <!--    FilePreviewActivity-->
     <string name="glia_preview_activity_preview_failed_msg">Could not load the image preview. Please try again.</string>

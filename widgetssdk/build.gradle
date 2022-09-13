@@ -37,6 +37,11 @@ android {
                 'WrongViewIdFormat',
                 'HardcodedText'
     }
+
+    buildFeatures {
+        viewBinding true
+    }
+    namespace 'com.glia.widgets'
 }
 
 dependencies {
@@ -60,6 +65,7 @@ dependencies {
 
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation "com.google.code.gson:gson:$gson"
+    implementation "androidx.core:core-ktx:$coreKtxVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
@@ -80,3 +86,5 @@ ext {
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-parcelize'

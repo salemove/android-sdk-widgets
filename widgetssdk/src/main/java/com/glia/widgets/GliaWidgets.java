@@ -31,6 +31,8 @@ import io.reactivex.plugins.RxJavaPlugins;
 public class GliaWidgets {
     private final static String TAG = "GliaWidgets";
 
+    public static final String REMOTE_CONFIGURATION = "remote_configuration";
+
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
@@ -134,6 +136,7 @@ public class GliaWidgets {
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         Dependencies.glia().init(createGliaConfig(gliaWidgetsConfig));
         Dependencies.init();
+        Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
     }
 

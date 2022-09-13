@@ -2,6 +2,7 @@ package com.glia.widgets.di;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.Lifecycle;
 
@@ -17,6 +18,7 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
+import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
 public class Dependencies {
 
@@ -28,6 +30,7 @@ public class Dependencies {
     private static UseCaseFactory useCaseFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
+    private static final UnifiedThemeManager UNIFIED_THEME_MANAGER = new UnifiedThemeManager();
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
@@ -68,6 +71,11 @@ public class Dependencies {
 
     public static GliaSdkConfigurationManager getSdkConfigurationManager() {
         return sdkConfigurationManager;
+    }
+
+    @NonNull
+    public static UnifiedThemeManager getGliaThemeManager() {
+        return UNIFIED_THEME_MANAGER;
     }
 
     public static void init() {

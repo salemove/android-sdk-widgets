@@ -1,5 +1,7 @@
 package com.glia.widgets.chat.model.history;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.chat.adapter.ChatAdapter;
 
 import java.util.Objects;
@@ -23,6 +25,7 @@ public class OperatorStatusItem extends ChatItem {
         return companyName;
     }
 
+    @NonNull
     public Status getStatus() {
         return status;
     }

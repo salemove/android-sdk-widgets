@@ -1,13 +1,17 @@
 package com.glia.widgets.chat.helper;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 
+import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 
 import com.glia.androidsdk.chat.AttachmentFile;
@@ -96,6 +100,42 @@ public class FileHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Uri getContentUri(AttachmentFile attachment, Context context) {
+        Uri contentUri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Uri downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            String[] projection = new String[]{
+                    MediaStore.Downloads._ID,
+                    MediaStore.Downloads.DISPLAY_NAME,
+                    MediaStore.Downloads.SIZE
+            };
+            String selection = MediaStore.Downloads.DISPLAY_NAME + " == ?";
+            String[] selectionArgs = new String[]{getFileName(attachment)};
+            String sortOrder = MediaStore.Downloads.DISPLAY_NAME + " ASC";
+            try (Cursor cursor = context.getContentResolver().query(
+                    downloadsContentUri,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+            )) {
+                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID);
+                cursor.moveToFirst();
+                long id = cursor.getLong(idColumn);
+                cursor.close();
+                contentUri = ContentUris.withAppendedId(downloadsContentUri, id);
+            }
+        } else {
+            File file = new File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),
+                    getFileName(attachment)
+            );
+            contentUri = FileProvider.getUriForFile(context, getFileProviderAuthority(context), file);
+        }
+
+        return contentUri;
     }
 
     private static int getRotationFromExif(Context context, Uri uri) {

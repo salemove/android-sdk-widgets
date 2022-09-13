@@ -60,6 +60,7 @@ public class ServiceChatHeadController
      * solution ignores such onResume calls because another activity is already in resumed state.
      */
     private String resumedViewName = null;
+    private Disposable operatorDisposable = null;
 
     public ServiceChatHeadController(
             ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase,
@@ -174,8 +175,6 @@ public class ServiceChatHeadController
         engagementDisposables.dispose();
         updateChatHeadView();
     }
-
-    private Disposable operatorDisposable = null;
 
     private void newEngagementLoaded(OmnicoreEngagement engagement) {
         state = State.ENGAGEMENT;

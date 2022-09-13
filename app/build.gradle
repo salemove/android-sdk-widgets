@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "com.glia.exampleapp"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -79,6 +80,7 @@ android {
                 'WrongViewIdFormat',
                 'HardcodedText'
     }
+    namespace 'com.glia.exampleapp'
 }
 
 dependencies {
@@ -91,6 +93,7 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
     implementation "com.google.firebase:firebase-messaging"
     implementation project(path: ':widgetssdk')
+    implementation "androidx.core:core-ktx:$coreKtxVersion"
 
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"

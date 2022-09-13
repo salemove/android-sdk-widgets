@@ -17,7 +17,6 @@ public class ChatState {
     public final boolean isVisible;
     public final boolean isChatInBottom;
     public final Integer messagesNotSeen;
-    public final boolean historyLoaded;     // TODO unused
     public final String operatorName;
     public final String operatorProfileImgUrl;
     public final String companyName;
@@ -44,7 +43,6 @@ public class ChatState {
         ChatState chatState = (ChatState) o;
         return integratorChatStarted == chatState.integratorChatStarted &&
                 isVisible == chatState.isVisible &&
-                historyLoaded == chatState.historyLoaded &&
                 Objects.equals(operatorName, chatState.operatorName) &&
                 Objects.equals(operatorProfileImgUrl, chatState.operatorProfileImgUrl) &&
                 Objects.equals(companyName, chatState.companyName) &&
@@ -69,7 +67,7 @@ public class ChatState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, historyLoaded, operatorName, operatorProfileImgUrl, companyName, queueId, visitorContextAssetId, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonNeeded);
+        return Objects.hash(integratorChatStarted, isVisible, isChatInBottom, operatorName, operatorProfileImgUrl, companyName, queueId, visitorContextAssetId, mediaUpgradeStartedTimerItem, chatItems, chatInputMode, lastTypedText, messagesNotSeen, engagementRequested, pendingNavigationType, unsentMessages, showSendButton, isOperatorTyping, isAttachmentButtonEnabled, isAttachmentButtonNeeded);
     }
 
     @NonNull
@@ -78,7 +76,6 @@ public class ChatState {
         return "ChatState{" +
                 "integratorChatStarted=" + integratorChatStarted +
                 ", isVisible=" + isVisible +
-                ", historyLoaded=" + historyLoaded +
                 ", operatorName='" + operatorName + '\'' +
                 ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                 ", companyName='" + companyName + '\'' +
@@ -192,7 +189,6 @@ public class ChatState {
     public ChatState stop() {
         return new Builder()
                 .copyFrom(this)
-                .setHistoryLoaded(false)
                 .setOperatorName(null)
                 .setOperatorProfileImgUrl(null)
                 .setIsVisible(false)
@@ -206,7 +202,6 @@ public class ChatState {
                 .copyFrom(this)
                 .setChatInputMode(ChatInputMode.ENABLED_NO_ENGAGEMENT)
                 .setIsAttachmentButtonNeeded(false)
-                .setHistoryLoaded(true)
                 .setChatItems(chatItems)
                 .createChatState();
     }
@@ -300,7 +295,6 @@ public class ChatState {
     }
 
     private ChatState(Builder builder) {
-        this.historyLoaded = builder.historyLoaded;
         this.operatorName = builder.operatorName;
         this.operatorProfileImgUrl = builder.operatorProfileImgUrl;
         this.companyName = builder.companyName;
@@ -329,7 +323,6 @@ public class ChatState {
         public boolean isOperatorTyping;
         public boolean isAttachmentButtonEnabled;
         public boolean isAttachmentButtonNeeded;
-        private boolean historyLoaded;
         private boolean isChatInBottom;
         private String operatorName;
         private String operatorProfileImgUrl;
@@ -351,7 +344,6 @@ public class ChatState {
         private String visitorContextAssetId;
 
         public Builder copyFrom(ChatState chatState) {
-            historyLoaded = chatState.historyLoaded;
             isChatInBottom = chatState.isChatInBottom;
             operatorName = chatState.operatorName;
             operatorProfileImgUrl = chatState.operatorProfileImgUrl;
@@ -374,11 +366,6 @@ public class ChatState {
             isAttachmentButtonEnabled = chatState.isAttachmentButtonEnabled;
             isAttachmentButtonNeeded = chatState.isAttachmentButtonNeeded;
             isAttachmentAllowed = chatState.isAttachmentAllowed;
-            return this;
-        }
-
-        public Builder setHistoryLoaded(boolean historyLoaded) {
-            this.historyLoaded = historyLoaded;
             return this;
         }
 

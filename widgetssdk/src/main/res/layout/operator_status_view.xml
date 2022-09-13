@@ -15,6 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
         app:lottie_colorFilter="?attr/gliaBrandPrimaryColor"
+        tools:lottie_colorFilter="@android:color/red"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/pulsation_lottie_animation"
         app:lottie_speed="0.75" />

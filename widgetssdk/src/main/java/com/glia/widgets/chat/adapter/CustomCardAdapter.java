@@ -93,6 +93,32 @@ public abstract class CustomCardAdapter {
                                                             @NonNull UiTheme uiTheme,
                                                             int viewType);
 
+    /**
+     *
+     * @param message a chat message with metadata.
+     * @param viewType the view type of the new view.
+     *                 The type is provided by {@link #getItemViewType(ChatMessage)}.
+     * @return a boolean indicating if the custom card view should be shown when
+     *         the card is interactable and an option is selected.
+     *         The default implementation returns {@code true}.
+     */
+    public boolean isInteractable(ChatMessage message, int viewType) {
+        return true;
+    }
+
+    /**
+     *
+     * @param message a chat message with metadata.
+     * @param viewType the view type of the new view.
+     *                 The type is provided by {@link #getItemViewType(ChatMessage)}.
+     * @return a boolean indicating if the custom card view should be shown when
+     *         the card is interactable and an option is selected.
+     *         The default implementation returns {@code false}.
+     */
+    public boolean shouldShowCard(ChatMessage message, int viewType) {
+        return false;
+    }
+
     @Nullable
     public final Integer getChatAdapterViewType(ChatMessage chatMessage) {
         Integer customCardViewType = getItemViewType(chatMessage);
@@ -111,7 +137,7 @@ public abstract class CustomCardAdapter {
     }
 
     @Nullable
-    final Integer getCustomCardViewType(int chatAdapterViewType) {
+    public final Integer getCustomCardViewType(int chatAdapterViewType) {
         int index = viewTypeMap.indexOfValue(chatAdapterViewType);
         if (index >= 0) {
             return viewTypeMap.keyAt(index);

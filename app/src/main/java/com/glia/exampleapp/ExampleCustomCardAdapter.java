@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.androidsdk.chat.ChatMessage;
+import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
@@ -46,12 +48,34 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
         }
     }
 
+    @Override
+    public boolean isInteractable(ChatMessage message, int viewType) {
+        if (viewType == NATIVE_VIEW_TYPE) {
+            return message.getMetadata()
+                    .optBoolean(NativeViewViewHolder.SHOW_BUTTON_KEY, false);
+        }
+        return super.shouldShowCard(message, viewType);
+    }
+
+    @Override
+    public boolean shouldShowCard(ChatMessage message, int viewType) {
+        if (viewType == NATIVE_VIEW_TYPE) {
+            return message.getMetadata()
+                    .optBoolean(NativeViewViewHolder.SHOULD_SHOW_VIEW_KEY, false);
+        }
+        return super.shouldShowCard(message, viewType);
+    }
+
     static class NativeViewViewHolder extends CustomCardViewHolder {
+        static final String SHOW_BUTTON_KEY = "showButton";
+        static final String SHOULD_SHOW_VIEW_KEY = "shouldShow";
+
         private final UiTheme uiTheme;
         private final Context context;
         private final View contentView;
         private final TextView messageTextView;
         private final TextView metadataTextView;
+        private final Button okButton;
 
         public NativeViewViewHolder(@NonNull View itemView, @NonNull UiTheme uiTheme) {
             super(itemView);
@@ -60,6 +84,7 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
             this.contentView = itemView.findViewById(R.id.content_view);
             this.messageTextView = itemView.findViewById(R.id.message);
             this.metadataTextView = itemView.findViewById(R.id.metadata);
+            this.okButton = itemView.findViewById(R.id.ok_button);
         }
 
         @Override
@@ -68,9 +93,37 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
             try {
                 String metadata = message.getMetadata().toString(2);
                 metadataTextView.setText(String.format("\"metadata\": %s", metadata));
+
+                if (message.getMetadata().optBoolean(SHOW_BUTTON_KEY, false)) {
+                    SingleChoiceAttachment singleChoiceAttachment = null;
+                    if (message.getAttachment() != null && message.getAttachment() instanceof SingleChoiceAttachment) {
+                        singleChoiceAttachment = (SingleChoiceAttachment) message.getAttachment();
+                    }
+
+                    if (singleChoiceAttachment != null && "ok_value".equals(singleChoiceAttachment.getSelectedOption())) {
+                        okButton.setOnClickListener(null);
+                        okButton.setSelected(true);
+                        okButton.setClickable(false);
+                    } else {
+                        okButton.setOnClickListener(view -> {
+                            callback.sendResponse("OK", "ok_value");
+                        });
+                        okButton.setSelected(false);
+                        okButton.setClickable(true);
+                    }
+                    okButton.setVisibility(View.VISIBLE);
+                } else {
+                    okButton.setOnClickListener(null);
+                    okButton.setVisibility(View.GONE);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            applyTheme();
+        }
+
+        private void applyTheme() {
             ColorStateList operatorBgColor =
                     ContextCompat.getColorStateList(context, uiTheme.getOperatorMessageBackgroundColor());
             contentView.setBackgroundTintList(operatorBgColor);
@@ -82,6 +135,19 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
                 messageTextView.setTypeface(fontFamily);
                 metadataTextView.setTypeface(fontFamily);
             }
+
+            ColorStateList actionButtonBackgroundColor =
+                    okButton.isSelected() ?
+                            ContextCompat.getColorStateList(context, uiTheme.getBotActionButtonSelectedBackgroundColor()) :
+                            ContextCompat.getColorStateList(context, uiTheme.getBotActionButtonBackgroundColor());
+
+            ColorStateList actionButtonTextColor =
+                    okButton.isSelected() ?
+                            ContextCompat.getColorStateList(context, uiTheme.getBotActionButtonSelectedTextColor()) :
+                            ContextCompat.getColorStateList(context, uiTheme.getBotActionButtonTextColor());
+
+            okButton.setBackgroundTintList(actionButtonBackgroundColor);
+            okButton.setTextColor(actionButtonTextColor);
         }
     }
 }

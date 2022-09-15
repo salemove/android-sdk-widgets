@@ -13,22 +13,22 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CustomCardTypeUseCaseTest {
+public class CustomCardAdapterTypeUseCaseTest {
     private static final Integer VIEW_TYPE = 10;
 
     private CustomCardAdapter customCardAdapter;
-    private CustomCardTypeUseCase useCase;
+    private CustomCardAdapterTypeUseCase useCase;
 
     @Before
     public void setUp() {
         customCardAdapter = mock(CustomCardAdapter.class);
         when(customCardAdapter.getChatAdapterViewType(any())).thenReturn(null);
-        useCase = new CustomCardTypeUseCase(customCardAdapter);
+        useCase = new CustomCardAdapterTypeUseCase(customCardAdapter);
     }
 
     @Test
     public void execute_returnsNull_whenAdapterIsNull() {
-        CustomCardTypeUseCase useCase = new CustomCardTypeUseCase(null);
+        CustomCardAdapterTypeUseCase useCase = new CustomCardAdapterTypeUseCase(null);
         ChatMessage message = mock(ChatMessage.class);
 
         Integer result = useCase.execute(message);

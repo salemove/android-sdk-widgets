@@ -21,4 +21,10 @@
         android:layout_height="wrap_content"
         android:textSize="11sp"/>
 
+    <Button
+        android:id="@+id/ok_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/glia_dialog_ok"/>
+
 </LinearLayout>

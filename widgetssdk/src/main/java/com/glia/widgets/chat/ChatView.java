@@ -168,9 +168,9 @@ public class ChatView extends ConstraintLayout implements
             }
         }
     };
-    private final ChatAdapter.OnCustomCardResponse onCustomCardResponse = (text, value) -> {
+    private final ChatAdapter.OnCustomCardResponse onCustomCardResponse = (messageId, text, value) -> {
         if (controller != null) {
-            controller.sendCustomCardResponse(text, value);
+            controller.sendCustomCardResponse(messageId, text, value);
         }
     };
 

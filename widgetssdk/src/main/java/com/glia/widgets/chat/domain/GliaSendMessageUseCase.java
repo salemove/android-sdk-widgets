@@ -2,6 +2,7 @@ package com.glia.widgets.chat.domain;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.chat.FilesAttachment;
+import com.glia.androidsdk.chat.OperatorMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.androidsdk.engagement.EngagementFile;
@@ -15,6 +16,8 @@ import java.util.List;
 public class GliaSendMessageUseCase {
     public interface Listener {
         void messageSent(VisitorMessage message);
+
+        void onCardMessageUpdated(OperatorMessage message);
 
         void onMessageValidated();
 
@@ -84,8 +87,8 @@ public class GliaSendMessageUseCase {
         chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener);
     }
 
-    public void execute(String message, SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
-        chatRepository.sendMessageWithAttachment(message, singleChoiceAttachment, listener);
+    public void execute(String cardMessageId, String text, String value, Listener listener) {
+        chatRepository.sendResponse(cardMessageId, text, value, listener);
     }
 
     private boolean isOperatorOnline() {

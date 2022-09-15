@@ -13,6 +13,7 @@ import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.FilesAttachment;
 import com.glia.androidsdk.chat.MessageAttachment;
+import com.glia.androidsdk.chat.OperatorMessage;
 import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.androidsdk.chat.VisitorMessage;
@@ -28,6 +29,8 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.chat.ChatView;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
+import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
@@ -37,11 +40,11 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
-import com.glia.widgets.chat.model.ResponseAttachment;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.CustomCardItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
@@ -131,6 +134,11 @@ public class ChatController implements
         }
 
         @Override
+        public void onCardMessageUpdated(OperatorMessage message) {
+            updateCustomCard(message);
+        }
+
+        @Override
         public void onMessageValidated() {
             if (viewCallback != null) {
                 viewCallback.clearMessageInput();
@@ -189,7 +197,10 @@ public class ChatController implements
     private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
     private final IsFromCallScreenUseCase isFromCallScreenUseCase;
     private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
+    private final CustomCardAdapterTypeUseCase customCardAdapterTypeUseCase;
     private final CustomCardTypeUseCase customCardTypeUseCase;
+    private final CustomCardInteractableUseCase customCardInteractableUseCase;
+    private final CustomCardShouldShowUseCase customCardShouldShowUseCase;
 
     private boolean isVisitorEndEngagement = false;
     private volatile boolean isChatViewPaused = false;
@@ -233,7 +244,10 @@ public class ChatController implements
             GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
             IsFromCallScreenUseCase isFromCallScreenUseCase,
             UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
-            CustomCardTypeUseCase customCardTypeUseCase) {
+            CustomCardAdapterTypeUseCase customCardAdapterTypeUseCase,
+            CustomCardTypeUseCase customCardTypeUseCase,
+            CustomCardInteractableUseCase customCardInteractableUseCase,
+            CustomCardShouldShowUseCase customCardShouldShowUseCase) {
         this.isFromCallScreenUseCase = isFromCallScreenUseCase;
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         Logger.d(TAG, "constructor");
@@ -296,7 +310,10 @@ public class ChatController implements
         this.siteInfoUseCase = siteInfoUseCase;
         this.surveyUseCase = surveyUseCase;
         this.getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase;
+        this.customCardAdapterTypeUseCase = customCardAdapterTypeUseCase;
         this.customCardTypeUseCase = customCardTypeUseCase;
+        this.customCardInteractableUseCase = customCardInteractableUseCase;
+        this.customCardShouldShowUseCase = customCardShouldShowUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -887,17 +904,21 @@ public class ChatController implements
     private void onOperatorMessageReceived(List<ChatItem> currentChatItems, ChatMessageInternal messageInternal) {
         appendOperatorMessage(currentChatItems, messageInternal);
         appendMessagesNotSeen();
-        changeChatInputMode(messageInternal.getChatMessage());
+        changeChatInputMode(currentChatItems, messageInternal.getChatMessage());
     }
 
-    private void changeChatInputMode(ChatMessage message) {
-        ChatInputMode newInputMode = getChatInputMode(message);
+    private void changeChatInputMode(List<ChatItem> currentChatItems, ChatMessage message) {
+        ChatInputMode newInputMode = getChatInputMode(currentChatItems, message);
         if (chatState.chatInputMode != newInputMode) {
             emitViewState(chatState.chatInputModeChanged(newInputMode));
         }
     }
 
-    private ChatInputMode getChatInputMode(ChatMessage message) {
+    private ChatInputMode getChatInputMode(List<ChatItem> currentChatItems, ChatMessage message) {
+        ChatInputMode customCardChatInputMode = customCardInteractableUseCase.execute(currentChatItems, message);
+        if (customCardChatInputMode != null) {
+            return customCardChatInputMode;
+        }
         if (message.getAttachment() instanceof SingleChoiceAttachment) {
             SingleChoiceAttachment attachment = ((SingleChoiceAttachment) message.getAttachment());
             if (attachment.getOptions() != null) {
@@ -1100,20 +1121,42 @@ public class ChatController implements
     private void appendOperatorOrCustomCardItem(List<ChatItem> currentChatItems, ChatMessageInternal messageInternal) {
         ChatMessage message = messageInternal.getChatMessage();
         if (!message.getContent().equals(EMPTY_MESSAGE)) {
-            MessageAttachment messageAttachment = message.getAttachment();
-            Integer customCardType = customCardTypeUseCase.execute(message);
-            if (customCardType != null) {
-                currentChatItems.add(new CustomCardItem(message, customCardType));
+            Integer viewType = customCardAdapterTypeUseCase.execute(message);
+            if (viewType != null) {
+                appendCustomCardItem(currentChatItems, message, viewType);
             } else {
-                appendOperatorMessageItem(currentChatItems, messageInternal, message, messageAttachment);
+                appendOperatorMessageItem(currentChatItems, messageInternal, message);
             }
+        }
+    }
+
+    private void appendCustomCardItem(List<ChatItem> currentChatItems, ChatMessage message, Integer viewType) {
+        Integer customCardType = customCardTypeUseCase.execute(viewType);
+        if (customCardType == null) {
+            return;
+        }
+        if (customCardShouldShowUseCase.execute(message, customCardType, true)) {
+            currentChatItems.add(new CustomCardItem(message, viewType));
+        }
+
+        String selectedOptionText = null;
+        if (message.getAttachment() != null && message.getAttachment() instanceof SingleChoiceAttachment) {
+            SingleChoiceAttachment singleChoiceAttachment = (SingleChoiceAttachment) message.getAttachment();
+            if (singleChoiceAttachment != null) {
+                selectedOptionText = singleChoiceAttachment.getSelectedOptionText();
+            }
+        }
+        if (selectedOptionText != null && !selectedOptionText.isEmpty()) {
+            currentChatItems.add(
+                    new VisitorMessageItem(VisitorMessageItem.CARD_RESPONSE_ID, false, selectedOptionText)
+            );
         }
     }
 
     private void appendOperatorMessageItem(List<ChatItem> currentChatItems,
                                            ChatMessageInternal messageInternal,
-                                           ChatMessage message,
-                                           MessageAttachment messageAttachment) {
+                                           ChatMessage message) {
+        MessageAttachment messageAttachment = message.getAttachment();
         currentChatItems.add(
                 new OperatorMessageItem(
                         message.getId(),
@@ -1241,9 +1284,68 @@ public class ChatController implements
         }
     }
 
-    public void sendCustomCardResponse(String text, String value) {
-        SingleChoiceAttachment attachment = new ResponseAttachment(value);
-        sendMessageUseCase.execute(text, attachment, sendMessageCallback);
+    public void sendCustomCardResponse(String messageId, String text, String value) {
+        sendMessageUseCase.execute(messageId, text, value, sendMessageCallback);
+
+        chatState.chatItems.stream()
+                .filter(chatItem -> messageId.equals(chatItem.getId()))
+                .map(chatItem -> (CustomCardItem) chatItem)
+                .findFirst()
+                .ifPresent(chatItem -> {
+                    Integer customCardType = customCardTypeUseCase.execute(chatItem.getViewType());
+                    if (customCardType == null) {
+                        return;
+                    }
+
+                    ChatMessage currentMessage = chatItem.getMessage();
+                    boolean showCustomCard = customCardShouldShowUseCase.execute(
+                            currentMessage,
+                            customCardType,
+                            false
+                    );
+
+                    List<ChatItem> chatItems = new ArrayList<>(chatState.chatItems);
+                    int indexForResponseMessage = chatItems.indexOf(chatItem);
+                    if (showCustomCard) {
+                        // The index for the response message should be next to the card
+                        // when the card is shown after the response.
+                        indexForResponseMessage += 1;
+                    } else {
+                        // If the card should be hidden after the response, we remove it from the
+                        // item list. The response message will be shown instead of the card.
+                        chatItems.remove(chatItem);
+                    }
+                    chatItems.add(
+                            indexForResponseMessage,
+                            new VisitorMessageItem(VisitorMessageItem.CARD_RESPONSE_ID, false, text)
+                    );
+                    emitChatItems(chatState.changeItems(chatItems));
+                });
+    }
+
+    private void updateCustomCard(OperatorMessage message) {
+        chatState.chatItems.stream()
+                .filter(chatItem -> message.getId().equals(chatItem.getId()))
+                .map(chatItem -> (CustomCardItem) chatItem)
+                .findFirst()
+                .ifPresent(chatItem -> {
+                    List<ChatItem> chatItems = new ArrayList<>(chatState.chatItems);
+                    updateCustomCardSelectedOption(chatItem, message, chatItems);
+                    emitChatItems(chatState.changeItems(chatItems));
+                });
+    }
+
+    private void updateCustomCardSelectedOption(CustomCardItem currentCustomCardItem,
+                                                ChatMessage updatedMessage,
+                                                List<ChatItem> chatItems) {
+        CustomCardItem updatedCustomCardItem = new CustomCardItem(
+                updatedMessage,
+                currentCustomCardItem.getViewType()
+        );
+
+        int indexInList = chatItems.indexOf(currentCustomCardItem);
+        chatItems.remove(indexInList);
+        chatItems.add(indexInList, updatedCustomCardItem);
     }
 
     public void onRecyclerviewPositionChanged(boolean isBottom) {

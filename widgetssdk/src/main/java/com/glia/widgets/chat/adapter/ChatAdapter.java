@@ -198,7 +198,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (chatItem instanceof CustomCardItem) {
             ((CustomCardViewHolder) holder).bind(
                     ((CustomCardItem) chatItem).getMessage(),
-                    onCustomCardResponse::onCustomCardResponse
+                    (text, value) -> onCustomCardResponse.onCustomCardResponse(chatItem.getId(), text, value)
             );
         }
     }
@@ -246,6 +246,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public interface OnCustomCardResponse {
-        void onCustomCardResponse(String text, String value);
+        void onCustomCardResponse(String messageId, String text, String value);
     }
 }

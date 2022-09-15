@@ -71,6 +71,21 @@ public class GliaChatRepository {
         );
     }
 
+    public void sendResponse(String cardMessageId, String text, String value, Listener listener) {
+        Dependencies.glia().getCurrentEngagement().ifPresent(engagement ->
+                engagement.getChat().sendResponse(cardMessageId, text, value, (result, ex) -> {
+                    if (listener != null) {
+                        if (ex != null) {
+                            listener.error(ex);
+                        } else {
+                            listener.messageSent(result.getVisitorResponseMessage());
+                            listener.onCardMessageUpdated(result.getCardMessage());
+                        }
+                    }
+                })
+        );
+    }
+
     private void onMessageReceived(VisitorMessage visitorMessage, GliaException ex, Listener listener) {
         if (listener != null) {
             if (ex != null) listener.error(ex);

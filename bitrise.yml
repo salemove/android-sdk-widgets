@@ -231,6 +231,39 @@ workflows:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: debug
+  upgrade_dependencies:
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@6: {}
+    - cache-pull@2: {}
+    - install-missing-android-tools@3:
+        inputs:
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+    - gradle-runner@2:
+        inputs:
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradle_file: $PROJECT_LOCATION/build.gradle
+        - gradle_task: saveCoreSdkVersion --coreSdkVersion=$NEW_VERSION
+    - script@1:
+        inputs:
+        - content: |2-
+             #!/bin/bash
+
+            BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+            MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
+
+            git checkout -b $BRANCH_NAME
+            git add -A
+            git commit -m "$MESSAGE"
+            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}"
+    - cache-push@2: {}
 app:
   envs:
   - opts:

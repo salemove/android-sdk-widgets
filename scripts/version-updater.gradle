@@ -54,4 +54,3 @@ class UpdateCoreSdkVersion extends DefaultTask {
 }
 
 tasks.register('saveCoreSdkVersion', UpdateCoreSdkVersion)
-

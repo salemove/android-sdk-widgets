@@ -1,10 +1,12 @@
-BRANCH_NAME=$1
-MESSAGE=$2
-NEW_VERSION =$3
+ #!/bin/bash
 
-git checkout -b "$BRANCH_NAME"
+NEW_VERSION=$1
+BRANCH_NAME="version-update/${NEW_VERSION}"
+MESSAGE="Update project version to ${NEW_VERSION}"
+
+git checkout -b $BRANCH_NAME
 git add -A
-git commit -m "$MESSAGE"
+git commit -m $MESSAGE
 git push origin "$BRANCH_NAME":"$BRANCH_NAME"
 
 curl \
@@ -12,4 +14,4 @@ curl \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $GITHUB_API_TOKEN" \
   https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-  -d '{"title":"Update project version to $NEW_VERSION","head":"$BRANCH_NAME","base":"master"}'
+  -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}"

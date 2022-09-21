@@ -6,6 +6,10 @@ ext {
     gradlePropertiesFilePath = "${rootProject.projectDir}/version.properties"
     gliaCoreSdkVersionTagInProperties = 'dependency.coreSdk.version'
     gliaCoreSdkVersionTag = 'gliaSdkVersion'
+    wdigetsVersionNameTagInProperties = 'widgets.versionName'
+    wdigetsVersionNameTag = 'widgetsVersionName'
+    wdigetsVersionCodeTagInProperties = 'widgets.versionCode'
+    wdigetsVersionCodeTag = 'widgetsVersionCode'
 }
 
 exposeGradlePropertiesToBuildScripts()
@@ -13,6 +17,8 @@ exposeGradlePropertiesToBuildScripts()
 def exposeGradlePropertiesToBuildScripts() {
     Properties gradleProperties = PropertiesIO.readProperties(gradlePropertiesFilePath)
     ext[gliaCoreSdkVersionTag] = gradleProperties.getProperty(gliaCoreSdkVersionTagInProperties)
+    ext[wdigetsVersionNameTag] = gradleProperties.getProperty(wdigetsVersionNameTagInProperties)
+    ext[wdigetsVersionCodeTag] = Integer.parseInt(gradleProperties.getProperty(wdigetsVersionCodeTagInProperties))
 }
 
 /**
@@ -32,12 +38,20 @@ class PropertiesIO {
     }
 }
 
+class VersionPropertiesTask extends DefaultTask {
+    void saveProperty(String propertyName, String propertyValue) {
+        Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
+        gradleProperties[propertyName] = propertyValue
+        PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
+    }
+}
+
 /**
  * A task class for editing the Core SDK version in version.properties
  * Example of usage from terminal:
  * ./gradlew saveCoreSdkVersion --coreSdkVersion=0.77.2
  */
-class UpdateCoreSdkVersion extends DefaultTask {
+class UpdateCoreSdkVersion extends VersionPropertiesTask {
     private String newCoreSdkVersion
 
     @Option(option = "coreSdkVersion", description = "Core SDK version that should be overriden in configuration files")
@@ -47,11 +61,36 @@ class UpdateCoreSdkVersion extends DefaultTask {
 
     @TaskAction
     void write() {
-        Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
-        gradleProperties[getProject().gliaCoreSdkVersionTagInProperties] = newCoreSdkVersion
-        PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
+        saveProperty(getProject().gliaCoreSdkVersionTagInProperties, newCoreSdkVersion)
+    }
+}
+
+/**
+ * A task class for editing the Widget SDK version in version.properties
+ * Example of usage from terminal:
+ * ./gradlew saveWidgetsVersionName --versionCode=77 --versionName=0.77.2
+ */
+class UpdateProjectVersion extends VersionPropertiesTask {
+    private String versionName
+    private String versionCode
+
+    @Option(option = "versionName", description = "Widget SDK version name that should be overriden in configuration files")
+    void setVersionName(String versionName) {
+        this.versionName = versionName
+    }
+
+    @Option(option = "versionCode", description = "Widget SDK version code that should be overriden in configuration files")
+    void setVersionCode(String versionCode) {
+        this.versionCode = versionCode
+    }
+
+    @TaskAction
+    void write() {
+        saveProperty(getProject().wdigetsVersionNameTagInProperties, versionName)
+        saveProperty(getProject().wdigetsVersionCodeTagInProperties, versionCode)
     }
 }
 
 tasks.register('saveCoreSdkVersion', UpdateCoreSdkVersion)
+tasks.register('saveWidgetsVersionName', UpdateProjectVersion)
 

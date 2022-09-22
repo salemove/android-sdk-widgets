@@ -6,10 +6,10 @@ ext {
     gradlePropertiesFilePath = "${rootProject.projectDir}/version.properties"
     gliaCoreSdkVersionTagInProperties = 'dependency.coreSdk.version'
     gliaCoreSdkVersionTag = 'gliaSdkVersion'
-    wdigetsVersionNameTagInProperties = 'widgets.versionName'
-    wdigetsVersionNameTag = 'widgetsVersionName'
-    wdigetsVersionCodeTagInProperties = 'widgets.versionCode'
-    wdigetsVersionCodeTag = 'widgetsVersionCode'
+    widgetsVersionNameTagInProperties = 'widgets.versionName'
+    widgetsVersionNameTag = 'widgetsVersionName'
+    widgetsVersionCodeTagInProperties = 'widgets.versionCode'
+    widgetsVersionCodeTag = 'widgetsVersionCode'
 }
 
 exposeGradlePropertiesToBuildScripts()
@@ -17,8 +17,8 @@ exposeGradlePropertiesToBuildScripts()
 def exposeGradlePropertiesToBuildScripts() {
     Properties gradleProperties = PropertiesIO.readProperties(gradlePropertiesFilePath)
     ext[gliaCoreSdkVersionTag] = gradleProperties.getProperty(gliaCoreSdkVersionTagInProperties)
-    ext[wdigetsVersionNameTag] = gradleProperties.getProperty(wdigetsVersionNameTagInProperties)
-    ext[wdigetsVersionCodeTag] = Integer.parseInt(gradleProperties.getProperty(wdigetsVersionCodeTagInProperties))
+    ext[widgetsVersionNameTag] = gradleProperties.getProperty(widgetsVersionNameTagInProperties)
+    ext[widgetsVersionCodeTag] = Integer.parseInt(gradleProperties.getProperty(widgetsVersionCodeTagInProperties))
 }
 
 /**
@@ -38,12 +38,16 @@ class PropertiesIO {
     }
 }
 
-class VersionPropertiesTask extends DefaultTask {
-    void saveProperty(String propertyName, String propertyValue) {
-        Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
-        gradleProperties[propertyName] = propertyValue
-        PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
-    }
+void saveProperty(String propertyKey, String propertyValue) {
+    saveProperties(Collections.singletonMap(propertyKey, propertyValue))
+}
+
+void saveProperties(Map<String, String> properties) {
+    Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
+    properties.forEach((propertyKey, propertyValue) -> {
+        gradleProperties[propertyKey] = propertyValue
+    })
+    PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
 }
 
 /**
@@ -51,7 +55,7 @@ class VersionPropertiesTask extends DefaultTask {
  * Example of usage from terminal:
  * ./gradlew saveCoreSdkVersion --coreSdkVersion=0.77.2
  */
-class UpdateCoreSdkVersion extends VersionPropertiesTask {
+class UpdateCoreSdkVersion extends DefaultTask {
     private String newCoreSdkVersion
 
     @Option(option = "coreSdkVersion", description = "Core SDK version that should be overriden in configuration files")
@@ -61,7 +65,7 @@ class UpdateCoreSdkVersion extends VersionPropertiesTask {
 
     @TaskAction
     void write() {
-        saveProperty(getProject().gliaCoreSdkVersionTagInProperties, newCoreSdkVersion)
+        getProject().saveProperty(getProject().gliaCoreSdkVersionTagInProperties, newCoreSdkVersion)
     }
 }
 
@@ -70,27 +74,61 @@ class UpdateCoreSdkVersion extends VersionPropertiesTask {
  * Example of usage from terminal:
  * ./gradlew saveWidgetsVersionName --versionCode=77 --versionName=0.77.2
  */
-class UpdateProjectVersion extends VersionPropertiesTask {
+class UpdateProjectVersion extends DefaultTask {
     private String versionName
     private String versionCode
 
     @Option(option = "versionName", description = "Widget SDK version name that should be overriden in configuration files")
-    void setVersionName(String versionName) {
+    UpdateProjectVersion setVersionName(String versionName) {
         this.versionName = versionName
+        return this
     }
 
     @Option(option = "versionCode", description = "Widget SDK version code that should be overriden in configuration files")
-    void setVersionCode(String versionCode) {
+    UpdateProjectVersion setVersionCode(String versionCode) {
         this.versionCode = versionCode
+        return this
     }
 
     @TaskAction
     void write() {
-        saveProperty(getProject().wdigetsVersionNameTagInProperties, versionName)
-        saveProperty(getProject().wdigetsVersionCodeTagInProperties, versionCode)
+        Map<String, String> propertiesMap = new HashMap<>();
+        propertiesMap.put(getProject().widgetsVersionNameTagInProperties, versionName)
+        propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, versionCode)
+        getProject().saveProperties(propertiesMap)
     }
 }
 
 tasks.register('saveCoreSdkVersion', UpdateCoreSdkVersion)
 tasks.register('saveWidgetsVersionName', UpdateProjectVersion)
+
+/**
+ * This task is used by Bitrise release flow to dynamically increment the current Widgets SDK version
+ * Usage example:
+ * ./gradlew bumpVersionMinorLevel
+ */
+task bumpVersionMinorLevel {
+    doLast {
+        String[] versionPartitioned = widgetsVersionName.split("\\.")
+        int updatedMinorVersion = versionPartitioned[1].toInteger() + 1
+        versionPartitioned[1] = updatedMinorVersion.toString()
+        versionPartitioned[2] = "0"
+        String newVersionName = String.join(".", versionPartitioned)
+        String newVersionCode = (widgetsVersionCode + 1).toString()
+
+        Map<String, String> propertiesMap = new HashMap<>();
+        propertiesMap.put(getProject().widgetsVersionNameTagInProperties, newVersionName)
+        propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, newVersionCode)
+        saveProperties(propertiesMap)
+    }
+}
+
+/**
+ * This task is used by Bitrise release flow to read current Widgets SDK version
+ * Usage example:
+ * ./gradlew -q printCurrentVersionName
+ */
+task printCurrentVersionName {
+    println widgetsVersionName
+}
 

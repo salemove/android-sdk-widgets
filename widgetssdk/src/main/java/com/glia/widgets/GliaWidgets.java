@@ -3,10 +3,13 @@ package com.glia.widgets;
 import android.app.Application;
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaConfig;
+import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
@@ -281,6 +284,18 @@ public class GliaWidgets {
     @Nullable
     public static CustomCardAdapter getCustomCardAdapter() {
         return customCardAdapter;
+    }
+
+    /**
+     * Creates `Authentication` instance for a given JWT token.
+     *
+     * @param behavior authentication behavior
+     * @return {@code Authentication} object or throws {@link GliaException} if error happened.
+     * Exception may have the following cause:
+     * {@link GliaException.Cause#INVALID_INPUT} - when SDK is not initialized
+     */
+    public static Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
+        return Dependencies.glia().getAuthentication(behavior);
     }
 
     /**

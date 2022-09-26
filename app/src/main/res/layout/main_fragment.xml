@@ -60,6 +60,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
+        android:paddingEnd="36dp"
         android:text="@string/main_start_chat_flow"
         app:icon="@drawable/ic_baseline_chat_bubble"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
@@ -71,6 +72,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
+        android:paddingEnd="36dp"
         android:text="@string/main_start_audio_call"
         app:icon="@drawable/ic_baseline_call"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
@@ -82,6 +84,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_m"
+        android:paddingEnd="36dp"
         android:text="@string/main_start_video_call"
         app:icon="@drawable/ic_baseline_videocam"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
@@ -99,6 +102,39 @@
         app:layout_constraintTop_toBottomOf="@+id/video_call_button" />
 
     <Button
+        android:id="@+id/initGliaWidgetsButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        android:text="@string/main_init_glia"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/end_engagement_button" />
+
+    <Button
+        android:id="@+id/authenticationButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        android:text="@string/main_authenticate"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/initGliaWidgetsButton" />
+
+    <Button
+        android:id="@+id/deauthenticationButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_m"
+        android:text="@string/main_deauthenticate"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/authenticationButton" />
+
+    <Button
         android:id="@+id/clear_session_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -106,6 +142,6 @@
         android:text="@string/main_clear_visitor_session"
         app:layout_constraintEnd_toStartOf="@+id/end_guideline"
         app:layout_constraintStart_toStartOf="@+id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@+id/end_engagement_button" />
+        app:layout_constraintTop_toBottomOf="@+id/deauthenticationButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,6 +18,7 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.site.SiteInfo;
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 
@@ -172,5 +173,10 @@ class GliaCoreImpl implements GliaCore {
     @Override
     public void getOperator(@NonNull String operatorId, @NonNull RequestCallback<Operator> callback) {
         Glia.getOperator(operatorId, callback);
+    }
+
+    @Override
+    public Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
+        return Glia.authentication(behavior);
     }
 }

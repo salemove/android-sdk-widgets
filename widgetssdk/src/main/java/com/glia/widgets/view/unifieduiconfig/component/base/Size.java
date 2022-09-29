@@ -1,5 +1,7 @@
 package com.glia.widgets.view.unifieduiconfig.component.base;
 
+import android.os.Parcelable;
+
 import androidx.annotation.Dimension;
 
 import com.glia.widgets.view.unifieduiconfig.deserializer.DpDeserializer;
@@ -8,7 +10,7 @@ import com.glia.widgets.view.unifieduiconfig.deserializer.SpDeserializer;
 /**
  * Represents density independent pixels
  */
-public interface Size {
+public interface Size extends Parcelable {
 
     /**
      * @return size in pixels

@@ -1,5 +1,8 @@
 package com.glia.widgets.view.unifieduiconfig.component;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringDef;
@@ -10,6 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +33,7 @@ import java.util.Objects;
  *
  * @see ColorLayerDeserializer
  */
-public class ColorLayer {
+public class ColorLayer implements Parcelable {
     public static final String TYPE_FILL = "fill";
     public static final String TYPE_GRADIENT = "gradient";
 
@@ -79,4 +83,33 @@ public class ColorLayer {
     @Retention(RetentionPolicy.SOURCE)
     public @interface ColorType {
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.type);
+        dest.writeList(this.values);
+    }
+
+    protected ColorLayer(Parcel in) {
+        this.type = in.readString();
+        this.values = new ArrayList<Color>();
+        in.readList(this.values, Color.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<ColorLayer> CREATOR = new Parcelable.Creator<ColorLayer>() {
+        @Override
+        public ColorLayer createFromParcel(Parcel source) {
+            return new ColorLayer(source);
+        }
+
+        @Override
+        public ColorLayer[] newArray(int size) {
+            return new ColorLayer[size];
+        }
+    };
 }

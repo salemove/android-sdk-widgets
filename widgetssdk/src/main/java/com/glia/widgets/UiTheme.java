@@ -6,10 +6,13 @@ import android.os.Parcelable;
 import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.FontRes;
+import androidx.annotation.NonNull;
 
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
+import com.glia.widgets.view.configuration.call.CallStyle;
+import com.glia.widgets.view.configuration.chat.ChatStyle;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
 public class UiTheme implements Parcelable {
@@ -288,6 +291,9 @@ public class UiTheme implements Parcelable {
     private final ButtonConfiguration neutralButtonConfiguration;
 
     private final ChatHeadConfiguration chatHeadConfiguration;
+
+    private final ChatStyle chatStyle;
+    private final CallStyle callStyle;
     private final SurveyStyle surveyStyle;
 
     private UiTheme(UiThemeBuilder builder) {
@@ -343,6 +349,8 @@ public class UiTheme implements Parcelable {
         this.chatStartedHeadingTextColor = builder.chatStartedHeadingTextColor;
         this.choiceCardContentTextConfiguration = builder.choiceCardContentTextConfiguration;
         this.chatHeadConfiguration = builder.chatHeadConfiguration;
+        this.chatStyle = builder.chatStyle;
+        this.callStyle = builder.callStyle;
         this.surveyStyle = builder.surveyStyle;
     }
 
@@ -598,6 +606,12 @@ public class UiTheme implements Parcelable {
         ChatHeadConfiguration chatHeadConfiguration;
 
         private
+        ChatStyle chatStyle;
+
+        private
+        CallStyle callStyle;
+
+        private
         SurveyStyle surveyStyle;
 
         public UiThemeBuilder() {
@@ -821,7 +835,7 @@ public class UiTheme implements Parcelable {
             this.surveyStyle = surveyStyle;
         }
 
-        public void setTheme(UiTheme theme) {
+        public void setTheme(@NonNull UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
             this.baseLightColor = theme.baseLightColor;
@@ -873,6 +887,8 @@ public class UiTheme implements Parcelable {
             this.chatStartedHeadingTextColor = theme.chatStartedHeadingTextColor;
             this.choiceCardContentTextConfiguration = theme.choiceCardContentTextConfiguration;
             this.chatHeadConfiguration = theme.chatHeadConfiguration;
+            this.chatStyle = theme.chatStyle;
+            this.callStyle = theme.callStyle;
             this.surveyStyle = theme.surveyStyle;
         }
 
@@ -1108,6 +1124,8 @@ public class UiTheme implements Parcelable {
         negativeButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         neutralButtonConfiguration = in.readParcelable(ButtonConfiguration.class.getClassLoader());
         chatHeadConfiguration = in.readParcelable(ChatHeadConfiguration.class.getClassLoader());
+        chatStyle = in.readParcelable(ChatStyle.class.getClassLoader());
+        callStyle = in.readParcelable(CallStyle.class.getClassLoader());
         surveyStyle = in.readParcelable(SurveyStyle.class.getClassLoader());
     }
 
@@ -1380,6 +1398,8 @@ public class UiTheme implements Parcelable {
         dest.writeParcelable(negativeButtonConfiguration, flags);
         dest.writeParcelable(neutralButtonConfiguration, flags);
         dest.writeParcelable(chatHeadConfiguration, flags);
+        dest.writeParcelable(chatStyle, flags);
+        dest.writeParcelable(callStyle, flags);
         dest.writeParcelable(surveyStyle, flags);
     }
 
@@ -1404,208 +1424,266 @@ public class UiTheme implements Parcelable {
         return appBarTitle;
     }
 
+    @Deprecated
     public Integer getBrandPrimaryColor() {
         return brandPrimaryColor;
     }
 
+    @Deprecated
     public Integer getBaseLightColor() {
         return baseLightColor;
     }
 
+    @Deprecated
     public Integer getBaseDarkColor() {
         return baseDarkColor;
     }
 
+    @Deprecated
     public Integer getBaseNormalColor() {
         return baseNormalColor;
     }
 
+    @Deprecated
     public Integer getBaseShadeColor() {
         return baseShadeColor;
     }
 
+    @Deprecated
     public Integer getSystemAgentBubbleColor() {
         return systemAgentBubbleColor;
     }
 
+    @Deprecated
     public Integer getFontRes() {
         return fontRes;
     }
 
+    @Deprecated
     public Integer getSystemNegativeColor() {
         return systemNegativeColor;
     }
 
+    @Deprecated
     public Integer getVisitorMessageBackgroundColor() {
         return visitorMessageBackgroundColor;
     }
 
+    @Deprecated
     public Integer getVisitorMessageTextColor() {
         return visitorMessageTextColor;
     }
 
+    @Deprecated
     public Integer getOperatorMessageBackgroundColor() {
         return operatorMessageBackgroundColor;
     }
 
+    @Deprecated
     public Integer getOperatorMessageTextColor() {
         return operatorMessageTextColor;
     }
 
+    @Deprecated
     public Integer getBotActionButtonBackgroundColor() {
         return botActionButtonBackgroundColor;
     }
 
+    @Deprecated
     public Integer getBotActionButtonTextColor() {
         return botActionButtonTextColor;
     }
 
+    @Deprecated
     public Integer getBotActionButtonSelectedBackgroundColor() {
         return botActionButtonSelectedBackgroundColor;
     }
 
+    @Deprecated
     public Integer getBotActionButtonSelectedTextColor() {
         return botActionButtonSelectedTextColor;
     }
 
+    @Deprecated
     public Integer getSendMessageButtonTintColor() {
         return sendMessageButtonTintColor;
     }
 
+    @Deprecated
     public Integer getGliaChatBackgroundColor() {
         return gliaChatBackgroundColor;
     }
 
+    @Deprecated
     public Integer getGliaChatHeaderTitleTintColor() {
         return gliaChatHeaderTitleTintColor;
     }
 
+    @Deprecated
     public Integer getGliaChatHeaderHomeButtonTintColor() {
         return gliaChatHeaderHomeButtonTintColor;
     }
 
+    @Deprecated
     public Integer getGliaChatHeaderExitQueueButtonTintColor() {
         return gliaChatHeaderExitQueueButtonTintColor;
     }
 
+    @Deprecated
     public Integer getIconAppBarBack() {
         return iconAppBarBack;
     }
 
+    @Deprecated
     public Integer getIconLeaveQueue() {
         return iconLeaveQueue;
     }
 
+    @Deprecated
     public Integer getIconSendMessage() {
         return iconSendMessage;
     }
 
+    @Deprecated
     public Integer getIconChatAudioUpgrade() {
         return iconChatAudioUpgrade;
     }
 
+    @Deprecated
     public Integer getIconUpgradeAudioDialog() {
         return iconUpgradeAudioDialog;
     }
 
+    @Deprecated
     public Integer getIconCallAudioOn() {
         return iconCallAudioOn;
     }
 
+    @Deprecated
     public Integer getIconChatVideoUpgrade() {
         return iconChatVideoUpgrade;
     }
 
+    @Deprecated
     public Integer getIconUpgradeVideoDialog() {
         return iconUpgradeVideoDialog;
     }
 
+    @Deprecated
     public Integer getIconScreenSharingDialog() {
         return iconScreenSharingDialog;
     }
 
+    @Deprecated
     public Integer getIconCallVideoOn() {
         return iconCallVideoOn;
     }
 
+    @Deprecated
     public Integer getIconCallAudioOff() {
         return iconCallAudioOff;
     }
 
+    @Deprecated
     public Integer getIconCallVideoOff() {
         return iconCallVideoOff;
     }
 
+    @Deprecated
     public Integer getIconCallChat() {
         return iconCallChat;
     }
 
+    @Deprecated
     public Integer getIconCallSpeakerOn() {
         return iconCallSpeakerOn;
     }
 
+    @Deprecated
     public Integer getIconCallSpeakerOff() {
         return iconCallSpeakerOff;
     }
 
+    @Deprecated
     public Integer getIconCallMinimize() {
         return iconCallMinimize;
     }
 
+    @Deprecated
     public Integer getIconPlaceholder() {
         return iconPlaceholder;
     }
 
+    @Deprecated
     public Integer getIconOnHold() {
         return iconOnHold;
     }
 
+    @Deprecated
     public Boolean getWhiteLabel() {
         return whiteLabel;
     }
 
+    @Deprecated
     public Boolean getGliaAlertDialogButtonUseVerticalAlignment() {
         return gliaAlertDialogButtonUseVerticalAlignment;
     }
 
+    @Deprecated
     public ButtonConfiguration getGliaEndButtonConfiguration() {
         return headerEndButtonConfiguration;
     }
 
+    @Deprecated
     public ButtonConfiguration getGliaPositiveButtonConfiguration() {
         return positiveButtonConfiguration;
     }
 
+    @Deprecated
     public ButtonConfiguration getGliaNegativeButtonConfiguration() {
         return negativeButtonConfiguration;
     }
 
+    @Deprecated
     public ButtonConfiguration getGliaNeutralButtonConfiguration() {
         return neutralButtonConfiguration;
     }
 
+    @Deprecated
     public TextConfiguration getGliaChoiceCardContentTextConfiguration() {
         return choiceCardContentTextConfiguration;
     }
 
+    @Deprecated
     public Integer getGliaChatStartingHeadingTextColor() {
         return chatStartingHeadingTextColor;
     }
 
+    @Deprecated
     public Integer getGliaChatStartingCaptionTextColor() {
         return chatStartingCaptionTextColor;
     }
 
+    @Deprecated
     public Integer getGliaChatStartedHeadingTextColor() {
         return chatStartedHeadingTextColor;
     }
 
+    @Deprecated
     public Integer getGliaChatStartedCaptionTextColor() {
         return chatStartedCaptionTextColor;
     }
 
     public ChatHeadConfiguration getChatHeadConfiguration() {
         return chatHeadConfiguration;
+    }
+
+    public ChatStyle getChatStyle() {
+        return chatStyle;
+    }
+
+    public CallStyle getCallStyle() {
+        return callStyle;
     }
 
     public SurveyStyle getSurveyStyle() {

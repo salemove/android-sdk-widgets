@@ -46,13 +46,20 @@ import org.json.JSONObject;
 public class WebViewViewHolder extends CustomCardViewHolder {
     private static final String MIME_TYPE = "text/html";
     private static final String ENCODING = "UTF-8";
-    private static final String JS_SCRIPT = "<script type=\"text/javascript\">function sendResponse(text, value){Glia.response(text, value);}</script>";
     private static final String METADATA_KEY = "html";
+    private static final String JS_SCRIPT =
+            "<script type=\"text/javascript\">" +
+                    "function sendResponse(text, value){Glia.response(text, value);}" +
+                    "function callMobileAction(action){Glia.action(action);}" +
+            "</script>";
 
     private final WebView webView;
 
     @Nullable
     private ResponseCallback responseCallback;
+
+    @Nullable
+    private MobileActionCallback mobileActionCallback;
 
     @SuppressLint("SetJavaScriptEnabled")
     public WebViewViewHolder(@NonNull ViewGroup parent) {
@@ -61,6 +68,15 @@ public class WebViewViewHolder extends CustomCardViewHolder {
         webView = itemView.findViewById(R.id.web_view);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.addJavascriptInterface(new JavaScriptInterface(), "Glia");
+    }
+
+    /**
+     * Register a callback to be invoked when
+     * the JS method {@code callMobileAction(String)} called inside WebView message.
+     * @param mobileActionCallback the callback that will run
+     */
+    public void setMobileActionCallback(@Nullable MobileActionCallback mobileActionCallback) {
+        this.mobileActionCallback = mobileActionCallback;
     }
 
     /**
@@ -102,5 +118,22 @@ public class WebViewViewHolder extends CustomCardViewHolder {
                 responseCallback.sendResponse(text, value);
             }
         }
+
+        @JavascriptInterface
+        public void action(String action) {
+            if (mobileActionCallback != null) {
+                mobileActionCallback.onMobileAction(action);
+            }
+        }
+    }
+
+    /**
+     * Allows sending the action from a custom card.
+     */
+    public interface MobileActionCallback {
+        /**
+         * @param action the value of an action.
+         */
+        void onMobileAction(String action);
     }
 }

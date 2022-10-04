@@ -1,6 +1,6 @@
 ---
 format_version: '8'
-default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
 workflows:
   browserstack_upload:
@@ -11,18 +11,18 @@ workflows:
     - cache-pull@2: {}
     - install-missing-android-tools@3.0:
         inputs:
-        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
     - android-build@1.0:
         inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
+        - variant: "$INTEGRATOR_VARIANT"
+        - module: "$EXAMPLE_APP_MODULE"
     - browserstack-upload@0:
         inputs:
-        - custom_id: $BROWSERSTACK_APP_ID
+        - custom_id: "$BROWSERSTACK_APP_ID"
         title: Upload APP to BrowserStack
     - deploy-to-bitrise-io@1:
         inputs:
-        - notify_email_list: $BUILD_EMAILS
+        - notify_email_list: "$BUILD_EMAILS"
     - cache-push@2: {}
     envs:
     - opts:
@@ -35,57 +35,103 @@ workflows:
     - git-clone@4: {}
     - script@1:
         inputs:
-        - content: >-
-            sudo update-alternatives --set javac
-            /usr/lib/jvm/java-11-openjdk-amd64/bin/javac
-
-            sudo update-alternatives --set java
-            /usr/lib/jvm/java-11-openjdk-amd64/bin/java
-
+        - content: |-
+            sudo update-alternatives --set javac /usr/lib/jvm/java-11-openjdk-amd64/bin/javac
+            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
             export JAVA_HOME='/usr/lib/jvm/java-11-openjdk-amd64'
-
-            envman add --key JAVA_HOME --value
-            '/usr/lib/jvm/java-11-openjdk-amd64'
+            envman add --key JAVA_HOME --value '/usr/lib/jvm/java-11-openjdk-amd64'
     - cache-pull@2: {}
     - install-missing-android-tools@2:
         inputs:
-        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
     - android-build@0:
         inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
+        - variant: "$INTEGRATOR_VARIANT"
+        - module: "$EXAMPLE_APP_MODULE"
     - android-lint@0:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
         title: Run Lint for SDK
     - android-unit-test@1:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
         title: Unit Test for SDK
     - android-lint@0:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
         title: Run Lint for APP
     - android-unit-test@1:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
         title: Unit Test for APP
     - deploy-to-bitrise-io@1:
         inputs:
-        - notify_email_list: $BUILD_EMAILS
+        - notify_email_list: "$BUILD_EMAILS"
     - cache-push@2: {}
     envs:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: master
+  increment_project_version:
+    steps:
+    - activate-ssh-key@4:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - git-clone@6: {}
+    - cache-pull@2: {}
+    - install-missing-android-tools@3:
+        inputs:
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
+    - gradle-runner@2:
+        inputs:
+        - gradle_file: "$PROJECT_LOCATION/build.gradle"
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
+        - gradle_task: ":bumpVersionMinorLevel"
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # make pipelines' return status equal the last command to exit with a non-zero status, or zero if all commands exit successfully
+            #set -o pipefail
+            # debug log
+            set -x
+
+            NEW_VERSION=`./gradlew -q printCurrentVersionName`
+            BRANCH_NAME="project-version-increment/${NEW_VERSION}"
+            MESSAGE="Increment project version to ${NEW_VERSION}"
+
+            git checkout -b $BRANCH_NAME
+            git add -A
+            git commit -m "$MESSAGE"
+            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+
+            PULL_REQUEST_NUMBER=$(curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}" | jq --raw-output '.number')
+
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
+              -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
+    - cache-push@2: {}
+    envs:
+    - opts:
+        is_expand: false
+      INTEGRATOR_VARIANT: debug
   master:
     steps:
     - activate-ssh-key@4:
@@ -94,42 +140,42 @@ workflows:
     - cache-pull@2: {}
     - install-missing-android-tools@2:
         inputs:
-        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
     - android-build@0:
         inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
+        - variant: "$INTEGRATOR_VARIANT"
+        - module: "$EXAMPLE_APP_MODULE"
     - android-lint@0:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
         title: Run Lint for SDK
     - android-unit-test@1:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
         title: Unit Test for SDK
     - android-lint@0:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
         title: Run Lint for APP
     - android-unit-test@1:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
         title: Unit Test for APP
     - browserstack-upload@0:
         inputs:
-        - custom_id: $BROWSERSTACK_APP_ID
+        - custom_id: "$BROWSERSTACK_APP_ID"
         title: Upload APP to BrowserStack
     - deploy-to-bitrise-io@1:
         inputs:
-        - notify_email_list: $BUILD_EMAILS
+        - notify_email_list: "$BUILD_EMAILS"
     - cache-push@2: {}
     envs:
     - opts:
@@ -143,42 +189,36 @@ workflows:
     - cache-pull@2: {}
     - install-missing-android-tools@3:
         inputs:
-        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
     - android-build@1:
         inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
+        - variant: "$INTEGRATOR_VARIANT"
+        - module: "$EXAMPLE_APP_MODULE"
     - android-unit-test@1:
         inputs:
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
-        - project_location: $PROJECT_LOCATION
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
+        - project_location: "$PROJECT_LOCATION"
     - android-unit-test@1:
         inputs:
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
-        - project_location: $PROJECT_LOCATION
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
+        - project_location: "$PROJECT_LOCATION"
     - script@1:
         title: Publish Android SDK to Nexus Repository Manager (Staging)
         inputs:
-        - content: >-
+        - content: |-
             #!/usr/bin/env bash
-
             # fail if any commands fails
-
             set -e
-
             # debug log
-
             set -x
 
-
-            # this will run Gradle script to deploy library and related
-            artifacts to Maven Central
-
-            ./gradlew clean
-            widgetssdk:publishReleasePublicationToSonatypeRepository
+            # this will run Gradle script to deploy library and related artifacts to Maven Central
+            ./gradlew clean widgetssdk:publishReleasePublicationToSonatypeRepository
     - cache-push@2: {}
+    after_run:
+    - increment_project_version
   pull_request:
     steps:
     - activate-ssh-key@4:
@@ -187,39 +227,39 @@ workflows:
     - cache-pull@2: {}
     - install-missing-android-tools@2:
         inputs:
-        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
     - android-build@0:
         inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
+        - variant: "$INTEGRATOR_VARIANT"
+        - module: "$EXAMPLE_APP_MODULE"
     - android-lint@0:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
         title: Run Lint for SDK
     - android-unit-test@1:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$WIDGET_SDK_MODULE"
+        - variant: "$SDK_VARIANT"
         title: Unit Test for SDK
     - android-lint@0:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
         title: Run Lint for APP
     - android-unit-test@1:
         inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - project_location: "$PROJECT_LOCATION"
+        - module: "$EXAMPLE_APP_MODULE"
+        - variant: "$INTEGRATOR_VARIANT"
         title: Unit Test for APP
     - gradle-runner@2:
         inputs:
-        - gradlew_path: ./gradlew
-        - gradle_task: ':$WIDGET_SDK_MODULE:assembleDebugAndroidTest'
+        - gradlew_path: "./gradlew"
+        - gradle_task: ":$WIDGET_SDK_MODULE:assembleDebugAndroidTest"
         title: Assemble SDK for instrumentation tests
     - virtual-device-testing-for-android@1:
         title: UI Test for APP
@@ -231,11 +271,50 @@ workflows:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: debug
+  upgrade_dependencies:
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@6: {}
+    - cache-pull@2: {}
+    - install-missing-android-tools@3:
+        inputs:
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
+    - gradle-runner@2:
+        inputs:
+        - gradlew_path: "$PROJECT_LOCATION/gradlew"
+        - gradle_file: "$PROJECT_LOCATION/build.gradle"
+        - gradle_task: saveCoreSdkVersion --coreSdkVersion=$NEW_VERSION
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # make pipelines' return status equal the last command to exit with a non-zero status, or zero if all commands exit successfully
+            set -o pipefail
+            # debug log
+            set -x
+
+            BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+            MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
+
+            git checkout -b $BRANCH_NAME
+            git add -A
+            git commit -m "$MESSAGE"
+            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}"
+    - cache-push@2: {}
 app:
   envs:
   - opts:
       is_expand: false
-    PROJECT_LOCATION: .
+    PROJECT_LOCATION: "."
   - opts:
       is_expand: false
     EXAMPLE_APP_MODULE: app
@@ -256,7 +335,7 @@ trigger_map:
   workflow: master
 - push_branch: develop
   workflow: develop
-- pull_request_target_branch: '*'
+- pull_request_target_branch: "*"
   workflow: pull_request
 - tag: v*.*.*
   workflow: publish_to_nexus

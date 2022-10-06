@@ -1,30 +1,33 @@
 package com.glia.widgets.view.unifieduiconfig.component.call;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ButtonBar {
+public class ButtonBar implements Parcelable {
 
     @SerializedName("chatButton")
     @Nullable
-    private BarButtonStates chatButton;
+    private final BarButtonStates chatButton;
 
     @SerializedName("minimizeButton")
     @Nullable
-    private BarButtonStates minimizeButton;
+    private final BarButtonStates minimizeButton;
 
     @SerializedName("muteButton")
     @Nullable
-    private BarButtonStates muteButton;
+    private final BarButtonStates muteButton;
 
     @SerializedName("speakerButton")
     @Nullable
-    private BarButtonStates speakerButton;
+    private final BarButtonStates speakerButton;
 
     @SerializedName("videoButton")
     @Nullable
-    private BarButtonStates videoButton;
+    private final BarButtonStates videoButton;
 
     @Nullable
     public BarButtonStates getChatButton() {
@@ -50,4 +53,38 @@ public class ButtonBar {
     public BarButtonStates getVideoButton() {
         return videoButton;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.chatButton, flags);
+        dest.writeParcelable(this.minimizeButton, flags);
+        dest.writeParcelable(this.muteButton, flags);
+        dest.writeParcelable(this.speakerButton, flags);
+        dest.writeParcelable(this.videoButton, flags);
+    }
+
+    protected ButtonBar(Parcel in) {
+        this.chatButton = in.readParcelable(BarButtonStates.class.getClassLoader());
+        this.minimizeButton = in.readParcelable(BarButtonStates.class.getClassLoader());
+        this.muteButton = in.readParcelable(BarButtonStates.class.getClassLoader());
+        this.speakerButton = in.readParcelable(BarButtonStates.class.getClassLoader());
+        this.videoButton = in.readParcelable(BarButtonStates.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<ButtonBar> CREATOR = new Parcelable.Creator<ButtonBar>() {
+        @Override
+        public ButtonBar createFromParcel(Parcel source) {
+            return new ButtonBar(source);
+        }
+
+        @Override
+        public ButtonBar[] newArray(int size) {
+            return new ButtonBar[size];
+        }
+    };
 }

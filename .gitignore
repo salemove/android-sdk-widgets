@@ -93,6 +93,7 @@ freeline/
 freeline_project_description.json
 gen-external-apklibs
 gen/
+gradle.deps
 hs_err_pid*
 lint/generated/
 lint/intermediates/

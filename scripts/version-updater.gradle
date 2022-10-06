@@ -10,6 +10,18 @@ ext {
     widgetsVersionNameTag = 'widgetsVersionName'
     widgetsVersionCodeTagInProperties = 'widgets.versionCode'
     widgetsVersionCodeTag = 'widgetsVersionCode'
+
+    saveProperty = {String propertyKey, String propertyValue ->
+        saveProperties(Collections.singletonMap(propertyKey, propertyValue))
+    }
+
+    saveProperties = {Map<String, String> properties ->
+        Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
+        properties.forEach((propertyKey, propertyValue) -> {
+            gradleProperties[propertyKey] = propertyValue
+        })
+        PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
+    }
 }
 
 exposeGradlePropertiesToBuildScripts()
@@ -36,18 +48,6 @@ class PropertiesIO {
         File gradlePropsFile = new File(propertiesFilePath)
         properties.store(gradlePropsFile.newWriter(), null)
     }
-}
-
-void saveProperty(String propertyKey, String propertyValue) {
-    saveProperties(Collections.singletonMap(propertyKey, propertyValue))
-}
-
-void saveProperties(Map<String, String> properties) {
-    Properties gradleProperties = PropertiesIO.readProperties(getProject().gradlePropertiesFilePath)
-    properties.forEach((propertyKey, propertyValue) -> {
-        gradleProperties[propertyKey] = propertyValue
-    })
-    PropertiesIO.saveProperties(gradleProperties, getProject().gradlePropertiesFilePath)
 }
 
 /**

@@ -27,6 +27,18 @@ import com.glia.widgets.chat.adapter.holder.WebViewViewHolder;
 public class WebViewCardAdapter extends CustomCardAdapter {
     private static final int WEB_VIEW_TYPE = 0;
 
+    @Nullable
+    private WebViewViewHolder.MobileActionCallback mobileActionCallback;
+
+    /**
+     * Register a callback to be invoked when
+     * the JS method {@code callMobileAction(String)} called inside WebView message.
+     * @param mobileActionCallback the callback that will run
+     */
+    public void setMobileActionCallback(@Nullable WebViewViewHolder.MobileActionCallback mobileActionCallback) {
+        this.mobileActionCallback = mobileActionCallback;
+    }
+
     /**
      * @see CustomCardAdapter#getItemViewType(ChatMessage)
      */
@@ -48,6 +60,8 @@ public class WebViewCardAdapter extends CustomCardAdapter {
                                                    @NonNull LayoutInflater inflater,
                                                    @NonNull UiTheme uiTheme,
                                                    int viewType) {
-        return new WebViewViewHolder(parent);
+        WebViewViewHolder webViewViewHolder = new WebViewViewHolder(parent);
+        webViewViewHolder.setMobileActionCallback(mobileActionCallback);
+        return webViewViewHolder;
     }
 }

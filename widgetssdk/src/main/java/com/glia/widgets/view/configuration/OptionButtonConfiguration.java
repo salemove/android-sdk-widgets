@@ -99,6 +99,7 @@ public class OptionButtonConfiguration implements Parcelable {
         }
 
         public OptionButtonConfiguration build() {
+            // TODO: builder should not set default values
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.normalText == null) {
                 this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);
@@ -122,11 +123,17 @@ public class OptionButtonConfiguration implements Parcelable {
         }
 
         private LayerConfiguration prepareDefaultLayerConfiguration() {
-            return new LayerConfiguration.Builder().build();
+            return new LayerConfiguration.Builder()
+                    .backgroundColor(R.color.glia_base_light_color)
+                    .borderColor(R.color.glia_stroke_gray)
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
+                    .cornerRadiusDimension(R.dimen.glia_survey_default_corner_radius)
+                    .build();
         }
 
         private TextConfiguration prepareDefaultTextConfiguration(ResourceProvider resourceProvider, int textColor) {
             return new TextConfiguration.Builder()
+                    .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                     .textColor(resourceProvider.getColorStateList(textColor))
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();

@@ -54,6 +54,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
         }
 
         public BooleanQuestionConfiguration build() {
+            // TODO: builder should not set default values
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
@@ -69,14 +70,17 @@ public class BooleanQuestionConfiguration implements Parcelable {
             ColorStateList normalTextColor = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
             ColorStateList selectedTextColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
             TextConfiguration normalText = new TextConfiguration.Builder()
+                    .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
             TextConfiguration selectedText = new TextConfiguration.Builder()
+                    .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                     .textColor(selectedTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
             TextConfiguration highlightedText = new TextConfiguration.Builder()
+                    .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                     .textColor(normalTextColor)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_text_size))
                     .build();
@@ -84,16 +88,19 @@ public class BooleanQuestionConfiguration implements Parcelable {
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_stroke_gray))
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             LayerConfiguration selectedLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_brand_primary_color))
                     .borderColor(resourceProvider.getString(R.color.glia_brand_primary_color))
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             LayerConfiguration highlightedLayer = new LayerConfiguration.Builder()
                     .backgroundColor(resourceProvider.getString(R.color.glia_base_light_color))
                     .borderColor(resourceProvider.getString(R.color.glia_system_negative_color))
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
                     .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_corner_radius))
                     .build();
             return new OptionButtonConfiguration.Builder()

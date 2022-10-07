@@ -171,6 +171,7 @@ public class SurveyStyle implements Parcelable {
         }
 
         public SurveyStyle build() {
+            // TODO: builder should not set default values
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
 
             if (this.layerConfiguration == null) {
@@ -200,7 +201,10 @@ public class SurveyStyle implements Parcelable {
                                                                       int backgroundColorId) {
             ColorStateList buttonTexColor = resourceProvider.getColorStateList(R.color.glia_base_light_color);
             TextConfiguration textConfiguration =
-                    new TextConfiguration.Builder().textColor(buttonTexColor).build();
+                    new TextConfiguration.Builder()
+                            .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
+                            .textColor(buttonTexColor)
+                            .build();
             return new ButtonConfiguration.Builder()
                     .backgroundColor(resourceProvider.getColorStateList(backgroundColorId))
                     .textConfiguration(textConfiguration)
@@ -217,7 +221,10 @@ public class SurveyStyle implements Parcelable {
 
         private LayerConfiguration prepareDefaultBackgroundConfiguration(ResourceProvider resourceProvider) {
             return new LayerConfiguration.Builder()
-                    .cornerRadius(resourceProvider.getDimension(R.dimen.glia_survey_default_survey_corner_radius))
+                    .backgroundColor(R.color.glia_base_light_color)
+                    .borderColor(R.color.glia_stroke_gray)
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
+                    .cornerRadiusDimension(R.dimen.glia_survey_default_survey_corner_radius)
                     .build();
         }
     }

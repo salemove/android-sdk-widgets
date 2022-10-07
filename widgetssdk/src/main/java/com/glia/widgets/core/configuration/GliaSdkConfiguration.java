@@ -88,6 +88,11 @@ public class GliaSdkConfiguration {
             return this;
         }
 
+        public Builder remoteConfiguration(RemoteConfiguration remoteConfiguration) {
+            this.remoteConfiguration = remoteConfiguration;
+            return this;
+        }
+
         public Builder runTimeTheme(UiTheme runTimeTheme) {
             this.runTimeTheme = runTimeTheme;
             return this;

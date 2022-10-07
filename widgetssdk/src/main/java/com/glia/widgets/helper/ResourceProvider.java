@@ -3,10 +3,12 @@ package com.glia.widgets.helper;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
@@ -32,6 +34,8 @@ interface IResourceProvider {
     float convertSpToPixel(float sp);
 
     int convertDpToIntPixel(float dp);
+
+    Drawable getDrawable(@DrawableRes int id);
 }
 
 public class ResourceProvider implements IResourceProvider {
@@ -81,6 +85,11 @@ public class ResourceProvider implements IResourceProvider {
     @Override
     public float convertSpToPixel(float sp) {
         return applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, weakContext.get());
+    }
+
+    @Override
+    public Drawable getDrawable(int id) {
+        return ContextCompat.getDrawable(weakContext.get(), id);
     }
 
     private float applyDimension(int unit, float value, Context context) {

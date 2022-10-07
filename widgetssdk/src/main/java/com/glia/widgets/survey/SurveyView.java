@@ -104,7 +104,11 @@ public class SurveyView extends FrameLayout
         this.title.setTextColor(titleStyle.getTextColor());
         float textSize = titleStyle.getTextSize();
         this.title.setTextSize(textSize);
-        if (titleStyle.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
+        if (Boolean.TRUE.equals(titleStyle.isBold())) {
+            this.title.setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            this.title.setTypeface(Typeface.DEFAULT);
+        }
 
         // The elevated view (buttonPanel) needs to have a background to cast a shadow
         buttonPanel.setBackgroundColor(Color.parseColor(surveyStyle.getLayer().getBackgroundColor()));
@@ -144,7 +148,11 @@ public class SurveyView extends FrameLayout
         button.setTextSize(configuration.getTextConfiguration().getTextSize());
         button.setStrokeColor(configuration.getStrokeColor());
         if (configuration.getStrokeWidth() != null) button.setStrokeWidth(configuration.getStrokeWidth());
-        if (configuration.getTextConfiguration().isBold()) button.setTypeface(Typeface.DEFAULT_BOLD);
+        if (Boolean.TRUE.equals(configuration.getTextConfiguration().isBold())) {
+            button.setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            button.setTypeface(Typeface.DEFAULT);
+        }
     }
 
     private void readTypedArray(AttributeSet attrs, int defStyleAttr, int defStyleRes) {

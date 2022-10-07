@@ -1,0 +1,525 @@
+{
+  "callScreen": {
+    "background": {
+      "border": {
+        "type": "fill",
+        "value": [
+          "#f542ec"
+        ]
+      },
+      "borderWidth": 4,
+      "cornerRadius": 8,
+      "color": {
+        "type": "gradient",
+        "value": [
+          "#f5429c",
+          "#ac4bc9",
+          "#5f63cf",
+          "#5f50cf",
+          "#3f4296",
+          "#51198a"
+        ]
+      }
+    },
+    "bottomText": {
+      "background": {
+        "type": "gradient",
+        "value": [
+          "#335f63cf",
+          "#33f542ec"
+        ]
+      },
+      "alignment": "center",
+      "font": {
+        "size": 15,
+        "style": "bold"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#e8c7f0"
+        ]
+      }
+    },
+    "buttonBar": {
+      "chatButton": {
+        "inactive": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#55f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#11f542ec",
+                "#115f63cf"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "italic"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "active": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        }
+      },
+      "muteButton": {
+        "inactive": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#55f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#11f542ec",
+                "#115f63cf"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "italic"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "active": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "selected": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#aadbfa"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "bold"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        }
+      },
+      "speakerButton": {
+        "inactive": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#55f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#11f542ec",
+                "#115f63cf"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "italic"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "active": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "selected": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#aadbfa"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "bold"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        }
+      },
+      "videoButton": {
+        "inactive": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#55f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#11f542ec",
+                "#115f63cf"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "italic"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "active": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        },
+        "selected": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#aadbfa"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "bold"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        }
+      },
+      "minimizeButton": {
+        "active": {
+          "background": {
+            "type": "fill",
+            "value": [
+              "#f542ec"
+            ]
+          },
+          "imageColor": {
+            "type": "fill",
+            "value": [
+              "#5f63cf"
+            ]
+          },
+          "title": {
+            "background": {
+              "type": "gradient",
+              "value": [
+                "#335f63cf",
+                "#33f542ec"
+              ]
+            },
+            "alignment": "center",
+            "font": {
+              "size": 13,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#e8c7f0"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "duration": {
+      "background": {
+        "type": "gradient",
+        "value": [
+          "#335f63cf",
+          "#33f542ec"
+        ]
+      },
+      "alignment": "center",
+      "font": {
+        "size": 15,
+        "style": "regular"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#e8c7f0"
+        ]
+      }
+    },
+    "operator": {
+      "background": {
+        "type": "gradient",
+        "value": [
+          "#335f63cf",
+          "#33f542ec"
+        ]
+      },
+      "alignment": "center",
+      "font": {
+        "size": 20,
+        "style": "bold"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#e8c7f0"
+        ]
+      }
+    },
+    "topText": {
+      "background": {
+        "type": "gradient",
+        "value": [
+          "#335f63cf",
+          "#33f542ec"
+        ]
+      },
+      "alignment": "center",
+      "font": {
+        "size": 16,
+        "style": "italic"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#e8c7f0"
+        ]
+      }
+    }
+  }
+}

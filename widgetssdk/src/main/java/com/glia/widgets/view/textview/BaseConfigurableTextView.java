@@ -15,6 +15,8 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.textview.MaterialTextView;
 
+import java.util.Objects;
+
 public abstract class BaseConfigurableTextView extends MaterialTextView {
     private TextConfiguration textConfiguration;
 
@@ -41,6 +43,7 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     private void createBuildTimeConfiguration() {
         textConfiguration = TextConfiguration
                 .builder()
+                .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .hintColor(getHintTextColors())
@@ -56,13 +59,13 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
 
         if (runTimeConfiguration.getTextColor() != null)
             builder.textColor(runTimeConfiguration.getTextColor());
-        if (runTimeConfiguration.getTextColorHighlight() != textConfiguration.getTextColorHighlight())
+        if (!Objects.equals(runTimeConfiguration.getTextColorHighlight(), textConfiguration.getTextColorHighlight()))
             builder.textColorHighlight(runTimeConfiguration.getTextColorHighlight());
         if (runTimeConfiguration.getHintColor() != null)
             builder.hintColor(runTimeConfiguration.getHintColor());
-        if (runTimeConfiguration.getTextSize() != textConfiguration.getTextSize())
+        if (!Objects.equals(runTimeConfiguration.getTextSize(), textConfiguration.getTextSize()))
             builder.textSize(runTimeConfiguration.getTextSize());
-        if (runTimeConfiguration.getFontFamily() != textConfiguration.getFontFamily())
+        if (!Objects.equals(runTimeConfiguration.getFontFamily(), textConfiguration.getFontFamily()))
             builder.fontFamily(runTimeConfiguration.getFontFamily());
 
         textConfiguration = builder.build();
@@ -70,12 +73,17 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     }
 
     private void updateView() {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, textConfiguration.getTextSize());
+        if (textConfiguration.getTextSize() != null) {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, textConfiguration.getTextSize());
+        }
         setTextColor(textConfiguration.getTextColor());
         setHintTextColor(textConfiguration.getHintColor());
         setLinkTextColor(textConfiguration.getTextColorLink());
-        setHighlightColor(textConfiguration.getTextColorHighlight());
-        if (textConfiguration.getFontFamily() != 0)
+        if (textConfiguration.getTextColorHighlight() != null) {
+            setHighlightColor(textConfiguration.getTextColorHighlight());
+        }
+        if (textConfiguration.getFontFamily() != null) {
             setTypeface(ResourcesCompat.getFont(getContext(), textConfiguration.getFontFamily()));
+        }
     }
 }

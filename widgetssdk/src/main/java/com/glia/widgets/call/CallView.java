@@ -47,12 +47,15 @@ import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.StyleUtils;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.Dialogs;
 import com.glia.widgets.view.OperatorStatusView;
+import com.glia.widgets.view.configuration.call.ButtonBarConfiguration;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.header.AppBarView;
+import com.glia.widgets.view.unifieduiconfig.component.RemoteConfiguration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import com.google.android.material.transition.MaterialFade;
@@ -316,23 +319,20 @@ public class CallView extends ConstraintLayout {
                         appBar.setBackgroundTintList(transparentColorStateList);
                     }
 
-                    muteButton.setEnabled(callState.isMuteButtonEnabled());
-                    speakerButton.setEnabled(callState.isSpeakerButtonEnabled());
-                    videoButton.setEnabled(callState.isVideoButtonEnabled());
                     setButtonActivated(
                             videoButton,
-                            theme.getIconCallVideoOn(),
-                            theme.getIconCallVideoOff(),
+                            videoButtonLabel,
                             R.string.glia_call_video_on_content_description,
                             R.string.glia_call_video_off_content_description,
+                            callState.isVideoButtonEnabled(),
                             callState.hasVideo
                     );
                     setButtonActivated(
                             muteButton,
-                            theme.getIconCallAudioOff(),    // mute (eg. mic-off) button activated icon
-                            theme.getIconCallAudioOn(),     // mute (eg. mic-off) button deactivated icon
+                            muteButtonLabel,
                             R.string.glia_call_mute_content_description,
                             R.string.glia_call_unmute_content_description,
+                            callState.isMuteButtonEnabled(),
                             callState.isMuted
                     );
                     muteButtonLabel.setText(callState.isMuted ?
@@ -353,17 +353,25 @@ public class CallView extends ConstraintLayout {
                     handleOperatorStatusViewState(callState);
                     handleOperatorVideoState(callState);
                     handleControlsVisibility(callState);
-                    onIsSpeakerOnStateChanged(callState.isSpeakerOn);
+                    onIsSpeakerOnStateChanged(callState.isSpeakerButtonEnabled(), callState.isSpeakerOn);
                     if (callState.isVisible) {
                         showUIOnCallOngoing();
                     } else {
                         hideUIOnCallEnd();
                     }
-                    chatButton.setEnabled(callState.isAudioCall() || callState.isVideoCall() || callState.is2WayVideoCall());
+                    boolean isChatButtonEnabled = callState.isAudioCall()
+                            || callState.isVideoCall() || callState.is2WayVideoCall();
+                    chatButton.setEnabled(isChatButtonEnabled);
                     chatButton.setContentDescription(callState.messagesNotSeen == 0 ?
                             resources.getString(R.string.glia_call_chat_zero_content_description) :
                             resources.getQuantityString(R.plurals.glia_call_chat_content_description,
                                     callState.messagesNotSeen, callState.messagesNotSeen));
+                    setBarButtonLabelAppearance(
+                            chatButtonLabel,
+                            isChatButtonEnabled ?
+                                    StyleUtils.FabButtonStatus.ACTIVE :
+                                    StyleUtils.FabButtonStatus.INACTIVE
+                    );
                 });
             }
 
@@ -527,16 +535,16 @@ public class CallView extends ConstraintLayout {
         }
     }
 
-    private void onIsSpeakerOnStateChanged(boolean isSpeakerOn) {
+    private void onIsSpeakerOnStateChanged(boolean isButtonEnabled, boolean isSpeakerOn) {
         if (isSpeakerOn != audioManager.isSpeakerphoneOn()) {
             post(() -> audioManager.setSpeakerphoneOn(isSpeakerOn));
         }
         setButtonActivated(
                 speakerButton,
-                theme.getIconCallSpeakerOn(),
-                theme.getIconCallSpeakerOff(),
+                speakerButtonLabel,
                 R.string.glia_call_speaker_on_content_description,
                 R.string.glia_call_speaker_off_content_description,
+                isButtonEnabled,
                 isSpeakerOn
         );
     }
@@ -644,18 +652,26 @@ public class CallView extends ConstraintLayout {
     }
 
     private void setButtonActivated(FloatingActionButton floatingActionButton,
-                                    Integer activatedDrawableRes,
-                                    Integer notActivatedDrawableRes,
+                                    TextView textView,
                                     @StringRes int activatedContentDescription,
                                     @StringRes int notActivatedContentDescription,
+                                    boolean isEnabled,
                                     boolean isActivated
     ) {
         floatingActionButton.setActivated(isActivated);
-        floatingActionButton.setImageResource(isActivated ? activatedDrawableRes : notActivatedDrawableRes);
         floatingActionButton.setContentDescription(resources.getString(isActivated ?
                 activatedContentDescription :
                 notActivatedContentDescription
         ));
+        floatingActionButton.setEnabled(isEnabled);
+        setBarButtonLabelAppearance(
+                textView,
+                isActivated ?
+                        StyleUtils.FabButtonStatus.SELECTED :
+                        isEnabled ?
+                                StyleUtils.FabButtonStatus.ACTIVE :
+                                StyleUtils.FabButtonStatus.INACTIVE
+        );
     }
 
     private void handleControlsVisibility(CallState callState) {
@@ -711,13 +727,10 @@ public class CallView extends ConstraintLayout {
 
     private void setupViewAppearance() {
         setAppBarTheme();
+        // background
+        StyleUtils.setLayerConfiguration(this, theme.getCallStyle().getBackground());
         // icons
         operatorStatusView.setTheme(theme);
-        chatButton.setImageResource(theme.getIconCallChat());
-        videoButton.setImageResource(theme.getIconCallVideoOn());
-        muteButton.setImageResource(theme.getIconCallAudioOn());
-        speakerButton.setImageResource(theme.getIconCallSpeakerOn());
-        minimizeButton.setImageResource(theme.getIconCallMinimize());
         chatButtonBadgeView.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), theme.getBrandPrimaryColor()));
         // fonts
         if (theme.getFontRes() != null) {
@@ -737,6 +750,62 @@ public class CallView extends ConstraintLayout {
             speakerButtonLabel.setTypeface(fontFamily);
             minimizeButtonLabel.setTypeface(fontFamily);
         }
+        // textViews
+        StyleUtils.setTextConfiguration(continueBrowsingView, theme.getCallStyle().getBottomText());
+        StyleUtils.setTextConfiguration(callTimerView, theme.getCallStyle().getDuration());
+        StyleUtils.setTextConfiguration(operatorNameView, theme.getCallStyle().getOperator());
+        StyleUtils.setTextConfiguration(onHoldTextView, theme.getCallStyle().getTopText());
+        // barButtons
+        ButtonBarConfiguration buttonBarConfiguration = theme.getCallStyle().getButtonBar();
+        if (buttonBarConfiguration != null) {
+            StyleUtils.setBarButtonStatesConfiguration(chatButton, buttonBarConfiguration.getChatButton());
+            StyleUtils.setBarButtonStatesConfiguration(videoButton, buttonBarConfiguration.getVideoButton());
+            StyleUtils.setBarButtonStatesConfiguration(muteButton, buttonBarConfiguration.getMuteButton());
+            StyleUtils.setBarButtonStatesConfiguration(speakerButton, buttonBarConfiguration.getSpeakerButton());
+            StyleUtils.setBarButtonStatesConfiguration(minimizeButton, buttonBarConfiguration.getMinimizeButton());
+            setBarButtonLabelAppearance(chatButtonLabel, StyleUtils.FabButtonStatus.ACTIVE);
+            setBarButtonLabelAppearance(videoButtonLabel, StyleUtils.FabButtonStatus.ACTIVE);
+            setBarButtonLabelAppearance(muteButtonLabel, StyleUtils.FabButtonStatus.ACTIVE);
+            setBarButtonLabelAppearance(speakerButtonLabel, StyleUtils.FabButtonStatus.ACTIVE);
+            setBarButtonLabelAppearance(minimizeButtonLabel, StyleUtils.FabButtonStatus.ACTIVE);
+        }
+    }
+
+    private void setBarButtonLabelAppearance(TextView buttonLabel, StyleUtils.FabButtonStatus status) {
+        if (theme.getCallStyle().getButtonBar() == null) {
+            return;
+        }
+        if (chatButtonLabel.equals(buttonLabel)) {
+            StyleUtils.setBarButtonConfiguration(
+                    chatButtonLabel,
+                    theme.getCallStyle().getButtonBar().getChatButton(),
+                    status
+            );
+        } else if (videoButtonLabel.equals(buttonLabel)) {
+            StyleUtils.setBarButtonConfiguration(
+                    videoButtonLabel,
+                    theme.getCallStyle().getButtonBar().getVideoButton(),
+                    status
+            );
+        } else if (muteButtonLabel.equals(buttonLabel)) {
+            StyleUtils.setBarButtonConfiguration(
+                    muteButtonLabel,
+                    theme.getCallStyle().getButtonBar().getMuteButton(),
+                    status
+            );
+        } else if (speakerButtonLabel.equals(buttonLabel)) {
+            StyleUtils.setBarButtonConfiguration(
+                    speakerButtonLabel,
+                    theme.getCallStyle().getButtonBar().getSpeakerButton(),
+                    status
+            );
+        } else if (minimizeButtonLabel.equals(buttonLabel)) {
+            StyleUtils.setBarButtonConfiguration(
+                    minimizeButtonLabel,
+                    theme.getCallStyle().getButtonBar().getMinimizeButton(),
+                    status
+            );
+        }
     }
 
     private void setAppBarTheme() {
@@ -754,7 +823,6 @@ public class CallView extends ConstraintLayout {
 
     private void initConfigurations() {
         setVisibility(INVISIBLE);
-        setBackgroundColor(ContextCompat.getColor(this.getContext(), R.color.glia_transparent_black_bg));
         // needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f);
     }
@@ -799,9 +867,9 @@ public class CallView extends ConstraintLayout {
         this.theme = Utils.getThemeFromTypedArray(typedArray, this.getContext());
     }
 
-    public void setTheme(UiTheme uiTheme) {
+    public void setTheme(UiTheme uiTheme, RemoteConfiguration remoteConfiguration) {
         if (uiTheme == null) return;
-        this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+        this.theme = Utils.getFullHybridTheme(remoteConfiguration, uiTheme, this.theme);
         setupViewAppearance();
         if (getVisibility() == VISIBLE) {
             handleStatusbarColor();

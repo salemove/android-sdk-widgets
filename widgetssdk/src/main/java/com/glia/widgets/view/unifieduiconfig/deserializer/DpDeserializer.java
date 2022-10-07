@@ -23,7 +23,7 @@ public class DpDeserializer implements JsonDeserializer<Size.Dp> {
             float sizeDp = json.getAsFloat();
             if (sizeDp <= 0) return null;
 
-            return new SizeImpl(resourceProvider.convertDpToPixel(sizeDp));
+            return new SizeImpl(sizeDp, resourceProvider.convertDpToPixel(sizeDp));
         } catch (Exception ignore) {
             return null;
         }

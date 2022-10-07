@@ -140,6 +140,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void navigateToSurvey(UiTheme theme, Survey survey) {
         Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class);
+//        newIntent.putExtra(GliaWidgets.REMOTE_CONFIGURATION, ); // TODO
         newIntent.putExtra(GliaWidgets.UI_THEME, theme);
         newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);

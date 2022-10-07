@@ -68,7 +68,10 @@ public class CallActivity extends AppCompatActivity {
 
         callView.setOnTitleUpdatedListener(this::setTitle);
         callView.setConfiguration(configuration.getSdkConfiguration());
-        callView.setTheme(configuration.getSdkConfiguration().getRunTimeTheme());
+        callView.setTheme(
+                configuration.getSdkConfiguration().getRunTimeTheme(),
+                configuration.getSdkConfiguration().getRemoteConfiguration()
+        );
         callView.setOnBackClickedListener(onBackClickedListener);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
@@ -204,6 +207,7 @@ public class CallActivity extends AppCompatActivity {
                 .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName())
                 .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
                 .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
+                .putExtra(GliaWidgets.REMOTE_CONFIGURATION, sdkConfiguration.getRemoteConfiguration())
                 .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
                 .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
                 .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
@@ -212,6 +216,7 @@ public class CallActivity extends AppCompatActivity {
 
     private void navigateToSurvey(Survey survey) {
         Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class)
+                .putExtra(GliaWidgets.REMOTE_CONFIGURATION, configuration.getSdkConfiguration().getRemoteConfiguration())
                 .putExtra(GliaWidgets.UI_THEME, configuration.getSdkConfiguration().getRunTimeTheme())
                 .putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);

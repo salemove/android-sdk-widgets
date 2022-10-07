@@ -17,6 +17,10 @@ public class BarButtonStates implements Parcelable {
     @Nullable
     private final BarButtonStyle active;
 
+    @SerializedName("selected")
+    @Nullable
+    private final BarButtonStyle selected;
+
     @Nullable
     public BarButtonStyle getInactive() {
         return inactive;
@@ -25,6 +29,11 @@ public class BarButtonStates implements Parcelable {
     @Nullable
     public BarButtonStyle getActive() {
         return active;
+    }
+
+    @Nullable
+    public BarButtonStyle getSelected() {
+        return selected;
     }
 
     @Override
@@ -36,11 +45,13 @@ public class BarButtonStates implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.inactive, flags);
         dest.writeParcelable(this.active, flags);
+        dest.writeParcelable(this.selected, flags);
     }
 
     protected BarButtonStates(Parcel in) {
         this.inactive = in.readParcelable(BarButtonStyle.class.getClassLoader());
         this.active = in.readParcelable(BarButtonStyle.class.getClassLoader());
+        this.selected = in.readParcelable(BarButtonStyle.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<BarButtonStates> CREATOR = new Parcelable.Creator<BarButtonStates>() {

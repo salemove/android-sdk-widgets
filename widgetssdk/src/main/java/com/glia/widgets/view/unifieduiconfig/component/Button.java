@@ -15,7 +15,15 @@ public class Button implements Parcelable {
 
     @SerializedName("background")
     @Nullable
-    private final ColorLayer color;
+    private final Layer background;
+
+    @SerializedName("tintColor")
+    @Nullable
+    private final ColorLayer tintColor;
+
+    @SerializedName("shadow")
+    @Nullable
+    private final Shadow shadow;
 
     @Nullable
     public Text getText() {
@@ -23,8 +31,18 @@ public class Button implements Parcelable {
     }
 
     @Nullable
-    public ColorLayer getColor() {
-        return color;
+    public Layer getBackground() {
+        return background;
+    }
+
+    @Nullable
+    public ColorLayer getTintColor() {
+        return tintColor;
+    }
+
+    @Nullable
+    public Shadow getShadow() {
+        return shadow;
     }
 
     @Override
@@ -35,15 +53,19 @@ public class Button implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.text, flags);
-        dest.writeParcelable(this.color, flags);
+        dest.writeParcelable(this.background, flags);
+        dest.writeParcelable(this.tintColor, flags);
+        dest.writeParcelable(this.shadow, flags);
     }
 
     protected Button(Parcel in) {
         this.text = in.readParcelable(Text.class.getClassLoader());
-        this.color = in.readParcelable(ColorLayer.class.getClassLoader());
+        this.background = in.readParcelable(Layer.class.getClassLoader());
+        this.tintColor = in.readParcelable(ColorLayer.class.getClassLoader());
+        this.shadow = in.readParcelable(Shadow.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<Button> CREATOR = new Parcelable.Creator<Button>() {
+    public static final Creator<Button> CREATOR = new Creator<Button>() {
         @Override
         public Button createFromParcel(Parcel source) {
             return new Button(source);

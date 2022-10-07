@@ -7,6 +7,7 @@ import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
@@ -15,7 +16,9 @@ import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StyleableRes;
 
 import com.glia.androidsdk.Engagement;
@@ -27,8 +30,15 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
+import com.glia.widgets.view.configuration.ColorConfiguration;
+import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
+import com.glia.widgets.view.configuration.call.BarButtonConfiguration;
+import com.glia.widgets.view.configuration.call.BarButtonStatesConfiguration;
+import com.glia.widgets.view.configuration.call.ButtonBarConfiguration;
+import com.glia.widgets.view.configuration.call.CallStyle;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.glia.widgets.view.unifieduiconfig.component.RemoteConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -322,14 +332,6 @@ public class Utils {
                         R.attr.gliaIconUpgradeAudioDialog
                 )
         );
-        defaultThemeBuilder.setIconCallAudioOn(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallAudioOn,
-                        R.attr.gliaIconCallAudioOn
-                )
-        );
         defaultThemeBuilder.setIconChatVideoUpgrade(
                 getTypedArrayIntegerValue(
                         typedArray,
@@ -352,62 +354,6 @@ public class Utils {
                         context,
                         R.styleable.GliaView_iconScreenSharingDialog,
                         R.attr.gliaIconScreenSharingDialog
-                )
-        );
-        defaultThemeBuilder.setIconCallVideoOn(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallVideoOn,
-                        R.attr.gliaIconCallVideoOn
-                )
-        );
-        defaultThemeBuilder.setIconCallAudioOff(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallAudioOff,
-                        R.attr.gliaIconCallAudioOff
-                )
-        );
-        defaultThemeBuilder.setIconCallVideoOff(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallVideoOff,
-                        R.attr.gliaIconCallVideoOff
-                )
-        );
-        defaultThemeBuilder.setIconCallChat(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallChat,
-                        R.attr.gliaIconCallChat
-                )
-        );
-        defaultThemeBuilder.setIconCallSpeakerOn(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallSpeakerOn,
-                        R.attr.gliaIconCallSpeakerOn
-                )
-        );
-        defaultThemeBuilder.setIconCallSpeakerOff(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallSpeakerOff,
-                        R.attr.gliaIconCallSpeakerOff
-                )
-        );
-        defaultThemeBuilder.setIconCallMinimize(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallMinimize,
-                        R.attr.gliaIconCallMinimize
                 )
         );
         defaultThemeBuilder.setIconPlaceholder(
@@ -438,7 +384,119 @@ public class Utils {
                         R.styleable.GliaView_gliaAlertDialogButtonUseVerticalAlignment
                 )
         );
+
+        defaultThemeBuilder.setCallStyle(getCallStyleFromTypedArray(typedArray, context));
+
         return defaultThemeBuilder.build();
+    }
+
+    private static CallStyle getCallStyleFromTypedArray(TypedArray typedArray, Context context) {
+        CallStyle.Builder builder = new CallStyle.Builder();
+
+        builder.setButtonBar(getButtonBarConfigurationFromTypedArray(typedArray, context));
+
+        return builder.build();
+    }
+
+    public static ButtonBarConfiguration getButtonBarConfigurationFromTypedArray(TypedArray typedArray, Context context) {
+        ButtonBarConfiguration.Builder builder = new ButtonBarConfiguration.Builder();
+
+        BarButtonStatesConfiguration.Builder chatButtonStatesBuilder = new BarButtonStatesConfiguration.Builder();
+        BarButtonConfiguration.Builder chatButtonActiveBuilder = new BarButtonConfiguration.Builder();
+        chatButtonActiveBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallChat,
+                        R.attr.gliaIconCallChat
+                )
+        );
+        chatButtonStatesBuilder.setActive(chatButtonActiveBuilder.build());
+        builder.setChatButton(chatButtonStatesBuilder.build());
+
+        BarButtonStatesConfiguration.Builder minimizeButtonStatesBuilder = new BarButtonStatesConfiguration.Builder();
+        BarButtonConfiguration.Builder minimizeButtonActiveBuilder = new BarButtonConfiguration.Builder();
+        minimizeButtonActiveBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallMinimize,
+                        R.attr.gliaIconCallMinimize
+                )
+        );
+        minimizeButtonStatesBuilder.setActive(minimizeButtonActiveBuilder.build());
+        builder.setMinimizeButton(minimizeButtonStatesBuilder.build());
+
+        BarButtonStatesConfiguration.Builder muteButtonStatesBuilder = new BarButtonStatesConfiguration.Builder();
+        BarButtonConfiguration.Builder muteButtonActiveBuilder = new BarButtonConfiguration.Builder();
+        muteButtonActiveBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallAudioOn,
+                        R.attr.gliaIconCallAudioOn
+                )
+        );
+        muteButtonStatesBuilder.setActive(muteButtonActiveBuilder.build());
+        BarButtonConfiguration.Builder muteButtonSelectedBuilder = new BarButtonConfiguration.Builder();
+        muteButtonSelectedBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallAudioOff,
+                        R.attr.gliaIconCallAudioOff
+                )
+        );
+        muteButtonStatesBuilder.setSelected(muteButtonSelectedBuilder.build());
+        builder.setMuteButton(muteButtonStatesBuilder.build());
+
+        BarButtonStatesConfiguration.Builder speakerButtonStatesBuilder = new BarButtonStatesConfiguration.Builder();
+        BarButtonConfiguration.Builder speakerButtonActiveBuilder = new BarButtonConfiguration.Builder();
+        speakerButtonActiveBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallSpeakerOff,
+                        R.attr.gliaIconCallSpeakerOff
+                )
+        );
+        speakerButtonStatesBuilder.setActive(speakerButtonActiveBuilder.build());
+        BarButtonConfiguration.Builder speakerButtonSelectedBuilder = new BarButtonConfiguration.Builder();
+        speakerButtonSelectedBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallSpeakerOn,
+                        R.attr.gliaIconCallSpeakerOn
+                )
+        );
+        speakerButtonStatesBuilder.setSelected(speakerButtonSelectedBuilder.build());
+        builder.setSpeakerButton(speakerButtonStatesBuilder.build());
+
+        BarButtonStatesConfiguration.Builder videoButtonStatesBuilder = new BarButtonStatesConfiguration.Builder();
+        BarButtonConfiguration.Builder videoButtonActiveBuilder = new BarButtonConfiguration.Builder();
+        videoButtonActiveBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallVideoOff,
+                        R.attr.gliaIconCallVideoOff
+                )
+        );
+        videoButtonStatesBuilder.setActive(videoButtonActiveBuilder.build());
+        BarButtonConfiguration.Builder videoButtonSelectedBuilder = new BarButtonConfiguration.Builder();
+        videoButtonSelectedBuilder.setImageRes(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconCallVideoOn,
+                        R.attr.gliaIconCallVideoOn
+                )
+        );
+        videoButtonStatesBuilder.setSelected(videoButtonSelectedBuilder.build());
+        builder.setVideoButton(videoButtonStatesBuilder.build());
+
+        return builder.build();
     }
 
     public static Boolean getGliaAlertDialogButtonUseVerticalAlignment(UiTheme theme) {
@@ -508,6 +566,13 @@ public class Utils {
         return newConf != null ? newConf : oldConf;
     }
 
+    public static UiTheme getFullHybridTheme(RemoteConfiguration remoteConfiguration, UiTheme newTheme, UiTheme oldTheme) {
+        UiTheme defaultUiTheme = UiTheme.getDefaultUiTheme();
+        UiTheme fullHybridOldTheme = getFullHybridTheme(oldTheme, defaultUiTheme);
+        UiTheme theme = getFullHybridTheme(newTheme, fullHybridOldTheme);
+        return ThemeUnits.apply(theme, remoteConfiguration);
+    }
+
     public static UiTheme getFullHybridTheme(UiTheme newTheme, UiTheme oldTheme) {
         String title = newTheme.getAppBarTitle() != null ? newTheme.getAppBarTitle() : oldTheme.getAppBarTitle();
         Integer baseLightColorRes = newTheme.getBaseLightColor() != null ?
@@ -569,28 +634,12 @@ public class Utils {
                 newTheme.getIconChatAudioUpgrade() : oldTheme.getIconChatAudioUpgrade();
         Integer iconUpgradeAudioDialog = newTheme.getIconUpgradeAudioDialog() != null ?
                 newTheme.getIconUpgradeAudioDialog() : oldTheme.getIconUpgradeAudioDialog();
-        Integer iconCallAudioOn = newTheme.getIconCallAudioOn() != null ?
-                newTheme.getIconCallAudioOn() : oldTheme.getIconCallAudioOn();
         Integer iconChatVideoUpgrade = newTheme.getIconChatVideoUpgrade() != null ?
                 newTheme.getIconChatVideoUpgrade() : oldTheme.getIconChatVideoUpgrade();
         Integer iconUpgradeVideoDialog = newTheme.getIconUpgradeVideoDialog() != null ?
                 newTheme.getIconUpgradeVideoDialog() : oldTheme.getIconUpgradeVideoDialog();
         Integer iconScreenSharingDialog = newTheme.getIconScreenSharingDialog() != null ?
                 newTheme.getIconScreenSharingDialog() : oldTheme.getIconScreenSharingDialog();
-        Integer iconCallVideoOn = newTheme.getIconCallVideoOn() != null ?
-                newTheme.getIconCallVideoOn() : oldTheme.getIconCallVideoOn();
-        Integer iconCallAudioOff = newTheme.getIconCallAudioOff() != null ?
-                newTheme.getIconCallAudioOff() : oldTheme.getIconCallAudioOff();
-        Integer iconCallVideoOff = newTheme.getIconCallVideoOff() != null ?
-                newTheme.getIconCallVideoOff() : oldTheme.getIconCallVideoOff();
-        Integer iconCallChat = newTheme.getIconCallChat() != null ?
-                newTheme.getIconCallChat() : oldTheme.getIconCallChat();
-        Integer iconCallSpeakerOn = newTheme.getIconCallSpeakerOn() != null ?
-                newTheme.getIconCallSpeakerOn() : oldTheme.getIconCallSpeakerOn();
-        Integer iconCallSpeakerOff = newTheme.getIconCallSpeakerOff() != null ?
-                newTheme.getIconCallSpeakerOff() : oldTheme.getIconCallSpeakerOff();
-        Integer iconCallMinimize = newTheme.getIconCallMinimize() != null ?
-                newTheme.getIconCallMinimize() : oldTheme.getIconCallMinimize();
         Integer iconPlaceholder = newTheme.getIconPlaceholder() != null ?
                 newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
         Integer iconOnHold = newTheme.getIconOnHold() != null ?
@@ -644,6 +693,8 @@ public class Utils {
                         oldTheme.getSurveyStyle()
                 );
 
+        CallStyle callStyle = getHybridCallStyle(oldTheme.getCallStyle(), newTheme.getCallStyle());
+
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
         builder.setAppBarTitle(title);
         builder.setBaseLightColor(baseLightColorRes);
@@ -676,17 +727,9 @@ public class Utils {
         builder.setIconSendMessage(iconSendMessage);
         builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
         builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
-        builder.setIconCallAudioOn(iconCallAudioOn);
         builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
         builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
         builder.setIconScreenSharingDialog(iconScreenSharingDialog);
-        builder.setIconCallVideoOn(iconCallVideoOn);
-        builder.setIconCallAudioOff(iconCallAudioOff);
-        builder.setIconCallVideoOff(iconCallVideoOff);
-        builder.setIconCallChat(iconCallChat);
-        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
-        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
-        builder.setIconCallMinimize(iconCallMinimize);
         builder.setIconPlaceholder(iconPlaceholder);
         builder.setIconOnHold(iconOnHold);
         builder.setWhiteLabel(whiteLabel);
@@ -698,6 +741,216 @@ public class Utils {
         builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
         builder.setChatHeadConfiguration(chatHeadConfiguration);
         builder.setSurveyStyle(surveyStyle);
+        builder.setCallStyle(callStyle);
+        return builder.build();
+    }
+
+    public static CallStyle getHybridCallStyle(@NonNull CallStyle newStyle, @Nullable CallStyle oldStyle) {
+        CallStyle.Builder builder = new CallStyle.Builder();
+        if (oldStyle != null) {
+            builder.setCallStyle(oldStyle);
+        }
+
+        if (newStyle.getBackground() != null) {
+            builder.setBackground(getHybridLayerConfiguration(
+                    newStyle.getBackground(),
+                    oldStyle != null ? newStyle.getBackground() : null
+            ));
+        }
+        if (newStyle.getBottomText() != null) {
+            builder.setBottomText(getHybridTextConfiguration(
+                    newStyle.getBottomText(),
+                    oldStyle != null ? oldStyle.getBottomText() : null
+            ));
+        }
+        if (newStyle.getBottomText() != null) {
+            builder.setBottomText(getHybridTextConfiguration(
+                    newStyle.getBottomText(),
+                    oldStyle != null ? oldStyle.getBottomText() : null
+            ));
+        }
+        if (newStyle.getButtonBar() != null) {
+            builder.setButtonBar(getHybridButtonBarConfiguration(
+                    newStyle.getButtonBar(),
+                    oldStyle != null ? oldStyle.getButtonBar() : null
+            ));
+        }
+        if (newStyle.getDuration() != null) {
+            builder.setDuration(getHybridTextConfiguration(
+                    newStyle.getDuration(),
+                    oldStyle != null ? oldStyle.getDuration() : null
+            ));
+        }
+        if (newStyle.getOperator() != null) {
+            builder.setOperator(getHybridTextConfiguration(
+                    newStyle.getOperator(),
+                    oldStyle != null ? oldStyle.getOperator() : null
+            ));
+        }
+        if (newStyle.getTopText() != null) {
+            builder.setTopText(getHybridTextConfiguration(
+                    newStyle.getTopText(),
+                    oldStyle != null ? oldStyle.getTopText() : null
+            ));
+        }
+        return builder.build();
+    }
+
+    private static ButtonBarConfiguration getHybridButtonBarConfiguration(@NonNull ButtonBarConfiguration newConfiguration,
+                                                                          @Nullable ButtonBarConfiguration oldConfiguration) {
+        ButtonBarConfiguration.Builder builder = new ButtonBarConfiguration.Builder();
+        if (oldConfiguration != null) {
+            builder.setButtonBarConfiguration(oldConfiguration);
+        }
+
+        if (newConfiguration.getChatButton() != null) {
+            builder.setChatButton(getHybridBarButtonStatesConfiguration(
+                    newConfiguration.getChatButton(),
+                    oldConfiguration != null ? oldConfiguration.getChatButton() : null
+            ));
+        }
+        if (newConfiguration.getMinimizeButton() != null) {
+            builder.setMinimizeButton(getHybridBarButtonStatesConfiguration(
+                    newConfiguration.getMinimizeButton(),
+                    oldConfiguration != null ? oldConfiguration.getMinimizeButton() : null
+            ));
+        }
+        if (newConfiguration.getMuteButton() != null) {
+            builder.setMuteButton(getHybridBarButtonStatesConfiguration(
+                    newConfiguration.getMuteButton(),
+                    oldConfiguration != null ? oldConfiguration.getMuteButton() : null
+            ));
+        }
+        if (newConfiguration.getSpeakerButton() != null) {
+            builder.setSpeakerButton(getHybridBarButtonStatesConfiguration(
+                    newConfiguration.getSpeakerButton(),
+                    oldConfiguration != null ? oldConfiguration.getSpeakerButton() : null
+            ));
+        }
+        if (newConfiguration.getVideoButton() != null) {
+            builder.setVideoButton(getHybridBarButtonStatesConfiguration(
+                    newConfiguration.getVideoButton(),
+                    oldConfiguration != null ? oldConfiguration.getVideoButton() : null
+            ));
+        }
+        return builder.build();
+    }
+
+    private static BarButtonStatesConfiguration getHybridBarButtonStatesConfiguration(@NonNull BarButtonStatesConfiguration newConfiguration,
+                                                                                      @Nullable BarButtonStatesConfiguration oldConfiguration) {
+        BarButtonStatesConfiguration.Builder builder = new BarButtonStatesConfiguration.Builder();
+        if (oldConfiguration != null) {
+            builder.setBarButtonStatesConfiguration(oldConfiguration);
+        }
+
+        if (newConfiguration.getInactive() != null) {
+            builder.setInactive(getHybridBarButtonConfiguration(
+                    newConfiguration.getInactive(),
+                    oldConfiguration != null ? oldConfiguration.getInactive() : null
+            ));
+        }
+        if (newConfiguration.getActive() != null) {
+            builder.setActive(getHybridBarButtonConfiguration(
+                    newConfiguration.getActive(),
+                    oldConfiguration != null ? oldConfiguration.getActive() : null
+            ));
+        }
+        if (newConfiguration.getSelected() != null) {
+            builder.setSelected(getHybridBarButtonConfiguration(
+                    newConfiguration.getSelected(),
+                    oldConfiguration != null ? oldConfiguration.getSelected() : null
+            ));
+        }
+        return builder.build();
+    }
+
+    private static BarButtonConfiguration getHybridBarButtonConfiguration(@NonNull BarButtonConfiguration newConfiguration,
+                                                                          @Nullable BarButtonConfiguration oldConfiguration) {
+        BarButtonConfiguration.Builder builder = new BarButtonConfiguration.Builder();
+        if (oldConfiguration != null) {
+            builder.setBarButtonConfiguration(oldConfiguration);
+        }
+
+        if (newConfiguration.getBackground() != null) {
+            builder.setBackground(newConfiguration.getBackground());
+        }
+        if (newConfiguration.getImageColor() != null) {
+            builder.setImageColor(newConfiguration.getImageColor());
+        }
+        if (newConfiguration.getTitle() != null) {
+            builder.setTitle(getHybridTextConfiguration(
+                    newConfiguration.getTitle(),
+                    oldConfiguration != null ? oldConfiguration.getTitle() : null
+            ));
+        }
+        if (newConfiguration.getImageRes() != null) {
+            builder.setImageRes(newConfiguration.getImageRes());
+        }
+        return builder.build();
+    }
+
+    private static TextConfiguration getHybridTextConfiguration(@NonNull TextConfiguration newConfiguration,
+                                                                @Nullable TextConfiguration oldConfiguration) {
+        TextConfiguration.Builder builder = new TextConfiguration.Builder();
+        if (oldConfiguration != null) {
+            builder.textConfiguration(oldConfiguration);
+        }
+
+        if (newConfiguration.getTextSize() != null) {
+            builder.textSize(newConfiguration.getTextSize());
+        }
+        if (newConfiguration.getTextTypeFaceStyle() != null) {
+            builder.textTypeFaceStyle(newConfiguration.getTextTypeFaceStyle());
+        }
+        if (newConfiguration.getTextColor() != null) {
+            builder.textColor(newConfiguration.getTextColor());
+        }
+        if (newConfiguration.getBackgroundColor() != null) {
+            builder.backgroundColor(newConfiguration.getBackgroundColor());
+        }
+        if (newConfiguration.getTextAlignment() != null) {
+            builder.textAlignment(newConfiguration.getTextAlignment());
+        }
+        if (newConfiguration.getHintColor() != null) {
+            builder.hintColor(newConfiguration.getHintColor());
+        }
+        if (newConfiguration.getTextColorLink() != null) {
+            builder.textColorLink(newConfiguration.getTextColorLink());
+        }
+        if (newConfiguration.getTextColorHighlight() != null) {
+            builder.textColorHighlight(newConfiguration.getTextColorHighlight());
+        }
+        if (newConfiguration.getFontFamily() != null) {
+            builder.fontFamily(newConfiguration.getFontFamily());
+        }
+        if (newConfiguration.isBold() != null) {
+            builder.bold(newConfiguration.isBold());
+        }
+        if (newConfiguration.isAllCaps() != null) {
+            builder.allCaps(newConfiguration.isAllCaps());
+        }
+        return builder.build();
+    }
+
+    private static LayerConfiguration getHybridLayerConfiguration(@NonNull LayerConfiguration newConfiguration,
+                                                                  @Nullable LayerConfiguration oldConfiguration) {
+        LayerConfiguration.Builder builder = new LayerConfiguration.Builder();
+        if (oldConfiguration != null) {
+            builder.layerConfiguration(oldConfiguration);
+        }
+
+        if (newConfiguration.getBackgroundColorConfiguration() != null) {
+            builder.backgroundColor(newConfiguration.getBackgroundColorConfiguration());
+        }
+        if (newConfiguration.getBorderColorConfiguration() != null) {
+            builder.borderColor(newConfiguration.getBorderColorConfiguration());
+        }
+        if (newConfiguration.getBorderWidth() != null) {
+            builder.borderWidth(newConfiguration.getBorderWidth());
+        }
+        if (newConfiguration.getCornerRadius() != null) {
+            builder.cornerRadius(newConfiguration.getCornerRadius());
+        }
         return builder.build();
     }
 
@@ -739,5 +992,14 @@ public class Utils {
                 ", isDeleted=" + attachmentFile.isDeleted() +
                 ", name=" + attachmentFile.getName() +
                 " }";
+    }
+
+    @ColorInt
+    public static int applyAlpha(@ColorInt int color, float alpha) {
+        int alphaOfColor = Math.round(Color.alpha(color) * alpha);
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+        return Color.argb(alphaOfColor, red, green, blue);
     }
 }

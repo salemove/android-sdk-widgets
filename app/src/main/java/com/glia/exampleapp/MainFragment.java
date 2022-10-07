@@ -3,6 +3,7 @@ package com.glia.exampleapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RawRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -26,6 +28,17 @@ import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.head.ChatHeadLayout;
+import com.glia.widgets.view.unifieduiconfig.UiComponents;
+import com.glia.widgets.view.unifieduiconfig.component.RemoteConfiguration;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 public class MainFragment extends Fragment {
 
@@ -136,7 +149,38 @@ public class MainFragment extends Fragment {
                 .runTimeTheme(getRuntimeThemeFromPrefs(sharedPreferences))
                 .screenSharingMode(getScreenSharingModeFromPrefs(sharedPreferences))
                 .useOverlay(getUseOverlay(sharedPreferences))
+                .remoteConfiguration(getRemoteConfiguration()) // TODO: temp
                 .build();
+    }
+
+    // TODO: temp
+    private RemoteConfiguration getRemoteConfiguration() {
+        String json = "";
+        try {
+            json = readRawRes(R.raw.remote_config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return UiComponents.parseRemoteConfiguration(json);
+    }
+
+    // TODO: temp
+    private String readRawRes(@RawRes int resId) throws IOException {
+        InputStream is = getResources().openRawResource(resId);
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } finally {
+            is.close();
+        }
+
+        return writer.toString();
     }
 
     private void setNavigationIntentData(Intent intent) {
@@ -166,6 +210,12 @@ public class MainFragment extends Fragment {
         intent.putExtra(
                 GliaWidgets.SCREEN_SHARING_MODE,
                 getScreenSharingModeFromPrefs(sharedPreferences)
+        );
+
+        // TODO: temp
+        intent.putExtra(
+                GliaWidgets.REMOTE_CONFIGURATION,
+                getRemoteConfiguration()
         );
     }
 

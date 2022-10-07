@@ -80,6 +80,10 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         } else {
             textConfiguration = buttonConfiguration.getNormalText();
         }
-        if (textConfiguration.isBold()) setTypeface(Typeface.DEFAULT_BOLD);
+        if (Boolean.TRUE.equals(textConfiguration.isBold())) {
+            setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            setTypeface(Typeface.DEFAULT);
+        }
     }
 }

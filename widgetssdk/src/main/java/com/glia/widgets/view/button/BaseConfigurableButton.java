@@ -55,12 +55,15 @@ public abstract class BaseConfigurableButton extends MaterialButton {
         setTextColor(textConfiguration.getTextColor());
         setHintTextColor(textConfiguration.getHintColor());
         setLinkTextColor(textConfiguration.getTextColorLink());
-        setHighlightColor(textConfiguration.getTextColorHighlight());
+        if (textConfiguration.getTextColorHighlight() != null) {
+            setHighlightColor(textConfiguration.getTextColorHighlight());
+        }
     }
 
     private void createBuildTimeConfiguration() {
         TextConfiguration textConfiguration = TextConfiguration
                 .builder()
+                .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                 .textColor(getTextColors())
                 .textColorHighlight(getHighlightColor())
                 .hintColor(getHintTextColors())

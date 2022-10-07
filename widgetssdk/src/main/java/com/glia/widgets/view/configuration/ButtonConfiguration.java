@@ -133,9 +133,11 @@ public class ButtonConfiguration implements Parcelable {
         }
 
         public ButtonConfiguration build() {
+            // TODO: builder should not set default values
             if (textConfiguration == null) {
                 ResourceProvider resourceProvider = Dependencies.getResourceProvider();
                 textConfiguration = new TextConfiguration.Builder()
+                        .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                         .textColor(resourceProvider.getColorStateList(R.color.glia_base_light_color))
                         .build();
             }

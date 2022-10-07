@@ -219,7 +219,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.title.setTextColor(titleConfiguration.getTextColor());
             float textSize = titleConfiguration.getTextSize();
             this.title.setTextSize(textSize);
-            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            if (Boolean.TRUE.equals(titleConfiguration.isBold())) {
+                this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                this.title.setTypeface(Typeface.DEFAULT);
+            }
 
             buttons = asList(
                     itemView.findViewById(R.id.scale_1_button),
@@ -288,7 +292,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.title.setTextColor(titleConfiguration.getTextColor());
             float textSize = titleConfiguration.getTextSize();
             this.title.setTextSize(textSize);
-            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            if (Boolean.TRUE.equals(titleConfiguration.isBold())) {
+                this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                this.title.setTypeface(Typeface.DEFAULT);
+            }
 
             OptionButtonConfiguration buttonConfiguration = questionStyle.getOptionButton();
 
@@ -356,7 +364,11 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.title.setTextColor(titleConfiguration.getTextColor());
             float textSize = titleConfiguration.getTextSize();
             this.title.setTextSize(textSize);
-            if (titleConfiguration.isBold()) this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            if (Boolean.TRUE.equals(titleConfiguration.isBold())) {
+                this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                this.title.setTypeface(Typeface.DEFAULT);
+            }
         }
 
         @Override
@@ -496,12 +508,20 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             title.setTextColor(titleConfiguration.getTextColor());
             float textSize = titleConfiguration.getTextSize();
             title.setTextSize(textSize);
-            if (titleConfiguration.isBold()) title.setTypeface(Typeface.DEFAULT_BOLD);
+            if (Boolean.TRUE.equals(titleConfiguration.isBold())) {
+                this.title.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                this.title.setTypeface(Typeface.DEFAULT);
+            }
         }
 
         private void setupInputBoxText(OptionButtonConfiguration optionButtonStyle) {
             comment.setTextColor(optionButtonStyle.getNormalText().getTextColor());
-            if (optionButtonStyle.getNormalText().isBold()) comment.setTypeface(Typeface.DEFAULT_BOLD);
+            if (Boolean.TRUE.equals(optionButtonStyle.getNormalText().isBold())) {
+                this.comment.setTypeface(Typeface.DEFAULT_BOLD);
+            } else {
+                this.comment.setTypeface(Typeface.DEFAULT);
+            }
             comment.setHintTextColor(ContextCompat.getColor(comment.getContext(), R.color.glia_base_shade_color));
             float textSize = optionButtonStyle.getNormalText().getTextSize();
             comment.setTextSize(textSize);

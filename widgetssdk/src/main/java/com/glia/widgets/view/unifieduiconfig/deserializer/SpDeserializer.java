@@ -24,7 +24,7 @@ public class SpDeserializer implements JsonDeserializer<Size.Sp> {
 
             if (sizeSp <= 0) return null;
 
-            return new SizeImpl(resourceProvider.convertSpToPixel(sizeSp));
+            return new SizeImpl(sizeSp, resourceProvider.convertSpToPixel(sizeSp));
         } catch (Exception ignore) {
             return null;
         }

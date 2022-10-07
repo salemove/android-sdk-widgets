@@ -54,6 +54,7 @@ public class InputQuestionConfiguration implements Parcelable {
         }
 
         public InputQuestionConfiguration build() {
+            // TODO: builder should not set default values
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);
@@ -68,12 +69,18 @@ public class InputQuestionConfiguration implements Parcelable {
         private OptionButtonConfiguration prepareDefaultButtonConfiguration(ResourceProvider resourceProvider) {
             String normalColor = resourceProvider.getString(R.color.glia_stroke_gray);
             LayerConfiguration normalLayer = new LayerConfiguration.Builder()
+                    .backgroundColor(R.color.glia_base_light_color)
                     .borderColor(normalColor)
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
+                    .cornerRadiusDimension(R.dimen.glia_survey_default_corner_radius)
                     .build();
 
             String errorColor = resourceProvider.getString(R.color.glia_system_negative_color);
             LayerConfiguration errorLayer = new LayerConfiguration.Builder()
+                    .backgroundColor(R.color.glia_base_light_color)
                     .borderColor(errorColor)
+                    .borderWidthDimension(R.dimen.glia_survey_default_border_width)
+                    .cornerRadiusDimension(R.dimen.glia_survey_default_corner_radius)
                     .build();
             return new OptionButtonConfiguration.Builder()
                     .normalLayer(normalLayer)
@@ -84,6 +91,7 @@ public class InputQuestionConfiguration implements Parcelable {
         private TextConfiguration prepareDefaultTitleConfiguration(ResourceProvider resourceProvider) {
             ColorStateList color = resourceProvider.getColorStateList(R.color.glia_base_dark_color);
             return new TextConfiguration.Builder()
+                    .textConfiguration(TextConfiguration.getDefaultTextConfiguration())
                     .textColor(color)
                     .bold(true)
                     .textSize(resourceProvider.getDimension(R.dimen.glia_survey_default_title_text_size))

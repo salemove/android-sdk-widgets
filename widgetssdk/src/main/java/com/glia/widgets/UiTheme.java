@@ -8,9 +8,13 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 
+import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
+import com.glia.widgets.view.configuration.call.BarButtonConfiguration;
+import com.glia.widgets.view.configuration.call.BarButtonStatesConfiguration;
+import com.glia.widgets.view.configuration.call.ButtonBarConfiguration;
 import com.glia.widgets.view.configuration.call.CallStyle;
 import com.glia.widgets.view.configuration.chat.ChatStyle;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
@@ -179,12 +183,6 @@ public class UiTheme implements Parcelable {
     final Integer iconUpgradeAudioDialog;
 
     /**
-     * The icon resId used to set the call's audio on
-     */
-    private @DrawableRes
-    final Integer iconCallAudioOn;
-
-    /**
      * The icon resId used in chat messages to display an ongoing video upgrade timer
      */
     private @DrawableRes
@@ -201,48 +199,6 @@ public class UiTheme implements Parcelable {
      */
     private @DrawableRes
     final Integer iconScreenSharingDialog;
-
-    /**
-     * The icon resId used to set the call's video on
-     */
-    private @DrawableRes
-    final Integer iconCallVideoOn;
-
-    /**
-     * The icon resId used to set the call's audio off
-     */
-    private @DrawableRes
-    final Integer iconCallAudioOff;
-
-    /**
-     * The icon resId used set the call's video off
-     */
-    private @DrawableRes
-    final Integer iconCallVideoOff;
-
-    /**
-     * The icon resId used to navigate back to the chat from a call
-     */
-    private @DrawableRes
-    final Integer iconCallChat;
-
-    /**
-     * The icon resId used to set the call's speaker on
-     */
-    private @DrawableRes
-    final Integer iconCallSpeakerOn;
-
-    /**
-     * The icon resId used to set the call's speaker off
-     */
-    private @DrawableRes
-    final Integer iconCallSpeakerOff;
-
-    /**
-     * The icon resId used to minimize a call
-     */
-    private @DrawableRes
-    final Integer iconCallMinimize;
 
     /**
      * The icon resId used in a chat head if an operator's profile image is absent
@@ -324,17 +280,9 @@ public class UiTheme implements Parcelable {
         this.iconSendMessage = builder.iconSendMessage;
         this.iconChatAudioUpgrade = builder.iconChatAudioUpgrade;
         this.iconUpgradeAudioDialog = builder.iconUpgradeAudioDialog;
-        this.iconCallAudioOn = builder.iconCallAudioOn;
         this.iconChatVideoUpgrade = builder.iconChatVideoUpgrade;
         this.iconUpgradeVideoDialog = builder.iconUpgradeVideoDialog;
         this.iconScreenSharingDialog = builder.iconScreenSharingDialog;
-        this.iconCallVideoOn = builder.iconCallVideoOn;
-        this.iconCallAudioOff = builder.iconCallAudioOff;
-        this.iconCallVideoOff = builder.iconCallVideoOff;
-        this.iconCallChat = builder.iconCallChat;
-        this.iconCallSpeakerOn = builder.iconCallSpeakerOn;
-        this.iconCallSpeakerOff = builder.iconCallSpeakerOff;
-        this.iconCallMinimize = builder.iconCallMinimize;
         this.iconPlaceholder = builder.iconPlaceholder;
         this.iconOnHold = builder.iconOnHold;
         this.whiteLabel = builder.whiteLabel;
@@ -491,11 +439,6 @@ public class UiTheme implements Parcelable {
         private @DrawableRes
         Integer iconUpgradeAudioDialog;
         /**
-         * The icon resId used to set the call's audio on
-         */
-        private @DrawableRes
-        Integer iconCallAudioOn;
-        /**
          * The icon resId used in chat messages to display an ongoing video upgrade timer
          */
         private @DrawableRes
@@ -510,41 +453,6 @@ public class UiTheme implements Parcelable {
          */
         private @DrawableRes
         Integer iconScreenSharingDialog;
-        /**
-         * The icon resId used to set the call's video on
-         */
-        private @DrawableRes
-        Integer iconCallVideoOn;
-        /**
-         * The icon resId used to set the call's audio off
-         */
-        private @DrawableRes
-        Integer iconCallAudioOff;
-        /**
-         * The icon resId used set the call's video off
-         */
-        private @DrawableRes
-        Integer iconCallVideoOff;
-        /**
-         * The icon resId used to navigate back to the chat from a call
-         */
-        private @DrawableRes
-        Integer iconCallChat;
-        /**
-         * The icon resId used to set the call's speaker on
-         */
-        private @DrawableRes
-        Integer iconCallSpeakerOn;
-        /**
-         * The icon resId used to set the call's speaker off
-         */
-        private @DrawableRes
-        Integer iconCallSpeakerOff;
-        /**
-         * The icon resId used to minimize a call
-         */
-        private @DrawableRes
-        Integer iconCallMinimize;
         /**
          * The icon resId used in a chat head if an operator's profile image is absent
          */
@@ -617,6 +525,7 @@ public class UiTheme implements Parcelable {
         public UiThemeBuilder() {
             // Default values
             this.surveyStyle = new SurveyStyle.Builder().build();
+            this.callStyle = new CallStyle.Builder().build();
         }
 
         public void setAppBarTitle(String appBarTitle) {
@@ -711,8 +620,19 @@ public class UiTheme implements Parcelable {
             this.iconUpgradeAudioDialog = iconUpgradeAudioDialog;
         }
 
+        @Deprecated
         public void setIconCallAudioOn(@DrawableRes Integer iconCallAudioOn) {
-            this.iconCallAudioOn = iconCallAudioOn;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setMuteButton(new BarButtonStatesConfiguration.Builder()
+                                    .setActive(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallAudioOn)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
         public void setIconChatVideoUpgrade(@DrawableRes Integer iconChatVideoUpgrade) {
@@ -727,32 +647,109 @@ public class UiTheme implements Parcelable {
             this.iconScreenSharingDialog = iconScreenSharingDialog;
         }
 
+        @Deprecated
         public void setIconCallVideoOn(@DrawableRes Integer iconCallVideoOn) {
-            this.iconCallVideoOn = iconCallVideoOn;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setVideoButton(new BarButtonStatesConfiguration.Builder()
+                                    .setSelected(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallVideoOn)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
+        @Deprecated
         public void setIconCallAudioOff(@DrawableRes Integer iconCallAudioOff) {
-            this.iconCallAudioOff = iconCallAudioOff;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setMuteButton(new BarButtonStatesConfiguration.Builder()
+                                    .setSelected(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallAudioOff)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
+        @Deprecated
         public void setIconCallVideoOff(@DrawableRes Integer iconCallVideoOff) {
-            this.iconCallVideoOff = iconCallVideoOff;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setVideoButton(new BarButtonStatesConfiguration.Builder()
+                                    .setActive(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallVideoOff)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
+        @Deprecated
         public void setIconCallChat(@DrawableRes Integer iconCallChat) {
-            this.iconCallChat = iconCallChat;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setChatButton(new BarButtonStatesConfiguration.Builder()
+                                    .setActive(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallChat)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
+        @Deprecated
         public void setIconCallSpeakerOn(@DrawableRes Integer iconCallSpeakerOn) {
-            this.iconCallSpeakerOn = iconCallSpeakerOn;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setSpeakerButton(new BarButtonStatesConfiguration.Builder()
+                                    .setSelected(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallSpeakerOn)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
+        @Deprecated
         public void setIconCallSpeakerOff(@DrawableRes Integer iconCallSpeakerOff) {
-            this.iconCallSpeakerOff = iconCallSpeakerOff;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setSpeakerButton(new BarButtonStatesConfiguration.Builder()
+                                    .setActive(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallSpeakerOff)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
+        @Deprecated
         public void setIconCallMinimize(@DrawableRes Integer iconCallMinimize) {
-            this.iconCallMinimize = iconCallMinimize;
+            CallStyle newStyle = new CallStyle.Builder()
+                    .setCallStyle(this.callStyle)
+                    .setButtonBar(new ButtonBarConfiguration.Builder()
+                            .setMinimizeButton(new BarButtonStatesConfiguration.Builder()
+                                    .setActive(new BarButtonConfiguration.Builder()
+                                            .setImageRes(iconCallMinimize)
+                                            .build())
+                                    .build())
+                            .build())
+                    .build();
+            this.callStyle = Utils.getHybridCallStyle(newStyle, this.callStyle);
         }
 
         public void setIconPlaceholder(@DrawableRes Integer iconPlaceholder) {
@@ -835,6 +832,10 @@ public class UiTheme implements Parcelable {
             this.surveyStyle = surveyStyle;
         }
 
+        public void setCallStyle(CallStyle callStyle) {
+            this.callStyle = callStyle;
+        }
+
         public void setTheme(@NonNull UiTheme theme) {
             this.appBarTitle = theme.appBarTitle;
             this.brandPrimaryColor = theme.brandPrimaryColor;
@@ -858,17 +859,9 @@ public class UiTheme implements Parcelable {
             this.iconSendMessage = theme.iconSendMessage;
             this.iconChatAudioUpgrade = theme.iconChatAudioUpgrade;
             this.iconUpgradeAudioDialog = theme.iconUpgradeAudioDialog;
-            this.iconCallAudioOn = theme.iconCallAudioOn;
             this.iconChatVideoUpgrade = theme.iconChatVideoUpgrade;
             this.iconUpgradeVideoDialog = theme.iconUpgradeVideoDialog;
             this.iconScreenSharingDialog = theme.iconScreenSharingDialog;
-            this.iconCallVideoOn = theme.iconCallVideoOn;
-            this.iconCallAudioOff = theme.iconCallAudioOff;
-            this.iconCallVideoOff = theme.iconCallVideoOff;
-            this.iconCallChat = theme.iconCallChat;
-            this.iconCallSpeakerOn = theme.iconCallSpeakerOn;
-            this.iconCallSpeakerOff = theme.iconCallSpeakerOff;
-            this.iconCallMinimize = theme.iconCallMinimize;
             this.iconPlaceholder = theme.iconPlaceholder;
             this.iconOnHold = theme.iconOnHold;
             this.whiteLabel = theme.whiteLabel;
@@ -895,6 +888,12 @@ public class UiTheme implements Parcelable {
         public UiTheme build() {
             return new UiTheme(this);
         }
+    }
+
+    public static UiTheme getDefaultUiTheme() {
+        UiThemeBuilder builder = new UiThemeBuilder();
+        builder.setCallStyle(CallStyle.getDefaultCallStyle());
+        return builder.build();
     }
 
     protected UiTheme(Parcel in) {
@@ -1030,11 +1029,6 @@ public class UiTheme implements Parcelable {
             iconUpgradeAudioDialog = in.readInt();
         }
         if (in.readByte() == 0) {
-            iconCallAudioOn = null;
-        } else {
-            iconCallAudioOn = in.readInt();
-        }
-        if (in.readByte() == 0) {
             iconChatVideoUpgrade = null;
         } else {
             iconChatVideoUpgrade = in.readInt();
@@ -1048,41 +1042,6 @@ public class UiTheme implements Parcelable {
             iconScreenSharingDialog = null;
         } else {
             iconScreenSharingDialog = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallVideoOn = null;
-        } else {
-            iconCallVideoOn = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallAudioOff = null;
-        } else {
-            iconCallAudioOff = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallVideoOff = null;
-        } else {
-            iconCallVideoOff = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallChat = null;
-        } else {
-            iconCallChat = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallSpeakerOn = null;
-        } else {
-            iconCallSpeakerOn = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallSpeakerOff = null;
-        } else {
-            iconCallSpeakerOff = in.readInt();
-        }
-        if (in.readByte() == 0) {
-            iconCallMinimize = null;
-        } else {
-            iconCallMinimize = in.readInt();
         }
         if (in.readByte() == 0) {
             iconPlaceholder = null;
@@ -1288,12 +1247,6 @@ public class UiTheme implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeInt(iconUpgradeAudioDialog);
         }
-        if (iconCallAudioOn == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallAudioOn);
-        }
         if (iconChatVideoUpgrade == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -1311,48 +1264,6 @@ public class UiTheme implements Parcelable {
         } else {
             dest.writeByte((byte) 1);
             dest.writeInt(iconScreenSharingDialog);
-        }
-        if (iconCallVideoOn == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallVideoOn);
-        }
-        if (iconCallAudioOff == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallAudioOff);
-        }
-        if (iconCallVideoOff == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallVideoOff);
-        }
-        if (iconCallChat == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallChat);
-        }
-        if (iconCallSpeakerOn == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallSpeakerOn);
-        }
-        if (iconCallSpeakerOff == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallSpeakerOff);
-        }
-        if (iconCallMinimize == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(iconCallMinimize);
         }
         if (iconPlaceholder == null) {
             dest.writeByte((byte) 0);
@@ -1555,11 +1466,6 @@ public class UiTheme implements Parcelable {
     }
 
     @Deprecated
-    public Integer getIconCallAudioOn() {
-        return iconCallAudioOn;
-    }
-
-    @Deprecated
     public Integer getIconChatVideoUpgrade() {
         return iconChatVideoUpgrade;
     }
@@ -1572,41 +1478,6 @@ public class UiTheme implements Parcelable {
     @Deprecated
     public Integer getIconScreenSharingDialog() {
         return iconScreenSharingDialog;
-    }
-
-    @Deprecated
-    public Integer getIconCallVideoOn() {
-        return iconCallVideoOn;
-    }
-
-    @Deprecated
-    public Integer getIconCallAudioOff() {
-        return iconCallAudioOff;
-    }
-
-    @Deprecated
-    public Integer getIconCallVideoOff() {
-        return iconCallVideoOff;
-    }
-
-    @Deprecated
-    public Integer getIconCallChat() {
-        return iconCallChat;
-    }
-
-    @Deprecated
-    public Integer getIconCallSpeakerOn() {
-        return iconCallSpeakerOn;
-    }
-
-    @Deprecated
-    public Integer getIconCallSpeakerOff() {
-        return iconCallSpeakerOff;
-    }
-
-    @Deprecated
-    public Integer getIconCallMinimize() {
-        return iconCallMinimize;
     }
 
     @Deprecated

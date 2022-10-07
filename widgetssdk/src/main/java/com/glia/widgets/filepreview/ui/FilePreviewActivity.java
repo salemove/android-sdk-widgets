@@ -74,6 +74,7 @@ public class FilePreviewActivity extends AppCompatActivity {
         Intent intent = new Intent(context, FilePreviewActivity.class);
         intent.putExtra(IMAGE_ID_KEY, itemId);
         intent.putExtra(IMAGE_ID_NAME, itemName);
+//        intent.putExtra(GliaWidgets.REMOTE_CONFIGURATION, ); // TODO
         intent.putExtra(GliaWidgets.UI_THEME, theme);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return intent;

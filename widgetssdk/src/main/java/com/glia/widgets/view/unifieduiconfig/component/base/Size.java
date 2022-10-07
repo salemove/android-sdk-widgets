@@ -11,6 +11,14 @@ import com.glia.widgets.view.unifieduiconfig.deserializer.SpDeserializer;
  * Represents density independent pixels
  */
 public interface Size extends Parcelable {
+    /**
+     * @return size in DP or SP
+     */
+    float getSizeDimension();
+
+    default int getIntSizeDimension() {
+        return Math.round(getSizeDimension());
+    }
 
     /**
      * @return size in pixels

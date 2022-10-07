@@ -33,6 +33,7 @@ class CallIntentBuilder {
                 .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName())
                 .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
                 .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
+                .putExtra(GliaWidgets.REMOTE_CONFIGURATION, sdkConfiguration.getRemoteConfiguration())
                 .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
                 .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
                 .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode())

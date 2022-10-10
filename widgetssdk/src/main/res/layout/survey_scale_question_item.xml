@@ -27,6 +27,8 @@
         android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_large"
+        android:layout_marginBottom="@dimen/glia_large"
+        app:layout_constraintBottom_toTopOf="@id/required_error"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/scale_2_button" />
@@ -81,11 +83,9 @@
         android:layout_height="wrap_content"
         android:textColor="@color/glia_system_negative_color"
         android:text="@string/glia_survey_required_error_message"
-        android:layout_marginTop="@dimen/glia_medium"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:drawablePadding="@dimen/glia_small"
         app:drawableStartCompat="@drawable/ic_attention"
-        app:layout_constraintTop_toBottomOf="@id/scale_1_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

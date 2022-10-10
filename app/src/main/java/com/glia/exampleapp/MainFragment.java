@@ -1,16 +1,25 @@
 package com.glia.exampleapp;
 
+import static com.glia.androidsdk.visitor.Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -19,6 +28,7 @@ import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
@@ -35,6 +45,8 @@ public class MainFragment extends Fragment {
     @Nullable
     private ChatHeadLayout chatHeadLayout;
 
+    private Authentication authentication;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -48,6 +60,7 @@ public class MainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.containerView = (ConstraintLayout) view;
         NavController navController = NavHostFragment.findNavController(this);
+        setupAuthButtonsVisibility();
         view.findViewById(R.id.settings_button).setOnClickListener(view1 ->
                 navController.navigate(R.id.settings));
         view.findViewById(R.id.chat_activity_button).setOnClickListener(v ->
@@ -58,13 +71,23 @@ public class MainFragment extends Fragment {
                 navigateToCall(GliaWidgets.MEDIA_TYPE_VIDEO));
         view.findViewById(R.id.end_engagement_button).setOnClickListener(v ->
                 GliaWidgets.endEngagement());
+        view.findViewById(R.id.initGliaWidgetsButton).setOnClickListener(v ->
+                initGliaWidgets());
+        view.findViewById(R.id.authenticationButton).setOnClickListener(v ->
+                showAuthenticationDialog());
+        view.findViewById(R.id.deauthenticationButton).setOnClickListener(v ->
+                deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
-                GliaWidgets.clearVisitorSession());
+                clearSession());
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
+        if (Glia.isInitialized() && authentication == null) {
+            prepareAuthentication();
+        }
 
         if (!Glia.isInitialized() || chatHeadLayout != null) return;
 
@@ -100,6 +123,34 @@ public class MainFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void setupAuthButtonsVisibility() {
+        if (getActivity() == null || containerView == null) return;
+        if (!Glia.isInitialized()) {
+            getActivity().runOnUiThread(() -> {
+                containerView.findViewById(R.id.initGliaWidgetsButton).setVisibility(View.VISIBLE);
+                containerView.findViewById(R.id.authenticationButton).setVisibility(View.GONE);
+                containerView.findViewById(R.id.deauthenticationButton).setVisibility(View.GONE);
+            });
+            return;
+        }
+
+        if (authentication == null) return;
+
+        if (authentication.isAuthenticated()) {
+            getActivity().runOnUiThread(() -> {
+                containerView.findViewById(R.id.initGliaWidgetsButton).setVisibility(View.GONE);
+                containerView.findViewById(R.id.authenticationButton).setVisibility(View.GONE);
+                containerView.findViewById(R.id.deauthenticationButton).setVisibility(View.VISIBLE);
+            });
+        } else {
+            getActivity().runOnUiThread(() -> {
+                containerView.findViewById(R.id.initGliaWidgetsButton).setVisibility(View.GONE);
+                containerView.findViewById(R.id.authenticationButton).setVisibility(View.VISIBLE);
+                containerView.findViewById(R.id.deauthenticationButton).setVisibility(View.GONE);
+            });
+        }
     }
 
     private void navigateToChat() {
@@ -206,5 +257,102 @@ public class MainFragment extends Fragment {
                 sharedPreferences,
                 getResources()
         );
+    }
+
+    private void showAuthenticationDialog() {
+        if (getContext() == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final EditText tokenInput = prepareTokenInputViewEditText(builder);
+        builder.setPositiveButton(
+                getString(R.string.authentication_dialog_authenticate_button),
+                (dialog, which) -> authenticate(tokenInput));
+        builder.setNegativeButton(
+                R.string.authentication_dialog_cancel_button,
+                (dialog, which) -> dialog.cancel());
+        builder.setView(prepareDialogLayout(tokenInput));
+        builder.show();
+    }
+
+    @NonNull
+    private LinearLayout prepareDialogLayout(EditText tokenInput) {
+        LinearLayout container = new LinearLayout(getContext());
+        container.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        int marginInDp = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
+        layoutParams.setMargins(marginInDp, 0, marginInDp, 0);
+        tokenInput.setLayoutParams(layoutParams);
+        tokenInput.setGravity(android.view.Gravity.TOP | Gravity.START);
+
+        container.addView(tokenInput, layoutParams);
+        return container;
+    }
+
+    @NonNull
+    private EditText prepareTokenInputViewEditText(AlertDialog.Builder builder) {
+        final EditText input = new EditText(getContext());
+        input.setHint(R.string.authentication_dialog_token_input_hint);
+        input.setSingleLine();
+        input.setMaxLines(10);
+        input.setHorizontallyScrolling(false);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setTitle(R.string.authentication_dialog_title);
+        builder.setView(input);
+        return input;
+    }
+
+    private void initGliaWidgets() {
+        if (Glia.isInitialized()) {
+            setupAuthButtonsVisibility();
+            return;
+        }
+
+        if (getActivity() == null) return;
+
+        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(getActivity().getApplicationContext()));
+        prepareAuthentication();
+    }
+
+    private void prepareAuthentication() {
+        authentication = GliaWidgets.getAuthentication(FORBIDDEN_DURING_ENGAGEMENT);
+        setupAuthButtonsVisibility();
+    }
+
+    private void authenticate(EditText input) {
+        if (getActivity() == null || containerView == null) return;
+
+        String jwt = input.getText().toString();
+        authentication.authenticate((response, exception) -> {
+            if (exception == null && authentication.isAuthenticated()) {
+                setupAuthButtonsVisibility();
+            } else {
+                showToast("Error: " + exception);
+            }
+        }, jwt);
+    }
+
+    private void deauthenticate() {
+        if (getActivity() == null || containerView == null) return;
+
+        authentication.deauthenticate((response, exception) -> {
+            if (exception == null && !authentication.isAuthenticated()) {
+                setupAuthButtonsVisibility();
+            } else {
+                showToast("Error: " + exception);
+            }
+        });
+    }
+
+    private void clearSession() {
+        GliaWidgets.clearVisitorSession();
+        setupAuthButtonsVisibility();
+    }
+
+    private void showToast(String message) {
+        if (getActivity() == null) return;
+
+        getActivity().runOnUiThread(() -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
     }
 }

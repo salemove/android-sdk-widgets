@@ -74,6 +74,14 @@
     <string name="main_start_audio_call">Start new audio call</string>
     <string name="main_start_video_call">Start new video call</string>
     <string name="main_end_engagement">End engagement</string>
+    <string name="main_init_glia">Init Glia Widgets SDK</string>
+    <string name="main_authenticate">Authenticate</string>
+    <string name="main_deauthenticate">De-authenticate</string>
     <string name="main_clear_visitor_session">Clear Session</string>
+
+    <string name="authentication_dialog_title">Authentication</string>
+    <string name="authentication_dialog_token_input_hint">JSON Web Token</string>
+    <string name="authentication_dialog_authenticate_button">Authenticate</string>
+    <string name="authentication_dialog_cancel_button">Cancel</string>
 
 </resources>

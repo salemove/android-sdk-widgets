@@ -12,8 +12,6 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Utils;
 
 public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFinishListener {
-    private static final String TAG = SurveyActivity.class.getSimpleName();
-
     private SurveyView surveyView;
 
     @Override
@@ -57,8 +55,7 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
         surveyView = findViewById(R.id.survey_view);
         surveyView.setOnTitleUpdatedListener(this::setTitle);
         surveyView.setOnFinishListener(this);
-        SurveyContract.Controller surveyController =
-                Dependencies.getControllerFactory().getSurveyController();
+        SurveyContract.Controller surveyController = Dependencies.getControllerFactory().getSurveyController();
         surveyView.setController(surveyController);
         Bundle extras = getIntent().getExtras();
         UiTheme uiTheme = extras.getParcelable(GliaWidgets.UI_THEME);

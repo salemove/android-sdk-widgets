@@ -67,11 +67,7 @@ public class SurveyView extends FrameLayout
 
     public SurveyView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(
-                MaterialThemeOverlay.wrap(
-                        context,
-                        attrs,
-                        defStyleAttr,
-                        defStyleRes),
+                MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
                 attrs,
                 defStyleAttr,
                 defStyleRes
@@ -113,7 +109,7 @@ public class SurveyView extends FrameLayout
         applyButtonStyle(surveyStyle.getCancelButton(), cancelButton);
     }
 
-    private void setupCardView(SurveyStyle surveyStyle) {
+    private void setupCardView(@NonNull SurveyStyle surveyStyle) {
         ResourceProvider resourceProvider = Dependencies.getResourceProvider();
         float cornerRadius = resourceProvider.convertDpToPixel(surveyStyle.getLayer().getCornerRadius());
         ShapeAppearanceModel.Builder cardViewShapeBuilder = new ShapeAppearanceModel().toBuilder();

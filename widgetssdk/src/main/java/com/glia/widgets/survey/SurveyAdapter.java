@@ -58,6 +58,8 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public SurveyAdapter(SurveyAdapterListener listener) {
         this.listener = listener;
+        // initialize style with default empty SurveyStyle, to make sure that style usage is safe even if new style is not set.
+        this.style = new SurveyStyle.Builder().build();
     }
 
     public void submitList(@Nullable List<QuestionItem> items) {
@@ -95,7 +97,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    private static View createNewLayout(ViewGroup parent, @LayoutRes int layoutId) {
+    private static View createNewLayout(@NonNull ViewGroup parent, @LayoutRes int layoutId) {
         return LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
     }
 
@@ -139,8 +141,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             requiredError = itemView.findViewById(R.id.required_error);
         }
 
-        void onBind(QuestionItem questionItem,
-                    SurveyAdapterListener listener) {
+        void onBind(@NonNull QuestionItem questionItem, SurveyAdapterListener listener) {
             this.questionItem = questionItem;
             this.listener = listener;
             this.questionItem.setAnswerCallback(this);
@@ -151,7 +152,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         void applyAnswer(@Nullable Survey.Answer answer) {
         }
 
-        private void setItemTitle(Survey.Question question) {
+        private void setItemTitle(@NonNull Survey.Question question) {
             String questionText = question.getText();
             if (question.isRequired()) {
                 Context context = titleTextView.getContext();
@@ -210,7 +211,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         List<GliaSurveyOptionButton> buttons;
         SurveyStyle style;
 
-        public ScaleQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public ScaleQuestionViewHolder(@NonNull View itemView, @NonNull SurveyStyle style) {
             super(itemView);
             this.style = style;
 
@@ -231,8 +232,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         @Override
-        void onBind(QuestionItem questionItem,
-                    SurveyAdapterListener listener) {
+        void onBind(@NonNull QuestionItem questionItem, SurveyAdapterListener listener) {
             super.onBind(questionItem, listener);
             applyAnswer(questionItem.getAnswer());
             buttons.forEach(button -> button.setOnClickListener(view ->
@@ -277,7 +277,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         GliaSurveyOptionButton noButton;
         SurveyStyle style;
 
-        public BooleanQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public BooleanQuestionViewHolder(@NonNull View itemView, @NonNull SurveyStyle style) {
             super(itemView);
             this.style = style;
 
@@ -302,8 +302,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         @Override
-        void onBind(QuestionItem questionItem,
-                    SurveyAdapterListener listener) {
+        void onBind(@NonNull QuestionItem questionItem, SurveyAdapterListener listener) {
             super.onBind(questionItem, listener);
             applyAnswer(questionItem.getAnswer());
         }
@@ -343,7 +342,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         RadioGroup radioGroup;
         SurveyStyle style;
 
-        public SingleQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public SingleQuestionViewHolder(@NonNull View itemView, @NonNull SurveyStyle style) {
             super(itemView);
             this.style = style;
 
@@ -360,13 +359,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         @Override
-        void onBind(QuestionItem questionItem,
-                    SurveyAdapterListener listener) {
+        void onBind(@NonNull QuestionItem questionItem, SurveyAdapterListener listener) {
             super.onBind(questionItem, listener);
             singleChoice(questionItem);
         }
 
-        void singleChoice(QuestionItem item) {
+        void singleChoice(@NonNull QuestionItem item) {
             String selectedId = Optional.ofNullable(item.getAnswer())
                     .map(answer -> (String) answer.getResponse())
                     .orElse(null);
@@ -433,7 +431,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         View requiredError;
         SurveyStyle style;
 
-        public InputQuestionViewHolder(@NonNull View itemView, SurveyStyle style) {
+        public InputQuestionViewHolder(@NonNull View itemView, @NonNull SurveyStyle style) {
             super(itemView);
             this.style = style;
             title = itemView.findViewById(R.id.tv_title);
@@ -446,8 +444,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         @Override
-        void onBind(QuestionItem questionItem,
-                    SurveyAdapterListener listener) {
+        void onBind(@NonNull QuestionItem questionItem, SurveyAdapterListener listener) {
             super.onBind(questionItem, listener);
             applyAnswer(questionItem.getAnswer());
         }
@@ -491,7 +488,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
         }
 
-        private void setupTitle(InputQuestionConfiguration inputQuestionConfig) {
+        private void setupTitle(@NonNull InputQuestionConfiguration inputQuestionConfig) {
             TextConfiguration titleConfiguration = inputQuestionConfig.getTitle();
             title.setTextColor(titleConfiguration.getTextColor());
             float textSize = titleConfiguration.getTextSize();
@@ -499,9 +496,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             if (titleConfiguration.isBold()) title.setTypeface(Typeface.DEFAULT_BOLD);
         }
 
-        private void setupInputBoxText(OptionButtonConfiguration optionButtonStyle) {
+        private void setupInputBoxText(@NonNull OptionButtonConfiguration optionButtonStyle) {
             comment.setTextColor(optionButtonStyle.getNormalText().getTextColor());
-            if (optionButtonStyle.getNormalText().isBold()) comment.setTypeface(Typeface.DEFAULT_BOLD);
+            if (optionButtonStyle.getNormalText().isBold())
+                comment.setTypeface(Typeface.DEFAULT_BOLD);
             comment.setHintTextColor(ContextCompat.getColor(comment.getContext(), R.color.glia_base_shade_color));
             float textSize = optionButtonStyle.getNormalText().getTextSize();
             comment.setTextSize(textSize);

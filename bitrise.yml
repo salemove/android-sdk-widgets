@@ -3,6 +3,65 @@ format_version: '8'
 default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 project_type: android
 workflows:
+  _increment_project_version:
+    steps:
+    - gradle-runner@2:
+        inputs:
+        - gradle_file: $PROJECT_LOCATION/build.gradle
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+        - gradle_task: ':bumpVersionMinorLevel'
+    - script@1:
+        inputs:
+        - content: >-
+            #!/usr/bin/env bash
+
+            # fail if any commands fails
+
+            set -e
+
+            # make pipelines' return status equal the last command to exit with
+            a non-zero status, or zero if all commands exit successfully
+
+            set -o pipefail
+
+            # debug log
+
+            set -x
+
+
+            NEW_VERSION=`./gradlew -q printCurrentVersionName`
+
+            BRANCH_NAME="project-version-increment/${NEW_VERSION}"
+
+            MESSAGE="Increment project version to ${NEW_VERSION}"
+
+
+            git checkout -b $BRANCH_NAME
+
+            git add -A
+
+            git commit -m "$MESSAGE"
+
+            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+
+
+            PULL_REQUEST_NUMBER=$(curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}" | jq --raw-output '.number')
+
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
+              -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
+    envs:
+    - opts:
+        is_expand: false
+      INTEGRATOR_VARIANT: debug
   browserstack_upload:
     steps:
     - activate-ssh-key@4:
@@ -86,51 +145,6 @@ workflows:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: master
-  _increment_project_version:
-    steps:
-    - gradle-runner@2:
-        inputs:
-        - gradle_file: $PROJECT_LOCATION/build.gradle
-        - gradlew_path: $PROJECT_LOCATION/gradlew
-        - gradle_task: ':bumpVersionMinorLevel'
-    - script@1:
-        inputs:
-        - content: >-
-            #!/usr/bin/env bash
-            # fail if any commands fails
-            set -e
-            # make pipelines' return status equal the last command to exit with
-            a non-zero status, or zero if all commands exit successfully
-            set -o pipefail
-            # debug log
-            set -x
-
-            NEW_VERSION=`./gradlew -q printCurrentVersionName`
-            BRANCH_NAME="project-version-increment/${NEW_VERSION}"
-            MESSAGE="Increment project version to ${NEW_VERSION}"
-
-            git checkout -b $BRANCH_NAME
-            git add -A
-            git commit -m "$MESSAGE"
-            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
-
-            PULL_REQUEST_NUMBER=$(curl \
-              -X POST \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
-              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}" | jq --raw-output '.number')
-
-            curl \
-              -X POST \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
-              https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
-              -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
-    envs:
-    - opts:
-        is_expand: false
-      INTEGRATOR_VARIANT: debug
   master:
     steps:
     - activate-ssh-key@4:
@@ -180,6 +194,14 @@ workflows:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: master
+  post_release:
+    steps:
+    - trigger-bitrise-workflow@0:
+        inputs:
+        - api_token: $ANDROID_CORTEX_BANKING_APP_BUILD_TRIGGER_TOKEN
+        - workflow_id: upgrade_dependencies
+        - exported_environment_variable_names: NEW_VERSION
+        - app_slug: $ANDROID_CORTEX_BANKING_APP_SLUG
   publish_to_nexus:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
@@ -208,13 +230,19 @@ workflows:
         inputs:
         - content: >-
             #!/usr/bin/env bash
+
             # fail if any commands fails
+
             set -e
+
             # debug log
+
             set -x
+
 
             # this will run Gradle script to deploy library and related
             artifacts to Maven Central
+
             ./gradlew clean
             widgetssdk:publishReleasePublicationToSonatypeRepository
     - generate-changelog@0: {}
@@ -299,28 +327,48 @@ workflows:
         inputs:
         - content: >-
             #!/usr/bin/env bash
+
             # fail if any commands fails
+
             set -e
+
             # make pipelines' return status equal the last command to exit with
             a non-zero status, or zero if all commands exit successfully
+
             set -o pipefail
+
             # debug log
+
             set -x
 
+
             BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+
             MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
 
+
             git checkout -b $BRANCH_NAME
+
             git add -A
+
             git commit -m "$MESSAGE"
+
             git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+
+
+            PULL_REQUEST_NUMBER=$(curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_API_TOKEN" \
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}" | jq --raw-output '.number')
 
             curl \
               -X POST \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
-              https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}"
+              https://api.github.com/repos/salemove/android-sdk-widgets/pulls/$PULL_REQUEST_NUMBER/requested_reviewers \
+              -d "{\"team_reviewers\":[\"tm-mobile-android\"]}"
     - cache-push@2: {}
 app:
   envs:
@@ -342,6 +390,9 @@ app:
   - opts:
       is_expand: false
     TEST_APP_MODULE: app
+  - opts:
+      is_expand: false
+    ANDROID_CORTEX_BANKING_APP_SLUG: 0376f45568cb22dd
 trigger_map:
 - push_branch: master
   workflow: master

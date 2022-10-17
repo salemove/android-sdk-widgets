@@ -72,35 +72,66 @@ class UpdateCoreSdkVersion extends DefaultTask {
 /**
  * A task class for editing the Widget SDK version in version.properties
  * Example of usage from terminal:
- * ./gradlew saveWidgetsVersionName --versionCode=77 --versionName=0.77.2
+ * ./gradlew saveWidgetsVersion --type=patch
  */
 class UpdateProjectVersion extends DefaultTask {
-    private String versionName
-    private String versionCode
+    private String versionUpdateType
 
-    @Option(option = "versionName", description = "Widget SDK version name that should be overriden in configuration files")
-    UpdateProjectVersion setVersionName(String versionName) {
-        this.versionName = versionName
-        return this
-    }
-
-    @Option(option = "versionCode", description = "Widget SDK version code that should be overriden in configuration files")
-    UpdateProjectVersion setVersionCode(String versionCode) {
-        this.versionCode = versionCode
+    @Option(option = "type", description = "Type of version update. Can be 'patch', 'minor', or 'major'.")
+    UpdateProjectVersion setVersionUpdateType(String versionUpdateType) {
+        this.versionUpdateType = versionUpdateType
         return this
     }
 
     @TaskAction
     void write() {
         Map<String, String> propertiesMap = new HashMap<>();
-        propertiesMap.put(getProject().widgetsVersionNameTagInProperties, versionName)
-        propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, versionCode)
+        propertiesMap.put(getProject().widgetsVersionCodeTagInProperties, updatedVersionCode())
+        propertiesMap.put(getProject().widgetsVersionNameTagInProperties, updatedVersionName())
         getProject().saveProperties(propertiesMap)
+    }
+
+    private String updatedVersionCode() {
+        Integer currentVersionCode = getProject().widgetsVersionCode.toInteger()
+        Integer updatedVersionCode = currentVersionCode + 1
+
+        return updatedVersionCode.toString()
+    }
+
+    private String updatedVersionName() {
+        String[] versionPartitioned = getProject().widgetsVersionName.split("\\.")
+
+        switch (this.versionUpdateType) {
+            case "patch":
+                int updatedPatchVersion = versionPartitioned[2].toInteger() + 1
+                versionPartitioned[2] = updatedPatchVersion.toString()
+                break;
+
+            case "minor":
+                int updatedMinorVersion = versionPartitioned[1].toInteger() + 1
+                versionPartitioned[1] = updatedMinorVersion.toString()
+                versionPartitioned[2] = "0"
+                break;
+
+            case "major":
+                int updatedMajorVersion = versionPartitioned[0].toInteger() + 1
+                versionPartitioned[0] = updatedMajorVersion.toString()
+                versionPartitioned[1] = "0"
+                versionPartitioned[2] = "0"
+                break;
+
+            default:
+                throw new Exception("Invalid version update type '$this.versionUpdateType'")
+        }
+
+        String newVersionName = String.join(".", versionPartitioned)
+
+        return newVersionName
     }
 }
 
 tasks.register('saveCoreSdkVersion', UpdateCoreSdkVersion)
-tasks.register('saveWidgetsVersionName', UpdateProjectVersion)
+tasks.register('saveWidgetsVersion', UpdateProjectVersion)
 
 /**
  * This task is used by Bitrise release flow to dynamically increment the current Widgets SDK version

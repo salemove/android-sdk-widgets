@@ -18,9 +18,9 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.site.SiteInfo;
-import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
+import com.glia.widgets.core.authentication.Authentication;
 
 import java.io.InputStream;
 import java.util.List;
@@ -177,6 +177,6 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
-        return Glia.authentication(behavior);
+        return new Authentication(Glia.authentication(behavior));
     }
 }

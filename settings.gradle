@@ -1,3 +1,4 @@
 include ':widgetssdk'
 include ':app'
+include ':domificator' // TODO: name to be decided
 rootProject.name = "Glia android SDK widgets"

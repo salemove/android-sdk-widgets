@@ -9,7 +9,7 @@ workflows:
         inputs:
         - gradle_file: $PROJECT_LOCATION/build.gradle
         - gradlew_path: $PROJECT_LOCATION/gradlew
-        - gradle_task: ':bumpVersionMinorLevel'
+        - gradle_task: saveWidgetsVersion --type=$VERSION_INCREMENT_TYPE
     - script@1:
         inputs:
         - content: >-
@@ -62,6 +62,22 @@ workflows:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: debug
+  authenticated_increment_project_version:
+    description: Task builds an SDK and uploads it to Nexus.
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@6: {}
+    - cache-pull@2: {}
+    - install-missing-android-tools@3:
+        inputs:
+        - gradlew_path: $PROJECT_LOCATION/gradlew
+    - cache-push@2: {}
+    after_run:
+    - _increment_project_version
+    envs:
+    - opts:
+        is_expand: false
+      VERSION_INCREMENT_TYPE: patch
   browserstack_upload:
     steps:
     - activate-ssh-key@4:

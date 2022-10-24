@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +28,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 
+import com.glia.android.domificator.Domificator;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.visitor.Authentication;
@@ -78,7 +81,14 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.deauthenticationButton).setOnClickListener(v ->
                 deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
-                clearSession());
+                aaa());
+    }
+
+    private void aaa() {
+        new Handler().postDelayed(() -> {
+            String aaa = new Domificator().generateDomFromActivity(getActivity());
+            Log.e("aaa", "Whats up?");
+        }, 1000);
     }
 
     @Override

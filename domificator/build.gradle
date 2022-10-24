@@ -19,5 +19,9 @@ android {
 
 dependencies {
 
+    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
+    implementation "io.reactivex.rxjava2:rxjava:$rxJava"
+    implementation "com.hp.gagawa:gagawa:1.0.1" // https://code.google.com/archive/p/gagawa/
+
     testImplementation 'junit:junit:4.13.2'
 }

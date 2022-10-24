@@ -38,7 +38,9 @@ public final class Domificator {
         }
 
         MStyle bodyStyle = new MStyle()
-                .add("border-style", "inset")
+                .add("border", "1px solid")
+                .add("margin", "0")
+                .add("overflow", "hidden") // TODO: This line seems to have no effect
                 .add("width", rootView.getWidth() + "px")
                 .add("height", rootView.getHeight() + "px");
 
@@ -81,10 +83,7 @@ public final class Domificator {
         if (view instanceof ViewGroup) {
             ViewGroup viewGroup = ((ViewGroup) view);
             if (view instanceof ScrollView) {
-                // TODO: check dynamically if the X and Y axis scroll bar should be displayed
-                style.remove("overflow");
-                style.add("overflow-x", "hidden");
-                style.add("overflow-y", "scroll");
+                // TODO
             }
             if (view instanceof LinearLayout) {
                 if (((LinearLayout) view).getOrientation() == LinearLayout.VERTICAL) {
@@ -109,7 +108,15 @@ public final class Domificator {
             style.addTextAlign(gravity);
             style.addTextSize(((TextView) view).getTextSize());
         } else if (view instanceof ImageView) {
-            div.appendChild(new Img("Image placeholder", IMAGE_PLACEHOLDER_SRC));
+            Img image = new Img("Image placeholder", IMAGE_PLACEHOLDER_SRC);
+            image.setStyle(new MStyle()
+                    .add("object-fit", "fill")
+                    .add("width", view.getWidth() + "px")
+                    .add("height", view.getHeight() + "px")
+                    .toString()
+            );
+            div.appendChild(image);
+
         }
 
         // TODO: Web view

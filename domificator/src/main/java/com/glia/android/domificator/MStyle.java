@@ -1,10 +1,13 @@
 package com.glia.android.domificator;
 
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.View;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class MStyle {
     private Map<String, String> styleMap = new HashMap<>();
@@ -15,8 +18,15 @@ public class MStyle {
     }
 
     public MStyle addColor(int color) {
-        String colorHex = String.format("#%06X", (0xFFFFFF & color));
-        return add("color", colorHex);
+        return add("color", colorIntToHex(color));
+    }
+
+    public MStyle addBackgroundColor(int color) {
+        return add("background-color", colorIntToHex(color));
+    }
+
+    private String colorIntToHex(int color) {
+        return String.format("#%06X", (0xFFFFFF & color));
     }
 
     /**
@@ -59,10 +69,19 @@ public class MStyle {
         add("padding-right", view.getPaddingRight() + "px");
         add("padding-bottom", view.getPaddingBottom() + "px");
         add("padding-left", view.getPaddingLeft() + "px");
+        Optional.ofNullable(getBackgroundColor(view)).ifPresent(this::addBackgroundColor);
         // TODO: margins?
-        // TODO: background?
         // TODO: opacity?
+        // TODO: background images?
         return this;
+    }
+
+    private Integer getBackgroundColor(View view) {
+        Drawable background = view.getBackground();
+        if (background instanceof ColorDrawable) {
+            return ((ColorDrawable) background).getColor();
+        }
+        return null;
     }
 
     @Override

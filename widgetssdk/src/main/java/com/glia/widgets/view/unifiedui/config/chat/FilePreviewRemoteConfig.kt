@@ -1,13 +1,11 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.FilePreviewTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class FilePreviewRemoteConfig(
     @SerializedName("text")
     val textRemoteConfig: TextRemoteConfig?,
@@ -20,4 +18,11 @@ internal data class FilePreviewRemoteConfig(
 
     @SerializedName("errorBackground")
     val errorBackground: LayerRemoteConfig?
-): Parcelable
+) {
+    fun toFilePreviewTheme(): FilePreviewTheme = FilePreviewTheme(
+        text = textRemoteConfig?.toTextTheme(),
+        errorIcon = errorIcon?.toColorTheme(),
+        background = background?.toLayerTheme(),
+        errorBackground = errorBackground?.toLayerTheme()
+    )
+}

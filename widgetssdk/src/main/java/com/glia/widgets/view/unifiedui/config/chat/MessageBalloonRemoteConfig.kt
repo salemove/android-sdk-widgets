@@ -1,13 +1,11 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
+import com.glia.widgets.view.unifiedui.config.base.AlignmentTypeRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.AlignmentTypeRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class MessageBalloonRemoteConfig(
     @SerializedName("background")
     val background: LayerRemoteConfig?,
@@ -20,4 +18,15 @@ internal data class MessageBalloonRemoteConfig(
 
     @SerializedName("alignment")
     val alignmentTypeRemoteConfig: AlignmentTypeRemoteConfig?,
-) : Parcelable
+
+    @SerializedName("userImage")
+    val userImageRemoteConfig: UserImageRemoteConfig?
+) {
+    fun toMessageBalloonTheme(): MessageBalloonTheme = MessageBalloonTheme(
+        background = background?.toLayerTheme(),
+        text = textRemoteConfig?.toTextTheme(),
+        status = status?.toTextTheme(),
+        alignment = alignmentTypeRemoteConfig?.nativeAlignment,
+        userImage = userImageRemoteConfig?.toUserImageTheme()
+    )
+}

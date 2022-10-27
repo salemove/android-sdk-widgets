@@ -1,19 +1,16 @@
 package com.glia.widgets.view.unifiedui.theme.survey
 
-import android.os.Parcelable
-import com.glia.widgets.view.unifiedui.theme.base.ThemeButton
-import com.glia.widgets.view.unifiedui.theme.base.ThemeLayer
-import com.glia.widgets.view.unifiedui.theme.base.ThemeText
-import kotlinx.parcelize.Parcelize
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
-@Parcelize
 internal data class SurveyTheme(
-    val layer: ThemeLayer?,
-    val title: ThemeText?,
-    val submitButton: ThemeButton?,
-    val cancelButton: ThemeButton?,
-    val booleanQuestion: ThemeSurveyBooleanQuestion?,
-    val scaleQuestion: ThemeSurveyScaleQuestion?,
-    val singleQuestion: ThemeSurveySingleQuestion?,
-    val inputQuestion: ThemeSurveyInputQuestion?
-) : Parcelable
+    val layer: LayerTheme?,
+    val title: TextTheme?,
+    val submitButton: ButtonTheme?,
+    val cancelButton: ButtonTheme?,
+    val booleanQuestion: SurveyBooleanQuestionTheme?,
+    val scaleQuestion: SurveyScaleQuestionTheme?,
+    val singleQuestion: SurveySingleQuestionTheme?,
+    val inputQuestion: SurveyInputQuestionTheme?
+)

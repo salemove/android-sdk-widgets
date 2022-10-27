@@ -1,10 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class LayerRemoteConfig(
     @SerializedName("color")
     val color: ColorLayerRemoteConfig?,
@@ -16,5 +14,12 @@ internal data class LayerRemoteConfig(
     val borderWidth: SizeDpRemoteConfig?,
 
     @SerializedName("cornerRadius")
-    val cornerRadius: SizeDpRemoteConfig?,
-) : Parcelable
+    val cornerRadius: SizeDpRemoteConfig?
+) {
+    fun toLayerTheme() = LayerTheme(
+        fill = color?.toColorTheme(),
+        stroke = borderColor?.toColorTheme()?.primaryColor,
+        borderWidth = borderWidth?.valuePx,
+        cornerRadius = cornerRadius?.valuePx
+    )
+}

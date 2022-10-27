@@ -1,12 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.survey
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class SurveySingleQuestionRemoteConfig(
 
     @SerializedName("title")
@@ -17,4 +15,10 @@ internal data class SurveySingleQuestionRemoteConfig(
 
     @SerializedName("option")
     val option: TextRemoteConfig?
-): Parcelable
+) {
+    fun toSurveySingleQuestionTheme(): SurveySingleQuestionTheme = SurveySingleQuestionTheme(
+        title = title?.toTextTheme(),
+        tintColor = tintColor?.toColorTheme(),
+        option = option?.toTextTheme()
+    )
+}

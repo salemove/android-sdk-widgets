@@ -1,10 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class TextRemoteConfig(
     @SerializedName("foreground")
     val textColor: ColorLayerRemoteConfig?,
@@ -17,14 +15,13 @@ internal data class TextRemoteConfig(
 
     @SerializedName("alignment")
     val alignment: AlignmentTypeRemoteConfig?,
-) : Parcelable {
-    val fontSize: Float?
-        get() = fontRemoteConfig?.size?.value
-
-    val fontStyle: Int?
-        get() = fontRemoteConfig?.style?.style
-
-    val nativeAlignment: Int?
-        get() = alignment?.nativeAlignment
+) {
+    fun toTextTheme(): TextTheme = TextTheme(
+        textColor = textColor?.toColorTheme(),
+        backgroundColor = backgroundColor?.toColorTheme(),
+        textSize = fontRemoteConfig?.size?.value,
+        textStyle = fontRemoteConfig?.style?.style,
+        textAlignment = alignment?.nativeAlignment
+    )
 
 }

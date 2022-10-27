@@ -1,13 +1,11 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.UpgradeTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class UpgradeRemoteConfig(
 
     @SerializedName("text")
@@ -21,4 +19,11 @@ internal data class UpgradeRemoteConfig(
 
     @SerializedName("background")
     val background: LayerRemoteConfig?,
-): Parcelable
+) {
+    fun toUpgradeTheme(): UpgradeTheme = UpgradeTheme(
+        text = textRemoteConfig?.toTextTheme(),
+        description = description?.toTextTheme(),
+        iconColor = iconColor?.toColorTheme(),
+        background = background?.toLayerTheme()
+    )
+}

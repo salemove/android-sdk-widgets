@@ -1,12 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class EngagementStateRemoteConfig(
     @SerializedName("title")
     val title: TextRemoteConfig?,
@@ -16,4 +14,10 @@ internal data class EngagementStateRemoteConfig(
 
     @SerializedName("tintColor")
     val tintColor: ColorLayerRemoteConfig?,
-): Parcelable
+) {
+    fun toEngagementStateTheme(): EngagementStateTheme = EngagementStateTheme(
+        title = title?.toTextTheme(),
+        description = description?.toTextTheme(),
+        tintColor = tintColor?.toColorTheme()
+    )
+}

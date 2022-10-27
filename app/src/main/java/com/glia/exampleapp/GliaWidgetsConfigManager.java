@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.SiteApiKey;
 import com.glia.widgets.GliaWidgetsConfig;
+import com.glia.widgets.view.unifiedui.exstensions.TempconfigKt;
 
 /**
  *Helper class to obtain Glia Config params from deep-link or preferences.
@@ -29,13 +30,6 @@ public class GliaWidgetsConfigManager {
 
     private static final String REGION_BETA = "beta";
     private static final String REGION_ACCEPTANCE = "acceptance";
-
-    @NonNull
-    public static GliaWidgetsConfig obtainConfig(@NonNull Intent intent, @NonNull Context applicationContext) {
-        if (intent.getData() == null) return createDefaultConfig(applicationContext);
-
-        return obtainConfigFromDeepLink(intent.getData(), applicationContext);
-    }
 
     @NonNull
     public static GliaWidgetsConfig obtainConfigFromDeepLink(@NonNull Uri data, @NonNull Context applicationContext) {
@@ -103,6 +97,7 @@ public class GliaWidgetsConfigManager {
                 .setSiteId(data.getQueryParameter(SITE_ID_KEY))
                 .setRegion(REGION_ACCEPTANCE)
                 .setContext(applicationContext)
+                .setUiJsonRemoteConfig(TempconfigKt.readRaw(applicationContext, R.raw.remote_config)) //TODO Temporary. Ticket - Ticket - https://glia.atlassian.net/browse/MOB-1657
                 .build();
     }
 
@@ -122,6 +117,7 @@ public class GliaWidgetsConfigManager {
                 .setSiteId(siteId)
                 .setRegion(REGION_BETA)
                 .setContext(applicationContext)
+                .setUiJsonRemoteConfig(TempconfigKt.readRaw(applicationContext, R.raw.remote_config)) //TODO Temporary. Ticket - Ticket - https://glia.atlassian.net/browse/MOB-1657
                 .build();
     }
 

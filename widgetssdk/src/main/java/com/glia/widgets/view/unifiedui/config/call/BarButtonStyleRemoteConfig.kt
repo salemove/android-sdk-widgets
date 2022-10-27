@@ -1,12 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.call
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.call.BarButtonStyleTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class BarButtonStyleRemoteConfig(
     @SerializedName("background")
     val background: ColorLayerRemoteConfig?,
@@ -16,4 +14,10 @@ internal data class BarButtonStyleRemoteConfig(
 
     @SerializedName("title")
     val title: TextRemoteConfig?
-) : Parcelable
+) {
+    fun toBarButtonTheme() = BarButtonStyleTheme(
+        background = background?.toColorTheme(),
+        imageColor = imageColor?.toColorTheme(),
+        title = title?.toTextTheme()
+    )
+}

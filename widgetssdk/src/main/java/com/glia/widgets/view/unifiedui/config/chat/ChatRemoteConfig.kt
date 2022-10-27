@@ -1,13 +1,12 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
+import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class ChatRemoteConfig(
     @SerializedName("background")
     val background: LayerRemoteConfig?,
@@ -47,4 +46,20 @@ internal data class ChatRemoteConfig(
 
     @SerializedName("typingIndicator")
     val typingIndicator: ColorLayerRemoteConfig?
-): Parcelable
+) {
+    fun toChatTheme(): ChatTheme = ChatTheme(
+        background = background?.toLayerTheme(),
+        header = headerRemoteConfig?.toHeaderTheme(),
+        operatorMessage = operatorMessage?.toMessageBalloonTheme(),
+        visitorMessage = visitorMessage?.toMessageBalloonTheme(),
+        connect = connect?.toEngagementStatesTheme(),
+        input = inputRemoteConfig?.toInputTheme(),
+        responseCard = responseCardRemoteConfig?.toResponseCardTheme(),
+        audioUpgrade = audioUpgradeRemoteConfig?.toUpgradeTheme(),
+        videoUpgrade = videoUpgradeRemoteConfig?.toUpgradeTheme(),
+        bubble = bubbleRemoteConfig?.toBubbleTheme(),
+        attachmentsPopup = attachmentSourceListRemoteConfig?.toAttachmentsPopupTheme(),
+        unreadIndicator = unreadIndicator?.toBubbleTheme(),
+        typingIndicator = typingIndicator?.toColorTheme()
+    )
+}

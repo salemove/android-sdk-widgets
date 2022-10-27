@@ -1,12 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.FontRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class BadgeRemoteConfig(
     @SerializedName("font")
     val fontRemoteConfig: FontRemoteConfig?,
@@ -16,10 +14,13 @@ internal data class BadgeRemoteConfig(
 
     @SerializedName("backgroundColor")
     val backgroundColor: ColorLayerRemoteConfig?,
-) : Parcelable {
-    val fontSize: Float?
-        get() = fontRemoteConfig?.size?.value
+) {
 
-    val fontStyle: Int?
-        get() = fontRemoteConfig?.style?.style
+    fun toTextTheme() = TextTheme(
+        textColor = fontColor?.toColorTheme(),
+        backgroundColor = backgroundColor?.toColorTheme(),
+        textSize = fontRemoteConfig?.size?.value,
+        textStyle = fontRemoteConfig?.style?.style,
+        textAlignment = null
+    )
 }

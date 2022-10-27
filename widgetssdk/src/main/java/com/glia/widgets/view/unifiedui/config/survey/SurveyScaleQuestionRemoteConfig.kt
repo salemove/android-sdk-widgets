@@ -1,11 +1,9 @@
 package com.glia.widgets.view.unifiedui.config.survey
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyScaleQuestionTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class SurveyScaleQuestionRemoteConfig(
 
     @SerializedName("title")
@@ -13,4 +11,9 @@ internal data class SurveyScaleQuestionRemoteConfig(
 
     @SerializedName("optionButton")
     val optionButtonRemoteConfig: OptionButtonRemoteConfig?
-): Parcelable
+) {
+    fun toSurveyScaleQuestionTheme() = SurveyScaleQuestionTheme(
+        title = title?.toTextTheme(),
+        optionButton = optionButtonRemoteConfig?.toOptionButtonTheme()
+    )
+}

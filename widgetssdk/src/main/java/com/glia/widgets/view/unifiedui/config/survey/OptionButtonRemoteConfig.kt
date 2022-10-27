@@ -1,13 +1,11 @@
 package com.glia.widgets.view.unifiedui.config.survey
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.FontRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class OptionButtonRemoteConfig(
 
     @SerializedName("normalText")
@@ -30,4 +28,15 @@ internal data class OptionButtonRemoteConfig(
 
     @SerializedName("font")
     val fontRemoteConfig: FontRemoteConfig?,
-) : Parcelable
+) {
+    fun toOptionButtonTheme(): OptionButtonTheme = OptionButtonTheme(
+        normalText = normalTextRemoteConfig?.toTextTheme(),
+        normalLayer = normalLayerRemoteConfig?.toLayerTheme(),
+        selectedText = selectedTextRemoteConfig?.toTextTheme(),
+        selectedLayer = selectedLayerRemoteConfig?.toLayerTheme(),
+        highlightedText = highlightedTextRemoteConfig?.toTextTheme(),
+        highlightedLayer = highlightedLayerRemoteConfig?.toLayerTheme(),
+        fontSize = fontRemoteConfig?.size?.value,
+        fontStyle = fontRemoteConfig?.style?.style
+    )
+}

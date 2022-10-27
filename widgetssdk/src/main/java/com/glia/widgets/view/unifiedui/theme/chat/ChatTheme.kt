@@ -1,24 +1,22 @@
 package com.glia.widgets.view.unifiedui.theme.chat
 
-import android.os.Parcelable
-import com.glia.widgets.view.unifiedui.theme.base.ThemeColor
-import com.glia.widgets.view.unifiedui.theme.base.ThemeHeader
-import com.glia.widgets.view.unifiedui.theme.base.ThemeLayer
-import kotlinx.parcelize.Parcelize
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 
-@Parcelize
 internal data class ChatTheme(
-    val background: ThemeLayer?,
-    val header: ThemeHeader?,
-    val operatorMessage: ThemeMessageBalloon?,
-    val visitorMessage: ThemeMessageBalloon?,
-    val connect: ThemeEngagementStates?,
-    val input: ThemeInput?,
-    val responseCard: ThemeResponseCard?,
-    val audioUpgrade: ThemeUpgrade?,
-    val videoUpgrade: ThemeUpgrade?,
-    val bubble: ThemeBubble?,
-    val attachmentsPopup: ThemeAttachmentsPopup?,
-    val unreadIndicator: ThemeBubble?,
-    val typingIndicator: ThemeColor?
-) : Parcelable
+    val background: LayerTheme?,
+    val header: HeaderTheme?,
+    val operatorMessage: MessageBalloonTheme?,
+    val visitorMessage: MessageBalloonTheme?,
+    val connect: EngagementStatesTheme?,
+    val input: InputTheme?,
+    val responseCard: ResponseCardTheme?,
+    val audioUpgrade: UpgradeTheme?,
+    val videoUpgrade: UpgradeTheme?,
+    val bubble: BubbleTheme?,
+    val attachmentsPopup: AttachmentsPopupTheme?,
+    val unreadIndicator: BubbleTheme?,
+    val typingIndicator: ColorTheme?
+)

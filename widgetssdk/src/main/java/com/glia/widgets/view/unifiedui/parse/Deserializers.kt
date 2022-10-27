@@ -1,7 +1,7 @@
 package com.glia.widgets.view.unifiedui.parse
 
 import android.graphics.Typeface
-import androidx.annotation.ColorInt
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.*
@@ -15,15 +15,15 @@ import java.lang.reflect.Type
 
 internal typealias SystemColor = android.graphics.Color
 
-internal fun <T> tryOrNull(block: () -> T?): T? = try {
-    block()
-} catch (ignore: Exception) {
-    null
-}
+private const val TAG = "UnifiedUi:Deserializers"
 
-@ColorInt
-internal fun parseColorOrNull(colorHex: String?): Int? = tryOrNull {
-    SystemColor.parseColor(colorHex)
+internal fun <T> tryOrNull(
+    onError: ((Exception) -> Unit)? = { Logger.e(TAG, "Skipping", it) }, block: () -> T?
+): T? = try {
+    block()
+} catch (ex: Exception) {
+    onError?.invoke(ex)
+    null
 }
 
 /**
@@ -138,12 +138,13 @@ internal class TextStyleDeserializer : JsonDeserializer<TextStyleRemoteConfig?> 
     }
 }
 
-internal class DpDeserializer(private val resourceProvider: ResourceProvider) : JsonDeserializer<SizeDpRemoteConfig?> {
+internal class DpDeserializer(private val resourceProvider: ResourceProvider) :
+    JsonDeserializer<SizeDpRemoteConfig?> {
 
     override fun deserialize(
         json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
     ): SizeDpRemoteConfig? = tryOrNull {
-        val sizePx = json.asFloat.takeIf { it > 0 }?.run(resourceProvider::convertDpToPixel)
+        val sizePx = json.asFloat.takeIf { it >= 0 }?.run(resourceProvider::convertDpToPixel)
             ?: return@tryOrNull null
 
         SizeDpRemoteConfig(sizePx)
@@ -155,7 +156,7 @@ internal class SpDeserializer : JsonDeserializer<SizeSpRemoteConfig?> {
     override fun deserialize(
         json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
     ): SizeSpRemoteConfig? = tryOrNull {
-        val sizeSp = json.asFloat.takeIf { it > 0 } ?: return@tryOrNull null
+        val sizeSp = json.asFloat.takeIf { it >= 0 } ?: return@tryOrNull null
 
         SizeSpRemoteConfig(sizeSp)
     }
@@ -165,7 +166,8 @@ internal class SpDeserializer : JsonDeserializer<SizeSpRemoteConfig?> {
  * Deserializes AttachmentSourceType property from remote config
  * returns null if property differs from [com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceTypeRemoteConfig.value]
  */
-internal class AttachmentSourceTypeDeserializer : JsonDeserializer<AttachmentSourceTypeRemoteConfig?> {
+internal class AttachmentSourceTypeDeserializer :
+    JsonDeserializer<AttachmentSourceTypeRemoteConfig?> {
 
     override fun deserialize(
         json: JsonElement, typeOfT: Type, context: JsonDeserializationContext

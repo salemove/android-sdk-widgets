@@ -1,10 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.call
 
-import android.os.Parcelable
+import com.glia.widgets.view.unifiedui.theme.call.ButtonBarTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class ButtonBarRemoteConfig(
     @SerializedName("chatButton")
     val chatButton: BarButtonStatesRemoteConfig?,
@@ -20,4 +18,12 @@ internal data class ButtonBarRemoteConfig(
 
     @SerializedName("videoButton")
     val videoButton: BarButtonStatesRemoteConfig?
-) : Parcelable
+) {
+    fun toButtonBarTheme(): ButtonBarTheme = ButtonBarTheme(
+        chatButton = chatButton?.toBarButtonStatesTheme(),
+        minimizeButton = minimizeButton?.toBarButtonStatesTheme(),
+        muteButton = muteButton?.toBarButtonStatesTheme(),
+        speakerButton = speakerButton?.toBarButtonStatesTheme(),
+        videoButton = videoButton?.toBarButtonStatesTheme()
+    )
+}

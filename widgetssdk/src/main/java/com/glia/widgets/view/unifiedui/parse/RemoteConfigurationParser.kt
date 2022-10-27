@@ -8,7 +8,7 @@ import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceTypeRemoteCon
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
-internal object RemoteConfigurationParser {
+internal class RemoteConfigurationParser {
     /**
      * @return [Gson] instance with applied deserializers to parse remote config.
      */
@@ -28,10 +28,8 @@ internal object RemoteConfigurationParser {
             .create()
     }
 
-    @JvmStatic
     inline fun <reified T> parse(json: String): T = defaultGson.fromJson(json, T::class.java)
 
-    @JvmStatic
     fun parseRemoteConfiguration(remoteConfiguration: String): RemoteConfiguration? =
-        parse(remoteConfiguration)
+        tryOrNull { parse(remoteConfiguration) }
 }

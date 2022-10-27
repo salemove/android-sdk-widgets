@@ -1,11 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class ResponseCardRemoteConfig(
 
     @SerializedName("background")
@@ -14,6 +13,16 @@ internal data class ResponseCardRemoteConfig(
     @SerializedName("option")
     val option: ResponseCardOptionRemoteConfig?,
 
-    @SerializedName("message")
-    val message: MessageBalloonRemoteConfig?,
-): Parcelable
+    @SerializedName("text")
+    val text: TextRemoteConfig?,
+
+    @SerializedName("userImage")
+    val userImage: UserImageRemoteConfig?
+) {
+    fun toResponseCardTheme(): ResponseCardTheme = ResponseCardTheme(
+        background = background?.toLayerTheme(),
+        option = option?.toResponseCardOptionTheme(),
+        text = text?.toTextTheme(),
+        userImage = userImage?.toUserImageTheme()
+    )
+}

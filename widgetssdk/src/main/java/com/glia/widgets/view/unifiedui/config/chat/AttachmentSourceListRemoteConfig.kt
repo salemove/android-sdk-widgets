@@ -1,11 +1,9 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class AttachmentSourceListRemoteConfig(
 
     @SerializedName("separator")
@@ -16,7 +14,7 @@ internal data class AttachmentSourceListRemoteConfig(
 
     @SerializedName("items")
     val items: List<AttachmentSourceRemoteConfig>?,
-) : Parcelable {
+) {
 
     val photoLibrary: AttachmentSourceRemoteConfig?
         get() = items?.firstOrNull { it.type == AttachmentSourceTypeRemoteConfig.PHOTO_LIBRARY }
@@ -26,4 +24,12 @@ internal data class AttachmentSourceListRemoteConfig(
 
     val browse: AttachmentSourceRemoteConfig?
         get() = items?.firstOrNull { it.type == AttachmentSourceTypeRemoteConfig.BROWSE }
+
+    fun toAttachmentsPopupTheme(): AttachmentsPopupTheme = AttachmentsPopupTheme(
+        dividerColor = separator?.toColorTheme(),
+        background = background?.toColorTheme(),
+        photoLibrary = photoLibrary?.toAttachmentsItemTheme(),
+        takePhoto = takePhoto?.toAttachmentsItemTheme(),
+        browse = browse?.toAttachmentsItemTheme()
+    )
 }

@@ -1,10 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.call
 
-import android.os.Parcelable
+import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class BarButtonStatesRemoteConfig(
     @SerializedName("inactive")
     val inactive: BarButtonStyleRemoteConfig?,
@@ -14,4 +12,10 @@ internal data class BarButtonStatesRemoteConfig(
 
     @SerializedName("selected")
     val selected: BarButtonStyleRemoteConfig?
-) : Parcelable
+) {
+    fun toBarButtonStatesTheme(): BarButtonStatesTheme = BarButtonStatesTheme(
+        inactive = inactive?.toBarButtonTheme(),
+        active = active?.toBarButtonTheme(),
+        selected = selected?.toBarButtonTheme()
+    )
+}

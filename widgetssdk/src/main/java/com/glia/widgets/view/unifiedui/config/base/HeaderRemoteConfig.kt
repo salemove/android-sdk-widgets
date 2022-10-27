@@ -1,10 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
+import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class HeaderRemoteConfig(
     @SerializedName("text")
     val textRemoteConfig: TextRemoteConfig?,
@@ -18,9 +16,16 @@ internal data class HeaderRemoteConfig(
     @SerializedName("closeButton")
     val closeButtonRemoteConfig: ButtonRemoteConfig?,
 
-    @SerializedName("endScreenSharingButton")
-    val endScreenSharingButtonRemoteConfig: ButtonRemoteConfig?,
+//  "endScreenSharingButton" parameter is missing because it is located in notification(in IOS it is in AppBar)
 
     @SerializedName("endButton")
     val endButtonRemoteConfig: ButtonRemoteConfig?
-) : Parcelable
+) {
+    fun toHeaderTheme(): HeaderTheme = HeaderTheme(
+        text = textRemoteConfig?.toTextTheme(),
+        background = background?.toLayerTheme(),
+        backButton = backButtonRemoteConfig?.toButtonTheme(),
+        closeButton = closeButtonRemoteConfig?.toButtonTheme(),
+        endButton = endButtonRemoteConfig?.toButtonTheme(),
+    )
+}

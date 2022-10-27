@@ -1,11 +1,9 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class UserImageRemoteConfig(
     @SerializedName("placeholderColor")
     val placeholderColor: ColorLayerRemoteConfig?,
@@ -15,4 +13,10 @@ internal data class UserImageRemoteConfig(
 
     @SerializedName("imageBackgroundColor")
     val imageBackgroundColor: ColorLayerRemoteConfig?,
-): Parcelable
+) {
+    fun toUserImageTheme(): UserImageTheme = UserImageTheme(
+        placeholderColor = placeholderColor?.toColorTheme(),
+        placeholderBackgroundColor = placeholderBackgroundColor?.toColorTheme(),
+        imageBackgroundColor = imageBackgroundColor?.toColorTheme()
+    )
+}

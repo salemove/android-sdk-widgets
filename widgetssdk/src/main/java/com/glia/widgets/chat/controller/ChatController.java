@@ -259,7 +259,6 @@ public class ChatController implements
         }
 
         this.chatState = new ChatState.Builder()
-                .setHistoryLoaded(false)
                 .setOperatorName(null)
                 .setCompanyName(null)
                 .setQueueId(null)

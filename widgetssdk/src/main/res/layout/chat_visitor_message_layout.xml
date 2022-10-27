@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="@dimen/glia_chat_visitor_margin_start" />
+        app:layout_constraintGuide_end="323dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/end_guideline"
@@ -24,6 +24,8 @@
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/glia_large"
+        android:paddingVertical="@dimen/glia_medium"
         android:background="@drawable/bg_message"
         android:backgroundTint="?attr/gliaBrandPrimaryColor"
         android:textAppearance="?attr/textAppearanceBody1"

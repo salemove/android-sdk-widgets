@@ -1,11 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
-import androidx.annotation.ColorInt
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class ButtonRemoteConfig(
     @SerializedName("text")
     val textRemoteConfig: TextRemoteConfig?,
@@ -18,16 +15,14 @@ internal data class ButtonRemoteConfig(
 
     @SerializedName("shadow")
     val shadowRemoteConfig: ShadowRemoteConfig?
-) : Parcelable {
+) {
 
-    @get:ColorInt
-    val iconColor: Int?
-        get() = tintColor?.primaryColor
+    fun toButtonTheme(): ButtonTheme = ButtonTheme(
+        text = textRemoteConfig?.toTextTheme(),
+        background = background?.toLayerTheme(),
+        iconColor = tintColor?.toColorTheme(),
+        elevation = shadowRemoteConfig?.elevationPx,
+        shadowColor = shadowRemoteConfig?.color
+    )
 
-    val elevation: Float?
-        get() = shadowRemoteConfig?.elevationPx
-
-    @get:ColorInt
-    val shadowColor: Int?
-        get() = shadowRemoteConfig?.color
 }

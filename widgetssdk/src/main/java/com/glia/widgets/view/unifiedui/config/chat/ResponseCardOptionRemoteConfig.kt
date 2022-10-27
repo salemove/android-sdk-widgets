@@ -1,11 +1,9 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardOptionTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class ResponseCardOptionRemoteConfig(
     @SerializedName("normal")
     val normal: ButtonRemoteConfig?,
@@ -15,4 +13,10 @@ internal data class ResponseCardOptionRemoteConfig(
 
     @SerializedName("disabled")
     val disabled: ButtonRemoteConfig?,
-): Parcelable
+) {
+    fun toResponseCardOptionTheme(): ResponseCardOptionTheme = ResponseCardOptionTheme(
+        normal = normal?.toButtonTheme(),
+        disabled = disabled?.toButtonTheme(),
+        selected = selected?.toButtonTheme(),
+    )
+}

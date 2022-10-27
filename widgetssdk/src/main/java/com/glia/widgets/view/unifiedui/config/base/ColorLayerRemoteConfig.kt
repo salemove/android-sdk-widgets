@@ -1,10 +1,9 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
 import androidx.annotation.ColorInt
 import com.glia.widgets.view.unifiedui.parse.ColorLayerDeserializer
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
 /**
  * Represents Color from remote config
@@ -23,23 +22,24 @@ import kotlinx.parcelize.Parcelize
  *
  * @see ColorLayerDeserializer
  */
-@Parcelize
 internal data class ColorLayerRemoteConfig(
     @SerializedName(ColorLayerDeserializer.TYPE_KEY)
     val type: ColorTypeRemoteConfig,
 
     @SerializedName(ColorLayerDeserializer.VALUE_KEY)
     val values: List<ColorRemoteConfig>
-) : Parcelable {
+) {
 
-    val isGradient: Boolean
+    private val isGradient: Boolean
         get() = type != ColorTypeRemoteConfig.FILL
+
+    private val valuesExpanded: List<Int>
+        get() = values.map(ColorRemoteConfig::color)
 
     @get:ColorInt
     val primaryColor: Int
         get() = values.first().color
 
-    val valuesExpanded: List<Int>
-        get() = values.map(ColorRemoteConfig::color)
+    fun toColorTheme(): ColorTheme = ColorTheme(isGradient = isGradient, values = valuesExpanded)
 
 }

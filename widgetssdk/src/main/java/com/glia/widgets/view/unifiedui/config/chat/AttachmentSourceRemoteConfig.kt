@@ -1,12 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsItemTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class AttachmentSourceRemoteConfig(
 
     @SerializedName("type")
@@ -17,4 +15,9 @@ internal data class AttachmentSourceRemoteConfig(
 
     @SerializedName("tintColor")
     val tintColor: ColorLayerRemoteConfig?
-) : Parcelable
+) {
+    fun toAttachmentsItemTheme(): AttachmentsItemTheme = AttachmentsItemTheme(
+        text = textRemoteConfig?.toTextTheme(),
+        iconColor = tintColor?.toColorTheme()
+    )
+}

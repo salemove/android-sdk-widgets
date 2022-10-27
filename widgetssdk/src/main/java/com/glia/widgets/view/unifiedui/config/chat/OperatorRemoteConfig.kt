@@ -1,11 +1,9 @@
 package com.glia.widgets.view.unifiedui.config.chat
 
-import android.os.Parcelable
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.chat.OperatorTheme
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 internal data class OperatorRemoteConfig(
     @SerializedName("image")
     val image: UserImageRemoteConfig?,
@@ -15,4 +13,10 @@ internal data class OperatorRemoteConfig(
 
     @SerializedName("overlayColor")
     val overlayColor: ColorLayerRemoteConfig?
-): Parcelable
+) {
+    fun toOperatorTheme(): OperatorTheme = OperatorTheme(
+        image = image?.toUserImageTheme(),
+        animationColor = animationColor?.toColorTheme(),
+        overlayColor = overlayColor?.toColorTheme()
+    )
+}

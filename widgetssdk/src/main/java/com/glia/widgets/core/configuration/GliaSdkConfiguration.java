@@ -5,7 +5,7 @@ import android.content.Intent;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.view.unifieduiconfig.component.RemoteConfiguration;
+import com.glia.widgets.view.unifiedui.config.RemoteConfiguration;
 
 public class GliaSdkConfiguration {
 

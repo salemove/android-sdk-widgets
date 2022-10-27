@@ -11,6 +11,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 
+@Deprecated
 public class ButtonConfiguration implements Parcelable {
     private final ColorStateList backgroundColor;
     private final ColorStateList strokeColor;
@@ -86,6 +87,7 @@ public class ButtonConfiguration implements Parcelable {
         return textConfiguration;
     }
 
+    @Deprecated
     public static class Builder {
         private ColorStateList backgroundColor;
         private ColorStateList strokeColor;

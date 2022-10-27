@@ -12,6 +12,7 @@ import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+@Deprecated
 public class BooleanQuestionConfiguration implements Parcelable {
     private TextConfiguration title;
     private OptionButtonConfiguration optionButton;
@@ -29,6 +30,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
         return optionButton;
     }
 
+    @Deprecated
     public static class Builder {
         private TextConfiguration title;
         private OptionButtonConfiguration optionButton;

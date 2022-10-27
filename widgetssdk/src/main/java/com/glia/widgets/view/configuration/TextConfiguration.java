@@ -9,6 +9,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 
+@Deprecated
 public class TextConfiguration implements Parcelable {
     private float textSize;
     private int textTypeFaceStyle;
@@ -74,6 +75,7 @@ public class TextConfiguration implements Parcelable {
         return new Builder();
     }
 
+    @Deprecated
     public static class Builder {
         private float textSize;
         private int textTypeFaceStyle;

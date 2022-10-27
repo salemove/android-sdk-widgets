@@ -11,6 +11,7 @@ import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+@Deprecated
 public class SurveyStyle implements Parcelable {
     // Layer style.
     private LayerConfiguration layer;
@@ -61,6 +62,7 @@ public class SurveyStyle implements Parcelable {
         return inputQuestion;
     }
 
+    @Deprecated
     private SurveyStyle(Builder builder) {
         this.layer = builder.layerConfiguration;
         this.title = builder.title;

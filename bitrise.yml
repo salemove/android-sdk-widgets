@@ -243,7 +243,9 @@ workflows:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
     - activate-ssh-key@4: {}
-    - git-clone@6: {}
+    - git-clone:
+        inputs:
+        - fetch_tags: 'yes'
     - cache-pull@2: {}
     - install-missing-android-tools@3:
         inputs:

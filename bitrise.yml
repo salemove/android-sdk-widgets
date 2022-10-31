@@ -5,6 +5,28 @@ project_type: android
 workflows:
   _increment_project_version:
     steps:
+    - script@1:
+        inputs:
+        - content: >-
+            #!/usr/bin/env bash
+
+            # fail if any commands fails
+
+            set -e
+
+            # make pipelines' return status equal the last command to exit with
+            a non-zero status, or zero if all commands exit successfully
+
+            set -o pipefail
+
+            # debug log
+
+            set -x
+
+
+            if [ ! -z "$GITHUB_VERSION_INCREMENT_TYPE" ] ; then
+              envman add --key VERSION_INCREMENT_TYPE --value "$GITHUB_VERSION_INCREMENT_TYPE"
+            fi
     - gradle-runner@2:
         inputs:
         - gradle_file: $PROJECT_LOCATION/build.gradle
@@ -62,6 +84,9 @@ workflows:
     - opts:
         is_expand: false
       INTEGRATOR_VARIANT: debug
+    - opts:
+        is_expand: false
+      VERSION_INCREMENT_TYPE: patch
   authenticated_increment_project_version:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
@@ -74,10 +99,6 @@ workflows:
     - cache-push@2: {}
     after_run:
     - _increment_project_version
-    envs:
-    - opts:
-        is_expand: false
-      VERSION_INCREMENT_TYPE: patch
   browserstack_upload:
     steps:
     - activate-ssh-key@4:
@@ -222,7 +243,9 @@ workflows:
     description: Task builds an SDK and uploads it to Nexus.
     steps:
     - activate-ssh-key@4: {}
-    - git-clone@6: {}
+    - git-clone:
+        inputs:
+        - fetch_tags: 'yes'
     - cache-pull@2: {}
     - install-missing-android-tools@3:
         inputs:

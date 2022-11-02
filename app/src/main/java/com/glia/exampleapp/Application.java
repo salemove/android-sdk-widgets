@@ -1,9 +1,12 @@
 package com.glia.exampleapp;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -40,17 +43,33 @@ public class Application extends android.app.Application {
 
         @Override
         public void run() {
-            handler.postDelayed(this, 200);
+            handler.postDelayed(this, 500);
 
             Activity activity = activityRef == null ? null : activityRef.get();
             if (activity == null) return;
             String htmlDom = domificator.generateDomFromActivity(activity);
+            Bitmap bitmap = toBitmapFromView(activity);
+
             Log.e(Domificator.class.getSimpleName(), "Tik-tak");
         }
 
         public void setCurrentActivity(Activity activity) {
             activityRef = new WeakReference<>(activity);
         }
+    }
+
+    private static Bitmap toBitmapFromView(Activity activity) {
+//        View view = activity.findViewById(android.R.id.content);
+        return toBitmapFromView(activity.getWindow().getDecorView());
+    }
+
+    private static Bitmap toBitmapFromView(View v) {
+        if (v.getWidth() <= 0 || v.getHeight() <= 0) return null;
+        Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+        v.draw(c);
+        return b;
     }
 
     private void initGliaWidgets() {

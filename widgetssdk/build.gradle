@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
     defaultPublishConfig "debug"
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode widgetsVersionCode
         versionName widgetsVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -60,6 +60,7 @@ dependencies {
 
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation "com.google.code.gson:gson:$gson"
+    implementation "androidx.core:core-ktx:$coreKtxVersion"
 
     testImplementation "junit:junit:$junitVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
@@ -80,3 +81,5 @@ ext {
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-parcelize'

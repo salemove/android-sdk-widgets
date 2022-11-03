@@ -7,6 +7,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 
+@Deprecated
 public class OptionButtonConfiguration implements Parcelable {
     // Title text for normal state.
     private TextConfiguration normalText;
@@ -54,6 +55,7 @@ public class OptionButtonConfiguration implements Parcelable {
         return highlightedLayer;
     }
 
+    @Deprecated
     public static class Builder {
         // Title text for normal state.
         private TextConfiguration normalText;

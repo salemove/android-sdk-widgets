@@ -10,6 +10,7 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
+@Deprecated
 public class SingleQuestionConfiguration implements Parcelable {
     private TextConfiguration title;
     private String tintColor;
@@ -33,6 +34,7 @@ public class SingleQuestionConfiguration implements Parcelable {
         return tintColor;
     }
 
+    @Deprecated
     public static class Builder {
         private TextConfiguration title;
         private String tintColor;

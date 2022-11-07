@@ -143,12 +143,14 @@ public class CallActivity extends AppCompatActivity {
 
     private void startCallWithPermissions() {
         List<String> missingPermissions = new ArrayList<>();
-        if (configuration.getMediaType() == Engagement.MediaType.VIDEO && missingPermission(Manifest.permission.CAMERA)) {
-            missingPermissions.add(Manifest.permission.CAMERA);
-        }
-        if ((configuration.getMediaType() == Engagement.MediaType.VIDEO || configuration.getMediaType() == Engagement.MediaType.AUDIO)
-                && missingPermission(Manifest.permission.RECORD_AUDIO)) {
-            missingPermissions.add(Manifest.permission.RECORD_AUDIO);
+        if (!configuration.getIsUpgradeToCall()) { // In upgrading to call, permissions handle on the Core SDK side.
+            if (configuration.getMediaType() == Engagement.MediaType.VIDEO && missingPermission(Manifest.permission.CAMERA)) {
+                missingPermissions.add(Manifest.permission.CAMERA);
+            }
+            if ((configuration.getMediaType() == Engagement.MediaType.VIDEO || configuration.getMediaType() == Engagement.MediaType.AUDIO)
+                    && missingPermission(Manifest.permission.RECORD_AUDIO)) {
+                missingPermissions.add(Manifest.permission.RECORD_AUDIO);
+            }
         }
         if (missingPermissions.size() > 0) {
             permissionSubjectDisposable = permissionSubject

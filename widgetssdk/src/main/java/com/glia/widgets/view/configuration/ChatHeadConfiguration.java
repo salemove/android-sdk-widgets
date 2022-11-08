@@ -3,7 +3,7 @@ package com.glia.widgets.view.configuration;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-@Deprecated
+@Deprecated // TODO find to which class map this
 public class ChatHeadConfiguration implements Parcelable {
     private final Integer operatorPlaceholderBackgroundColor;
     private final Integer operatorPlaceholderIcon;

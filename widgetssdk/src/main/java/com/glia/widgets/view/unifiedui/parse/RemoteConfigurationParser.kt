@@ -1,6 +1,5 @@
 package com.glia.widgets.view.unifiedui.parse
 
-import android.widget.TextView
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.config.RemoteConfiguration
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig
@@ -14,7 +13,6 @@ internal object RemoteConfigurationParser {
      * @return [Gson] instance with applied deserializers to parse remote config.
      */
     val defaultGson: Gson by lazy {
-        TextView(null).textAlignment
         GsonBuilder()
             .registerTypeAdapter(ColorLayerRemoteConfig::class.java, ColorLayerDeserializer())
             .registerTypeAdapter(

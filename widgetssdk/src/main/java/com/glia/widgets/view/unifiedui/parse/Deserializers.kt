@@ -1,6 +1,7 @@
 package com.glia.widgets.view.unifiedui.parse
 
 import android.graphics.Typeface
+import androidx.annotation.ColorInt
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.*
@@ -18,6 +19,11 @@ internal fun <T> tryOrNull(block: () -> T?): T? = try {
     block()
 } catch (ignore: Exception) {
     null
+}
+
+@ColorInt
+internal fun parseColorOrNull(colorHex: String?): Int? = tryOrNull {
+    SystemColor.parseColor(colorHex)
 }
 
 /**

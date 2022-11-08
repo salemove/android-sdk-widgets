@@ -37,6 +37,10 @@ android {
                 'WrongViewIdFormat',
                 'HardcodedText'
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {

@@ -9,5 +9,5 @@ internal data class ThemeText(
     val backgroundColor: ThemeColor?,
     val textSize: Float?, // Size in SP
     val textStyle: Int?, //Typeface.NORMAL
-    val textAlignment: Int? //TextView.TEXT_ALIGNMENT_TEXT_START
+    val textAlignment: Int?, //TextView.TEXT_ALIGNMENT_TEXT_START
 ) : Parcelable

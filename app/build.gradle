@@ -38,25 +38,35 @@ android {
         ext["GLIA_API_KEY_SECRET"] = System.getenv("GLIA_API_KEY_SECRET") as String
         ext["GLIA_API_KEY_ID"] = System.getenv("GLIA_API_KEY_ID") as String
         ext["GLIA_SITE_ID"] = System.getenv("GLIA_SITE_ID") as String
+        ext["FIREBASE_PROJECT_ID"] = System.getenv("FIREBASE_PROJECT_ID") as String
+        ext["FIREBASE_API_KEY"] = System.getenv("FIREBASE_API_KEY") as String
+        ext["FIREBASE_APP_ID"] = System.getenv("FIREBASE_APP_ID") as String
+        ext["FIREBASE_APP_ID_DEBUG"] = System.getenv("FIREBASE_APP_ID_DEBUG") as String
+        ext["FIREBASE_APP_ID_MASTER"] = System.getenv("FIREBASE_APP_ID_MASTER") as String
     }
     buildTypes {
         all {
             resValue("string", "site_id", GLIA_SITE_ID ?: "")
             resValue("string", "glia_api_key_id", GLIA_API_KEY_ID ?: "")
             resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET ?: "")
+            resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID ?: "")
+            resValue("string", "firebase_api_key", FIREBASE_API_KEY ?: "")
         }
         debug {
             signingConfig signingConfigs.debug
             applicationIdSuffix '.debug'
+            resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG ?: "")
         }
         master {
             initWith debug
             applicationIdSuffix '.master'
             matchingFallbacks = ['debug']
+            resValue("string", "firebase_app_id", FIREBASE_APP_ID_MASTER ?: "")
         }
         release {
             initWith debug
             applicationIdSuffix ''
+            resValue("string", "firebase_app_id", FIREBASE_APP_ID ?: "")
         }
     }
     lint {
@@ -78,6 +88,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment:$navVersion"
     implementation "androidx.navigation:navigation-ui:$navVersion"
     implementation "androidx.preference:preference:$preferenceVersion"
+    implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
+    implementation "com.google.firebase:firebase-messaging"
     implementation project(path: ':widgetssdk')
 
     testImplementation "junit:junit:$junitVersion"

@@ -93,7 +93,7 @@
     <string name="glia_dialog_upgrade_decline">@string/glia_dialog_decline</string>
 
     <!-- Operators unavailable AlertDialog -->
-    <string name="glia_dialog_operators_unavailable_title">Operators Not Available</string>
+    <string name="glia_dialog_operators_unavailable_title">We\'re sorry</string>
     <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
 
     <!-- Unexpected error AlertDialog -->

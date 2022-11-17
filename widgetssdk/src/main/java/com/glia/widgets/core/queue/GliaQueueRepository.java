@@ -1,14 +1,23 @@
 package com.glia.widgets.core.queue;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.queuing.QueueTicket;
+import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.helper.Logger;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.Consumer;
+
 import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
 import io.reactivex.Single;
 
 public class GliaQueueRepository {
@@ -17,9 +26,16 @@ public class GliaQueueRepository {
 
     private final GliaCore gliaCore;
     private GliaQueueingState queueingState = new GliaQueueingState.None();
+    private final Consumer<QueueTicket[]> unstaffedQueueTicketStateListener = null;
 
     public GliaQueueRepository(GliaCore gliaCore) {
         this.gliaCore = gliaCore;
+    }
+
+    @VisibleForTesting
+    public GliaQueueRepository(GliaCore gliaCore, GliaQueueingState queueingState) {
+        this.gliaCore = gliaCore;
+        this.queueingState = queueingState;
     }
 
     public Completable startQueueingForEngagement(
@@ -123,5 +139,33 @@ public class GliaQueueRepository {
 
     public GliaQueueingState getQueueingState() {
         return queueingState;
+    }
+
+    /**
+     * Completes when ongoing queue ticket state changes to {@link QueueTicket.State.UNSTAFFED}
+     */
+    public Completable observeQueueTicketStateChangeToUnstaffed() {
+        return Completable.create(emitter -> gliaCore.on(
+                Glia.Events.RECENT_QUEUE_TICKETS,
+                getQueueTicketStateChangeToUnstaffedListener(emitter)));
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public Consumer<QueueTicket[]> getQueueTicketStateChangeToUnstaffedListener(CompletableEmitter emitter) {
+        return queueTickets -> {
+            QueueTicket updatedOngoingTicket = Arrays.stream(queueTickets)
+                    .filter(ticket -> Objects.equals(ticket.getId(), queueingState.getTicketId()))
+                    .findFirst()
+                    .orElse(null);
+            if (updatedOngoingTicket != null &&
+                    updatedOngoingTicket.getState() == QueueTicket.State.UNSTAFFED) {
+                emitter.onComplete();
+            }
+        };
+    }
+
+    public void unsubscribeQueueTicketStateChangeToUnstaffed() {
+        Glia.off(Glia.Events.RECENT_QUEUE_TICKETS, unstaffedQueueTicketStateListener);
     }
 }

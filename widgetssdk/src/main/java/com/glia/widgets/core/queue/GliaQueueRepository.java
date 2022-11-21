@@ -146,7 +146,7 @@ public class GliaQueueRepository {
      */
     public Completable observeQueueTicketStateChangeToUnstaffed() {
         return Completable.create(emitter -> gliaCore.on(
-                Glia.Events.RECENT_QUEUE_TICKETS,
+                Glia.Events.QUEUE_TICKETS_UPDATES,
                 getQueueTicketStateChangeToUnstaffedListener(emitter)));
     }
 
@@ -166,6 +166,6 @@ public class GliaQueueRepository {
     }
 
     public void unsubscribeQueueTicketStateChangeToUnstaffed() {
-        Glia.off(Glia.Events.RECENT_QUEUE_TICKETS, unstaffedQueueTicketStateListener);
+        Glia.off(Glia.Events.QUEUE_TICKETS_UPDATES, unstaffedQueueTicketStateListener);
     }
 }

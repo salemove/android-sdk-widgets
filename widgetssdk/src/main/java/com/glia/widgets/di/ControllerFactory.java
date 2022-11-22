@@ -110,7 +110,8 @@ public class ControllerFactory {
                     useCaseFactory.createCustomCardAdapterTypeUseCase(),
                     useCaseFactory.createCustomCardTypeUseCase(),
                     useCaseFactory.createCustomCardInteractableUseCase(),
-                    useCaseFactory.createCustomCardShouldShowUseCase());
+                    useCaseFactory.createCustomCardShouldShowUseCase(),
+                    useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase());
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -149,7 +150,8 @@ public class ControllerFactory {
                     useCaseFactory.createToggleVisitorAudioMediaMuteUseCase(),
                     useCaseFactory.createToggleVisitorVideoUseCase(),
                     useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
-                    useCaseFactory.createUpdateFromCallScreenUseCase());
+                    useCaseFactory.createUpdateFromCallScreenUseCase(),
+                    useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

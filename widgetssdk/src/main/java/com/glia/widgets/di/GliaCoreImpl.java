@@ -17,6 +17,7 @@ import com.glia.androidsdk.comms.EngagementOptions;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.queuing.Queue;
+import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
@@ -138,6 +139,12 @@ class GliaCoreImpl implements GliaCore {
     public void unsubscribeFromQueueUpdates(Consumer<GliaException> onError,
                                             Consumer<Queue> callback) {
         Glia.unsubscribeFromQueueUpdates(onError, callback);
+    }
+
+    @Override
+    public void subscribeToQueueTicketUpdates(@NonNull String ticketId,
+                                              RequestCallback<QueueTicket> callback) {
+        Glia.subscribeToQueueTicketUpdates(ticketId, callback);
     }
 
     @Override

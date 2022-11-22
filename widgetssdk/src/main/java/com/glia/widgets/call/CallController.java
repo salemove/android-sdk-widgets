@@ -35,6 +35,7 @@ import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCas
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
 import com.glia.widgets.core.survey.OnSurveyListener;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
@@ -95,6 +96,7 @@ public class CallController implements
     private final ToggleVisitorVideoUseCase toggleVisitorVideoUseCase;
     private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
     private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
+    private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
@@ -132,7 +134,8 @@ public class CallController implements
             ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
             ToggleVisitorVideoUseCase toggleVisitorVideoUseCase,
             GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
-            UpdateFromCallScreenUseCase updateFromCallScreenUseCase) {
+            UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
+            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
@@ -173,6 +176,7 @@ public class CallController implements
         this.toggleVisitorVideoUseCase = toggleVisitorVideoUseCase;
         this.getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase;
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
+        this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
     }
 
     @Override
@@ -448,6 +452,7 @@ public class CallController implements
 
     public void queueForEngagementStarted() {
         Logger.d(TAG, "queueForEngagementStarted");
+        observeQueueTicketState();
     }
 
     public void queueForEngagementStopped() {
@@ -475,6 +480,10 @@ public class CallController implements
 
     public boolean shouldShowMediaEngagementView(boolean isUpgradeToCall) {
         return shouldShowMediaEngagementViewUseCase.execute(isUpgradeToCall);
+    }
+
+    public void onBackClicked() {
+        updateFromCallScreenUseCase.updateFromCallScreen(false);
     }
 
     private synchronized void emitViewState(CallState state) {
@@ -793,7 +802,14 @@ public class CallController implements
         if (viewCallback != null) viewCallback.minimizeView();
     }
 
-    public void onBackClicked() {
-        updateFromCallScreenUseCase.updateFromCallScreen(false);
+    private void observeQueueTicketState() {
+        Logger.d(TAG, "observeQueueTicketState");
+        disposable.add(
+                ticketStateChangeToUnstaffedUseCase
+                        .execute()
+                        .subscribe(dialogController::showNoMoreOperatorsAvailableDialog,
+                                error -> Logger.e(TAG, "Error happened while observing queue state : " + error.toString())
+                        )
+        );
     }
 }

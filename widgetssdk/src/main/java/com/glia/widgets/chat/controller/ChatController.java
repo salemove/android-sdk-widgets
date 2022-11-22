@@ -79,6 +79,7 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
+import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
 import com.glia.widgets.core.survey.OnSurveyListener;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
@@ -201,6 +202,7 @@ public class ChatController implements
     private final CustomCardTypeUseCase customCardTypeUseCase;
     private final CustomCardInteractableUseCase customCardInteractableUseCase;
     private final CustomCardShouldShowUseCase customCardShouldShowUseCase;
+    private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
 
     private boolean isVisitorEndEngagement = false;
     private volatile boolean isChatViewPaused = false;
@@ -247,7 +249,8 @@ public class ChatController implements
             CustomCardAdapterTypeUseCase customCardAdapterTypeUseCase,
             CustomCardTypeUseCase customCardTypeUseCase,
             CustomCardInteractableUseCase customCardInteractableUseCase,
-            CustomCardShouldShowUseCase customCardShouldShowUseCase) {
+            CustomCardShouldShowUseCase customCardShouldShowUseCase,
+            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase) {
         this.isFromCallScreenUseCase = isFromCallScreenUseCase;
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         Logger.d(TAG, "constructor");
@@ -314,6 +317,7 @@ public class ChatController implements
         this.customCardTypeUseCase = customCardTypeUseCase;
         this.customCardInteractableUseCase = customCardInteractableUseCase;
         this.customCardShouldShowUseCase = customCardShouldShowUseCase;
+        this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -1472,6 +1476,7 @@ public class ChatController implements
 
     public void queueForEngagementStarted() {
         Logger.d(TAG, "queueForEngagementStarted");
+        observeQueueTicketState();
         viewInitQueueing();
     }
 
@@ -1559,5 +1564,16 @@ public class ChatController implements
 
     private void onSiteInfoReceived(@Nullable SiteInfo siteInfo) {
         emitViewState(chatState.allowSendAttachmentStateChanged(siteInfo == null || siteInfo.getAllowedFileSenders().isVisitorAllowed()));
+    }
+
+    private void observeQueueTicketState() {
+        Logger.d(TAG, "observeQueueTicketState");
+        disposable.add(
+                ticketStateChangeToUnstaffedUseCase
+                        .execute()
+                        .subscribe(dialogController::showNoMoreOperatorsAvailableDialog,
+                                error -> Logger.e(TAG, "Error happened while observing queue state : " + error.toString())
+                        )
+        );
     }
 }

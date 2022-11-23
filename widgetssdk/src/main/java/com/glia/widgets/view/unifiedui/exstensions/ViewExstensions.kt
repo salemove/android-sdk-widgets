@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -72,6 +73,8 @@ internal fun ImageView.load(
 
     Picasso.get().load(url).into(this, callback)
 }
+
+val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
 
 //Unified Ui
 //--------------------------------------------------------------------------------------------------

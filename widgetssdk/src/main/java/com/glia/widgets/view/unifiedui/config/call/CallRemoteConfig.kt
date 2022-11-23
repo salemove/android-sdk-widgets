@@ -1,6 +1,5 @@
 package com.glia.widgets.view.unifiedui.config.call
 
-import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
@@ -20,9 +19,6 @@ internal data class CallRemoteConfig(
     @SerializedName("duration")
     val duration: TextRemoteConfig?,
 
-    @SerializedName("endButton")
-    val endButtonRemoteConfig: ButtonRemoteConfig?,
-
     @SerializedName("header")
     val headerRemoteConfig: HeaderRemoteConfig?,
 
@@ -37,7 +33,6 @@ internal data class CallRemoteConfig(
         bottomText = bottomTextRemoteConfig?.toTextTheme(),
         buttonBar = buttonBarRemoteConfig?.toButtonBarTheme(),
         duration = duration?.toTextTheme(),
-        endButton = endButtonRemoteConfig?.toButtonTheme(),
         header = headerRemoteConfig?.toHeaderTheme(),
         operator = operator?.toTextTheme(),
         topText = topTextRemoteConfig?.toTextTheme()

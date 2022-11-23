@@ -3,7 +3,6 @@ package com.glia.widgets.view.head
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
@@ -14,6 +13,7 @@ import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.ViewHelpers
+import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
@@ -44,7 +44,7 @@ class ChatHeadLayout @JvmOverloads constructor(
     private val chatHeadMargin: Float by lazy { resources.getDimension(R.dimen.glia_chat_head_content_padding) }
 
     private val binding: ChatHeadLayoutBinding by lazy {
-        ChatHeadLayoutBinding.inflate(LayoutInflater.from(context), this)
+        ChatHeadLayoutBinding.inflate(layoutInflater, this)
     }
 
     private val chatHeadView: ChatHeadView by lazy { binding.chatHeadView }

@@ -164,7 +164,6 @@ class OperatorStatusViewHolder(
             chatStartingHeadingView.applyTextTheme(it)
             chatStartedNameView.applyTextTheme(it)
         }
-        engagementStateTheme?.tintColor.also(statusPictureView::applyPlaceHolderImageTheme)
     }
 
     private fun isShowStatusPictureView(status: OperatorStatusItem.Status) =

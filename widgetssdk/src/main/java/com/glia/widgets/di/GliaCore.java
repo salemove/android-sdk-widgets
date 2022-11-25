@@ -17,6 +17,7 @@ import com.glia.androidsdk.comms.EngagementOptions;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.queuing.Queue;
+import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
@@ -73,6 +74,8 @@ public interface GliaCore {
     void subscribeToQueueStateUpdates(@NonNull String queueId, Consumer<GliaException> onError, Consumer<Queue> callback);
 
     void unsubscribeFromQueueUpdates(Consumer<GliaException> onError, Consumer<Queue> callback);
+
+    void subscribeToQueueTicketUpdates(@NonNull String ticketId, RequestCallback<QueueTicket> callback);
 
     void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults);
 

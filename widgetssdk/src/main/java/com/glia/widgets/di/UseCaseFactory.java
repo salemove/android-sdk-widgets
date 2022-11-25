@@ -34,6 +34,7 @@ import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -434,5 +435,9 @@ public class UseCaseFactory {
 
     public CustomCardShouldShowUseCase createCustomCardShouldShowUseCase() {
         return new CustomCardShouldShowUseCase(GliaWidgets.getCustomCardAdapter());
+    }
+
+    public QueueTicketStateChangeToUnstaffedUseCase createQueueTicketStateChangeToUnstaffedUseCase() {
+        return new QueueTicketStateChangeToUnstaffedUseCase(repositoryFactory.getGliaQueueRepository());
     }
 }

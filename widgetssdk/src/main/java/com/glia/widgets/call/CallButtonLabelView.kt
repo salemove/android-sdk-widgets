@@ -1,40 +1,19 @@
 package com.glia.widgets.call
 
 import android.content.Context
-import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
-import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 
 class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
-    AppCompatTextView(context, attrs) {
+    ThemedStateText(context, attrs) {
 
-    private var defaultLabelTheme: TextTheme? = null
     private var barButtonStatesTheme: BarButtonStatesTheme? = null
-
-    init {
-        defaultLabelTheme = TextTheme(
-            textColor = ColorTheme(values = listOf(currentTextColor)),
-            backgroundColor = null,
-            textSize = Utils.pxToSp(context, textSize),
-            textStyle = typeface.style,
-            textAlignment = textAlignment
-        )
-    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
         applyNewState()
-    }
-
-    override fun setTypeface(tf: Typeface?) {
-        tf?.apply { defaultLabelTheme = defaultLabelTheme?.copy(textStyle = style) }
-        super.setTypeface(tf)
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -55,10 +34,6 @@ class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: Att
         this.barButtonStatesTheme = barButtonStatesTheme
     }
 
-    private fun applyDefaultTheme() {
-        applyTextTheme(defaultLabelTheme)
-    }
-
     private fun applyNewState() {
         when {
             !isEnabled -> applyDisabledTheme()
@@ -68,15 +43,15 @@ class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: Att
     }
 
     private fun applyEnabledTheme() {
-        barButtonStatesTheme?.enabled?.title?.also(::applyTextTheme) ?: applyDefaultTheme()
+        barButtonStatesTheme?.enabled?.title?.also(::applyTextTheme) ?: restoreDefaultTheme()
     }
 
     private fun applyDisabledTheme() {
-        barButtonStatesTheme?.disabled?.title?.also(::applyTextTheme) ?: applyDefaultTheme()
+        barButtonStatesTheme?.disabled?.title?.also(::applyTextTheme) ?: restoreDefaultTheme()
     }
 
     private fun applyActivatedTheme() {
-        barButtonStatesTheme?.activated?.title?.also(::applyTextTheme) ?: applyDefaultTheme()
+        barButtonStatesTheme?.activated?.title?.also(::applyTextTheme) ?: restoreDefaultTheme()
     }
 
 }

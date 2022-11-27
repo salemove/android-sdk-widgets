@@ -30,7 +30,7 @@ internal data class CallRemoteConfig(
     val topTextRemoteConfig: TextRemoteConfig?,
 
     @SerializedName("connect")
-    val connect: EngagementStatesRemoteConfig
+    val connect: EngagementStatesRemoteConfig?
 ) {
     fun toCallTheme(): CallTheme = CallTheme(
         background = background?.toLayerTheme(),
@@ -40,6 +40,6 @@ internal data class CallRemoteConfig(
         header = headerRemoteConfig?.toHeaderTheme(),
         operator = operator?.toTextTheme(),
         topText = topTextRemoteConfig?.toTextTheme(),
-        connect = connect.toEngagementStatesTheme()
+        connect = connect?.toEngagementStatesTheme()
     )
 }

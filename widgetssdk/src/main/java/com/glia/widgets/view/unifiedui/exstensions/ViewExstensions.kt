@@ -24,8 +24,10 @@ import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -185,4 +187,76 @@ internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
 
 internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {
     colorTheme?.primaryColorStateList.also(::setImageTintList)
+}
+
+internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme: BarButtonStatesTheme?) {
+    if (barButtonStatesTheme == null) return
+
+    val colors: MutableList<Int> = mutableListOf()
+    val states: MutableList<IntArray> = mutableListOf()
+
+    val disabledState = intArrayOf(-android.R.attr.state_enabled)
+    val activatedState = intArrayOf(android.R.attr.state_activated)
+    val enabledState = intArrayOf()
+
+    val oldBgTint = supportBackgroundTintList
+
+    val bgDisabledColor = barButtonStatesTheme.disabled?.background?.primaryColor
+        ?: oldBgTint.colorForStateOrNull(disabledState)
+
+    if (bgDisabledColor != null) {
+        colors.add(bgDisabledColor)
+        states.add(disabledState)
+    }
+
+    val bgActivatedColor = barButtonStatesTheme.activated?.background?.primaryColor
+        ?: oldBgTint.colorForStateOrNull(activatedState)
+
+    if (bgActivatedColor != null) {
+        colors.add(bgActivatedColor)
+        states.add(activatedState)
+    }
+
+    val bgEnabledColor = barButtonStatesTheme.enabled?.background?.primaryColor
+        ?: oldBgTint.colorForStateOrNull(enabledState)
+
+//        Default value must be at the latest position
+    if (bgEnabledColor != null) {
+        colors.add(bgEnabledColor)
+        states.add(enabledState)
+    }
+
+    supportBackgroundTintList = ColorStateList(states.toTypedArray(), colors.toIntArray())
+    states.clear()
+    colors.clear()
+
+    val oldImageTintList = supportImageTintList
+
+    val disabledColor = barButtonStatesTheme.disabled?.imageColor?.primaryColor
+        ?: oldImageTintList.colorForStateOrNull(disabledState)
+
+    if (disabledColor != null) {
+        colors.add(disabledColor)
+        states.add(disabledState)
+    }
+
+    val activatedColor = barButtonStatesTheme.activated?.imageColor?.primaryColor
+        ?: oldImageTintList.colorForStateOrNull(activatedState)
+
+    if (activatedColor != null) {
+        colors.add(activatedColor)
+        states.add(activatedState)
+    }
+
+    val enabledColor = barButtonStatesTheme.enabled?.imageColor?.primaryColor
+        ?: oldImageTintList.colorForStateOrNull(enabledState)
+
+    if (enabledColor != null) {
+        colors.add(enabledColor)
+        states.add(enabledState)
+    }
+
+    supportImageTintList = ColorStateList(states.toTypedArray(), colors.toIntArray())
+    states.clear()
+    colors.clear()
 }

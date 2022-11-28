@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/chat_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         app:layout_constraintEnd_toEndOf="@id/chat_button"
         app:layout_constraintTop_toTopOf="@id/chat_button" />
 
-    <TextView
+    <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/video_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
         app:rippleColor="@color/call_fab_ripple_color_states"
         app:tint="@color/call_fab_icon_color_states" />
 
-    <TextView
+    <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/mute_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
         app:rippleColor="@color/call_fab_ripple_color_states"
         app:tint="@color/call_fab_icon_color_states" />
 
-    <TextView
+    <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/speaker_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -122,7 +122,7 @@
         app:rippleColor="@color/call_fab_ripple_color_states"
         app:tint="@color/call_fab_icon_color_states" />
 
-    <TextView
+    <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/minimize_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

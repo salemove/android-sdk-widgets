@@ -5,17 +5,17 @@ import com.google.gson.annotations.SerializedName
 
 internal data class BarButtonStatesRemoteConfig(
     @SerializedName("inactive")
-    val inactive: BarButtonStyleRemoteConfig?,
+    val disabled: BarButtonStyleRemoteConfig?,
 
     @SerializedName("active")
-    val active: BarButtonStyleRemoteConfig?,
+    val enabled: BarButtonStyleRemoteConfig?,
 
     @SerializedName("selected")
-    val selected: BarButtonStyleRemoteConfig?
+    val activated: BarButtonStyleRemoteConfig?
 ) {
     fun toBarButtonStatesTheme(): BarButtonStatesTheme = BarButtonStatesTheme(
-        inactive = inactive?.toBarButtonTheme(),
-        active = active?.toBarButtonTheme(),
-        selected = selected?.toBarButtonTheme()
+        disabled = disabled?.toBarButtonTheme(),
+        enabled = enabled?.toBarButtonTheme(),
+        activated = activated?.toBarButtonTheme()
     )
 }

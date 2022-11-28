@@ -49,9 +49,7 @@ import com.glia.widgets.view.OperatorStatusView
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.getColorStateListCompat
-import com.glia.widgets.view.unifiedui.exstensions.getFontCompat
+import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -81,22 +79,14 @@ internal class CallView(
     private val binding: CallViewBinding by lazy {
         CallViewBinding.inflate(LayoutInflater.from(this.context), this)
     }
-    private val callButtonsLayoutBinding: CallButtonsLayoutBinding get() = binding.buttonsLayout
 
-    private val appBar: AppBarView get() = binding.topAppBar
-    private val operatorStatusView: OperatorStatusView get() = binding.operatorStatusView
-    private val operatorNameView: TextView get() = binding.operatorNameView
-    private val companyNameView: TextView get() = binding.companyNameView
-    private val msrView: TextView get() = binding.msrView
-    private val callTimerView: TextView get() = binding.callTimerView
-    private val connectingView: TextView get() = binding.connectingView
-    private val continueBrowsingView: TextView get() = binding.continueBrowsingView
-    private val operatorVideoContainer: FrameLayout get() = binding.operatorVideoContainer
-    private val chatButtonLabel: TextView get() = callButtonsLayoutBinding.chatButtonLabel
-    private val videoButtonLabel: TextView get() = callButtonsLayoutBinding.videoButtonLabel
-    private val muteButtonLabel: TextView get() = callButtonsLayoutBinding.muteButtonLabel
-    private val speakerButtonLabel: TextView get() = callButtonsLayoutBinding.speakerButtonLabel
-    private val minimizeButtonLabel: TextView get() = callButtonsLayoutBinding.minimizeButtonLabel
+    //    -------- Buttons Bar widgets ----------
+    private val callButtonsLayoutBinding: CallButtonsLayoutBinding get() = binding.buttonsLayout
+    private val chatButtonLabel: CallButtonLabelView get() = callButtonsLayoutBinding.chatButtonLabel
+    private val videoButtonLabel: CallButtonLabelView get() = callButtonsLayoutBinding.videoButtonLabel
+    private val muteButtonLabel: CallButtonLabelView get() = callButtonsLayoutBinding.muteButtonLabel
+    private val speakerButtonLabel: CallButtonLabelView get() = callButtonsLayoutBinding.speakerButtonLabel
+    private val minimizeButtonLabel: CallButtonLabelView get() = callButtonsLayoutBinding.minimizeButtonLabel
     private val videoButton: FloatingActionButton get() = callButtonsLayoutBinding.videoButton
     private val muteButton: FloatingActionButton get() = callButtonsLayoutBinding.muteButton
     private val speakerButton: FloatingActionButton get() = callButtonsLayoutBinding.speakerButton
@@ -105,7 +95,18 @@ internal class CallView(
     private val chatButtonBadgeView: TextView get() = callButtonsLayoutBinding.chatButtonBadge
     private val buttonsLayoutBackground: View get() = binding.buttonsLayoutBg
     private val buttonsLayout: View get() = callButtonsLayoutBinding.root
-    private val onHoldTextView: TextView get() = binding.onHoldText
+    //    ---------------------------------------
+
+    private val appBar: AppBarView get() = binding.topAppBar
+    private val operatorStatusView: OperatorStatusView get() = binding.operatorStatusView
+    private val operatorNameView: ThemedStateText get() = binding.operatorNameView
+    private val companyNameView: TextView get() = binding.companyNameView
+    private val msrView: TextView get() = binding.msrView
+    private val callTimerView: ThemedStateText get() = binding.callTimerView
+    private val connectingView: ThemedStateText get() = binding.connectingView
+    private val continueBrowsingView: TextView get() = binding.continueBrowsingView
+    private val operatorVideoContainer: FrameLayout get() = binding.operatorVideoContainer
+    private val onHoldTextView: ThemedStateText get() = binding.onHoldText
     private val floatingVisitorVideoContainer: FloatingVisitorVideoContainer get() = binding.floatingVisitorVideo
 
     private var theme: UiTheme by Delegates.notNull()
@@ -122,7 +123,7 @@ internal class CallView(
     private var onNavigateToChatListener: OnNavigateToChatListener? = null
     private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
-    private var defaultStatusbarColor: Int? = null
+    private var defaultStatusBarColor: Int? = null
 
     private var operatorVideoView: VideoView? = null
     private var alertDialog: AlertDialog? = null
@@ -309,6 +310,7 @@ internal class CallView(
             R.string.glia_call_speaker_off_content_description,
             isSpeakerOn
         )
+        speakerButtonLabel.isActivated = isSpeakerOn
     }
 
     private fun showExitQueueDialog() {
@@ -462,6 +464,7 @@ internal class CallView(
         setAppBarTheme()
         // icons
         operatorStatusView.setTheme(theme)
+        operatorStatusView.applyOperatorTheme(callTheme?.connect?.operator)
 
         theme.iconCallChat?.also(chatButton::setImageResource)
         theme.iconCallVideoOn?.also(videoButton::setImageResource)
@@ -486,6 +489,28 @@ internal class CallView(
             minimizeButtonLabel.typeface = it
         }
 
+        //ButtonBar Buttons
+        chatButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.chatButton)
+        videoButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.videoButton)
+        muteButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.muteButton)
+        speakerButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.speakerButton)
+        minimizeButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.minimizeButton)
+
+        //ButtonBar Labels
+        chatButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.chatButton)
+        videoButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.videoButton)
+        muteButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.muteButton)
+        speakerButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.speakerButton)
+        minimizeButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.minimizeButton)
+
+        //Texts
+        callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
+        callTheme?.duration.also(callTimerView::applyThemeAsDefault)
+        callTheme?.operator.also(operatorNameView::applyThemeAsDefault)
+        callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
+
+        //Background
+        callTheme?.background?.fill.also(::applyColorTheme)
     }
 
     private fun setAppBarTheme() {
@@ -561,17 +586,17 @@ internal class CallView(
         val activity = Utils.getActivity(this.context)
         hideOperatorVideo()
         hideVisitorVideo()
-        if (defaultStatusbarColor != null && activity != null) {
-            activity.window.statusBarColor = defaultStatusbarColor!!
-            defaultStatusbarColor = null
+        if (defaultStatusBarColor != null && activity != null) {
+            activity.window.statusBarColor = defaultStatusBarColor!!
+            defaultStatusBarColor = null
         }
         Utils.hideSoftKeyboard(this.context, windowToken)
     }
 
     private fun handleStatusBarColor() {
         val activity = Utils.getActivity(this.context)
-        if (activity != null && defaultStatusbarColor == null) {
-            defaultStatusbarColor = activity.window.statusBarColor
+        if (activity != null && defaultStatusBarColor == null) {
+            defaultStatusBarColor = activity.window.statusBarColor
             activity.window.statusBarColor = getColorCompat(R.color.glia_transparent_black_bg)
         }
     }
@@ -797,8 +822,59 @@ internal class CallView(
     fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean) =
         callController?.shouldShowMediaEngagementView(isUpgradeToCall) ?: false
 
+    private fun applyTextThemeBasedOnCallState(callState: CallState) {
+        when {
+            callState.showOnHold() -> {
+                //onHold operatorNameView, onHoldText
+                callTheme?.connect?.onHold?.apply {
+                    title?.also(operatorNameView::applyThemeOrDefault)
+                    description?.also(onHoldTextView::applyThemeOrDefault)
+                }
+            }
+            callState.isCallOngoingAndOperatorIsConnecting -> {
+                //connecting connectingView, operatorNameView, callTimerView
+                callTheme?.connect?.connecting?.apply {
+                    title?.also(operatorNameView::applyThemeOrDefault)
+                    description?.also(connectingView::applyThemeOrDefault)
+                }
+            }
+            callState.isCallOngoingAndOperatorConnected -> {
+                //connected operatorNameView, callTimerView
+                callTheme?.connect?.connected?.apply {
+                    title?.also(operatorNameView::applyThemeOrDefault)
+                }
+            }
+            callState.isTransferring -> {
+                //transferring operatorNameView, callTimerView
+                callTheme?.connect?.connected?.apply {
+                    title?.also(operatorNameView::applyThemeOrDefault)
+                }
+            }
+            else -> {
+                //queue companyNameView, msrView
+                // this is the same as [callState.isCallNotOngoing] or queue state
+                callTheme?.connect?.connecting?.apply {
+                    title?.also(companyNameView::applyTextTheme)
+                    description?.also(msrView::applyTextTheme)
+                    operatorNameView.restoreDefaultTheme()
+                    connectingView.restoreDefaultTheme()
+                }
+            }
+        }
+    }
+
     override fun emitState(callState: CallState) {
         post {
+            connectingView.text = resources.getString(
+                R.string.glia_call_connecting_with,
+                callState.callStatus.formattedOperatorName,
+                callState.callStatus.time
+            )
+            handleCallTimerView(callState)
+
+            //No need to manage the remaining view's states if only time has changed
+            if (callState.isOnlyTimeChanged) return@post
+
             if (callState.isMediaEngagementStarted) {
                 appBar.showEndButton()
             } else {
@@ -810,11 +886,6 @@ internal class CallView(
                 setTitle(resources.getString(R.string.glia_call_audio_app_bar_title))
             }
             operatorNameView.text = callState.callStatus.formattedOperatorName
-            connectingView.text = resources.getString(
-                R.string.glia_call_connecting_with,
-                callState.callStatus.formattedOperatorName,
-                callState.callStatus.time
-            )
             connectingView.contentDescription = resources.getString(
                 R.string.glia_call_connecting_with,
                 callState.callStatus.formattedOperatorName,
@@ -833,9 +904,22 @@ internal class CallView(
             } else {
                 appBar.backgroundTintList = getColorStateListCompat(android.R.color.transparent)
             }
-            muteButton.isEnabled = callState.isMuteButtonEnabled
-            speakerButton.isEnabled = callState.isSpeakerButtonEnabled
-            videoButton.isEnabled = callState.isVideoButtonEnabled
+
+            callState.isMuteButtonEnabled.also {
+                muteButtonLabel.isEnabled = it
+                muteButton.isEnabled = it
+            }
+
+            callState.isSpeakerButtonEnabled.also {
+                speakerButton.isEnabled = it
+                speakerButtonLabel.isEnabled = it
+            }
+
+            callState.isVideoButtonEnabled.also {
+                videoButton.isEnabled = it
+                videoButtonLabel.isEnabled = it
+            }
+
             setButtonActivated(
                 videoButton,
                 theme.iconCallVideoOn,
@@ -844,6 +928,8 @@ internal class CallView(
                 R.string.glia_call_video_off_content_description,
                 callState.hasVideo
             )
+            videoButton.isActivated = callState.hasVideo
+
             setButtonActivated(
                 muteButton,
                 theme.iconCallAudioOff,  // mute (eg. mic-off) button activated icon
@@ -852,9 +938,11 @@ internal class CallView(
                 R.string.glia_call_unmute_content_description,
                 callState.isMuted
             )
+            muteButtonLabel.isActivated = callState.isMuted
             muteButtonLabel.setText(
                 if (callState.isMuted) R.string.glia_call_mute_button_unmute else R.string.glia_call_mute_button_mute
             )
+
             chatButtonBadgeView.isVisible = callState.messagesNotSeen > 0
             videoButton.isVisible = callState.is2WayVideoCall
             videoButtonLabel.isVisible = callState.is2WayVideoCall
@@ -863,7 +951,6 @@ internal class CallView(
             msrView.isVisible = callState.isCallNotOngoing
             connectingView.isVisible = callState.isCallOngoingAndOperatorIsConnecting
             onHoldTextView.isVisible = callState.showOnHold()
-            handleCallTimerView(callState)
             handleContinueBrowsingView(callState)
             handleOperatorStatusViewState(callState)
             handleOperatorVideoState(callState)
@@ -874,13 +961,18 @@ internal class CallView(
             } else {
                 hideUIOnCallEnd()
             }
-            chatButton.isEnabled =
-                callState.isAudioCall || callState.isVideoCall || callState.is2WayVideoCall
+            (callState.isAudioCall || callState.isVideoCall || callState.is2WayVideoCall).also {
+                chatButton.isEnabled = it
+                chatButtonLabel.isEnabled = it
+            }
+
             chatButton.contentDescription =
                 if (callState.messagesNotSeen == 0) resources.getString(R.string.glia_call_chat_zero_content_description) else resources.getQuantityString(
                     R.plurals.glia_call_chat_content_description,
                     callState.messagesNotSeen, callState.messagesNotSeen
                 )
+
+            applyTextThemeBasedOnCallState(callState)
         }
     }
 

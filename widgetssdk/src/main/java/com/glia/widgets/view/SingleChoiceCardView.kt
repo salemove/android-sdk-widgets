@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import androidx.annotation.ColorInt
@@ -34,7 +33,7 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     init {
-        binding = SingleChoiceCardViewBinding.inflate(LayoutInflater.from(context), this)
+        binding = SingleChoiceCardViewBinding.inflate(layoutInflater, this)
 
         bgDrawable.color =
             getColorStateListCompat(Utils.getAttrResourceId(context, R.attr.gliaBaseLightColor))

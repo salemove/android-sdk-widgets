@@ -57,9 +57,7 @@ public class CallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
-        configuration =
-                CallIntentReader.from(this)
-                        .getConfiguration();
+        configuration = CallIntentReader.from(this).getConfiguration();
 
         if (!callView.shouldShowMediaEngagementView(configuration.getIsUpgradeToCall())) {
             finishAndRemoveTask();
@@ -68,7 +66,7 @@ public class CallActivity extends AppCompatActivity {
 
         callView.setOnTitleUpdatedListener(this::setTitle);
         callView.setConfiguration(configuration.getSdkConfiguration());
-        callView.setTheme(configuration.getSdkConfiguration().getRunTimeTheme());
+        callView.setUiTheme(configuration.getSdkConfiguration().getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu

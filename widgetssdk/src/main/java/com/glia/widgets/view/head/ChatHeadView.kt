@@ -84,8 +84,7 @@ class ChatHeadView @JvmOverloads constructor(
             binding.apply {
                 queueingLottieAnimation.visibility = GONE
                 profilePictureView.setImageDrawable(null)
-                profilePictureView.backgroundTintList =
-                    getColorStateListCompat(configuration.backgroundColorRes)
+                profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
                 placeholderView.visibility = VISIBLE
             }
         }
@@ -96,8 +95,7 @@ class ChatHeadView @JvmOverloads constructor(
             binding.apply {
                 placeholderView.visibility = GONE
                 profilePictureView.setImageDrawable(null)
-                profilePictureView.backgroundTintList =
-                    getColorStateListCompat(configuration.badgeTextColor)
+                profilePictureView.backgroundTintList = getColorStateListCompat(configuration.badgeTextColor)
                 queueingLottieAnimation.visibility = VISIBLE
             }
         }

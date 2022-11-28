@@ -14,7 +14,6 @@ import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -611,7 +610,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun bindViews() {
-        binding = ChatViewBinding.inflate(LayoutInflater.from(context), this)
+        binding = ChatViewBinding.inflate(layoutInflater, this)
     }
 
     private fun setupViewAppearance() {

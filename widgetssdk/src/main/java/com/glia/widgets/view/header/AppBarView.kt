@@ -2,7 +2,6 @@ package com.glia.widgets.view.header
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.core.content.withStyledAttributes
@@ -17,18 +16,16 @@ import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.appbar.AppBarLayout
-import kotlin.properties.Delegates
 
 class AppBarView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
 ) : AppBarLayout(context, attrs, defStyleAttr) {
-    private var binding: AppBarBinding by Delegates.notNull()
+    private val binding: AppBarBinding by lazy { AppBarBinding.inflate(layoutInflater, this) }
 
     private val toolbarTitleText: TextView?
         get() = binding.toolbar.children.firstOrNull { it.isVisible && it is TextView } as? TextView
 
     init {
-        binding = AppBarBinding.inflate(LayoutInflater.from(context), this)
         setDefaults(attrs)
     }
 

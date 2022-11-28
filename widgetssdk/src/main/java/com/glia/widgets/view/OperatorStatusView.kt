@@ -19,8 +19,8 @@ import com.squareup.picasso.Picasso
 import kotlin.properties.Delegates
 
 class OperatorStatusView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0
+) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val binding by lazy {
         OperatorStatusViewBinding.bind(inflate(context, R.layout.operator_status_view, this))
@@ -100,20 +100,24 @@ class OperatorStatusView @JvmOverloads constructor(
     internal fun applyUserImageTheme(userImageTheme: UserImageTheme?) {
         if (userImageTheme == null) return
 
+        userImageTheme.placeholderBackgroundColor?.also(::applyPlaceholderBackgroundColorTheme)
+
         userImageTheme.imageBackgroundColor?.also {
+            profilePictureView.backgroundTintList = it.primaryColorStateList
+        }
+
+        userImageTheme.placeholderColor?.also {
+            placeholderView.imageTintList = it.primaryColorStateList
+        }
+    }
+
+    internal fun applyPlaceholderBackgroundColorTheme(colorTheme: ColorTheme?) {
+        colorTheme?.also {
             if (it.isGradient) {
                 profilePictureBackgroundColorDrawable.colors = it.valuesArray
             } else {
                 profilePictureBackgroundColorDrawable.setColor(it.primaryColor)
             }
-        }
-
-        userImageTheme.placeholderBackgroundColor?.also {
-            placeholderView.backgroundTintList = it.primaryColorStateList
-        }
-
-        userImageTheme.placeholderColor?.also {
-            placeholderView.imageTintList = it.primaryColorStateList
         }
     }
 

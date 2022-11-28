@@ -22,6 +22,8 @@ class CallState {
     public final Engagement.MediaType requestedMediaType;
     public final boolean isSpeakerOn;
     public final boolean isOnHold;
+    //    Need this to not update all views when only time is changed.
+    public final boolean isOnlyTimeChanged;
 
     @NonNull
     @Override
@@ -56,14 +58,15 @@ class CallState {
                 Objects.equals(companyName, callState.companyName) &&
                 Objects.equals(requestedMediaType, callState.requestedMediaType) &&
                 isSpeakerOn == callState.isSpeakerOn &&
-                isOnHold == callState.isOnHold;
+                isOnHold == callState.isOnHold &&
+                isOnlyTimeChanged == callState.isOnlyTimeChanged;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
                 callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
-                companyName, requestedMediaType, isSpeakerOn, isOnHold);
+                companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged);
     }
 
     public boolean showOperatorStatusView() {
@@ -241,6 +244,7 @@ class CallState {
                                     callStatus.getVisitorMediaState()
                             )
                     )
+                    .setOnlyTimeChanged(true)
                     .createCallState();
         } else if (isVideoCall()) {
             return new Builder()
@@ -254,6 +258,7 @@ class CallState {
                                     callStatus.getVisitorMediaState()
                             )
                     )
+                    .setOnlyTimeChanged(true)
                     .createCallState();
         } else if (isTransferring()) {
             return new Builder()
@@ -264,6 +269,7 @@ class CallState {
                                     callStatus.getVisitorMediaState()
                             )
                     )
+                    .setOnlyTimeChanged(true)
                     .createCallState();
         } else {
             return this;
@@ -282,6 +288,7 @@ class CallState {
                                     callStatus.getVisitorMediaState()
                             )
                     )
+                    .setOnlyTimeChanged(true)
                     .createCallState();
         } else {
             return this;
@@ -395,6 +402,8 @@ class CallState {
         private Engagement.MediaType requestedMediaType;
         private boolean isSpeakerOn;
         private boolean isOnHold;
+        //May be helpful when converting to Kotlin, as android studio makes fields nullable.
+        private boolean isOnlyTimeChanged = false;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -451,6 +460,11 @@ class CallState {
             return this;
         }
 
+        public Builder setOnlyTimeChanged(boolean isOnlyTimeChanged) {
+            this.isOnlyTimeChanged = isOnlyTimeChanged;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -463,6 +477,8 @@ class CallState {
             requestedMediaType = callState.requestedMediaType;
             isSpeakerOn = callState.isSpeakerOn;
             isOnHold = callState.isOnHold;
+            //as we are updating this field only when only time is changed, so needs to make it false every time.
+            isOnlyTimeChanged = false;
             return this;
         }
 
@@ -483,5 +499,6 @@ class CallState {
         this.requestedMediaType = builder.requestedMediaType;
         this.isSpeakerOn = builder.isSpeakerOn;
         this.isOnHold = builder.isOnHold;
+        this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
     }
 }

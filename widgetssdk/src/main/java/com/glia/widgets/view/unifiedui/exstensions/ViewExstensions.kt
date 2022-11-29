@@ -20,11 +20,13 @@ import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
 import com.glia.widgets.R
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.view.button.GliaSurveyOptionButton
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
+import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -259,4 +261,29 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     supportImageTintList = ColorStateList(states.toTypedArray(), colors.toIntArray())
     states.clear()
     colors.clear()
+}
+
+internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTheme?) {
+    val textTheme: TextTheme?
+    val layerTheme: LayerTheme?
+    when {
+        isError -> {
+            textTheme = theme?.highlightedText
+            layerTheme = theme?.highlightedLayer
+        }
+        isSelected -> {
+            textTheme = theme?.selectedText
+            layerTheme = theme?.selectedLayer
+        }
+        else -> {
+            textTheme = theme?.normalText
+            layerTheme = theme?.normalLayer
+        }
+    }
+    applyButtonTheme(
+        ButtonTheme(
+            textTheme?.copy(textSize = theme?.fontSize, textStyle = theme?.fontStyle),
+            layerTheme, null, null, null
+        )
+    )
 }

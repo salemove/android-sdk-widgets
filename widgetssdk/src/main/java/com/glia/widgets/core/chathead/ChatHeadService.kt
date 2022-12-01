@@ -8,6 +8,8 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.util.DisplayMetrics
+import android.util.Size
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.content.getSystemService
@@ -19,15 +21,14 @@ import com.glia.widgets.view.ViewHelpers
 import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
+import kotlin.math.roundToInt
 
 class ChatHeadService : Service() {
     private val windowManager: WindowManager by lazy { getSystemService()!! }
 
-    private val chatHeadSize: Int
-        get() = resources.getDimensionPixelSize(R.dimen.glia_chat_head_size)
+    private val chatHeadSize: Int get() = resources.getDimensionPixelSize(R.dimen.glia_chat_head_size)
 
-    private val chatHeadMargin: Int
-        get() = resources.getDimensionPixelSize(R.dimen.glia_chat_head_content_padding)
+    private val chatHeadMargin: Int get() = resources.getDimensionPixelSize(R.dimen.glia_chat_head_content_padding)
 
 
     private val layoutFlag: Int
@@ -36,13 +37,7 @@ class ChatHeadService : Service() {
         } else {
             WindowManager.LayoutParams.TYPE_PHONE
         }
-    private val displayMetrics: DisplayMetrics
-        get() {
-            val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-            val metrics = DisplayMetrics()
-            windowManager.defaultDisplay.getMetrics(metrics)
-            return metrics
-        }
+    private val displaySize: Size get() = obtainScreenSize()
 
     private val layoutParams: WindowManager.LayoutParams
         get() = WindowManager.LayoutParams(
@@ -57,7 +52,22 @@ class ChatHeadService : Service() {
 
     private var chatHeadView: ChatHeadView? = null
 
+    private fun obtainScreenSize(): Size {
+        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return windowManager.currentWindowMetrics.bounds.run { Size(width(), height()) }
+        }
+        return DisplayMetrics().also(windowManager.defaultDisplay::getMetrics)
+            .run { Size(widthPixels, heightPixels) }
+    }
+
     override fun onBind(intent: Intent): IBinder? = null
+
+    override fun attachBaseContext(newBase: Context) {
+        /*Since a Service doesn't really have a theme, need to force style to avoid crashes in views attached with this context.
+        Otherwise this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.*/
+        super.attachBaseContext(ContextThemeWrapper(newBase, R.style.Application_Glia_Chat_Activity))
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -75,7 +85,7 @@ class ChatHeadService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
-        if (chatHeadView != null) windowManager.removeView(chatHeadView)
+        chatHeadView?.also(windowManager::removeView)
         Logger.d(TAG, "onDestroy")
     }
 
@@ -90,8 +100,8 @@ class ChatHeadService : Service() {
             ViewHelpers.OnTouchListener(
                 { Pair(layoutParams.x, layoutParams.y) },
                 { x: Float, y: Float ->
-                    layoutParams.x = java.lang.Float.valueOf(x).toInt()
-                    layoutParams.y = java.lang.Float.valueOf(y).toInt()
+                    layoutParams.x = x.roundToInt()
+                    layoutParams.y = y.roundToInt()
                     windowManager.updateViewLayout(chatHeadView, layoutParams)
                     controller.onChatHeadPositionChanged(layoutParams.x, layoutParams.y)
                 }
@@ -101,17 +111,14 @@ class ChatHeadService : Service() {
     private fun initChatHeadPosition(
         params: WindowManager.LayoutParams, chatHeadPosition: Pair<Int, Int>
     ) {
-        val displayMetrics = displayMetrics
-        val screenHeight = displayMetrics.heightPixels
-        val screenWidth = displayMetrics.widthPixels
-        params.x = notNullOrDefault(chatHeadPosition.first, getDefaultXPosition(screenWidth))
-        params.y = notNullOrDefault(chatHeadPosition.second, getDefaultYPosition(screenHeight))
+        val display = displaySize
+        params.x = chatHeadPosition.first ?: getDefaultXPosition(display.width)
+        params.y = chatHeadPosition.second ?: getDefaultYPosition(display.height)
     }
-
-    private fun notNullOrDefault(item: Int?, defaultItem: Int): Int = item ?: defaultItem
 
     private fun getDefaultXPosition(screenWidth: Int): Int = screenWidth - chatHeadSize - chatHeadMargin
 
+    //🤔 Need to think why it is strictly the 4/5 of screen height
     private fun getDefaultYPosition(screenHeight: Int): Int = screenHeight / 10 * 8
 
     companion object {

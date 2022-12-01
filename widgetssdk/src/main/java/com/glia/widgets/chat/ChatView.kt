@@ -503,51 +503,53 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
             alertDialog = Dialogs.showOptionsDialog(
-                this.context,
-                theme,
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
-                {
+                context = this.context,
+                theme = theme,
+                title = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
+                message = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
+                positiveButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
+                negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                positiveButtonClickListener = {
                     dismissAlertDialog()
                     NotificationManager.openNotificationChannelScreen(this.context)
                 },
-                {
+                negativeButtonClickListener = {
                     dismissAlertDialog()
                     controller?.notificationsDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
+                },
+                cancelListener = {
+                    it.dismiss()
+                    controller?.notificationsDialogDismissed()
+                    screenSharingController?.onScreenSharingDeclined()
                 }
-            ) {
-                it.dismiss()
-                controller?.notificationsDialogDismissed()
-                screenSharingController?.onScreenSharingDeclined()
-            }
+            )
         }
     }
 
     private fun showAllowNotificationsDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
             alertDialog = Dialogs.showOptionsDialog(
-                this.context,
-                theme,
-                resources.getString(R.string.glia_dialog_allow_notifications_title),
-                resources.getString(R.string.glia_dialog_allow_notifications_message),
-                resources.getString(R.string.glia_dialog_allow_notifications_yes),
-                resources.getString(R.string.glia_dialog_allow_notifications_no),
-                {
+                context = this.context,
+                theme = theme,
+                title = resources.getString(R.string.glia_dialog_allow_notifications_title),
+                message = resources.getString(R.string.glia_dialog_allow_notifications_message),
+                positiveButtonText = resources.getString(R.string.glia_dialog_allow_notifications_yes),
+                negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
+                positiveButtonClickListener = {
                     dismissAlertDialog()
                     controller?.notificationsDialogDismissed()
                     NotificationManager.openNotificationChannelScreen(this.context)
                 },
-                {
+                negativeButtonClickListener = {
                     dismissAlertDialog()
                     controller?.notificationsDialogDismissed()
+                },
+                cancelListener = {
+                    it.dismiss()
+                    controller?.notificationsDialogDismissed()
                 }
-            ) {
-                it.dismiss()
-                controller?.notificationsDialogDismissed()
-            }
+            )
         }
     }
 
@@ -779,51 +781,54 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showExitQueueDialog() {
         alertDialog = Dialogs.showOptionsDialog(
-            context,
-            theme,
-            resources.getString(R.string.glia_dialog_leave_queue_title),
-            resources.getString(R.string.glia_dialog_leave_queue_message),
-            resources.getString(R.string.glia_dialog_leave_queue_yes),
-            resources.getString(R.string.glia_dialog_leave_queue_no),
-            {
+            context = context,
+            theme = theme,
+            title = resources.getString(R.string.glia_dialog_leave_queue_title),
+            message = resources.getString(R.string.glia_dialog_leave_queue_message),
+            positiveButtonText = resources.getString(R.string.glia_dialog_leave_queue_yes),
+            negativeButtonText = resources.getString(R.string.glia_dialog_leave_queue_no),
+            positiveButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogYesClicked()
                 onEndListener?.onEnd()
                 chatEnded()
             },
-            {
+            negativeButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogDismissed()
             },
-            {
+            cancelListener = {
                 it.dismiss()
                 controller?.endEngagementDialogDismissed()
             },
-            true
+            isButtonsColorsReversed = true
         )
     }
 
     private fun showEndEngagementDialog(operatorName: String) {
         alertDialog = Dialogs.showOptionsDialog(
-            context,
-            theme,
-            resources.getString(R.string.glia_dialog_end_engagement_title),
-            resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
-            resources.getString(R.string.glia_dialog_end_engagement_yes),
-            resources.getString(R.string.glia_dialog_end_engagement_no),
-            {
+            context = context,
+            theme = theme,
+            title = resources.getString(R.string.glia_dialog_end_engagement_title),
+            message = resources.getString(
+                R.string.glia_dialog_end_engagement_message,
+                operatorName
+            ),
+            positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
+            negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
+            positiveButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogYesClicked()
             },
-            {
+            negativeButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogDismissed()
             },
-            {
+            cancelListener = {
                 controller?.endEngagementDialogDismissed()
                 it.dismiss()
             },
-            true
+            isButtonsColorsReversed = true
         )
     }
 
@@ -837,15 +842,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         cancelListener: DialogInterface.OnCancelListener
     ) {
         alertDialog = Dialogs.showOptionsDialog(
-            this.context,
-            theme,
-            title,
-            message,
-            positiveButtonText,
-            neutralButtonText,
-            positiveButtonClickListener,
-            neutralButtonClickListener,
-            cancelListener
+            context = this.context,
+            theme = theme,
+            title = title,
+            message = message,
+            positiveButtonText = positiveButtonText,
+            negativeButtonText = neutralButtonText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = neutralButtonClickListener,
+            cancelListener = cancelListener
         )
     }
 
@@ -1155,12 +1160,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.addAttachmentButton.applyButtonTheme(inputTheme.mediaButton)
         binding.dividerView.applyColorTheme(inputTheme.divider)
         binding.chatMessageLayout.applyLayerTheme(inputTheme.background)
-        binding.chatEditText.applyTextTheme(inputTheme.text)
+        binding.chatEditText.applyTextTheme(textTheme = inputTheme.text, withAlignment = false)
         inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
     }
 
     private fun applyUnreadMessagesTheme(bubbleTheme: BubbleTheme) {
-        bubbleTheme.badge?.text.also(binding.newMessagesBadgeView::applyTextTheme)
+        bubbleTheme.badge?.also(binding.newMessagesBadgeView::applyBadgeTheme)
         bubbleTheme.userImage?.also(binding.newMessagesIndicatorImage::applyUserImageTheme)
         bubbleTheme.userImage?.imageBackgroundColor?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
     }

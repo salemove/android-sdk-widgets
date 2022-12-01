@@ -46,6 +46,11 @@ internal fun View.getTypedArrayResId(
     typedArray: TypedArray, @StyleableRes index: Int, @AttrRes fallbackAttr: Int
 ) = Utils.getTypedArrayIntegerValue(typedArray, context, index, fallbackAttr)
 
+@AnyRes
+fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int = TypedValue().takeIf {
+    context.theme.resolveAttribute(attr, it, true)
+}?.resourceId ?: fallBackResId
+
 internal fun LottieAnimationView.addColorFilter(
     @ColorInt color: Int,
     keyPath: KeyPath = KeyPath("**"),
@@ -157,11 +162,15 @@ internal fun TextView.applyTextColorTheme(color: ColorTheme?) {
 
 }
 
-internal fun TextView.applyTextTheme(textTheme: TextTheme?, withBackground: Boolean = false) {
+internal fun TextView.applyTextTheme(
+    textTheme: TextTheme?, withBackground: Boolean = false, withAlignment: Boolean = true
+) {
     textTheme?.textColor.also(::applyTextColorTheme)
     textTheme?.textSize?.also { setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
     textTheme?.textStyle?.also { typeface = Typeface.create(typeface, it) }
-    textTheme?.textAlignment?.let { textAlignment = it }
+
+    if (withAlignment)
+        textTheme?.textAlignment?.let { textAlignment = it }
 
     if (withBackground) {
         textTheme?.backgroundColor.also(::applyColorTheme)

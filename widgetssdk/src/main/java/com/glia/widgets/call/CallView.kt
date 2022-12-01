@@ -315,79 +315,81 @@ internal class CallView(
 
     private fun showExitQueueDialog() {
         alertDialog = Dialogs.showOptionsDialog(
-            this.context,
-            theme,
-            resources.getString(R.string.glia_dialog_leave_queue_title),
-            resources.getString(R.string.glia_dialog_leave_queue_message),
-            resources.getString(R.string.glia_dialog_leave_queue_yes),
-            resources.getString(R.string.glia_dialog_leave_queue_no),
-            {
+            context = this.context,
+            theme = theme,
+            title = resources.getString(R.string.glia_dialog_leave_queue_title),
+            message = resources.getString(R.string.glia_dialog_leave_queue_message),
+            positiveButtonText = resources.getString(R.string.glia_dialog_leave_queue_yes),
+            negativeButtonText = resources.getString(R.string.glia_dialog_leave_queue_no),
+            positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
                 onEndListener?.onEnd()
                 callEnded()
             },
-            {
+            negativeButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogDismissed()
             },
-            {
+            cancelListener = {
                 it.dismiss()
                 callController?.endEngagementDialogDismissed()
             },
-            true
+            isButtonsColorsReversed = true
         )
     }
 
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
             alertDialog = Dialogs.showOptionsDialog(
-                this.context,
-                theme,
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-                resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
-                {
+                context = this.context,
+                theme = theme,
+                title = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
+                message = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
+                positiveButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
+                negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     NotificationManager.openNotificationChannelScreen(this.context)
                 },
-                {
+                negativeButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
+                },
+                cancelListener = {
+                    it.dismiss()
+                    callController?.notificationsDialogDismissed()
+                    screenSharingController?.onScreenSharingDeclined()
                 }
-            ) {
-                it.dismiss()
-                callController?.notificationsDialogDismissed()
-                screenSharingController?.onScreenSharingDeclined()
-            }
+            )
         }
     }
 
     private fun showAllowNotificationsDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
             alertDialog = Dialogs.showOptionsDialog(
-                this.context,
-                theme,
-                resources.getString(R.string.glia_dialog_allow_notifications_title),
-                resources.getString(R.string.glia_dialog_allow_notifications_message),
-                resources.getString(R.string.glia_dialog_allow_notifications_yes),
-                resources.getString(R.string.glia_dialog_allow_notifications_no),
-                {
+                context = this.context,
+                theme = theme,
+                title = resources.getString(R.string.glia_dialog_allow_notifications_title),
+                message = resources.getString(R.string.glia_dialog_allow_notifications_message),
+                positiveButtonText = resources.getString(R.string.glia_dialog_allow_notifications_yes),
+                negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
+                positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     NotificationManager.openNotificationChannelScreen(this.context)
                 },
-                {
+                negativeButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
+                },
+                cancelListener = {
+                    it.dismiss()
+                    callController?.notificationsDialogDismissed()
                 }
-            ) {
-                it.dismiss()
-                callController?.notificationsDialogDismissed()
-            }
+            )
         }
     }
 
@@ -603,27 +605,27 @@ internal class CallView(
 
     private fun showEndEngagementDialog(operatorName: String) {
         alertDialog = Dialogs.showOptionsDialog(
-            this.context,
-            theme,
-            resources.getString(R.string.glia_dialog_end_engagement_title),
-            resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
-            resources.getString(R.string.glia_dialog_end_engagement_yes),
-            resources.getString(R.string.glia_dialog_end_engagement_no),
-            {
+            context = this.context,
+            theme = theme,
+            title = resources.getString(R.string.glia_dialog_end_engagement_title),
+            message = resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
+            positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
+            negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
+            positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
                 alertDialog = null
             },
-            {
+            negativeButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogDismissed()
                 alertDialog = null
             },
-            {
+            cancelListener = {
                 it.dismiss()
                 callController?.endEngagementDialogDismissed()
             },
-            true
+            isButtonsColorsReversed = true
         )
     }
 
@@ -645,15 +647,15 @@ internal class CallView(
         cancelListener: DialogInterface.OnCancelListener
     ) {
         alertDialog = Dialogs.showOptionsDialog(
-            this.context,
-            theme,
-            title,
-            message,
-            positiveButtonText,
-            neutralButtonText,
-            positiveButtonClickListener,
-            neutralButtonClickListener,
-            cancelListener
+            context = this.context,
+            theme = theme,
+            title = title,
+            message = message,
+            positiveButtonText = positiveButtonText,
+            negativeButtonText = neutralButtonText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = neutralButtonClickListener,
+            cancelListener = cancelListener
         )
     }
 

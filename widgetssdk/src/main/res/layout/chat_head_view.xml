@@ -69,19 +69,15 @@
         app:lottie_rawRes="@raw/chat_typing_indicator"
         tools:visibility="gone" />
 
-    <TextView
+    <com.glia.widgets.view.head.BadgeTextView
         android:id="@+id/chat_bubble_badge"
-        android:layout_width="@dimen/glia_chat_head_badge_size"
-        android:layout_height="@dimen/glia_chat_head_badge_size"
-        android:background="@drawable/bg_badge"
-        android:elevation="@dimen/glia_chat_head_badge_elevation"
-        android:gravity="center"
-        android:textAppearance="?attr/textAppearanceCaption"
-        android:textColor="@color/glia_base_light_color"
-        android:textSize="12sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        android:importantForAccessibility="no"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
-        app:layout_constraintTop_toTopOf="@id/profile_picture_view" />
+        app:layout_constraintTop_toTopOf="@id/profile_picture_view"
+        tools:ignore="TouchTargetSizeCheck"
+        tools:text="1"
+        tools:visibility="visible" />
 
 </merge>

@@ -1,5 +1,5 @@
 {
-  "alertScreen": {
+  "alert": {
     "backgroundColor": {
       "type": "fill",
       "value": [
@@ -141,7 +141,7 @@
       }
     },
     "title": {
-      "alignment": "leading",
+      "alignment": "center",
       "background": {
         "type": "fill",
         "value": [
@@ -162,7 +162,7 @@
     "titleImageColor": {
       "type": "fill",
       "value": [
-        "#FF0000"
+        "#04728c"
       ]
     }
   },
@@ -172,60 +172,39 @@
         "border": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#fdd42b"
           ]
         },
-        "borderWidth": 2,
+        "borderWidth": 1,
         "color": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
-          ]
-        },
-        "cornerRadius": 8
-      },
-      "shadow": {
-        "color": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
-          ]
-        },
-        "offset": 0,
-        "opacity": 1,
-        "radius": 5
-      },
-      "text": {
-        "alignment": "center",
-        "background": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
-          ]
-        },
-        "font": {
-          "size": 16,
-          "style": "regular"
-        },
-        "foreground": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
+            "#04728c"
           ]
         }
       },
-      "tintColor": {
+      "font": {
+        "size": 12,
+        "style": "bold"
+      },
+      "fontColor": {
         "type": "fill",
         "value": [
-          "#FFFFFF"
+          "#fdd42b"
         ]
       }
     },
     "onHoldOverlay": {
-      "color": {
+      "backgroundColor": {
         "type": "fill",
         "value": [
-          "#00FF00"
+          "#000000"
+        ]
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": [
+          "#ffd100"
         ]
       }
     },
@@ -233,19 +212,19 @@
       "imageBackgroundColor": {
         "type": "fill",
         "value": [
-          "#FF0000"
+          "#04728c"
         ]
       },
       "placeholderBackgroundColor": {
         "type": "fill",
         "value": [
-          "#FF0000"
+          "#04728c"
         ]
       },
       "placeholderColor": {
         "type": "fill",
         "value": [
-          "#FF0000"
+          "#fdd42b"
         ]
       }
     }
@@ -255,14 +234,14 @@
       "border": {
         "type": "fill",
         "value": [
-          "#FF0000"
+          "FF0000"
         ]
       },
       "borderWidth": 2,
       "color": {
         "type": "fill",
         "value": [
-          "#FF0000"
+          "#3A3A3A"
         ]
       },
       "cornerRadius": 8
@@ -272,7 +251,7 @@
       "background": {
         "type": "fill",
         "value": [
-          "#00FF00"
+          "#FFFFFF"
         ]
       },
       "font": {
@@ -282,11 +261,38 @@
       "foreground": {
         "type": "fill",
         "value": [
-          "#0000FF"
+          "#FFFFFF"
         ]
       }
     },
     "buttonBar": {
+      "badge": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#fdd42b"
+            ]
+          },
+          "borderWidth": 1,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#fdd42b"
+            ]
+          }
+        },
+        "font": {
+          "size": 12,
+          "style": "bold"
+        },
+        "fontColor": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
+        }
+      },
       "chatButton": {
         "active": {
           "background": {
@@ -399,7 +405,7 @@
           "imageColor": {
             "type": "fill",
             "value": [
-              "#FF00FF"
+              "#FFFFFF"
             ]
           },
           "title": {
@@ -793,6 +799,269 @@
         }
       }
     },
+    "operator": {
+      "alignment": "center",
+      "background": {
+        "type": "fill",
+        "value": [
+          "#FFFFFF"
+        ]
+      },
+      "font": {
+        "size": 24,
+        "style": "regular"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#FFFFFF"
+        ]
+      }
+    },
+    "connect": {
+      "connected": {
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 24,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "description": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 18,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        }
+      },
+      "connecting": {
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 24,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "description": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 18,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        }
+      },
+      "onHold": {
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 24,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#8E8E93"
+            ]
+          }
+        },
+        "description": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 18,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#8E8E93"
+            ]
+          }
+        }
+      },
+      "operator": {
+        "image": {
+          "placeholderColor": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          },
+          "placeholderBackgroundColor": {
+            "type": "fill",
+            "value": [
+              "#f9d12b"
+            ]
+          },
+          "imageBackgroundColor": {
+            "type": "fill",
+            "value": [
+              "#f9d12b"
+            ]
+          }
+        },
+        "animationColor": {
+          "type": "fill",
+          "value": [
+            "#f9d12b"
+          ]
+        },
+        "onHoldOverlay": {
+          "backgroundColor": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          },
+          "tintColor": {
+            "type": "fill",
+            "value": [
+              "#f9d12b"
+            ]
+          }
+        }
+      },
+      "queue": {
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 24,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "description": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 18,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        }
+      },
+      "transferring": {
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 24,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "description": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 18,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        }
+      }
+    },
     "duration": {
       "alignment": "center",
       "background": {
@@ -808,7 +1077,7 @@
       "foreground": {
         "type": "fill",
         "value": [
-          "#000000"
+          "#FFFFFF"
         ]
       }
     },
@@ -825,7 +1094,7 @@
           "color": {
             "type": "fill",
             "value": [
-              "#FFFFFF"
+              "#000000"
             ]
           },
           "cornerRadius": 8
@@ -856,7 +1125,7 @@
           "foreground": {
             "type": "fill",
             "value": [
-              "#FFFFFF"
+              "#000000"
             ]
           }
         },
@@ -878,7 +1147,7 @@
         "color": {
           "type": "fill",
           "value": [
-            "#fdd42b"
+            "#f9d12b"
           ]
         },
         "cornerRadius": 8
@@ -920,7 +1189,7 @@
             ]
           },
           "font": {
-            "size": 24,
+            "size": 16,
             "style": "regular"
           },
           "foreground": {
@@ -987,7 +1256,7 @@
         "tintColor": {
           "type": "fill",
           "value": [
-            "#2596be"
+            "#3e95a6"
           ]
         }
       },
@@ -1041,7 +1310,7 @@
         "tintColor": {
           "type": "fill",
           "value": [
-            "#2596be"
+            "#FFFFFF"
           ]
         }
       },
@@ -1054,8 +1323,8 @@
           ]
         },
         "font": {
-          "size": 24,
-          "style": "bold"
+          "size": 20,
+          "style": "regular"
         },
         "foreground": {
           "type": "fill",
@@ -1065,31 +1334,12 @@
         }
       }
     },
-    "callOperator": {
-      "alignment": "center",
-      "background": {
-        "type": "fill",
-        "value": [
-          "#FFFFFF"
-        ]
-      },
-      "font": {
-        "size": 12,
-        "style": "regular"
-      },
-      "foreground": {
-        "type": "fill",
-        "value": [
-          "#FFFFFF"
-        ]
-      }
-    },
     "topText": {
       "alignment": "center",
       "background": {
         "type": "fill",
         "value": [
-          "#0000FF"
+          "#FFFFFF"
         ]
       },
       "font": {
@@ -1099,7 +1349,7 @@
       "foreground": {
         "type": "fill",
         "value": [
-          "#0000FF"
+          "#FFFFFF"
         ]
       }
     }
@@ -1124,14 +1374,14 @@
             "foreground": {
               "type": "fill",
               "value": [
-                "#3333ff"
+                "#04728c"
               ]
             }
           },
           "tintColor": {
             "type": "fill",
             "value": [
-              "#3333ff"
+              "#04728c"
             ]
           }
         },
@@ -1152,14 +1402,14 @@
             "foreground": {
               "type": "fill",
               "value": [
-                "#66ff99"
+                "#04728c"
               ]
             }
           },
           "tintColor": {
             "type": "fill",
             "value": [
-              "#66ff99"
+              "#04728c"
             ]
           }
         },
@@ -1180,14 +1430,14 @@
             "foreground": {
               "type": "fill",
               "value": [
-                "#ff33cc"
+                "#04728c"
               ]
             }
           },
           "tintColor": {
             "type": "fill",
             "value": [
-              "#ff33cc"
+              "#04728c"
             ]
           }
         }
@@ -1195,13 +1445,13 @@
       "separator": {
         "type": "fill",
         "value": [
-          "#2596be"
+          "#04728c"
         ]
       },
       "background": {
         "type": "fill",
         "value": [
-          "#f9e5a0"
+          "#FAFAFA"
         ]
       }
     },
@@ -1210,17 +1460,17 @@
         "border": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#04728c"
           ]
         },
-        "borderWidth": 2,
         "color": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#88fdd42b"
           ]
         },
-        "cornerRadius": 0
+        "cornerRadius": 8,
+        "borderWidth": 1
       },
       "description": {
         "alignment": "center",
@@ -1237,14 +1487,14 @@
         "foreground": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#111111"
           ]
         }
       },
       "iconColor": {
         "type": "fill",
         "value": [
-          "#FFFFFF"
+          "#04728c"
         ]
       },
       "text": {
@@ -1284,78 +1534,66 @@
       "cornerRadius": 16
     },
     "bubble": {
-      "userImage": {
-        "placeholderColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
-        },
-        "placeholderBackgroundColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
-        },
-        "imageBackgroundColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
-        }
-      },
       "badge": {
         "background": {
           "border": {
             "type": "fill",
             "value": [
-              "#FFFFFF"
+              "#fdd42b"
             ]
           },
+          "borderWidth": 1,
           "color": {
             "type": "fill",
             "value": [
-              "#8E8E93"
-            ]
-          },
-          "cornerRadius": 5,
-          "borderWidth": 0
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "offset": 0,
-          "opacity": 1,
-          "radius": 5
-        },
-        "text": {
-          "font": {
-            "size": 18,
-            "style": "bold"
-          },
-          "foreground": {
-            "type": "fill",
-            "value": [
-              "#8E8E93"
+              "#04728c"
             ]
           }
         },
-        "tintColor": {
+        "font": {
+          "size": 12,
+          "style": "bold"
+        },
+        "fontColor": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#fdd42b"
           ]
         }
       },
       "onHoldOverlay": {
-        "type": "fill",
-        "value": [
-          "#8E8E93"
-        ]
+        "backgroundColor": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#ffd100"
+          ]
+        }
+      },
+      "userImage": {
+        "imageBackgroundColor": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
+        },
+        "placeholderBackgroundColor": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
+        },
+        "placeholderColor": {
+          "type": "fill",
+          "value": [
+            "#fdd42b"
+          ]
+        }
       }
     },
     "connect": {
@@ -1369,8 +1607,8 @@
             ]
           },
           "font": {
-            "size": 18,
-            "style": "regular"
+            "size": 24,
+            "style": "bold"
           },
           "foreground": {
             "type": "fill",
@@ -1397,12 +1635,6 @@
               "#8E8E93"
             ]
           }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#f9d12b"
-          ]
         }
       },
       "connecting": {
@@ -1415,8 +1647,8 @@
             ]
           },
           "font": {
-            "size": 18,
-            "style": "regular"
+            "size": 24,
+            "style": "bold"
           },
           "foreground": {
             "type": "fill",
@@ -1443,12 +1675,6 @@
               "#8E8E93"
             ]
           }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#f9d12b"
-          ]
         }
       },
       "onHold": {
@@ -1461,8 +1687,8 @@
             ]
           },
           "font": {
-            "size": 18,
-            "style": "regular"
+            "size": 24,
+            "style": "bold"
           },
           "foreground": {
             "type": "fill",
@@ -1489,12 +1715,6 @@
               "#8E8E93"
             ]
           }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#f9d12b"
-          ]
         }
       },
       "operator": {
@@ -1508,27 +1728,35 @@
           "placeholderBackgroundColor": {
             "type": "fill",
             "value": [
-              "#8E8E93"
+              "#04728c"
             ]
           },
           "imageBackgroundColor": {
             "type": "fill",
             "value": [
-              "#8E8E93"
+              "#04728c"
             ]
           }
         },
         "animationColor": {
           "type": "fill",
           "value": [
-            "#8E8E93"
+            "#04728c"
           ]
         },
-        "overlayColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
+        "onHoldOverlay": {
+          "backgroundColor": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          },
+          "tintColor": {
+            "type": "fill",
+            "value": [
+              "#f9d12b"
+            ]
+          }
         }
       },
       "queue": {
@@ -1541,8 +1769,8 @@
             ]
           },
           "font": {
-            "size": 18,
-            "style": "regular"
+            "size": 24,
+            "style": "bold"
           },
           "foreground": {
             "type": "fill",
@@ -1569,12 +1797,6 @@
               "#8E8E93"
             ]
           }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#f9d12b"
-          ]
         }
       },
       "transferring": {
@@ -1587,8 +1809,8 @@
             ]
           },
           "font": {
-            "size": 18,
-            "style": "regular"
+            "size": 24,
+            "style": "bold"
           },
           "foreground": {
             "type": "fill",
@@ -1615,12 +1837,6 @@
               "#8E8E93"
             ]
           }
-        },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#f9d12b"
-          ]
         }
       }
     },
@@ -2246,7 +2462,6 @@
       }
     },
     "operatorMessage": {
-      "alignment": "center",
       "background": {
         "border": {
           "type": "fill",
@@ -2327,13 +2542,13 @@
         "border": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#04728c"
           ]
         },
         "color": {
           "type": "fill",
           "value": [
-            "#bf8040"
+            "#8878e1e1"
           ]
         },
         "cornerRadius": 8,
@@ -2345,17 +2560,17 @@
             "border": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "#04728c"
               ]
             },
+            "borderWidth": 1,
             "color": {
               "type": "fill",
               "value": [
-                "#8E8E93"
+                "#FFFFFF"
               ]
             },
-            "cornerRadius":0,
-            "borderWidth":0
+            "cornerRadius": 8
           },
           "shadow": {
             "color": {
@@ -2366,31 +2581,31 @@
             },
             "offset": 0,
             "opacity": 1,
-            "radius": 5
+            "radius": 8
           },
           "text": {
             "alignment": "center",
             "background": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "FF0000"
               ]
             },
             "font": {
-              "size": 18,
-              "style": "bold"
+              "size": 16,
+              "style": "regular"
             },
             "foreground": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "#000000"
               ]
             }
           },
           "tintColor": {
             "type": "fill",
             "value": [
-              "#FFFFFF"
+              "#ffd100"
             ]
           }
         },
@@ -2399,17 +2614,17 @@
             "border": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "#04728c"
               ]
             },
+            "borderWidth": 1,
             "color": {
               "type": "fill",
               "value": [
-                "#8E8E93"
+                "#04728c"
               ]
             },
-            "cornerRadius":0,
-            "borderWidth":0
+            "cornerRadius": 8
           },
           "shadow": {
             "color": {
@@ -2420,19 +2635,19 @@
             },
             "offset": 0,
             "opacity": 1,
-            "radius": 5
+            "radius": 8
           },
           "text": {
             "alignment": "center",
             "background": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "FF0000"
               ]
             },
             "font": {
-              "size": 18,
-              "style": "bold"
+              "size": 16,
+              "style": "regular"
             },
             "foreground": {
               "type": "fill",
@@ -2453,17 +2668,17 @@
             "border": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "#66000000"
               ]
             },
+            "borderWidth": 1,
             "color": {
               "type": "fill",
               "value": [
-                "#8E8E93"
+                "#FFFFFF"
               ]
             },
-            "cornerRadius":0,
-            "borderWidth":0
+            "cornerRadius": 8
           },
           "shadow": {
             "color": {
@@ -2474,31 +2689,31 @@
             },
             "offset": 0,
             "opacity": 1,
-            "radius": 5
+            "radius": 8
           },
           "text": {
             "alignment": "center",
             "background": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "FF0000"
               ]
             },
             "font": {
-              "size": 18,
-              "style": "bold"
+              "size": 16,
+              "style": "regular"
             },
             "foreground": {
               "type": "fill",
               "value": [
-                "#FFFFFF"
+                "#66000000"
               ]
             }
           },
           "tintColor": {
             "type": "fill",
             "value": [
-              "#FFFFFF"
+              "#ffd100"
             ]
           }
         }
@@ -2512,13 +2727,13 @@
           ]
         },
         "font": {
-          "size": 12,
+          "size": 16,
           "style": "bold"
         },
         "foreground": {
           "type": "fill",
           "value": [
-            "#8E8E93"
+            "#88000000"
           ]
         }
       },
@@ -2550,85 +2765,74 @@
       ]
     },
     "unreadIndicator": {
-      "userImage": {
-        "placeholderColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
-        },
-        "placeholderBackgroundColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
-        },
-        "imageBackgroundColor": {
-          "type": "fill",
-          "value": [
-            "#8E8E93"
-          ]
-        }
+      "backgroundColor": {
+        "type": "fill",
+        "value": [
+          "#04728c"
+        ]
       },
-      "badge": {
-        "background": {
-          "border": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "borderWidth": 0,
-          "color": {
-            "type": "fill",
-            "value": [
-              "#8E8E93"
-            ]
-          },
-          "cornerRadius": 0
-        },
-        "shadow": {
-          "color": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
-          },
-          "offset": 0,
-          "opacity": 1,
-          "radius": 5
-        },
-        "text": {
-          "alignment": "center",
+      "bubble": {
+        "badge": {
           "background": {
-            "type": "fill",
-            "value": [
-              "#FFFFFF"
-            ]
+            "border": {
+              "type": "fill",
+              "value": [
+                "#fdd42b"
+              ]
+            },
+            "borderWidth": 1,
+            "color": {
+              "type": "fill",
+              "value": [
+                "#04728c"
+              ]
+            }
           },
           "font": {
-            "size": 18,
+            "size": 12,
             "style": "bold"
           },
-          "foreground": {
+          "fontColor": {
             "type": "fill",
             "value": [
-              "#8E8E93"
+              "#fdd42b"
             ]
           }
         },
-        "tintColor": {
-          "type": "fill",
-          "value": [
-            "#FFFFFF"
-          ]
+        "onHoldOverlay": {
+          "backgroundColor": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          },
+          "tintColor": {
+            "type": "fill",
+            "value": [
+              "#ffd100"
+            ]
+          }
+        },
+        "userImage": {
+          "imageBackgroundColor": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          },
+          "placeholderBackgroundColor": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          },
+          "placeholderColor": {
+            "type": "fill",
+            "value": [
+              "#fdd42b"
+            ]
+          }
         }
-      },
-      "onHoldOverlay": {
-        "type": "fill",
-        "value": [
-          "#8E8E93"
-        ]
       }
     },
     "videoUpgrade": {
@@ -2636,17 +2840,17 @@
         "border": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#04728c"
           ]
         },
-        "borderWidth": 2,
         "color": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#88fdd42b"
           ]
         },
-        "cornerRadius": 0
+        "cornerRadius": 8,
+        "borderWidth": 1
       },
       "description": {
         "alignment": "center",
@@ -2663,14 +2867,14 @@
         "foreground": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#111111"
           ]
         }
       },
       "iconColor": {
         "type": "fill",
         "value": [
-          "#FFFFFF"
+          "#04728c"
         ]
       },
       "text": {
@@ -2694,7 +2898,6 @@
       }
     },
     "visitorMessage": {
-      "alignment": "center",
       "background": {
         "border": {
           "type": "fill",

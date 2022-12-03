@@ -130,6 +130,13 @@ internal fun View.applyLayerTheme(layer: LayerTheme?) {
 }
 
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
+    layer?.fill?.primaryColor?.also {
+        /*
+        when the card has opacity/alpha then shadow shapes inner part becomes visible,
+        so in this case we need to make elevation = 0 to prevent this behavior
+        */
+        if (Color.alpha(it) > 0) cardElevation = 0f
+    }
     layer?.fill?.primaryColor?.also(::setCardBackgroundColor)
     layer?.stroke?.also(::setStrokeColor)
     layer?.borderWidthInt?.also(::setStrokeWidth)

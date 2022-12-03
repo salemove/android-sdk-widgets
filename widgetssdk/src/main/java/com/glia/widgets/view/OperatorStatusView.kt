@@ -12,6 +12,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.OperatorStatusViewBinding
 import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.chat.OnHoldOverlayTheme
 import com.glia.widgets.view.unifiedui.theme.chat.OperatorTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.android.material.imageview.ShapeableImageView
@@ -128,11 +129,12 @@ class OperatorStatusView @JvmOverloads constructor(
     internal fun applyOperatorTheme(operatorTheme: OperatorTheme?) {
         applyUserImageTheme(operatorTheme?.image)
         applyRippleColorTheme(operatorTheme?.animationColor)
-        onHoldOverlayView.applyImageColorTheme(operatorTheme?.overlayColor)
+        applyOnHoldOverlayTheme(operatorTheme?.onHoldOverlay)
     }
 
-    internal fun applyPlaceHolderImageTheme(colorTheme: ColorTheme?) {
-        colorTheme?.also(placeholderView::applyImageColorTheme)
+    internal fun applyOnHoldOverlayTheme(onHoldOverlayTheme: OnHoldOverlayTheme?) {
+        onHoldOverlayView.applyImageColorTheme(onHoldOverlayTheme?.tintColor)
+        onHoldOverlayTheme?.backgroundColor?.primaryColorStateList?.also(onHoldOverlayView::setBackgroundTintList)
     }
 
     fun showTransferring() {

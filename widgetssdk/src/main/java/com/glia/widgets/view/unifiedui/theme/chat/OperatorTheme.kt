@@ -5,5 +5,5 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 internal data class OperatorTheme(
     val image: UserImageTheme?,
     val animationColor: ColorTheme?,
-    val overlayColor: ColorTheme?
+    val onHoldOverlay: OnHoldOverlayTheme?
 )

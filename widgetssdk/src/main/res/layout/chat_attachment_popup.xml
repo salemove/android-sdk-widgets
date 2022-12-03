@@ -4,7 +4,7 @@
     android:id="@+id/root_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:divider="@color/glia_separator_gray"
+    android:divider="@drawable/bg_separator_gray"
     android:orientation="vertical"
     android:showDividers="middle">
 

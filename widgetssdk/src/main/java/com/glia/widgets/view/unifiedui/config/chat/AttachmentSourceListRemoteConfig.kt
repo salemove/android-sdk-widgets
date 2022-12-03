@@ -16,13 +16,13 @@ internal data class AttachmentSourceListRemoteConfig(
     val items: List<AttachmentSourceRemoteConfig>?,
 ) {
 
-    val photoLibrary: AttachmentSourceRemoteConfig?
+    private val photoLibrary: AttachmentSourceRemoteConfig?
         get() = items?.firstOrNull { it.type == AttachmentSourceTypeRemoteConfig.PHOTO_LIBRARY }
 
-    val takePhoto: AttachmentSourceRemoteConfig?
+    private val takePhoto: AttachmentSourceRemoteConfig?
         get() = items?.firstOrNull { it.type == AttachmentSourceTypeRemoteConfig.TAKE_PHOTO }
 
-    val browse: AttachmentSourceRemoteConfig?
+    private val browse: AttachmentSourceRemoteConfig?
         get() = items?.firstOrNull { it.type == AttachmentSourceTypeRemoteConfig.BROWSE }
 
     fun toAttachmentsPopupTheme(): AttachmentsPopupTheme = AttachmentsPopupTheme(

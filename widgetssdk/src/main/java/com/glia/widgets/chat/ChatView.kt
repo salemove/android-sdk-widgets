@@ -455,19 +455,14 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     item.operatorProfileImgUrl,
                     isFileDownloaded,
                     item.isDownloading,
-                    item.operatorId
+                    item.operatorId,
+                    item.messageId,
+                    item.timestamp
                 )
             }
             is VisitorAttachmentItem -> {
                 val isFileDownloaded = FileHelper.isFileDownloaded(item.attachmentFile)
-                VisitorAttachmentItem(
-                    item.id,
-                    item.viewType,
-                    item.attachmentFile,
-                    isFileDownloaded,
-                    item.isDownloading,
-                    item.showDelivered
-                )
+                VisitorAttachmentItem.editDownloadedStatus(item, isFileDownloaded)
             }
             else -> {
                 item
@@ -1020,14 +1015,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     ): ChatItem {
         if (currentChatItem is VisitorAttachmentItem) {
             if (currentChatItem.attachmentFile.id == attachmentFile.id) {
-                return VisitorAttachmentItem(
-                    currentChatItem.id,
-                    currentChatItem.viewType,
-                    currentChatItem.attachmentFile,
-                    isFileExists,
-                    isDownloading,
-                    currentChatItem.showDelivered
-                )
+                return VisitorAttachmentItem.editFileStatuses(currentChatItem, isFileExists, isDownloading)
             }
         } else if (currentChatItem is OperatorAttachmentItem) {
             if (currentChatItem.attachmentFile.id == attachmentFile.id) {
@@ -1039,7 +1027,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     currentChatItem.operatorProfileImgUrl,
                     isFileExists,
                     isDownloading,
-                    currentChatItem.operatorId
+                    currentChatItem.operatorId,
+                    currentChatItem.messageId,
+                    currentChatItem.timestamp
                 )
             }
         }

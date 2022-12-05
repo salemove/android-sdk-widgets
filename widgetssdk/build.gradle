@@ -54,9 +54,10 @@ dependencies {
     // https://square.github.io/leakcanary/changelog/
     // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 
-    api "com.glia:android-sdk:$gliaSdkVersion"
+//    api "com.glia:android-sdk:$gliaSdkVersion"
     // Glia sdk aar
     // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
+    api "com.glia:android-sdk:0.26.4-SNAPSHOT"
 
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation "com.google.code.gson:gson:$gson"

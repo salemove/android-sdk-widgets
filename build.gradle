@@ -20,6 +20,7 @@ allprojects {
         flatDir {
             dirs '../libs'
         }
+        maven { url '/Users/aleksandr.chatsky/Projects/glia-android-sdk/build/maven_repo' }
     }
 }
 

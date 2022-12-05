@@ -6,15 +6,15 @@ import com.glia.widgets.chat.adapter.ChatAdapter;
 
 import java.util.Objects;
 
-public class VisitorMessageItem extends ChatItem {
+public class VisitorMessageItem extends ParticipantMessageChatItem {
     public final static String HISTORY_ID = "history_id";
     public final static String CARD_RESPONSE_ID = "card_response_id";
     public final static String UNSENT_MESSAGE_ID = "unsent_message_id";
     private final boolean showDelivered;
     private final String message;
 
-    public VisitorMessageItem(String id, boolean showDelivered, String message) {
-        super(id, ChatAdapter.VISITOR_MESSAGE_TYPE);
+    public VisitorMessageItem(String id, boolean showDelivered, String message, String messageId) {
+        super(id, ChatAdapter.VISITOR_MESSAGE_TYPE, messageId);
         this.showDelivered = showDelivered;
         this.message = message;
     }

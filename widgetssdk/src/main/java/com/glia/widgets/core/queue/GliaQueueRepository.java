@@ -150,9 +150,9 @@ public class GliaQueueRepository {
     @NonNull
     public RequestCallback<QueueTicket> emitOnQueueTicketChangeToUnstaffed(CompletableEmitter emitter) {
         return (queueTicket, e) -> {
-            if (queueTicket.getState() == QueueTicket.State.UNSTAFFED) {
-                emitter.onComplete();
-            }
+//            if (queueTicket.getState() == QueueTicket.State.UNSTAFFED) {
+//                emitter.onComplete();
+//            }
         };
     }
 

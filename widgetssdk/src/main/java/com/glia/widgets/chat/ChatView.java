@@ -643,7 +643,8 @@ public class ChatView extends ConstraintLayout implements
                     oldItem.operatorProfileImgUrl,
                     isFileDownloaded,
                     oldItem.isDownloading,
-                    oldItem.operatorId
+                    oldItem.operatorId,
+                    oldItem.getMessageId()
             );
         } else if (item instanceof VisitorAttachmentItem) {
             VisitorAttachmentItem oldItem = (VisitorAttachmentItem) item;
@@ -1332,7 +1333,8 @@ public class ChatView extends ConstraintLayout implements
                         currentItem.operatorProfileImgUrl,
                         isFileExists,
                         isDownloading,
-                        currentItem.operatorId);
+                        currentItem.operatorId,
+                        currentItem.getMessageId());
             }
         }
         return currentChatItem;

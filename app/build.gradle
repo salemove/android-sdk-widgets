@@ -80,6 +80,7 @@ android {
                 'WrongViewIdFormat',
                 'HardcodedText'
     }
+    namespace 'com.glia.exampleapp'
 }
 
 dependencies {

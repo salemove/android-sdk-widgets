@@ -65,8 +65,8 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
-import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
+import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
 import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.io.File
@@ -1164,10 +1164,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         inputTheme.placeholder?.textColor?.primaryColor?.also(binding.chatEditText::setHintTextColor)
     }
 
-    private fun applyUnreadMessagesTheme(bubbleTheme: BubbleTheme) {
-        bubbleTheme.badge?.also(binding.newMessagesBadgeView::applyBadgeTheme)
-        bubbleTheme.userImage?.also(binding.newMessagesIndicatorImage::applyUserImageTheme)
-        bubbleTheme.userImage?.imageBackgroundColor?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
+    private fun applyUnreadMessagesTheme(unreadIndicatorTheme: UnreadIndicatorTheme) {
+        unreadIndicatorTheme.bubble?.badge?.also(binding.newMessagesBadgeView::applyBadgeTheme)
+        unreadIndicatorTheme.bubble?.userImage?.also(binding.newMessagesIndicatorImage::applyUserImageTheme)
+        unreadIndicatorTheme.background?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
     }
 
 }

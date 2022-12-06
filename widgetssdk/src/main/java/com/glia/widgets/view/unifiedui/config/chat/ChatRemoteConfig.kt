@@ -42,7 +42,7 @@ internal data class ChatRemoteConfig(
     val attachmentSourceListRemoteConfig: AttachmentSourceListRemoteConfig?,
 
     @SerializedName("unreadIndicator")
-    val unreadIndicator: BubbleRemoteConfig?,
+    val unreadIndicator: UnreadIndicatorRemoteConfig?,
 
     @SerializedName("typingIndicator")
     val typingIndicator: ColorLayerRemoteConfig?
@@ -59,7 +59,7 @@ internal data class ChatRemoteConfig(
         videoUpgrade = videoUpgradeRemoteConfig?.toUpgradeTheme(),
         bubble = bubbleRemoteConfig?.toBubbleTheme(),
         attachmentsPopup = attachmentSourceListRemoteConfig?.toAttachmentsPopupTheme(),
-        unreadIndicator = unreadIndicator?.toBubbleTheme(),
+        unreadIndicator = unreadIndicator?.toUnreadIndicatorTheme(),
         typingIndicator = typingIndicator?.toColorTheme()
     )
 }

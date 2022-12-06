@@ -111,7 +111,10 @@ class ChatHeadView @JvmOverloads constructor(
 
     private fun applyBubbleTheme() {
         bubbleTheme?.badge?.also(binding.chatBubbleBadge::applyBadgeTheme)
-        bubbleTheme?.onHoldOverlay.also(binding.onHoldIcon::applyImageColorTheme)
+        bubbleTheme?.onHoldOverlay?.also {
+            it.tintColor.also(binding.onHoldIcon::applyImageColorTheme)
+            it.backgroundColor?.primaryColorStateList?.also(binding.onHoldIcon::setBackgroundTintList)
+        }
         bubbleTheme?.userImage?.also(::applyUserImageTheme)
     }
 

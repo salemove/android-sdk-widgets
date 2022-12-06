@@ -47,6 +47,7 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.OperatorStatusView
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
+import com.glia.widgets.view.head.BadgeTextView
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.exstensions.*
@@ -92,7 +93,7 @@ internal class CallView(
     private val speakerButton: FloatingActionButton get() = callButtonsLayoutBinding.speakerButton
     private val minimizeButton: FloatingActionButton get() = callButtonsLayoutBinding.minimizeButton
     private val chatButton: FloatingActionButton get() = callButtonsLayoutBinding.chatButton
-    private val chatButtonBadgeView: TextView get() = callButtonsLayoutBinding.chatButtonBadge
+    private val chatButtonBadgeView: BadgeTextView get() = callButtonsLayoutBinding.chatButtonBadge
     private val buttonsLayoutBackground: View get() = binding.buttonsLayoutBg
     private val buttonsLayout: View get() = callButtonsLayoutBinding.root
     //    ---------------------------------------
@@ -504,6 +505,9 @@ internal class CallView(
         muteButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.muteButton)
         speakerButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.speakerButton)
         minimizeButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.minimizeButton)
+
+        //Badge
+        chatButtonBadgeView.applyBadgeTheme(callTheme?.buttonBar?.badge)
 
         //Texts
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)

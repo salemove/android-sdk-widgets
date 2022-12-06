@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.Typeface
 import android.text.InputType
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.Gravity
 import com.glia.widgets.R
 import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyShadow
 import com.glia.widgets.view.unifiedui.exstensions.applyTextColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.BadgeTheme
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
@@ -53,12 +55,12 @@ class BadgeTextView @JvmOverloads constructor(context: Context, attrs: Attribute
         setMeasuredDimension(size, size)
     }
 
-    internal fun applyBadgeTheme(theme: ButtonTheme?) {
+    internal fun applyBadgeTheme(theme: BadgeTheme?) {
         theme?.apply {
             background?.also(::applyLayerTheme)
-            text?.textColor.also(::applyTextColorTheme)
-            text?.textStyle?.also { typeface = Typeface.create(typeface, it) }
-            shadowColor?.also(::applyShadow)
+            textColor.also(::applyTextColorTheme)
+            textStyle?.also { typeface = Typeface.create(typeface, it) }
+            textSize?.also { setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
         }
     }
 

@@ -2,7 +2,8 @@ package com.glia.widgets.view.unifiedui.config.chat
 
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.FontRemoteConfig
-import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
+import com.glia.widgets.view.unifiedui.theme.base.BadgeTheme
 import com.google.gson.annotations.SerializedName
 
 internal data class BadgeRemoteConfig(
@@ -12,15 +13,14 @@ internal data class BadgeRemoteConfig(
     @SerializedName("fontColor")
     val fontColor: ColorLayerRemoteConfig?,
 
-    @SerializedName("backgroundColor")
-    val backgroundColor: ColorLayerRemoteConfig?,
+    @SerializedName("background")
+    val background: LayerRemoteConfig?,
 ) {
 
-    fun toTextTheme() = TextTheme(
+    fun toBadgeTheme() = BadgeTheme(
         textColor = fontColor?.toColorTheme(),
-        backgroundColor = backgroundColor?.toColorTheme(),
+        background = background?.toLayerTheme(),
         textSize = fontRemoteConfig?.size?.value,
         textStyle = fontRemoteConfig?.style?.style,
-        textAlignment = null
     )
 }

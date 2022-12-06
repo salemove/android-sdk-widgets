@@ -71,6 +71,7 @@
     <string name="main_launch_fragment">Launch Chat in Fragment</string>
     <string name="main_start_in_integrator_app">Start Chat in integrator app</string>
     <string name="main_start_chat_flow">Start new chat flow</string>
+    <string name="main_start_message_center_flow">Start new messaging flow</string>
     <string name="main_start_audio_call">Start new audio call</string>
     <string name="main_start_video_call">Start new video call</string>
     <string name="main_end_engagement">End engagement</string>

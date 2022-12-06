@@ -30,6 +30,10 @@
             android:launchMode="singleTop"
             android:theme="@style/Application.Glia.Translucent.Activity"
             android:windowSoftInputMode="stateHidden" />
+        <activity android:name="com.glia.widgets.messagecenter.MessageCenterActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Application.Glia.Chat.Activity"
+            android:windowSoftInputMode="adjustResize" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

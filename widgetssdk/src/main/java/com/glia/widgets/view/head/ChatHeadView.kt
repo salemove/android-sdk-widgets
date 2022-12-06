@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.util.AttributeSet
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.AccessibilityDelegateCompat
@@ -33,23 +31,17 @@ class ChatHeadView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.gliaChatStyle,
     defStyleRes: Int = R.style.Application_Glia_Chat
-) : ConstraintLayout(
-    /*ContextThemeWrapper modifies the given Context's theme with the one you specify in the constructor.
-    Since a Service doesn't really have a theme, it just tacks yours onto the Service's Context.
-    Otherwise this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.*/
-    ContextThemeWrapper(context, R.style.Application_Glia_Chat),
-    attrs,
-    defStyleAttr,
-    defStyleRes
-), ChatHeadContract.View {
-    private val binding by lazy { ChatHeadViewBinding.inflate(LayoutInflater.from(context), this) }
+) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), ChatHeadContract.View {
+    private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
 
     private var sdkConfiguration: GliaSdkConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
 
+    private val isService by lazy { context is Service }
+
     private val bubbleTheme: BubbleTheme?
         get() = Dependencies.getGliaThemeManager().theme?.run {
-            if (context is Service) bubbleTheme else chatTheme?.bubble
+            if (isService) bubbleTheme else chatTheme?.bubble
         }
 
     init {
@@ -118,8 +110,11 @@ class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun applyBubbleTheme() {
-        bubbleTheme?.badge?.text?.also(binding.chatBubbleBadge::applyTextTheme)
-        bubbleTheme?.onHoldOverlay.also(binding.onHoldIcon::applyImageColorTheme)
+        bubbleTheme?.badge?.also(binding.chatBubbleBadge::applyBadgeTheme)
+        bubbleTheme?.onHoldOverlay?.also {
+            it.tintColor.also(binding.onHoldIcon::applyImageColorTheme)
+            it.backgroundColor?.primaryColorStateList?.also(binding.onHoldIcon::setBackgroundTintList)
+        }
         bubbleTheme?.userImage?.also(::applyUserImageTheme)
     }
 

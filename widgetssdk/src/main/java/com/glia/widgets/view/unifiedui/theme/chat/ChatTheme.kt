@@ -17,6 +17,6 @@ internal data class ChatTheme(
     val videoUpgrade: UpgradeTheme?,
     val bubble: BubbleTheme?,
     val attachmentsPopup: AttachmentsPopupTheme?,
-    val unreadIndicator: BubbleTheme?,
+    val unreadIndicator: UnreadIndicatorTheme?,
     val typingIndicator: ColorTheme?
 )

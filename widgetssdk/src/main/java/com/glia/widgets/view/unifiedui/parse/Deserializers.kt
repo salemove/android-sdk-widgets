@@ -12,8 +12,7 @@ import com.glia.widgets.view.unifiedui.parse.TextStyleDeserializer.Companion.ITA
 import com.glia.widgets.view.unifiedui.parse.TextStyleDeserializer.Companion.REGULAR
 import com.google.gson.*
 import java.lang.reflect.Type
-
-internal typealias SystemColor = android.graphics.Color
+import android.graphics.Color as SystemColor
 
 private const val TAG = "UnifiedUi:Deserializers"
 
@@ -40,7 +39,7 @@ internal class AlignmentDeserializer : JsonDeserializer<AlignmentTypeRemoteConfi
 }
 
 /**
- * Json deserializer for ARGB color, will return [null] if color is not valid and [ColorRemoteConfig] for other cases
+ * Json deserializer for ARGB color, will return `null` if color is not valid and [ColorRemoteConfig] for other cases
  */
 internal class ColorDeserializer : JsonDeserializer<ColorRemoteConfig?> {
 
@@ -67,7 +66,7 @@ internal class ColorDeserializer : JsonDeserializer<ColorRemoteConfig?> {
  *
  * to [ColorLayerRemoteConfig]
  *
- * will return [null] if "value" property is missing or empty
+ * will return `null` if "value" property is missing or empty
  * will change [ColorLayerRemoteConfig.type] to [ColorTypeRemoteConfig.FILL] if "value" property contains single color.
  *
  * @see ColorLayerDeserializer

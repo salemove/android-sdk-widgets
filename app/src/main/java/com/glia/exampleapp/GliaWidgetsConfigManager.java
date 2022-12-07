@@ -1,7 +1,6 @@
 package com.glia.exampleapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
@@ -10,7 +9,6 @@ import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.SiteApiKey;
 import com.glia.widgets.GliaWidgetsConfig;
-import com.glia.widgets.view.unifiedui.exstensions.TempconfigKt;
 
 /**
  *Helper class to obtain Glia Config params from deep-link or preferences.
@@ -97,7 +95,6 @@ public class GliaWidgetsConfigManager {
                 .setSiteId(data.getQueryParameter(SITE_ID_KEY))
                 .setRegion(REGION_ACCEPTANCE)
                 .setContext(applicationContext)
-                .setUiJsonRemoteConfig(TempconfigKt.readRaw(applicationContext, R.raw.remote_config)) //TODO Temporary. Ticket - Ticket - https://glia.atlassian.net/browse/MOB-1657
                 .build();
     }
 
@@ -117,7 +114,6 @@ public class GliaWidgetsConfigManager {
                 .setSiteId(siteId)
                 .setRegion(REGION_BETA)
                 .setContext(applicationContext)
-                .setUiJsonRemoteConfig(TempconfigKt.readRaw(applicationContext, R.raw.remote_config)) //TODO Temporary. Ticket - Ticket - https://glia.atlassian.net/browse/MOB-1657
                 .build();
     }
 

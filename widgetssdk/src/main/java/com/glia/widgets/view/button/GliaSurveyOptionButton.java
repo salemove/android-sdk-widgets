@@ -32,6 +32,10 @@ public class GliaSurveyOptionButton extends BaseConfigurableButton {
         applyView();
     }
 
+    public boolean isError() {
+        return isError;
+    }
+
     @Override
     public void setSelected(boolean selected) {
         super.setSelected(selected);

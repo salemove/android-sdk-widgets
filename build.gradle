@@ -60,5 +60,5 @@ ext {
     archCoreVersion = '2.1.0'
 
     //kotlin
-    coreKtxVersion = '1.9.0'
+    coreKtxVersion = '1.8.0'
 }

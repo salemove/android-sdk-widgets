@@ -39,7 +39,7 @@
         app:layout_constraintVertical_bias="0.350"
         app:rippleTint="@color/glia_base_light_color" />
 
-    <TextView
+    <com.glia.widgets.call.ThemedStateText
         android:id="@+id/connecting_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/operator_status_view" />
 
-    <TextView
+    <com.glia.widgets.call.ThemedStateText
         android:id="@+id/operator_name_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
         app:layout_constraintTop_toBottomOf="@id/operator_status_view"
         app:layout_goneMarginTop="@dimen/glia_call_operator_name_gone_margin_top" />
 
-    <TextView
+    <com.glia.widgets.call.ThemedStateText
         android:id="@+id/on_hold_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/company_name_view" />
 
-    <TextView
+    <com.glia.widgets.call.ThemedStateText
         android:id="@+id/call_timer_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

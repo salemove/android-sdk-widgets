@@ -8,6 +8,7 @@ import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ResourceProvider;
 
+@Deprecated
 public class LayerConfiguration implements Parcelable {
     // Background hex color.
     private String backgroundColor;
@@ -41,6 +42,7 @@ public class LayerConfiguration implements Parcelable {
         return cornerRadius;
     }
 
+    @Deprecated
     public static class Builder {
         // Background hex color.
         private String backgroundColor;

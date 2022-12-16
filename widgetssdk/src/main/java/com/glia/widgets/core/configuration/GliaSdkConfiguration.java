@@ -5,6 +5,7 @@ import android.content.Intent;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.view.unifiedui.config.RemoteConfiguration;
 
 public class GliaSdkConfiguration {
 
@@ -17,6 +18,7 @@ public class GliaSdkConfiguration {
     private final String contextAssetId;
     @Deprecated
     private final String contextUrl;
+    private final RemoteConfiguration remoteConfiguration;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
@@ -38,6 +40,10 @@ public class GliaSdkConfiguration {
         return this.contextAssetId;
     }
 
+    public RemoteConfiguration getRemoteConfiguration() {
+        return remoteConfiguration;
+    }
+
     public UiTheme getRunTimeTheme() {
         return this.runTimeTheme;
     }
@@ -56,6 +62,7 @@ public class GliaSdkConfiguration {
         private String contextAssetId;
         @Deprecated
         private String contextUrl;
+        private RemoteConfiguration remoteConfiguration;
         private UiTheme runTimeTheme;
         private boolean useOverlay;
         private ScreenSharing.Mode screenSharingMode;
@@ -99,6 +106,7 @@ public class GliaSdkConfiguration {
         public Builder intent(Intent intent) {
             this.companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
             this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
+            this.remoteConfiguration = intent.getParcelableExtra(GliaWidgets.REMOTE_CONFIGURATION);
             this.runTimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
             this.contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID);
             this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
@@ -118,6 +126,7 @@ public class GliaSdkConfiguration {
         this.queueId = builder.queueId;
         this.contextAssetId = builder.contextAssetId;
         this.contextUrl = builder.contextUrl;
+        this.remoteConfiguration = builder.remoteConfiguration;
         this.runTimeTheme = builder.runTimeTheme;
         this.useOverlay = builder.useOverlay;
         this.screenSharingMode = builder.screenSharingMode;

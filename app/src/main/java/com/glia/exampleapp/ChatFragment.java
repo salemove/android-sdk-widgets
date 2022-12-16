@@ -50,7 +50,7 @@ public class ChatFragment extends Fragment {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         chatView = view.findViewById(R.id.chat_view);
         UiTheme theme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
-        chatView.setTheme(theme);
+        chatView.setUiTheme(theme);
         chatView.setOnEndListener(onEndListener);
         chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.startChat(

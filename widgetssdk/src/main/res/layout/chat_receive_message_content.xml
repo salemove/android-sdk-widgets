@@ -4,6 +4,8 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/glia_medium"
     android:autoLink="web|email|phone"
+    android:paddingHorizontal="@dimen/glia_large"
+    android:paddingVertical="@dimen/glia_medium"
     android:background="@drawable/bg_message"
     android:backgroundTint="?attr/gliaSystemAgentBubbleColor"
     android:textAppearance="?attr/textAppearanceBody1"

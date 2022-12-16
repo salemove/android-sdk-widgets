@@ -3,7 +3,7 @@ package com.glia.widgets.helper;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -13,6 +13,26 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.lang.ref.WeakReference;
+
+interface IResourceProvider {
+
+    String getString(@StringRes int id);
+
+    String getString(@StringRes int id, @Nullable Object... formatArgs);
+
+    @ColorInt
+    Integer getColor(@ColorRes int id);
+
+    ColorStateList getColorStateList(int id);
+
+    int getDimension(int dimensionId);
+
+    float convertDpToPixel(float dp);
+
+    float convertSpToPixel(float sp);
+
+    int convertDpToIntPixel(float dp);
+}
 
 public class ResourceProvider implements IResourceProvider {
 
@@ -49,23 +69,22 @@ public class ResourceProvider implements IResourceProvider {
     }
 
     @Override
-    public float convertDpToPixel(int dp) {
-        return dp * ((float) weakContext.get().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    public float convertDpToPixel(float dp) {
+        return applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, weakContext.get());
     }
-}
 
-interface IResourceProvider {
+    @Override
+    public int convertDpToIntPixel(float dp) {
+        return Math.round(convertDpToPixel(dp));
+    }
 
-    String getString(@StringRes int id);
+    @Override
+    public float convertSpToPixel(float sp) {
+        return applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, weakContext.get());
+    }
 
-    String getString(@StringRes int id, @Nullable Object... formatArgs);
+    private float applyDimension(int unit, float value, Context context) {
+        return TypedValue.applyDimension(unit, value, context.getResources().getDisplayMetrics());
+    }
 
-    @ColorInt
-    Integer getColor(@ColorRes int id);
-
-    ColorStateList getColorStateList(int id);
-
-    int getDimension(int dimensionId);
-
-    float convertDpToPixel(int dp);
 }

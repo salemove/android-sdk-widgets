@@ -218,4 +218,13 @@
     <!-- ChatHeadView -->
     <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
 
+    <!-- Message Center -->
+    <string name="message_center_screen_title">Messaging</string>
+    <string name="message_center_title">Welcome to Message Center</string>
+    <string name="message_center_description">Send a message and we\'ll get back to you \nwithin 48 hours</string>
+    <string name="message_center_message_title">Your message</string>
+    <string name="message_center_message_edit_text_hint">Enter your message</string>
+    <string name="message_center_check_messages_btn">Check messages</string>
+    <string name="message_center_send_message_btn">Send</string>
+
 </resources>

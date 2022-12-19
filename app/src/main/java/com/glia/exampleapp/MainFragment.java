@@ -35,6 +35,7 @@ import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.messagecenter.MessageCenterActivity;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
@@ -69,6 +70,8 @@ public class MainFragment extends Fragment {
                 navigateToCall(GliaWidgets.MEDIA_TYPE_AUDIO));
         view.findViewById(R.id.video_call_button).setOnClickListener(v ->
                 navigateToCall(GliaWidgets.MEDIA_TYPE_VIDEO));
+        view.findViewById(R.id.message_center_activity_button).setOnClickListener(v ->
+                navigateToMessageCenter());
         view.findViewById(R.id.end_engagement_button).setOnClickListener(v ->
                 GliaWidgets.endEngagement());
         view.findViewById(R.id.initGliaWidgetsButton).setOnClickListener(v ->
@@ -155,6 +158,12 @@ public class MainFragment extends Fragment {
 
     private void navigateToChat() {
         Intent intent = new Intent(requireContext(), ChatActivity.class);
+        setNavigationIntentData(intent);
+        startActivity(intent);
+    }
+
+    private void navigateToMessageCenter() {
+        Intent intent = new Intent(requireContext(), MessageCenterActivity.class);
         setNavigationIntentData(intent);
         startActivity(intent);
     }

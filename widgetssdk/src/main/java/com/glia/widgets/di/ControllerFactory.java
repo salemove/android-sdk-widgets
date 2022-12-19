@@ -10,6 +10,8 @@ import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
+import com.glia.widgets.messagecenter.MessageCenterContract;
+import com.glia.widgets.messagecenter.MessageCenterController;
 import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
@@ -263,5 +265,9 @@ public class ControllerFactory {
                 useCaseFactory.createIsShowVideoUseCase(),
                 useCaseFactory.createIsShowOnHoldUseCase()
         );
+    }
+
+    public MessageCenterContract.Controller getMessageCenterController() {
+        return new MessageCenterController();
     }
 }

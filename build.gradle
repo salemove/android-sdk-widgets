@@ -20,8 +20,6 @@ allprojects {
         flatDir {
             dirs '../libs'
         }
-        // Used in case when testing local Core SDK snapshot releases
-//        maven { url '/Users/aleksandr.chatsky/Projects/glia-android-sdk/build/maven_repo' }
     }
 }
 

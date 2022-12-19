@@ -6,11 +6,11 @@ import com.glia.androidsdk.chat.ChatMessage;
 
 import java.util.Objects;
 
-public class CustomCardItem extends ChatItem {
+public class CustomCardItem extends ParticipantMessageChatItem {
     private final ChatMessage message;
 
     public CustomCardItem(ChatMessage message, int viewType) {
-        super(message.getId(), viewType);
+        super(message.getId(), viewType, message.getId());
 
         this.message = message;
     }

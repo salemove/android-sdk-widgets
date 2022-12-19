@@ -7,7 +7,7 @@ import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
-public class VisitorAttachmentItem extends ChatItem {
+public class VisitorAttachmentItem extends ParticipantMessageChatItem {
 
     public final AttachmentFile attachmentFile;
     public final boolean isFileExists;
@@ -16,7 +16,7 @@ public class VisitorAttachmentItem extends ChatItem {
 
     public VisitorAttachmentItem(String chatItemId, int viewType, AttachmentFile attachmentFile,
                                  boolean isFileExists, boolean isDownloading, boolean showDelivered) {
-        super(chatItemId, viewType);
+        super(chatItemId, viewType, chatItemId);
         this.attachmentFile = attachmentFile;
         this.isFileExists = isFileExists;
         this.isDownloading = isDownloading;

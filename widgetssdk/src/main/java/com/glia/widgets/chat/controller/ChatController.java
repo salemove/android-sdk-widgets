@@ -800,7 +800,7 @@ public class ChatController implements
             items.remove(chatState.operatorStatusItem);
         }
         OperatorStatusItem operatorStatusItem =
-                OperatorStatusItem.QueueingStatusItem("viewInitQueueing");
+                OperatorStatusItem.QueueingStatusItem(chatState.companyName);
         items.add(operatorStatusItem);
         emitViewState(chatState.queueingStarted(operatorStatusItem));
         emitChatItems(chatState.changeItems(items));
@@ -827,7 +827,7 @@ public class ChatController implements
             items.add(
                     operatorStatusItemIndex,
                     OperatorStatusItem.OperatorFoundStatusItem(
-                            "operatorConnected1",
+                            chatState.companyName,
                             Utils.formatOperatorName(operatorName),
                             profileImgUrl
                     )
@@ -835,7 +835,7 @@ public class ChatController implements
         } else {
             items.add(
                     OperatorStatusItem.OperatorFoundStatusItem(
-                            "operatorConnected2",
+                            chatState.companyName,
                             Utils.formatOperatorName(operatorName),
                             profileImgUrl
                     )
@@ -1384,9 +1384,7 @@ public class ChatController implements
         disposable.add(historyDisposable);
     }
 
-    int count = 0;
     private synchronized void historyLoaded(List<ChatMessageInternal> messages) {
-        count++;
         Logger.d(TAG, "historyLoaded");
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         messages = removeDuplicates(items, messages);
@@ -1441,10 +1439,9 @@ public class ChatController implements
             Logger.d(TAG, "unsentMessage sent!");
         }
         emitViewState(chatState.engagementStarted());
-        if (chatState.chatItems == null || chatState.chatItems.isEmpty()) {
-            // Loading chat history again on engagement start in case it was an-authenticated visitor that restored ongoing engagement
-            loadChatHistory();
-        }
+        // Loading chat history again on engagement start in case it was an-authenticated visitor that restored ongoing engagement
+        // Currently there is no direct way to know if Visitor is authenticated.
+        loadChatHistory();
     }
 
     @Override

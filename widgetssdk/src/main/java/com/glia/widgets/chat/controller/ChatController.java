@@ -52,7 +52,7 @@ import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.model.history.OperatorChatItem;
 import com.glia.widgets.chat.model.history.OperatorMessageItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
-import com.glia.widgets.chat.model.history.ParticipantMessageChatItem;
+import com.glia.widgets.chat.model.history.LinkedChatItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorMessageItem;
 import com.glia.widgets.core.dialog.DialogController;
@@ -1383,9 +1383,9 @@ public class ChatController implements
     }
 
     private Comparator<ChatItem> chatItemComparator = (chatItem1, chatItem2) -> {
-        if (chatItem1 instanceof ParticipantMessageChatItem && chatItem2 instanceof ParticipantMessageChatItem) {
-            long item1Timestamp = ((ParticipantMessageChatItem) chatItem1).getTimestamp();
-            long item2Timestamp = ((ParticipantMessageChatItem) chatItem2).getTimestamp();
+        if (chatItem1 instanceof LinkedChatItem && chatItem2 instanceof LinkedChatItem) {
+            long item1Timestamp = ((LinkedChatItem) chatItem1).getTimestamp();
+            long item2Timestamp = ((LinkedChatItem) chatItem2).getTimestamp();
             if (item1Timestamp < item2Timestamp) {
                 return -1;
             } else if (item1Timestamp > item2Timestamp) {
@@ -1409,8 +1409,8 @@ public class ChatController implements
 
     private boolean isNewMessage(List<ChatItem> oldHistory, ChatMessage newMessage) {
         return oldHistory.stream()
-                .filter(oldMessage -> oldMessage instanceof ParticipantMessageChatItem)
-                .map(oldMessage -> (ParticipantMessageChatItem) oldMessage)
+                .filter(oldMessage -> oldMessage instanceof LinkedChatItem)
+                .map(oldMessage -> (LinkedChatItem) oldMessage)
                 .noneMatch(oldMessage -> oldMessage.getMessageId().equals(newMessage.getId()));
     }
 

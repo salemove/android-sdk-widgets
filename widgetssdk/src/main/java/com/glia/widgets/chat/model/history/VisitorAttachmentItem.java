@@ -8,7 +8,7 @@ import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
-public class VisitorAttachmentItem extends ParticipantMessageChatItem {
+public class VisitorAttachmentItem extends LinkedChatItem {
 
     public final AttachmentFile attachmentFile;
     public final boolean isFileExists;

@@ -1,11 +1,11 @@
 package com.glia.widgets.chat.model.history;
 
-public class ParticipantMessageChatItem extends ChatItem {
+public class LinkedChatItem extends ChatItem {
 
     private final String messageId;
     private final long timestamp;
 
-    public ParticipantMessageChatItem(String id, int viewType, String messageId, long timestamp) {
+    public LinkedChatItem(String id, int viewType, String messageId, long timestamp) {
         super(id, viewType);
         this.messageId = messageId;
         this.timestamp = timestamp;

@@ -6,7 +6,7 @@ import com.glia.androidsdk.chat.ChatMessage;
 
 import java.util.Objects;
 
-public class CustomCardItem extends ParticipantMessageChatItem {
+public class CustomCardItem extends LinkedChatItem {
     private final ChatMessage message;
 
     public CustomCardItem(ChatMessage message, int viewType) {

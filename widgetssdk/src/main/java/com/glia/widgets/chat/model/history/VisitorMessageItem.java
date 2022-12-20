@@ -8,7 +8,7 @@ import com.glia.widgets.chat.adapter.ChatAdapter;
 
 import java.util.Objects;
 
-public class VisitorMessageItem extends ParticipantMessageChatItem {
+public class VisitorMessageItem extends LinkedChatItem {
     public final static String HISTORY_ID = "history_id";
     public final static String CARD_RESPONSE_ID = "card_response_id";
     public final static String UNSENT_MESSAGE_ID = "unsent_message_id";

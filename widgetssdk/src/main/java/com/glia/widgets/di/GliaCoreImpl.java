@@ -144,7 +144,7 @@ class GliaCoreImpl implements GliaCore {
     @Override
     public void subscribeToQueueTicketUpdates(@NonNull String ticketId,
                                               RequestCallback<QueueTicket> callback) {
-//        Glia.subscribeToQueueTicketUpdates(ticketId, callback);
+        Glia.subscribeToQueueTicketUpdates(ticketId, callback);
     }
 
     @Override

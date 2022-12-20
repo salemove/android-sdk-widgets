@@ -94,6 +94,7 @@ import com.glia.widgets.view.MinimizeHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
@@ -461,6 +462,10 @@ public class ChatController implements
 
     private void onMessage(@NonNull ChatMessageInternal messageInternal) {
         ChatMessage message = messageInternal.getChatMessage();
+        if (!isNewMessage(chatState.chatItems, message)) {
+            return;
+        }
+
         boolean isUnsentMessage = !chatState.unsentMessages.isEmpty() && chatState.unsentMessages.get(0).getMessage().equals(message.getContent());
         Logger.d(TAG, "onMessage: " + message.getContent() + ", id: " + message.getId() + ", isUnsentMessage: " + isUnsentMessage);
         if (isUnsentMessage) {
@@ -471,7 +476,7 @@ public class ChatController implements
             List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
             int currentMessageIndex = currentChatItems.indexOf(currentMessage);
             currentChatItems.remove(currentMessage);
-            currentChatItems.add(currentMessageIndex, new VisitorMessageItem(message.getId(), false, message.getContent(), message.getId()));
+            currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message));
 
             // emitting state because no need to change recyclerview items here
             emitViewState(chatState
@@ -520,7 +525,7 @@ public class ChatController implements
     private void appendUnsentMessage(String message) {
         Logger.d(TAG, "appendUnsentMessage: " + message);
         List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
-        VisitorMessageItem unsentItem = new VisitorMessageItem(VisitorMessageItem.UNSENT_MESSAGE_ID, false, message, null);
+        VisitorMessageItem unsentItem = VisitorMessageItem.asUnsentItem(message);
         unsentMessages.add(unsentItem);
 
         List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
@@ -892,7 +897,7 @@ public class ChatController implements
         }
 
         if (message.getContent() != null && !message.getContent().isEmpty()) {
-            currentChatItems.add(new VisitorMessageItem(VisitorMessageItem.HISTORY_ID, false, message.getContent(), message.getId()));
+            currentChatItems.add(VisitorMessageItem.asHistoryItem(message));
         }
     }
 
@@ -939,14 +944,8 @@ public class ChatController implements
             FilesAttachment filesAttachment = (FilesAttachment) attachment;
             AttachmentFile[] files = filesAttachment.getFiles();
             for (AttachmentFile file : files) {
-                int type;
-                if (file.getContentType().startsWith("image")) {
-                    type = ChatAdapter.VISITOR_IMAGE_VIEW_TYPE;
-                } else {
-                    type = ChatAdapter.VISITOR_FILE_VIEW_TYPE;
-                }
                 currentChatItems.add(
-                        new VisitorAttachmentItem(chatMessage.getId(), type, file, false, false, false)
+                        VisitorAttachmentItem.fromAttachmentFile(chatMessage.getId(), chatMessage.getTimestamp(), file)
                 );
             }
         }
@@ -962,7 +961,7 @@ public class ChatController implements
         }
 
         if (message.getContent() != null && !message.getContent().isEmpty()) {
-            items.add(new VisitorMessageItem(message.getId(), false, message.getContent(), message.getId()));
+            items.add(VisitorMessageItem.asNewMessage(message));
         }
     }
 
@@ -993,9 +992,9 @@ public class ChatController implements
                     break;
                 } else if (!foundDelivered && itemId.equals(messageId)) {
                     foundDelivered = true;
-                    currentChatItems.set(i, new VisitorMessageItem(itemId, true, item.getMessage(), item.getMessageId()));
+                    currentChatItems.set(i, VisitorMessageItem.editDeliveredStatus(item, true));
                 } else if (item.isShowDelivered()) {
-                    currentChatItems.set(i, new VisitorMessageItem(itemId, false, item.getMessage(), item.getMessageId()));
+                    currentChatItems.set(i, VisitorMessageItem.editDeliveredStatus(item, false));
                 }
             } else if (currentChatItem instanceof VisitorAttachmentItem) {
                 VisitorAttachmentItem item = (VisitorAttachmentItem) currentChatItem;
@@ -1010,17 +1009,7 @@ public class ChatController implements
     }
 
     private void setDelivered(List<ChatItem> currentChatItems, int i, VisitorAttachmentItem item, boolean delivered) {
-        currentChatItems.set(
-                i,
-                new VisitorAttachmentItem(
-                        item.getId(),
-                        item.getViewType(),
-                        item.attachmentFile,
-                        item.isFileExists,
-                        item.isDownloading,
-                        delivered
-                )
-        );
+        currentChatItems.set(i, VisitorAttachmentItem.editDeliveredStatus(item, delivered));
     }
 
     private void appendOperatorMessage(List<ChatItem> currentChatItems, ChatMessageInternal chatMessageInternal) {
@@ -1063,7 +1052,7 @@ public class ChatController implements
                                 lastItemInView.selectedChoiceIndex,
                                 lastItemInView.choiceCardImageUrl,
                                 lastItemInView.operatorId,
-                                lastItemInView.getMessageId()
+                                lastItemInView.getTimestamp()
                         )
                 );
             } else if (lastItem instanceof OperatorAttachmentItem) {
@@ -1079,7 +1068,8 @@ public class ChatController implements
                                 false,
                                 false,
                                 lastItemInView.operatorId,
-                                lastItemInView.getMessageId()
+                                lastItemInView.getMessageId(),
+                                lastItemInView.getTimestamp()
                         )
                 );
             } else if (lastItem instanceof CustomCardItem) {
@@ -1119,7 +1109,8 @@ public class ChatController implements
                                 false,
                                 false,
                                 messageInternal.getOperatorId().orElse(UUID.randomUUID().toString()),
-                                message.getId()
+                                message.getId(),
+                                message.getTimestamp()
                         )
                 );
             }
@@ -1133,7 +1124,7 @@ public class ChatController implements
             if (viewType != null) {
                 appendCustomCardItem(currentChatItems, message, viewType);
             } else {
-                appendOperatorMessageItem(currentChatItems, messageInternal, message);
+                appendOperatorMessageItem(currentChatItems, messageInternal);
             }
         }
     }
@@ -1146,24 +1137,15 @@ public class ChatController implements
         if (customCardShouldShowUseCase.execute(message, customCardType, true)) {
             currentChatItems.add(new CustomCardItem(message, viewType));
         }
-
-        String selectedOptionText = null;
-        if (message.getAttachment() != null && message.getAttachment() instanceof SingleChoiceAttachment) {
-            SingleChoiceAttachment singleChoiceAttachment = (SingleChoiceAttachment) message.getAttachment();
-            if (singleChoiceAttachment != null) {
-                selectedOptionText = singleChoiceAttachment.getSelectedOptionText();
-            }
-        }
-        if (selectedOptionText != null && !selectedOptionText.isEmpty()) {
-            currentChatItems.add(
-                    new VisitorMessageItem(VisitorMessageItem.CARD_RESPONSE_ID, false, selectedOptionText, message.getId())
-            );
+        VisitorMessageItem visitorCardResponseItem = VisitorMessageItem.asCardResponseItem(message);
+        if (visitorCardResponseItem.getMessage() != null && !visitorCardResponseItem.getMessage().isEmpty()) {
+            currentChatItems.add(visitorCardResponseItem);
         }
     }
 
     private void appendOperatorMessageItem(List<ChatItem> currentChatItems,
-                                           ChatMessageInternal messageInternal,
-                                           ChatMessage message) {
+                                           ChatMessageInternal messageInternal) {
+        ChatMessage message = messageInternal.getChatMessage();
         MessageAttachment messageAttachment = message.getAttachment();
         currentChatItems.add(
                 new OperatorMessageItem(
@@ -1176,7 +1158,7 @@ public class ChatController implements
                         null,
                         getSingleChoiceAttachmentImgUrl(messageAttachment),
                         messageInternal.getOperatorId().orElse(UUID.randomUUID().toString()),
-                        message.getId()
+                        message.getTimestamp()
                 )
         );
     }
@@ -1284,7 +1266,7 @@ public class ChatController implements
                             optionIndex,
                             choiceCardItem.choiceCardImageUrl,
                             choiceCardItem.operatorId,
-                            id
+                            choiceCardItem.getTimestamp()
                     );
 
             List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);
@@ -1327,7 +1309,7 @@ public class ChatController implements
                     }
                     chatItems.add(
                             indexForResponseMessage,
-                            new VisitorMessageItem(VisitorMessageItem.CARD_RESPONSE_ID, false, text, null)
+                            VisitorMessageItem.asUnsentCardResponse(text)
                     );
                     emitChatItems(chatState.changeItems(chatItems));
                 });
@@ -1375,7 +1357,7 @@ public class ChatController implements
         }
     }
 
-    private synchronized void loadChatHistory() {
+    private void loadChatHistory() {
         Disposable historyDisposable = loadHistoryUseCase.execute()
                 .doOnError(this::error)
                 .doOnSuccess(this::historyLoaded)
@@ -1389,19 +1371,29 @@ public class ChatController implements
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
         messages = removeDuplicates(items, messages);
         if (messages != null && !messages.isEmpty()) {
-            Logger.d(TAG, "historyLoaded: appending messages: " + messages.size());
             for (ChatMessageInternal message : messages) {
                 appendHistoryChatItem(items, message);
             }
-            emitChatItems(chatState.historyLoaded(items));
+            emitChatItems(chatState.historyLoaded(items.stream().sorted(chatItemComparator).collect(Collectors.toList())));
             initGliaEngagementObserving();
         } else if (!chatState.engagementRequested) {
-            Logger.d(TAG, "historyLoaded: no history, queue for engagement");
             initGliaEngagementObserving();
             queueForEngagement();
         }
-
     }
+
+    private Comparator<ChatItem> chatItemComparator = (chatItem1, chatItem2) -> {
+        if (chatItem1 instanceof ParticipantMessageChatItem && chatItem2 instanceof ParticipantMessageChatItem) {
+            long item1Timestamp = ((ParticipantMessageChatItem) chatItem1).getTimestamp();
+            long item2Timestamp = ((ParticipantMessageChatItem) chatItem2).getTimestamp();
+            if (item1Timestamp < item2Timestamp) {
+                return -1;
+            } else if (item1Timestamp > item2Timestamp) {
+                return 1;
+            }
+        }
+        return 0;
+    };
 
     private List<ChatMessageInternal> removeDuplicates(List<ChatItem> oldHistory, List<ChatMessageInternal> newHistory) {
         if (newHistory == null || newHistory.isEmpty()) {
@@ -1410,15 +1402,16 @@ public class ChatController implements
         if (oldHistory == null || oldHistory.isEmpty()) {
             return newHistory;
         }
-        return newHistory.stream().filter(newMessage -> oldHistory
-                .stream()
-                .noneMatch(oldMessage ->  {
-                    if (oldMessage instanceof ParticipantMessageChatItem) {
-                        return ((ParticipantMessageChatItem) oldMessage).getMessageId().equals(newMessage.getChatMessage().getId());
-                    } else {
-                        return false;
-                    }}))
+        return newHistory.stream()
+                .filter(newMessage -> isNewMessage(oldHistory, newMessage.getChatMessage()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isNewMessage(List<ChatItem> oldHistory, ChatMessage newMessage) {
+        return oldHistory.stream()
+                .filter(oldMessage -> oldMessage instanceof ParticipantMessageChatItem)
+                .map(oldMessage -> (ParticipantMessageChatItem) oldMessage)
+                .noneMatch(oldMessage -> oldMessage.getMessageId().equals(newMessage.getId()));
     }
 
     private void error(Throwable error) {

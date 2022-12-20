@@ -24,9 +24,9 @@ public class OperatorMessageItem extends OperatorChatItem {
             Integer selectedChoiceIndex,
             String choiceCardImageUrl,
             String operatorId,
-            String messageId
+            long timestamp
     ) {
-        super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE, showChatHead, operatorProfileImgUrl, operatorId, messageId);
+        super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE, showChatHead, operatorProfileImgUrl, operatorId, id, timestamp);
         this.operatorName = operatorName;
         this.content = content;
         this.singleChoiceOptions = singleChoiceOptions != null ? Collections.unmodifiableList(singleChoiceOptions) : null;

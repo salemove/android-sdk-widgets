@@ -10,7 +10,7 @@ public class CustomCardItem extends ParticipantMessageChatItem {
     private final ChatMessage message;
 
     public CustomCardItem(ChatMessage message, int viewType) {
-        super(message.getId(), viewType, message.getId());
+        super(message.getId(), viewType, message.getId(), message.getTimestamp());
 
         this.message = message;
     }

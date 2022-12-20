@@ -8,8 +8,8 @@ public abstract class OperatorChatItem extends ParticipantMessageChatItem {
     public final String operatorProfileImgUrl;
     public final String operatorId;
 
-    protected OperatorChatItem(String id, int viewType, boolean showChatHead, String operatorProfileImgUrl, String operatorId, String messageId) {
-        super(id, viewType, messageId);
+    protected OperatorChatItem(String id, int viewType, boolean showChatHead, String operatorProfileImgUrl, String operatorId, String messageId, long timestamp) {
+        super(id, viewType, messageId, timestamp);
         this.showChatHead = showChatHead;
         this.operatorProfileImgUrl = operatorProfileImgUrl;
         this.operatorId = operatorId;

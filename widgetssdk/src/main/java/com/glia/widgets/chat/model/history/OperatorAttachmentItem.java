@@ -22,9 +22,10 @@ public class OperatorAttachmentItem extends OperatorChatItem {
             boolean isFileExists,
             boolean isDownloading,
             String operatorId,
-            String messageId
+            String messageId,
+            long timestamp
     ) {
-        super(chatItemId, viewType, showChatHead, operatorProfileImgUrl, operatorId, messageId);
+        super(chatItemId, viewType, showChatHead, operatorProfileImgUrl, operatorId, messageId, timestamp);
         this.attachmentFile = attachmentFile;
         this.isFileExists = isFileExists;
         this.isDownloading = isDownloading;

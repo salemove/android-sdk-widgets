@@ -644,19 +644,13 @@ public class ChatView extends ConstraintLayout implements
                     isFileDownloaded,
                     oldItem.isDownloading,
                     oldItem.operatorId,
-                    oldItem.getMessageId()
+                    oldItem.getMessageId(),
+                    oldItem.getTimestamp()
             );
         } else if (item instanceof VisitorAttachmentItem) {
             VisitorAttachmentItem oldItem = (VisitorAttachmentItem) item;
             boolean isFileDownloaded = FileHelper.isFileDownloaded(oldItem.attachmentFile);
-            return new VisitorAttachmentItem(
-                    oldItem.getId(),
-                    oldItem.getViewType(),
-                    oldItem.attachmentFile,
-                    isFileDownloaded,
-                    oldItem.isDownloading,
-                    oldItem.showDelivered
-            );
+            return VisitorAttachmentItem.editDownloadedStatus(oldItem, isFileDownloaded);
         } else {
             return item;
         }
@@ -1313,14 +1307,7 @@ public class ChatView extends ConstraintLayout implements
         if (currentChatItem instanceof VisitorAttachmentItem) {
             VisitorAttachmentItem currentItem = (VisitorAttachmentItem) currentChatItem;
             if (currentItem.attachmentFile.getId().equals(attachmentFile.getId())) {
-                return new VisitorAttachmentItem(
-                        currentItem.getId(),
-                        currentItem.getViewType(),
-                        currentItem.attachmentFile,
-                        isFileExists,
-                        isDownloading,
-                        currentItem.showDelivered
-                );
+                return VisitorAttachmentItem.editFileStatuses(currentItem, isFileExists, isDownloading);
             }
         } else if (currentChatItem instanceof OperatorAttachmentItem) {
             OperatorAttachmentItem currentItem = (OperatorAttachmentItem) currentChatItem;
@@ -1334,7 +1321,8 @@ public class ChatView extends ConstraintLayout implements
                         isFileExists,
                         isDownloading,
                         currentItem.operatorId,
-                        currentItem.getMessageId());
+                        currentItem.getMessageId(),
+                        currentItem.getTimestamp());
             }
         }
         return currentChatItem;

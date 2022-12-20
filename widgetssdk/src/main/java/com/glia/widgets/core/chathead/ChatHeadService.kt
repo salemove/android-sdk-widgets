@@ -11,6 +11,7 @@ import android.util.DisplayMetrics
 import android.util.Size
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.core.content.getSystemService
 import androidx.core.util.Pair
@@ -55,7 +56,11 @@ class ChatHeadService : Service() {
     private fun obtainScreenSize(): Size {
         val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return windowManager.currentWindowMetrics.bounds.run { Size(width(), height()) }
+            val metrics = windowManager.currentWindowMetrics
+            val insets = metrics.windowInsets.getInsets(WindowInsets.Type.systemBars())
+            val width = metrics.bounds.width() - insets.left - insets.right
+            val height = metrics.bounds.height() - insets.bottom - insets.top
+            return Size(width, height)
         }
         return DisplayMetrics().also(windowManager.defaultDisplay::getMetrics)
             .run { Size(widthPixels, heightPixels) }

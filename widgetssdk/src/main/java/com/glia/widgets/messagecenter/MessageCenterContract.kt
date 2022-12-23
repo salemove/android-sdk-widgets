@@ -7,7 +7,7 @@ interface MessageCenterContract {
     interface Controller : BaseController {
         fun setView(view: View)
         fun onCheckMessagesClicked()
-        fun onSendMessageClicked()
+        fun onSendMessageClicked(message: String)
         fun onBackArrowClicked()
         fun onCloseButtonClicked()
         fun onAddAttachmentButtonClicked()
@@ -20,5 +20,7 @@ interface MessageCenterContract {
         fun finish()
         fun navigateToMessaging()
         fun showAttachmentPopup()
+        fun showUnexpectedErrorDialog()
+        fun showMessageCenterUnavailableDialog()
     }
 }

@@ -18,10 +18,11 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.queuing.QueueTicket;
+import com.glia.androidsdk.secureconversations.SecureConversations;
 import com.glia.androidsdk.site.SiteInfo;
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
-import com.glia.widgets.core.authentication.Authentication;
 
 import java.io.InputStream;
 import java.util.List;
@@ -93,4 +94,6 @@ public interface GliaCore {
     void getOperator(@NonNull String operatorId, @NonNull RequestCallback<Operator> callback);
 
     Authentication getAuthentication(@NonNull Authentication.Behavior behavior);
+
+    SecureConversations getSecureConversations();
 }

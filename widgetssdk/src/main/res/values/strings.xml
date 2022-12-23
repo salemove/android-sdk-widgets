@@ -105,6 +105,10 @@
     <string name="glia_dialog_permission_error_title">Additional Permissions Required</string>
     <string name="glia_dialog_permission_error_message">Please make sure all required permissions are enabled.</string>
 
+    <!-- Message Center unavailable AlertDialog -->
+    <string name="glia_dialog_message_center_unavailable_title">We\'re sorry</string>
+    <string name="glia_dialog_message_center_unavailable_message">Message center is currently not available. Please try again later.</string>
+
     <string name="glia_dialog_yes">Yes</string>
     <string name="glia_dialog_no">No</string>
     <string name="glia_dialog_decline">Decline</string>

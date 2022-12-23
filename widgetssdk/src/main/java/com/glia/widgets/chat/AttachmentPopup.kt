@@ -9,10 +9,10 @@ import android.widget.PopupWindow
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentPopupBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.setTintCompat
+import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.setTintCompat
 
 internal class AttachmentPopup(anchor: View) {
 

@@ -10,7 +10,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.OperatorStatusViewBinding
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.chat.OnHoldOverlayTheme
 import com.glia.widgets.view.unifiedui.theme.chat.OperatorTheme

@@ -10,9 +10,9 @@ import com.glia.widgets.chat.model.history.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.OperatorStatusView
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.getFontCompat
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getFontCompat
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
 
@@ -84,14 +84,14 @@ class OperatorStatusViewHolder(
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
     }
 
-    private fun applyInQueueState(companyName: String) {
+    private fun applyInQueueState(companyName: String?) {
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
         itemView.contentDescription =
             itemView.resources.getString(
                 R.string.glia_chat_in_queue_message_content_description,
-                companyName
+                companyName ?: ""
             )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)

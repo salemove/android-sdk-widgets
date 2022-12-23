@@ -8,8 +8,8 @@ import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.button.GliaSurveyOptionButton
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.exstensions.applyOptionButtonTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.applyOptionButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyBooleanQuestionTheme
 
 class BooleanQuestionViewHolder(

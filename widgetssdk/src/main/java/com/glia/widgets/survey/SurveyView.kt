@@ -22,10 +22,10 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
 import com.glia.widgets.view.configuration.ButtonConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyColorTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.shape.CornerFamily

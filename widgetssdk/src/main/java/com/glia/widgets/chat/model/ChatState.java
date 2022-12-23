@@ -35,6 +35,7 @@ public class ChatState {
     public final boolean isAttachmentButtonNeeded;
     public final boolean isOperatorTyping;
     public final boolean isAttachmentAllowed;
+    public final boolean isSecureMessaging;
 
     @Override
     public boolean equals(Object o) {
@@ -62,7 +63,8 @@ public class ChatState {
                 isOperatorTyping == chatState.isOperatorTyping &&
                 isAttachmentButtonEnabled == chatState.isAttachmentButtonEnabled &&
                 isAttachmentButtonNeeded == chatState.isAttachmentButtonNeeded &&
-                isAttachmentAllowed == chatState.isAttachmentAllowed;
+                isAttachmentAllowed == chatState.isAttachmentAllowed &&
+                isSecureMessaging == chatState.isSecureMessaging;
     }
 
     @Override
@@ -96,6 +98,7 @@ public class ChatState {
                 ", isAttachmentButtonEnabled=" + isAttachmentButtonEnabled +
                 ", isAttachmentButtonEnabled=" + isAttachmentButtonEnabled +
                 ", isAttachmentAllowed=" + isAttachmentAllowed +
+                ", isSecureMessaging=" + isSecureMessaging +
                 '}';
     }
 
@@ -162,6 +165,21 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState setSecureMessagingState() {
+        return new Builder()
+                .copyFrom(this)
+                .setSecureMessaging(true)
+                .enableChatPanel()
+                .createChatState();
+    }
+
+    public ChatState setLiveChatState() {
+        return new Builder()
+                .copyFrom(this)
+                .setSecureMessaging(false)
+                .createChatState();
+    }
+
     public ChatState allowSendAttachmentStateChanged(boolean isAttachmentAllowed) {
         return new Builder()
                 .copyFrom(this)
@@ -182,7 +200,7 @@ public class ChatState {
                 .copyFrom(this)
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
-                .enableChatPanel()
+//                .enableChatPanel() // Why is this here?
                 .createChatState();
     }
 
@@ -317,6 +335,7 @@ public class ChatState {
         this.isAttachmentButtonEnabled = builder.isAttachmentButtonEnabled;
         this.isAttachmentButtonNeeded = builder.isAttachmentButtonNeeded;
         this.isAttachmentAllowed = builder.isAttachmentAllowed;
+        this.isSecureMessaging = builder.isSecureMessaging;
     }
 
     public static class Builder {
@@ -342,6 +361,7 @@ public class ChatState {
         private boolean showSendButton;
         private boolean isAttachmentAllowed;
         private String visitorContextAssetId;
+        private boolean isSecureMessaging;
 
         public Builder copyFrom(ChatState chatState) {
             isChatInBottom = chatState.isChatInBottom;
@@ -366,6 +386,7 @@ public class ChatState {
             isAttachmentButtonEnabled = chatState.isAttachmentButtonEnabled;
             isAttachmentButtonNeeded = chatState.isAttachmentButtonNeeded;
             isAttachmentAllowed = chatState.isAttachmentAllowed;
+            isSecureMessaging = chatState.isSecureMessaging;
             return this;
         }
 
@@ -480,6 +501,11 @@ public class ChatState {
 
         public Builder setVisitorContextAssetId(String visitorContextAssetId) {
             this.visitorContextAssetId = visitorContextAssetId;
+            return this;
+        }
+
+        public Builder setSecureMessaging(boolean secureMessaging) {
+            this.isSecureMessaging = secureMessaging;
             return this;
         }
 

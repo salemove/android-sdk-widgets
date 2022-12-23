@@ -123,8 +123,15 @@ public class ControllerFactory {
                     useCaseFactory.createCustomCardInteractableUseCase(),
                     useCaseFactory.createCustomCardShouldShowUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
+                    useCaseFactory.createIsQueueingEngagementUseCase(),
                     useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
-                    useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase());
+                    useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase(),
+                    useCaseFactory.createIsSecureEngagementUseCase(),
+                    useCaseFactory.createIsOngoingEngagementUseCase(),
+                    useCaseFactory.createSetEngagementConfigUseCase(),
+                    useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
+                    useCaseFactory.createMarkMessagesReadUseCase()
+            );
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -224,6 +231,13 @@ public class ControllerFactory {
         return dialogController;
     }
 
+    public DialogController createDialogController() {
+        return new DialogController(
+                useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
+                useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
+        );
+    }
+
     public void init() {
         messagesNotSeenHandler.init();
         getCallVisualizerController().init();
@@ -282,10 +296,10 @@ public class ControllerFactory {
             callVisualizerController = new CallVisualizerController(
                     repositoryFactory.getCallVisualizerRepository(),
                     dialogController,
-                    useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
                     useCaseFactory.getGliaSurveyUseCase(),
                     useCaseFactory.createOnCallVisualizerUseCase(),
-                    useCaseFactory.createOnCallVisualizerEndUseCase()
+                    useCaseFactory.createOnCallVisualizerEndUseCase(),
+                    useCaseFactory.createIsCallOrChatScreenActiveUseCase()
             );
         }
         return callVisualizerController;
@@ -300,8 +314,22 @@ public class ControllerFactory {
         );
     }
 
-    public MessageCenterContract.Controller getMessageCenterController() {
-        return new MessageCenterController();
+    public MessageCenterContract.Controller getMessageCenterController(String queueId) {
+        return new MessageCenterController(
+                useCaseFactory.createSendSecureMessageUseCase(queueId),
+                useCaseFactory.createIsMessageCenterAvailableUseCase(queueId),
+                useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
+                useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
+                useCaseFactory.createGetSecureFileAttachmentsUseCase(),
+                useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
+                useCaseFactory.createIsAuthenticatedUseCase(),
+                useCaseFactory.createSiteInfoUseCase(),
+                useCaseFactory.createOnNextMessageUseCase(),
+                useCaseFactory.createEnableSendMessageButtonUseCase(),
+                useCaseFactory.createShowMessageLimitErrorUseCase(),
+                useCaseFactory.createResetMessageCenterUseCase(),
+                createDialogController()
+        );
     }
 
     public EndScreenSharingContract.Controller getEndScreenSharingController() {

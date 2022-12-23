@@ -1,14 +1,17 @@
 package com.glia.widgets;
 
+import android.Manifest;
 import android.content.Context;
 import android.graphics.Bitmap;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,6 +23,10 @@ import java.io.InputStream;
 public class DownloadsFolderDataSourceTest {
 
     private DownloadsFolderDataSource dataSource;
+
+    @Rule
+    public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule
+            .grant(Manifest.permission.READ_EXTERNAL_STORAGE);
 
     @Before
     public void setUp() {

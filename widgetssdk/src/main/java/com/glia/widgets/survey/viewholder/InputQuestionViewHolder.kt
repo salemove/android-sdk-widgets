@@ -14,11 +14,10 @@ import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.configuration.OptionButtonConfiguration
 import com.glia.widgets.view.configuration.survey.InputQuestionConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.exstensions.deepMerge
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.deepMerge
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.deepMerge
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
@@ -131,4 +130,3 @@ class InputQuestionViewHolder(
         comment.applyLayerTheme(optionButtonTheme.normalLayer)
     }
 }
-

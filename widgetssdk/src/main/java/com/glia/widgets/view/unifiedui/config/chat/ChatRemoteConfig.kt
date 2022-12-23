@@ -3,6 +3,7 @@ package com.glia.widgets.view.unifiedui.config.chat
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 import com.google.gson.annotations.SerializedName
@@ -45,7 +46,13 @@ internal data class ChatRemoteConfig(
     val unreadIndicator: UnreadIndicatorRemoteConfig?,
 
     @SerializedName("typingIndicator")
-    val typingIndicator: ColorLayerRemoteConfig?
+    val typingIndicator: ColorLayerRemoteConfig?,
+
+    @SerializedName("newMessagesDividerColor")
+    val newMessagesDividerColorRemoteConfig: ColorLayerRemoteConfig?,
+
+    @SerializedName("newMessagesDividerText")
+    val newMessagesDividerTextRemoteConfig: TextRemoteConfig?
 ) {
     fun toChatTheme(): ChatTheme = ChatTheme(
         background = background?.toLayerTheme(),
@@ -60,6 +67,8 @@ internal data class ChatRemoteConfig(
         bubble = bubbleRemoteConfig?.toBubbleTheme(),
         attachmentsPopup = attachmentSourceListRemoteConfig?.toAttachmentsPopupTheme(),
         unreadIndicator = unreadIndicator?.toUnreadIndicatorTheme(),
-        typingIndicator = typingIndicator?.toColorTheme()
+        typingIndicator = typingIndicator?.toColorTheme(),
+        newMessagesDividerColorTheme = newMessagesDividerColorRemoteConfig?.toColorTheme(),
+        newMessagesDividerTextTheme = newMessagesDividerTextRemoteConfig?.toTextTheme()
     )
 }

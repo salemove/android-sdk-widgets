@@ -23,9 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.ViewCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
+import androidx.core.view.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
@@ -64,7 +62,7 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
@@ -122,9 +120,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
-    private val onOptionClickedListener = OnOptionClickedListener { id, indexInList, optionIndex ->
+    private val onOptionClickedListener = OnOptionClickedListener { item, selectedOption ->
         Logger.d(TAG, "singleChoiceCardClicked")
-        controller?.singleChoiceOptionClicked(id, indexInList, optionIndex)
+        controller?.singleChoiceOptionClicked(item, selectedOption)
     }
     private val onScrollListener: RecyclerView.OnScrollListener =
         object : RecyclerView.OnScrollListener() {
@@ -205,11 +203,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         queueId: String?,
         visitorContextAssetId: String?,
         useOverlays: Boolean = false,
-        screenSharingMode: ScreenSharing.Mode? = null
+        screenSharingMode: ScreenSharing.Mode? = null,
+        chatType: ChatType = ChatType.LIVE_CHAT
     ) {
         Dependencies.getSdkConfigurationManager()?.isUseOverlay = useOverlays
         Dependencies.getSdkConfigurationManager()?.screenSharingMode = screenSharingMode
-        controller?.initChat(companyName, queueId, visitorContextAssetId)
+        controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
         serviceChatHeadController?.init()
     }
 
@@ -433,6 +432,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         dialogCallback = DialogController.Callback {
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
+                Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> post { showChatUnavailableView() }
                 Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
                 Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
                 Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
@@ -444,6 +444,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
                 Dialog.MODE_VISITOR_CODE -> { Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")} // Should never happen inside ChatView
+                else -> Logger.d(TAG, "Dialog mode ${it.mode} not handled.")
             }
         }
     }
@@ -507,6 +508,14 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.appBarView.showEndScreenSharingButton()
         } else {
             binding.appBarView.hideEndScreenSharingButton()
+        }
+        if (chatState.isSecureMessaging) {
+            showToolbar(resources.getString(R.string.glia_messaging_title))
+            binding.appBarView.hideBackButton()
+            binding.appBarView.showXButton()
+        } else {
+            showToolbar(theme.appBarTitle)
+            binding.appBarView.showBackButton()
         }
     }
 
@@ -592,11 +601,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         Utils.hideSoftKeyboard(this.context, windowToken)
     }
 
-    private fun showToolbar(title: String) {
+    private fun showToolbar(title: String?) {
         onTitleUpdatedListener?.onTitleUpdated(title)
 
         binding.appBarView.setTitle(title)
-        binding.appBarView.showToolbar()
+        binding.appBarView.setVisibility(title != null)
     }
 
     private fun destroyController() {
@@ -690,9 +699,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         // fonts
         theme.fontRes?.also { binding.chatEditText.typeface = getFontCompat(it) }
 
-        // texts
-        theme.appBarTitle?.also(::showToolbar)
-
         theme.brandPrimaryColor?.also {
             binding.operatorTypingAnimationView.addColorFilter(color = it)
         }
@@ -723,7 +729,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             screenSharingController?.onForceStopScreenSharing()
             binding.appBarView.hideEndScreenSharingButton()
         }
-        binding.appBarView.setOnXClickedListener { controller?.leaveChatQueueClicked() }
+        binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
     }
 
@@ -733,7 +739,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 val intent = Intent()
                 intent.type = INTENT_TYPE_IMAGES
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
-                Utils.getActivity(context).startActivityForResult(
+                Utils.getActivity(context)?.startActivityForResult(
                     Intent.createChooser(
                         intent,
                         resources.getString(R.string.glia_chat_select_picture_title)
@@ -748,17 +754,16 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 ) {
                     dispatchImageCapture()
                 } else {
-                    Utils.getActivity(context)
-                        .requestPermissions(
-                            arrayOf(Manifest.permission.CAMERA),
-                            CAMERA_PERMISSION_REQUEST
-                        )
+                    Utils.getActivity(context)?.requestPermissions(
+                        arrayOf(Manifest.permission.CAMERA),
+                        CAMERA_PERMISSION_REQUEST
+                    )
                 }
             }, {
                 val intent = Intent()
                 intent.type = INTENT_TYPE_ALL
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
-                Utils.getActivity(context).startActivityForResult(
+                Utils.getActivity(context)?.startActivityForResult(
                     Intent.createChooser(
                         intent,
                         resources.getString(R.string.glia_chat_select_file_title)
@@ -785,7 +790,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             )
             if (controller?.photoCaptureFileUri != null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, controller!!.photoCaptureFileUri)
-                Utils.getActivity(context).startActivityForResult(
+                Utils.getActivity(context)?.startActivityForResult(
                     intent,
                     CAPTURE_IMAGE_ACTION_REQUEST
                 )
@@ -871,14 +876,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun showAlertDialog(
         @StringRes title: Int, @StringRes message: Int, buttonClickListener: OnClickListener
     ) {
-        alertDialog?.dismiss()
-        alertDialog = null
+        dismissAlertDialog()
         alertDialog = Dialogs.showAlertDialog(context, theme, title, message, buttonClickListener)
     }
 
     private fun showEngagementEndedDialog() {
-        alertDialog?.dismiss()
-        alertDialog = null
+        dismissAlertDialog()
         alertDialog = Dialogs.showOperatorEndedEngagementDialog(context, theme) {
             dismissAlertDialog()
             controller?.noMoreOperatorsAvailableDismissed()
@@ -988,7 +991,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         ) {
             onFileDownload(file)
         } else {
-            Utils.getActivity(context).requestPermissions(
+            Utils.getActivity(context)?.requestPermissions(
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -1034,7 +1037,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     ): ChatItem {
         if (currentChatItem is VisitorAttachmentItem) {
             if (currentChatItem.attachmentFile.id == attachmentFile.id) {
-                return VisitorAttachmentItem.editFileStatuses(currentChatItem, isFileExists, isDownloading)
+                return VisitorAttachmentItem.editFileStatuses(
+                    currentChatItem,
+                    isFileExists,
+                    isDownloading
+                )
             }
         } else if (currentChatItem is OperatorAttachmentItem) {
             if (currentChatItem.attachmentFile.id == attachmentFile.id) {
@@ -1177,6 +1184,20 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         unreadIndicatorTheme.bubble?.badge?.also(binding.newMessagesBadgeView::applyBadgeTheme)
         unreadIndicatorTheme.bubble?.userImage?.also(binding.newMessagesIndicatorImage::applyUserImageTheme)
         unreadIndicatorTheme.background?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
+    }
+
+    private fun showChatUnavailableView() {
+        alertDialog = Dialogs.showMessageCenterUnavailableDialog(context, theme) {
+            hideChatControls(it.window?.decorView?.height ?: 0)
+        }
+    }
+
+    private fun hideChatControls(dialogHeight: Int) {
+        binding.apply {
+            chatRecyclerView.updatePadding(bottom = dialogHeight)
+            chatRecyclerView.scrollBy(0, dialogHeight)
+            groupChatControls.isGone = true
+        }
     }
 
 }

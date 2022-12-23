@@ -2,8 +2,8 @@ package com.glia.widgets.core.engagement.domain;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
@@ -26,6 +26,7 @@ public class GliaOnEngagementEndUseCase implements
     private final FileAttachmentRepository fileAttachmentRepository;
     private final GliaSurveyRepository surveyRepository;
     private final GliaVisitorMediaRepository gliaVisitorMediaRepository;
+    private final GliaEngagementConfigRepository gliaEngagementConfigRepository;
 
     private Listener listener;
 
@@ -48,6 +49,7 @@ public class GliaOnEngagementEndUseCase implements
             removeScreenSharingNotificationUseCase.execute();
             removeCallNotificationUseCase.execute();
             gliaVisitorMediaRepository.onEngagementEnded(engagement);
+            gliaEngagementConfigRepository.reset();
         }
     }
 
@@ -61,7 +63,8 @@ public class GliaOnEngagementEndUseCase implements
             RemoveCallNotificationUseCase removeCallNotificationUseCase,
             RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase,
             GliaSurveyRepository surveyRepository,
-            GliaVisitorMediaRepository gliaVisitorMediaRepository
+            GliaVisitorMediaRepository gliaVisitorMediaRepository,
+            GliaEngagementConfigRepository gliaEngagementConfigRepository
     ) {
         this.repository = repository;
         this.engagementUseCase = engagementUseCase;
@@ -71,6 +74,7 @@ public class GliaOnEngagementEndUseCase implements
         this.fileAttachmentRepository = fileAttachmentRepository;
         this.surveyRepository = surveyRepository;
         this.gliaVisitorMediaRepository = gliaVisitorMediaRepository;
+        this.gliaEngagementConfigRepository = gliaEngagementConfigRepository;
     }
 
     public void execute(Listener listener) {

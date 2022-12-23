@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
+import com.glia.androidsdk.secureconversations.SecureConversations;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
@@ -305,6 +306,17 @@ public class GliaWidgets {
      */
     public static CallVisualizer getCallVisualizer() {
         return Dependencies.getCallVisualizerManager();
+    }
+
+    /**
+     * Creates `SecureConversations` instance for secure conversations.
+     *
+     * @return {@code SecureConversations} object or throws {@link GliaException} if error happened.
+     * Exception may have the following cause:
+     * {@link GliaException.Cause#INVALID_INPUT} - when SDK is not initialized
+     */
+    public static SecureConversations getSecureConversations() {
+        return Dependencies.glia().getSecureConversations();
     }
 
     /**

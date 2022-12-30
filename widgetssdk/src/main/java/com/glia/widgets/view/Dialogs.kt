@@ -3,8 +3,7 @@ package com.glia.widgets.view
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -75,6 +74,7 @@ object Dialogs {
         //With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
         .setView(LayoutInflater.from(context).inflate(layoutRes, null))
         .setCancelable(cancelable)
+        .setBackgroundInsetBottom(Dependencies.getResourceProvider().convertDpToIntPixel(24f))
         .show()
         .also { setDialogBackground(it, backgroundTint) }
         .also(onLayout)
@@ -332,5 +332,45 @@ object Dialogs {
                     ?.also(::setImageTintList)
             }
         }
+    }
+
+    fun showMessageCenterUnavailableDialog(
+        context: Context,
+        theme: UiTheme
+    ): AlertDialog {
+        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
+        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
+
+        val alertDialog = showDialog(context, R.layout.alert_dialog, theme.baseLightColor, false) {
+            findViewById<TextView>(R.id.dialog_title_view).apply {
+                setText(R.string.glia_dialog_message_center_unavailable_title)
+                baseDarkColor?.also(::setTextColor)
+                fontFamily?.also(::setTypeface)
+                alertTheme?.title.also(::applyTextTheme)
+            }
+            findViewById<TextView>(R.id.dialog_message_view).apply {
+                setText(R.string.glia_dialog_message_center_unavailable_message)
+                baseDarkColor?.also(::setTextColor)
+                fontFamily?.also(::setTypeface)
+                alertTheme?.message.also(::applyTextTheme)
+            }
+            findViewById<ImageButton>(R.id.close_dialog_button).apply {
+                visibility = View.INVISIBLE
+            }
+        }
+
+        val window = alertDialog.window
+        window?.setGravity(Gravity.BOTTOM)
+        enableOutsideTouch(window)
+
+        return alertDialog
+    }
+
+    private fun enableOutsideTouch(window: Window?) {
+        window?.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        )
+        window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 }

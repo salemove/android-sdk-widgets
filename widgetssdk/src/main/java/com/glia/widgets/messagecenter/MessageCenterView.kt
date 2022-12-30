@@ -5,13 +5,14 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.*
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
@@ -66,6 +67,7 @@ class MessageCenterView(
     private val messageEditText: EditText get() = binding.messageEditText
     private val addAttachmentButton: ImageButton get() = binding.addAttachmentButton
     private val attachmentRecyclerView: RecyclerView get() = binding.attachmentsRecyclerView
+    private val sendMessageGroup: Group get() = binding.sendMessageGroup
     private var alertDialog: AlertDialog? = null
 
     @JvmOverloads
@@ -77,6 +79,22 @@ class MessageCenterView(
         initConfigurations()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
         initCallbacks()
+    }
+
+    private fun setupViewAppearance() {
+        val callback: RequestCallback<Boolean> = RequestCallback { isAvailable, exception ->
+            if (exception != null) {
+                showUnexpectedErrorDialog()
+                sendMessageGroup.visibility = INVISIBLE
+                return@RequestCallback
+            }
+            if (!isAvailable) {
+                showMessageCenterUnavailableDialog()
+                sendMessageGroup.visibility = INVISIBLE
+            }
+        }
+
+        controller?.isMessageCenterAvailable(callback)
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -122,15 +140,6 @@ class MessageCenterView(
         )
     }
 
-    private fun showAlertDialog(
-        @StringRes title: Int, @StringRes message: Int, buttonClickListener: OnClickListener
-    ) {
-        dismissAlertDialog()
-        alertDialog = Dialogs.showAlertDialog(
-            this.context, theme, title, message, buttonClickListener
-        )
-    }
-
     private fun dismissAlertDialog() {
         alertDialog?.apply {
             dismiss()
@@ -139,7 +148,10 @@ class MessageCenterView(
     }
 
     override fun showUnexpectedErrorDialog() {
-        showAlertDialog(
+        dismissAlertDialog()
+        alertDialog = Dialogs.showAlertDialog(
+            this.context,
+            theme,
             R.string.glia_dialog_unexpected_error_title,
             R.string.glia_dialog_unexpected_error_message
         ) {
@@ -149,18 +161,17 @@ class MessageCenterView(
     }
 
     override fun showMessageCenterUnavailableDialog() {
-        showAlertDialog(
-            R.string.glia_dialog_message_center_unavailable_title,
-            R.string.glia_dialog_message_center_unavailable_message
-        ) {
-            dismissAlertDialog()
-            alertDialog = null
-        }
+        dismissAlertDialog()
+        alertDialog = Dialogs.showMessageCenterUnavailableDialog(
+            this.context,
+            theme
+        )
     }
 
     override fun setController(controller: MessageCenterContract.Controller?) {
         this.controller = controller
         controller?.setView(this)
+        setupViewAppearance()
     }
 
     override fun finish() {

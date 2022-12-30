@@ -35,6 +35,10 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
+import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
+import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -439,5 +443,24 @@ public class UseCaseFactory {
 
     public QueueTicketStateChangeToUnstaffedUseCase createQueueTicketStateChangeToUnstaffedUseCase() {
         return new QueueTicketStateChangeToUnstaffedUseCase(repositoryFactory.getGliaQueueRepository());
+    }
+
+    public SendSecureMessageUseCase createSendSecureMessageUseCase(String queueId) {
+        return new SendSecureMessageUseCase(queueId, repositoryFactory.getSecureConversationsRepository());
+    }
+
+    public IsMessageCenterAvailableUseCase createIsMessageCenterAvailableUseCase(String queueId) {
+        return new IsMessageCenterAvailableUseCase(
+                queueId,
+                repositoryFactory.getGliaQueueRepository(),
+                schedulers);
+    }
+
+    public FetchChatTranscriptUseCase createFetchChatTranscriptUseCase() {
+        return new FetchChatTranscriptUseCase(repositoryFactory.getSecureConversationsRepository());
+    }
+
+    public MarkMessagesReadUseCase createMarkMessagesReadUseCase() {
+        return new MarkMessagesReadUseCase(repositoryFactory.getSecureConversationsRepository());
     }
 }

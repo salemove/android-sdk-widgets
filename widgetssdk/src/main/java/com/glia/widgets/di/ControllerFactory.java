@@ -14,7 +14,6 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
-import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -302,7 +301,10 @@ public class ControllerFactory {
     }
 
     public MessageCenterContract.Controller getMessageCenterController(String queueId) {
-        return new MessageCenterController(new SendSecureMessageUseCase(queueId));
+        return new MessageCenterController(
+                useCaseFactory.createSendSecureMessageUseCase(queueId),
+                useCaseFactory.createIsMessageCenterAvailableUseCase(queueId)
+                );
     }
 
     public EndScreenSharingContract.Controller getEndScreenSharingController() {

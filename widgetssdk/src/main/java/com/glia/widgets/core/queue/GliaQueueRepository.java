@@ -7,6 +7,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
+import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.di.GliaCore;
@@ -156,5 +157,13 @@ public class GliaQueueRepository {
         };
     }
 
-
+    /**
+     * Emits a list of all Queues
+     */
+    public Single<Queue[]> getQueues() {
+        return Single.create(emitter -> {
+            RequestCallback<Queue[]> requestCallback = (queues, e) -> emitter.onSuccess(queues);
+            gliaCore.getQueues(requestCallback);
+        });
+    }
 }

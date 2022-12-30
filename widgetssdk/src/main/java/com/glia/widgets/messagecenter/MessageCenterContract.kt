@@ -1,5 +1,6 @@
 package com.glia.widgets.messagecenter
 
+import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
@@ -14,6 +15,7 @@ interface MessageCenterContract {
         fun onGalleryClicked()
         fun onBrowseClicked()
         fun onTakePhotoClicked()
+        fun isMessageCenterAvailable(callback: RequestCallback<Boolean>)
     }
 
     interface View : BaseView<Controller> {

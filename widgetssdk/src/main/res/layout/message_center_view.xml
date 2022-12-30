@@ -87,6 +87,12 @@
         app:layout_constraintBottom_toTopOf="@id/message_title"
         app:layout_constraintHorizontal_bias="0.0"/>
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/send_message_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="message_title,add_attachment_button,message_edit_text, attachments_recycler_view, btn_send_message" />
+
     <TextView
         android:id="@+id/message_title"
         android:layout_width="wrap_content"

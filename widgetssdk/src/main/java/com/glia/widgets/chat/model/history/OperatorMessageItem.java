@@ -1,5 +1,7 @@
 package com.glia.widgets.chat.model.history;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.chat.SingleChoiceOption;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 
@@ -11,8 +13,8 @@ public class OperatorMessageItem extends OperatorChatItem {
     public final String operatorName;
     public final String content;
     public final List<SingleChoiceOption> singleChoiceOptions;
-    public final Integer selectedChoiceIndex;
     public final String choiceCardImageUrl;
+    public final boolean isClosed;
 
     public OperatorMessageItem(
             String id,
@@ -21,17 +23,21 @@ public class OperatorMessageItem extends OperatorChatItem {
             boolean showChatHead,
             String content,
             List<SingleChoiceOption> singleChoiceOptions,
-            Integer selectedChoiceIndex,
             String choiceCardImageUrl,
             String operatorId,
-            long timestamp
+            long timestamp,
+            boolean isClosed
     ) {
         super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE, showChatHead, operatorProfileImgUrl, operatorId, id, timestamp);
         this.operatorName = operatorName;
         this.content = content;
         this.singleChoiceOptions = singleChoiceOptions != null ? Collections.unmodifiableList(singleChoiceOptions) : null;
-        this.selectedChoiceIndex = selectedChoiceIndex;
         this.choiceCardImageUrl = choiceCardImageUrl;
+        this.isClosed = isClosed;
+    }
+
+    public boolean isSingleChoiceCard() {
+        return singleChoiceOptions != null && !singleChoiceOptions.isEmpty() && !isClosed;
     }
 
     @Override
@@ -43,15 +49,16 @@ public class OperatorMessageItem extends OperatorChatItem {
         return Objects.equals(operatorName, that.operatorName)
                 && Objects.equals(content, that.content)
                 && Objects.equals(singleChoiceOptions, that.singleChoiceOptions)
-                && Objects.equals(selectedChoiceIndex, that.selectedChoiceIndex)
+                && Objects.equals(isClosed, that.isClosed)
                 && Objects.equals(choiceCardImageUrl, that.choiceCardImageUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), operatorName, content, singleChoiceOptions, selectedChoiceIndex, choiceCardImageUrl);
+        return Objects.hash(super.hashCode(), operatorName, content, singleChoiceOptions, choiceCardImageUrl, isClosed);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "OperatorMessageItem{" +
@@ -60,9 +67,9 @@ public class OperatorMessageItem extends OperatorChatItem {
                 ", operatorId='" + operatorId + '\'' +
                 ", operatorName='" + operatorName + '\'' +
                 ", content='" + content + '\'' +
-                ", singleChoiceOptions=" + singleChoiceOptions +
-                ", selectedChoiceIndex=" + selectedChoiceIndex +
+                ", singleChoiceOptions=" + singleChoiceOptions + '\'' +
                 ", choiceCardImageUrl='" + choiceCardImageUrl + '\'' +
+                ", isClosed='" + isClosed + '\'' +
                 "} " + super.toString();
     }
 }

@@ -12,7 +12,7 @@ public class IsEnableChatEditTextUseCase {
     // should enable only if there is no unselected choicecard last
     public boolean execute(List<ChatItem> items, ChatInputMode inputMode) {
         ChatItem lastItem = ListUtil.getLast(items);
-        return !exists(lastItem) || !isOperatorMessageType(lastItem) || !isNoChoiceCardActionSelected(lastItem);
+        return !exists(lastItem) || !isOperatorMessageType(lastItem) || !isCardRequiresInteraction(lastItem);
     }
 
     private boolean exists(ChatItem item) {
@@ -23,8 +23,8 @@ public class IsEnableChatEditTextUseCase {
         return item.getViewType() == ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE;
     }
 
-    private boolean isNoChoiceCardActionSelected(ChatItem item) {
-        return ((OperatorMessageItem) item).selectedChoiceIndex == null;
+    private boolean isCardRequiresInteraction(ChatItem item) {
+        return ((OperatorMessageItem) item).isSingleChoiceCard();
     }
 }
 

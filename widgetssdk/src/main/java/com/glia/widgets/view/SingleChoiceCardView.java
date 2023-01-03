@@ -56,14 +56,12 @@ public class SingleChoiceCardView extends FrameLayout {
             String imageUrl,
             String content,
             List<SingleChoiceOption> options,
-            Integer selectedIndex,
             UiTheme theme,
-            int adapterPosition
-    ) {
+            int adapterPosition) {
         setupCardView(theme);
         setupImage(imageUrl);
         setupText(content, theme);
-        setupButtons(id, options, selectedIndex, theme, adapterPosition);
+        setupButtons(id, options, theme, adapterPosition);
     }
 
     public void setOnOptionClickedListener(OnOptionClickedListener onOptionClickedListener) {
@@ -71,20 +69,12 @@ public class SingleChoiceCardView extends FrameLayout {
     }
 
     public interface OnOptionClickedListener {
-        void onClicked(
-                String id,
-                int indexInList,
-                int indexOfOption
-        );
+        void onClicked(String id, int indexInList, int indexOfOption);
     }
 
     private void setupCardView(UiTheme theme) {
-        int gliaBaseLightColor = ContextCompat.getColor(
-                this.getContext(), theme.getBaseLightColor()
-        );
-        int gliaBrandPrimaryColor = ContextCompat.getColor(
-                this.getContext(), theme.getBrandPrimaryColor()
-        );
+        int gliaBaseLightColor = ContextCompat.getColor(this.getContext(), theme.getBaseLightColor());
+        int gliaBrandPrimaryColor = ContextCompat.getColor(this.getContext(), theme.getBrandPrimaryColor());
         materialCardView.setStrokeColor(gliaBrandPrimaryColor);
         materialCardView.setBackgroundColor(gliaBaseLightColor);
     }
@@ -99,7 +89,7 @@ public class SingleChoiceCardView extends FrameLayout {
         contentView.setTheme(theme);
     }
 
-    private void setupButtons(String id, List<SingleChoiceOption> options, Integer selectedIndex, UiTheme theme, int adapterPosition) {
+    private void setupButtons(String id, List<SingleChoiceOption> options, UiTheme theme, int adapterPosition) {
         ConstraintSet constraintSet = new ConstraintSet();
         int topViewId = R.id.content_view;
 
@@ -125,7 +115,6 @@ public class SingleChoiceCardView extends FrameLayout {
             button.setLayoutParams(params);
             button.setId(View.generateViewId());
             button.setText(option.getText());
-            button.setEnabled(selectedIndex == null);
             layout.addView(button, layout.getChildCount());
             constraintSet.clone(layout);
 
@@ -150,46 +139,25 @@ public class SingleChoiceCardView extends FrameLayout {
 
             topViewId = button.getId();
 
-            boolean isSelected = selectedIndex != null && selectedIndex == index;
-
             ColorStateList actionButtonBackgroundColor =
-                    isSelected ?
-                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonSelectedBackgroundColor()) :
-                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonBackgroundColor());
+                    ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonBackgroundColor());
 
             ColorStateList actionButtonTextColor =
-                    isSelected ?
-                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonSelectedTextColor()) :
-                            ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonTextColor());
+                    ContextCompat.getColorStateList(this.getContext(), theme.getBotActionButtonTextColor());
 
             button.setBackgroundTintList(actionButtonBackgroundColor);
             button.setTextColor(actionButtonTextColor);
-            button.setSelected(isSelected);
 
             if (theme.getFontRes() != null) {
-                button.setTypeface(
-                        ResourcesCompat.getFont(
-                                this.getContext(),
-                                theme.getFontRes())
+                button.setTypeface(ResourcesCompat.getFont(this.getContext(), theme.getFontRes())
                 );
             }
-            if (selectedIndex != null && selectedIndex != index) {
-                button.setStrokeWidth(
-                        Float.valueOf(Utils.pxFromDp(this.getContext(), 1f)).intValue()
-                );
-                button.setStrokeColor(
-                        ContextCompat.getColorStateList(this.getContext(), theme.getBaseShadeColor())
-                );
-            }
+
             if (onOptionClickedListener != null) {
                 final int optionIndex = index;
                 button.setOnClickListener(v -> {
                     if (onOptionClickedListener != null) {
-                        onOptionClickedListener.onClicked(
-                                id,
-                                adapterPosition,
-                                optionIndex
-                        );
+                        onOptionClickedListener.onClicked(id, adapterPosition, optionIndex);
                     }
                 });
             }

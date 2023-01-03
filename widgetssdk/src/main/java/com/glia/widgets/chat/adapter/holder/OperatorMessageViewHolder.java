@@ -46,7 +46,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
             SingleChoiceCardView.OnOptionClickedListener onOptionClickedListener
     ) {
         contentLayout.removeAllViews();
-        if (item.singleChoiceOptions != null) {
+        if (item.isSingleChoiceCard()) {
             addSingleChoiceCardView(item, onOptionClickedListener);
         } else {
             addMessageTextView(item);
@@ -65,7 +65,6 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 item.choiceCardImageUrl,
                 item.content,
                 item.singleChoiceOptions,
-                item.selectedChoiceIndex,
                 uiTheme,
                 getAdapterPosition()
         );
@@ -73,13 +72,7 @@ public class OperatorMessageViewHolder extends RecyclerView.ViewHolder {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(
-                0,
-                Float.valueOf(context.getResources().getDimension(R.dimen.glia_medium))
-                        .intValue(),
-                0,
-                0
-        );
+        params.setMargins(0, context.getResources().getDimensionPixelSize(R.dimen.glia_medium), 0, 0);
         contentLayout.addView(singleChoiceCardView, params);
 
         itemView.setContentDescription(item.content);

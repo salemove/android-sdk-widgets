@@ -1,6 +1,7 @@
 package com.glia.widgets.chat.controller;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +32,7 @@ import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
+import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
@@ -40,19 +42,18 @@ import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
-import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.chat.model.ChatInputMode;
 import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.chat.model.history.CustomCardItem;
+import com.glia.widgets.chat.model.history.LinkedChatItem;
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem;
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
 import com.glia.widgets.chat.model.history.OperatorChatItem;
 import com.glia.widgets.chat.model.history.OperatorMessageItem;
 import com.glia.widgets.chat.model.history.OperatorStatusItem;
-import com.glia.widgets.chat.model.history.LinkedChatItem;
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
 import com.glia.widgets.chat.model.history.VisitorMessageItem;
 import com.glia.widgets.core.dialog.DialogController;
@@ -95,11 +96,13 @@ import com.glia.widgets.view.MinimizeHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -211,6 +214,8 @@ public class ChatController implements
 
     // TODO pending photoCaptureFileUri - need to move some place better
     private Uri photoCaptureFileUri = null;
+
+    private final Set<String> messageIds = new HashSet<>();
 
     public ChatController(
             MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
@@ -388,14 +393,18 @@ public class ChatController implements
         }
     }
 
-    private synchronized void emitChatItems(ChatState state) {
-        if (setState(state) && viewCallback != null) {
-            Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() +
-                    "\n(State): " + state);
-            viewCallback.emitItems(state.chatItems);
-            viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
+    private final Comparator<ChatItem> chatItemComparator = (chatItem1, chatItem2) -> {
+        if (chatItem1 instanceof LinkedChatItem && chatItem2 instanceof LinkedChatItem) {
+            long item1Timestamp = ((LinkedChatItem) chatItem1).getTimestamp();
+            long item2Timestamp = ((LinkedChatItem) chatItem2).getTimestamp();
+            if (item1Timestamp < item2Timestamp) {
+                return -1;
+            } else if (item1Timestamp > item2Timestamp) {
+                return 1;
+            }
         }
-    }
+        return 0;
+    };
 
     public void onDestroy(boolean retain) {
         Logger.d(TAG, "onDestroy, retain:" + retain);
@@ -460,38 +469,12 @@ public class ChatController implements
         disposable.add(onMessageUseCase.execute().doOnNext(this::onMessage).subscribe());
     }
 
-    private void onMessage(@NonNull ChatMessageInternal messageInternal) {
-        ChatMessage message = messageInternal.getChatMessage();
-        if (!isNewMessage(chatState.chatItems, message)) {
-            return;
+    private synchronized void emitChatItems(ChatState state) {
+        if (setState(state) && viewCallback != null) {
+            Logger.d(TAG, "Emit chat items:\n" + state.chatItems.toString() + "\n(State): " + state);
+            viewCallback.emitItems(state.chatItems);
+            viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
         }
-
-        boolean isUnsentMessage = !chatState.unsentMessages.isEmpty() && chatState.unsentMessages.get(0).getMessage().equals(message.getContent());
-        Logger.d(TAG, "onMessage: " + message.getContent() + ", id: " + message.getId() + ", isUnsentMessage: " + isUnsentMessage);
-        if (isUnsentMessage) {
-            List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
-            VisitorMessageItem currentMessage = unsentMessages.get(0);
-            unsentMessages.remove(currentMessage);
-
-            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
-            int currentMessageIndex = currentChatItems.indexOf(currentMessage);
-            currentChatItems.remove(currentMessage);
-            currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message));
-
-            // emitting state because no need to change recyclerview items here
-            emitViewState(chatState
-                    .changeItems(currentChatItems)
-                    .changeUnsentMessages(unsentMessages)
-            );
-            if (!chatState.unsentMessages.isEmpty()) {
-                sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
-            }
-            return;
-        }
-
-        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
-        appendMessageItem(items, messageInternal);
-        emitChatItems(chatState.changeItems(items));
     }
 
     private void onMessageSent(VisitorMessage message) {
@@ -552,18 +535,36 @@ public class ChatController implements
         messagesNotSeenHandler.chatOnBackClicked();
     }
 
-    public void onBackArrowClicked(@Nullable ChatView.OnBackClickedListener onBackClickedListener) {
-        if (isFromCallScreenUseCase.isFromCallScreen()) {
-            if (viewCallback != null) {
-                viewCallback.backToCall();
-            }
-        } else {
-            if (onBackClickedListener!= null) {
-                onBackClickedListener.onBackClicked();
-            }
+    private void onMessage(@NonNull ChatMessageInternal messageInternal) {
+        ChatMessage message = messageInternal.getChatMessage();
+        if (isOldMessage(message)) {
+            return;
         }
 
-        updateFromCallScreenUseCase.updateFromCallScreen(false);
+        boolean isUnsentMessage = !chatState.unsentMessages.isEmpty() && chatState.unsentMessages.get(0).getMessage().equals(message.getContent());
+        Logger.d(TAG, "onMessage: " + message.getContent() + ", id: " + message.getId() + ", isUnsentMessage: " + isUnsentMessage);
+        if (isUnsentMessage) {
+            List<VisitorMessageItem> unsentMessages = new ArrayList<>(chatState.unsentMessages);
+            VisitorMessageItem currentMessage = unsentMessages.get(0);
+            unsentMessages.remove(currentMessage);
+
+            List<ChatItem> currentChatItems = new ArrayList<>(chatState.chatItems);
+            int currentMessageIndex = currentChatItems.indexOf(currentMessage);
+            currentChatItems.remove(currentMessage);
+            currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message));
+
+            // emitting state because no need to change recyclerview items here
+            emitViewState(chatState.changeItems(currentChatItems).changeUnsentMessages(unsentMessages)
+            );
+            if (!chatState.unsentMessages.isEmpty()) {
+                sendMessageUseCase.execute(chatState.unsentMessages.get(0).getMessage(), sendMessageCallback);
+            }
+            return;
+        }
+
+        List<ChatItem> items = new ArrayList<>(chatState.chatItems);
+        appendMessageItem(items, messageInternal);
+        emitChatItems(chatState.changeItems(items));
     }
 
     public void noMoreOperatorsAvailableDismissed() {
@@ -615,9 +616,7 @@ public class ChatController implements
         viewCallback.emitUploadAttachments(getFileAttachmentsUseCase.execute());
 
         // always start in bottom
-        emitViewState(chatState
-                .isInBottomChanged(true)
-                .changeVisibility(true)
+        emitViewState(chatState.isInBottomChanged(true).changeVisibility(true)
         );
 
         viewCallback.scrollToBottomImmediate();
@@ -804,8 +803,7 @@ public class ChatController implements
         if (chatState.operatorStatusItem != null) {
             items.remove(chatState.operatorStatusItem);
         }
-        OperatorStatusItem operatorStatusItem =
-                OperatorStatusItem.QueueingStatusItem(chatState.companyName);
+        OperatorStatusItem operatorStatusItem = OperatorStatusItem.QueueingStatusItem(chatState.companyName);
         items.add(operatorStatusItem);
         emitViewState(chatState.queueingStarted(operatorStatusItem));
         emitChatItems(chatState.changeItems(items));
@@ -878,26 +876,31 @@ public class ChatController implements
         emitViewState(chatState.stop());
     }
 
-    private void appendHistoryChatItem(List<ChatItem> currentChatItems, ChatMessageInternal chatMessageInternal) {
+    public void onBackArrowClicked(@Nullable ChatView.OnBackClickedListener onBackClickedListener) {
+        if (isFromCallScreenUseCase.isFromCallScreen()) {
+            if (viewCallback != null) {
+                viewCallback.backToCall();
+            }
+        } else {
+            if (onBackClickedListener != null) {
+                onBackClickedListener.onBackClicked();
+            }
+        }
+
+        updateFromCallScreenUseCase.updateFromCallScreen(false);
+    }
+
+    private void appendHistoryChatItem(
+            List<ChatItem> currentChatItems,
+            ChatMessageInternal chatMessageInternal,
+            boolean isClosed
+    ) {
         ChatMessage message = chatMessageInternal.getChatMessage();
         if (message.getSenderType() == Chat.Participant.VISITOR) {
             appendHistoryMessage(currentChatItems, message);
             addVisitorAttachmentItemsToChatItems(currentChatItems, message);
         } else if (message.getSenderType() == Chat.Participant.OPERATOR) {
-            appendOperatorMessage(currentChatItems, chatMessageInternal);
-        }
-    }
-
-    private void appendHistoryMessage(List<ChatItem> currentChatItems, ChatMessage message) {
-        MessageAttachment attachment = message.getAttachment();
-        if (attachment instanceof SingleChoiceAttachment &&
-                ((SingleChoiceAttachment) attachment).getSelectedOption() != null) {
-            Logger.d(TAG, "Not adding singleChoiceAnswer");
-            return;
-        }
-
-        if (message.getContent() != null && !message.getContent().isEmpty()) {
-            currentChatItems.add(VisitorMessageItem.asHistoryItem(message));
+            appendOperatorMessage(currentChatItems, chatMessageInternal, isClosed);
         }
     }
 
@@ -912,7 +915,7 @@ public class ChatController implements
     }
 
     private void onOperatorMessageReceived(List<ChatItem> currentChatItems, ChatMessageInternal messageInternal) {
-        appendOperatorMessage(currentChatItems, messageInternal);
+        appendOperatorMessage(currentChatItems, messageInternal, false);
         appendMessagesNotSeen();
         changeChatInputMode(currentChatItems, messageInternal.getChatMessage());
     }
@@ -951,17 +954,9 @@ public class ChatController implements
         }
     }
 
-    private void appendSentMessage(List<ChatItem> items, ChatMessage message) {
-        // do nothing if single choice response
-        MessageAttachment attachment = message.getAttachment();
-        if (attachment instanceof SingleChoiceAttachment &&
-                ((SingleChoiceAttachment) attachment).getSelectedOption() != null) {
-            Logger.d(TAG, "Not adding singleChoiceAnswer");
-            return;
-        }
-
-        if (message.getContent() != null && !message.getContent().isEmpty()) {
-            items.add(VisitorMessageItem.asNewMessage(message));
+    private void appendHistoryMessage(List<ChatItem> currentChatItems, ChatMessage message) {
+        if (!TextUtils.isEmpty(message.getContent())) {
+            currentChatItems.add(VisitorMessageItem.asHistoryItem(message));
         }
     }
 
@@ -979,7 +974,7 @@ public class ChatController implements
 
     private void changeDeliveredIndex(List<ChatItem> currentChatItems, VisitorMessage message) {
         // "Delivered" status only applies to visitor messages
-        if (message.getSender() != Chat.Participant.VISITOR) return;
+        if (message.getSenderType() != Chat.Participant.VISITOR) return;
         String messageId = message.getId();
         boolean foundDelivered = false;
         for (int i = currentChatItems.size() - 1; i >= 0; i--) {
@@ -1012,9 +1007,13 @@ public class ChatController implements
         currentChatItems.set(i, VisitorAttachmentItem.editDeliveredStatus(item, delivered));
     }
 
-    private void appendOperatorMessage(List<ChatItem> currentChatItems, ChatMessageInternal chatMessageInternal) {
+    private void appendOperatorMessage(
+            List<ChatItem> currentChatItems,
+            ChatMessageInternal chatMessageInternal,
+            boolean isClosed
+    ) {
         setLastOperatorItemChatHeadVisibility(currentChatItems, isOperatorChanged(currentChatItems, chatMessageInternal));
-        appendOperatorOrCustomCardItem(currentChatItems, chatMessageInternal);
+        appendOperatorOrCustomCardItem(currentChatItems, chatMessageInternal, isClosed);
         appendOperatorAttachmentItems(currentChatItems, chatMessageInternal);
         setLastOperatorItemChatHeadVisibility(currentChatItems, true);
     }
@@ -1035,53 +1034,9 @@ public class ChatController implements
         return false;
     }
 
-    private void setLastOperatorItemChatHeadVisibility(List<ChatItem> currentChatItems, boolean showChatHead) {
-        if (!currentChatItems.isEmpty()) {
-            ChatItem lastItem = currentChatItems.get(currentChatItems.size() - 1);
-            if (lastItem instanceof OperatorMessageItem) {
-                OperatorMessageItem lastItemInView = (OperatorMessageItem) lastItem;
-                currentChatItems.remove(lastItemInView);
-                currentChatItems.add(
-                        new OperatorMessageItem(
-                                lastItemInView.getId(),
-                                lastItemInView.operatorName,
-                                lastItemInView.operatorProfileImgUrl,
-                                showChatHead,
-                                lastItemInView.content,
-                                lastItemInView.singleChoiceOptions,
-                                lastItemInView.selectedChoiceIndex,
-                                lastItemInView.choiceCardImageUrl,
-                                lastItemInView.operatorId,
-                                lastItemInView.getTimestamp()
-                        )
-                );
-            } else if (lastItem instanceof OperatorAttachmentItem) {
-                OperatorAttachmentItem lastItemInView = (OperatorAttachmentItem) lastItem;
-                currentChatItems.remove(lastItemInView);
-                currentChatItems.add(
-                        new OperatorAttachmentItem(
-                                lastItemInView.getId(),
-                                lastItemInView.getViewType(),
-                                showChatHead,
-                                lastItemInView.attachmentFile,
-                                lastItemInView.operatorProfileImgUrl,
-                                false,
-                                false,
-                                lastItemInView.operatorId,
-                                lastItemInView.getMessageId(),
-                                lastItemInView.getTimestamp()
-                        )
-                );
-            } else if (lastItem instanceof CustomCardItem) {
-                CustomCardItem lastCustomCardItem = (CustomCardItem) lastItem;
-                currentChatItems.remove(lastCustomCardItem);
-                currentChatItems.add(
-                        new CustomCardItem(
-                                lastCustomCardItem.getMessage(),
-                                lastCustomCardItem.getViewType()
-                        )
-                );
-            }
+    private void appendSentMessage(List<ChatItem> items, ChatMessage message) {
+        if (!TextUtils.isEmpty(message.getContent())) {
+            items.add(VisitorMessageItem.asNewMessage(message));
         }
     }
 
@@ -1117,14 +1072,14 @@ public class ChatController implements
         }
     }
 
-    private void appendOperatorOrCustomCardItem(List<ChatItem> currentChatItems, ChatMessageInternal messageInternal) {
+    private void appendOperatorOrCustomCardItem(List<ChatItem> currentChatItems, ChatMessageInternal messageInternal, boolean isClosed) {
         ChatMessage message = messageInternal.getChatMessage();
         if (!message.getContent().equals(EMPTY_MESSAGE)) {
             Integer viewType = customCardAdapterTypeUseCase.execute(message);
             if (viewType != null) {
                 appendCustomCardItem(currentChatItems, message, viewType);
             } else {
-                appendOperatorMessageItem(currentChatItems, messageInternal);
+                appendOperatorMessageItem(currentChatItems, messageInternal, isClosed);
             }
         }
     }
@@ -1143,24 +1098,51 @@ public class ChatController implements
         }
     }
 
-    private void appendOperatorMessageItem(List<ChatItem> currentChatItems,
-                                           ChatMessageInternal messageInternal) {
-        ChatMessage message = messageInternal.getChatMessage();
-        MessageAttachment messageAttachment = message.getAttachment();
-        currentChatItems.add(
-                new OperatorMessageItem(
-                        message.getId(),
-                        messageInternal.getOperatorName().orElse(chatState.operatorName),
-                        messageInternal.getOperatorImageUrl().orElse(chatState.operatorProfileImgUrl),
-                        false,
-                        message.getContent(),
-                        getSingleChoiceAttachmentOptions(messageAttachment),
-                        null,
-                        getSingleChoiceAttachmentImgUrl(messageAttachment),
-                        messageInternal.getOperatorId().orElse(UUID.randomUUID().toString()),
-                        message.getTimestamp()
-                )
-        );
+    private void setLastOperatorItemChatHeadVisibility(List<ChatItem> currentChatItems, boolean showChatHead) {
+        if (!currentChatItems.isEmpty()) {
+            ChatItem lastItem = currentChatItems.get(currentChatItems.size() - 1);
+            if (lastItem instanceof OperatorMessageItem) {
+                OperatorMessageItem lastItemInView = (OperatorMessageItem) lastItem;
+                currentChatItems.remove(lastItemInView);
+                currentChatItems.add(
+                        new OperatorMessageItem(
+                                lastItemInView.getId(),
+                                lastItemInView.operatorName,
+                                lastItemInView.operatorProfileImgUrl,
+                                showChatHead,
+                                lastItemInView.content,
+                                lastItemInView.singleChoiceOptions,
+                                lastItemInView.choiceCardImageUrl,
+                                lastItemInView.operatorId,
+                                lastItemInView.getTimestamp(),
+                                lastItemInView.isClosed
+                        )
+                );
+            } else if (lastItem instanceof OperatorAttachmentItem) {
+                OperatorAttachmentItem lastItemInView = (OperatorAttachmentItem) lastItem;
+                currentChatItems.remove(lastItemInView);
+                currentChatItems.add(
+                        new OperatorAttachmentItem(
+                                lastItemInView.getId(),
+                                lastItemInView.getViewType(),
+                                showChatHead,
+                                lastItemInView.attachmentFile,
+                                lastItemInView.operatorProfileImgUrl,
+                                false,
+                                false,
+                                lastItemInView.operatorId,
+                                lastItemInView.getMessageId(),
+                                lastItemInView.getTimestamp()
+                        )
+                );
+            } else if (lastItem instanceof CustomCardItem) {
+                CustomCardItem lastCustomCardItem = (CustomCardItem) lastItem;
+                currentChatItems.remove(lastCustomCardItem);
+                currentChatItems.add(
+                        new CustomCardItem(lastCustomCardItem.getMessage(), lastCustomCardItem.getViewType())
+                );
+            }
+        }
     }
 
     private String getSingleChoiceAttachmentImgUrl(MessageAttachment attachment) {
@@ -1177,17 +1159,27 @@ public class ChatController implements
         return imageUrl;
     }
 
-    private List<SingleChoiceOption> getSingleChoiceAttachmentOptions(MessageAttachment attachment) {
-        List<SingleChoiceOption> singleChoiceOptions = null;
-
-        if (attachment instanceof SingleChoiceAttachment) {
-            SingleChoiceAttachment singleChoiceAttachment = (SingleChoiceAttachment) attachment;
-            singleChoiceOptions =
-                    Arrays.stream(singleChoiceAttachment.getOptions())
-                            .collect(Collectors.toList());
-        }
-
-        return singleChoiceOptions;
+    private void appendOperatorMessageItem(
+            List<ChatItem> currentChatItems,
+            ChatMessageInternal messageInternal,
+            boolean isClosed
+    ) {
+        ChatMessage message = messageInternal.getChatMessage();
+        MessageAttachment messageAttachment = message.getAttachment();
+        currentChatItems.add(
+                new OperatorMessageItem(
+                        message.getId(),
+                        messageInternal.getOperatorName().orElse(chatState.operatorName),
+                        messageInternal.getOperatorImageUrl().orElse(chatState.operatorProfileImgUrl),
+                        false,
+                        message.getContent(),
+                        getSingleChoiceAttachmentOptions(messageAttachment),
+                        getSingleChoiceAttachmentImgUrl(messageAttachment),
+                        messageInternal.getOperatorId().orElse(UUID.randomUUID().toString()),
+                        message.getTimestamp(),
+                        isClosed
+                )
+        );
     }
 
     private void startTimer() {
@@ -1238,42 +1230,15 @@ public class ChatController implements
         };
     }
 
-    public void singleChoiceOptionClicked(
-            String id,
-            int indexInList,
-            int optionIndex
-    ) {
-        Logger.d(TAG, "singleChoiceOptionClicked, id: " + id);
-        if (indexInList == RecyclerView.NO_POSITION) {
-            return;
-        }
-        ChatItem item = chatState.chatItems.get(indexInList);
-        if (item.getId().equals(id)) {
-            OperatorMessageItem choiceCardItem =
-                    (OperatorMessageItem) chatState.chatItems.get(indexInList);
-            SingleChoiceOption selectedOption =
-                    choiceCardItem.singleChoiceOptions.get(optionIndex);
-            sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback);
+    private List<SingleChoiceOption> getSingleChoiceAttachmentOptions(MessageAttachment attachment) {
+        List<SingleChoiceOption> singleChoiceOptions = null;
 
-            OperatorMessageItem choiceCardItemWithSelected =
-                    new OperatorMessageItem(
-                            id,
-                            choiceCardItem.operatorName,
-                            choiceCardItem.operatorProfileImgUrl,
-                            choiceCardItem.showChatHead,
-                            choiceCardItem.content,
-                            choiceCardItem.singleChoiceOptions,
-                            optionIndex,
-                            choiceCardItem.choiceCardImageUrl,
-                            choiceCardItem.operatorId,
-                            choiceCardItem.getTimestamp()
-                    );
-
-            List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);
-            modifiedItems.remove(indexInList);
-            modifiedItems.add(indexInList, choiceCardItemWithSelected);
-            emitChatItems(chatState.changeItems(modifiedItems));
+        if (attachment instanceof SingleChoiceAttachment) {
+            SingleChoiceAttachment singleChoiceAttachment = (SingleChoiceAttachment) attachment;
+            singleChoiceOptions = Arrays.asList(singleChoiceAttachment.getOptions());
         }
+
+        return singleChoiceOptions;
     }
 
     public void sendCustomCardResponse(String messageId, String text, String value) {
@@ -1366,14 +1331,54 @@ public class ChatController implements
         disposable.add(historyDisposable);
     }
 
+    public void singleChoiceOptionClicked(
+            String id,
+            int indexInList,
+            int optionIndex
+    ) {
+        Logger.d(TAG, "singleChoiceOptionClicked, id: " + id);
+        if (indexInList == RecyclerView.NO_POSITION) {
+            return;
+        }
+        ChatItem item = chatState.chatItems.get(indexInList);
+        if (item.getId().equals(id)) {
+            OperatorMessageItem choiceCardItem = (OperatorMessageItem) chatState.chatItems.get(indexInList);
+            SingleChoiceOption selectedOption = choiceCardItem.singleChoiceOptions.get(optionIndex);
+            sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback);
+
+            OperatorMessageItem choiceCardItemWithSelected =
+                    new OperatorMessageItem(
+                            id,
+                            choiceCardItem.operatorName,
+                            choiceCardItem.operatorProfileImgUrl,
+                            choiceCardItem.showChatHead,
+                            choiceCardItem.content,
+                            choiceCardItem.singleChoiceOptions,
+                            choiceCardItem.choiceCardImageUrl,
+                            choiceCardItem.operatorId,
+                            choiceCardItem.getTimestamp(),
+                            true
+                    );
+
+            List<ChatItem> modifiedItems = new ArrayList<>(chatState.chatItems);
+            modifiedItems.remove(indexInList);
+            modifiedItems.add(indexInList, choiceCardItemWithSelected);
+            emitChatItems(chatState.changeItems(modifiedItems));
+        }
+    }
+
     private synchronized void historyLoaded(List<ChatMessageInternal> messages) {
         Logger.d(TAG, "historyLoaded");
         List<ChatItem> items = new ArrayList<>(chatState.chatItems);
-        messages = removeDuplicates(items, messages);
+
         if (messages != null && !messages.isEmpty()) {
-            for (ChatMessageInternal message : messages) {
-                appendHistoryChatItem(items, message);
+            for (int index = 0; index < messages.size(); index++) {
+                ChatMessageInternal message = messages.get(index);
+                if (isOldMessage(message.getChatMessage())) continue;
+
+                appendHistoryChatItem(items, message, index != messages.size() - 1);
             }
+
             emitChatItems(chatState.historyLoaded(items.stream().sorted(chatItemComparator).collect(Collectors.toList())));
             initGliaEngagementObserving();
         } else if (!chatState.engagementRequested) {
@@ -1382,36 +1387,8 @@ public class ChatController implements
         }
     }
 
-    private Comparator<ChatItem> chatItemComparator = (chatItem1, chatItem2) -> {
-        if (chatItem1 instanceof LinkedChatItem && chatItem2 instanceof LinkedChatItem) {
-            long item1Timestamp = ((LinkedChatItem) chatItem1).getTimestamp();
-            long item2Timestamp = ((LinkedChatItem) chatItem2).getTimestamp();
-            if (item1Timestamp < item2Timestamp) {
-                return -1;
-            } else if (item1Timestamp > item2Timestamp) {
-                return 1;
-            }
-        }
-        return 0;
-    };
-
-    private List<ChatMessageInternal> removeDuplicates(List<ChatItem> oldHistory, List<ChatMessageInternal> newHistory) {
-        if (newHistory == null || newHistory.isEmpty()) {
-            return newHistory;
-        }
-        if (oldHistory == null || oldHistory.isEmpty()) {
-            return newHistory;
-        }
-        return newHistory.stream()
-                .filter(newMessage -> isNewMessage(oldHistory, newMessage.getChatMessage()))
-                .collect(Collectors.toList());
-    }
-
-    private boolean isNewMessage(List<ChatItem> oldHistory, ChatMessage newMessage) {
-        return oldHistory.stream()
-                .filter(oldMessage -> oldMessage instanceof LinkedChatItem)
-                .map(oldMessage -> (LinkedChatItem) oldMessage)
-                .noneMatch(oldMessage -> oldMessage.getMessageId().equals(newMessage.getId()));
+    private boolean isOldMessage(ChatMessage newMessage) {
+        return !messageIds.add(newMessage.getId());
     }
 
     private void error(Throwable error) {

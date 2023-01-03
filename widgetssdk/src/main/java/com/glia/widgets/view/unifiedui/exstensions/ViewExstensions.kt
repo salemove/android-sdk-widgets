@@ -204,7 +204,7 @@ internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
 }
 
 internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {
-    colorTheme?.primaryColorStateList.also(::setImageTintList)
+    colorTheme?.primaryColorStateList?.also(::setImageTintList)
 }
 
 internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme: BarButtonStatesTheme?) {

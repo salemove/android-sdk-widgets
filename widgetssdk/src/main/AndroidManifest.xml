@@ -33,7 +33,7 @@
         <activity android:name="com.glia.widgets.messagecenter.MessageCenterActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Chat.Activity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity android:name=".callvisualizer.EndScreenSharingActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Call.Activity"

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -58,6 +59,8 @@ class MessageCenterView(
     private val attachmentPopup by lazy { AttachmentPopup(addAttachmentButton) }
 
     private val appBar: AppBarView get() = binding.appBarView
+    private val scrollView: ScrollView get() = binding.scrollView
+    private val scrollContainer: View get() = binding.scrollContainer
     private val icon: ImageView get() = binding.icon
     private val title: TextView get() = binding.title
     private val description: TextView get() = binding.description
@@ -79,6 +82,7 @@ class MessageCenterView(
         initConfigurations()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
         initCallbacks()
+        handleScrollView()
     }
 
     private fun setupViewAppearance() {
@@ -128,6 +132,39 @@ class MessageCenterView(
         }
         addAttachmentButton.setOnClickListener {
             controller?.onAddAttachmentButtonClicked()
+        }
+    }
+
+    private fun handleScrollView() {
+        var scrollContainerHeight = 0
+        scrollContainer.viewTreeObserver.addOnGlobalLayoutListener {
+            val scrollViewWidth = scrollView.width
+            val scrollViewHeight = scrollView.height
+
+            // Set to the container the size of the scroll view.
+            // 1. Ignore if the scroll view height is less than the value that was previous set.
+            // 2. Skip if the content height is more than the scroll view height (small screen/landscape mode)
+            if (
+                scrollContainerHeight < scrollViewHeight && // 1
+                scrollContainer.height <= scrollViewHeight // 2
+            ) {
+                // Set new layout params.
+                scrollContainer.layoutParams = FrameLayout.LayoutParams(scrollViewWidth, scrollViewHeight)
+
+                // Remember the maximum size to prevent cyclically layout params updates.
+                scrollContainerHeight = scrollViewHeight
+            }
+
+            // Scroll to the top of the send message group when keyboard appears.
+            // 1. Ignore if the content is more than scroll view (landscape mode). In this case, Android
+            //    will automatically scroll to the edit text view. Or will use a fullscreen keyboard.
+            // 2. Check possible keyboard appearing.
+            if (
+                scrollContainerHeight > 0 && // 1
+                scrollContainer.height > scrollViewHeight // 2
+            ) {
+                scrollView.post { scrollView.smoothScrollTo(0, addAttachmentButton.top) }
+            }
         }
     }
 

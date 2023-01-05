@@ -37,6 +37,10 @@ public class GliaOnEngagementUseCase implements Consumer<OmnicoreEngagement> {
     }
 
     public void execute(Listener listener) {
+        if (this.listener == listener) {
+            // Already listening
+            return;
+        }
         this.listener = listener;
         gliaRepository.listenForEngagement(this);
     }

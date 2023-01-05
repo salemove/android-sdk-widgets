@@ -74,6 +74,10 @@ public class GliaOnEngagementEndUseCase implements
     }
 
     public void execute(Listener listener) {
+        if (this.listener == listener) {
+            // Already listening
+            return;
+        }
         this.listener = listener;
         engagementUseCase.execute(this);
     }

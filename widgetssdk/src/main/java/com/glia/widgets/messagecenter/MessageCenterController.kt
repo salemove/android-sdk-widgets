@@ -12,20 +12,45 @@ class MessageCenterController(
     private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
+    private var state = State()
 
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
+        setState(state)
     }
 
     override fun onCheckMessagesClicked() {
         view?.navigateToMessaging()
     }
 
-    override fun onSendMessageClicked(message: String) {
-        view?.hideSoftKeyboard()
-        sendSecureMessageUseCase.execute(message) { _: VisitorMessage?, gliaException: GliaException? ->
-            handleSendMessageResult(gliaException)
+    override fun onMessageChanged(message: String) {
+        val showLimitError = message.count() > MAX_MESSAGE_LENGTH
+        if (state.showMessageLimitError != showLimitError) {
+            setState(state.copy(showMessageLimitError = showLimitError))
         }
+
+        val sendButtonState = if (message.isEmpty() || showLimitError) {
+            State.ButtonState.DISABLE
+        } else {
+            State.ButtonState.NORMAL
+        }
+        if (state.sendMessageButtonState != sendButtonState) {
+            setState(state.copy(sendMessageButtonState = sendButtonState))
+        }
+    }
+
+    override fun onSendMessageClicked(message: String) {
+        setState(state.copy(
+            sendMessageButtonState = State.ButtonState.PROGRESS,
+            messageEditTextEnabled = false,
+            addAttachmentButtonEnabled = false
+        ))
+        view?.hideSoftKeyboard()
+        val callback =
+            RequestCallback { _: VisitorMessage?, gliaException: GliaException? ->
+                handleSendMessageResult(gliaException)
+            }
+        sendSecureMessageUseCase.execute(message, callback)
     }
 
     @VisibleForTesting
@@ -38,6 +63,11 @@ class MessageCenterController(
                 GliaException.Cause.INTERNAL_ERROR -> view?.showUnexpectedErrorDialog()
                 else -> {
                     view?.showUnexpectedErrorDialog()
+                    setState(state.copy(
+                        sendMessageButtonState = State.ButtonState.NORMAL,
+                        messageEditTextEnabled = true,
+                        addAttachmentButtonEnabled = true
+                    ))
                 }
             }
         }
@@ -73,5 +103,14 @@ class MessageCenterController(
 
     override fun onDestroy() {
         isMessageCenterAvailableUseCase.dispose()
+    }
+
+    private fun setState(state: State) {
+        this.state = state
+        this.view?.onStateUpdated(state)
+    }
+
+    companion object {
+        private const val MAX_MESSAGE_LENGTH = 10000
     }
 }

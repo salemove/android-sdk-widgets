@@ -110,6 +110,9 @@ class MessageCenterView(
         messageView.setOnAttachmentButtonClickListener {
             controller?.onAddAttachmentButtonClicked()
         }
+        messageView.setOnMessageTextChangedListener {
+            controller?.onMessageChanged(it)
+        }
         appBar.setOnBackClickedListener {
             controller?.onBackArrowClicked()
         }
@@ -179,4 +182,9 @@ class MessageCenterView(
     override fun navigateToMessaging() {
         this.onNavigateToMessagingListener?.navigateToMessaging()
     }
+
+    override fun onStateUpdated(state: State) {
+        messageView.onStateUpdated(state)
+    }
+
 }

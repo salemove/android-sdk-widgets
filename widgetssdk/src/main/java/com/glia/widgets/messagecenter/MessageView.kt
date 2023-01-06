@@ -1,18 +1,31 @@
 package com.glia.widgets.messagecenter
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
+import android.text.Editable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.*
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
+import com.glia.widgets.helper.SimpleTextWatcher
+import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 class MessageView(
@@ -37,8 +50,11 @@ class MessageView(
     private val description: TextView get() = binding.description
     private val checkMessagesButton: MaterialButton get() = binding.btnCheckMessages
     private val sendMessageButton: MaterialButton get() = binding.btnSendMessage
+    private val sendMessageButtonProgressBar: CircularProgressIndicator get() = binding.btnSendMessageProgressBar
+    private val sendMessageButtonTextView: TextView get() = binding.btnSendMessageText
     private val messageTitle: TextView get() = binding.messageTitle
     private val messageEditText: EditText get() = binding.messageEditText
+    private val messageErrorTextView: TextView get() = binding.errorTextView
     private val addAttachmentButton: ImageButton get() = binding.addAttachmentButton
     private val attachmentRecyclerView: RecyclerView get() = binding.attachmentsRecyclerView
     private val sendMessageGroup: Group get() = binding.sendMessageGroup
@@ -48,17 +64,40 @@ class MessageView(
     private var checkMessageButtonClickListener: OnClickListener? = null
     private var attachmentButtonClickListener: OnClickListener? = null
     private var sendMessageButtonClickListener: ((String) -> Unit)? = null
+    private var onMessageTextChangedListener: ((String) -> Unit)? = null
 
     init {
         isFillViewport = true
         handleScrollView()
         initCallbacks()
+        setupTheme()
     }
 
     @JvmOverloads
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+
+    private fun setupTheme() {
+        val normalColor = getColorCompat(R.color.glia_base_normal_color)
+        val disabledColor = getColorCompat(R.color.glia_base_shade_color)
+
+        val colors: MutableList<Int> = mutableListOf()
+        val states: MutableList<IntArray> = mutableListOf()
+
+        val disabledState = intArrayOf(-android.R.attr.state_enabled)
+        val activatedState = intArrayOf(android.R.attr.state_activated)
+        val enabledState = intArrayOf()
+
+        colors.add(disabledColor)
+        states.add(disabledState)
+
+        colors.add(normalColor)
+        states.add(enabledState)
+
+        addAttachmentButton.imageTintList =
+            ColorStateList(states.toTypedArray(), colors.toIntArray())
+    }
 
     private fun initCallbacks() {
         checkMessagesButton.setOnClickListener {
@@ -71,6 +110,12 @@ class MessageView(
         addAttachmentButton.setOnClickListener {
             attachmentButtonClickListener?.onClick(it)
         }
+
+        messageEditText.addTextChangedListener(object : SimpleTextWatcher() {
+            override fun afterTextChanged(editable: Editable) {
+                onMessageTextChangedListener?.invoke(editable.toString())
+            }
+        })
     }
 
     private fun handleScrollView() {
@@ -139,4 +184,96 @@ class MessageView(
         sendMessageButtonClickListener = listener
     }
 
+    fun setOnMessageTextChangedListener(listener: (String) -> Unit) {
+        onMessageTextChangedListener = listener
+    }
+
+    fun onStateUpdated(state: State) {
+        updateSendButtonState(state.sendMessageButtonState)
+        updateSendMessageError(state.showMessageLimitError)
+        updateMessageEditText(state.messageEditTextEnabled, state.showMessageLimitError)
+        addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+    }
+
+    private fun updateSendMessageError(showError: Boolean) {
+        if (showError) {
+            messageErrorTextView.visibility = VISIBLE
+        } else {
+            messageErrorTextView.visibility = GONE
+        }
+    }
+
+    private fun updateMessageEditText(isEnabled: Boolean, showError: Boolean) {
+        messageEditText.isEnabled = isEnabled
+
+        val shape = ContextCompat.getDrawable(
+            context,
+            R.drawable.bg_edit_text
+        ) as GradientDrawable?
+        if (shape != null) {
+            val errorColor = getColorCompat(R.color.glia_system_negative_color)
+            val normalColor = getColorCompat(R.color.glia_base_shade_color)
+            val disabledBackgroundColor = getColorCompat(R.color.glia_disable_button_bg)
+            val normalBackgroundColor = getColorCompat(R.color.glia_base_light_color)
+            val strokeColor = if (showError) ColorStateList.valueOf(errorColor)
+            else ColorStateList.valueOf(normalColor)
+            val backgroundColor = if (isEnabled) normalBackgroundColor
+            else disabledBackgroundColor
+            val width = context.resources.getDimensionPixelSize(R.dimen.glia_px)
+            shape.setStroke(width, strokeColor)
+            shape.setColor(backgroundColor)
+            messageEditText.background = shape
+        }
+    }
+
+    private fun updateSendButtonState(state: State.ButtonState) {
+        // default button theme
+        val normalButtonTheme = ButtonTheme(
+            TextTheme(
+                ColorTheme(false, listOf(getColorCompat(R.color.glia_base_light_color))),
+                null, null, null, null),
+            LayerTheme(
+                ColorTheme(false, listOf(getColorCompat(R.color.glia_brand_primary_color))),
+                getColorCompat(android.R.color.transparent), 0f),
+            null, null, null)
+
+        // default disabled button theme
+        val disabledButtonTheme = ButtonTheme(
+            TextTheme(
+                ColorTheme(false, listOf(getColorCompat(R.color.glia_disable_button_text))),
+                null, null, null, null),
+            LayerTheme(
+                ColorTheme(false, listOf(getColorCompat(R.color.glia_disable_button_bg))),
+                getColorCompat(R.color.glia_disable_button_border), context.resources.getDimensionPixelSize(R.dimen.glia_px).toFloat()),
+            ColorTheme(false, listOf(getColorCompat(R.color.glia_button_progress_bar))), null, null)
+
+        when (state) {
+            State.ButtonState.PROGRESS -> {
+                disabledButtonTheme?.also { buttonTheme ->
+                    sendMessageButton.applyButtonTheme(buttonTheme)
+                    buttonTheme.text?.also { sendMessageButtonTextView.applyTextTheme(it) }
+                    buttonTheme.iconColor?.primaryColor
+                        ?.also { sendMessageButtonProgressBar.setIndicatorColor(it) }
+                }
+                sendMessageButtonProgressBar.visibility = VISIBLE
+                sendMessageButton.isEnabled = false
+            }
+            State.ButtonState.NORMAL -> {
+                normalButtonTheme?.also { buttonTheme ->
+                    sendMessageButton.applyButtonTheme(buttonTheme)
+                    buttonTheme.text?.also { sendMessageButtonTextView.applyTextTheme(it) }
+                }
+                sendMessageButtonProgressBar.visibility = GONE
+                sendMessageButton.isEnabled = true
+            }
+            State.ButtonState.DISABLE -> {
+                disabledButtonTheme?.also { buttonTheme ->
+                    sendMessageButton.applyButtonTheme(buttonTheme)
+                    buttonTheme.text?.also { sendMessageButtonTextView.applyTextTheme(it) }
+                }
+                sendMessageButtonProgressBar.visibility = GONE
+                sendMessageButton.isEnabled = false
+            }
+        }
+    }
 }

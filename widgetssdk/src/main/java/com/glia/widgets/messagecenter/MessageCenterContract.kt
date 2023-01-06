@@ -8,6 +8,7 @@ interface MessageCenterContract {
     interface Controller : BaseController {
         fun setView(view: View)
         fun onCheckMessagesClicked()
+        fun onMessageChanged(message: String)
         fun onSendMessageClicked(message: String)
         fun onBackArrowClicked()
         fun onCloseButtonClicked()
@@ -19,6 +20,7 @@ interface MessageCenterContract {
     }
 
     interface View : BaseView<Controller> {
+        fun onStateUpdated(state: State)
         fun finish()
         fun navigateToMessaging()
         fun showAttachmentPopup()

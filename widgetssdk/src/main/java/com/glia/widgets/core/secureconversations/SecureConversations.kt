@@ -36,4 +36,8 @@ class SecureConversations(private val secureConversations: SecureConversations) 
     override fun uploadFile(fileUri: Uri, callback: RequestCallback<EngagementFile>) {
         secureConversations.uploadFile(fileUri, callback)
     }
+
+    override fun getUnreadMessageCount(callback: RequestCallback<Int>) {
+        secureConversations.getUnreadMessageCount(callback)
+    }
 }

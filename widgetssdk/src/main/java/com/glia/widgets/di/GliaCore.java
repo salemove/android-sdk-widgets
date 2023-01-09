@@ -16,6 +16,7 @@ import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.comms.EngagementOptions;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
+import com.glia.androidsdk.omnibrowse.VisitorCode;
 import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.queuing.QueueTicket;

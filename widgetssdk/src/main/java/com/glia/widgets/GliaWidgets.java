@@ -14,6 +14,7 @@ import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
+import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
@@ -316,6 +317,15 @@ public class GliaWidgets {
      */
     public static Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
         return Dependencies.glia().getAuthentication(behavior);
+    }
+
+    /**
+     * Returns CallVisualizer module
+     *
+     * // TODO
+     */
+    public static CallVisualizer getCallVisualizer() {
+        return Dependencies.getCallVisualizerManager();
     }
 
     /**

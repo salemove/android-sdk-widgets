@@ -3,38 +3,32 @@ package com.glia.widgets.messagecenter
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.*
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
-import com.google.android.material.button.MaterialButton
+import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
 class MessageCenterView(
-        context: Context,
-        attrs: AttributeSet?,
-        defStyleAttr: Int,
-        defStyleRes: Int)
-    : ConstraintLayout(
-        MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
-        attrs,
-        defStyleAttr,
-        defStyleRes
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int,
+    defStyleRes: Int
+) : LinearLayout(
+    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    attrs,
+    defStyleAttr,
+    defStyleRes
 ), MessageCenterContract.View {
 
     private var theme: UiTheme by Delegates.notNull()
@@ -53,48 +47,37 @@ class MessageCenterView(
     private var controller: MessageCenterContract.Controller? = null
 
     private val binding: MessageCenterViewBinding by lazy {
-        MessageCenterViewBinding.inflate(LayoutInflater.from(this.context), this)
+        MessageCenterViewBinding.inflate(layoutInflater, this)
     }
 
-    private val attachmentPopup by lazy { AttachmentPopup(addAttachmentButton) }
-
     private val appBar: AppBarView get() = binding.appBarView
-    private val scrollView: ScrollView get() = binding.scrollView
-    private val scrollContainer: View get() = binding.scrollContainer
-    private val icon: ImageView get() = binding.icon
-    private val title: TextView get() = binding.title
-    private val description: TextView get() = binding.description
-    private val checkMessagesButton: MaterialButton get() = binding.btnCheckMessages
-    private val sendMessageButton: MaterialButton get() = binding.btnSendMessage
-    private val messageTitle: TextView get() = binding.messageTitle
-    private val messageEditText: EditText get() = binding.messageEditText
-    private val addAttachmentButton: ImageButton get() = binding.addAttachmentButton
-    private val attachmentRecyclerView: RecyclerView get() = binding.attachmentsRecyclerView
-    private val sendMessageGroup: Group get() = binding.sendMessageGroup
+    private val messageView: MessageView get() = binding.messageView
+    private val confirmationView: ConfirmationScreenView get() = binding.confirmationView
+
     private var alertDialog: AlertDialog? = null
 
     @JvmOverloads
     constructor(
-            context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     init {
+        orientation = VERTICAL
+        initCallbacks()
         initConfigurations()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
-        initCallbacks()
-        handleScrollView()
     }
 
     private fun setupViewAppearance() {
         val callback: RequestCallback<Boolean> = RequestCallback { isAvailable, exception ->
             if (exception != null) {
                 showUnexpectedErrorDialog()
-                sendMessageGroup.visibility = INVISIBLE
+                messageView.hideSendMessageGroup()
                 return@RequestCallback
             }
             if (!isAvailable) {
                 showMessageCenterUnavailableDialog()
-                sendMessageGroup.visibility = INVISIBLE
+                messageView.hideSendMessageGroup()
             }
         }
 
@@ -118,11 +101,14 @@ class MessageCenterView(
     }
 
     private fun initCallbacks() {
-        checkMessagesButton.setOnClickListener {
+        messageView.setOnCheckMessageButtonClickListener {
             controller?.onCheckMessagesClicked()
         }
-        sendMessageButton.setOnClickListener {
-            controller?.onSendMessageClicked(messageEditText.text.toString())
+        messageView.setOnSendMessageButtonClickListener {
+            controller?.onSendMessageClicked(it)
+        }
+        messageView.setOnAttachmentButtonClickListener {
+            controller?.onAddAttachmentButtonClicked()
         }
         appBar.setOnBackClickedListener {
             controller?.onBackArrowClicked()
@@ -130,47 +116,14 @@ class MessageCenterView(
         appBar.setOnXClickedListener {
             controller?.onCloseButtonClicked()
         }
-        addAttachmentButton.setOnClickListener {
-            controller?.onAddAttachmentButtonClicked()
-        }
-    }
 
-    private fun handleScrollView() {
-        var scrollContainerHeight = 0
-        scrollContainer.viewTreeObserver.addOnGlobalLayoutListener {
-            val scrollViewWidth = scrollView.width
-            val scrollViewHeight = scrollView.height
-
-            // Set to the container the size of the scroll view.
-            // 1. Ignore if the scroll view height is less than the value that was previous set.
-            // 2. Skip if the content height is more than the scroll view height (small screen/landscape mode)
-            if (
-                scrollContainerHeight < scrollViewHeight && // 1
-                scrollContainer.height <= scrollViewHeight // 2
-            ) {
-                // Set new layout params.
-                scrollContainer.layoutParams = FrameLayout.LayoutParams(scrollViewWidth, scrollViewHeight)
-
-                // Remember the maximum size to prevent cyclically layout params updates.
-                scrollContainerHeight = scrollViewHeight
-            }
-
-            // Scroll to the top of the send message group when keyboard appears.
-            // 1. Ignore if the content is more than scroll view (landscape mode). In this case, Android
-            //    will automatically scroll to the edit text view. Or will use a fullscreen keyboard.
-            // 2. Check possible keyboard appearing.
-            if (
-                scrollContainerHeight > 0 && // 1
-                scrollContainer.height > scrollViewHeight // 2
-            ) {
-                scrollView.post { scrollView.smoothScrollTo(0, addAttachmentButton.top) }
-            }
+        confirmationView.setOnCheckMessagesButtonClickListener {
+            controller?.onCheckMessagesClicked()
         }
     }
 
     override fun showAttachmentPopup() {
-        attachmentPopup.show(
-            addAttachmentButton,
+        messageView.showAttachmentPopup(
             { controller?.onGalleryClicked() },
             { controller?.onTakePhotoClicked() },
             { controller?.onBrowseClicked() }
@@ -203,6 +156,14 @@ class MessageCenterView(
             this.context,
             theme
         )
+    }
+
+    override fun showConfirmationScreen() {
+        confirmationView.fadeThrough(messageView)
+    }
+
+    override fun hideSoftKeyboard() {
+        Utils.hideSoftKeyboard(context, windowToken)
     }
 
     override fun setController(controller: MessageCenterContract.Controller?) {

@@ -22,17 +22,16 @@ class MessageCenterController(
     }
 
     override fun onSendMessageClicked(message: String) {
-        val callback =
-            RequestCallback { _: VisitorMessage?, gliaException: GliaException? ->
-                handleSendMessageResult(gliaException)
-            }
-        sendSecureMessageUseCase.execute(message, callback)
+        view?.hideSoftKeyboard()
+        sendSecureMessageUseCase.execute(message) { _: VisitorMessage?, gliaException: GliaException? ->
+            handleSendMessageResult(gliaException)
+        }
     }
 
     @VisibleForTesting
     fun handleSendMessageResult(gliaException: GliaException?) {
         if (gliaException == null) {
-            view?.navigateToMessaging()
+            view?.showConfirmationScreen()
         } else {
             when (gliaException.cause) {
                 GliaException.Cause.AUTHENTICATION_ERROR -> view?.showMessageCenterUnavailableDialog()

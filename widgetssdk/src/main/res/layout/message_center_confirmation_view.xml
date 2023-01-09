@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:gravity="center"
+    tools:orientation="vertical"
+    tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat">
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_checkmark_message_center_confirmation_screen"
+        app:tint="?attr/gliaBrandPrimaryColor" />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/Application.Glia.Header3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/message_center_confirmation_screen_title" />
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/Application.Glia.Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="42dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="@string/message_center_confirmation_screen_message"
+        android:textSize="16sp" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.glia.widgets.view.button.GliaPositiveButton
+        android:id="@+id/btn_check_messages_confirmation_screen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="24dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/message_center_confirmation_screen_check_messages_btn"
+        android:textAllCaps="false" />
+
+</merge>

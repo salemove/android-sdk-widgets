@@ -24,5 +24,7 @@ interface MessageCenterContract {
         fun showAttachmentPopup()
         fun showUnexpectedErrorDialog()
         fun showMessageCenterUnavailableDialog()
+        fun showConfirmationScreen()
+        fun hideSoftKeyboard()
     }
 }

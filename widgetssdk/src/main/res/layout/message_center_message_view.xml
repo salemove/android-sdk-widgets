@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:fillViewport="true"
+    tools:parentTag="android.widget.ScrollView">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scroll_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Space
+            android:id="@+id/top_space"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintVertical_weight="1" />
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/ic_secure_message"
+            app:layout_constraintBottom_toTopOf="@id/title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_space" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/message_center_title"
+            android:textColor="@color/glia_base_dark_color"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@id/description"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/icon" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/message_center_description"
+            android:textColor="@color/glia_base_dark_color"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/btn_check_messages"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_check_messages"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@string/message_center_check_messages_btn"
+            android:textAllCaps="false"
+            android:textColor="@color/glia_brand_primary_color"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/message_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/description" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/send_message_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="message_title,add_attachment_button,message_edit_text, attachments_recycler_view, btn_send_message" />
+
+        <TextView
+            android:id="@+id/message_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="56dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/message_center_message_title"
+            android:textColor="@color/glia_base_dark_color"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/message_edit_text"
+            app:layout_constraintEnd_toStartOf="@id/add_attachment_button"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_check_messages" />
+
+        <ImageButton
+            android:id="@+id/add_attachment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@string/glia_chat_add_attachment_description"
+            android:paddingStart="16dp"
+            android:paddingTop="22dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/ic_add_attachment"
+            app:layout_constraintBottom_toTopOf="@id/message_edit_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/message_title" />
+
+        <EditText
+            android:id="@+id/message_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:gravity="start"
+            android:hint="@string/message_center_message_edit_text_hint"
+            android:imeOptions="actionNone"
+            android:inputType="textCapSentences|textMultiLine"
+            android:padding="@dimen/glia_large"
+            android:textColor="@color/glia_base_dark_color"
+            android:textColorHint="@color/glia_base_normal_color"
+            app:layout_constraintBottom_toTopOf="@id/attachments_recycler_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_min="56dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/message_title"
+            app:layout_constraintVertical_weight="7" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/attachments_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toTopOf="@id/btn_send_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="216dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/message_edit_text"
+            tools:itemCount="1"
+            tools:listitem="@layout/chat_attachment_uploaded_item" />
+
+        <com.glia.widgets.view.button.GliaPositiveButton
+            android:id="@+id/btn_send_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/message_center_send_message_btn"
+            app:layout_constraintBottom_toTopOf="@id/bottom_space"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/attachments_recycler_view" />
+
+        <Space
+            android:id="@+id/bottom_space"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_send_message"
+            app:layout_constraintVertical_weight="3" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+</merge>

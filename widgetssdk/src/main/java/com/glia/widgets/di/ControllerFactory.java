@@ -74,9 +74,9 @@ public class ControllerFactory {
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
+                    chatViewCallback,
                     repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
-                    chatViewCallback,
                     minimizeHandler,
                     dialogController,
                     messagesNotSeenHandler,

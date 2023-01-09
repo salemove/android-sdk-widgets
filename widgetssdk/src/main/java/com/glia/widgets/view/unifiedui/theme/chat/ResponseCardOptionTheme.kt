@@ -2,8 +2,10 @@ package com.glia.widgets.view.unifiedui.theme.chat
 
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 
-internal data class ResponseCardOptionTheme(
-    val normal: ButtonTheme?,
-    val selected: ButtonTheme?,
-    val disabled: ButtonTheme?,
+@JvmInline
+internal value class ResponseCardOptionTheme(
+    val normal: ButtonTheme?
+//    No longer needed, because the Response card has only one state when it is open
+//    val selected: ButtonTheme?,
+//    val disabled: ButtonTheme?,
 )

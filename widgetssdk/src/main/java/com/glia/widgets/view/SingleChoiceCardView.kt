@@ -60,14 +60,13 @@ class SingleChoiceCardView @JvmOverloads constructor(
         imageUrl: String?,
         content: String,
         options: List<SingleChoiceOption>,
-        selectedIndex: Int?,
         theme: UiTheme,
         adapterPosition: Int
     ) {
         setupCardView(theme)
         setupImage(imageUrl)
         setupText(content, theme)
-        setupButtons(id, options, selectedIndex, theme, adapterPosition)
+        setupButtons(id, options, theme, adapterPosition)
     }
 
     fun setOnOptionClickedListener(onOptionClickedListener: OnOptionClickedListener?) {
@@ -75,7 +74,7 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     fun interface OnOptionClickedListener {
-        fun onClicked(id: String?, indexInList: Int, indexOfOption: Int)
+        fun onClicked(id: String, indexInList: Int, indexOfOption: Int)
     }
 
     private fun setupCardView(theme: UiTheme) {
@@ -107,8 +106,6 @@ class SingleChoiceCardView @JvmOverloads constructor(
 
     private fun composeButton(
         text: String,
-        isEnabled: Boolean,
-        isSelected: Boolean,
         uiTheme: UiTheme,
         onClickListener: OnClickListener?
     ): MaterialButton {
@@ -116,43 +113,22 @@ class SingleChoiceCardView @JvmOverloads constructor(
         return MaterialButton(ContextThemeWrapper(this.context, styleResId), null, 0).also {
             it.id = View.generateViewId()
             it.text = text
-            it.isEnabled = isEnabled
-            it.isSelected = isSelected
             onClickListener?.also(it::setOnClickListener)
 
             uiTheme.fontRes?.let(::getFontCompat)?.also(it::setTypeface)
 
-            when {
-                isSelected -> {
-                    uiTheme.botActionButtonSelectedBackgroundColor?.let(::getColorStateListCompat)
-                        ?.also(it::setBackgroundTintList)
-                    uiTheme.botActionButtonSelectedTextColor?.let(::getColorStateListCompat)
-                        ?.also(it::setTextColor)
+            uiTheme.botActionButtonBackgroundColor?.let(::getColorStateListCompat)
+                ?.also(it::setBackgroundTintList)
+            uiTheme.botActionButtonTextColor?.let(::getColorStateListCompat)
+                ?.also(it::setTextColor)
 
-                    responseCardTheme?.option?.selected.also(it::applyButtonTheme)
-                }
-                !isEnabled -> {
-                    it.strokeWidth = resources.getDimensionPixelSize(R.dimen.glia_px)
-                    uiTheme.baseShadeColor?.let(::getColorStateListCompat)?.also(it::setStrokeColor)
-
-                    responseCardTheme?.option?.disabled.also(it::applyButtonTheme)
-                }
-                else -> {
-                    uiTheme.botActionButtonBackgroundColor?.let(::getColorStateListCompat)
-                        ?.also(it::setBackgroundTintList)
-                    uiTheme.botActionButtonTextColor?.let(::getColorStateListCompat)
-                        ?.also(it::setTextColor)
-
-                    responseCardTheme?.option?.normal.also(it::applyButtonTheme)
-                }
-            }
+            responseCardTheme?.option?.normal.also(it::applyButtonTheme)
         }
     }
 
     private fun setupButtons(
         id: String,
         options: List<SingleChoiceOption>,
-        selectedIndex: Int?,
         theme: UiTheme,
         adapterPosition: Int
     ) {
@@ -166,8 +142,6 @@ class SingleChoiceCardView @JvmOverloads constructor(
 
             val button = composeButton(
                 text = options[index].text,
-                isEnabled = selectedIndex == null,
-                isSelected = selectedIndex == index,
                 uiTheme = theme,
                 onClickListener = onClickListener
             )

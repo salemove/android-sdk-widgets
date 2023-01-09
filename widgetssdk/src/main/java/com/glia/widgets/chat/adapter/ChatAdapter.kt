@@ -200,7 +200,7 @@ class ChatAdapter(
     }
 
     fun interface OnCustomCardResponse {
-        fun onCustomCardResponse(messageId: String?, text: String?, value: String?)
+        fun onCustomCardResponse(messageId: String, text: String?, value: String?)
     }
 
     companion object {

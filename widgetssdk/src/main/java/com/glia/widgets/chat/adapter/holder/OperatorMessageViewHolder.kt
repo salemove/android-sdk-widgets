@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.history.OperatorMessageItem
+import com.glia.widgets.chat.model.history.ResponseCardItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
@@ -61,7 +62,7 @@ class OperatorMessageViewHolder(
         onOptionClickedListener: OnOptionClickedListener
     ) {
         binding.contentLayout.removeAllViews()
-        if (item.singleChoiceOptions != null) {
+        if (item is ResponseCardItem) {
             addSingleChoiceCardView(item, onOptionClickedListener)
         } else {
             addMessageTextView(item)
@@ -70,7 +71,7 @@ class OperatorMessageViewHolder(
     }
 
     private fun addSingleChoiceCardView(
-        item: OperatorMessageItem,
+        item: ResponseCardItem,
         onOptionClickedListener: OnOptionClickedListener
     ) {
         val singleChoiceCardView = SingleChoiceCardView(itemView.context)
@@ -80,7 +81,6 @@ class OperatorMessageViewHolder(
             item.choiceCardImageUrl,
             item.content,
             item.singleChoiceOptions,
-            item.selectedChoiceIndex,
             uiTheme,
             adapterPosition
         )

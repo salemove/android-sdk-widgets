@@ -218,6 +218,9 @@
     <!-- ChatHeadView -->
     <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
 
+    <!-- Visitor Code View -->
+    <string name="glia_visitor_code_view_title">Your Visitor Code</string>
+
     <!-- Message Center -->
     <string name="message_center_screen_title">Messaging</string>
     <string name="message_center_title">Welcome to Message Center</string>

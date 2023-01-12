@@ -2,15 +2,14 @@ package com.glia.widgets.core.callvisualizer.domain;
 
 import android.content.Context;
 
-import com.glia.androidsdk.omnibrowse.VisitorCode;
 import com.glia.widgets.view.VisitorCodeView;
 
-public class BuildVisitorCodeUseCase {
+public class VisitorCodeViewBuilderUseCase {
 
     private final VisitorCodeRepository visitorCodeRepository;
     private final VisitorCodeViewRepository visitorCodeViewRepository;
 
-    public BuildVisitorCodeUseCase(VisitorCodeRepository visitorCodeRepository, VisitorCodeViewRepository visitorCodeViewRepository) {
+    public VisitorCodeViewBuilderUseCase(VisitorCodeRepository visitorCodeRepository, VisitorCodeViewRepository visitorCodeViewRepository) {
         this.visitorCodeRepository = visitorCodeRepository;
         this.visitorCodeViewRepository = visitorCodeViewRepository;
     }

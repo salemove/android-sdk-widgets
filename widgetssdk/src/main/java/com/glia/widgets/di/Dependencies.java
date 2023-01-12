@@ -61,7 +61,7 @@ public class Dependencies {
                 controllerFactory.getChatHeadController()
         );
         resourceProvider = new ResourceProvider(application.getBaseContext());
-        callVisualizerManager = new CallVisualizerManager();
+        callVisualizerManager = new CallVisualizerManager(useCaseFactory.getVisitorCodeViewBuilderUseCase());
     }
 
     public static UseCaseFactory getUseCaseFactory() {

@@ -36,6 +36,7 @@ import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
+import com.glia.widgets.view.VisitorCodeView;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
@@ -82,6 +83,8 @@ public class MainFragment extends Fragment {
                 deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
                 clearSession());
+        view.findViewById(R.id.visitor_code_button).setOnClickListener(v ->
+                showVisitorCode());
     }
 
     @Override
@@ -357,6 +360,18 @@ public class MainFragment extends Fragment {
     private void clearSession() {
         GliaWidgets.clearVisitorSession();
         setupAuthButtonsVisibility();
+    }
+
+    private void showVisitorCode() {
+        VisitorCodeView visitorCodeView = GliaWidgets.getCallVisualizer().buildVisitorCodeView(getContext());
+
+        // TODO: temp solution
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(visitorCodeView);
+        builder.setNeutralButton(
+                R.string.authentication_dialog_cancel_button,
+                (dialog, which) -> dialog.cancel());
+        builder.show();
     }
 
     private void showToast(String message) {

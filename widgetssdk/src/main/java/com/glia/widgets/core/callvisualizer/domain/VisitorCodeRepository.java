@@ -12,6 +12,6 @@ public class VisitorCodeRepository {
     }
 
     public void getVisitorCode(RequestCallback<VisitorCode> callback) {
-        gliaCore.getVisitorCode(callback);
+        gliaCore.getCallVisualizer().getVisitorCode(callback);
     }
 }

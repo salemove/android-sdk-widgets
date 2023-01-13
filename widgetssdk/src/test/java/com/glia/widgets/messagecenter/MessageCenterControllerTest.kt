@@ -1,55 +1,107 @@
 package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase
-import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
+import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.secureconversations.domain.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.times
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 
 internal class MessageCenterControllerTest {
     private lateinit var messageCenterController: MessageCenterController
     private lateinit var sendSecureMessageUseCase: SendSecureMessageUseCase
     private lateinit var isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase
+    private lateinit var addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase
+    private lateinit var addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase
+    private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
+    private lateinit var removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase
+    private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
     private lateinit var viewContract: MessageCenterContract.View
 
     @Before
     fun setUp() {
-        sendSecureMessageUseCase = Mockito.mock(SendSecureMessageUseCase::class.java)
-        isMessageCenterAvailableUseCase = Mockito.mock(
-            IsMessageCenterAvailableUseCase::class.java
-        )
+        sendSecureMessageUseCase = mock()
+        isMessageCenterAvailableUseCase = mock()
+        addFileAttachmentsObserverUseCase = mock()
+        addFileToAttachmentAndUploadUseCase = mock()
+        getFileAttachmentsUseCase = mock()
+        removeFileAttachmentObserverUseCase = mock()
+        removeFileAttachmentUseCase = mock()
+        viewContract = mock()
         messageCenterController =
-            MessageCenterController(sendSecureMessageUseCase, isMessageCenterAvailableUseCase)
-        viewContract = Mockito.mock(MessageCenterContract.View::class.java)
-        messageCenterController.setView(viewContract)
+            MessageCenterController(sendSecureMessageUseCase, isMessageCenterAvailableUseCase,
+                addFileAttachmentsObserverUseCase, addFileToAttachmentAndUploadUseCase,
+                getFileAttachmentsUseCase, removeFileAttachmentObserverUseCase,
+                removeFileAttachmentUseCase)
     }
 
     @Test
-    fun handleMessageSendResult_CallsNavigateToMessaging_WhenErrorNull() {
+    fun setView_ExecutesAddSecureFileAttachmentsObserverUseCase_onTrigger() {
+        messageCenterController.setView(viewContract)
+
+        verify(addFileAttachmentsObserverUseCase, times(1)).execute(any())
+    }
+
+    @Test
+    fun setView_ExecutesGetFileAttachmentsUseCase_onTrigger() {
+        messageCenterController.setView(viewContract)
+
+        verify(getFileAttachmentsUseCase, times(1)).execute()
+    }
+
+    @Test
+    fun handleMessageSendResult_CallsShowNavigationScreen_WhenErrorNull() {
+        messageCenterController.setView(viewContract)
         messageCenterController.handleSendMessageResult(null)
-        Mockito.verify(viewContract, Mockito.times(1)).navigateToMessaging()
+        verify(viewContract, times(1)).showConfirmationScreen()
     }
 
     @Test
     fun handleMessageSendResult_CallsNavigateToMessaging_WhenAuthError() {
+        messageCenterController.setView(viewContract)
         val gliaException = GliaException("Message", GliaException.Cause.AUTHENTICATION_ERROR)
         messageCenterController.handleSendMessageResult(gliaException)
-        Mockito.verify(viewContract, Mockito.times(1)).showMessageCenterUnavailableDialog()
+        verify(viewContract, times(1)).showMessageCenterUnavailableDialog()
     }
 
     @Test
     fun handleMessageSendResult_CallsNavigateToMessaging_WhenInternalError() {
+        messageCenterController.setView(viewContract)
         val gliaException = GliaException("Message", GliaException.Cause.INTERNAL_ERROR)
         messageCenterController.handleSendMessageResult(gliaException)
-        Mockito.verify(viewContract, Mockito.times(1)).showUnexpectedErrorDialog()
+        verify(viewContract, times(1)).showUnexpectedErrorDialog()
     }
 
     @Test
     fun handleMessageSendResult_CallsNavigateToMessaging_WhenOtherError() {
+        messageCenterController.setView(viewContract)
         val gliaException = GliaException("Message", GliaException.Cause.INVALID_INPUT)
         messageCenterController.handleSendMessageResult(gliaException)
-        Mockito.verify(viewContract, Mockito.times(1)).showUnexpectedErrorDialog()
+        verify(viewContract, times(1)).showUnexpectedErrorDialog()
+    }
+
+    @Test
+    fun onAttachmentReceived_ExecutesAddSecureFileToAttachmentAndUploadUseCase_onTrigger() {
+        val fileAttachment = mock<FileAttachment>()
+        messageCenterController.onAttachmentReceived(fileAttachment)
+        verify(addFileToAttachmentAndUploadUseCase, times(1)).execute(eq(fileAttachment), any())
+    }
+
+    @Test
+    fun onRemoveAttachment() {
+        val fileAttachment = mock<FileAttachment>()
+        messageCenterController.onRemoveAttachment(fileAttachment)
+        verify(removeFileAttachmentUseCase, times(1)).execute(eq(fileAttachment))
+    }
+
+    @Test
+    fun onDestroy_ExecutesRemoveSecureFileAttachmentObserverUseCase_onTrigger() {
+        messageCenterController.onDestroy()
+
+        verify(removeFileAttachmentObserverUseCase, times(1)).execute(any())
     }
 }

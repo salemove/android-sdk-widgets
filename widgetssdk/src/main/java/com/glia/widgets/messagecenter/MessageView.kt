@@ -11,9 +11,12 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.chat.AttachmentPopup
+import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
+import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
@@ -27,6 +30,7 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
+import kotlin.properties.Delegates
 
 class MessageView(
     context: Context,
@@ -58,6 +62,7 @@ class MessageView(
     private val addAttachmentButton: ImageButton get() = binding.addAttachmentButton
     private val attachmentRecyclerView: RecyclerView get() = binding.attachmentsRecyclerView
     private val sendMessageGroup: Group get() = binding.sendMessageGroup
+    private val bottomSpace: Space get() = binding.bottomSpace
 
     private val attachmentPopup by lazy { AttachmentPopup(addAttachmentButton) }
 
@@ -65,9 +70,13 @@ class MessageView(
     private var attachmentButtonClickListener: OnClickListener? = null
     private var sendMessageButtonClickListener: ((String) -> Unit)? = null
     private var onMessageTextChangedListener: ((String) -> Unit)? = null
+    private var onRemoveAttachmentListener: ((FileAttachment) -> Unit)? = null
+
+    private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
 
     init {
         isFillViewport = true
+        setupViewAppearance()
         handleScrollView()
         initCallbacks()
         setupTheme()
@@ -77,6 +86,21 @@ class MessageView(
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+
+    private fun setupViewAppearance() {
+        uploadAttachmentAdapter = UploadAttachmentAdapter(R.layout.message_center_attachment_uploaded_item)
+        uploadAttachmentAdapter.setItemCallback {
+            onRemoveAttachmentListener?.invoke(it)
+        }
+        uploadAttachmentAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                attachmentRecyclerView.smoothScrollToPosition(uploadAttachmentAdapter.itemCount)
+            }
+        })
+        attachmentRecyclerView.layoutManager = LinearLayoutManager(this.context)
+        attachmentRecyclerView.adapter = uploadAttachmentAdapter
+    }
 
     private fun setupTheme() {
         val normalColor = getColorCompat(R.color.glia_base_normal_color)
@@ -177,7 +201,7 @@ class MessageView(
     }
 
     fun setOnAttachmentButtonClickListener(listener: OnClickListener) {
-        checkMessageButtonClickListener = listener
+        attachmentButtonClickListener = listener
     }
 
     fun setOnSendMessageButtonClickListener(listener: (String) -> Unit) {
@@ -188,11 +212,26 @@ class MessageView(
         onMessageTextChangedListener = listener
     }
 
+    fun setOnRemoveAttachmentListener(listener: (FileAttachment) -> Unit) {
+        onRemoveAttachmentListener = listener
+    }
+
     fun onStateUpdated(state: State) {
         updateSendButtonState(state.sendMessageButtonState)
         updateSendMessageError(state.showMessageLimitError)
         updateMessageEditText(state.messageEditTextEnabled, state.showMessageLimitError)
         addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+    }
+
+    fun emitUploadAttachments(attachments: List<FileAttachment>) {
+        post {
+            uploadAttachmentAdapter.submitList(attachments)
+            if (attachments.isEmpty()) {
+                bottomSpace.visibility = VISIBLE
+            } else {
+                bottomSpace.visibility = GONE
+            }
+        }
     }
 
     private fun updateSendMessageError(showError: Boolean) {

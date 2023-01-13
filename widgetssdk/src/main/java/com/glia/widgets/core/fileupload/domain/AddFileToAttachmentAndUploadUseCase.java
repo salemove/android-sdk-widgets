@@ -81,6 +81,5 @@ public class AddFileToAttachmentAndUploadUseCase {
         void onSecurityCheckFinished(EngagementFile.ScanResult scanResult);
     }
 
-    @VisibleForTesting
     public final static long SUPPORTED_FILE_SIZE = 26214400L;
 }

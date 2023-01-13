@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -24,7 +25,15 @@ import com.squareup.picasso.Picasso;
 
 public class UploadAttachmentAdapter
         extends ListAdapter<FileAttachment, UploadAttachmentAdapter.ViewHolder> {
+
+    @LayoutRes
+    private final int itemLayoutResource;
+
     public UploadAttachmentAdapter() {
+        this(R.layout.chat_attachment_uploaded_item);
+    }
+
+    public UploadAttachmentAdapter(@LayoutRes int itemLayoutResource) {
         super(new DiffUtil.ItemCallback<FileAttachment>() {
             @Override
             public boolean areItemsTheSame(@NonNull FileAttachment oldItem, @NonNull FileAttachment newItem) {
@@ -37,6 +46,7 @@ public class UploadAttachmentAdapter
                         oldItem.getAttachmentStatus().equals(newItem.getAttachmentStatus());
             }
         });
+        this.itemLayoutResource = itemLayoutResource;
     }
 
     private ItemCallback callback;
@@ -53,7 +63,7 @@ public class UploadAttachmentAdapter
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_attachment_uploaded_item, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(itemLayoutResource, parent, false));
     }
 
     @Override

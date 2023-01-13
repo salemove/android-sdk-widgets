@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
@@ -41,8 +42,14 @@ class MessageCenterView(
         fun navigateToMessaging()
     }
 
+    interface OnAttachFileListener {
+        fun selectAttachmentFile(type: String)
+        fun takePhoto()
+    }
+
     var onFinishListener: OnFinishListener? = null
     var onNavigateToMessagingListener: OnNavigateToMessagingListener? = null
+    var onAttachFileListener: OnAttachFileListener? = null
 
     private var controller: MessageCenterContract.Controller? = null
 
@@ -112,6 +119,9 @@ class MessageCenterView(
         }
         messageView.setOnMessageTextChangedListener {
             controller?.onMessageChanged(it)
+        }
+        messageView.setOnRemoveAttachmentListener {
+            controller?.onRemoveAttachment(it)
         }
         appBar.setOnBackClickedListener {
             controller?.onBackArrowClicked()
@@ -187,4 +197,15 @@ class MessageCenterView(
         messageView.onStateUpdated(state)
     }
 
+    override fun emitUploadAttachments(attachments: List<FileAttachment>) {
+        messageView.emitUploadAttachments(attachments)
+    }
+
+    override fun selectAttachmentFile(type: String) {
+        onAttachFileListener?.selectAttachmentFile(type)
+    }
+
+    override fun takePhoto() {
+        onAttachFileListener?.takePhoto()
+    }
 }

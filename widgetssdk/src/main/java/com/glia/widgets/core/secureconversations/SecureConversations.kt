@@ -3,10 +3,12 @@ package com.glia.widgets.core.secureconversations
 import android.net.Uri
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import java.io.File
+import java.io.InputStream
 
 /**
  * Wrapper class for {@link com.glia.androidsdk.secureconversations.SecureConversations}
@@ -25,6 +27,15 @@ class SecureConversations(private val secureConversations: SecureConversations) 
         secureConversations.send(message, queueIds, callback)
     }
 
+    override fun send(
+        message: String,
+        queueIds: Array<out String>,
+        attachment: MessageAttachment?,
+        callback: RequestCallback<VisitorMessage?>
+    ) {
+        secureConversations.send(message, queueIds, attachment, callback)
+    }
+
     override fun markMessagesRead(callback: RequestCallback<Void>?) {
         secureConversations.markMessagesRead(callback)
     }
@@ -35,6 +46,10 @@ class SecureConversations(private val secureConversations: SecureConversations) 
 
     override fun uploadFile(fileUri: Uri, callback: RequestCallback<EngagementFile>) {
         secureConversations.uploadFile(fileUri, callback)
+    }
+
+    override fun fetchFile(fileId: String, callback: RequestCallback<InputStream>) {
+        secureConversations.fetchFile(fileId, callback)
     }
 
     override fun getUnreadMessageCount(callback: RequestCallback<Int>) {

@@ -1,18 +1,56 @@
 package com.glia.widgets.messagecenter
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.glia.widgets.chat.ChatActivity
+import com.glia.widgets.chat.helper.FileHelper
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.Utils
+import java.io.IOException
 
 class MessageCenterActivity : AppCompatActivity(),
-        MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener {
+        MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener,
+        MessageCenterView.OnAttachFileListener {
 
     private lateinit var binding: MessageCenterActivityBinding
     private var configuration: GliaSdkConfiguration? = null
+
+    private val controller: MessageCenterContract.Controller by lazy {
+        Dependencies.getControllerFactory().getMessageCenterController(configuration?.queueId)
+    }
+
+    private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
+        uri?.also {
+            controller.onAttachmentReceived(Utils.mapUriToFileAttachment(contentResolver, it))
+        }
+    }
+
+    private val getImage = registerForActivityResult(TakePicture()) { _: Boolean ->
+        // Handle the returned Uri
+        controller.photoCaptureFileUri?.also {
+            FileHelper.fixCapturedPhotoRotation(this, it)
+            controller.onAttachmentReceived(Utils.mapUriToFileAttachment(contentResolver, it))
+        }
+    }
+
+    private val getPermission = registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
+        // Handle the returned Uri
+        if (isGranted) {
+            takePhoto()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +61,37 @@ class MessageCenterActivity : AppCompatActivity(),
         val messageCenterView = binding.messageCenterView
         messageCenterView.onFinishListener = this
         messageCenterView.onNavigateToMessagingListener = this
+        messageCenterView.onAttachFileListener = this
 
-        val controller = Dependencies.getControllerFactory().getMessageCenterController(configuration?.queueId)
         messageCenterView.setController(controller)
+    }
+
+    override fun selectAttachmentFile(type: String) {
+        getContent.launch(type)
+    }
+
+    override fun takePhoto() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            getPermission.launch(Manifest.permission.CAMERA)
+            return
+        }
+
+        try {
+            val photoFile = Utils.createTempPhotoFile(this)
+            val uri = FileProvider.getUriForFile(
+                this,
+                FileHelper.getFileProviderAuthority(this),
+                photoFile
+            )
+            controller.photoCaptureFileUri = uri
+            getImage.launch(uri)
+        } catch (exception: IOException) {
+            Logger.e(TAG, "Create photo file failed: " + exception.message)
+        }
     }
 
     override fun navigateToMessaging() {
@@ -39,5 +105,9 @@ class MessageCenterActivity : AppCompatActivity(),
         return GliaSdkConfiguration.Builder()
             .intent(intent)
             .build()
+    }
+
+    companion object {
+        private const val TAG = "MessageCenterActivity"
     }
 }

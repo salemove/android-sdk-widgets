@@ -1,22 +1,42 @@
 package com.glia.widgets.messagecenter
 
+import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase
-import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
+import com.glia.androidsdk.engagement.EngagementFile
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.core.secureconversations.domain.*
+import com.glia.widgets.helper.Logger
+import java.util.*
 
 class MessageCenterController(
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
-    private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase
+    private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase,
+    private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
+    private val addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase,
+    private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
+    private val removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase,
+    private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private var state = State()
 
+    private val fileAttachmentObserver = Observer { _, _ ->
+        view?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
+    }
+
+    override var photoCaptureFileUri: Uri? = null
+
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
+
+        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
+
         setState(state)
+        view.emitUploadAttachments(getFileAttachmentsUseCase.execute())
     }
 
     override fun onCheckMessagesClicked() {
@@ -86,23 +106,52 @@ class MessageCenterController(
     }
 
     override fun onGalleryClicked() {
-        TODO("Not yet implemented")
+        view?.selectAttachmentFile(FILE_TYPE_IMAGES)
     }
 
     override fun onBrowseClicked() {
-        TODO("Not yet implemented")
+        view?.selectAttachmentFile(FILE_TYPE_ALL)
     }
 
     override fun onTakePhotoClicked() {
-        TODO("Not yet implemented")
+        view?.takePhoto()
     }
 
     override fun isMessageCenterAvailable(callback: RequestCallback<Boolean>) {
         isMessageCenterAvailableUseCase.execute(callback)
     }
 
+    override fun onAttachmentReceived(file: FileAttachment) {
+        addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
+            override fun onFinished() {
+                Logger.d(TAG, "fileUploadFinished")
+            }
+
+            override fun onStarted() {
+                Logger.d(TAG, "fileUploadStarted")
+            }
+
+            override fun onError(ex: Exception) {
+                Logger.e(TAG, "Upload file failed: " + ex.message)
+            }
+
+            override fun onSecurityCheckStarted() {
+                Logger.d(TAG, "fileUploadSecurityCheckStarted")
+            }
+
+            override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
+                Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
+            }
+        })
+    }
+
+    override fun onRemoveAttachment(file: FileAttachment) {
+        removeFileAttachmentUseCase.execute(file)
+    }
+
     override fun onDestroy() {
         isMessageCenterAvailableUseCase.dispose()
+        removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
     }
 
     private fun setState(state: State) {
@@ -111,6 +160,11 @@ class MessageCenterController(
     }
 
     companion object {
+        private const val TAG = "MessageCenterController"
+
         private const val MAX_MESSAGE_LENGTH = 10000
+
+        private const val FILE_TYPE_IMAGES = "image/*"
+        private const val FILE_TYPE_ALL = "*/*"
     }
 }

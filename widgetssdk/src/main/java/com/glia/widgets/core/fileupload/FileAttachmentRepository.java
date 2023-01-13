@@ -211,7 +211,7 @@ public class FileAttachmentRepository {
         }
     }
 
-    private static class ObservableFileAttachmentList extends Observable {
+    public static class ObservableFileAttachmentList extends Observable {
         public List<FileAttachment> fileAttachments = new ArrayList<>();
 
         public void notifyUpdate(List<FileAttachment> newObject) {

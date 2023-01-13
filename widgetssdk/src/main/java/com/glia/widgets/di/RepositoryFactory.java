@@ -10,6 +10,7 @@ import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
+import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
@@ -28,6 +29,7 @@ public class RepositoryFactory {
     private MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private ChatScreenRepository chatScreenRepository;
     private static SecureConversationsRepository secureConversationsRepository;
+    private static SecureFileAttachmentRepository secureFileAttachmentRepository;
     private static GliaEngagementRepository gliaEngagementRepository;
     private static GliaVisitorMediaRepository gliaVisitorMediaRepository;
     private static GliaOperatorMediaRepository gliaOperatorMediaRepository;
@@ -171,5 +173,13 @@ public class RepositoryFactory {
             secureConversationsRepository = new SecureConversationsRepository(secureConversations);
         }
         return secureConversationsRepository;
+    }
+
+    public SecureFileAttachmentRepository getSecureFileAttachmentRepository() {
+        if (secureFileAttachmentRepository == null) {
+            SecureConversations secureConversations = new GliaCoreImpl().getSecureConversations();
+            secureFileAttachmentRepository = new SecureFileAttachmentRepository(secureConversations);
+        }
+        return secureFileAttachmentRepository;
     }
 }

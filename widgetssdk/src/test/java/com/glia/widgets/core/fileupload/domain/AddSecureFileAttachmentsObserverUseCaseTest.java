@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import java.util.Observer;
 
-public class AddFileAttachmentsObserverUseCaseTest {
+public class AddSecureFileAttachmentsObserverUseCaseTest {
 
     private FileAttachmentRepository repository;
     private AddFileAttachmentsObserverUseCase subjectUnderTest;

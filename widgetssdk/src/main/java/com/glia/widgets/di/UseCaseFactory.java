@@ -41,9 +41,14 @@ import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
@@ -478,7 +483,10 @@ public class UseCaseFactory {
     }
 
     public SendSecureMessageUseCase createSendSecureMessageUseCase(String queueId) {
-        return new SendSecureMessageUseCase(queueId, repositoryFactory.getSecureConversationsRepository());
+        return new SendSecureMessageUseCase(
+                queueId,
+                repositoryFactory.getSecureConversationsRepository(),
+                repositoryFactory.getSecureFileAttachmentRepository());
     }
 
     public IsMessageCenterAvailableUseCase createIsMessageCenterAvailableUseCase(String queueId) {
@@ -494,6 +502,26 @@ public class UseCaseFactory {
 
     public MarkMessagesReadUseCase createMarkMessagesReadUseCase() {
         return new MarkMessagesReadUseCase(repositoryFactory.getSecureConversationsRepository());
+    }
+
+    public AddSecureFileToAttachmentAndUploadUseCase createAddSecureFileToAttachmentAndUploadUseCase() {
+        return new AddSecureFileToAttachmentAndUploadUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+    }
+
+    public AddSecureFileAttachmentsObserverUseCase createAddSecureFileAttachmentsObserverUseCase() {
+        return new AddSecureFileAttachmentsObserverUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+    }
+
+    public GetSecureFileAttachmentsUseCase createGetSecureFileAttachmentsUseCase() {
+        return new GetSecureFileAttachmentsUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+    }
+
+    public RemoveSecureFileAttachmentObserverUseCase createRemoveSecureFileAttachmentObserverUseCase() {
+        return new RemoveSecureFileAttachmentObserverUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+    }
+
+    public RemoveSecureFileAttachmentUseCase createRemoveSecureFileAttachmentUseCase() {
+        return new RemoveSecureFileAttachmentUseCase(repositoryFactory.getSecureFileAttachmentRepository());
     }
 
     public GliaOnCallVisualizerUseCase createOnCallVisualizerUseCase() {

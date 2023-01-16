@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
+    @Nullable
     public static String getOperatorImageUrl(Operator operator) {
         return operator.getPicture() != null ? operator.getPicture().getURL().orElse(null) : null;
     }

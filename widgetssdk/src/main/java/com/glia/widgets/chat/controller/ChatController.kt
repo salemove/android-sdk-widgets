@@ -623,7 +623,7 @@ class ChatController(
         viewCallback?.minimizeView()
     }
 
-    private fun operatorConnected(operatorName: String, profileImgUrl: String) {
+    private fun operatorConnected(operatorName: String, profileImgUrl: String?) {
         val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         if (chatState.operatorStatusItem != null) {
             // remove previous operator status item
@@ -654,7 +654,7 @@ class ChatController(
         emitChatItems(chatState.changeItems(items))
     }
 
-    private fun operatorChanged(operatorName: String, profileImgUrl: String) {
+    private fun operatorChanged(operatorName: String, profileImgUrl: String?) {
         val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         val operatorStatusItem = OperatorStatusItem.OperatorJoinedStatusItem(
             chatState.companyName,

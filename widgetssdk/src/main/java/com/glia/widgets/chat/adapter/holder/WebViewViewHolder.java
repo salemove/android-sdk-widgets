@@ -104,7 +104,7 @@ public class WebViewViewHolder extends CustomCardViewHolder {
      */
     public static boolean isWebViewType(@NonNull ChatMessage message) {
         JSONObject metadata = message.getMetadata();
-        if (metadata == null) {
+        if (metadata == null || metadata.length() == 0) {
             return false;
         }
         return metadata.has(METADATA_KEY);

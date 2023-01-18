@@ -15,7 +15,7 @@ public class CustomCardAdapterTypeUseCase {
 
     @Nullable
     public Integer execute(ChatMessage message) {
-        if (adapter == null || message.getMetadata() == null) {
+        if (adapter == null || message.getMetadata() == null || message.getMetadata().length() == 0) {
             return null;
         }
         return adapter.getChatAdapterViewType(message);

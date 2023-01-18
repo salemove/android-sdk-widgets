@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,9 +58,9 @@ public class CustomCardAdapterTypeUseCaseTest {
     }
 
     @Test
-    public void execute_returnsViewType_whenAdapterReturnsViewType() {
+    public void execute_returnsViewType_whenAdapterReturnsViewType() throws JSONException {
         ChatMessage message = mock(ChatMessage.class);
-        JSONObject metadata = new JSONObject();
+        JSONObject metadata = new JSONObject().put("someKey", "someValue");
         when(message.getMetadata()).thenReturn(metadata);
         when(customCardAdapter.getChatAdapterViewType(message)).thenReturn(VIEW_TYPE);
 

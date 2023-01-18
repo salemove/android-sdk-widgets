@@ -226,6 +226,13 @@ workflows:
     - deploy-to-bitrise-io@1:
         inputs:
         - notify_email_list: $BUILD_EMAILS
+    - slack@3:
+        is_always_run: false
+        inputs:
+        - channel: '#tm-mobile-builds'
+        - text: Android Build Succeeded!
+        - pretext: ''
+        - webhook_url: $SLACK_ANDROID_WEBHOOK
     - cache-push@2: {}
     envs:
     - opts:

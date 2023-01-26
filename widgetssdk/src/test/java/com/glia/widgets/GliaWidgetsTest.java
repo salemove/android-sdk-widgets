@@ -3,6 +3,7 @@ package com.glia.widgets;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
@@ -11,6 +12,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.SiteApiKey;
+import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.widgets.di.ControllerFactory;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.di.GliaCore;
@@ -58,6 +60,8 @@ public class GliaWidgetsTest {
                 .setRegion(region)
                 .setContext(context)
                 .build();
+        Omnibrowse callVisualizer = mock(Omnibrowse.class);
+        when(gliaCore.getCallVisualizer()).thenReturn(callVisualizer);
 
         GliaWidgets.init(widgetsConfig);
 

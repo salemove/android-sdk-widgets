@@ -16,6 +16,7 @@ import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.comms.EngagementOptions;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.fcm.PushNotifications;
+import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.queuing.QueueTicket;
 import com.glia.androidsdk.site.SiteInfo;
@@ -185,5 +186,10 @@ class GliaCoreImpl implements GliaCore {
     @Override
     public Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
         return new Authentication(Glia.authentication(behavior));
+    }
+
+    @Override
+    public Omnibrowse getCallVisualizer() {
+        return Glia.omnibrowse;
     }
 }

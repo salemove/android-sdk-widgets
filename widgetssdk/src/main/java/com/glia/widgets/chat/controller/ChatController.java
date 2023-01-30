@@ -81,6 +81,7 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
 import com.glia.widgets.core.survey.OnSurveyListener;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.di.Dependencies;
@@ -203,6 +204,7 @@ public class ChatController implements
     private final CustomCardInteractableUseCase customCardInteractableUseCase;
     private final CustomCardShouldShowUseCase customCardShouldShowUseCase;
     private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
+    private final IsSecureEngagementUseCase isSecureEngagementUseCase;
 
     private boolean isVisitorEndEngagement = false;
     private volatile boolean isChatViewPaused = false;
@@ -250,7 +252,8 @@ public class ChatController implements
             CustomCardTypeUseCase customCardTypeUseCase,
             CustomCardInteractableUseCase customCardInteractableUseCase,
             CustomCardShouldShowUseCase customCardShouldShowUseCase,
-            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase) {
+            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
+            IsSecureEngagementUseCase isSecureEngagementUseCase) {
         this.isFromCallScreenUseCase = isFromCallScreenUseCase;
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         Logger.d(TAG, "constructor");
@@ -317,6 +320,7 @@ public class ChatController implements
         this.customCardInteractableUseCase = customCardInteractableUseCase;
         this.customCardShouldShowUseCase = customCardShouldShowUseCase;
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
+        this.isSecureEngagementUseCase = isSecureEngagementUseCase;
     }
 
     public void setPhotoCaptureFileUri(Uri photoCaptureFileUri) {
@@ -361,6 +365,12 @@ public class ChatController implements
         createNewTimerCallback();
         callTimer.addFormattedValueListener(timerStatusListener);
         updateAllowFileSendState();
+
+        // TODO: enable chat panel with send message support
+        // will implement in the next task
+        if (isSecureEngagementUseCase.invoke()) {
+            emitViewState(chatState.enableChatPanel());
+        }
     }
 
     private void queueForEngagement() {
@@ -1502,11 +1512,11 @@ public class ChatController implements
         }
     }
 
-    public void onRemoveAttachment(FileAttachment attachment) {
+    public void onRemoveAttachment(@NonNull FileAttachment attachment) {
         removeFileAttachmentUseCase.execute(attachment);
     }
 
-    public void onAttachmentReceived(FileAttachment file) {
+    public void onAttachmentReceived(@NonNull FileAttachment file) {
         addFileToAttachmentAndUploadUseCase
                 .execute(file, new AddFileToAttachmentAndUploadUseCase.Listener() {
                     @Override

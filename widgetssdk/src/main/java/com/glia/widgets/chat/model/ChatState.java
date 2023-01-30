@@ -162,6 +162,13 @@ public class ChatState {
                 .createChatState();
     }
 
+    public ChatState enableChatPanel() {
+        return new Builder()
+                .copyFrom(this)
+                .enableChatPanel()
+                .createChatState();
+    }
+
     public ChatState allowSendAttachmentStateChanged(boolean isAttachmentAllowed) {
         return new Builder()
                 .copyFrom(this)

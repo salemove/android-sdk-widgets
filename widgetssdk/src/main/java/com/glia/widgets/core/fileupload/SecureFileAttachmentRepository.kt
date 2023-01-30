@@ -8,6 +8,7 @@ import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCa
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversations
 import java.util.*
+import kotlin.collections.ArrayList
 
 class SecureFileAttachmentRepository(private val secureConversations: SecureConversations) {
     private val observable = ObservableFileAttachmentList()
@@ -42,7 +43,7 @@ class SecureFileAttachmentRepository(private val secureConversations: SecureConv
     }
     fun attachFile(file: FileAttachment) {
         observable.notifyUpdate(
-            observable.fileAttachments.also { it.add(file) }
+            observable.fileAttachments + file
         )
     }
 

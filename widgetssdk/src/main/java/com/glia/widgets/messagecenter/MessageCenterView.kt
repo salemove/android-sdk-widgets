@@ -2,7 +2,9 @@ package com.glia.widgets.messagecenter
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Color
 import android.util.AttributeSet
+import android.view.Window
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -16,6 +18,7 @@ import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
+import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
@@ -63,6 +66,12 @@ class MessageCenterView(
 
     private var alertDialog: AlertDialog? = null
 
+    // Is needed for setting status bar color back when view is gone
+    private var defaultStatusBarColor: Int? = null
+    private var statusBarColor: Int by Delegates.notNull()
+
+    private val window: Window? by lazy { Utils.getActivity(this.context)?.window }
+
     @JvmOverloads
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
@@ -91,6 +100,19 @@ class MessageCenterView(
         controller?.isMessageCenterAvailable(callback)
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        defaultStatusBarColor = window?.statusBarColor
+        window?.statusBarColor = statusBarColor
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        window?.statusBarColor = defaultStatusBarColor ?: return
+    }
+
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
             setDefaultTheme(this)
@@ -99,11 +121,12 @@ class MessageCenterView(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        statusBarColor = theme.brandPrimaryColor?.let(::getColorCompat) ?: Color.TRANSPARENT
     }
 
     private fun initConfigurations() {
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
-        // needed to overlap existing app bar in existing view with this view's app bar.
+        // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f)
     }
 

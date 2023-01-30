@@ -1,5 +1,7 @@
 package com.glia.widgets.core.fileupload.domain;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
@@ -10,7 +12,7 @@ public class RemoveFileAttachmentUseCase {
         this.repository = repository;
     }
 
-    public void execute(FileAttachment attachment) {
+    public void execute(@NonNull FileAttachment attachment) {
         repository.detachFile(attachment);
     }
 }

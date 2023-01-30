@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
@@ -26,9 +27,11 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.engagement.EngagementFile;
+import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.core.secureconversations.SecureConversations;
 import com.glia.widgets.di.GliaCore;
 
 import org.junit.Before;
@@ -44,11 +47,16 @@ public class FileAttachmentRepositoryTest {
 
     private FileAttachmentRepository subjectUnderTest;
     GliaCore gliaCore;
+    GliaEngagementTypeRepository gliaEngagementTypeRepository;
+    SecureConversations secureConversations;
 
     @Before
     public void setUp() {
         gliaCore = mock(GliaCore.class);
-        subjectUnderTest = new FileAttachmentRepository(gliaCore);
+        gliaEngagementTypeRepository = mock(GliaEngagementTypeRepository.class);
+        secureConversations = mock(SecureConversations.class);
+        subjectUnderTest = new FileAttachmentRepository(gliaCore,
+                gliaEngagementTypeRepository, () -> secureConversations);
 
         when(FILE_ATTACHMENT_1.getUri()).thenReturn(URI_1);
         when(FILE_ATTACHMENT_2.getUri()).thenReturn(URI_2);
@@ -87,13 +95,6 @@ public class FileAttachmentRepositoryTest {
     }
 
     @Test
-    public void isFileAttached_returnsFalse_whenNullArgument() {
-        subjectUnderTest.detachAllFiles();
-        boolean result = subjectUnderTest.isFileAttached(null);
-        assertFalse(result);
-    }
-
-    @Test
     public void attachFile_attachesFileAttachment_whenValidArgument() {
         subjectUnderTest.detachAllFiles();
         subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
@@ -102,22 +103,14 @@ public class FileAttachmentRepositoryTest {
     }
 
     @Test
-    public void attachFile_attachesNull_whenNullArgument() {
-        subjectUnderTest.detachAllFiles();
-        subjectUnderTest.attachFile(null);
-        List<FileAttachment> result = subjectUnderTest.getFileAttachments();
-        assertTrue(result.contains(null));
-    }
-
-    @Test
     public void attachFile_attachesMultipleFiles_whenCalledMultipleTimes() {
         subjectUnderTest.detachAllFiles();
-        subjectUnderTest.attachFile(null);
         subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
+        subjectUnderTest.attachFile(FILE_ATTACHMENT_2);
         List<FileAttachment> result = subjectUnderTest.getFileAttachments();
         assertTrue(
                 result.containsAll(
-                        Arrays.asList(null, FILE_ATTACHMENT_1)
+                        Arrays.asList(FILE_ATTACHMENT_1, FILE_ATTACHMENT_2)
                 )
         );
     }
@@ -247,6 +240,40 @@ public class FileAttachmentRepositoryTest {
     }
 
     @Test
+    public void uploadFile_checkIsSecureEngagement_whenEngagementIsNull() {
+        AddFileToAttachmentAndUploadUseCase.Listener listener =
+                mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
+        when(gliaCore.getCurrentEngagement()).thenReturn(Optional.empty());
+
+        subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
+
+        verify(gliaEngagementTypeRepository, times(1)).isSecureEngagement();
+    }
+
+    @Test
+    public void uploadFile_notCheckIsSecureEngagement_whenEngagementNotNull() {
+        AddFileToAttachmentAndUploadUseCase.Listener listener =
+                mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
+        when(gliaCore.getCurrentEngagement()).thenReturn(Optional.of(ENGAGEMENT));
+
+        subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
+
+        verify(gliaEngagementTypeRepository, never()).isSecureEngagement();
+    }
+
+    @Test
+    public void uploadFile_useSecureUploadFile_whenSecureEngagement() {
+        AddFileToAttachmentAndUploadUseCase.Listener listener =
+                mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
+        when(gliaCore.getCurrentEngagement()).thenReturn(Optional.empty());
+        when(gliaEngagementTypeRepository.isSecureEngagement()).thenReturn(true);
+
+        subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
+
+        verify(secureConversations).uploadFile(eq(URI_1), any());
+    }
+
+    @Test
     public void setFileAttachmentTooLarge_updatesCorrectFileAttachmentStatus_whenMultipleFileAttachmentsAttached() {
         clearInvocations(FILE_ATTACHMENT_1);
         subjectUnderTest.detachAllFiles();
@@ -257,18 +284,6 @@ public class FileAttachmentRepositoryTest {
 
         verify(FILE_ATTACHMENT_1).setAttachmentStatus(ERROR_FILE_TOO_LARGE);
         verify(FILE_ATTACHMENT_2, never()).setAttachmentStatus(any());
-    }
-
-    @Test
-    public void setFileAttachmentTooLarge_updatesFileAttachmentStatus_whenNullArgument() {
-        clearInvocations(FILE_ATTACHMENT_1);
-        when(FILE_ATTACHMENT_1.getUri()).thenReturn(null);
-        subjectUnderTest.detachAllFiles();
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-
-        subjectUnderTest.setFileAttachmentTooLarge(null);
-
-        verify(FILE_ATTACHMENT_1).setAttachmentStatus(ERROR_FILE_TOO_LARGE);
     }
 
     @Test
@@ -336,14 +351,6 @@ public class FileAttachmentRepositoryTest {
         subjectUnderTest.detachFile(FILE_ATTACHMENT_1);
 
         assertFalse(subjectUnderTest.getFileAttachments().contains(FILE_ATTACHMENT_1));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void detachFile_throwsNullPointerException_whenNullArgument() {
-        subjectUnderTest.detachAllFiles();
-        subjectUnderTest.attachFile(FILE_ATTACHMENT_1);
-
-        subjectUnderTest.detachFile(null);
     }
 
     @Test

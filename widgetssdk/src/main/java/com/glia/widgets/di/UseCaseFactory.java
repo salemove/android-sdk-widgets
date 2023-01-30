@@ -46,10 +46,12 @@ import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmen
 import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.core.secureconversations.domain.SetSecureEngagementUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -258,7 +260,8 @@ public class UseCaseFactory {
                 createRemoveCallNotificationUseCase(),
                 createRemoveScreenSharingNotificationUseCase(),
                 repositoryFactory.getGliaSurveyRepository(),
-                repositoryFactory.getGliaVisitorMediaRepository()
+                repositoryFactory.getGliaVisitorMediaRepository(),
+                repositoryFactory.getGliaEngagementTypeRepository()
         );
     }
 
@@ -309,7 +312,8 @@ public class UseCaseFactory {
     public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
         return new AddFileToAttachmentAndUploadUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
-                repositoryFactory.getGliaFileAttachmentRepository()
+                repositoryFactory.getGliaFileAttachmentRepository(),
+                repositoryFactory.getGliaEngagementTypeRepository()
         );
     }
 
@@ -522,6 +526,14 @@ public class UseCaseFactory {
 
     public RemoveSecureFileAttachmentUseCase createRemoveSecureFileAttachmentUseCase() {
         return new RemoveSecureFileAttachmentUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+    }
+
+    public SetSecureEngagementUseCase createSetSecureEngagementUseCase() {
+        return new SetSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
+    }
+
+    public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
+        return new IsSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
     }
 
     public GliaOnCallVisualizerUseCase createOnCallVisualizerUseCase() {

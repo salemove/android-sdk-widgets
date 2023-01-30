@@ -5,10 +5,14 @@ import static com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUse
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.net.Uri;
+
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
+import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException;
@@ -24,20 +28,25 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
     private GliaEngagementRepository gliaEngagementRepository;
     private FileAttachmentRepository fileAttachmentRepository;
     private AddFileToAttachmentAndUploadUseCase subjectUnderTest;
+    private GliaEngagementTypeRepository gliaEngagementTypeRepository;
 
     @Before
     public void setUp() {
         gliaEngagementRepository = mock(GliaEngagementRepository.class);
         fileAttachmentRepository = mock(FileAttachmentRepository.class);
+        gliaEngagementTypeRepository = mock(GliaEngagementTypeRepository.class);
         subjectUnderTest = new AddFileToAttachmentAndUploadUseCase(
                 gliaEngagementRepository,
-                fileAttachmentRepository
+                fileAttachmentRepository,
+                gliaEngagementTypeRepository
         );
     }
 
     @Test
     public void execute_callsOnErrorWithRemoveBeforeReUploadingException_whenFileAttachmentIsAttached() {
         FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(true);
@@ -50,6 +59,8 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
     @Test
     public void execute_callsOnErrorWithEngagementMissingException_whenEngagementIsMissing() {
         FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
@@ -63,6 +74,8 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
     @Test
     public void execute_callsOnErrorWithSupportedFileCountExceededException_whenTooManyAttachedFiles() {
         FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
@@ -77,6 +90,8 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
     @Test
     public void execute_callsOnErrorWithSupportedFileSizeExceededException_whenFileAttachmentTooLarge() {
         FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
@@ -92,6 +107,8 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
     @Test
     public void execute_callsOnStarted_whenValidArgument() {
         FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
@@ -123,5 +140,38 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
 
         subjectUnderTest.execute(fileAttachment, null);
+    }
+
+    @Test
+    public void execute_checkIsSecureEngagement_whenHasNoOngoingEngagement() {
+        FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
+        AddFileToAttachmentAndUploadUseCase.Listener listener =
+                mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
+        when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
+        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(false);
+
+        subjectUnderTest.execute(fileAttachment, listener);
+
+        verify(gliaEngagementTypeRepository, times(1)).isSecureEngagement();
+    }
+
+    @Test
+    public void execute_uploadFile_whenIsSecureEngagement() {
+        FileAttachment fileAttachment = mock(FileAttachment.class);
+        Uri uri = mock(Uri.class);
+        when(fileAttachment.getUri()).thenReturn(uri);
+        AddFileToAttachmentAndUploadUseCase.Listener listener =
+                mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
+        when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
+        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(false);
+        when(gliaEngagementTypeRepository.isSecureEngagement()).thenReturn(true);
+        when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
+        when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
+
+        subjectUnderTest.execute(fileAttachment, listener);
+
+        verify(fileAttachmentRepository, times(1)).uploadFile(fileAttachment, listener);
     }
 }

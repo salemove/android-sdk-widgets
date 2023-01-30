@@ -10,6 +10,7 @@ import org.mockito.Mockito.times
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 
 internal class MessageCenterControllerTest {
     private lateinit var messageCenterController: MessageCenterController
@@ -20,6 +21,7 @@ internal class MessageCenterControllerTest {
     private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
     private lateinit var removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
+    private lateinit var setSecureEngagementUseCase: SetSecureEngagementUseCase
     private lateinit var viewContract: MessageCenterContract.View
 
     @Before
@@ -31,12 +33,13 @@ internal class MessageCenterControllerTest {
         getFileAttachmentsUseCase = mock()
         removeFileAttachmentObserverUseCase = mock()
         removeFileAttachmentUseCase = mock()
+        setSecureEngagementUseCase = mock()
         viewContract = mock()
         messageCenterController =
             MessageCenterController(sendSecureMessageUseCase, isMessageCenterAvailableUseCase,
                 addFileAttachmentsObserverUseCase, addFileToAttachmentAndUploadUseCase,
                 getFileAttachmentsUseCase, removeFileAttachmentObserverUseCase,
-                removeFileAttachmentUseCase)
+                removeFileAttachmentUseCase, setSecureEngagementUseCase)
     }
 
     @Test
@@ -82,6 +85,19 @@ internal class MessageCenterControllerTest {
         val gliaException = GliaException("Message", GliaException.Cause.INVALID_INPUT)
         messageCenterController.handleSendMessageResult(gliaException)
         verify(viewContract, times(1)).showUnexpectedErrorDialog()
+    }
+
+    @Test
+    fun handleSendMessageResult_SetSecureEngagement_WhenErrorNull() {
+        messageCenterController.handleSendMessageResult(null)
+        verify(setSecureEngagementUseCase, times(1)).invoke(true)
+    }
+
+    @Test
+    fun handleSendMessageResult_NotSetSecureEngagement_WhenError() {
+        val gliaException = GliaException("Message", GliaException.Cause.INTERNAL_ERROR)
+        messageCenterController.handleSendMessageResult(gliaException)
+        verify(setSecureEngagementUseCase, never()).invoke(any())
     }
 
     @Test

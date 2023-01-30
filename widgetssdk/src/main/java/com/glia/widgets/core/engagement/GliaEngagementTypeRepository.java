@@ -8,6 +8,7 @@ public class GliaEngagementTypeRepository {
     private final GliaVisitorMediaRepository visitorMediaRepository;
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final GliaEngagementStateRepository engagementStateRepository;
+    private boolean isSecureEngagement = false;
 
     public GliaEngagementTypeRepository(
             GliaEngagementRepository engagementRepository,
@@ -42,5 +43,13 @@ public class GliaEngagementTypeRepository {
     private boolean hasVisitorMedia() {
         return visitorMediaRepository.hasVisitorVideoMedia().blockingGet() ||
                 visitorMediaRepository.hasVisitorAudioMedia().blockingGet();
+    }
+
+    public boolean isSecureEngagement() {
+        return isSecureEngagement;
+    }
+
+    public void setIsSecureEngagement(boolean secureEngagement) {
+        isSecureEngagement = secureEngagement;
     }
 }

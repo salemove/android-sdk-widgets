@@ -48,6 +48,7 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
@@ -106,7 +107,8 @@ class ChatController(
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
     private val addMediaUpgradeCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase,
-    private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase
+    private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase,
+    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -182,6 +184,12 @@ class ChatController(
         createNewTimerCallback()
         callTimer.addFormattedValueListener(timerStatusListener)
         updateAllowFileSendState()
+
+        // TODO: enable chat panel with send message support
+        // will implement in the next task
+        if (isSecureEngagementUseCase()) {
+            emitViewState(chatState.enableChatPanel())
+        }
     }
 
     private fun queueForEngagement() {
@@ -1383,11 +1391,11 @@ class ChatController(
 
     }
 
-    fun onRemoveAttachment(attachment: FileAttachment?) {
+    fun onRemoveAttachment(attachment: FileAttachment) {
         removeFileAttachmentUseCase.execute(attachment)
     }
 
-    fun onAttachmentReceived(file: FileAttachment?) {
+    fun onAttachmentReceived(file: FileAttachment) {
         addFileToAttachmentAndUploadUseCase
             .execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
@@ -1406,7 +1414,7 @@ class ChatController(
                     Logger.d(TAG, "fileUploadSecurityCheckStarted")
                 }
 
-                override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult) {
+                override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
                     Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
                 }
             })

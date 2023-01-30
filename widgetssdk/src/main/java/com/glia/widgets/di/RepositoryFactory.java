@@ -101,7 +101,8 @@ public class RepositoryFactory {
 
     public FileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository(gliaCore);
+            fileAttachmentRepository = new FileAttachmentRepository(gliaCore,
+                    getGliaEngagementTypeRepository(), gliaCore::getSecureConversations);
         }
         return fileAttachmentRepository;
     }

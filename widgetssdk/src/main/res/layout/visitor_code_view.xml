@@ -20,26 +20,27 @@
         app:layout_constraintGuide_end="@dimen/glia_large_x_large" />
 
     <TextView
-        android:id="@+id/dialog_title_view"
+        android:id="@+id/title_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceHeadline2"
         android:text="@string/glia_visitor_code_view_title"
-        app:layout_constraintEnd_toStartOf="@id/end_guideline"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/aaa"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/cardview_shadow_end_color"
-        android:layout_marginTop="@dimen/glia_large_x_large"
-        app:layout_constraintEnd_toStartOf="@id/end_guideline"
+    <com.glia.widgets.view.VisitorCodeCodeView
+        android:id="@+id/codeView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/glia_medium"
+        app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/dialog_title_view"/>
+        app:layout_constraintTop_toBottomOf="@id/title_view"
+        android:textAppearance="?attr/textAppearanceBody1"/>
 
     <ImageView
         android:id="@+id/logo_view"
@@ -50,18 +51,6 @@
         android:src="@drawable/ic_powered_by_glia"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/aaa"
-        app:tint="?attr/gliaBaseShadeColor" />
-
-    <Space
-        android:id="@+id/space"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/glia_large_x_large"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo_view"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintTop_toBottomOf="@id/codeView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

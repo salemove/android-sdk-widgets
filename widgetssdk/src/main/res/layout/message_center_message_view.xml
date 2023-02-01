@@ -32,6 +32,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginBottom="10dp"
             android:src="@drawable/ic_secure_message"
+            android:importantForAccessibility="no"
             app:layout_constraintBottom_toTopOf="@id/title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -137,6 +138,7 @@
             android:hint="@string/message_center_message_edit_text_hint"
             android:imeOptions="actionNone"
             android:inputType="textCapSentences|textMultiLine"
+            android:importantForAutofill="no"
             android:padding="@dimen/glia_large"
             android:textColor="@color/glia_base_dark_color"
             android:textColorHint="@color/glia_base_normal_color"
@@ -191,6 +193,8 @@
             android:layout_marginBottom="16dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:accessibilityLiveRegion="polite"
+            android:contentDescription="@string/message_center_send_message_btn"
             app:layout_constraintBottom_toTopOf="@id/bottom_space"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -207,11 +211,14 @@
             app:indicatorColor="#C4C4C4"
             app:indicatorSize="20dp"
             app:trackThickness="1.67dp"
+            android:accessibilityLiveRegion="polite"
+            android:contentDescription="@string/message_center_progress_bar_content_description"
+            android:importantForAccessibility="yes"
             app:layout_constraintTop_toTopOf="@id/btn_send_message"
             app:layout_constraintStart_toStartOf="@id/btn_send_message"
             app:layout_constraintEnd_toStartOf="@id/btn_send_message_text"
             app:layout_constraintBottom_toBottomOf="@id/btn_send_message"
-            app:layout_constraintHorizontal_chainStyle="packed"/>
+            app:layout_constraintHorizontal_chainStyle="packed" />
 
         <TextView
             android:id="@+id/btn_send_message_text"
@@ -221,6 +228,7 @@
             android:textColor="#C4C4C4"
             android:textSize="14sp"
             android:text="@string/message_center_send_message_btn"
+            android:importantForAccessibility="no"
             app:layout_constraintTop_toTopOf="@id/btn_send_message"
             app:layout_constraintStart_toEndOf="@id/btn_send_message_progress_bar"
             app:layout_constraintEnd_toEndOf="@id/btn_send_message"

@@ -519,6 +519,7 @@ public class Utils {
         return null;
     }
 
+    @Nullable
     public static Activity getActivity(Context context) {
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {

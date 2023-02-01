@@ -1,21 +1,23 @@
 package com.glia.widgets.di;
 
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
+import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
-import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
@@ -35,19 +37,6 @@ import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
-import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
-import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
-import com.glia.widgets.core.secureconversations.domain.SetSecureEngagementUseCase;
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
@@ -68,7 +57,20 @@ import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChan
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
+import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
+import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.core.secureconversations.domain.SetSecureEngagementUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
@@ -99,6 +101,7 @@ public class UseCaseFactory {
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final Schedulers schedulers;
+    private final GliaCore gliaCore;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
                           PermissionManager permissionManager,
@@ -106,8 +109,8 @@ public class UseCaseFactory {
                           INotificationManager notificationManager,
                           GliaSdkConfigurationManager gliaSdkConfigurationManager,
                           ChatHeadManager chatHeadManager,
-                          Schedulers schedulers
-    ) {
+                          Schedulers schedulers,
+                          GliaCore gliaCore) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
@@ -115,6 +118,7 @@ public class UseCaseFactory {
         this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
         this.chatHeadManager = chatHeadManager;
         this.schedulers = schedulers;
+        this.gliaCore = gliaCore;
     }
 
     public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
@@ -507,5 +511,9 @@ public class UseCaseFactory {
 
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
         return new IsSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
+    }
+
+    public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
+        return new IsAuthenticatedUseCase(gliaCore.getAuthentication(Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT));
     }
 }

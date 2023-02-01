@@ -6,7 +6,8 @@ import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.widgets.core.fileupload.FileAttachmentRepository.ObservableFileAttachmentList
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.secureconversations.SecureConversations
+import com.glia.androidsdk.secureconversations.SecureConversations
+
 import java.util.*
 import kotlin.collections.ArrayList
 

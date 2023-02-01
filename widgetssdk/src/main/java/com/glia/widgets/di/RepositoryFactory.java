@@ -15,7 +15,6 @@ import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
-import com.glia.widgets.core.secureconversations.SecureConversations;
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
@@ -26,8 +25,6 @@ import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 
 public class RepositoryFactory {
 
-    private MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
-    private ChatScreenRepository chatScreenRepository;
     private static SecureConversationsRepository secureConversationsRepository;
     private static SecureFileAttachmentRepository secureFileAttachmentRepository;
     private static GliaEngagementRepository gliaEngagementRepository;
@@ -45,6 +42,8 @@ public class RepositoryFactory {
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
     private final FileHelper fileHelper = new FileHelper();
+    private MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
+    private ChatScreenRepository chatScreenRepository;
 
     public RepositoryFactory(
             GliaCore gliaCore,
@@ -170,16 +169,14 @@ public class RepositoryFactory {
 
     public SecureConversationsRepository getSecureConversationsRepository() {
         if (secureConversationsRepository == null) {
-            SecureConversations secureConversations = new GliaCoreImpl().getSecureConversations();
-            secureConversationsRepository = new SecureConversationsRepository(secureConversations);
+            secureConversationsRepository = new SecureConversationsRepository(gliaCore.getSecureConversations());
         }
         return secureConversationsRepository;
     }
 
     public SecureFileAttachmentRepository getSecureFileAttachmentRepository() {
         if (secureFileAttachmentRepository == null) {
-            SecureConversations secureConversations = new GliaCoreImpl().getSecureConversations();
-            secureFileAttachmentRepository = new SecureFileAttachmentRepository(secureConversations);
+            secureFileAttachmentRepository = new SecureFileAttachmentRepository(gliaCore.getSecureConversations());
         }
         return secureFileAttachmentRepository;
     }

@@ -731,7 +731,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 val intent = Intent()
                 intent.type = INTENT_TYPE_IMAGES
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
-                Utils.getActivity(context).startActivityForResult(
+                Utils.getActivity(context)?.startActivityForResult(
                     Intent.createChooser(
                         intent,
                         resources.getString(R.string.glia_chat_select_picture_title)
@@ -746,17 +746,16 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 ) {
                     dispatchImageCapture()
                 } else {
-                    Utils.getActivity(context)
-                        .requestPermissions(
-                            arrayOf(Manifest.permission.CAMERA),
-                            CAMERA_PERMISSION_REQUEST
-                        )
+                    Utils.getActivity(context)?.requestPermissions(
+                        arrayOf(Manifest.permission.CAMERA),
+                        CAMERA_PERMISSION_REQUEST
+                    )
                 }
             }, {
                 val intent = Intent()
                 intent.type = INTENT_TYPE_ALL
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
-                Utils.getActivity(context).startActivityForResult(
+                Utils.getActivity(context)?.startActivityForResult(
                     Intent.createChooser(
                         intent,
                         resources.getString(R.string.glia_chat_select_file_title)
@@ -783,7 +782,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             )
             if (controller?.photoCaptureFileUri != null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, controller!!.photoCaptureFileUri)
-                Utils.getActivity(context).startActivityForResult(
+                Utils.getActivity(context)?.startActivityForResult(
                     intent,
                     CAPTURE_IMAGE_ACTION_REQUEST
                 )
@@ -986,7 +985,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         ) {
             onFileDownload(file)
         } else {
-            Utils.getActivity(context).requestPermissions(
+            Utils.getActivity(context)?.requestPermissions(
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE

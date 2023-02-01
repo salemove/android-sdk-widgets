@@ -4,6 +4,8 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.chat.VisitorMessage
+import com.glia.androidsdk.secureconversations.SecureConversations
+
 
 class SecureConversationsRepository(private val secureConversations: SecureConversations) {
     fun fetchChatTranscript(callback: RequestCallback<Array<ChatMessage>>?) {

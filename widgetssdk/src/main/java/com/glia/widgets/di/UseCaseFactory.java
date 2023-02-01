@@ -1,21 +1,23 @@
 package com.glia.widgets.di;
 
+import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
+import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
 import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
-import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
@@ -105,6 +107,7 @@ public class UseCaseFactory {
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final Schedulers schedulers;
+    private final GliaCore gliaCore;
 
     public UseCaseFactory(RepositoryFactory repositoryFactory,
                           PermissionManager permissionManager,
@@ -112,8 +115,8 @@ public class UseCaseFactory {
                           INotificationManager notificationManager,
                           GliaSdkConfigurationManager gliaSdkConfigurationManager,
                           ChatHeadManager chatHeadManager,
-                          Schedulers schedulers
-    ) {
+                          Schedulers schedulers,
+                          GliaCore gliaCore) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
@@ -121,6 +124,7 @@ public class UseCaseFactory {
         this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
         this.chatHeadManager = chatHeadManager;
         this.schedulers = schedulers;
+        this.gliaCore = gliaCore;
     }
 
     public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
@@ -534,6 +538,10 @@ public class UseCaseFactory {
 
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
         return new IsSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
+    }
+
+    public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
+        return new IsAuthenticatedUseCase(gliaCore.getAuthentication(Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT));
     }
 
     public GliaOnCallVisualizerUseCase createOnCallVisualizerUseCase() {

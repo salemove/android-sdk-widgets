@@ -303,7 +303,8 @@ public class ControllerFactory {
                 useCaseFactory.createGetSecureFileAttachmentsUseCase(),
                 useCaseFactory.createRemoveSecureFileAttachmentObserverUseCase(),
                 useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
-                useCaseFactory.createSetSecureEngagementUseCase()
+                useCaseFactory.createSetSecureEngagementUseCase(),
+                useCaseFactory.createIsAuthenticatedUseCase()
         );
     }
 

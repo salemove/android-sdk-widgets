@@ -1,16 +1,14 @@
 package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.times
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
+import org.mockito.kotlin.*
 
 internal class MessageCenterControllerTest {
     private lateinit var messageCenterController: MessageCenterController
@@ -22,6 +20,7 @@ internal class MessageCenterControllerTest {
     private lateinit var removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
     private lateinit var setSecureEngagementUseCase: SetSecureEngagementUseCase
+    private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var viewContract: MessageCenterContract.View
 
     @Before
@@ -35,15 +34,17 @@ internal class MessageCenterControllerTest {
         removeFileAttachmentUseCase = mock()
         setSecureEngagementUseCase = mock()
         viewContract = mock()
+        isAuthenticatedUseCase = mock()
         messageCenterController =
             MessageCenterController(sendSecureMessageUseCase, isMessageCenterAvailableUseCase,
                 addFileAttachmentsObserverUseCase, addFileToAttachmentAndUploadUseCase,
                 getFileAttachmentsUseCase, removeFileAttachmentObserverUseCase,
-                removeFileAttachmentUseCase, setSecureEngagementUseCase)
+                removeFileAttachmentUseCase, setSecureEngagementUseCase, isAuthenticatedUseCase)
     }
 
     @Test
     fun setView_ExecutesAddSecureFileAttachmentsObserverUseCase_onTrigger() {
+        whenever(isAuthenticatedUseCase.execute()) doReturn true
         messageCenterController.setView(viewContract)
 
         verify(addFileAttachmentsObserverUseCase, times(1)).execute(any())
@@ -51,9 +52,28 @@ internal class MessageCenterControllerTest {
 
     @Test
     fun setView_ExecutesGetFileAttachmentsUseCase_onTrigger() {
+        whenever(isAuthenticatedUseCase.execute()) doReturn true
         messageCenterController.setView(viewContract)
 
         verify(getFileAttachmentsUseCase, times(1)).execute()
+    }
+
+    @Test
+    fun setView_triggersNotAuthenticatedDialog_whenNotAuthenticated() {
+        whenever(isAuthenticatedUseCase.execute()) doReturn false
+
+        messageCenterController.setView(viewContract)
+
+        verify(viewContract).showUnAuthenticatedDialog()
+    }
+
+    @Test
+    fun setView_triggersViewInitialization_whenAuthenticated() {
+        whenever(isAuthenticatedUseCase.execute()) doReturn true
+
+        messageCenterController.setView(viewContract)
+
+        verify(viewContract).setupViewAppearance()
     }
 
     @Test

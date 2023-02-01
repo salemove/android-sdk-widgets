@@ -288,17 +288,18 @@ class MessageView(
 
         when (state) {
             State.ButtonState.PROGRESS -> {
-                disabledButtonTheme?.also { buttonTheme ->
+                disabledButtonTheme.also { buttonTheme ->
                     sendMessageButton.applyButtonTheme(buttonTheme)
                     buttonTheme.text?.also { sendMessageButtonTextView.applyTextTheme(it) }
-                    buttonTheme.iconColor?.primaryColor
-                        ?.also { sendMessageButtonProgressBar.setIndicatorColor(it) }
+                    buttonTheme.iconColor?.primaryColor?.also {
+                        sendMessageButtonProgressBar.setIndicatorColor(it)
+                    }
                 }
                 sendMessageButtonProgressBar.visibility = VISIBLE
                 sendMessageButton.isEnabled = false
             }
             State.ButtonState.NORMAL -> {
-                normalButtonTheme?.also { buttonTheme ->
+                normalButtonTheme.also { buttonTheme ->
                     sendMessageButton.applyButtonTheme(buttonTheme)
                     buttonTheme.text?.also { sendMessageButtonTextView.applyTextTheme(it) }
                 }
@@ -306,7 +307,7 @@ class MessageView(
                 sendMessageButton.isEnabled = true
             }
             State.ButtonState.DISABLE -> {
-                disabledButtonTheme?.also { buttonTheme ->
+                disabledButtonTheme.also { buttonTheme ->
                     sendMessageButton.applyButtonTheme(buttonTheme)
                     buttonTheme.text?.also { sendMessageButtonTextView.applyTextTheme(it) }
                 }

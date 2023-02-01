@@ -79,12 +79,12 @@ class MessageCenterView(
 
     init {
         orientation = VERTICAL
-        initCallbacks()
-        initConfigurations()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
     }
 
-    private fun setupViewAppearance() {
+    override fun setupViewAppearance() {
+        initCallbacks()
+        initConfigurations()
         val callback: RequestCallback<Boolean> = RequestCallback { isAvailable, exception ->
             if (exception != null) {
                 showUnexpectedErrorDialog()
@@ -158,6 +158,18 @@ class MessageCenterView(
         }
     }
 
+    override fun showUnAuthenticatedDialog() {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showAlertDialog(
+            context,
+            theme,
+            R.string.glia_dialog_message_center_unavailable_title,
+            R.string.glia_dialog_message_center_unauthorized_message
+        ) {
+            controller?.onCloseButtonClicked()
+        }
+    }
+
     override fun showAttachmentPopup() {
         messageView.showAttachmentPopup(
             { controller?.onGalleryClicked() },
@@ -205,7 +217,6 @@ class MessageCenterView(
     override fun setController(controller: MessageCenterContract.Controller?) {
         this.controller = controller
         controller?.setView(this)
-        setupViewAppearance()
     }
 
     override fun finish() {

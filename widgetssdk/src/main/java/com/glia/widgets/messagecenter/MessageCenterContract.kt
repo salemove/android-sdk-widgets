@@ -25,6 +25,7 @@ interface MessageCenterContract {
     }
 
     interface View : BaseView<Controller> {
+        fun setupViewAppearance()
         fun onStateUpdated(state: State)
         fun emitUploadAttachments(attachments: List<FileAttachment>)
         fun selectAttachmentFile(type: String)
@@ -36,5 +37,6 @@ interface MessageCenterContract {
         fun showMessageCenterUnavailableDialog()
         fun showConfirmationScreen()
         fun hideSoftKeyboard()
+        fun showUnAuthenticatedDialog()
     }
 }

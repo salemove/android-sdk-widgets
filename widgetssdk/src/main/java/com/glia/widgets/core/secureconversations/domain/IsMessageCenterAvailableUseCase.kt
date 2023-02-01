@@ -23,21 +23,19 @@ class IsMessageCenterAvailableUseCase(
                 .subscribeOn(schedulers.computationScheduler)
                 .observeOn(schedulers.mainScheduler)
                 .subscribe(
-                    { queues ->
-                        callback.onResult(containsMessagingQueue(queues), null)
-                    },
-                    { error -> callback.onResult(null, GliaException.from(error)) })
+                    { queues -> callback.onResult(containsMessagingQueue(queues), null) },
+                    { error -> callback.onResult(null, GliaException.from(error)) }
+                )
         )
     }
 
     @VisibleForTesting
     fun containsMessagingQueue(queues: Array<Queue>): Boolean {
-        val messagingQueues = queues
+        return queues
             .filter { queue -> queue.id == queueId }
             .filterNot { queue -> queue.state.status == QueueState.Status.CLOSED }
             .filterNot { queue -> queue.state.status == QueueState.Status.UNKNOWN }
-            .filter { queue -> queue.state.medias.any { media -> media == Engagement.MediaType.MESSAGING } }
-        return messagingQueues.isNotEmpty()
+            .any { queue -> queue.state.medias.any { media -> media == Engagement.MediaType.MESSAGING } }
     }
 
     fun dispose() {

@@ -6,6 +6,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
@@ -20,7 +21,8 @@ class MessageCenterController(
     private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
     private val removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase,
     private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase,
-    private val setSecureEngagementUseCase: SetSecureEngagementUseCase
+    private val setSecureEngagementUseCase: SetSecureEngagementUseCase,
+    private val isAuthenticatedUseCase: IsAuthenticatedUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private var state = State()
@@ -34,10 +36,19 @@ class MessageCenterController(
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
 
-        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
+        if (isAuthenticatedUseCase.execute()) {
+            initComponents(view)
+        } else {
+            view.showUnAuthenticatedDialog()
+        }
+    }
 
+    private fun initComponents(view: MessageCenterContract.View) {
+        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         setState(state)
+
         view.emitUploadAttachments(getFileAttachmentsUseCase.execute())
+        view.setupViewAppearance()
     }
 
     override fun onCheckMessagesClicked() {

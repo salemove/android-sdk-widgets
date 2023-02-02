@@ -35,23 +35,24 @@ android {
         Properties p = new Properties()
         new FileInputStream(propsFile).withCloseable { is -> p.load(is) }
         p.each { name, value -> ext[name] = value }
-    } else {
-        ext["GLIA_API_KEY_SECRET"] = System.getenv("GLIA_API_KEY_SECRET") as String
-        ext["GLIA_API_KEY_ID"] = System.getenv("GLIA_API_KEY_ID") as String
-        ext["GLIA_SITE_ID"] = System.getenv("GLIA_SITE_ID") as String
-        ext["FIREBASE_PROJECT_ID"] = System.getenv("FIREBASE_PROJECT_ID") as String
-        ext["FIREBASE_API_KEY"] = System.getenv("FIREBASE_API_KEY") as String
-        ext["FIREBASE_APP_ID"] = System.getenv("FIREBASE_APP_ID") as String
-        ext["FIREBASE_APP_ID_DEBUG"] = System.getenv("FIREBASE_APP_ID_DEBUG") as String
-        ext["FIREBASE_APP_ID_MASTER"] = System.getenv("FIREBASE_APP_ID_MASTER") as String
     }
+
+    initEnvProperty('GLIA_API_KEY_SECRET')
+    initEnvProperty('GLIA_API_KEY_ID')
+    initEnvProperty('GLIA_SITE_ID')
+    initEnvProperty('FIREBASE_PROJECT_ID')
+    initEnvProperty('FIREBASE_API_KEY')
+    initEnvProperty('FIREBASE_APP_ID')
+    initEnvProperty('FIREBASE_APP_ID_DEBUG')
+    initEnvProperty('FIREBASE_APP_ID_MASTER')
+
     buildTypes {
         all {
-            resValue("string", "site_id", GLIA_SITE_ID ?: "")
-            resValue("string", "glia_api_key_id", GLIA_API_KEY_ID ?: "")
-            resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET ?: "")
-            resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID ?: "")
-            resValue("string", "firebase_api_key", FIREBASE_API_KEY ?: "")
+            resValue("string", "site_id", GLIA_SITE_ID)
+            resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
+            resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
+            resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
+            resValue("string", "firebase_api_key", FIREBASE_API_KEY)
         }
         debug {
             signingConfig signingConfigs.debug
@@ -81,6 +82,12 @@ android {
                 'HardcodedText'
     }
     namespace 'com.glia.exampleapp'
+}
+
+def initEnvProperty(String propertyName) {
+    if (!project.hasProperty(propertyName)) {
+        ext[propertyName] = System.getenv(propertyName) as String ?: "UNDEFINED"
+    }
 }
 
 dependencies {

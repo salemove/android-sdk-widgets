@@ -35,7 +35,21 @@ import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
+import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
+import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
@@ -56,20 +70,7 @@ import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChan
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.secureconversations.domain.FetchChatTranscriptUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
-import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
-import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
-import com.glia.widgets.core.secureconversations.domain.SetSecureEngagementUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
@@ -249,7 +250,7 @@ public class UseCaseFactory {
                 createRemoveScreenSharingNotificationUseCase(),
                 repositoryFactory.getGliaSurveyRepository(),
                 repositoryFactory.getGliaVisitorMediaRepository(),
-                repositoryFactory.getGliaEngagementTypeRepository()
+                repositoryFactory.getEngagementConfigRepository()
         );
     }
 
@@ -275,7 +276,10 @@ public class UseCaseFactory {
         return new GliaSendMessageUseCase(
                 repositoryFactory.getGliaMessageRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
-                repositoryFactory.getGliaEngagementStateRepository()
+                repositoryFactory.getGliaEngagementStateRepository(),
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getEngagementConfigRepository(),
+                repositoryFactory.getSecureConversationsRepository()
         );
     }
 
@@ -301,7 +305,7 @@ public class UseCaseFactory {
         return new AddFileToAttachmentAndUploadUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
-                repositoryFactory.getGliaEngagementTypeRepository()
+                repositoryFactory.getEngagementConfigRepository()
         );
     }
 
@@ -500,15 +504,19 @@ public class UseCaseFactory {
         return new RemoveSecureFileAttachmentUseCase(repositoryFactory.getSecureFileAttachmentRepository());
     }
 
-    public SetSecureEngagementUseCase createSetSecureEngagementUseCase() {
-        return new SetSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
-    }
-
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
-        return new IsSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
+        return new IsSecureEngagementUseCase(repositoryFactory.getEngagementConfigRepository());
     }
 
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
         return new IsAuthenticatedUseCase(gliaCore.getAuthentication(Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT));
+    }
+
+    public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
+        return new SetEngagementConfigUseCase(repositoryFactory.getEngagementConfigRepository());
+    }
+
+    public IsOngoingEngagementUseCase createIsOngoingEngagementUseCase() {
+        return new IsOngoingEngagementUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 }

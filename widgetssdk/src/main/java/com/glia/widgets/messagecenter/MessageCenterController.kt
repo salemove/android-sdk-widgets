@@ -21,7 +21,6 @@ class MessageCenterController(
     private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
     private val removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase,
     private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase,
-    private val setSecureEngagementUseCase: SetSecureEngagementUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
@@ -88,7 +87,6 @@ class MessageCenterController(
     @VisibleForTesting
     fun handleSendMessageResult(gliaException: GliaException?) {
         if (gliaException == null) {
-            setSecureEngagementUseCase(true)
             view?.showConfirmationScreen()
         } else {
             when (gliaException.cause) {

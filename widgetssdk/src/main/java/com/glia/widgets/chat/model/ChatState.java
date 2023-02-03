@@ -162,7 +162,7 @@ public class ChatState {
                 .createChatState();
     }
 
-    public ChatState enableChatPanel() {
+    public ChatState setSecureMessagingState() {
         return new Builder()
                 .copyFrom(this)
                 .enableChatPanel()
@@ -189,7 +189,7 @@ public class ChatState {
                 .copyFrom(this)
                 .setOperatorName(operatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
-                .enableChatPanel()
+//                .enableChatPanel() // Why is this here?
                 .createChatState();
     }
 

@@ -121,6 +121,8 @@ public class GliaWidgets {
      */
     public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
 
+    public static final String CHAT_TYPE = "chat_type";
+
     @Nullable
     private static CustomCardAdapter customCardAdapter;
 

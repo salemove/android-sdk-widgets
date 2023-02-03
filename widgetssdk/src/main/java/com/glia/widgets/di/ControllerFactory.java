@@ -116,7 +116,9 @@ public class ControllerFactory {
                     useCaseFactory.createCustomCardInteractableUseCase(),
                     useCaseFactory.createCustomCardShouldShowUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
-                    useCaseFactory.createIsSecureEngagementUseCase());
+                    useCaseFactory.createIsOngoingEngagementUseCase(),
+                    useCaseFactory.createIsSecureEngagementUseCase(),
+                    useCaseFactory.createSetEngagementConfigUseCase());
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -290,7 +292,6 @@ public class ControllerFactory {
                 useCaseFactory.createGetSecureFileAttachmentsUseCase(),
                 useCaseFactory.createRemoveSecureFileAttachmentObserverUseCase(),
                 useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
-                useCaseFactory.createSetSecureEngagementUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase()
         );
     }

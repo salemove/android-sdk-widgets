@@ -5,13 +5,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.glia.widgets.GliaWidgets.CHAT_TYPE
 import com.glia.widgets.chat.ChatActivity
+import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.helper.FileHelper
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.MessageCenterActivityBinding
@@ -97,6 +100,7 @@ class MessageCenterActivity : AppCompatActivity(),
     override fun navigateToMessaging() {
         val intent = Intent(this, ChatActivity::class.java)
         intent.putExtras(getIntent())
+        intent.putExtra(CHAT_TYPE, ChatType.SECURE_MESSAGING as Parcelable)
         startActivity(intent)
         finish()
     }

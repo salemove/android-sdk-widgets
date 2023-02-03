@@ -40,6 +40,7 @@ import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
@@ -54,8 +55,8 @@ import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
-import com.glia.widgets.core.secureconversations.domain.SetSecureEngagementUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
+import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
@@ -266,7 +267,7 @@ public class UseCaseFactory {
                 createRemoveScreenSharingNotificationUseCase(),
                 repositoryFactory.getGliaSurveyRepository(),
                 repositoryFactory.getGliaVisitorMediaRepository(),
-                repositoryFactory.getGliaEngagementTypeRepository()
+                repositoryFactory.getEngagementConfigRepository()
         );
     }
 
@@ -292,7 +293,10 @@ public class UseCaseFactory {
         return new GliaSendMessageUseCase(
                 repositoryFactory.getGliaMessageRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
-                repositoryFactory.getGliaEngagementStateRepository()
+                repositoryFactory.getGliaEngagementStateRepository(),
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getEngagementConfigRepository(),
+                repositoryFactory.getSecureConversationsRepository()
         );
     }
 
@@ -318,7 +322,7 @@ public class UseCaseFactory {
         return new AddFileToAttachmentAndUploadUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
-                repositoryFactory.getGliaEngagementTypeRepository()
+                repositoryFactory.getEngagementConfigRepository()
         );
     }
 
@@ -533,16 +537,20 @@ public class UseCaseFactory {
         return new RemoveSecureFileAttachmentUseCase(repositoryFactory.getSecureFileAttachmentRepository());
     }
 
-    public SetSecureEngagementUseCase createSetSecureEngagementUseCase() {
-        return new SetSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
-    }
-
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
-        return new IsSecureEngagementUseCase(repositoryFactory.getGliaEngagementTypeRepository());
+        return new IsSecureEngagementUseCase(repositoryFactory.getEngagementConfigRepository());
     }
 
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
         return new IsAuthenticatedUseCase(gliaCore.getAuthentication(Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT));
+    }
+
+    public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
+        return new SetEngagementConfigUseCase(repositoryFactory.getEngagementConfigRepository());
+    }
+
+    public IsOngoingEngagementUseCase createIsOngoingEngagementUseCase() {
+        return new IsOngoingEngagementUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 
     public GliaOnCallVisualizerUseCase createOnCallVisualizerUseCase() {

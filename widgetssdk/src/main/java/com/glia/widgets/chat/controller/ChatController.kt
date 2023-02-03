@@ -15,6 +15,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.adapter.ChatAdapter
@@ -24,10 +25,7 @@ import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.history.*
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
+import com.glia.widgets.core.engagement.domain.*
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor
@@ -108,7 +106,9 @@ class ChatController(
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
     private val addMediaUpgradeCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase,
     private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase,
-    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
+    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
+    private val engagementConfigUseCase: SetEngagementConfigUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -121,7 +121,7 @@ class ChatController(
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener =
         object : GliaSendMessageUseCase.Listener {
-            override fun messageSent(message: VisitorMessage) {
+            override fun messageSent(message: VisitorMessage?) {
                 onMessageSent(message)
             }
 
@@ -170,13 +170,19 @@ class ChatController(
     @Volatile
     private var chatState: ChatState
 
-    fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?) {
+    fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType) {
+        val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
+        engagementConfigUseCase(chatType, queueIds)
 
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) dialogController.showOverlayPermissionsDialog()
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
             return
         }
-        emitViewState(chatState.initChat(companyName, queueId, visitorContextAssetId))
+        var initChatState = chatState.initChat(companyName, queueId, visitorContextAssetId)
+        if (isSecureEngagementUseCase()) {
+            initChatState = initChatState.setSecureMessagingState()
+        }
+        emitViewState(initChatState)
         loadChatHistory()
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         initMediaUpgradeCallback()
@@ -185,12 +191,6 @@ class ChatController(
         createNewTimerCallback()
         callTimer.addFormattedValueListener(timerStatusListener)
         updateAllowFileSendState()
-
-        // TODO: enable chat panel with send message support
-        // will implement in the next task
-        if (isSecureEngagementUseCase()) {
-            emitViewState(chatState.enableChatPanel())
-        }
     }
 
     private fun queueForEngagement() {
@@ -327,7 +327,12 @@ class ChatController(
         if (message != null) {
             Logger.d(TAG, "messageSent: $message, id: ${message.id}")
             val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-            changeDeliveredIndex(currentChatItems, message)
+            if (isOngoingEngagementUseCase()) {
+                changeDeliveredIndex(currentChatItems, message)
+            } else if (isSecureEngagementUseCase()) {
+                appendSentMessage(currentChatItems, message)
+                addVisitorAttachmentItemsToChatItems(currentChatItems, message)
+            }
 
             // chat input mode has to be set to enable after a message is sent
             if (isEnableChatEditTextUseCase(currentChatItems)) {
@@ -337,11 +342,9 @@ class ChatController(
         }
     }
 
-    private fun onMessageSendError(ex: GliaException?) {
-        ex?.also {
-            Logger.d(TAG, "messageSent exception")
-            error(it)
-        }
+    private fun onMessageSendError(exception: GliaException) {
+        Logger.d(TAG, "messageSent exception")
+        error(exception)
     }
 
     private fun onSendMessageOperatorOffline(message: String) {
@@ -1235,8 +1238,13 @@ class ChatController(
                 appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
             }
 
+            val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
             emitChatItems(
-                chatState.historyLoaded(currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp })
+                if (isSecureEngagementUseCase()) {
+                    chatState.changeItems(sortedItems)
+                } else {
+                    chatState.historyLoaded(sortedItems)
+                }
             )
             initGliaEngagementObserving()
         } else if (!chatState.engagementRequested) {

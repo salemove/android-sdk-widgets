@@ -6,6 +6,7 @@ import com.glia.widgets.chat.data.ChatScreenRepositoryImpl;
 import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
@@ -41,6 +42,7 @@ public class RepositoryFactory {
     private static GliaEngagementStateRepository gliaEngagementStateRepository;
     private static FileAttachmentRepository fileAttachmentRepository;
     private static GliaOperatorRepository operatorRepository;
+    private static GliaEngagementConfigRepository engagementConfigRepository;
     private CallVisualizerRepository callVisualizerRepository;
     private static VisitorCodeRepository visitorCodeRepository;
 
@@ -108,8 +110,10 @@ public class RepositoryFactory {
 
     public FileAttachmentRepository getGliaFileAttachmentRepository() {
         if (fileAttachmentRepository == null) {
-            fileAttachmentRepository = new FileAttachmentRepository(gliaCore,
-                    getGliaEngagementTypeRepository(), gliaCore::getSecureConversations);
+            fileAttachmentRepository = new FileAttachmentRepository(
+                    gliaCore,
+                    getEngagementConfigRepository()
+            );
         }
         return fileAttachmentRepository;
     }
@@ -194,5 +198,12 @@ public class RepositoryFactory {
             secureFileAttachmentRepository = new SecureFileAttachmentRepository(gliaCore.getSecureConversations());
         }
         return secureFileAttachmentRepository;
+    }
+
+    public GliaEngagementConfigRepository getEngagementConfigRepository() {
+        if (engagementConfigRepository == null) {
+            engagementConfigRepository = new GliaEngagementConfigRepository();
+        }
+        return engagementConfigRepository;
     }
 }

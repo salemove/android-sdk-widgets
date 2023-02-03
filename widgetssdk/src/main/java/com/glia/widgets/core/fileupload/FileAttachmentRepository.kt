@@ -5,7 +5,8 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.secureconversations.SecureConversations
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository
+import com.glia.widgets.chat.ChatType
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -14,11 +15,10 @@ import java.util.*
 
 class FileAttachmentRepository(
     private val gliaCore: GliaCore,
-    private val engagementTypeRepository: GliaEngagementTypeRepository,
-    private val secureConversationsResolver: (() -> SecureConversations)
+    private val engagementConfigRepository: GliaEngagementConfigRepository
 ) {
     private val secureConversations: SecureConversations by lazy {
-        secureConversationsResolver.invoke()
+        gliaCore.secureConversations
     }
 
     private val observable = ObservableFileAttachmentList()
@@ -48,7 +48,7 @@ class FileAttachmentRepository(
         val engagement = gliaCore.currentEngagement.orElse(null)
         if (engagement != null) {
             engagement.uploadFile(file.uri, handleFileUpload(file, listener))
-        } else if (engagementTypeRepository.isSecureEngagement) {
+        } else if (engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING) {
             secureConversations.uploadFile(file.uri, handleFileUpload(file, listener))
         } else {
             setFileAttachmentEngagementMissing(file.uri)

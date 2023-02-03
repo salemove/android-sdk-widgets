@@ -19,7 +19,7 @@ class SendSecureMessageUseCase(
     ) {
         val queueIds = arrayOf(queueId)
         val fileAttachments = fileAttachmentRepository.getReadyToSendFileAttachments()
-        if (fileAttachments != null && fileAttachments.isNotEmpty()) {
+        if (fileAttachments.isNotEmpty()) {
             sendMessageWithAttachments(message, queueIds, fileAttachments, callback)
         } else {
             secureConversationsRepository.send(message, queueIds, callback)

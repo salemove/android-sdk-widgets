@@ -205,11 +205,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         queueId: String?,
         visitorContextAssetId: String?,
         useOverlays: Boolean = false,
-        screenSharingMode: ScreenSharing.Mode? = null
+        screenSharingMode: ScreenSharing.Mode? = null,
+        chatType: ChatType = ChatType.LIVE_CHAT
     ) {
         Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
         Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
-        controller?.initChat(companyName, queueId, visitorContextAssetId)
+        controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
         serviceChatHeadController?.init()
     }
 

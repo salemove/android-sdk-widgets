@@ -1,8 +1,9 @@
 package com.glia.widgets.core.fileupload.domain
 
 import com.glia.androidsdk.engagement.EngagementFile
+import com.glia.widgets.chat.ChatType
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.GliaEngagementRepository
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
@@ -13,7 +14,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 class AddFileToAttachmentAndUploadUseCase(
     private val gliaEngagementRepository: GliaEngagementRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
-    private val engagementTypeRepository: GliaEngagementTypeRepository
+    private val engagementConfigRepository: GliaEngagementConfigRepository
 ) {
     private val isSupportedFileCountExceeded: Boolean
         get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
@@ -22,7 +23,7 @@ class AddFileToAttachmentAndUploadUseCase(
         get() = !gliaEngagementRepository.hasOngoingEngagement()
 
     private val isNotSecureEngagement: Boolean
-        get() = !engagementTypeRepository.isSecureEngagement
+        get() = engagementConfigRepository.chatType != ChatType.SECURE_MESSAGING
 
     fun execute(file: FileAttachment, listener: Listener) {
         if (fileAttachmentRepository.isFileAttached(file.uri)) {

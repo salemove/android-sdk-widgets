@@ -9,16 +9,22 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
+import com.glia.androidsdk.comms.Media;
+import com.glia.androidsdk.comms.MediaDirection;
+import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.omnibrowse.Omnibrowse;
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
+import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
+import com.glia.widgets.helper.Utils;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -175,10 +181,7 @@ public class GliaWidgets {
                 }
             };
             engagementRequest.accept((String) null, onResult);
-        });
-
-        Dependencies.glia().getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, engagement -> {
-            Logger.d(TAG, "New Call Visualizer engagement started");
+            Dependencies.getControllerFactory().getCallVisualizerController().init();
         });
     }
 

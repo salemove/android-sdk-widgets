@@ -258,14 +258,14 @@ object Dialogs {
                         R.string.glia_dialog_upgrade_video_1_way_title,
                         mediaUpgrade.operatorName
                     )
-                    titleIconView.setImageResource(theme.iconUpgradeVideoDialog!!)
+                    titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                 }
                 MediaUpgrade.MODE_VIDEO_TWO_WAY -> {
                     titleView.text = context.getString(
                         R.string.glia_dialog_upgrade_video_2_way_title,
                         mediaUpgrade.operatorName
                     )
-                    titleIconView.setImageResource(theme.iconUpgradeVideoDialog!!)
+                    titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                     titleIconView.contentDescription =
                         context.getString(R.string.glia_chat_video_icon_content_description)
                 }

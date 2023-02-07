@@ -33,6 +33,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
+import com.glia.widgets.callvisualizer.ScreenSharingScreenActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
@@ -72,6 +73,8 @@ public class MainFragment extends Fragment {
                 navigateToCall(GliaWidgets.MEDIA_TYPE_VIDEO));
         view.findViewById(R.id.message_center_activity_button).setOnClickListener(v ->
                 navigateToMessageCenter());
+        view.findViewById(R.id.screen_share_test_button).setOnClickListener( v ->
+                navigateToScreenShare());
         view.findViewById(R.id.end_engagement_button).setOnClickListener(v ->
                 GliaWidgets.endEngagement());
         view.findViewById(R.id.initGliaWidgetsButton).setOnClickListener(v ->
@@ -82,6 +85,12 @@ public class MainFragment extends Fragment {
                 deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
                 clearSession());
+    }
+
+    private void navigateToScreenShare() {
+        Intent intent = new Intent(requireContext(), ScreenSharingScreenActivity.class);
+        setNavigationIntentData(intent);
+        startActivity(intent);
     }
 
     @Override

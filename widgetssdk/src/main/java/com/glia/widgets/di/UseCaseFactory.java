@@ -3,6 +3,7 @@ package com.glia.widgets.di;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
+import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
@@ -439,5 +440,9 @@ public class UseCaseFactory {
 
     public QueueTicketStateChangeToUnstaffedUseCase createQueueTicketStateChangeToUnstaffedUseCase() {
         return new QueueTicketStateChangeToUnstaffedUseCase(repositoryFactory.getGliaQueueRepository());
+    }
+
+    public IsCallOrChatScreenActiveUseCase createIsCallOrChatScreenActiveUseCase() {
+        return new IsCallOrChatScreenActiveUseCase();
     }
 }

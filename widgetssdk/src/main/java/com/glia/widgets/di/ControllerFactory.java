@@ -2,6 +2,9 @@ package com.glia.widgets.di;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
+import com.glia.widgets.callvisualizer.ScreenSharingScreenContract;
+import com.glia.widgets.callvisualizer.ScreenSharingScreenController;
+import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -41,6 +44,7 @@ public class ControllerFactory {
     private final FilePreviewController filePreviewController;
     private final ChatHeadPosition chatHeadPosition;
     private SurveyController surveyController;
+    private CallVisualizerController callVisualizerController;
 
     private static ServiceChatHeadController serviceChatHeadController;
 
@@ -258,6 +262,16 @@ public class ControllerFactory {
         return surveyController;
     }
 
+    public CallVisualizerController getCallVisualizerController() {
+        if (callVisualizerController == null) {
+            callVisualizerController = new CallVisualizerController(
+                    dialogController,
+                    useCaseFactory.createIsCallOrChatScreenActiveUseCase()
+            );
+        }
+        return callVisualizerController;
+    }
+
     public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {
         return new FloatingVisitorVideoController(
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
@@ -269,5 +283,9 @@ public class ControllerFactory {
 
     public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController();
+    }
+
+    public ScreenSharingScreenContract.Controller getScreenSharingViewController() {
+        return new ScreenSharingScreenController();
     }
 }

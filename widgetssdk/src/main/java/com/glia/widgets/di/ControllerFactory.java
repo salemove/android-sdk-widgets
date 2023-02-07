@@ -2,6 +2,7 @@ package com.glia.widgets.di;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
+import com.glia.widgets.callvisualizer.controller.CallVisualizerMediaUpgradeController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -41,6 +42,7 @@ public class ControllerFactory {
     private final FilePreviewController filePreviewController;
     private final ChatHeadPosition chatHeadPosition;
     private SurveyController surveyController;
+    private CallVisualizerMediaUpgradeController callVisualizerMediaUpgradeController;
 
     private static ServiceChatHeadController serviceChatHeadController;
 
@@ -256,6 +258,16 @@ public class ControllerFactory {
             );
         }
         return surveyController;
+    }
+
+    public CallVisualizerMediaUpgradeController getCallVisualizerMediaUpgradeController() {
+        if (callVisualizerMediaUpgradeController == null) {
+            callVisualizerMediaUpgradeController = new CallVisualizerMediaUpgradeController(
+                    dialogController,
+                    useCaseFactory.createIsCallOrChatScreenActiveUseCase()
+            );
+        }
+        return callVisualizerMediaUpgradeController;
     }
 
     public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {

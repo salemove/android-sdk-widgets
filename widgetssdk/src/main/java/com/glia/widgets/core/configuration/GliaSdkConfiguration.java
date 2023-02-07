@@ -10,7 +10,7 @@ import com.glia.widgets.view.unifiedui.config.RemoteConfiguration;
 public class GliaSdkConfiguration {
 
     private static final boolean DEFAULT_USE_OVERLAY = true;
-    private static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE =
+    public static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE =
             ScreenSharing.Mode.UNBOUNDED;
 
     private final String companyName;

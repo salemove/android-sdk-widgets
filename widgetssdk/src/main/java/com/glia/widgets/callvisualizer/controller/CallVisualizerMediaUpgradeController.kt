@@ -1,6 +1,7 @@
 package com.glia.widgets.callvisualizer.controller
 
 import android.app.Activity
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
@@ -32,25 +33,14 @@ class CallVisualizerMediaUpgradeController(
         dialogController.removeCallback(dialogCallback)
     }
 
-    private fun setupDialogCallback(resumedActivity: Activity?) {
+    @VisibleForTesting
+    fun setupDialogCallback(resumedActivity: Activity?) {
         dialogCallback = DialogController.Callback {
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
-//                Dialog.MODE_OVERLAY_PERMISSION -> resumedActivity?.runOnUiThread {
-//                  showOverlayPermissionsDialog() // TODO: 07.02.2023 implement within screen sharing task
-//                  }
                 Dialog.MODE_MEDIA_UPGRADE -> resumedActivity?.runOnUiThread {
                     showUpgradeDialog(resumedActivity, it as DialogState.MediaUpgrade)
                 }
-//                Dialog.MODE_START_SCREEN_SHARING -> resumedActivity?.runOnUiThread {
-//                  showScreenSharingDialog() TODO: 07.02.2023 implement within screen sharing task
-//                }
-//                Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> resumedActivity?.runOnUiThread {
-//                  showAllowNotificationsDialog() TODO: 07.02.2023 implement within screen sharing task
-//                }
-//                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
-//                  showAllowScreenSharingNotificationsAndStartSharingDialog() TODO: 07.02.2023 implement within screen sharing task
-//                }
             }
         }
     }
@@ -71,7 +61,6 @@ class CallVisualizerMediaUpgradeController(
 
         alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
             dialogController.dismissCurrentDialog()
-            // TODO: 07.02.2023 handle media request accepting
         }) {
             dialogController.dismissCurrentDialog()
         }

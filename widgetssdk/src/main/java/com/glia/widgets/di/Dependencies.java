@@ -106,6 +106,10 @@ public class Dependencies {
         return resourceProvider;
     }
 
+    public static ActivityWatcher getActivityWatcher() {
+        return activityWatcher;
+    }
+
     @VisibleForTesting
     public static void setControllerFactory(ControllerFactory controllerFactory) {
         Dependencies.controllerFactory = controllerFactory;

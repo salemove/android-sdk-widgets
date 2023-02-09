@@ -22,7 +22,9 @@ import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
+import com.glia.widgets.di.ControllerFactory;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.ActivityWatcher;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 
@@ -144,7 +146,7 @@ public class GliaWidgets {
         Dependencies.glia().init(createGliaConfig(gliaWidgetsConfig));
         Dependencies.init();
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
-        listenCallVisualizerEvents();
+        initCallVisualizer();
         Logger.d(TAG, "init");
     }
 
@@ -169,6 +171,25 @@ public class GliaWidgets {
         } else {
             throw new RuntimeException("Site key or app token is missing");
         }
+    }
+
+    private static void initCallVisualizer() {
+        listenCallVisualizerEvents();
+        initScreenSharingForCallVisualizer();
+    }
+
+    private static void initScreenSharingForCallVisualizer() {
+        ControllerFactory controllerFactory = Dependencies.getControllerFactory();
+        // ScreenSharingController can be initialized only after Glia initialization
+        controllerFactory.getScreenSharingController();
+        ActivityWatcher activityWatcher = Dependencies.getActivityWatcher();
+        // ScreenSharingCallback registration is needed for displaying screen sharing request dialog.
+        // ScreenSharingCallback requires current Activity, thus is registered from
+        // ActivityWatcher.onActivityResumed().
+        // ScreenSharingController can be initialized only after Glia Widgets initialization.
+        // Activity that was displayed before Glia Widgets initialization can display
+        // screen sharing requests only after next onResume() execution, if the line below is not called.
+        controllerFactory.getCallVisualizerController().addScreenSharingCallback(activityWatcher.getResumedActivity());
     }
 
     private static void listenCallVisualizerEvents() {

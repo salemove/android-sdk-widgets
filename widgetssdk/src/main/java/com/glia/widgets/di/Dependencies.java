@@ -62,7 +62,7 @@ public class Dependencies {
         );
         ActivityWatcher activityWatcher = new ActivityWatcher(
                 application,
-                controllerFactory.getCallVisualizerMediaUpgradeController());
+                controllerFactory.getCallVisualizerController());
         activityWatcher.init();
         resourceProvider = new ResourceProvider(application.getBaseContext());
     }

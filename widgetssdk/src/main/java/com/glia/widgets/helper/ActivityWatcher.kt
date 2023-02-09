@@ -4,12 +4,12 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import androidx.annotation.VisibleForTesting
-import com.glia.widgets.callvisualizer.controller.CallVisualizerMediaUpgradeController
+import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import java.lang.ref.WeakReference
 
 class ActivityWatcher(
     private val app: Application,
-    private val callVisualizerMediaUpgradeController: CallVisualizerMediaUpgradeController
+    private val callVisualizerController: CallVisualizerController
 ) :
     Application.ActivityLifecycleCallbacks {
 
@@ -34,12 +34,12 @@ class ActivityWatcher(
     override fun onActivityResumed(activity: Activity) {
         _resumedActivity = WeakReference(activity)
         // There are separate handlers for Media requests on CallActivity and ChatActivity
-        callVisualizerMediaUpgradeController.addDialogCallback(resumedActivity)
+        callVisualizerController.addDialogCallback(resumedActivity)
     }
 
     override fun onActivityPaused(activity: Activity) {
         _resumedActivity.clear()
-        callVisualizerMediaUpgradeController.removeDialogCallback()
+        callVisualizerController.removeDialogCallback()
     }
 
 

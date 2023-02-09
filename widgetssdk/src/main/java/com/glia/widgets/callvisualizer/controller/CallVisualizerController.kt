@@ -13,7 +13,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.view.Dialogs
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
-class CallVisualizerMediaUpgradeController(
+class CallVisualizerController(
     private val dialogController: DialogController,
     private val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
 ) {
@@ -73,6 +73,6 @@ class CallVisualizerMediaUpgradeController(
     }
 
     companion object {
-        private val TAG = CallVisualizerMediaUpgradeController::class.java.simpleName
+        private val TAG = CallVisualizerController::class.java.simpleName
     }
 }

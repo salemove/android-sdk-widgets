@@ -8,8 +8,8 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 
-internal class CallVisualizerMediaUpgradeControllerTest {
-    private lateinit var callVisualizerMediaUpgradeController: CallVisualizerMediaUpgradeController
+internal class CallVisualizerControllerTest {
+    private lateinit var callVisualizerController: CallVisualizerController
     private lateinit var isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
     private lateinit var dialogController: DialogController
 
@@ -17,7 +17,7 @@ internal class CallVisualizerMediaUpgradeControllerTest {
     fun setUp() {
         isCallOrChatScreenActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
         dialogController = mock(DialogController::class.java)
-        callVisualizerMediaUpgradeController = CallVisualizerMediaUpgradeController(
+        callVisualizerController = CallVisualizerController(
             dialogController,
             isCallOrChatScreenActiveUseCase
         )
@@ -28,7 +28,7 @@ internal class CallVisualizerMediaUpgradeControllerTest {
         val resumedActivity = Activity()
         `when`(isCallOrChatScreenActiveUseCase(resumedActivity)).thenReturn(false)
 
-        callVisualizerMediaUpgradeController.addDialogCallback(resumedActivity)
+        callVisualizerController.addDialogCallback(resumedActivity)
 
         verify(dialogController, times(1)).addCallback(any(DialogController.Callback::class.java))
     }
@@ -38,7 +38,7 @@ internal class CallVisualizerMediaUpgradeControllerTest {
         val resumedActivity = Activity()
         `when`(isCallOrChatScreenActiveUseCase(resumedActivity)).thenReturn(true)
 
-        callVisualizerMediaUpgradeController.addDialogCallback(resumedActivity)
+        callVisualizerController.addDialogCallback(resumedActivity)
 
         verify(dialogController, never()).addCallback(any(DialogController.Callback::class.java))
     }

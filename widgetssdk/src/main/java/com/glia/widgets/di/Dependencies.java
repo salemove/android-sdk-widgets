@@ -111,6 +111,11 @@ public class Dependencies {
     }
 
     @VisibleForTesting
+    public static void setActivityWatcher(ActivityWatcher activityWatcher) {
+        Dependencies.activityWatcher = activityWatcher;
+    }
+
+    @VisibleForTesting
     public static void setControllerFactory(ControllerFactory controllerFactory) {
         Dependencies.controllerFactory = controllerFactory;
     }

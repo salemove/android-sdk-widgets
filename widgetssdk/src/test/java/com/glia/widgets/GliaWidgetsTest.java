@@ -13,9 +13,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.SiteApiKey;
 import com.glia.androidsdk.omnibrowse.Omnibrowse;
+import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.di.ControllerFactory;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.di.GliaCore;
+import com.glia.widgets.helper.ActivityWatcher;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -34,6 +36,7 @@ public class GliaWidgetsTest {
     public void setUp() {
         gliaCore = mock(GliaCore.class);
         Dependencies.setGlia(gliaCore);
+        Dependencies.setActivityWatcher(mock(ActivityWatcher.class));
 
         controllerFactory = mock(ControllerFactory.class);
         Dependencies.setControllerFactory(controllerFactory);
@@ -62,6 +65,8 @@ public class GliaWidgetsTest {
                 .build();
         Omnibrowse callVisualizer = mock(Omnibrowse.class);
         when(gliaCore.getCallVisualizer()).thenReturn(callVisualizer);
+        CallVisualizerController callVisualizerController = mock(CallVisualizerController.class);
+        when(controllerFactory.getCallVisualizerController()).thenReturn(callVisualizerController);
 
         GliaWidgets.init(widgetsConfig);
 

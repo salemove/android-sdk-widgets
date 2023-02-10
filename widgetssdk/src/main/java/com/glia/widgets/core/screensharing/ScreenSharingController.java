@@ -84,6 +84,7 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     @Override
     public void onScreenSharingRequestSuccess() {
         Logger.d(TAG, "screen sharing request success");
+        viewCallbacks.forEach(ViewCallback::onScreenSharingStarted);
     }
 
     public void onResume(Context context) {
@@ -100,6 +101,10 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     public void onDestroy() {
         Logger.d(TAG, "onDestroy");
         repository.onDestroy();
+    }
+
+    public boolean isSharingScreen() {
+        return repository.isSharingScreen();
     }
 
     public void onScreenSharingAccepted(Context context) {
@@ -143,5 +148,11 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
 
     public interface ViewCallback {
         void onScreenSharingRequestError(GliaException ex);
+        void onScreenSharingStarted();
+    }
+
+    @Override
+    public void onForceStopScreenSharing() {
+        repository.forceEndScreenSharing();
     }
 }

@@ -12,4 +12,6 @@ public interface GliaScreenSharingCallback {
     void onScreenSharingRequestError(GliaException exception);
 
     void onScreenSharingRequestSuccess();
+
+    void onForceStopScreenSharing();
 }

@@ -7,6 +7,8 @@ import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.AttributeSet
 import android.view.Gravity
@@ -25,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.engagement.Survey
@@ -73,8 +76,14 @@ internal class CallView(
     }
 
     private val audioManager: AudioManager by lazy { context.getSystemService()!! }
-    private val screenSharingViewCallback = ScreenSharingController.ViewCallback {
-        showToast(it.debugMessage)
+    private val screenSharingViewCallback = object: ScreenSharingController.ViewCallback {
+        override fun onScreenSharingRequestError(ex: GliaException?) {
+            ex?.run { showToast(this.debugMessage) }
+        }
+
+        override fun onScreenSharingStarted() {
+            Handler(Looper.getMainLooper()).post { appBar.showEndScreenSharingButton() }
+        }
     }
 
     private val binding: CallViewBinding by lazy {
@@ -148,6 +157,7 @@ internal class CallView(
             onBackClickedListener?.onBackClicked()
         }
         appBar.setOnEndChatClickedListener { callController?.leaveChatClicked() }
+        appBar.setOnEndCallButtonClickedListener { screenSharingController?.onForceStopScreenSharing()}
         appBar.setOnXClickedListener { callController?.leaveChatQueueClicked() }
         chatButton.setOnClickListener { callController?.chatButtonClicked() }
         speakerButton.setOnClickListener { callController?.onSpeakerButtonPressed() }
@@ -353,6 +363,7 @@ internal class CallView(
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     NotificationManager.openNotificationChannelScreen(this.context)
+
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
@@ -885,6 +896,11 @@ internal class CallView(
                 appBar.showEndButton()
             } else {
                 appBar.showXButton()
+            }
+            if (screenSharingController?.isSharingScreen == true) {
+                appBar.showEndScreenSharingButton()
+            } else {
+                appBar.hideEndScreenSharingButton()
             }
             if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
                 setTitle(resources.getString(R.string.glia_call_video_app_bar_title))

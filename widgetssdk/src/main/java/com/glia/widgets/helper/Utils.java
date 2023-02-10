@@ -430,6 +430,22 @@ public class Utils {
                         R.attr.gliaIconOnHold
                 )
         );
+        defaultThemeBuilder.setIconEndScreenShare(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_iconEndScreenShare,
+                        R.attr.gliaIconEndScreenShare
+                )
+        );
+        defaultThemeBuilder.setEndScreenShareTintColor(
+                getTypedArrayIntegerValue(
+                        typedArray,
+                        context,
+                        R.styleable.GliaView_endScreenShareTintColor,
+                        R.attr.gliaEndScreenShareTintColor
+                )
+        );
         defaultThemeBuilder.setWhiteLabel(
                 getTypedArrayBooleanValue(
                         typedArray,
@@ -612,6 +628,10 @@ public class Utils {
                 newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
         Integer iconOnHold = newTheme.getIconOnHold() != null ?
                 newTheme.getIconOnHold() : oldTheme.getIconOnHold();
+        Integer iconEndScreenShare = newTheme.getIconEndScreenShare() != null ?
+                newTheme.getIconEndScreenShare() : oldTheme.getIconEndScreenShare();
+        Integer endScreenShareTintColor = newTheme.getEndScreenShareTintColor() != null ?
+                newTheme.getEndScreenShareTintColor() : oldTheme.getEndScreenShareTintColor();
 
         Boolean whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
         Boolean isUseAlertDialogButtonVerticalAlignment =
@@ -715,6 +735,8 @@ public class Utils {
         builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
         builder.setChatHeadConfiguration(chatHeadConfiguration);
         builder.setSurveyStyle(surveyStyle);
+        builder.setIconEndScreenShare(iconEndScreenShare);
+        builder.setEndScreenShareTintColor(endScreenShareTintColor);
         return builder.build();
     }
 

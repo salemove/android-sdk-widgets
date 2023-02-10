@@ -28,6 +28,7 @@
         <item name="iconCallMinimize">?attr/gliaIconCallMinimize</item>
         <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
         <item name="iconOnHold">?attr/gliaIconOnHold</item>
+        <item name="iconEndScreenShare">?attr/gliaIconEndScreenShare</item>
 
         <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
 
@@ -42,7 +43,7 @@
         <item name="chatStartingCaptionTextColor">?attr/gliaChatStartingCaptionTextColor</item>
         <item name="chatStartedHeadingTextColor">?attr/gliaChatStartedHeadingTextColor</item>
         <item name="chatStartedCaptionTextColor">?attr/gliaChatStartedCaptionTextColor</item>
-
+        <item name="endScreenShareTintColor">?attr/gliaEndScreenShareTintColor</item>
         <item name="visitorMessageBackgroundColor">?attr/gliaVisitorMessageBackgroundColor</item>
         <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
         <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
@@ -98,6 +99,7 @@
         <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
         <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
         <item name="gliaChatBackgroundColor">@color/glia_chat_background_color</item>
+        <item name="gliaEndScreenShareTintColor">@color/glia_base_light_color</item>
         <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
         <item name="gliaIconLeaveQueue">@drawable/ic_baseline_close</item>
         <item name="gliaIconSendMessage">@drawable/ic_baseline_send</item>
@@ -115,6 +117,7 @@
         <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
         <item name="gliaIconOnHold">@drawable/ic_pause_circle</item>
+        <item name="gliaIconEndScreenShare">@drawable/ic_screensharing_off</item>
 
         <item name="gliaSendMessageButtonTintColor">?attr/gliaBrandPrimaryColor</item>
 

@@ -1234,7 +1234,7 @@ class ChatController(
 
             val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
             emitChatItems(
-                if (isSecureEngagementUseCase()) {
+                if (isSecureEngagementUseCase() && !isOngoingEngagementUseCase()) {
                     chatState.changeItems(sortedItems)
                 } else {
                     chatState.historyLoaded(sortedItems)

@@ -6,9 +6,14 @@ import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
+import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 
 class SecureConversationsRepository(private val secureConversations: SecureConversations) {
+    fun fetchChatTranscript(listener: GliaChatRepository.HistoryLoadedListener) {
+        secureConversations.fetchChatTranscript(listener::loaded)
+    }
+
     fun fetchChatTranscript(callback: RequestCallback<Array<ChatMessage>>?) {
         secureConversations.fetchChatTranscript(callback)
     }

@@ -207,7 +207,12 @@ public class UseCaseFactory {
     }
 
     public GliaLoadHistoryUseCase createGliaLoadHistoryUseCase() {
-        return new GliaLoadHistoryUseCase(repositoryFactory.getGliaMessageRepository(), getMapOperatorUseCase());
+        return new GliaLoadHistoryUseCase(
+                repositoryFactory.getGliaMessageRepository(),
+                repositoryFactory.getSecureConversationsRepository(),
+                repositoryFactory.getEngagementConfigRepository(),
+                getMapOperatorUseCase()
+        );
     }
 
     public MapOperatorUseCase getMapOperatorUseCase() {

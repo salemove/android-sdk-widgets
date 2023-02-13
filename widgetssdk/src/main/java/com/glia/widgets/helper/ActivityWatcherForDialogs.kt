@@ -25,16 +25,14 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference
 
 class ActivityWatcherForDialogs(
-    private val app: Application,
     private val callVisualizerController: CallVisualizerController,
+    private val screenSharingController: ScreenSharingController,
+    private val dialogController: DialogController,
 ) : Application.ActivityLifecycleCallbacks {
 
     companion object {
         private val TAG = ActivityWatcherForDialogs::class.java.simpleName
     }
-
-    private var dialogController: DialogController? = null
-    private var screenSharingController: ScreenSharingController? = null
 
     @VisibleForTesting
     var dialogCallback: DialogController.Callback? = null
@@ -49,15 +47,6 @@ class ActivityWatcherForDialogs(
      */
     @VisibleForTesting
     var resumedActivity: WeakReference<Activity?> = WeakReference(null)
-
-    fun init(
-        dialogController: DialogController,
-        screenSharingController: ScreenSharingController
-    ) {
-        app.registerActivityLifecycleCallbacks(this)
-        this.dialogController = dialogController
-        this.screenSharingController = screenSharingController
-    }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
     override fun onActivityDestroyed(activity: Activity) {}

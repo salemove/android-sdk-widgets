@@ -8,6 +8,7 @@ import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.screensharing.ScreenSharingController
 import junit.framework.TestCase.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -37,12 +38,14 @@ internal class ActivityWatcherForDialogsTest {
     fun resumedActivity_saved_whenActivityResumed() {
         val app = mock(Application::class.java)
         val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
+        val callVisualizerController =
+            CallVisualizerController(callVisualizerRepository, IsCallOrChatScreenActiveUseCase())
+        val screenSharingController = mock(ScreenSharingController::class.java)
         val dialogController = mock(DialogController::class.java)
-        val controller = CallVisualizerController(
-            callVisualizerRepository,
-            dialogController,
-            IsCallOrChatScreenActiveUseCase())
-        val activityWatcherForDialogs = ActivityWatcherForDialogs(app, controller)
+        val activityWatcherForDialogs = ActivityWatcherForDialogs(
+            app,
+            callVisualizerController,
+        )
 
         activityWatcherForDialogs.onActivityResumed(mock(Activity::class.java))
 

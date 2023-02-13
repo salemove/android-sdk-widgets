@@ -181,29 +181,8 @@ public class GliaWidgets {
                 }
             };
             engagementRequest.accept((String) null, onResult);
+            Dependencies.getControllerFactory().getCallVisualizerController().init();
         });
-
-        Dependencies.glia().getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, engagement -> {
-            Logger.d(TAG, "New Call Visualizer engagement started");
-
-            Consumer<MediaUpgradeOffer> upgradeOfferConsumer = prepareMediaUpgradeOfferConsumer(engagement);
-            engagement.getMedia().on(Media.Events.MEDIA_UPGRADE_OFFER, upgradeOfferConsumer);
-        });
-    }
-
-    @NonNull
-    private static Consumer<MediaUpgradeOffer> prepareMediaUpgradeOfferConsumer(OmnibrowseEngagement engagement) {
-        return offer -> {
-            Logger.d(TAG, "upgradeOfferConsumer, offer: " + offer.toString());
-            DialogController dialogController = Dependencies.getControllerFactory().getDialogController();
-            String operatorName = engagement.getState().getOperator().getName();
-            String formattedOperatorName = Utils.formatOperatorName(operatorName);
-            if (offer.video == MediaDirection.TWO_WAY) {
-                dialogController.showUpgradeVideoDialog2Way(offer, formattedOperatorName);
-            } else if (offer.video == MediaDirection.ONE_WAY) {
-                dialogController.showUpgradeVideoDialog1Way(offer, formattedOperatorName);
-            }
-        };
     }
 
     /**

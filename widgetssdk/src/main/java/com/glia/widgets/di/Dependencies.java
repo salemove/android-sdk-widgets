@@ -13,7 +13,7 @@ import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
-import com.glia.widgets.helper.ActivityWatcher;
+import com.glia.widgets.helper.ActivityWatcherForDialogs;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
@@ -60,10 +60,10 @@ public class Dependencies {
                 new ApplicationLifecycleManager(),
                 controllerFactory.getChatHeadController()
         );
-        ActivityWatcher activityWatcher = new ActivityWatcher(
+        ActivityWatcherForDialogs activityWatcherForDialogs = new ActivityWatcherForDialogs(
                 application,
                 controllerFactory.getCallVisualizerController());
-        activityWatcher.init();
+        activityWatcherForDialogs.init(Dependencies.controllerFactory.getDialogController());
         resourceProvider = new ResourceProvider(application.getBaseContext());
     }
 

@@ -263,7 +263,7 @@ public class ControllerFactory {
     public CallVisualizerController getCallVisualizerController() {
         if (callVisualizerController == null) {
             callVisualizerController = new CallVisualizerController(
-                    dialogController,
+                    repositoryFactory.getCallVisualizerRepository(),
                     useCaseFactory.createIsCallOrChatScreenActiveUseCase()
             );
         }

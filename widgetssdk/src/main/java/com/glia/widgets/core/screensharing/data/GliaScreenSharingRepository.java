@@ -29,7 +29,7 @@ public class GliaScreenSharingRepository {
     // Consumers
     private final Consumer<OmnicoreEngagement> omnicoreEngagementConsumer = this::onEngagement;
     private final Consumer<OmnibrowseEngagement> omnibrowseEngagementConsumer = this::onEngagement;
-    private final Consumer<ScreenSharingRequest> screenSharingRequestConsumer = this::onScreenSharingRequest; //2
+    private final Consumer<ScreenSharingRequest> screenSharingRequestConsumer = this::onScreenSharingRequest;
     private final Consumer<VisitorScreenSharingState> visitorScreenSharingStateConsumer = this::onVisitorScreenSharingStateChanged;
     private final Consumer<GliaException> exceptionConsumer = this::onScreenSharingRequestHandled;
 

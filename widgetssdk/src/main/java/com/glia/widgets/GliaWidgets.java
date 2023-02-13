@@ -9,24 +9,15 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
-import com.glia.androidsdk.comms.Media;
-import com.glia.androidsdk.comms.MediaDirection;
-import com.glia.androidsdk.comms.MediaUpgradeOffer;
-import com.glia.androidsdk.omnibrowse.Omnibrowse;
-import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
-import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
-import com.glia.widgets.di.ControllerFactory;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.helper.ActivityWatcher;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.helper.Utils;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -146,7 +137,6 @@ public class GliaWidgets {
         Dependencies.glia().init(createGliaConfig(gliaWidgetsConfig));
         Dependencies.init();
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
-        initCallVisualizer();
         Logger.d(TAG, "init");
     }
 
@@ -171,39 +161,6 @@ public class GliaWidgets {
         } else {
             throw new RuntimeException("Site key or app token is missing");
         }
-    }
-
-    private static void initCallVisualizer() {
-        listenCallVisualizerEvents();
-        initScreenSharingForCallVisualizer();
-    }
-
-    private static void initScreenSharingForCallVisualizer() {
-        ControllerFactory controllerFactory = Dependencies.getControllerFactory();
-        // ScreenSharingController can be initialized only after Glia initialization
-        controllerFactory.getScreenSharingController();
-        ActivityWatcher activityWatcher = Dependencies.getActivityWatcher();
-        // ScreenSharingCallback registration is needed for displaying screen sharing request dialog.
-        // ScreenSharingCallback requires current Activity, thus is registered from
-        // ActivityWatcher.onActivityResumed().
-        // ScreenSharingController can be initialized only after Glia Widgets initialization.
-        // Activity that was displayed before Glia Widgets initialization can display
-        // screen sharing requests only after next onResume() execution, if the line below is not called.
-        controllerFactory.getCallVisualizerController().addScreenSharingCallback(activityWatcher.getResumedActivity());
-    }
-
-    private static void listenCallVisualizerEvents() {
-        Dependencies.glia().getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT_REQUEST, engagementRequest -> {
-            Consumer<GliaException> onResult = error -> {
-                if (error != null) {
-                    Logger.e(TAG, "Error during accepting engagement request, reason" + error.getMessage());
-                } else {
-                    Logger.d(TAG, "Incoming Call Visualizer engagement auto accepted");
-                }
-            };
-            engagementRequest.accept((String) null, onResult);
-            Dependencies.getControllerFactory().getCallVisualizerController().init();
-        });
     }
 
     /**

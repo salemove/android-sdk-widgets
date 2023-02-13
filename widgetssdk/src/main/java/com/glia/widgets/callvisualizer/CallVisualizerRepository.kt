@@ -1,5 +1,7 @@
 package com.glia.widgets.callvisualizer
 
+import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
@@ -17,22 +19,40 @@ class CallVisualizerRepository {
         private val TAG = CallVisualizerRepository::class.java.simpleName
     }
 
-    fun init(callVisualizerCallback: CallVisualizerCallback) {
-        this.callback = callVisualizerCallback
+    fun init() {
+        autoAcceptEngagementRequest()
+        showDialogForMediaUpgradeRequest()
+        Logger.d(TAG, "CallVisualizerRepository initialized")
+    }
+
+    private fun showDialogForMediaUpgradeRequest() {
         Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT)
         { engagement: OmnibrowseEngagement ->
             Logger.d(TAG, "New Call Visualizer engagement started")
             val upgradeOfferConsumer = prepareMediaUpgradeOfferConsumer(engagement)
             engagement.media.on(Media.Events.MEDIA_UPGRADE_OFFER, upgradeOfferConsumer)
         }
-        Logger.d(TAG, "CallVisualizerRepository initialized")
+    }
+
+    private fun autoAcceptEngagementRequest() {
+        Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST) { engagementRequest: IncomingEngagementRequest ->
+            val onResult = Consumer { error: GliaException? ->
+                if (error != null) {
+                    Logger.e(
+                        TAG, "Error during accepting engagement request, reason" + error.message
+                    )
+                } else {
+                    Logger.d(TAG, "Incoming Call Visualizer engagement auto accepted")
+                }
+            }
+            engagementRequest.accept(null as String?, onResult)
+        }
     }
 
     private fun prepareMediaUpgradeOfferConsumer(engagement: OmnibrowseEngagement): Consumer<MediaUpgradeOffer> {
         return Consumer { offer: MediaUpgradeOffer ->
             Logger.d(
-                TAG,
-                "upgradeOfferConsumer, offer: $offer"
+                TAG, "upgradeOfferConsumer, offer: $offer"
             )
             val operatorName = engagement.state.operator.name
             if (offer.video == MediaDirection.TWO_WAY) {

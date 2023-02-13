@@ -63,7 +63,9 @@ public class Dependencies {
         ActivityWatcherForDialogs activityWatcherForDialogs = new ActivityWatcherForDialogs(
                 application,
                 controllerFactory.getCallVisualizerController());
-        activityWatcherForDialogs.init(Dependencies.controllerFactory.getDialogController());
+        activityWatcherForDialogs.init(
+                Dependencies.controllerFactory.getDialogController(),
+                Dependencies.controllerFactory.getScreenSharingController());
         resourceProvider = new ResourceProvider(application.getBaseContext());
     }
 
@@ -104,15 +106,6 @@ public class Dependencies {
 
     public static ResourceProvider getResourceProvider() {
         return resourceProvider;
-    }
-
-    public static ActivityWatcher getActivityWatcher() {
-        return activityWatcher;
-    }
-
-    @VisibleForTesting
-    public static void setActivityWatcher(ActivityWatcher activityWatcher) {
-        Dependencies.activityWatcher = activityWatcher;
     }
 
     @VisibleForTesting

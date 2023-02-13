@@ -17,7 +17,6 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.di.ControllerFactory;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.di.GliaCore;
-import com.glia.widgets.helper.ActivityWatcher;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -36,7 +35,6 @@ public class GliaWidgetsTest {
     public void setUp() {
         gliaCore = mock(GliaCore.class);
         Dependencies.setGlia(gliaCore);
-        Dependencies.setActivityWatcher(mock(ActivityWatcher.class));
 
         controllerFactory = mock(ControllerFactory.class);
         Dependencies.setControllerFactory(controllerFactory);

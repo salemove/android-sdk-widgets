@@ -21,11 +21,11 @@ class CallVisualizerRepository {
 
     fun init() {
         autoAcceptEngagementRequest()
-        showDialogForMediaUpgradeRequest()
+        showDialogOnMediaUpgradeRequest()
         Logger.d(TAG, "CallVisualizerRepository initialized")
     }
 
-    private fun showDialogForMediaUpgradeRequest() {
+    private fun showDialogOnMediaUpgradeRequest() {
         Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT)
         { engagement: OmnibrowseEngagement ->
             Logger.d(TAG, "New Call Visualizer engagement started")

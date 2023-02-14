@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
@@ -112,8 +111,8 @@ class AppBarView @JvmOverloads constructor(
         binding.title.text = title
     }
 
-    fun showToolbar() {
-        isVisible = true
+    fun setVisibility(visibility: Boolean = true) {
+        isVisible = visibility
     }
 
     fun showXButton() {

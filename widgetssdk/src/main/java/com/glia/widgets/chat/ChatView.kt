@@ -509,6 +509,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         } else {
             binding.appBarView.hideEndScreenSharingButton()
         }
+        if (chatState.isSecureMessaging) {
+            showToolbar(resources.getString(R.string.glia_messaging_title))
+        } else {
+            showToolbar(theme.appBarTitle)
+        }
     }
 
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
@@ -593,11 +598,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         Utils.hideSoftKeyboard(this.context, windowToken)
     }
 
-    private fun showToolbar(title: String) {
+    private fun showToolbar(title: String?) {
         onTitleUpdatedListener?.onTitleUpdated(title)
 
         binding.appBarView.setTitle(title)
-        binding.appBarView.showToolbar()
+        binding.appBarView.setVisibility(title != null)
     }
 
     private fun destroyController() {
@@ -690,9 +695,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
         // fonts
         theme.fontRes?.also { binding.chatEditText.typeface = getFontCompat(it) }
-
-        // texts
-        theme.appBarTitle?.also(::showToolbar)
 
         theme.brandPrimaryColor?.also {
             binding.operatorTypingAnimationView.addColorFilter(color = it)

@@ -668,7 +668,11 @@ class ChatController(
                 )
             )
         }
-        emitViewState(chatState.operatorConnected(operatorName, profileImgUrl))
+        emitViewState(
+            chatState
+                .operatorConnected(operatorName, profileImgUrl)
+                .setLiveChatState()
+        )
         emitChatItems(chatState.changeItems(items))
     }
 

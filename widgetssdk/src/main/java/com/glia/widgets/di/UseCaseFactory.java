@@ -542,7 +542,10 @@ public class UseCaseFactory {
     }
 
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
-        return new IsSecureEngagementUseCase(repositoryFactory.getEngagementConfigRepository());
+        return new IsSecureEngagementUseCase(
+                repositoryFactory.getEngagementConfigRepository(),
+                repositoryFactory.getGliaEngagementRepository()
+        );
     }
 
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {

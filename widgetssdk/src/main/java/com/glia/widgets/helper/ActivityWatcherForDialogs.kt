@@ -120,9 +120,10 @@ class ActivityWatcherForDialogs(
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> activity.runOnUiThread {
                     showAllowNotificationsDialog(resumedActivity)
                 }
-                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> resumedActivity?.runOnUiThread {
-                    showAllowScreenSharingNotificationsAndStartSharingDialog(resumedActivity)
-                }
+                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING ->
+                    activity.runOnUiThread {
+                        showAllowScreenSharingNotificationsAndStartSharingDialog(resumedActivity)
+                    }
                 else -> {
                     Logger.d(TAG, "Unexpected dialog mode received")
                 }
@@ -136,6 +137,7 @@ class ActivityWatcherForDialogs(
             return
         }
 
+        Logger.d(TAG, "Show overlay permissions dialog")
         alertDialog = Dialogs.showOptionsDialog(
             prepareContextWithStyle(activity),
             UiTheme.UiThemeBuilder().build(),
@@ -169,6 +171,7 @@ class ActivityWatcherForDialogs(
             return
         }
 
+        Logger.d(TAG, "Show allow notifications dialog")
         val contextWithStyle = prepareContextWithStyle(activity)
         alertDialog = Dialogs.showOptionsDialog(
             context = contextWithStyle,
@@ -199,7 +202,7 @@ class ActivityWatcherForDialogs(
             return
         }
 
-        Logger.d(TAG, "Show screen sharing dialog")
+        Logger.d(TAG, "Show screen sharing and notifications dialog")
         val builder = UiTheme.UiThemeBuilder()
         val theme = builder.build()
         val contextWithStyle = prepareContextWithStyle(activity)

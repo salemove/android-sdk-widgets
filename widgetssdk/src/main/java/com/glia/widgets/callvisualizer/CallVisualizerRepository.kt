@@ -19,7 +19,8 @@ class CallVisualizerRepository {
         private val TAG = CallVisualizerRepository::class.java.simpleName
     }
 
-    fun init() {
+    fun init(callVisualizerCallback: CallVisualizerCallback) {
+        this.callback = callVisualizerCallback
         autoAcceptEngagementRequest()
         showDialogOnMediaUpgradeRequest()
         Logger.d(TAG, "CallVisualizerRepository initialized")
@@ -35,7 +36,8 @@ class CallVisualizerRepository {
     }
 
     private fun autoAcceptEngagementRequest() {
-        Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST) { engagementRequest: IncomingEngagementRequest ->
+        Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST)
+        { engagementRequest: IncomingEngagementRequest ->
             val onResult = Consumer { error: GliaException? ->
                 if (error != null) {
                     Logger.e(

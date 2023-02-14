@@ -62,8 +62,8 @@ public class Dependencies {
         );
         ActivityWatcherForDialogs activityWatcherForDialogs = new ActivityWatcherForDialogs(
                 controllerFactory.getCallVisualizerController(),
-                Dependencies.controllerFactory.getScreenSharingController(),
-                Dependencies.controllerFactory.getDialogController());
+                controllerFactory.getScreenSharingController(),
+                controllerFactory.getDialogController());
         application.registerActivityLifecycleCallbacks(activityWatcherForDialogs);
         resourceProvider = new ResourceProvider(application.getBaseContext());
     }

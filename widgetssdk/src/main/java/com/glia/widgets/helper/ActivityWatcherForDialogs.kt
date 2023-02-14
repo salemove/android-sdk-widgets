@@ -74,23 +74,23 @@ class ActivityWatcherForDialogs(
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity.get())) return
 
         setupDialogCallback(resumedActivity)
-        dialogController?.addCallback(dialogCallback)
+        dialogController.addCallback(dialogCallback)
     }
 
     private fun removeDialogCallback() {
-        dialogController?.removeCallback(dialogCallback)
+        dialogController.removeCallback(dialogCallback)
     }
 
     private fun addScreenSharingCallback(resumedActivity: WeakReference<Activity?>) {
         val activity = resumedActivity.get() ?: return
 
         setupScreenSharingViewCallback(resumedActivity)
-        screenSharingController?.setViewCallback(screenSharingViewCallback)
-        screenSharingController?.onResume(activity)
+        screenSharingController.setViewCallback(screenSharingViewCallback)
+        screenSharingController.onResume(activity)
     }
 
     private fun removeScreenSharingCallback() {
-        screenSharingController?.removeViewCallback(screenSharingViewCallback)
+        screenSharingController.removeViewCallback(screenSharingViewCallback)
     }
 
     private fun setupScreenSharingViewCallback(resumedActivity: WeakReference<Activity?>) {
@@ -145,7 +145,7 @@ class ActivityWatcherForDialogs(
             activity.getString(R.string.glia_dialog_overlay_permissions_no),
             {
                 dismissAlertDialog()
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
                 val overlayIntent = Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + activity.packageName)
@@ -155,10 +155,10 @@ class ActivityWatcherForDialogs(
             },
             {
                 dismissAlertDialog()
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
             },
             { dialog: DialogInterface ->
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
                 dialog.dismiss()
             })
     }
@@ -179,16 +179,16 @@ class ActivityWatcherForDialogs(
             negativeButtonText = activity.getString(R.string.glia_dialog_allow_notifications_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
                 NotificationManager.openNotificationChannelScreen(contextWithStyle)
             },
             negativeButtonClickListener = {
                 dismissAlertDialog()
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
             },
             cancelListener = {
                 it.dismiss()
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
             }
         )
     }
@@ -212,18 +212,18 @@ class ActivityWatcherForDialogs(
             negativeButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
-                dialogController?.dismissCurrentDialog()
+                dialogController.dismissCurrentDialog()
                 NotificationManager.openNotificationChannelScreen(contextWithStyle)
             },
             negativeButtonClickListener = {
                 dismissAlertDialog()
-                dialogController?.dismissCurrentDialog()
-                screenSharingController?.onScreenSharingDeclined()
+                dialogController.dismissCurrentDialog()
+                screenSharingController.onScreenSharingDeclined()
             },
             cancelListener = {
                 it.dismiss()
-                dialogController?.dismissCurrentDialog()
-                screenSharingController?.onScreenSharingDeclined()
+                dialogController.dismissCurrentDialog()
+                screenSharingController.onScreenSharingDeclined()
             }
         )
     }
@@ -246,8 +246,8 @@ class ActivityWatcherForDialogs(
             activity.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
             R.string.glia_dialog_screen_sharing_offer_accept,
             R.string.glia_dialog_screen_sharing_offer_decline,
-            { screenSharingController?.onScreenSharingAccepted(contextWithStyle) }
-        ) { screenSharingController?.onScreenSharingDeclined() }
+            { screenSharingController.onScreenSharingAccepted(contextWithStyle) }
+        ) { screenSharingController.onScreenSharingDeclined() }
     }
 
     private fun showUpgradeDialog(
@@ -265,10 +265,10 @@ class ActivityWatcherForDialogs(
         val contextWithStyle = prepareContextWithStyle(activity)
 
         alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
-            dialogController?.dismissCurrentDialog()
+            dialogController.dismissCurrentDialog()
             // TODO: 07.02.2023 handle media request accepting in the scope of respective ticket
         }) {
-            dialogController?.dismissCurrentDialog()
+            dialogController.dismissCurrentDialog()
         }
     }
 

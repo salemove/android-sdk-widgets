@@ -25,8 +25,12 @@ class ActivityWatcherForDialogs(
     }
 
     private var dialogController: DialogController? = null
-    private var dialogCallback: DialogController.Callback? = null
-    private var alertDialog: AlertDialog? = null
+
+    @VisibleForTesting
+    var dialogCallback: DialogController.Callback? = null
+
+    @VisibleForTesting
+    var alertDialog: AlertDialog? = null
 
     /**
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet

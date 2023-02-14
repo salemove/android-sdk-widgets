@@ -81,6 +81,9 @@ class ActivityWatcherForDialogs(
                 Dialog.MODE_MEDIA_UPGRADE -> activity.runOnUiThread {
                     showUpgradeDialog(resumedActivity, it as DialogState.MediaUpgrade)
                 }
+                else -> {
+                    Logger.d(TAG, "Unexpected dialog mode received")
+                }
             }
         }
     }

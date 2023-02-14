@@ -33,6 +33,8 @@
     <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
     <string name="glia_chat_visitor_status_transferring">Transferring</string>
 
+    <string name="glia_messaging_title">Messaging</string>
+
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
     <string name="glia_top_app_bar_chat_end">End</string>

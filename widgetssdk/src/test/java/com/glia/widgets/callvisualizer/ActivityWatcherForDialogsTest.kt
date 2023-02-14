@@ -1,7 +1,6 @@
-package com.glia.widgets.helper
+package com.glia.widgets.callvisualizer
 
 import android.app.Activity
-import com.glia.widgets.callvisualizer.CallVisualizerRepository
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.Dialog

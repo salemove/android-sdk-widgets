@@ -1,4 +1,4 @@
-package com.glia.widgets.helper
+package com.glia.widgets.callvisualizer
 
 import android.app.Activity
 import android.app.Application
@@ -20,6 +20,7 @@ import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.view.Dialogs
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference

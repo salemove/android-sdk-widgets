@@ -7,16 +7,18 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.Utils
 import java.util.function.Consumer
 
 class CallVisualizerRepository {
+
+    private lateinit var callback: CallVisualizerCallback
 
     companion object {
         private val TAG = CallVisualizerRepository::class.java.simpleName
     }
 
-    fun init() {
+    fun init(callVisualizerCallback: CallVisualizerCallback) {
+        this.callback = callVisualizerCallback
         Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT)
         { engagement: OmnibrowseEngagement ->
             Logger.d(TAG, "New Call Visualizer engagement started")
@@ -32,13 +34,11 @@ class CallVisualizerRepository {
                 TAG,
                 "upgradeOfferConsumer, offer: $offer"
             )
-            val dialogController = Dependencies.getControllerFactory().dialogController
             val operatorName = engagement.state.operator.name
-            val formattedOperatorName = Utils.formatOperatorName(operatorName)
             if (offer.video == MediaDirection.TWO_WAY) {
-                dialogController.showUpgradeVideoDialog2Way(offer, formattedOperatorName)
+                callback.onTwoWayMediaUpgradeRequest(offer, operatorName)
             } else if (offer.video == MediaDirection.ONE_WAY) {
-                dialogController.showUpgradeVideoDialog1Way(offer, formattedOperatorName)
+                callback.onOneWayMediaUpgradeRequest(offer, operatorName)
             }
         }
     }

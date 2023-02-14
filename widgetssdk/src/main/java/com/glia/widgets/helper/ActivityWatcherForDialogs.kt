@@ -46,7 +46,7 @@ class ActivityWatcherForDialogs(
 
     override fun onActivityResumed(activity: Activity) {
         resumedActivity = WeakReference(activity)
-        addDialogCallback(resumedActivity.get())
+        addDialogCallback(resumedActivity)
     }
 
     override fun onActivityPaused(activity: Activity) {
@@ -59,9 +59,9 @@ class ActivityWatcherForDialogs(
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-    private fun addDialogCallback(resumedActivity: Activity?) {
+    private fun addDialogCallback(resumedActivity: WeakReference<Activity?>) {
         // There are separate dialog callbacks for incoming media requests on Call and Chat screens.
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity)) return
+        if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity.get())) return
 
         setupDialogCallback(resumedActivity)
         dialogController?.addCallback(dialogCallback)
@@ -72,11 +72,13 @@ class ActivityWatcherForDialogs(
     }
 
     @VisibleForTesting
-    fun setupDialogCallback(resumedActivity: Activity?) {
+    fun setupDialogCallback(resumedActivity: WeakReference<Activity?>) {
+        val activity = resumedActivity.get() ?: return
+
         dialogCallback = DialogController.Callback {
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
-                Dialog.MODE_MEDIA_UPGRADE -> resumedActivity?.runOnUiThread {
+                Dialog.MODE_MEDIA_UPGRADE -> activity.runOnUiThread {
                     showUpgradeDialog(resumedActivity, it as DialogState.MediaUpgrade)
                 }
             }
@@ -84,14 +86,16 @@ class ActivityWatcherForDialogs(
     }
 
     private fun showUpgradeDialog(
-        resumedActivity: Activity,
+        resumedActivity: WeakReference<Activity?>,
         mediaUpgrade: DialogState.MediaUpgrade
     ) {
+        val activity = resumedActivity.get() ?: return
+
         Logger.d(TAG, "Show upgrade dialog")
         val builder = UiTheme.UiThemeBuilder()
         val theme = builder.build()
         val contextWithStyle = MaterialThemeOverlay.wrap(
-            resumedActivity,
+            activity,
             null,
             R.attr.gliaChatStyle,
             R.style.Application_Glia_Chat

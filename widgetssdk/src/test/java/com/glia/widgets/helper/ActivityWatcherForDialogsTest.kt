@@ -5,6 +5,7 @@ import android.app.Application
 import com.glia.widgets.callvisualizer.CallVisualizerRepository
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
+import com.glia.widgets.core.dialog.DialogController
 import junit.framework.TestCase.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -16,7 +17,11 @@ internal class ActivityWatcherForDialogsTest {
     fun resumedActivity_cleared_whenActivityPaused() {
         val app = mock(Application::class.java)
         val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
-        val controller = CallVisualizerController(callVisualizerRepository, IsCallOrChatScreenActiveUseCase())
+        val dialogController = mock(DialogController::class.java)
+        val controller = CallVisualizerController(
+            callVisualizerRepository,
+            dialogController,
+            IsCallOrChatScreenActiveUseCase())
         val activityWatcherForDialogs = ActivityWatcherForDialogs(app, controller)
 
         activityWatcherForDialogs.onActivityResumed(mock(Activity::class.java))
@@ -29,7 +34,11 @@ internal class ActivityWatcherForDialogsTest {
     fun resumedActivity_saved_whenActivityResumed() {
         val app = mock(Application::class.java)
         val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
-        val controller = CallVisualizerController(callVisualizerRepository, IsCallOrChatScreenActiveUseCase())
+        val dialogController = mock(DialogController::class.java)
+        val controller = CallVisualizerController(
+            callVisualizerRepository,
+            dialogController,
+            IsCallOrChatScreenActiveUseCase())
         val activityWatcherForDialogs = ActivityWatcherForDialogs(app, controller)
 
         activityWatcherForDialogs.onActivityResumed(mock(Activity::class.java))

@@ -8,6 +8,7 @@
     <dimen name="glia_large">16dp</dimen>
     <dimen name="glia_large_x_large">24dp</dimen>
     <dimen name="glia_x_large">32dp</dimen>
+    <dimen name="glia_pre_xx_large">42dp</dimen>
     <dimen name="glia_xx_large">64dp</dimen>
 
     <dimen name="glia_visitor_video_height">182dp</dimen>

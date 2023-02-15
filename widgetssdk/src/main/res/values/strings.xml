@@ -228,4 +228,9 @@
     <string name="message_center_check_messages_btn">Check messages</string>
     <string name="message_center_send_message_btn">Send</string>
 
+    <!-- Call Visualizer -->
+    <string name="call_visualizer_screen_sharing_title">Screen Sharing</string>
+    <string name="call_visualizer_label">Your Screen is Being Shared</string>
+    <string name="call_visualizer_button">End Screen Sharing</string>
+
 </resources>

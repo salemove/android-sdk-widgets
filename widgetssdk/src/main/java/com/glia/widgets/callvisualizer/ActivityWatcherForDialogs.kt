@@ -246,8 +246,8 @@ class ActivityWatcherForDialogs(
         alertDialog = Dialogs.showScreenSharingDialog(
             contextWithStyle,
             theme,
-            activity.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
-            activity.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
+            activity.getString(R.string.glia_dialog_screen_sharing_offer_title),
+            activity.getString(R.string.glia_dialog_screen_sharing_offer_message),
             R.string.glia_dialog_screen_sharing_offer_accept,
             R.string.glia_dialog_screen_sharing_offer_decline,
             { screenSharingController.onScreenSharingAccepted(contextWithStyle) }

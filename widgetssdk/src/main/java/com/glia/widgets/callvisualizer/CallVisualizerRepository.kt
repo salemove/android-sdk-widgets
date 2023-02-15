@@ -7,11 +7,11 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
-import com.glia.widgets.di.Dependencies
+import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import java.util.function.Consumer
 
-class CallVisualizerRepository {
+class CallVisualizerRepository(private val gliaCore: GliaCore) {
 
     private lateinit var callback: CallVisualizerCallback
 
@@ -27,7 +27,7 @@ class CallVisualizerRepository {
     }
 
     private fun showDialogOnMediaUpgradeRequest() {
-        Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT)
+        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT)
         { engagement: OmnibrowseEngagement ->
             Logger.d(TAG, "New Call Visualizer engagement started")
             val upgradeOfferConsumer = prepareMediaUpgradeOfferConsumer(engagement)
@@ -36,7 +36,7 @@ class CallVisualizerRepository {
     }
 
     private fun autoAcceptEngagementRequest() {
-        Dependencies.glia().callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST)
+        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST)
         { engagementRequest: IncomingEngagementRequest ->
             val onResult = Consumer { error: GliaException? ->
                 if (error != null) {

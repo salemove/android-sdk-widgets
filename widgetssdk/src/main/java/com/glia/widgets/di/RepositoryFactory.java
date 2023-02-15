@@ -156,7 +156,7 @@ public class RepositoryFactory {
 
     public CallVisualizerRepository getCallVisualizerRepository() {
         if (callVisualizerRepository == null) {
-            callVisualizerRepository = new CallVisualizerRepository();
+            callVisualizerRepository = new CallVisualizerRepository(gliaCore);
         }
 
         return callVisualizerRepository;

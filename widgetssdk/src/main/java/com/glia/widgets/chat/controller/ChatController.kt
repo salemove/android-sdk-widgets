@@ -1,6 +1,7 @@
 package com.glia.widgets.chat.controller
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
@@ -276,7 +277,7 @@ class ChatController(
 
     private fun onMessage(messageInternal: ChatMessageInternal) {
         val message = messageInternal.chatMessage
-        if (!isNewMessage(message)) {
+        if (!isNewMessage(chatState.chatItems, message)) {
             return
         }
         val isUnsentMessage =
@@ -1257,18 +1258,22 @@ class ChatController(
             .createChatState()
     }
 
-    private fun removeDuplicates(
+    @VisibleForTesting
+    fun removeDuplicates(
         oldHistory: List<ChatItem>?, newHistory: List<ChatMessageInternal>?
     ): List<ChatMessageInternal>? {
         return if (newHistory.isNullOrEmpty() || oldHistory.isNullOrEmpty()) {
             newHistory
-        } else newHistory.filter { isNewMessage(it.chatMessage) }
+        } else newHistory.filter { isNewMessage(oldHistory, it.chatMessage) }
     }
 
-    private val oldMessageIdsHash: MutableSet<String> by lazy { mutableSetOf() }
-
-    private fun isNewMessage(newMessage: ChatMessage): Boolean =
-        oldMessageIdsHash.add(newMessage.id)
+    @VisibleForTesting
+    fun isNewMessage(oldHistory: List<ChatItem>?, newMessage: ChatMessage): Boolean =
+        oldHistory
+            ?.filterIsInstance<LinkedChatItem>()
+            ?.any { oldMessage -> oldMessage.messageId != null && oldMessage.messageId == newMessage.id }
+            ?.not()
+            ?: true
 
     private fun error(error: Throwable?) {
         error?.also { error(it.toString()) }

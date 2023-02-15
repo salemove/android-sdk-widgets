@@ -9,6 +9,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
@@ -91,8 +93,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var controller: ChatController? = null
     private var dialogCallback: DialogController.Callback? = null
     private var dialogController: DialogController? = null
-    private val screenSharingViewCallback =
-        ScreenSharingController.ViewCallback { exception: GliaException -> showToast(exception.debugMessage) }
+    private val screenSharingViewCallback = object: ScreenSharingController.ViewCallback {
+        override fun onScreenSharingRequestError(ex: GliaException?) {
+            ex?.run { showToast(this.debugMessage) }
+        }
+
+        override fun onScreenSharingStarted() {
+            Handler(Looper.getMainLooper()).post { binding.appBarView.showEndScreenSharingButton() }
+        }
+    }
     private var screenSharingController: ScreenSharingController? = null
     private var serviceChatHeadController: ServiceChatHeadController? = null
 
@@ -493,6 +502,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         } else {
             binding.appBarView.hideLeaveButtons()
         }
+        if (screenSharingController?.isSharingScreen == true) {
+            binding.appBarView.showEndScreenSharingButton()
+        } else {
+            binding.appBarView.hideEndScreenSharingButton()
+        }
     }
 
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
@@ -638,6 +652,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTheme(theme)
 
+
         //icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
 
@@ -700,10 +715,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             controller?.sendMessage(message)
         }
         setupAddAttachmentButton()
-        binding.appBarView.setOnBackClickedListener {
-            controller?.onBackArrowClicked(onBackClickedListener)
-        }
+        binding.appBarView.setOnBackClickedListener { controller?.onBackArrowClicked(onBackClickedListener) }
         binding.appBarView.setOnEndChatClickedListener { controller?.leaveChatClicked() }
+        binding.appBarView.setOnEndCallButtonClickedListener {
+            screenSharingController?.onForceStopScreenSharing()
+            binding.appBarView.hideEndScreenSharingButton()
+        }
         binding.appBarView.setOnXClickedListener { controller?.leaveChatQueueClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
     }

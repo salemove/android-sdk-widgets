@@ -38,6 +38,7 @@
     <string name="glia_top_app_bar_chat_end">End</string>
     <string name="glia_top_app_bar_navigate_up_content_description">Navigate Up</string>
     <string name="glia_top_app_bar_chat_end_content_description">End engagement</string>
+    <string name="glia_top_app_bar_end_screen_sharing_description">End screen sharing</string>
 
     <!--    dialogs-->
     <string name="glia_chat_glia_logo_content_description">Powered by Glia</string>

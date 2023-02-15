@@ -4,6 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
 import androidx.core.view.isGone
@@ -31,6 +34,7 @@ class AppBarView @JvmOverloads constructor(
 
     private val leaveQueueIcon: MenuItem
         get() = binding.toolbar.menu.findItem(R.id.leave_queue_button)
+    private val endScreenShareButton: AppCompatImageButton = binding.endScreenSharingButton
 
     private fun setDefaults(attrs: AttributeSet?) {
         context.withStyledAttributes(attrs, R.styleable.AppBarView) {
@@ -75,6 +79,9 @@ class AppBarView @JvmOverloads constructor(
         // icons
         uiTheme.iconAppBarBack?.also(binding.toolbar::setNavigationIcon)
         uiTheme.iconLeaveQueue?.also(leaveQueueIcon::setIcon)
+        uiTheme.iconEndScreenShare?.also {
+            endScreenShareButton.setImageResource(it)
+        }
 
         // colors
         uiTheme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
@@ -82,6 +89,9 @@ class AppBarView @JvmOverloads constructor(
         }
         (uiTheme.gliaChatHeaderExitQueueButtonTintColor ?: uiTheme.baseLightColor)?.also {
             leaveQueueIcon.icon?.setTintCompat(it)
+        }
+        uiTheme.endScreenShareTintColor?.also {
+            endScreenShareButton.setColorFilter(ContextCompat.getColor(context, it))
         }
 
         uiTheme.gliaChatHeaderTitleTintColor?.let(::getColorStateListCompat)
@@ -105,7 +115,16 @@ class AppBarView @JvmOverloads constructor(
 
     fun showXButton() {
         binding.endButton.isGone = true
+        endScreenShareButton.isGone = true
         leaveQueueIcon.isVisible = true
+    }
+
+    fun showEndScreenSharingButton() {
+        endScreenShareButton.isVisible = true
+    }
+
+    fun hideEndScreenSharingButton() {
+        endScreenShareButton.isGone = true
     }
 
     fun showEndButton() {
@@ -126,6 +145,10 @@ class AppBarView @JvmOverloads constructor(
 
     fun setOnEndChatClickedListener(onEndChatClicked: OnEndChatClicked) {
         binding.endButton.setOnClickListener { onEndChatClicked() }
+    }
+
+    fun setOnEndCallButtonClickedListener(onEndScreenSharingClicked: OnEndScreenSharingClicked) {
+        binding.endScreenSharingButton.setOnClickListener { onEndScreenSharingClicked() }
     }
 
     fun hideLeaveButtons() {
@@ -193,6 +216,10 @@ class AppBarView @JvmOverloads constructor(
     }
 
     fun interface OnEndChatClicked {
+        operator fun invoke()
+    }
+
+    fun interface OnEndScreenSharingClicked {
         operator fun invoke()
     }
 }

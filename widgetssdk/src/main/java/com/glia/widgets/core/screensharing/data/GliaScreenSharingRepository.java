@@ -71,6 +71,14 @@ public class GliaScreenSharingRepository {
         }
     }
 
+    public void forceEndScreenSharing() {
+        onEndScreenSharing();
+    }
+
+    public boolean isSharingScreen() {
+        return currentScreen != null && screenSharingStatus.equals(SHARING);
+    }
+
     public void onDestroy() {
         gliaCore.getCurrentEngagement().ifPresent(engagement -> {
             engagement.getScreenSharing().off(

@@ -56,6 +56,8 @@
         <attr name="iconPlaceholder" format="reference" />
         <!-- The icon resId used when visitor is put on hold by operator -->
         <attr name="iconOnHold" format="reference" />
+        <!-- The icon resID used when visitor is sharing the screen -->
+        <attr name="iconEndScreenShare" format="reference" />
 
         <!-- Visitor message background color -->
         <attr name="visitorMessageBackgroundColor" format="reference" />
@@ -77,6 +79,8 @@
         <attr name="chatSendMessageButtonTintColor" format="reference" />
         <!-- Chat background color -->
         <attr name="gliaChatBackgroundColor" format="reference" />
+        <!-- The icon resID used when visitor is sharing the screen -->
+        <attr name="endScreenShareTintColor" format="reference" />
 
         <attr name="chatHeaderTitleTintColor" format="reference" />
         <attr name="chatHeaderHomeButtonTintColor" format="reference" />
@@ -145,6 +149,8 @@
     <attr name="gliaIconPlaceholder" format="reference" />
     <!-- The icon resId used when visitor is put on hold by operator -->
     <attr name="gliaIconOnHold" format="reference" />
+    <!-- The icon resID used when visitor is sharing the screen -->
+    <attr name="gliaIconEndScreenShare" format="reference" />
 
     <!-- Header colors -->
     <attr name="gliaChatHeaderTitleTintColor" format="reference" />
@@ -175,6 +181,9 @@
     <attr name="gliaBotActionButtonSelectedTextColor" format="reference" />
     <!-- Send message button tint color -->
     <attr name="gliaSendMessageButtonTintColor" format="reference" />
+    <!-- The icon resID used when visitor is sharing the screen -->
+    <attr name="gliaEndScreenShareTintColor" format="reference" />
+
 
     <attr name="whiteLabel" format="boolean" />
     <attr name="gliaAlertDialogButtonUseVerticalAlignment" format="boolean" />

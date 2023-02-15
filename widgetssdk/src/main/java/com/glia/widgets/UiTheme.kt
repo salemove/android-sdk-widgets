@@ -253,6 +253,18 @@ data class UiTheme(
     val iconOnHold: Int? = null,
 
     /**
+     * The icon resId used when visitor is sharing the screen
+     */
+    @DrawableRes
+    val iconEndScreenShare: Int? = null,
+
+    /**
+     * The icon tint resId when visitor is sharing the screen
+     */
+    @DrawableRes
+    val endScreenShareTintColor: Int? = null,
+
+    /**
      * Connecting Operator Status Layout Heading Text Color
      */
     @ColorRes
@@ -342,6 +354,8 @@ data class UiTheme(
         iconCallMinimize = builder.iconCallMinimize,
         iconPlaceholder = builder.iconPlaceholder,
         iconOnHold = builder.iconOnHold,
+        iconEndScreenShare = builder.iconEndScreenShare,
+        endScreenShareTintColor = builder.endScreenShareTintColor,
         whiteLabel = builder.whiteLabel,
         gliaAlertDialogButtonUseVerticalAlignment =
         builder.gliaAlertDialogButtonUseVerticalAlignment,
@@ -640,6 +654,20 @@ data class UiTheme(
             private set
 
         /**
+         * The icon resId used when visitor is sharing the screen
+         */
+        @DrawableRes
+        var iconEndScreenShare: Int? = null
+        private set
+
+        /**
+         * The icon tint resId when visitor is sharing the screen
+         */
+        @DrawableRes
+        var endScreenShareTintColor: Int? = null
+        private set
+
+        /**
          * Connecting Operator Status Layout Heading Text Color
          */
         @ColorRes
@@ -825,6 +853,14 @@ data class UiTheme(
             this.iconOnHold = iconOnHold
         }
 
+        fun setIconEndScreenShare(@DrawableRes iconEndScreenShare: Int?) {
+            this.iconEndScreenShare = iconEndScreenShare
+        }
+
+        fun setEndScreenShareTintColor(@DrawableRes endScreenShareTint: Int?) {
+            this.endScreenShareTintColor = endScreenShareTint
+        }
+
         fun setWhiteLabel(whiteLabel: Boolean?) {
             this.whiteLabel = whiteLabel
         }
@@ -933,6 +969,8 @@ data class UiTheme(
             iconCallMinimize = theme.iconCallMinimize
             iconPlaceholder = theme.iconPlaceholder
             iconOnHold = theme.iconOnHold
+            iconEndScreenShare = theme.iconEndScreenShare
+            endScreenShareTintColor = theme.endScreenShareTintColor
             whiteLabel = theme.whiteLabel
             headerEndButtonConfiguration = theme.gliaEndButtonConfiguration
             positiveButtonConfiguration = theme.gliaPositiveButtonConfiguration

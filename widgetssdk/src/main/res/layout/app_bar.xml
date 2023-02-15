@@ -21,17 +21,37 @@
             android:layout_gravity="center"
             android:textAppearance="?attr/textAppearanceHeadline2" />
 
-        <com.glia.widgets.view.header.button.GliaEndButton
-            android:id="@+id/end_button"
-            style="?attr/gliaHeaderEndButtonStyle"
+        <LinearLayout
+            android:id="@+id/button_layout"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/glia_large"
-            android:minWidth="@dimen/glia_app_bar_end_button_width"
-            android:text="@string/glia_top_app_bar_chat_end"
-            android:contentDescription="@string/glia_top_app_bar_chat_end_content_description"
-            android:visibility="gone" />
+            android:layout_marginEnd="@dimen/glia_large">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/end_screen_sharing_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/glia_top_app_bar_end_screen_sharing_description"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_screensharing_off"
+                android:background="@null"
+                android:padding="@dimen/glia_medium"
+                android:layout_marginEnd="@dimen/glia_medium"
+                android:visibility="gone"/>
+
+            <com.glia.widgets.view.header.button.GliaEndButton
+                android:id="@+id/end_button"
+                style="?attr/gliaHeaderEndButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="@dimen/glia_app_bar_end_button_width"
+                android:text="@string/glia_top_app_bar_chat_end"
+                android:contentDescription="@string/glia_top_app_bar_chat_end_content_description"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </com.google.android.material.appbar.MaterialToolbar>
 

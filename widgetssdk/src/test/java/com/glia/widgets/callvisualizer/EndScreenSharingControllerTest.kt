@@ -33,6 +33,7 @@ internal class ScreenSharingScreenControllerTest {
     fun onEndScreenSharingButtonClicked() {
         controller.onEndScreenSharingButtonClicked()
         verify(view).stopScreenSharing()
+        verify(view).finish()
         verifyNoMoreInteractions(view)
     }
 

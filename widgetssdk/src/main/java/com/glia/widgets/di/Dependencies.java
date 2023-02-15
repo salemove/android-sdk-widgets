@@ -13,6 +13,7 @@ import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
+import com.glia.widgets.helper.ActivityWatcherForDialogs;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
@@ -23,6 +24,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 public class Dependencies {
 
     private final static String TAG = "Dependencies";
+
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static GliaSdkConfigurationManager sdkConfigurationManager =
@@ -58,6 +60,10 @@ public class Dependencies {
                 new ApplicationLifecycleManager(),
                 controllerFactory.getChatHeadController()
         );
+        ActivityWatcherForDialogs activityWatcherForDialogs = new ActivityWatcherForDialogs(
+                application,
+                controllerFactory.getCallVisualizerController());
+        activityWatcherForDialogs.init(Dependencies.controllerFactory.getDialogController());
         resourceProvider = new ResourceProvider(application.getBaseContext());
     }
 

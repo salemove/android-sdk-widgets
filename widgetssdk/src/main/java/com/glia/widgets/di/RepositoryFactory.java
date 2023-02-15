@@ -1,5 +1,6 @@
 package com.glia.widgets.di;
 
+import com.glia.widgets.callvisualizer.CallVisualizerRepository;
 import com.glia.widgets.chat.data.ChatScreenRepository;
 import com.glia.widgets.chat.data.ChatScreenRepositoryImpl;
 import com.glia.widgets.chat.data.GliaChatRepository;
@@ -34,6 +35,7 @@ public class RepositoryFactory {
     private static GliaEngagementStateRepository gliaEngagementStateRepository;
     private static FileAttachmentRepository fileAttachmentRepository;
     private static GliaOperatorRepository operatorRepository;
+    private CallVisualizerRepository callVisualizerRepository;
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
@@ -150,5 +152,13 @@ public class RepositoryFactory {
         }
 
         return operatorRepository;
+    }
+
+    public CallVisualizerRepository getCallVisualizerRepository() {
+        if (callVisualizerRepository == null) {
+            callVisualizerRepository = new CallVisualizerRepository();
+        }
+
+        return callVisualizerRepository;
     }
 }

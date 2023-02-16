@@ -120,6 +120,7 @@ public class ControllerFactory {
                     useCaseFactory.createCustomCardInteractableUseCase(),
                     useCaseFactory.createCustomCardShouldShowUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
+                    useCaseFactory.createIsQueueingEngagementUseCase(),
                     useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
                     useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase(),
                     useCaseFactory.createIsSecureEngagementUseCase(),

@@ -111,6 +111,8 @@ class MessageCenterView(
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f)
+
+        appBar.hideBackButton()
     }
 
     private fun initCallbacks() {
@@ -129,9 +131,6 @@ class MessageCenterView(
         }
         messageView.setOnRemoveAttachmentListener {
             controller?.onRemoveAttachment(it)
-        }
-        appBar.setOnBackClickedListener {
-            controller?.onBackArrowClicked()
         }
         appBar.setOnXClickedListener {
             clearAndDismissDialogs()

@@ -1,13 +1,12 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.chat.ChatMessage
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.data.GliaChatRepository.HistoryLoadedListener
-import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -15,7 +14,7 @@ import io.reactivex.SingleEmitter
 class GliaLoadHistoryUseCase(
     private val gliaChatRepository: GliaChatRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
-    private val engagementConfigRepository: GliaEngagementConfigRepository,
+    private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val mapOperatorUseCase: MapOperatorUseCase
 ) {
 
@@ -39,7 +38,7 @@ class GliaLoadHistoryUseCase(
     }
 
     private fun loadHistory(listener: HistoryLoadedListener) {
-        if (engagementConfigRepository.chatType === ChatType.SECURE_MESSAGING) {
+        if (isSecureEngagementUseCase()) {
             secureConversationsRepository.fetchChatTranscript(listener)
         } else {
             gliaChatRepository.loadHistory(listener)

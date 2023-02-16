@@ -42,6 +42,7 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
@@ -210,7 +211,7 @@ public class UseCaseFactory {
         return new GliaLoadHistoryUseCase(
                 repositoryFactory.getGliaMessageRepository(),
                 repositoryFactory.getSecureConversationsRepository(),
-                repositoryFactory.getEngagementConfigRepository(),
+                createIsSecureEngagementUseCase(),
                 getMapOperatorUseCase()
         );
     }
@@ -299,9 +300,9 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaMessageRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
                 repositoryFactory.getGliaEngagementStateRepository(),
-                repositoryFactory.getGliaEngagementRepository(),
                 repositoryFactory.getEngagementConfigRepository(),
-                repositoryFactory.getSecureConversationsRepository()
+                repositoryFactory.getSecureConversationsRepository(),
+                createIsSecureEngagementUseCase()
         );
     }
 
@@ -534,7 +535,8 @@ public class UseCaseFactory {
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
         return new IsSecureEngagementUseCase(
                 repositoryFactory.getEngagementConfigRepository(),
-                repositoryFactory.getGliaEngagementRepository()
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaQueueRepository()
         );
     }
 
@@ -544,6 +546,10 @@ public class UseCaseFactory {
 
     public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
         return new SetEngagementConfigUseCase(repositoryFactory.getEngagementConfigRepository());
+    }
+
+    public IsQueueingEngagementUseCase createIsQueueingEngagementUseCase() {
+        return new IsQueueingEngagementUseCase(repositoryFactory.getGliaQueueRepository());
     }
 
     public IsOngoingEngagementUseCase createIsOngoingEngagementUseCase() {

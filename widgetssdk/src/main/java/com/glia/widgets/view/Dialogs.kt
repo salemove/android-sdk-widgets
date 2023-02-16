@@ -13,6 +13,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
@@ -20,9 +21,9 @@ import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.BaseConfigurableButton
-import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -69,15 +70,28 @@ object Dialogs {
         @LayoutRes layoutRes: Int,
         @ColorRes backgroundTint: Int? = null,
         cancelable: Boolean = false,
+        onShow: ((AlertDialog) -> Unit)? = null,
         onLayout: Dialog.() -> Unit
-    ): AlertDialog = MaterialAlertDialogBuilder(context)
-        //With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
-        .setView(LayoutInflater.from(context).inflate(layoutRes, null))
-        .setCancelable(cancelable)
-        .setBackgroundInsetBottom(Dependencies.getResourceProvider().convertDpToIntPixel(24f))
-        .show()
-        .also { setDialogBackground(it, backgroundTint) }
-        .also(onLayout)
+    ): AlertDialog {
+        val verticalInset = context.resources.getDimensionPixelSize(R.dimen.glia_large_x_large)
+        val alertDialog = MaterialAlertDialogBuilder(context)
+            //With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
+            .setView(LayoutInflater.from(context).inflate(layoutRes, null))
+            .setCancelable(cancelable)
+            .setBackgroundInsetBottom(verticalInset)
+            .setBackgroundInsetTop(verticalInset)
+            .create()
+
+        onShow?.also { listener -> alertDialog.setOnShowListener { listener.invoke(alertDialog) } }
+
+        alertDialog.show()
+
+        return alertDialog.also {
+            it.show()
+            setDialogBackground(it, backgroundTint)
+            onLayout(it)
+        }
+    }
 
     @JvmOverloads
     fun showOptionsDialog(
@@ -336,12 +350,13 @@ object Dialogs {
 
     fun showMessageCenterUnavailableDialog(
         context: Context,
-        theme: UiTheme
+        theme: UiTheme,
+        onShow: ((AlertDialog) -> Unit)? = null,
     ): AlertDialog {
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
 
-        val alertDialog = showDialog(context, R.layout.alert_dialog, theme.baseLightColor, false) {
+        return showDialog(context, R.layout.alert_dialog, theme.baseLightColor, false, onShow) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
                 setText(R.string.glia_dialog_message_center_unavailable_title)
                 baseDarkColor?.also(::setTextColor)
@@ -355,22 +370,20 @@ object Dialogs {
                 alertTheme?.message.also(::applyTextTheme)
             }
             findViewById<ImageButton>(R.id.close_dialog_button).apply {
-                visibility = View.INVISIBLE
+                isGone = true
+            }
+            window?.apply {
+                setGravity(Gravity.BOTTOM)
+                allowOutsideTouch()
             }
         }
-
-        val window = alertDialog.window
-        window?.setGravity(Gravity.BOTTOM)
-        enableOutsideTouch(window)
-
-        return alertDialog
     }
 
-    private fun enableOutsideTouch(window: Window?) {
-        window?.setFlags(
+    private fun Window.allowOutsideTouch() {
+        setFlags(
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         )
-        window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 }

@@ -7,10 +7,7 @@ import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
+import com.glia.widgets.core.engagement.domain.*
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.fileupload.domain.*
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
@@ -21,6 +18,7 @@ import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCas
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.helper.TimeCounter
@@ -73,6 +71,10 @@ class ChatControllerTest {
     private lateinit var customCardInteractableUseCase: CustomCardInteractableUseCase
     private lateinit var customCardShouldShowUseCase: CustomCardShouldShowUseCase
     private lateinit var ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase
+    private lateinit var isOngoingEngagementUseCase: IsOngoingEngagementUseCase
+    private lateinit var isSecureEngagementUseCase: IsSecureEngagementUseCase
+    private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
+    private lateinit var isSecureConversationsChatAvailableUseCase: IsSecureConversationsChatAvailableUseCase
 
     private lateinit var chatController: ChatController
 
@@ -118,20 +120,57 @@ class ChatControllerTest {
         customCardInteractableUseCase = mock()
         customCardShouldShowUseCase = mock()
         ticketStateChangeToUnstaffedUseCase = mock()
+        isOngoingEngagementUseCase = mock()
+        isSecureEngagementUseCase = mock()
+        engagementConfigUseCase = mock()
+        isSecureConversationsChatAvailableUseCase = mock()
 
-        chatController = ChatController(chatViewCallback, mediaUpgradeOfferRepository, callTimer,
-            minimizeHandler, dialogController, messagesNotSeenHandler, showAudioCallNotificationUseCase,
-            showVideoCallNotificationUseCase, removeCallNotificationUseCase, loadHistoryUseCase,
-            queueForChatEngagementUseCase, getEngagementUseCase, engagementEndUseCase, onMessageUseCase,
-            onOperatorTypingUseCase, sendMessagePreviewUseCase, sendMessageUseCase,
-            addOperatorMediaStateListenerUseCase, cancelQueueTicketUseCase, endEngagementUseCase,
-            addFileToAttachmentAndUploadUseCase, addFileAttachmentsObserverUseCase,
-            removeFileAttachmentObserverUseCase, getFileAttachmentsUseCase, removeFileAttachmentUseCase,
-            supportedFileCountCheckUseCase, isShowSendButtonUseCase,
-            isShowOverlayPermissionRequestDialogUseCase, downloadFileUseCase, isEnableChatEditTextUseCase,
-            siteInfoUseCase, surveyUseCase, getGliaEngagementStateFlowableUseCase, isFromCallScreenUseCase,
-            updateFromCallScreenUseCase, customCardAdapterTypeUseCase, customCardTypeUseCase,
-            customCardInteractableUseCase, customCardShouldShowUseCase, ticketStateChangeToUnstaffedUseCase)
+        chatController = ChatController(
+            chatViewCallback = chatViewCallback,
+            mediaUpgradeOfferRepository = mediaUpgradeOfferRepository,
+            callTimer = callTimer,
+            minimizeHandler = minimizeHandler,
+            dialogController = dialogController,
+            messagesNotSeenHandler = messagesNotSeenHandler,
+            showAudioCallNotificationUseCase = showAudioCallNotificationUseCase,
+            showVideoCallNotificationUseCase = showVideoCallNotificationUseCase,
+            removeCallNotificationUseCase = removeCallNotificationUseCase,
+            loadHistoryUseCase = loadHistoryUseCase,
+            queueForChatEngagementUseCase = queueForChatEngagementUseCase,
+            getEngagementUseCase = getEngagementUseCase,
+            engagementEndUseCase = engagementEndUseCase,
+            onMessageUseCase = onMessageUseCase,
+            onOperatorTypingUseCase = onOperatorTypingUseCase,
+            sendMessagePreviewUseCase = sendMessagePreviewUseCase,
+            sendMessageUseCase = sendMessageUseCase,
+            addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase,
+            cancelQueueTicketUseCase = cancelQueueTicketUseCase,
+            endEngagementUseCase = endEngagementUseCase,
+            addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
+            addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
+            removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase,
+            getFileAttachmentsUseCase = getFileAttachmentsUseCase,
+            removeFileAttachmentUseCase = removeFileAttachmentUseCase,
+            supportedFileCountCheckUseCase = supportedFileCountCheckUseCase,
+            isShowSendButtonUseCase = isShowSendButtonUseCase,
+            isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase,
+            downloadFileUseCase = downloadFileUseCase,
+            isEnableChatEditTextUseCase = isEnableChatEditTextUseCase,
+            siteInfoUseCase = siteInfoUseCase,
+            surveyUseCase = surveyUseCase,
+            getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase,
+            isFromCallScreenUseCase = isFromCallScreenUseCase,
+            updateFromCallScreenUseCase = updateFromCallScreenUseCase,
+            customCardAdapterTypeUseCase = customCardAdapterTypeUseCase,
+            customCardTypeUseCase = customCardTypeUseCase,
+            customCardInteractableUseCase = customCardInteractableUseCase,
+            customCardShouldShowUseCase = customCardShouldShowUseCase,
+            ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase,
+            isOngoingEngagementUseCase = isOngoingEngagementUseCase,
+            isSecureEngagementUseCase = isSecureEngagementUseCase,
+            engagementConfigUseCase = engagementConfigUseCase,
+            isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase
+        )
     }
 
     @Test
@@ -174,7 +213,8 @@ class ChatControllerTest {
             mock<ChatMessageInternal>().also { whenever(it.chatMessage).thenReturn(chatItem) }
         }
 
-        val result = chatController.removeDuplicates(oldHistory, newMessages)!!.map { it.chatMessage.id }
+        val result =
+            chatController.removeDuplicates(oldHistory, newMessages)!!.map { it.chatMessage.id }
         assertEquals(listOf("Id4", "Id5", "Id6"), result)
     }
 
@@ -193,7 +233,8 @@ class ChatControllerTest {
             mock<ChatMessageInternal>().also { whenever(it.chatMessage).thenReturn(chatItem) }
         }
 
-        val result = chatController.removeDuplicates(oldHistory, newMessages)!!.map { it.chatMessage.id }
+        val result =
+            chatController.removeDuplicates(oldHistory, newMessages)!!.map { it.chatMessage.id }
         assertEquals(listOf("Id4", "Id5"), result)
     }
 

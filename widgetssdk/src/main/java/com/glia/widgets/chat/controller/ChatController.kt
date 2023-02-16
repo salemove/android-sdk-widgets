@@ -61,7 +61,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class ChatController(
+internal class ChatController(
     chatViewCallback: ChatViewCallback,
     private val mediaUpgradeOfferRepository: MediaUpgradeOfferRepository,
     private val callTimer: TimeCounter,
@@ -104,7 +104,8 @@ class ChatController(
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
-    private val engagementConfigUseCase: SetEngagementConfigUseCase
+    private val engagementConfigUseCase: SetEngagementConfigUseCase,
+    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -166,20 +167,49 @@ class ChatController(
     @Volatile
     private var chatState: ChatState
 
-    fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType) {
+    private val isSecureEngagement get() = isSecureEngagementUseCase()
+    fun initChat(
+        companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType
+    ) {
         val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
         engagementConfigUseCase(chatType, queueIds)
 
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) dialogController.showOverlayPermissionsDialog()
+
+        ensureSecureMessagingAvailable()
+
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
             return
         }
+
         var initChatState = chatState.initChat(companyName, queueId, visitorContextAssetId)
-        if (isSecureEngagementUseCase()) {
+        if (isSecureEngagement) {
             initChatState = initChatState.setSecureMessagingState()
         }
+        prepareChatComponents()
         emitViewState(initChatState)
         loadChatHistory()
+    }
+
+    private fun ensureSecureMessagingAvailable() {
+        if (!isSecureEngagement) return
+
+        disposable.add(
+            isSecureEngagementAvailableUseCase().subscribe({
+                if (it) {
+                    Logger.d(TAG, "Messaging is available")
+                } else {
+                    Logger.d(TAG, "Messaging is unavailable")
+                    dialogController.showMessageCenterUnavailableDialog()
+                }
+            }, {
+                Logger.e(TAG, "Checking for Messaging availability failed", it)
+                dialogController.showUnexpectedErrorDialog()
+            })
+        )
+    }
+
+    private fun prepareChatComponents() {
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         initMediaUpgradeCallback()
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback)
@@ -1231,24 +1261,31 @@ class ChatController(
         val currentItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         val newItems = removeDuplicates(currentItems, messages)
 
-        if (!newItems.isNullOrEmpty()) {
-            newItems.forEachIndexed { index, message ->
-                appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
-            }
-
-            val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
-            emitChatItems(
-                if (isSecureEngagementUseCase() && !isOngoingEngagementUseCase()) {
-                    chatState.changeItems(sortedItems)
-                } else {
-                    chatState.historyLoaded(sortedItems)
-                }
-            )
-            initGliaEngagementObserving()
-        } else if (!chatState.engagementRequested) {
-            initGliaEngagementObserving()
-            queueForEngagement()
+        when {
+            !newItems.isNullOrEmpty() -> submitHistoryItems(newItems, currentItems)
+            !chatState.engagementRequested && !isSecureEngagement -> queueForEngagement()
+            else -> Logger.d(TAG, "Opened empty Secure Conversations chat")
         }
+
+        initGliaEngagementObserving()
+    }
+
+    private fun submitHistoryItems(
+        newItems: List<ChatMessageInternal>,
+        currentItems: MutableList<ChatItem>
+    ) {
+        newItems.forEachIndexed { index, message ->
+            appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
+        }
+
+        val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
+        emitChatItems(
+            if (isSecureEngagementUseCase() && !isOngoingEngagementUseCase()) {
+                chatState.changeItems(sortedItems)
+            } else {
+                chatState.historyLoaded(sortedItems)
+            }
+        )
     }
 
     init {

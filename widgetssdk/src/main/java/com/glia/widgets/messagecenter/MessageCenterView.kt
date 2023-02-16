@@ -10,16 +10,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
-import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.core.dialog.Dialog
+import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
@@ -72,6 +75,11 @@ class MessageCenterView(
 
     private val window: Window? by lazy { Utils.getActivity(this.context)?.window }
 
+    private val dialogController by lazy { Dependencies.getControllerFactory().dialogController }
+    private val dialogCallback: DialogController.Callback = DialogController.Callback {
+        onDialogState(it)
+    }
+
     @JvmOverloads
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
@@ -85,32 +93,7 @@ class MessageCenterView(
     override fun setupViewAppearance() {
         initCallbacks()
         initConfigurations()
-        val callback: RequestCallback<Boolean> = RequestCallback { isAvailable, exception ->
-            if (exception != null) {
-                showUnexpectedErrorDialog()
-                messageView.hideSendMessageGroup()
-                return@RequestCallback
-            }
-            if (!isAvailable) {
-                showMessageCenterUnavailableDialog()
-                messageView.hideSendMessageGroup()
-            }
-        }
-
-        controller?.isMessageCenterAvailable(callback)
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        defaultStatusBarColor = window?.statusBarColor
-        window?.statusBarColor = statusBarColor
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-
-        window?.statusBarColor = defaultStatusBarColor ?: return
+        controller?.ensureMessageCenterAvailability()
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -132,6 +115,7 @@ class MessageCenterView(
 
     private fun initCallbacks() {
         messageView.setOnCheckMessageButtonClickListener {
+            clearAndDismissDialogs()
             controller?.onCheckMessagesClicked()
         }
         messageView.setOnSendMessageButtonClickListener {
@@ -150,6 +134,7 @@ class MessageCenterView(
             controller?.onBackArrowClicked()
         }
         appBar.setOnXClickedListener {
+            clearAndDismissDialogs()
             controller?.onCloseButtonClicked()
         }
 
@@ -158,14 +143,14 @@ class MessageCenterView(
         }
     }
 
-    override fun showUnAuthenticatedDialog() {
-        dismissAlertDialog()
+    private fun showUnAuthenticatedDialog() {
         alertDialog = Dialogs.showAlertDialog(
             context,
             theme,
             R.string.glia_dialog_message_center_unavailable_title,
             R.string.glia_dialog_message_center_unauthorized_message
         ) {
+            dialogController.dismissCurrentDialog()
             controller?.onCloseButtonClicked()
         }
     }
@@ -185,25 +170,27 @@ class MessageCenterView(
         }
     }
 
-    override fun showUnexpectedErrorDialog() {
+    private fun clearAndDismissDialogs() {
+        dialogController.dismissDialogs()
         dismissAlertDialog()
+    }
+
+    private fun showUnexpectedErrorDialog() {
+        messageView.hideSendMessageGroup()
         alertDialog = Dialogs.showAlertDialog(
             this.context,
             theme,
             R.string.glia_dialog_unexpected_error_title,
             R.string.glia_dialog_unexpected_error_message
         ) {
-            dismissAlertDialog()
-            alertDialog = null
+            dialogController.dismissCurrentDialog()
         }
     }
 
-    override fun showMessageCenterUnavailableDialog() {
-        dismissAlertDialog()
-        alertDialog = Dialogs.showMessageCenterUnavailableDialog(
-            this.context,
-            theme
-        )
+    private fun showMessageCenterUnavailableDialog() {
+        alertDialog = Dialogs.showMessageCenterUnavailableDialog(this.context, theme) {
+            messageView.hideSendMessageGroup()
+        }
     }
 
     override fun showConfirmationScreen() {
@@ -241,5 +228,44 @@ class MessageCenterView(
 
     override fun takePhoto() {
         onAttachFileListener?.takePhoto()
+    }
+
+    private fun onDialogState(state: DialogState) {
+        when (state.mode) {
+            Dialog.MODE_NONE -> dismissAlertDialog()
+            Dialog.MODE_UNEXPECTED_ERROR -> showUnexpectedErrorDialog()
+            Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> showMessageCenterUnavailableDialog()
+            Dialog.MODE_UNAUTHENTICATED -> showUnAuthenticatedDialog()
+            else -> throw UnsupportedOperationException("Unexpected dialog type for Message Center screen")
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        window?.statusBarColor = statusBarColor
+        defaultStatusBarColor = window?.statusBarColor
+
+        attachDialogController()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        detachDialogController()
+
+        window?.statusBarColor = defaultStatusBarColor ?: return
+    }
+
+    private fun attachDialogController() {
+        dialogController.addCallback(dialogCallback)
+    }
+
+    private fun detachDialogController() {
+        dialogController.removeCallback(dialogCallback)
+    }
+
+    fun onSystemBack() {
+        clearAndDismissDialogs()
     }
 }

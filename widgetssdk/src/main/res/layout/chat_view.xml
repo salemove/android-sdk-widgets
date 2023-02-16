@@ -9,14 +9,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/chat_recycler_view"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <com.glia.widgets.chat.ChatRecyclerView
         android:id="@+id/chat_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/operator_typing_animation_view"
-        app:layout_constraintTop_toBottomOf="@id/app_bar_view" />
+        android:paddingBottom="@dimen/glia_medium"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@+id/operator_typing_animation_view"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_view"
+        tools:listitem="@layout/chat_visitor_message_layout" />
 
     <RelativeLayout
         android:id="@+id/new_messages_indicator_layout"
@@ -27,7 +32,8 @@
         android:padding="@dimen/glia_large"
         app:layout_constraintBottom_toTopOf="@id/divider_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="gone">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/new_messages_indicator_card"
@@ -66,29 +72,30 @@
         android:layout_marginStart="@dimen/glia_medium"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view"
+        app:layout_constraintBottom_toTopOf="@+id/divider_view"
+        app:layout_constraintTop_toBottomOf="@+id/chat_recycler_view"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/chat_typing_indicator"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 
     <View
         android:id="@+id/divider_view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/glia_medium"
         android:background="?attr/gliaBaseNormalColor"
-        app:layout_constraintTop_toBottomOf="@id/operator_typing_animation_view" />
+        app:layout_constraintBottom_toTopOf="@+id/add_attachment_queue"
+        app:layout_constraintTop_toBottomOf="@+id/operator_typing_animation_view"
+        tools:background="@android:color/holo_red_dark" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/add_attachment_queue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="216dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider_view"
+        app:layout_constraintBottom_toTopOf="@+id/chat_message_layout"
+        app:layout_constraintTop_toBottomOf="@+id/divider_view"
         tools:itemCount="6"
         tools:listitem="@layout/chat_attachment_uploaded_item" />
 
@@ -98,21 +105,22 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_attachment_queue">
+        app:layout_constraintTop_toBottomOf="@+id/add_attachment_queue">
 
         <EditText
             android:id="@+id/chat_edit_text"
             style="@style/Application.Glia.Chat.Edittext"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:minHeight="@dimen/glia_chat_edit_text_min_height"
-            android:paddingStart="@dimen/glia_large"
             android:layout_weight="1"
             android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
+            android:minHeight="@dimen/glia_chat_edit_text_min_height"
+            android:paddingStart="@dimen/glia_large"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor"
-            tools:ignore="RtlSymmetry" />
+            tools:ignore="RtlSymmetry"
+            tools:textColor="@color/glia_black_color" />
 
         <ImageButton
             android:id="@+id/add_attachment_button"
@@ -137,4 +145,11 @@
             tools:src="@drawable/ic_baseline_send"
             tools:tint="@color/glia_brand_primary_color" />
     </LinearLayout>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_chat_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="operator_typing_animation_view, divider_view, add_attachment_queue, chat_message_layout"/>
+
 </merge>

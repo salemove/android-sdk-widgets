@@ -15,9 +15,9 @@ import com.glia.widgets.view.Dialogs
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference
 
-class ActivityWatcherForDialogs(
+internal class ActivityWatcherForDialogs(
     private val app: Application,
-    private val callVisualizerController: CallVisualizerController
+    private val controller: CallVisualizerController
 ) : Application.ActivityLifecycleCallbacks {
 
     companion object {
@@ -36,8 +36,11 @@ class ActivityWatcherForDialogs(
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
      * @return Currently resumed activity.
      */
+    private var _resumedActivity: WeakReference<Activity> = WeakReference(null)
+
     @VisibleForTesting
-    var resumedActivity: WeakReference<Activity?> = WeakReference(null)
+    val resumedActivity: Activity? get() = _resumedActivity.get()
+
 
     fun init(dialogController: DialogController) {
         app.registerActivityLifecycleCallbacks(this)
@@ -49,12 +52,12 @@ class ActivityWatcherForDialogs(
 
 
     override fun onActivityResumed(activity: Activity) {
-        resumedActivity = WeakReference(activity)
-        addDialogCallback(resumedActivity)
+        _resumedActivity = WeakReference(activity)
+        addDialogCallback()
     }
 
     override fun onActivityPaused(activity: Activity) {
-        resumedActivity.clear()
+        _resumedActivity.clear()
         removeDialogCallback()
     }
 
@@ -63,40 +66,37 @@ class ActivityWatcherForDialogs(
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-    private fun addDialogCallback(resumedActivity: WeakReference<Activity?>) {
+    private fun addDialogCallback() {
         // There are separate dialog callbacks for incoming media requests on Call and Chat screens.
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity.get())) return
+        if (controller.isGliaActivity(resumedActivity)) return
 
-        setupDialogCallback(resumedActivity)
+        setupDialogCallback()
         dialogController?.addCallback(dialogCallback)
     }
 
     private fun removeDialogCallback() {
+        if (controller.isGliaActivity(resumedActivity)) return
+
         dialogController?.removeCallback(dialogCallback)
     }
 
     @VisibleForTesting
-    fun setupDialogCallback(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    fun setupDialogCallback() {
+        val activity = resumedActivity ?: return
 
         dialogCallback = DialogController.Callback {
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
                 Dialog.MODE_MEDIA_UPGRADE -> activity.runOnUiThread {
-                    showUpgradeDialog(resumedActivity, it as DialogState.MediaUpgrade)
+                    showUpgradeDialog(it as DialogState.MediaUpgrade)
                 }
-                else -> {
-                    Logger.d(TAG, "Unexpected dialog mode received")
-                }
+                else -> Logger.d(TAG, "Unexpected dialog mode received")
             }
         }
     }
 
-    private fun showUpgradeDialog(
-        resumedActivity: WeakReference<Activity?>,
-        mediaUpgrade: DialogState.MediaUpgrade
-    ) {
-        val activity = resumedActivity.get() ?: return
+    private fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade) {
+        val activity = resumedActivity ?: return
 
         Logger.d(TAG, "Show upgrade dialog")
         val builder = UiTheme.UiThemeBuilder()
@@ -115,7 +115,8 @@ class ActivityWatcherForDialogs(
         }
     }
 
-    private fun dismissAlertDialog() {
+    @VisibleForTesting
+    fun dismissAlertDialog() {
         Logger.d(TAG, "Dismiss alert dialog")
         alertDialog?.dismiss()
         alertDialog = null

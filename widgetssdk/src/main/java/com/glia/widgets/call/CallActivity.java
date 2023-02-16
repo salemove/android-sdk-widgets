@@ -18,6 +18,7 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
+import com.glia.widgets.base.GliaActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
@@ -32,7 +33,7 @@ import java.util.stream.IntStream;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
-public class CallActivity extends AppCompatActivity {
+public class CallActivity extends AppCompatActivity implements GliaActivity {
     private static final int MEDIA_PERMISSION_REQUEST_CODE = 2001;
 
     private static final String TAG = CallActivity.class.getSimpleName();

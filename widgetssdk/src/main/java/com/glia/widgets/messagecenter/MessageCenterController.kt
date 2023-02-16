@@ -7,13 +7,14 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import com.glia.widgets.helper.Logger
 import java.util.*
 
-class MessageCenterController(
+internal class MessageCenterController(
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
     private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase,
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
@@ -21,7 +22,8 @@ class MessageCenterController(
     private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
     private val removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase,
     private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase,
-    private val isAuthenticatedUseCase: IsAuthenticatedUseCase
+    private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
+    private val dialogController: DialogController
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private var state = State()
@@ -35,19 +37,19 @@ class MessageCenterController(
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
 
-        if (isAuthenticatedUseCase.execute()) {
-            initComponents(view)
+        if (isAuthenticatedUseCase()) {
+            initComponents()
         } else {
-            view.showUnAuthenticatedDialog()
+            dialogController.showUnauthenticatedDialog()
         }
     }
 
-    private fun initComponents(view: MessageCenterContract.View) {
+    private fun initComponents() {
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         setState(state)
 
-        view.emitUploadAttachments(getFileAttachmentsUseCase.execute())
-        view.setupViewAppearance()
+        view?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
+        view?.setupViewAppearance()
     }
 
     override fun onCheckMessagesClicked() {
@@ -71,11 +73,13 @@ class MessageCenterController(
     }
 
     override fun onSendMessageClicked(message: String) {
-        setState(state.copy(
-            sendMessageButtonState = State.ButtonState.PROGRESS,
-            messageEditTextEnabled = false,
-            addAttachmentButtonEnabled = false
-        ))
+        setState(
+            state.copy(
+                sendMessageButtonState = State.ButtonState.PROGRESS,
+                messageEditTextEnabled = false,
+                addAttachmentButtonEnabled = false
+            )
+        )
         view?.hideSoftKeyboard()
         val callback =
             RequestCallback { _: VisitorMessage?, gliaException: GliaException? ->
@@ -90,15 +94,17 @@ class MessageCenterController(
             view?.showConfirmationScreen()
         } else {
             when (gliaException.cause) {
-                GliaException.Cause.AUTHENTICATION_ERROR -> view?.showMessageCenterUnavailableDialog()
-                GliaException.Cause.INTERNAL_ERROR -> view?.showUnexpectedErrorDialog()
+                GliaException.Cause.AUTHENTICATION_ERROR -> dialogController.showMessageCenterUnavailableDialog()
+                GliaException.Cause.INTERNAL_ERROR -> dialogController.showUnexpectedErrorDialog()
                 else -> {
-                    view?.showUnexpectedErrorDialog()
-                    setState(state.copy(
-                        sendMessageButtonState = State.ButtonState.NORMAL,
-                        messageEditTextEnabled = true,
-                        addAttachmentButtonEnabled = true
-                    ))
+                    dialogController.showUnexpectedErrorDialog()
+                    setState(
+                        state.copy(
+                            sendMessageButtonState = State.ButtonState.NORMAL,
+                            messageEditTextEnabled = true,
+                            addAttachmentButtonEnabled = true
+                        )
+                    )
                 }
             }
         }
@@ -128,32 +134,40 @@ class MessageCenterController(
         view?.takePhoto()
     }
 
-    override fun isMessageCenterAvailable(callback: RequestCallback<Boolean>) {
-        isMessageCenterAvailableUseCase.execute(callback)
+    override fun ensureMessageCenterAvailability() {
+        isMessageCenterAvailableUseCase(RequestCallback { isAvailable, exception ->
+            when {
+                exception != null -> dialogController.showUnexpectedErrorDialog()
+                !isAvailable -> dialogController.showMessageCenterUnavailableDialog()
+                else -> Logger.d(TAG, "Message center is available")
+            }
+        })
     }
 
     override fun onAttachmentReceived(file: FileAttachment) {
-        addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
-            override fun onFinished() {
-                Logger.d(TAG, "fileUploadFinished")
-            }
+        addFileToAttachmentAndUploadUseCase.execute(
+            file,
+            object : AddFileToAttachmentAndUploadUseCase.Listener {
+                override fun onFinished() {
+                    Logger.d(TAG, "fileUploadFinished")
+                }
 
-            override fun onStarted() {
-                Logger.d(TAG, "fileUploadStarted")
-            }
+                override fun onStarted() {
+                    Logger.d(TAG, "fileUploadStarted")
+                }
 
-            override fun onError(ex: Exception) {
-                Logger.e(TAG, "Upload file failed: " + ex.message)
-            }
+                override fun onError(ex: Exception) {
+                    Logger.e(TAG, "Upload file failed: " + ex.message)
+                }
 
-            override fun onSecurityCheckStarted() {
-                Logger.d(TAG, "fileUploadSecurityCheckStarted")
-            }
+                override fun onSecurityCheckStarted() {
+                    Logger.d(TAG, "fileUploadSecurityCheckStarted")
+                }
 
-            override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
-                Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
-            }
-        })
+                override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
+                    Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
+                }
+            })
     }
 
     override fun onRemoveAttachment(file: FileAttachment) {

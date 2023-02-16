@@ -46,6 +46,9 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
         this.removeScreenSharingNotificationUseCase = removeScreenSharingNotificationUseCase;
         this.hasScreenSharingNotificationChannelEnabledUseCase = hasScreenSharingNotificationChannelEnabledUseCase;
         this.gliaSdkConfigurationManager = sdkConfigurationManager;
+    }
+
+    public void init() {
         repository.init(this);
     }
 

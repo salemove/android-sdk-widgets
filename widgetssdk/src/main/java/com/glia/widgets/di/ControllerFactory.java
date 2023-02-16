@@ -215,6 +215,8 @@ public class ControllerFactory {
 
     public void init() {
         messagesNotSeenHandler.init();
+        getCallVisualizerController().init();
+        getScreenSharingController().init();
     }
 
     public FilePreviewController getImagePreviewController() {

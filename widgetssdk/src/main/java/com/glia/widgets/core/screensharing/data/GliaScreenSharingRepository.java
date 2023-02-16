@@ -8,6 +8,8 @@ import android.app.Activity;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.omnibrowse.Omnibrowse;
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.screensharing.LocalScreen;
 import com.glia.androidsdk.screensharing.ScreenSharing;
@@ -25,7 +27,8 @@ public class GliaScreenSharingRepository {
     private GliaScreenSharingCallback callback = null;
 
     // Consumers
-    private final Consumer<OmnicoreEngagement> engagementConsumer = this::onEngagement;
+    private final Consumer<OmnicoreEngagement> omnicoreEngagementConsumer = this::onEngagement;
+    private final Consumer<OmnibrowseEngagement> omnibrowseEngagementConsumer = this::onEngagement;
     private final Consumer<ScreenSharingRequest> screenSharingRequestConsumer = this::onScreenSharingRequest;
     private final Consumer<VisitorScreenSharingState> visitorScreenSharingStateConsumer = this::onVisitorScreenSharingStateChanged;
     private final Consumer<GliaException> exceptionConsumer = this::onScreenSharingRequestHandled;
@@ -42,7 +45,8 @@ public class GliaScreenSharingRepository {
         Logger.d(TAG, "init screen sharing repository");
 
         this.callback = gliaScreenSharingCallback;
-        gliaCore.on(Glia.Events.ENGAGEMENT, engagementConsumer);
+        gliaCore.on(Glia.Events.ENGAGEMENT, omnicoreEngagementConsumer);
+        gliaCore.getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagementConsumer);
     }
 
     public void onScreenSharingAccepted(
@@ -91,7 +95,8 @@ public class GliaScreenSharingRepository {
             );
         });
 
-        gliaCore.off(Glia.Events.ENGAGEMENT, engagementConsumer);
+        gliaCore.off(Glia.Events.ENGAGEMENT, omnicoreEngagementConsumer);
+        gliaCore.getCallVisualizer().off(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagementConsumer);
     }
 
     private void onEngagement(Engagement engagement) {

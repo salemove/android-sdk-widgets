@@ -23,9 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.ViewCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
+import androidx.core.view.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
@@ -64,7 +62,7 @@ import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
@@ -434,6 +432,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         dialogCallback = DialogController.Callback {
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
+                Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> post { showChatUnavailableView() }
                 Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
                 Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
                 Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
@@ -445,6 +444,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
                 Dialog.MODE_VISITOR_CODE -> { Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")} // Should never happen inside ChatView
+                else -> Logger.d(TAG, "Dialog mode ${it.mode} not handled.")
             }
         }
     }
@@ -873,14 +873,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun showAlertDialog(
         @StringRes title: Int, @StringRes message: Int, buttonClickListener: OnClickListener
     ) {
-        alertDialog?.dismiss()
-        alertDialog = null
+        dismissAlertDialog()
         alertDialog = Dialogs.showAlertDialog(context, theme, title, message, buttonClickListener)
     }
 
     private fun showEngagementEndedDialog() {
-        alertDialog?.dismiss()
-        alertDialog = null
+        dismissAlertDialog()
         alertDialog = Dialogs.showOperatorEndedEngagementDialog(context, theme) {
             dismissAlertDialog()
             controller?.noMoreOperatorsAvailableDismissed()
@@ -1036,7 +1034,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     ): ChatItem {
         if (currentChatItem is VisitorAttachmentItem) {
             if (currentChatItem.attachmentFile.id == attachmentFile.id) {
-                return VisitorAttachmentItem.editFileStatuses(currentChatItem, isFileExists, isDownloading)
+                return VisitorAttachmentItem.editFileStatuses(
+                    currentChatItem,
+                    isFileExists,
+                    isDownloading
+                )
             }
         } else if (currentChatItem is OperatorAttachmentItem) {
             if (currentChatItem.attachmentFile.id == attachmentFile.id) {
@@ -1179,6 +1181,20 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         unreadIndicatorTheme.bubble?.badge?.also(binding.newMessagesBadgeView::applyBadgeTheme)
         unreadIndicatorTheme.bubble?.userImage?.also(binding.newMessagesIndicatorImage::applyUserImageTheme)
         unreadIndicatorTheme.background?.primaryColor?.also(binding.newMessagesIndicatorCard::setCardBackgroundColor)
+    }
+
+    private fun showChatUnavailableView() {
+        alertDialog = Dialogs.showMessageCenterUnavailableDialog(context, theme) {
+            hideChatControls(it.window?.decorView?.height ?: 0)
+        }
+    }
+
+    private fun hideChatControls(dialogHeight: Int) {
+        binding.apply {
+            chatRecyclerView.updatePadding(bottom = dialogHeight)
+            chatRecyclerView.scrollBy(0, dialogHeight)
+            groupChatControls.isGone = true
+        }
     }
 
 }

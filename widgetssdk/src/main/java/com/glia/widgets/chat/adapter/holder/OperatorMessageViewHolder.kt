@@ -17,7 +17,7 @@ import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.SingleChoiceCardView
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 class OperatorMessageViewHolder(

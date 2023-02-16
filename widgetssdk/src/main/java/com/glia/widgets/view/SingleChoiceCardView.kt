@@ -17,7 +17,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardTheme
 import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates

@@ -2,6 +2,7 @@ package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import org.junit.Before
@@ -19,9 +20,9 @@ internal class MessageCenterControllerTest {
     private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
     private lateinit var removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
-    private lateinit var setSecureEngagementUseCase: SetSecureEngagementUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var viewContract: MessageCenterContract.View
+    private lateinit var dialogController: DialogController
 
     @Before
     fun setUp() {
@@ -32,19 +33,19 @@ internal class MessageCenterControllerTest {
         getFileAttachmentsUseCase = mock()
         removeFileAttachmentObserverUseCase = mock()
         removeFileAttachmentUseCase = mock()
-        setSecureEngagementUseCase = mock()
         viewContract = mock()
         isAuthenticatedUseCase = mock()
+        dialogController = mock()
         messageCenterController =
             MessageCenterController(sendSecureMessageUseCase, isMessageCenterAvailableUseCase,
                 addFileAttachmentsObserverUseCase, addFileToAttachmentAndUploadUseCase,
                 getFileAttachmentsUseCase, removeFileAttachmentObserverUseCase,
-                removeFileAttachmentUseCase, setSecureEngagementUseCase, isAuthenticatedUseCase)
+                removeFileAttachmentUseCase, isAuthenticatedUseCase, dialogController)
     }
 
     @Test
     fun setView_ExecutesAddSecureFileAttachmentsObserverUseCase_onTrigger() {
-        whenever(isAuthenticatedUseCase.execute()) doReturn true
+        whenever(isAuthenticatedUseCase()) doReturn true
         messageCenterController.setView(viewContract)
 
         verify(addFileAttachmentsObserverUseCase, times(1)).execute(any())
@@ -52,7 +53,7 @@ internal class MessageCenterControllerTest {
 
     @Test
     fun setView_ExecutesGetFileAttachmentsUseCase_onTrigger() {
-        whenever(isAuthenticatedUseCase.execute()) doReturn true
+        whenever(isAuthenticatedUseCase()) doReturn true
         messageCenterController.setView(viewContract)
 
         verify(getFileAttachmentsUseCase, times(1)).execute()
@@ -60,16 +61,16 @@ internal class MessageCenterControllerTest {
 
     @Test
     fun setView_triggersNotAuthenticatedDialog_whenNotAuthenticated() {
-        whenever(isAuthenticatedUseCase.execute()) doReturn false
+        whenever(isAuthenticatedUseCase()) doReturn false
 
         messageCenterController.setView(viewContract)
 
-        verify(viewContract).showUnAuthenticatedDialog()
+        verify(dialogController).showUnauthenticatedDialog()
     }
 
     @Test
     fun setView_triggersViewInitialization_whenAuthenticated() {
-        whenever(isAuthenticatedUseCase.execute()) doReturn true
+        whenever(isAuthenticatedUseCase()) doReturn true
 
         messageCenterController.setView(viewContract)
 
@@ -88,7 +89,7 @@ internal class MessageCenterControllerTest {
         messageCenterController.setView(viewContract)
         val gliaException = GliaException("Message", GliaException.Cause.AUTHENTICATION_ERROR)
         messageCenterController.handleSendMessageResult(gliaException)
-        verify(viewContract, times(1)).showMessageCenterUnavailableDialog()
+        verify(dialogController).showMessageCenterUnavailableDialog()
     }
 
     @Test
@@ -96,7 +97,7 @@ internal class MessageCenterControllerTest {
         messageCenterController.setView(viewContract)
         val gliaException = GliaException("Message", GliaException.Cause.INTERNAL_ERROR)
         messageCenterController.handleSendMessageResult(gliaException)
-        verify(viewContract, times(1)).showUnexpectedErrorDialog()
+        verify(dialogController).showUnexpectedErrorDialog()
     }
 
     @Test
@@ -104,20 +105,7 @@ internal class MessageCenterControllerTest {
         messageCenterController.setView(viewContract)
         val gliaException = GliaException("Message", GliaException.Cause.INVALID_INPUT)
         messageCenterController.handleSendMessageResult(gliaException)
-        verify(viewContract, times(1)).showUnexpectedErrorDialog()
-    }
-
-    @Test
-    fun handleSendMessageResult_SetSecureEngagement_WhenErrorNull() {
-        messageCenterController.handleSendMessageResult(null)
-        verify(setSecureEngagementUseCase, times(1)).invoke(true)
-    }
-
-    @Test
-    fun handleSendMessageResult_NotSetSecureEngagement_WhenError() {
-        val gliaException = GliaException("Message", GliaException.Cause.INTERNAL_ERROR)
-        messageCenterController.handleSendMessageResult(gliaException)
-        verify(setSecureEngagementUseCase, never()).invoke(any())
+        verify(dialogController).showUnexpectedErrorDialog()
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.exstensions
+package com.glia.widgets.view.unifiedui.extensions
 
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
@@ -51,7 +51,7 @@ internal fun View.getTypedArrayResId(
 ) = Utils.getTypedArrayIntegerValue(typedArray, context, index, fallbackAttr)
 
 @AnyRes
-fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int = TypedValue().takeIf {
+internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int = TypedValue().takeIf {
     context.theme.resolveAttribute(attr, it, true)
 }?.resourceId ?: fallBackResId
 
@@ -85,7 +85,7 @@ internal fun ImageView.load(
     Picasso.get().load(url).into(this, callback)
 }
 
-val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
+internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
 
 //Unified Ui
 //--------------------------------------------------------------------------------------------------
@@ -216,7 +216,7 @@ internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
 
 internal fun View.changeStatusBarColor(color: Int?) {
     color?.run {
-        Utils.getActivity(context).window.statusBarColor = this
+        Utils.getActivity(context)?.window?.statusBarColor = this
     }
 }
 

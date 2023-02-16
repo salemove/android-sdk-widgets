@@ -1,17 +1,18 @@
 package com.glia.widgets.callvisualizer.controller
 
+import android.app.Activity
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerCallback
 import com.glia.widgets.callvisualizer.CallVisualizerRepository
-import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
+import com.glia.widgets.callvisualizer.domain.IsGliaActivityUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 
-class CallVisualizerController(
+internal class CallVisualizerController(
     private val callVisualizerRepository: CallVisualizerRepository,
     private val dialogController: DialogController,
-    val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
+    private val isGliaActivityUseCase: IsGliaActivityUseCase
 ) : CallVisualizerCallback {
     companion object {
         private val TAG = CallVisualizerController::class.java.simpleName
@@ -21,6 +22,8 @@ class CallVisualizerController(
         Logger.d(TAG, "CallVisualizerController initialized")
         callVisualizerRepository.init(this)
     }
+
+    fun isGliaActivity(activity: Activity?) = isGliaActivityUseCase(activity)
 
     override fun onOneWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String) {
         val formattedOperatorName = Utils.formatOperatorName(operatorName)

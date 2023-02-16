@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.glia.widgets.GliaWidgets.CHAT_TYPE
+import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.helper.FileHelper
@@ -25,9 +27,10 @@ import java.io.IOException
 
 class MessageCenterActivity : AppCompatActivity(),
         MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener,
-        MessageCenterView.OnAttachFileListener {
+        MessageCenterView.OnAttachFileListener, GliaActivity {
 
     private lateinit var binding: MessageCenterActivityBinding
+    private val messageCenterView  get() = binding.messageCenterView
     private var configuration: GliaSdkConfiguration? = null
 
     private val controller: MessageCenterContract.Controller by lazy {
@@ -61,12 +64,18 @@ class MessageCenterActivity : AppCompatActivity(),
         setContentView(binding.root)
 
         configuration = createConfiguration(intent)
-        val messageCenterView = binding.messageCenterView
+
         messageCenterView.onFinishListener = this
         messageCenterView.onNavigateToMessagingListener = this
         messageCenterView.onAttachFileListener = this
 
         messageCenterView.setController(controller)
+        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                messageCenterView.onSystemBack()
+                finishAndRemoveTask()
+            }
+        })
     }
 
     override fun selectAttachmentFile(type: String) {

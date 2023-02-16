@@ -1,41 +1,22 @@
 package com.glia.widgets.core.secureconversations.domain
 
-import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.queuing.Queue
-import com.glia.androidsdk.queuing.QueueState
-import com.glia.widgets.core.queue.GliaQueueRepository
-import com.glia.widgets.helper.rx.Schedulers
 import io.reactivex.disposables.CompositeDisposable
 
-class IsMessageCenterAvailableUseCase(
+internal class IsMessageCenterAvailableUseCase(
     private val queueId: String,
-    private val queueRepository: GliaQueueRepository,
-    private val schedulers: Schedulers
+    private val isMessagingAvailableUseCase: IsMessagingAvailableUseCase
 ) {
     private val disposable = CompositeDisposable()
 
-    fun execute(callback: RequestCallback<Boolean>) {
+    operator fun invoke(callback: RequestCallback<Boolean>) {
         disposable.add(
-            queueRepository.queues
-                .subscribeOn(schedulers.computationScheduler)
-                .observeOn(schedulers.mainScheduler)
-                .subscribe(
-                    { queues -> callback.onResult(containsMessagingQueue(queues), null) },
-                    { error -> callback.onResult(null, GliaException.from(error)) }
-                )
+            isMessagingAvailableUseCase(arrayOf(queueId)).subscribe(
+                { callback.onResult(it, null) },
+                { callback.onResult(null, GliaException.from(it)) }
+            )
         )
-    }
-
-    @VisibleForTesting
-    fun containsMessagingQueue(queues: Array<Queue>): Boolean {
-        return queues
-            .filter { queue -> queue.id == queueId }
-            .filterNot { queue -> queue.state.status == QueueState.Status.CLOSED }
-            .filterNot { queue -> queue.state.status == QueueState.Status.UNKNOWN }
-            .any { queue -> queue.state.medias.any { media -> media == Engagement.MediaType.MESSAGING } }
     }
 
     fun dispose() {

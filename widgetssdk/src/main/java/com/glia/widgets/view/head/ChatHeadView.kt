@@ -24,7 +24,7 @@ import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay

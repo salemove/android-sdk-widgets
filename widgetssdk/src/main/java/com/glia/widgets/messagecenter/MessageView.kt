@@ -19,10 +19,10 @@ import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.helper.SimpleTextWatcher
-import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme

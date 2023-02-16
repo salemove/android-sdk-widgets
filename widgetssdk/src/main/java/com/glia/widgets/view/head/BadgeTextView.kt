@@ -7,12 +7,8 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
 import com.glia.widgets.R
-import com.glia.widgets.view.unifiedui.exstensions.*
-import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyShadow
-import com.glia.widgets.view.unifiedui.exstensions.applyTextColorTheme
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.base.BadgeTheme
-import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.max

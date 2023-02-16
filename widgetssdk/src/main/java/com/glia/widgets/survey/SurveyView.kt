@@ -23,15 +23,14 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import com.glia.androidsdk.engagement.Survey
 import android.widget.Toast
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyColorTheme
-import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
 import kotlin.properties.Delegates
 

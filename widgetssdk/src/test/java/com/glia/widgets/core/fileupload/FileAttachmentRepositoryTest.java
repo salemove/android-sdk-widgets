@@ -27,7 +27,8 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.engagement.EngagementFile;
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
+import com.glia.widgets.chat.ChatType;
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
@@ -47,16 +48,16 @@ public class FileAttachmentRepositoryTest {
 
     private FileAttachmentRepository subjectUnderTest;
     GliaCore gliaCore;
-    GliaEngagementTypeRepository gliaEngagementTypeRepository;
+    GliaEngagementConfigRepository gliaEngagementConfigRepository;
     SecureConversations secureConversations;
 
     @Before
     public void setUp() {
         gliaCore = mock(GliaCore.class);
-        gliaEngagementTypeRepository = mock(GliaEngagementTypeRepository.class);
+        gliaEngagementConfigRepository = mock(GliaEngagementConfigRepository.class);
         secureConversations = mock(SecureConversations.class);
-        subjectUnderTest = new FileAttachmentRepository(gliaCore,
-                gliaEngagementTypeRepository, () -> secureConversations);
+        when(gliaCore.getSecureConversations()).thenReturn(secureConversations);
+        subjectUnderTest = new FileAttachmentRepository(gliaCore, gliaEngagementConfigRepository);
 
         when(FILE_ATTACHMENT_1.getUri()).thenReturn(URI_1);
         when(FILE_ATTACHMENT_2.getUri()).thenReturn(URI_2);
@@ -247,7 +248,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
 
-        verify(gliaEngagementTypeRepository, times(1)).isSecureEngagement();
+        verify(gliaEngagementConfigRepository).getChatType();
     }
 
     @Test
@@ -258,7 +259,7 @@ public class FileAttachmentRepositoryTest {
 
         subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
 
-        verify(gliaEngagementTypeRepository, never()).isSecureEngagement();
+        verify(gliaEngagementConfigRepository, never()).getChatType();
     }
 
     @Test
@@ -266,7 +267,7 @@ public class FileAttachmentRepositoryTest {
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(gliaCore.getCurrentEngagement()).thenReturn(Optional.empty());
-        when(gliaEngagementTypeRepository.isSecureEngagement()).thenReturn(true);
+        when(gliaEngagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
 
         subjectUnderTest.uploadFile(FILE_ATTACHMENT_1, listener);
 

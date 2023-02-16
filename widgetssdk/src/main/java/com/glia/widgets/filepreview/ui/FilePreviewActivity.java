@@ -11,9 +11,10 @@ import androidx.core.content.ContextCompat;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.base.GliaActivity;
 import com.glia.widgets.di.Dependencies;
 
-public class FilePreviewActivity extends AppCompatActivity {
+public class FilePreviewActivity extends AppCompatActivity implements GliaActivity {
 
     private static final String TAG = FilePreviewActivity.class.getSimpleName();
     private static final String IMAGE_ID_KEY = "image_id";
@@ -55,7 +56,9 @@ public class FilePreviewActivity extends AppCompatActivity {
     }
 
     private void handleStatusBarColor() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, this.theme.getBrandPrimaryColor()));
+        if (theme != null && theme.getBrandPrimaryColor() != null) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, theme.getBrandPrimaryColor()));
+        }
     }
 
     @Override

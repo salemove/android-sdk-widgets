@@ -110,10 +110,6 @@ internal class MessageCenterController(
         }
     }
 
-    override fun onBackArrowClicked() {
-        view?.finish()
-    }
-
     override fun onCloseButtonClicked() {
         view?.finish()
     }

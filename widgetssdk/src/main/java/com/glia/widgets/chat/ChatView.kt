@@ -510,8 +510,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
         if (chatState.isSecureMessaging) {
             showToolbar(resources.getString(R.string.glia_messaging_title))
+            binding.appBarView.hideBackButton()
+            binding.appBarView.showXButton()
         } else {
             showToolbar(theme.appBarTitle)
+            binding.appBarView.showBackButton()
         }
     }
 
@@ -724,7 +727,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             screenSharingController?.onForceStopScreenSharing()
             binding.appBarView.hideEndScreenSharingButton()
         }
-        binding.appBarView.setOnXClickedListener { controller?.leaveChatQueueClicked() }
+        binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
     }
 

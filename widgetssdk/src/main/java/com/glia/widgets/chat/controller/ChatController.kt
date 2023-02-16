@@ -102,6 +102,7 @@ internal class ChatController(
     private val customCardInteractableUseCase: CustomCardInteractableUseCase,
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
+    private val isQueueingEngagementUseCase: IsQueueingEngagementUseCase,
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
@@ -168,6 +169,9 @@ internal class ChatController(
     private var chatState: ChatState
 
     private val isSecureEngagement get() = isSecureEngagementUseCase()
+
+    private val isQueueingOrOngoingEngagement get() = isQueueingEngagementUseCase() || isOngoingEngagementUseCase()
+
     fun initChat(
         companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType
     ) {
@@ -179,6 +183,9 @@ internal class ChatController(
         ensureSecureMessagingAvailable()
 
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+            if (isSecureEngagement) {
+                emitViewState(chatState.setSecureMessagingState())
+            }
             return
         }
 
@@ -352,7 +359,7 @@ internal class ChatController(
         if (message != null) {
             Logger.d(TAG, "messageSent: $message, id: ${message.id}")
             val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-            if (isOngoingEngagementUseCase()) {
+            if (isQueueingOrOngoingEngagement) {
                 changeDeliveredIndex(currentChatItems, message)
             } else if (isSecureEngagementUseCase()) {
                 appendSentMessage(currentChatItems, message)
@@ -404,8 +411,12 @@ internal class ChatController(
 
     fun onBackArrowClicked() {
         Logger.d(TAG, "onBackArrowClicked")
-        emitViewState(chatState.changeVisibility(false))
-        messagesNotSeenHandler.chatOnBackClicked()
+        if (isQueueingOrOngoingEngagement) {
+            emitViewState(chatState.changeVisibility(false))
+            messagesNotSeenHandler.chatOnBackClicked()
+        } else {
+            Dependencies.getControllerFactory().destroyControllers()
+        }
     }
 
     fun onBackArrowClicked(onBackClickedListener: ChatView.OnBackClickedListener?) {
@@ -446,9 +457,13 @@ internal class ChatController(
         if (chatState.isOperatorOnline) dialogController.showExitChatDialog(chatState.formattedOperatorName)
     }
 
-    fun leaveChatQueueClicked() {
-        Logger.d(TAG, "leaveChatQueueClicked")
-        dialogController.showExitQueueDialog()
+    fun onXButtonClicked() {
+        Logger.d(TAG, "onXButtonClicked")
+        if (isQueueingEngagementUseCase()) {
+            dialogController.showExitQueueDialog()
+        } else {
+            Dependencies.getControllerFactory().destroyControllers()
+        }
     }
 
     val isChatVisible: Boolean
@@ -1280,7 +1295,7 @@ internal class ChatController(
 
         val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
         emitChatItems(
-            if (isSecureEngagementUseCase() && !isOngoingEngagementUseCase()) {
+            if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
                 chatState.changeItems(sortedItems)
             } else {
                 chatState.historyLoaded(sortedItems)

@@ -12,7 +12,6 @@ interface MessageCenterContract {
         fun onCheckMessagesClicked()
         fun onMessageChanged(message: String)
         fun onSendMessageClicked(message: String)
-        fun onBackArrowClicked()
         fun onCloseButtonClicked()
         fun onAddAttachmentButtonClicked()
         fun onGalleryClicked()

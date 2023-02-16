@@ -5,22 +5,21 @@ import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
-import com.glia.widgets.core.engagement.GliaEngagementRepository
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 
 class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val engagementStateRepository: GliaEngagementStateRepository,
-    private val engagementRepository: GliaEngagementRepository,
     private val engagementConfigRepository: GliaEngagementConfigRepository,
-    private val secureConversationsRepository: SecureConversationsRepository
+    private val secureConversationsRepository: SecureConversationsRepository,
+    private val isSecureEngagementUseCase: IsSecureEngagementUseCase
 ) {
     interface Listener {
         fun messageSent(message: VisitorMessage?)
@@ -31,11 +30,8 @@ class GliaSendMessageUseCase(
         fun error(ex: GliaException)
     }
 
-    private val hasNoOngoingEngagement: Boolean
-        get() = !engagementRepository.hasOngoingEngagement()
-
     private val isSecureEngagement: Boolean
-        get() = hasNoOngoingEngagement && engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING
+        get() = isSecureEngagementUseCase()
 
     private fun hasFileAttachments(fileAttachments: List<FileAttachment>): Boolean {
         return fileAttachments.isNotEmpty()

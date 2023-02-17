@@ -122,6 +122,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
+    private var onRequestScreenSharingPermissionCallback: OnRequestScreenSharingPermissionCallback? = null
     private val onOptionClickedListener = OnOptionClickedListener { id, indexInList, optionIndex ->
         Logger.d(TAG, "singleChoiceCardClicked")
         controller?.singleChoiceOptionClicked(id, indexInList, optionIndex)
@@ -275,6 +276,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     fun setOnBackToCallListener(onBackToCallListener: OnBackToCallListener?) {
         this.onBackToCallListener = onBackToCallListener
+    }
+
+    fun setOnRequestScreenSharingPermissionCallback(
+        onRequestScreenSharingPermissionCallback: OnRequestScreenSharingPermissionCallback?
+    ) {
+        this.onRequestScreenSharingPermissionCallback = onRequestScreenSharingPermissionCallback
     }
 
     /**
@@ -571,7 +578,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
                 R.string.glia_dialog_screen_sharing_offer_accept,
                 R.string.glia_dialog_screen_sharing_offer_decline,
-                { screenSharingController?.onScreenSharingAccepted(context) }
+                {
+                    onRequestScreenSharingPermissionCallback?.askPermission()
+                    screenSharingController?.onScreenSharingAccepted(context)
+                }
             ) { screenSharingController?.onScreenSharingDeclined() }
         }
     }
@@ -1125,6 +1135,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     interface OnTitleUpdatedListener {
         fun onTitleUpdated(title: String?)
+    }
+
+    interface OnRequestScreenSharingPermissionCallback {
+        fun askPermission()
     }
 
     companion object {

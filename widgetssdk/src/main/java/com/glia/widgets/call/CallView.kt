@@ -133,6 +133,7 @@ internal class CallView(
     private var onNavigateToChatListener: OnNavigateToChatListener? = null
     private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
+    private var onRequestScreenSharingPermissionCallback: OnRequestScreenSharingPermissionCallback? = null
     private var defaultStatusBarColor: Int? = null
 
     private var operatorVideoView: VideoView? = null
@@ -414,7 +415,10 @@ internal class CallView(
                 resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
                 R.string.glia_dialog_screen_sharing_offer_accept,
                 R.string.glia_dialog_screen_sharing_offer_decline,
-                { screenSharingController!!.onScreenSharingAccepted(context) }
+                {
+                    onRequestScreenSharingPermissionCallback?.askPermission()
+                    screenSharingController!!.onScreenSharingAccepted(context)
+                }
             ) { screenSharingController!!.onScreenSharingDeclined() }
     }
 
@@ -587,6 +591,12 @@ internal class CallView(
 
     fun setOnNavigateToSurveyListener(onNavigateToSurveyListener: OnNavigateToSurveyListener) {
         this.onNavigateToSurveyListener = onNavigateToSurveyListener
+    }
+
+    fun setOnRequestScreenSharingPermissionCallback(
+        onRequestScreenSharingPermissionCallback: OnRequestScreenSharingPermissionCallback?
+    ) {
+        this.onRequestScreenSharingPermissionCallback = onRequestScreenSharingPermissionCallback
     }
 
     fun setOnTitleUpdatedListener(onTitleUpdatedListener: OnTitleUpdatedListener) {
@@ -831,6 +841,10 @@ internal class CallView(
 
     fun interface OnTitleUpdatedListener {
         fun onTitleUpdated(title: String?)
+    }
+
+    interface OnRequestScreenSharingPermissionCallback {
+        fun askPermission()
     }
 
     @Deprecated("", ReplaceWith("shouldShowMediaEngagementView(isUpgradeToCall)"))

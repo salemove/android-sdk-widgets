@@ -1,12 +1,17 @@
 package com.glia.widgets.call;
 
+import static com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository.UNIQUE_RESULT_CODE;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -15,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -40,6 +46,10 @@ public class CallActivity extends AppCompatActivity {
     private Configuration configuration;
 
     private CallView callView;
+
+    private ActivityResultLauncher<Intent> startMediaProjection;
+    private MediaProjectionManager mediaProjectionManager;
+
     private CallView.OnBackClickedListener onBackClickedListener = this::finish;
     private CallView.OnNavigateToChatListener onNavigateToChatListener = () -> {
         navigateToChat();
@@ -49,6 +59,14 @@ public class CallActivity extends AppCompatActivity {
         navigateToSurvey(survey);
         finish();
     };
+    private CallView.OnRequestScreenSharingPermissionCallback onRequestScreenSharingPermissionCallback =
+            () -> {
+                if (startMediaProjection != null && mediaProjectionManager != null) {
+                    startMediaProjection.launch(mediaProjectionManager.createScreenCaptureIntent());
+                    Logger.d(TAG, "Acquire a media projection token: launching permission request"
+                    );
+                }
+            };
     private final PublishSubject<Pair<Integer, Integer[]>> permissionSubject = PublishSubject.create();
     private Disposable permissionSubjectDisposable;
 
@@ -68,6 +86,8 @@ public class CallActivity extends AppCompatActivity {
         callView.setConfiguration(configuration.getSdkConfiguration());
         callView.setUiTheme(configuration.getSdkConfiguration().getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
+        registerForMediaProjectionPermissionResult();
+        callView.setOnRequestScreenSharingPermissionCallback(onRequestScreenSharingPermissionCallback);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
         // to avoid app users to accidentally start queueing for another call when they resume
@@ -194,6 +214,27 @@ public class CallActivity extends AppCompatActivity {
                 sdkConfiguration.getUseOverlay(),
                 sdkConfiguration.getScreenSharingMode(),
                 configuration.getMediaType()
+        );
+    }
+
+    private void registerForMediaProjectionPermissionResult() {
+        // Request a token that grants the app the ability to capture the display contents
+        // See https://developer.android.com/guide/topics/large-screens/media-projection
+        mediaProjectionManager = getSystemService(MediaProjectionManager.class);
+        startMediaProjection = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Logger.d(TAG, "Acquire a media projection token: result received");
+                    if (result.getResultCode() == RESULT_OK) {
+                        Logger.d(TAG,
+                                "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK");
+                        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(
+                                UNIQUE_RESULT_CODE,
+                                result.getResultCode(),
+                                result.getData()
+                        ));
+                    }
+                }
         );
     }
 

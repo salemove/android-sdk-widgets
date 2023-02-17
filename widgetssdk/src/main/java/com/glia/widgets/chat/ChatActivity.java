@@ -1,13 +1,19 @@
 package com.glia.widgets.chat;
 
+import static com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository.UNIQUE_RESULT_CODE;
+
 import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -15,12 +21,19 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class ChatActivity extends AppCompatActivity {
+
+    private final static String TAG = ChatActivity.class.getSimpleName();
     private ChatView chatView;
+
+    private ActivityResultLauncher<Intent> startMediaProjection;
+    private MediaProjectionManager mediaProjectionManager;
+
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();
     };
@@ -34,6 +47,15 @@ public class ChatActivity extends AppCompatActivity {
             (UiTheme theme, Survey survey) -> {
                 navigateToSurvey(theme, survey);
                 finish();
+            };
+
+    private ChatView.OnRequestScreenSharingPermissionCallback onRequestScreenSharingPermissionCallback =
+            () -> {
+                if (startMediaProjection != null && mediaProjectionManager != null) {
+                    startMediaProjection.launch(mediaProjectionManager.createScreenCaptureIntent());
+                    Logger.d(TAG, "Acquire a media projection token: launching permission request"
+                    );
+                }
             };
 
     private GliaSdkConfiguration configuration;
@@ -62,6 +84,8 @@ public class ChatActivity extends AppCompatActivity {
         chatView.setOnMinimizeListener(this::finish);
         chatView.setOnNavigateToCallListener(onNavigateToCallListener);
         chatView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
+        registerForMediaProjectionPermissionResult();
+        chatView.setOnRequestScreenSharingPermissionCallback(onRequestScreenSharingPermissionCallback);
         chatView.startChat(
                 configuration.getCompanyName(),
                 configuration.getQueueId(),
@@ -109,6 +133,27 @@ public class ChatActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
         chatView.onRequestPermissionsResult(requestCode, grantResults);
+    }
+
+    private void registerForMediaProjectionPermissionResult() {
+        // Request a token that grants the app the ability to capture the display contents
+        // See https://developer.android.com/guide/topics/large-screens/media-projection
+        mediaProjectionManager = getSystemService(MediaProjectionManager.class);
+        startMediaProjection = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    Logger.d(TAG, "Acquire a media projection token: result received");
+                    if (result.getResultCode() == RESULT_OK) {
+                        Logger.d(TAG,
+                                "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK");
+                        Glia.getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(
+                                UNIQUE_RESULT_CODE,
+                                result.getResultCode(),
+                                result.getData()
+                        ));
+                    }
+                }
+        );
     }
 
     private GliaSdkConfiguration createConfiguration(Intent intent) {

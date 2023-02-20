@@ -16,10 +16,10 @@ internal data class HeaderRemoteConfig(
     @SerializedName("closeButton")
     val closeButtonRemoteConfig: ButtonRemoteConfig?,
 
-//  "endScreenSharingButton" parameter is missing because it is located in notification(in IOS it is in AppBar)
-
     @SerializedName("endButton")
     val endButtonRemoteConfig: ButtonRemoteConfig?
+
+    // TODO add endScreenSharingButton configuration param
 ) {
     fun toHeaderTheme(): HeaderTheme = HeaderTheme(
         text = textRemoteConfig?.toTextTheme(),

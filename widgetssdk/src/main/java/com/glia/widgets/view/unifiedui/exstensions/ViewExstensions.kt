@@ -1,5 +1,6 @@
 package com.glia.widgets.view.unifiedui.exstensions
 
+import android.app.Activity
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.*
@@ -201,6 +202,12 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
 
 internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
     applyImageColorTheme(buttonTheme?.iconColor)
+}
+
+internal fun View.changeStatusBarColor(color: Int?) {
+    color?.run {
+        Utils.getActivity(context).window.statusBarColor = this
+    }
 }
 
 internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {

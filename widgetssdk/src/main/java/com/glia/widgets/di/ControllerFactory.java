@@ -2,6 +2,8 @@ package com.glia.widgets.di;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
+import com.glia.widgets.callvisualizer.EndScreenSharingContract;
+import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
@@ -284,5 +286,9 @@ public class ControllerFactory {
 
     public MessageCenterContract.Controller getMessageCenterController() {
         return new MessageCenterController();
+    }
+
+    public EndScreenSharingContract.Controller getScreenSharingViewController() {
+        return new EndScreenSharingController();
     }
 }

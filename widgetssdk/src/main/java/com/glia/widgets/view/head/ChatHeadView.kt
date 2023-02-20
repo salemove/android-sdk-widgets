@@ -16,6 +16,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
+import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
@@ -77,6 +78,7 @@ class ChatHeadView @JvmOverloads constructor(
                 queueingLottieAnimation.visibility = GONE
                 profilePictureView.setImageDrawable(null)
                 profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
+                placeholderView.setImageResource(configuration.operatorPlaceholderIcon)
                 placeholderView.visibility = VISIBLE
             }
         }
@@ -89,6 +91,18 @@ class ChatHeadView @JvmOverloads constructor(
                 profilePictureView.setImageDrawable(null)
                 profilePictureView.backgroundTintList = getColorStateListCompat(configuration.badgeTextColor)
                 queueingLottieAnimation.visibility = VISIBLE
+            }
+        }
+    }
+
+    override fun showScreenSharing() {
+        post {
+            binding.apply {
+                placeholderView.visibility = GONE
+                profilePictureView.setImageDrawable(null)
+                profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
+                placeholderView.setImageResource(R.drawable.ic_screensharing)
+                placeholderView.visibility = VISIBLE
             }
         }
     }
@@ -133,6 +147,12 @@ class ChatHeadView @JvmOverloads constructor(
             Configuration.Builder().setWidgetsConfiguration(sdkConfiguration).build()
 
         val intent = CallActivity.getIntent(context, activityConfig)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    }
+
+    override fun navigateToEndScreenSharing() {
+        val intent = Intent(context, EndScreenSharingActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
     }

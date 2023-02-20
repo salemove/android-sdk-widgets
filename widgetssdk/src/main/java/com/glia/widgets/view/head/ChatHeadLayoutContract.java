@@ -18,6 +18,7 @@ public interface ChatHeadLayoutContract {
         void showPlaceholder();
 
         void showQueueing();
+        void showScreenSharing();
 
         void showOnHold();
 
@@ -26,6 +27,8 @@ public interface ChatHeadLayoutContract {
         void navigateToChat();
 
         void navigateToCall();
+
+        void navigateToEndScreenSharing();
 
         boolean isInChatView();
 

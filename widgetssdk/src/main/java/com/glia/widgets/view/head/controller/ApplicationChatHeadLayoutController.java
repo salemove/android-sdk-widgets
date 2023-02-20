@@ -8,6 +8,7 @@ import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
@@ -30,6 +31,7 @@ public class ApplicationChatHeadLayoutController
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final GetOperatorFlowableUseCase getOperatorFlowableUseCase;
+    private final IsCallVisualizerUseCase isCallVisualizerUseCase;
 
     private final CompositeDisposable engagementDisposables = new CompositeDisposable();
 
@@ -48,7 +50,8 @@ public class ApplicationChatHeadLayoutController
             MessagesNotSeenHandler messagesNotSeenHandler,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
-            GetOperatorFlowableUseCase getOperatorFlowableUseCase
+            GetOperatorFlowableUseCase getOperatorFlowableUseCase,
+            IsCallVisualizerUseCase isCallVisualizerUseCase
     ) {
         this.isDisplayApplicationChatHeadUseCase = isDisplayApplicationChatHeadUseCase;
         this.navigationDestinationUseCase = navigationDestinationUseCase;
@@ -58,6 +61,7 @@ public class ApplicationChatHeadLayoutController
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
         this.getOperatorFlowableUseCase = getOperatorFlowableUseCase;
+        this.isCallVisualizerUseCase = isCallVisualizerUseCase;
     }
 
     @Override
@@ -69,6 +73,8 @@ public class ApplicationChatHeadLayoutController
             case CHAT_VIEW:
                 chatHeadLayout.navigateToChat();
                 break;
+            case SCREEN_SHARING:
+                chatHeadLayout.navigateToEndScreenSharing();
         }
     }
 
@@ -150,7 +156,7 @@ public class ApplicationChatHeadLayoutController
     private void updateChatHeadViewState(ChatHeadLayoutContract.View view) {
         switch (state) {
             case ENGAGEMENT:
-                showOperatorImageOrPlaceholder(view);
+                decideOnEngagementBubbleDesign(view);
                 break;
             case QUEUEING:
                 view.showQueueing();
@@ -161,8 +167,10 @@ public class ApplicationChatHeadLayoutController
         }
     }
 
-    private void showOperatorImageOrPlaceholder(ChatHeadLayoutContract.View view) {
-        if (operatorProfileImgUrl != null) {
+    private void decideOnEngagementBubbleDesign(ChatHeadLayoutContract.View view) {
+        if (isCallVisualizerUseCase.execute()) {
+            view.showScreenSharing();
+        } else if (operatorProfileImgUrl != null) {
             view.showOperatorImage(operatorProfileImgUrl);
         } else {
             view.showPlaceholder();

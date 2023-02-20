@@ -34,6 +34,7 @@ import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
@@ -138,7 +139,8 @@ public class UseCaseFactory {
             resolveChatHeadNavigationUseCase = new ResolveChatHeadNavigationUseCase(
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository(),
-                    repositoryFactory.getGliaEngagementTypeRepository()
+                    repositoryFactory.getGliaEngagementTypeRepository(),
+                    createIsCallVisualizerUseCase()
             );
         }
         return resolveChatHeadNavigationUseCase;
@@ -444,5 +446,9 @@ public class UseCaseFactory {
 
     public IsCallOrChatScreenActiveUseCase createIsCallOrChatScreenActiveUseCase() {
         return new IsCallOrChatScreenActiveUseCase();
+    }
+
+    public IsCallVisualizerUseCase createIsCallVisualizerUseCase() {
+        return new IsCallVisualizerUseCase();
     }
 }

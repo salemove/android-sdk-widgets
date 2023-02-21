@@ -96,9 +96,13 @@ class ActivityWatcherForDialogs(
                 TAG, "Activity does not support ActivityResultRegistry APIs, " +
                         "legacy onActivityResult() will be used to acquire a media projection token"
             )
+            startMediaProjection = null
+            mediaProjectionManager = null
+            return
         }
+
         mediaProjectionManager = activity.getSystemService(MediaProjectionManager::class.java)
-        startMediaProjection = componentActivity?.registerForActivityResult(
+        startMediaProjection = componentActivity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             Logger.d(TAG, "Acquire a media projection token: result received")

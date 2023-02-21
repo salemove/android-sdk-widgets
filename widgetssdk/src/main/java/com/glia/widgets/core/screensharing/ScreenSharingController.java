@@ -157,5 +157,6 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     @Override
     public void onForceStopScreenSharing() {
         repository.forceEndScreenSharing();
+        removeScreenSharingNotificationUseCase.execute();
     }
 }

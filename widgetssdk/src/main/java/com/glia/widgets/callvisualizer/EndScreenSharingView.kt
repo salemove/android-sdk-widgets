@@ -5,7 +5,9 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
+import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.glia.widgets.R
+import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
@@ -31,6 +33,7 @@ class EndScreenSharingView (
     private var uiTheme: UiTheme by Delegates.notNull()
     private var defaultStatusBarColor: Int by Delegates.notNull()
     private var statusBarColor: Int by Delegates.notNull()
+    private var screenSharingController: ScreenSharingController? = null
 
     private val binding: EndScreenSharingViewBinding by lazy {
         EndScreenSharingViewBinding.inflate(layoutInflater, this)
@@ -78,12 +81,13 @@ class EndScreenSharingView (
     }
 
     override fun stopScreenSharing() {
-        TODO("Not yet implemented")
+        screenSharingController?.onForceStopScreenSharing()
     }
 
     override fun setController(controller: EndScreenSharingContract.Controller?) {
         this.controller = controller
         controller?.setView(this)
+        screenSharingController = Dependencies.getControllerFactory().screenSharingController
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

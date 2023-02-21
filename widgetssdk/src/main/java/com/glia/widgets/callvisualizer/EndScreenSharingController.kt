@@ -14,6 +14,7 @@ class EndScreenSharingController : EndScreenSharingContract.Controller {
 
     override fun onEndScreenSharingButtonClicked() {
         view?.stopScreenSharing()
+        view?.finish()
     }
 
     override fun onDestroy() {}

@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.exstensions
+package com.glia.widgets.view.unifiedui.extensions
 
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
@@ -49,7 +49,7 @@ internal fun View.getTypedArrayResId(
 ) = Utils.getTypedArrayIntegerValue(typedArray, context, index, fallbackAttr)
 
 @AnyRes
-fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int = TypedValue().takeIf {
+internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int = TypedValue().takeIf {
     context.theme.resolveAttribute(attr, it, true)
 }?.resourceId ?: fallBackResId
 
@@ -83,7 +83,7 @@ internal fun ImageView.load(
     Picasso.get().load(url).into(this, callback)
 }
 
-val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
+internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
 
 //Unified Ui
 //--------------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ internal fun View.applyLayerTheme(layer: LayerTheme?) {
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
     layer?.fill?.primaryColor?.also {
         /*
-        when the card has opacity/alpha then shadow shapes inner part becomes visible,
+        when the card has opacity/alpha, then shadow shapes inner part becomes visible,
         so in this case we need to make elevation = 0 to prevent this behavior
         */
         if (Color.alpha(it) > 0) cardElevation = 0f
@@ -197,6 +197,7 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     buttonTheme?.elevation?.also { elevation = it }
     buttonTheme?.shadowColor?.also(::applyShadow)
     buttonTheme?.text.also(::applyTextTheme)
+    buttonTheme?.iconColor?.also { iconTint = it.primaryColorStateList }
 }
 
 internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {

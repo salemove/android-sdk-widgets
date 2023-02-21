@@ -12,7 +12,7 @@ import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.MessageCenterConfirmationViewBinding
-import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.google.android.material.transition.MaterialFadeThrough
 

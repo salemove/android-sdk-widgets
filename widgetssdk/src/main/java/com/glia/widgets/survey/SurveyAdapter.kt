@@ -28,9 +28,9 @@ import com.glia.widgets.databinding.SurveyInputQuestionItemBinding
 import com.glia.widgets.databinding.SurveyScaleQuestionItemBinding
 import com.glia.widgets.databinding.SurveySingleQuestionItemBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.exstensions.applyOptionButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.applyOptionButtonTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyBooleanQuestionTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyInputQuestionTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyScaleQuestionTheme

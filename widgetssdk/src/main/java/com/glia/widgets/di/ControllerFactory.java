@@ -315,6 +315,7 @@ public class ControllerFactory {
                 useCaseFactory.createRemoveSecureFileAttachmentObserverUseCase(),
                 useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase(),
+                useCaseFactory.createSiteInfoUseCase(),
                 dialogController
         );
     }

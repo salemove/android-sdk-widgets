@@ -6,7 +6,9 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
+import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -23,6 +25,7 @@ internal class MessageCenterController(
     private val removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase,
     private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
+    private val siteInfoUseCase: SiteInfoUseCase,
     private val dialogController: DialogController
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
@@ -50,6 +53,19 @@ internal class MessageCenterController(
 
         view?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
         view?.setupViewAppearance()
+
+        updateAllowFileSendState()
+    }
+
+    private fun updateAllowFileSendState() {
+        siteInfoUseCase.execute { siteInfo: SiteInfo?, _ ->
+            onSiteInfoReceived(siteInfo)
+        }
+    }
+
+    private fun onSiteInfoReceived(siteInfo: SiteInfo?) {
+        val attachmentAllowed = siteInfo?.allowedFileSenders?.isVisitorAllowed ?: false
+        setState(state.copy(addAttachmentButtonVisible = attachmentAllowed))
     }
 
     override fun onCheckMessagesClicked() {

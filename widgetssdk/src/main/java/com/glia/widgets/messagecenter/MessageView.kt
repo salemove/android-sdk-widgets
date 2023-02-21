@@ -220,7 +220,12 @@ class MessageView(
         updateSendButtonState(state.sendMessageButtonState)
         updateSendMessageError(state.showMessageLimitError)
         updateMessageEditText(state.messageEditTextEnabled, state.showMessageLimitError)
-        addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+        if (state.addAttachmentButtonVisible) {
+            addAttachmentButton.visibility = VISIBLE
+            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+        } else {
+            addAttachmentButton.visibility = GONE
+        }
     }
 
     fun emitUploadAttachments(attachments: List<FileAttachment>) {

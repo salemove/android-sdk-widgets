@@ -48,6 +48,7 @@ class ActivityWatcherForDialogs(
 
     @VisibleForTesting
     var startMediaProjection: ActivityResultLauncher<Intent>? = null
+
     @VisibleForTesting
     var mediaProjectionManager: MediaProjectionManager? = null
 
@@ -62,8 +63,12 @@ class ActivityWatcherForDialogs(
     var resumedActivity: WeakReference<Activity?> = WeakReference(null)
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        // Call and Chat screens process screen sharing requests on their own
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
+        if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) {
+            // Call and Chat screens process screen sharing requests on their own
+            startMediaProjection = null
+            mediaProjectionManager = null
+            return
+        }
         registerForMediaProjectionPermissionResult(activity)
         super.onActivityPreCreated(activity, savedInstanceState)
     }
@@ -110,7 +115,8 @@ class ActivityWatcherForDialogs(
             return
         }
 
-        mediaProjectionManager = componentActivity.getSystemService(MediaProjectionManager::class.java)
+        mediaProjectionManager =
+            componentActivity.getSystemService(MediaProjectionManager::class.java)
         startMediaProjection = componentActivity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -323,7 +329,8 @@ class ActivityWatcherForDialogs(
                 startMediaProjection?.let { startMediaProjection ->
                     mediaProjectionManager?.let { mediaProjectionManager ->
                         startMediaProjection.launch(mediaProjectionManager.createScreenCaptureIntent())
-                        Logger.d(TAG, "Acquire a media projection token: launching permission request"
+                        Logger.d(
+                            TAG, "Acquire a media projection token: launching permission request"
                         )
                     }
                 }

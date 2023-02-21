@@ -46,8 +46,10 @@ class ActivityWatcherForDialogs(
     var dialogCallback: DialogController.Callback? = null
     private var screenSharingViewCallback: ScreenSharingController.ViewCallback? = null
 
-    private var startMediaProjection: ActivityResultLauncher<Intent>? = null
-    private var mediaProjectionManager: MediaProjectionManager? = null
+    @VisibleForTesting
+    var startMediaProjection: ActivityResultLauncher<Intent>? = null
+    @VisibleForTesting
+    var mediaProjectionManager: MediaProjectionManager? = null
 
     @VisibleForTesting
     var alertDialog: AlertDialog? = null
@@ -61,7 +63,7 @@ class ActivityWatcherForDialogs(
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
         // Call and Chat screens process screen sharing requests on their own
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity.get())) return
+        if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
         registerForMediaProjectionPermissionResult(activity)
         super.onActivityPreCreated(activity, savedInstanceState)
     }
@@ -87,7 +89,14 @@ class ActivityWatcherForDialogs(
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-    private fun registerForMediaProjectionPermissionResult(activity: Activity) {
+    override fun onActivityPreDestroyed(activity: Activity) {
+        super.onActivityPreDestroyed(activity)
+        startMediaProjection = null
+        mediaProjectionManager = null
+    }
+
+    @VisibleForTesting
+    fun registerForMediaProjectionPermissionResult(activity: Activity) {
         // Request a token that grants the app the ability to capture the display contents
         // See https://developer.android.com/guide/topics/large-screens/media-projection
         val componentActivity = activity as? ComponentActivity?
@@ -101,7 +110,7 @@ class ActivityWatcherForDialogs(
             return
         }
 
-        mediaProjectionManager = activity.getSystemService(MediaProjectionManager::class.java)
+        mediaProjectionManager = componentActivity.getSystemService(MediaProjectionManager::class.java)
         startMediaProjection = componentActivity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->

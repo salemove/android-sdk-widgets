@@ -416,8 +416,9 @@ internal class CallView(
                 R.string.glia_dialog_screen_sharing_offer_accept,
                 R.string.glia_dialog_screen_sharing_offer_decline,
                 {
-                    onRequestScreenSharingPermissionCallback?.askPermission()
                     screenSharingController!!.onScreenSharingAccepted(context)
+                    // Visitor accepted request, need to ask for screen sharing permission now
+                    onRequestScreenSharingPermissionCallback?.askPermission()
                 }
             ) { screenSharingController!!.onScreenSharingDeclined() }
     }

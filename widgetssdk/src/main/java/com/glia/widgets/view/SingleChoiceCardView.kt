@@ -14,6 +14,7 @@ import androidx.core.view.updatePadding
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.model.history.ResponseCardItem
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
@@ -56,17 +57,13 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     fun setData(
-        id: String,
-        imageUrl: String?,
-        content: String,
-        options: List<SingleChoiceOption>,
+        item: ResponseCardItem,
         theme: UiTheme,
-        adapterPosition: Int
     ) {
         setupCardView(theme)
-        setupImage(imageUrl)
-        setupText(content, theme)
-        setupButtons(id, options, theme, adapterPosition)
+        setupImage(item.choiceCardImageUrl)
+        setupText(item.content, theme)
+        setupButtons(item, theme)
     }
 
     fun setOnOptionClickedListener(onOptionClickedListener: OnOptionClickedListener?) {
@@ -74,7 +71,7 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     fun interface OnOptionClickedListener {
-        fun onClicked(id: String, indexInList: Int, indexOfOption: Int)
+        fun onClicked(item: ResponseCardItem, selectedOption: SingleChoiceOption)
     }
 
     private fun setupCardView(theme: UiTheme) {
@@ -127,21 +124,19 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     private fun setupButtons(
-        id: String,
-        options: List<SingleChoiceOption>,
-        theme: UiTheme,
-        adapterPosition: Int
+        item: ResponseCardItem,
+        theme: UiTheme
     ) {
         val horizontalMargin = resources.getDimensionPixelOffset(R.dimen.glia_large)
         val topMargin = resources.getDimensionPixelOffset(R.dimen.glia_medium)
-        for (index in options.indices) {
+        for (option in item.singleChoiceOptions) {
 
             val onClickListener = onOptionClickedListener?.run {
-                OnClickListener { onClicked(id, adapterPosition, index) }
+                OnClickListener { onClicked(item, option) }
             }
 
             val button = composeButton(
-                text = options[index].text,
+                text = option.text,
                 uiTheme = theme,
                 onClickListener = onClickListener
             )

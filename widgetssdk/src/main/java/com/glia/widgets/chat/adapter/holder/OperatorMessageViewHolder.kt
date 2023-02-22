@@ -77,12 +77,8 @@ class OperatorMessageViewHolder(
         val singleChoiceCardView = SingleChoiceCardView(itemView.context)
         singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener)
         singleChoiceCardView.setData(
-            item.id,
-            item.choiceCardImageUrl,
-            item.content,
-            item.singleChoiceOptions,
-            uiTheme,
-            adapterPosition
+            item,
+            uiTheme
         )
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,

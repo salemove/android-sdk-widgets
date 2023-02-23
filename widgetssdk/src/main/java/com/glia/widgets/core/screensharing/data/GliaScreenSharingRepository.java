@@ -2,8 +2,12 @@ package com.glia.widgets.core.screensharing.data;
 
 import static com.glia.androidsdk.screensharing.ScreenSharing.Status.NOT_SHARING;
 import static com.glia.androidsdk.screensharing.ScreenSharing.Status.SHARING;
+import static com.glia.widgets.core.screensharing.MediaProjectionService.Actions.START;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
@@ -16,6 +20,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.screensharing.ScreenSharingRequest;
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState;
 import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.core.screensharing.MediaProjectionService;
 import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.helper.Logger;
 
@@ -37,6 +42,8 @@ public class GliaScreenSharingRepository {
     private ScreenSharingRequest screenSharingRequest = null;
     private ScreenSharing.Status screenSharingStatus = NOT_SHARING;
 
+    public static final int SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995;
+
     public GliaScreenSharingRepository(GliaCore gliaCore) {
         this.gliaCore = gliaCore;
     }
@@ -54,11 +61,34 @@ public class GliaScreenSharingRepository {
             ScreenSharing.Mode screenSharingMode
     ) {
         Logger.d(TAG, "screen sharing accepted by the user");
-
+        startMediaProjectionService(activity);
         screenSharingRequest.accept(
                 screenSharingMode,
                 activity,
                 UNIQUE_RESULT_CODE,
+                exceptionConsumer
+        );
+    }
+
+    @SuppressLint("ShouldUseStaticImport")
+    private void startMediaProjectionService(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Intent intent = new Intent(activity, MediaProjectionService.class);
+            intent.setAction(START);
+            activity.startForegroundService(intent);
+        }
+    }
+
+    public void onScreenSharingAcceptedAndPermissionAsked(
+            Activity activity,
+            ScreenSharing.Mode screenSharingMode
+    ) {
+        Logger.d(TAG, "screen sharing accepted by the user");
+
+        screenSharingRequest.accept(
+                screenSharingMode,
+                activity,
+                SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE,
                 exceptionConsumer
         );
     }
@@ -94,9 +124,6 @@ public class GliaScreenSharingRepository {
                     visitorScreenSharingStateConsumer
             );
         });
-
-        gliaCore.off(Glia.Events.ENGAGEMENT, omnicoreEngagementConsumer);
-        gliaCore.getCallVisualizer().off(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagementConsumer);
     }
 
     private void onEngagement(Engagement engagement) {

@@ -89,6 +89,16 @@ class ChatAdapter(
                     ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false), uiTheme
                 )
             }
+            NEW_MESSAGES_DIVIDER_TYPE -> {
+                NewMessagesDividerViewHolder(
+                    ChatNewMessagesDividerLayoutBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    uiTheme
+                )
+            }
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {

@@ -73,6 +73,7 @@ import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDela
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
@@ -608,6 +609,11 @@ public class UseCaseFactory {
                 repositoryFactory.getEngagementConfigRepository(),
                 createIsMessagingAvailableUseCase()
         );
+    }
+
+    @NonNull
+    public GetUnreadMessagesCountWithTimeoutUseCase createSubscribeToUnreadMessagesCountUseCase() {
+        return new GetUnreadMessagesCountWithTimeoutUseCase(repositoryFactory.getSecureConversationsRepository());
     }
 
     @NonNull

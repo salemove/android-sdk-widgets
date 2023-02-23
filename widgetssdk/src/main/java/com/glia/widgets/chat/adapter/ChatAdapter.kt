@@ -14,10 +14,7 @@ import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewH
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.history.*
-import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
-import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
-import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
-import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
+import com.glia.widgets.databinding.*
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
@@ -90,6 +87,16 @@ class ChatAdapter(
             MEDIA_UPGRADE_ITEM_TYPE -> {
                 MediaUpgradeStartedViewHolder(
                     ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false), uiTheme
+                )
+            }
+            NEW_MESSAGES_DIVIDER_TYPE -> {
+                NewMessagesDividerViewHolder(
+                    ChatNewMessagesDividerLayoutBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    uiTheme
                 )
             }
             else -> {
@@ -212,6 +219,7 @@ class ChatAdapter(
         const val OPERATOR_IMAGE_VIEW_TYPE = 5
         const val VISITOR_FILE_VIEW_TYPE = 6
         const val VISITOR_IMAGE_VIEW_TYPE = 7
-        const val CUSTOM_CARD_TYPE = 8 // Should be the last type with the highest value
+        const val NEW_MESSAGES_DIVIDER_TYPE = 8
+        const val CUSTOM_CARD_TYPE = 9 // Should be the last type with the highest value
     }
 }

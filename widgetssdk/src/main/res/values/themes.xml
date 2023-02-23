@@ -48,6 +48,8 @@
         <item name="visitorMessageTextColor">?attr/gliaVisitorMessageTextColor</item>
         <item name="operatorMessageBackgroundColor">?attr/gliaOperatorMessageBackgroundColor</item>
         <item name="operatorMessageTextColor">?attr/gliaOperatorMessageTextColor</item>
+        <item name="newMessagesDividerColor">?attr/gliaNewMessagesDividerColor</item>
+        <item name="newMessagesDividerTextColor">?attr/gliaNewMessagesDividerTextColor</item>
         <item name="botActionButtonBackgroundColor">?attr/gliaBotActionButtonBackgroundColor</item>
         <item name="botActionButtonTextColor">?attr/gliaBotActionButtonTextColor</item>
         <item name="botActionButtonSelectedBackgroundColor">
@@ -134,6 +136,8 @@
         <item name="gliaVisitorMessageTextColor">?attr/gliaBaseLightColor</item>
         <item name="gliaOperatorMessageBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
         <item name="gliaOperatorMessageTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaNewMessagesDividerColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaNewMessagesDividerTextColor">?attr/gliaBrandPrimaryColor</item>
         <item name="gliaBotActionButtonBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
         <item name="gliaBotActionButtonTextColor">?attr/gliaBaseDarkColor</item>
         <item name="gliaBotActionButtonSelectedBackgroundColor">?attr/gliaBrandPrimaryColor</item>

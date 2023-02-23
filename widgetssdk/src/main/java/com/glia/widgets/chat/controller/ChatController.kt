@@ -44,7 +44,9 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
+import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
@@ -106,7 +108,9 @@ internal class ChatController(
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
-    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase
+    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
+    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
+    private val getUnreadMessagesCountWithTimeoutUseCase: GetUnreadMessagesCountWithTimeoutUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -1286,21 +1290,59 @@ internal class ChatController(
     }
 
     private fun submitHistoryItems(
-        newItems: List<ChatMessageInternal>,
-        currentItems: MutableList<ChatItem>
+        newItems: List<ChatMessageInternal>, currentItems: MutableList<ChatItem>
     ) {
         newItems.forEachIndexed { index, message ->
             appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
         }
 
         val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
-        emitChatItems(
-            if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
-                chatState.changeItems(sortedItems)
-            } else {
-                chatState.historyLoaded(sortedItems)
-            }
+
+        val newState = if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
+            chatState.changeItems(sortedItems)
+        } else {
+            chatState.historyLoaded(sortedItems)
+        }
+
+        if (isSecureEngagement) {
+            disposable.add(
+                getUnreadMessagesCountWithTimeoutUseCase().subscribe { count -> tryToAddNewMessagesDivider(count, newState) }
+            )
+        } else {
+            emitChatItems(newState)
+        }
+
+    }
+
+    private fun tryToAddNewMessagesDivider(count: Int, newState: ChatState) {
+        if (count < 1) {
+            emitChatItems(newState)
+            return
+        }
+
+        val index = newState.chatItems.count().minus(count).coerceAtLeast(0)
+
+        val newItems = newState.chatItems.toMutableList().apply {
+            add(index, NewMessagesItem)
+        }
+
+        emitChatItems(newState.changeItems(newItems))
+
+        markMessagesReadWithDelay()
+    }
+
+    private fun markMessagesReadWithDelay() {
+        disposable.add(
+            markMessagesReadWithDelayUseCase().subscribe({
+                removeNewMessagesDivider()
+            }, {
+                Logger.e(TAG, "Marking messages read failed", it)
+            })
         )
+    }
+
+    private fun removeNewMessagesDivider() {
+        emitChatItems(chatState.run { changeItems(chatItems - NewMessagesItem) })
     }
 
     init {

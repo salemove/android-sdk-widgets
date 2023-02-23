@@ -32,6 +32,7 @@
     <string name="glia_chat_attachment_item_content_description">Attachment %1$s, size %2$s. %3$s</string>
     <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
     <string name="glia_chat_visitor_status_transferring">Transferring</string>
+    <string name="glia_chat_new_messages">New Messages</string>
 
     <string name="glia_messaging_title">Messaging</string>
 

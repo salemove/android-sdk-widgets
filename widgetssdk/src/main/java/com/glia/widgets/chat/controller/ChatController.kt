@@ -45,6 +45,7 @@ import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
@@ -105,7 +106,8 @@ internal class ChatController(
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
-    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase
+    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
+    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -1271,8 +1273,7 @@ internal class ChatController(
     }
 
     private fun submitHistoryItems(
-        newItems: List<ChatMessageInternal>,
-        currentItems: MutableList<ChatItem>
+        newItems: List<ChatMessageInternal>, currentItems: MutableList<ChatItem>
     ) {
         newItems.forEachIndexed { index, message ->
             appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
@@ -1286,6 +1287,20 @@ internal class ChatController(
                 chatState.historyLoaded(sortedItems)
             }
         )
+    }
+
+    private fun markMessagesReadWithDelay() {
+        disposable.add(
+            markMessagesReadWithDelayUseCase().subscribe({
+                removeNewMessagesDivider()
+            }, {
+                Logger.e(TAG, "Marking messages read failed", it)
+            })
+        )
+    }
+
+    private fun removeNewMessagesDivider() {
+        emitChatItems(chatState.run { changeItems(chatItems - NewMessagesItem) })
     }
 
     init {

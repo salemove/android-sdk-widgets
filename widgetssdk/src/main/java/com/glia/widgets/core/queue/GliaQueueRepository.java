@@ -162,7 +162,13 @@ public class GliaQueueRepository {
      */
     public Single<Queue[]> getQueues() {
         return Single.create(emitter -> {
-            RequestCallback<Queue[]> requestCallback = (queues, e) -> emitter.onSuccess(queues);
+            RequestCallback<Queue[]> requestCallback = (queues, e) -> {
+                if (e == null) {
+                    emitter.onSuccess(queues);
+                } else {
+                    emitter.onError(e);
+                }
+            };
             gliaCore.getQueues(requestCallback);
         });
     }

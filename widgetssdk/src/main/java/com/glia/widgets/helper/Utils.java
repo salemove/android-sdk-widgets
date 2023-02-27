@@ -172,6 +172,12 @@ public class Utils {
                         R.attr.operatorMessageTextColor
                 )
         );
+        defaultThemeBuilder.setNewMessagesDividerColor(
+                getTypedArrayIntegerValue(typedArray, context, R.styleable.GliaView_newMessagesDividerColor, R.attr.gliaNewMessagesDividerColor)
+        );
+        defaultThemeBuilder.setNewMessagesDividerTextColor(
+                getTypedArrayIntegerValue(typedArray, context, R.styleable.GliaView_newMessagesDividerTextColor, R.attr.gliaNewMessagesDividerTextColor)
+        );
         defaultThemeBuilder.setBotActionButtonBackgroundColor(
                 getTypedArrayIntegerValue(
                         typedArray,

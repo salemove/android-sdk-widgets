@@ -69,6 +69,10 @@ class ChatHeadLayout @JvmOverloads constructor(
         chatHeadView.showQueueing()
     }
 
+    override fun showScreenSharing() {
+        chatHeadView.showScreenSharing()
+    }
+
     override fun showOnHold() {
         chatHeadView.showOnHold()
     }
@@ -78,11 +82,8 @@ class ChatHeadLayout @JvmOverloads constructor(
     }
 
     override fun navigateToChat() {
-        if (navigationCallback != null) {
-            navigationCallback!!.onNavigateToChat()
-        } else {
-            chatHeadView.navigateToChat()
-        }
+        navigationCallback?.apply { navigateToEndScreenSharing() } ?:
+            chatHeadView.navigateToEndScreenSharing()
     }
 
     override fun navigateToCall() {
@@ -90,6 +91,14 @@ class ChatHeadLayout @JvmOverloads constructor(
             navigationCallback!!.onNavigateToCall()
         } else {
             chatHeadView.navigateToCall()
+        }
+    }
+
+    override fun navigateToEndScreenSharing() {
+        if (navigationCallback != null) {
+            navigationCallback!!.onNavigateToEndScreenSharing()
+        } else {
+            chatHeadView.navigateToEndScreenSharing()
         }
     }
 
@@ -213,5 +222,6 @@ class ChatHeadLayout @JvmOverloads constructor(
     interface NavigationCallback {
         fun onNavigateToChat()
         fun onNavigateToCall()
+        fun onNavigateToEndScreenSharing()
     }
 }

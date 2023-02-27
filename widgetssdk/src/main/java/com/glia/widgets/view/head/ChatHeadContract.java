@@ -31,6 +31,8 @@ public interface ChatHeadContract {
 
         void showQueueing();
 
+        void showScreenSharing();
+
         void showOnHold();
 
         void hideOnHold();
@@ -38,6 +40,8 @@ public interface ChatHeadContract {
         void navigateToChat();
 
         void navigateToCall();
+
+        void navigateToEndScreenSharing();
 
         void updateConfiguration(UiTheme buildTimeTheme, GliaSdkConfiguration sdkConfiguration);
     }

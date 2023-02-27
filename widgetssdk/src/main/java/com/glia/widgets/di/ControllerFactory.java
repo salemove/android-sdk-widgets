@@ -236,7 +236,8 @@ public class ControllerFactory {
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     chatHeadPosition,
-                    useCaseFactory.createGetOperatorFlowableUseCase()
+                    useCaseFactory.createGetOperatorFlowableUseCase(),
+                    useCaseFactory.createIsCallVisualizerUseCase()
             );
         }
         return serviceChatHeadController;
@@ -251,7 +252,8 @@ public class ControllerFactory {
                 messagesNotSeenHandler,
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                 useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createGetOperatorFlowableUseCase()
+                useCaseFactory.createGetOperatorFlowableUseCase(),
+                useCaseFactory.createIsCallVisualizerUseCase()
         );
     }
 

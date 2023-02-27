@@ -33,6 +33,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
+import com.glia.widgets.callvisualizer.EndScreenSharingActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
@@ -106,6 +107,11 @@ public class MainFragment extends Fragment {
         chatHeadLayout.setNavigationCallback(
                 new ChatHeadLayout.NavigationCallback() {
                     @Override
+                    public void onNavigateToEndScreenSharing() {
+                        navigateToEndScreenSharing();
+                    }
+
+                    @Override
                     public void onNavigateToChat() {
                         navigateToChat();
                     }
@@ -158,6 +164,12 @@ public class MainFragment extends Fragment {
 
     private void navigateToChat() {
         Intent intent = new Intent(requireContext(), ChatActivity.class);
+        setNavigationIntentData(intent);
+        startActivity(intent);
+    }
+
+    private void navigateToEndScreenSharing() {
+        Intent intent = new Intent(requireContext(), EndScreenSharingActivity.class);
         setNavigationIntentData(intent);
         startActivity(intent);
     }

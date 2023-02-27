@@ -14,10 +14,6 @@ class SecureConversationsRepository(private val secureConversations: SecureConve
         secureConversations.fetchChatTranscript(listener::loaded)
     }
 
-    fun fetchChatTranscript(callback: RequestCallback<Array<ChatMessage>>?) {
-        secureConversations.fetchChatTranscript(callback)
-    }
-
     fun send(message: String, queueIds: Array<String>, attachment: MessageAttachment, callback: RequestCallback<VisitorMessage?>) {
         secureConversations.send(message, queueIds, attachment, callback)
     }
@@ -52,4 +48,7 @@ class SecureConversationsRepository(private val secureConversations: SecureConve
         else
             listener.messageSent(visitorMessage)
     }
+
+    fun getUnreadMessagesCount(callback: RequestCallback<Int>) =
+        secureConversations.getUnreadMessageCount(callback)
 }

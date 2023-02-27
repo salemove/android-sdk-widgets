@@ -19,6 +19,8 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.helper.TimeCounter
@@ -75,6 +77,9 @@ class ChatControllerTest {
     private lateinit var isSecureEngagementUseCase: IsSecureEngagementUseCase
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var isSecureConversationsChatAvailableUseCase: IsSecureConversationsChatAvailableUseCase
+    private lateinit var markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
+    private lateinit var getUnreadMessagesCountWithTimeoutUseCase: GetUnreadMessagesCountWithTimeoutUseCase
+    private lateinit var isQueueingEngagementUseCase: IsQueueingEngagementUseCase
 
     private lateinit var chatController: ChatController
 
@@ -124,6 +129,9 @@ class ChatControllerTest {
         isSecureEngagementUseCase = mock()
         engagementConfigUseCase = mock()
         isSecureConversationsChatAvailableUseCase = mock()
+        markMessagesReadWithDelayUseCase = mock()
+        getUnreadMessagesCountWithTimeoutUseCase = mock()
+        isQueueingEngagementUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -169,7 +177,10 @@ class ChatControllerTest {
             isOngoingEngagementUseCase = isOngoingEngagementUseCase,
             isSecureEngagementUseCase = isSecureEngagementUseCase,
             engagementConfigUseCase = engagementConfigUseCase,
-            isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase
+            isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase,
+            markMessagesReadWithDelayUseCase = markMessagesReadWithDelayUseCase,
+            getUnreadMessagesCountWithTimeoutUseCase = getUnreadMessagesCountWithTimeoutUseCase,
+            isQueueingEngagementUseCase = isQueueingEngagementUseCase
         )
     }
 

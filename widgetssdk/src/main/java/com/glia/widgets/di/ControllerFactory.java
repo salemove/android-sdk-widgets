@@ -120,7 +120,9 @@ public class ControllerFactory {
                     useCaseFactory.createIsOngoingEngagementUseCase(),
                     useCaseFactory.createIsSecureEngagementUseCase(),
                     useCaseFactory.createSetEngagementConfigUseCase(),
-                    useCaseFactory.createIsSecureConversationsChatAvailableUseCase()
+                    useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
+                    useCaseFactory.createMarkMessagesReadUseCase(),
+                    useCaseFactory.createSubscribeToUnreadMessagesCountUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

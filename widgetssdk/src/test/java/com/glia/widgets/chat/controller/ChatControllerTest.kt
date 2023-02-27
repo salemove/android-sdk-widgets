@@ -79,7 +79,7 @@ class ChatControllerTest {
     private lateinit var isSecureConversationsChatAvailableUseCase: IsSecureConversationsChatAvailableUseCase
     private lateinit var markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
     private lateinit var getUnreadMessagesCountWithTimeoutUseCase: GetUnreadMessagesCountWithTimeoutUseCase
-    private lateinit var isQueueTicketUseCase: IsQueueingEngagementUseCase
+    private lateinit var isQueueingEngagementUseCase: IsQueueingEngagementUseCase
 
     private lateinit var chatController: ChatController
 
@@ -131,7 +131,7 @@ class ChatControllerTest {
         isSecureConversationsChatAvailableUseCase = mock()
         markMessagesReadWithDelayUseCase = mock()
         getUnreadMessagesCountWithTimeoutUseCase = mock()
-        isQueueTicketUseCase = mock()
+        isQueueingEngagementUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -180,7 +180,7 @@ class ChatControllerTest {
             isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase,
             markMessagesReadWithDelayUseCase = markMessagesReadWithDelayUseCase,
             getUnreadMessagesCountWithTimeoutUseCase = getUnreadMessagesCountWithTimeoutUseCase,
-            isQueueingEngagementUseCase = isQueueTicketUseCase
+            isQueueingEngagementUseCase = isQueueingEngagementUseCase
         )
     }
 

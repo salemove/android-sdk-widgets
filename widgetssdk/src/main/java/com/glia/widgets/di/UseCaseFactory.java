@@ -36,6 +36,8 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
@@ -450,5 +452,13 @@ public class UseCaseFactory {
 
     public IsCallVisualizerUseCase createIsCallVisualizerUseCase() {
         return new IsCallVisualizerUseCase();
+    }
+
+    public AddMediaUpgradeOfferCallbackUseCase createAddMediaUpgradeOfferCallbackUseCase() {
+        return new AddMediaUpgradeOfferCallbackUseCase(repositoryFactory.getMediaUpgradeOfferRepository());
+    }
+
+    public RemoveMediaUpgradeOfferCallbackUseCase createRemoveMediaUpgradeOfferCallbackUseCase() {
+        return new RemoveMediaUpgradeOfferCallbackUseCase(repositoryFactory.getMediaUpgradeOfferRepository());
     }
 }

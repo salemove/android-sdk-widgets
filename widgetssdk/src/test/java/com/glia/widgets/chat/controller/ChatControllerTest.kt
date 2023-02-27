@@ -14,6 +14,8 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.fileupload.domain.*
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
+import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
+import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase
@@ -73,6 +75,8 @@ class ChatControllerTest {
     private lateinit var customCardInteractableUseCase: CustomCardInteractableUseCase
     private lateinit var customCardShouldShowUseCase: CustomCardShouldShowUseCase
     private lateinit var ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase
+    private lateinit var addMediaUpgradeOfferCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase
+    private lateinit var removeMediaUpgradeOfferCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase
 
     private lateinit var chatController: ChatController
 
@@ -118,6 +122,8 @@ class ChatControllerTest {
         customCardInteractableUseCase = mock()
         customCardShouldShowUseCase = mock()
         ticketStateChangeToUnstaffedUseCase = mock()
+        addMediaUpgradeOfferCallbackUseCase = mock()
+        removeMediaUpgradeOfferCallbackUseCase = mock()
 
         chatController = ChatController(chatViewCallback, mediaUpgradeOfferRepository, callTimer,
             minimizeHandler, dialogController, messagesNotSeenHandler, showAudioCallNotificationUseCase,
@@ -131,7 +137,8 @@ class ChatControllerTest {
             isShowOverlayPermissionRequestDialogUseCase, downloadFileUseCase, isEnableChatEditTextUseCase,
             siteInfoUseCase, surveyUseCase, getGliaEngagementStateFlowableUseCase, isFromCallScreenUseCase,
             updateFromCallScreenUseCase, customCardAdapterTypeUseCase, customCardTypeUseCase,
-            customCardInteractableUseCase, customCardShouldShowUseCase, ticketStateChangeToUnstaffedUseCase)
+            customCardInteractableUseCase, customCardShouldShowUseCase, ticketStateChangeToUnstaffedUseCase,
+            addMediaUpgradeOfferCallbackUseCase, removeMediaUpgradeOfferCallbackUseCase)
     }
 
     @Test

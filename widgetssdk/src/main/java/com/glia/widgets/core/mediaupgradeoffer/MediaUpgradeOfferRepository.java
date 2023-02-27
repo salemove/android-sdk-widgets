@@ -33,6 +33,11 @@ public class MediaUpgradeOfferRepository {
         callbacks.add(callback);
     }
 
+    public void removeCallback(MediaUpgradeOfferRepositoryCallback callback) {
+        Logger.d(TAG, "removeCallback");
+        callbacks.remove(callback);
+    }
+
     public void acceptOffer(MediaUpgradeOffer offer, Submitter submitter) {
         offer.accept(exception -> {
             if (exception == null) {

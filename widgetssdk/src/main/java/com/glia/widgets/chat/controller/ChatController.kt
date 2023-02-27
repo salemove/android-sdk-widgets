@@ -37,6 +37,8 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository.Submitter
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback
+import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
+import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase
@@ -102,7 +104,9 @@ class ChatController(
     private val customCardTypeUseCase: CustomCardTypeUseCase,
     private val customCardInteractableUseCase: CustomCardInteractableUseCase,
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
-    private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase
+    private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
+    private val addMediaUpgradeCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase,
+    private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -174,7 +178,6 @@ class ChatController(
         loadChatHistory()
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         initMediaUpgradeCallback()
-        mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback)
         minimizeHandler.addListener { minimizeView() }
         createNewTimerCallback()
         callTimer.addFormattedValueListener(timerStatusListener)
@@ -240,6 +243,7 @@ class ChatController(
         isChatViewPaused = true
         messagesNotSeenHandler.onChatWentBackground()
         surveyUseCase.unregisterListener(this)
+        mediaUpgradeOfferRepositoryCallback?.let { removeMediaUpgradeCallbackUseCase(it) }
     }
 
     fun onMessageTextChanged(message: String) {
@@ -433,11 +437,12 @@ class ChatController(
     }
 
     fun onResume() {
+        Logger.d(TAG, "onResume")
         isChatViewPaused = false
-        Logger.d(TAG, "onResume\n")
         messagesNotSeenHandler.callChatButtonClicked()
         surveyUseCase.registerListener(this)
         subscribeToEngagementStateChange()
+        mediaUpgradeOfferRepositoryCallback?.let { addMediaUpgradeCallbackUseCase(it) }
     }
 
     private fun subscribeToEngagementStateChange() {

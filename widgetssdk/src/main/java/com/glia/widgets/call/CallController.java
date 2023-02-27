@@ -27,6 +27,8 @@ import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
+import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
@@ -90,6 +92,8 @@ public class CallController implements
     private final IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase;
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
+    private final AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase;
+    private final RemoveMediaUpgradeOfferCallbackUseCase removeMediaUpgradeCallbackUseCase;
     private final DialogController dialogController;
     private final GliaSurveyUseCase surveyUseCase;
     private final ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase;
@@ -131,6 +135,8 @@ public class CallController implements
             GliaSurveyUseCase surveyUseCase,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
+            AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase,
+            RemoveMediaUpgradeOfferCallbackUseCase removeMediaUpgradeCallbackUseCase,
             ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
             ToggleVisitorVideoUseCase toggleVisitorVideoUseCase,
             GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
@@ -172,6 +178,8 @@ public class CallController implements
         this.surveyUseCase = surveyUseCase;
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
+        this.addMediaUpgradeCallbackUseCase = addMediaUpgradeCallbackUseCase;
+        this.removeMediaUpgradeCallbackUseCase = removeMediaUpgradeCallbackUseCase;
         this.toggleVisitorAudioMediaMuteUseCase = toggleVisitorAudioMediaMuteUseCase;
         this.toggleVisitorVideoUseCase = toggleVisitorVideoUseCase;
         this.getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase;
@@ -241,7 +249,6 @@ public class CallController implements
                         )
         );
         onEngagementEndUseCase.execute(this);
-        mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
         connectingTimerCounter.addRawValueListener(connectingTimerStatusListener);
         minimizeHandler.addListener(this::minimizeView);
@@ -280,6 +287,9 @@ public class CallController implements
     public void onPause() {
         surveyUseCase.unregisterListener(this);
         removeVisitorMediaStateListenerUseCase.execute(this);
+        if(mediaUpgradeOfferRepositoryCallback != null) {
+            removeMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
+        }
     }
 
     public void leaveChatClicked() {
@@ -337,6 +347,7 @@ public class CallController implements
 
         surveyUseCase.registerListener(this);
         subscribeToEngagementStateChange();
+        addMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
     }
 
     public void chatButtonClicked() {

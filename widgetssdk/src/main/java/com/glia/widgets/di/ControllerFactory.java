@@ -117,7 +117,9 @@ public class ControllerFactory {
                     useCaseFactory.createCustomCardTypeUseCase(),
                     useCaseFactory.createCustomCardInteractableUseCase(),
                     useCaseFactory.createCustomCardShouldShowUseCase(),
-                    useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase());
+                    useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
+                    useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
+                    useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase());
         } else {
             Logger.d(TAG, "retained chat controller");
             retainedChatController.setViewCallback(chatViewCallback);
@@ -153,6 +155,8 @@ public class ControllerFactory {
                     useCaseFactory.getGliaSurveyUseCase(),
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
+                    useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase(),
                     useCaseFactory.createToggleVisitorAudioMediaMuteUseCase(),
                     useCaseFactory.createToggleVisitorVideoUseCase(),
                     useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),

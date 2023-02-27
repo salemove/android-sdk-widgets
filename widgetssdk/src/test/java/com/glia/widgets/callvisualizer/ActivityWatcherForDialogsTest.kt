@@ -1,8 +1,13 @@
 package com.glia.widgets.callvisualizer
 
 import android.app.Activity
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.fragment.app.FragmentActivity
+import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
+import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
@@ -11,7 +16,8 @@ import junit.framework.TestCase.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.*
+import org.mockito.kotlin.verify
 import java.lang.ref.WeakReference
 
 internal class ActivityWatcherForDialogsTest {
@@ -92,5 +98,43 @@ internal class ActivityWatcherForDialogsTest {
         val state = DialogState(Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING)
         activityWatcherForDialogs.dialogCallback?.emitDialogState(state)
         assertNotNull(activityWatcherForDialogs.alertDialog)
+    }
+
+    @Test
+    fun mediaProjectionObjects_null_whenChatActivity() {
+        val activity = mock(ChatActivity::class.java)
+        activityWatcherForDialogs.onActivityPreCreated(activity, null)
+
+        assertNull(activityWatcherForDialogs.startMediaProjection)
+    }
+
+    @Test
+    fun mediaProjectionObjects_null_whenCallActivity() {
+        val activity = mock(CallActivity::class.java)
+        activityWatcherForDialogs.onActivityPreCreated(activity, null)
+
+        assertNull(activityWatcherForDialogs.startMediaProjection)
+    }
+
+    @Test
+    fun mediaProjectionObjects_creation_whenComponentActivity() {
+        val activity = mock(ComponentActivity::class.java)
+        activityWatcherForDialogs.registerForMediaProjectionPermissionResult(activity)
+
+        verify(activity, times(1)).registerForActivityResult(
+            any(ActivityResultContract::class.java),
+            any()
+        )
+    }
+
+    @Test
+    fun mediaProjectionObjects_creation_whenComponentActivitySubclass() {
+        val activity = mock(FragmentActivity::class.java)
+        activityWatcherForDialogs.registerForMediaProjectionPermissionResult(activity)
+
+        verify(activity, times(1)).registerForActivityResult(
+            any(ActivityResultContract::class.java),
+            any()
+        )
     }
 }

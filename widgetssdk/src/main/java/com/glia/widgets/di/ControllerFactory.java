@@ -186,7 +186,6 @@ public class ControllerFactory {
 
     public void destroyControllers() {
         destroyCallController();
-        destroyScreenSharingController();
         destroyChatController();
         serviceChatHeadController.onDestroy();
     }

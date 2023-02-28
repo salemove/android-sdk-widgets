@@ -3,49 +3,35 @@ package com.glia.widgets.core.fileupload
 import android.net.Uri
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.widgets.core.fileupload.FileAttachmentRepository.ObservableFileAttachmentList
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
-
-import java.util.*
-import kotlin.collections.ArrayList
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 
 class SecureFileAttachmentRepository(private val secureConversations: SecureConversations) {
-    private val observable = ObservableFileAttachmentList()
+    private val _observable = BehaviorSubject.createDefault(emptyList<FileAttachment>())
 
-    fun addObserver(observer: Observer?) {
-        observable.addObserver(observer)
-    }
-
-    fun removeObserver(observer: Observer?) {
-        observable.deleteObserver(observer)
-    }
-
-    fun clearObservers() {
-        observable.deleteObservers()
-    }
+    val observable: Observable<List<FileAttachment>> = _observable
 
     fun getFileAttachments(): List<FileAttachment> {
-        return observable.fileAttachments
+        return _observable.value ?: emptyList()
     }
 
     fun getReadyToSendFileAttachments(): List<FileAttachment> {
-        return observable.fileAttachments
+        return getFileAttachments()
             .filter { obj: FileAttachment -> obj.isReadyToSend }
     }
 
-    fun getAttachedFilesCount(): Long {
-        return observable.fileAttachments.size.toLong()
+    fun getAttachedFilesCount(): Int {
+        return getFileAttachments().size
     }
     fun isFileAttached(uri: Uri): Boolean {
-        return observable.fileAttachments
+        return getFileAttachments()
             .any { it.uri == uri }
     }
     fun attachFile(file: FileAttachment) {
-        observable.notifyUpdate(
-            observable.fileAttachments + file
-        )
+        _observable.onNext(getFileAttachments() + file)
     }
 
     fun uploadFile(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
@@ -64,15 +50,15 @@ class SecureFileAttachmentRepository(private val secureConversations: SecureConv
     }
 
     fun detachFile(attachment: FileAttachment) {
-        observable.notifyUpdate(
-            observable.fileAttachments
+        _observable.onNext(
+            getFileAttachments()
                 .filter { it.uri !== attachment.uri }
         )
     }
 
     fun detachFiles(attachments: List<FileAttachment?>) {
-        observable.notifyUpdate(
-            observable.fileAttachments
+        _observable.onNext(
+            getFileAttachments()
                 .filter { attachment: FileAttachment? ->
                     !attachments.contains(
                         attachment
@@ -82,7 +68,7 @@ class SecureFileAttachmentRepository(private val secureConversations: SecureConv
     }
 
     fun detachAllFiles() {
-        observable.notifyUpdate(ArrayList())
+        _observable.onNext(emptyList())
     }
 
     private fun onUploadFileSecurityScanRequired(
@@ -125,8 +111,8 @@ class SecureFileAttachmentRepository(private val secureConversations: SecureConv
     }
 
     private fun onEngagementFileReceived(uri: Uri, engagementFile: EngagementFile) {
-        observable.notifyUpdate(
-            observable.fileAttachments
+        _observable.onNext(
+            getFileAttachments()
                 .map { attachment: FileAttachment ->
                     if (attachment.uri == uri) {
                         attachment
@@ -148,8 +134,8 @@ class SecureFileAttachmentRepository(private val secureConversations: SecureConv
     }
 
     private fun setFileAttachmentStatus(uri: Uri, status: FileAttachment.Status) {
-        observable.notifyUpdate(
-            observable.fileAttachments
+        _observable.onNext(
+            getFileAttachments()
                 .map { fileAttachment: FileAttachment ->
                     if (fileAttachment.uri === uri) {
                         fileAttachment.setAttachmentStatus(status)

@@ -6,6 +6,7 @@ import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
+import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.times
@@ -19,11 +20,14 @@ internal class MessageCenterControllerTest {
     private lateinit var addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase
     private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
-    private lateinit var removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
     private lateinit var siteInfoUseCase: SiteInfoUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var viewContract: MessageCenterContract.View
+    private lateinit var onNextMessageUseCase: OnNextMessageUseCase
+    private lateinit var sendMessageButtonStateUseCase: SendMessageButtonStateUseCase
+    private lateinit var showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase
+    private lateinit var resetMessageCenterUseCase: ResetMessageCenterUseCase
     private lateinit var dialogController: DialogController
 
     @Before
@@ -33,11 +37,14 @@ internal class MessageCenterControllerTest {
         addFileAttachmentsObserverUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
         getFileAttachmentsUseCase = mock()
-        removeFileAttachmentObserverUseCase = mock()
         removeFileAttachmentUseCase = mock()
         siteInfoUseCase = mock()
         viewContract = mock()
         isAuthenticatedUseCase = mock()
+        onNextMessageUseCase = mock()
+        sendMessageButtonStateUseCase = mock()
+        showMessageLimitErrorUseCase = mock()
+        resetMessageCenterUseCase = mock()
         dialogController = mock()
         messageCenterController =
             MessageCenterController(
@@ -46,10 +53,13 @@ internal class MessageCenterControllerTest {
                 addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
                 addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
                 getFileAttachmentsUseCase = getFileAttachmentsUseCase,
-                removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase,
                 removeFileAttachmentUseCase = removeFileAttachmentUseCase,
                 isAuthenticatedUseCase = isAuthenticatedUseCase,
                 siteInfoUseCase = siteInfoUseCase,
+                onNextMessageUseCase = onNextMessageUseCase,
+                sendMessageButtonStateUseCase = sendMessageButtonStateUseCase,
+                showMessageLimitErrorUseCase = showMessageLimitErrorUseCase,
+                resetMessageCenterUseCase = resetMessageCenterUseCase,
                 dialogController = dialogController
             )
     }
@@ -57,17 +67,49 @@ internal class MessageCenterControllerTest {
     @Test
     fun setView_ExecutesAddSecureFileAttachmentsObserverUseCase_onTrigger() {
         whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
+
         messageCenterController.setView(viewContract)
 
-        verify(addFileAttachmentsObserverUseCase, times(1)).execute(any())
+        verify(addFileAttachmentsObserverUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun setView_ExecutesShowMessageLimitErrorUseCase_onTrigger() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
+
+        messageCenterController.setView(viewContract)
+
+        verify(showMessageLimitErrorUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun setView_ExecutesSendMessageButtonStateUseCase_onTrigger() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
+
+        messageCenterController.setView(viewContract)
+
+        verify(sendMessageButtonStateUseCase, times(1)).invoke()
     }
 
     @Test
     fun setView_ExecutesGetFileAttachmentsUseCase_onTrigger() {
         whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
+
         messageCenterController.setView(viewContract)
 
-        verify(getFileAttachmentsUseCase, times(1)).execute()
+        verify(getFileAttachmentsUseCase, times(1)).invoke()
     }
 
     @Test
@@ -82,6 +124,9 @@ internal class MessageCenterControllerTest {
     @Test
     fun setView_triggersViewInitialization_whenAuthenticated() {
         whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(addFileAttachmentsObserverUseCase.invoke()) doReturn Observable.empty()
+        whenever(showMessageLimitErrorUseCase.invoke()) doReturn Observable.empty()
+        whenever(sendMessageButtonStateUseCase.invoke()) doReturn Observable.empty()
 
         messageCenterController.setView(viewContract)
 
@@ -134,9 +179,30 @@ internal class MessageCenterControllerTest {
     }
 
     @Test
-    fun onDestroy_ExecutesRemoveSecureFileAttachmentObserverUseCase_onTrigger() {
+    fun onCheckMessagesClicked_ExecutesResetMessageCenterUseCase_onTrigger() {
+        messageCenterController.onCheckMessagesClicked()
+
+        verify(resetMessageCenterUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun onCloseButtonClicked_ExecutesResetMessageCenterUseCase_onTrigger() {
+        messageCenterController.onCloseButtonClicked()
+
+        verify(resetMessageCenterUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun onSystemBack_ExecutesResetMessageCenterUseCase_onTrigger() {
+        messageCenterController.onSystemBack()
+
+        verify(resetMessageCenterUseCase, times(1)).invoke()
+    }
+
+    @Test
+    fun onDestroy_ExecutesIsMessageCenterAvailableUseCase_onTrigger() {
         messageCenterController.onDestroy()
 
-        verify(removeFileAttachmentObserverUseCase, times(1)).execute(any())
+        verify(isMessageCenterAvailableUseCase, times(1)).dispose()
     }
 }

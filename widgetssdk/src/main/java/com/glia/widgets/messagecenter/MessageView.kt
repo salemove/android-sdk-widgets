@@ -68,7 +68,7 @@ class MessageView(
 
     private var checkMessageButtonClickListener: OnClickListener? = null
     private var attachmentButtonClickListener: OnClickListener? = null
-    private var sendMessageButtonClickListener: ((String) -> Unit)? = null
+    private var sendMessageButtonClickListener: OnClickListener? = null
     private var onMessageTextChangedListener: ((String) -> Unit)? = null
     private var onRemoveAttachmentListener: ((FileAttachment) -> Unit)? = null
 
@@ -128,7 +128,7 @@ class MessageView(
             checkMessageButtonClickListener?.onClick(it)
         }
         sendMessageButton.setOnClickListener {
-            sendMessageButtonClickListener?.invoke(messageEditText.text.toString())
+            sendMessageButtonClickListener?.onClick(it)
         }
 
         addAttachmentButton.setOnClickListener {
@@ -188,11 +188,11 @@ class MessageView(
         )
     }
 
-    fun showSendMessageGroup() {
+    private fun showSendMessageGroup() {
         sendMessageGroup.isVisible = true
     }
 
-    fun hideSendMessageGroup() {
+    private fun hideSendMessageGroup() {
         sendMessageGroup.isInvisible = true
     }
 
@@ -204,7 +204,7 @@ class MessageView(
         attachmentButtonClickListener = listener
     }
 
-    fun setOnSendMessageButtonClickListener(listener: (String) -> Unit) {
+    fun setOnSendMessageButtonClickListener(listener: OnClickListener) {
         sendMessageButtonClickListener = listener
     }
 
@@ -220,11 +220,16 @@ class MessageView(
         updateSendButtonState(state.sendMessageButtonState)
         updateSendMessageError(state.showMessageLimitError)
         updateMessageEditText(state.messageEditTextEnabled, state.showMessageLimitError)
-        if (state.addAttachmentButtonVisible) {
-            addAttachmentButton.visibility = VISIBLE
-            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+        if (state.showSendMessageGroup) {
+            showSendMessageGroup()
+            if (state.addAttachmentButtonVisible) {
+                addAttachmentButton.visibility = VISIBLE
+                addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+            } else {
+                addAttachmentButton.visibility = GONE
+            }
         } else {
-            addAttachmentButton.visibility = GONE
+            hideSendMessageGroup()
         }
     }
 

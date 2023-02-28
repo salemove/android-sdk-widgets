@@ -163,7 +163,8 @@ public class ControllerFactory {
                     useCaseFactory.createToggleVisitorVideoUseCase(),
                     useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                     useCaseFactory.createUpdateFromCallScreenUseCase(),
-                    useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase());
+                    useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
+                    useCaseFactory.createIsCallVisualizerUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

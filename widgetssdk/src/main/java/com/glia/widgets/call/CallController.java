@@ -22,6 +22,7 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;
@@ -101,6 +102,7 @@ public class CallController implements
     private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
     private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
     private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
+    private final IsCallVisualizerUseCase isCallVisualizerUseCase;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
@@ -141,7 +143,8 @@ public class CallController implements
             ToggleVisitorVideoUseCase toggleVisitorVideoUseCase,
             GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
             UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
-            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase) {
+            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
+            IsCallVisualizerUseCase isCallVisualizerUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
@@ -153,6 +156,7 @@ public class CallController implements
                 .setIsSpeakerOn(false)
                 .setIsMuted(false)
                 .setHasVideo(false)
+                .setIsCallVisualizer(isCallVisualizerUseCase.execute())
                 .createCallState();
         this.dialogController = dialogController;
         this.callTimer = sharedTimer;
@@ -185,6 +189,7 @@ public class CallController implements
         this.getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase;
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
+        this.isCallVisualizerUseCase = isCallVisualizerUseCase;
     }
 
     @Override
@@ -505,6 +510,7 @@ public class CallController implements
             Logger.d(TAG, "Emit state:\n" + state.toString());
             viewCallback.emitState(callState);
         }
+
     }
 
     private synchronized boolean setState(CallState state) {

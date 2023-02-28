@@ -18,6 +18,7 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository;
+import com.glia.widgets.core.secureconversations.SendMessageRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepository;
@@ -43,6 +44,7 @@ public class RepositoryFactory {
     private static FileAttachmentRepository fileAttachmentRepository;
     private static GliaOperatorRepository operatorRepository;
     private static GliaEngagementConfigRepository engagementConfigRepository;
+    private static SendMessageRepository sendMessageRepository;
     private CallVisualizerRepository callVisualizerRepository;
     private static VisitorCodeRepository visitorCodeRepository;
 
@@ -205,5 +207,12 @@ public class RepositoryFactory {
             engagementConfigRepository = new GliaEngagementConfigRepository();
         }
         return engagementConfigRepository;
+    }
+
+    public SendMessageRepository getSendMessageRepository() {
+        if (sendMessageRepository == null) {
+            sendMessageRepository = new SendMessageRepository();
+        }
+        return sendMessageRepository;
     }
 }

@@ -5,7 +5,8 @@ data class State(
     val addAttachmentButtonEnabled: Boolean = true,
     val messageEditTextEnabled: Boolean = true,
     val sendMessageButtonState: ButtonState = ButtonState.DISABLE,
-    val showMessageLimitError: Boolean = false
+    val showMessageLimitError: Boolean = false,
+    val showSendMessageGroup: Boolean = true
 ) {
     enum class ButtonState {
         NORMAL,

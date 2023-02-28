@@ -121,7 +121,7 @@ class MessageCenterView(
             controller?.onCheckMessagesClicked()
         }
         messageView.setOnSendMessageButtonClickListener {
-            controller?.onSendMessageClicked(it)
+            controller?.onSendMessageClicked()
         }
         messageView.setOnAttachmentButtonClickListener {
             controller?.onAddAttachmentButtonClicked()
@@ -175,7 +175,6 @@ class MessageCenterView(
     }
 
     private fun showUnexpectedErrorDialog() {
-        messageView.hideSendMessageGroup()
         alertDialog = Dialogs.showAlertDialog(
             this.context,
             theme,
@@ -187,9 +186,7 @@ class MessageCenterView(
     }
 
     private fun showMessageCenterUnavailableDialog() {
-        alertDialog = Dialogs.showMessageCenterUnavailableDialog(this.context, theme) {
-            messageView.hideSendMessageGroup()
-        }
+        alertDialog = Dialogs.showMessageCenterUnavailableDialog(this.context, theme)
     }
 
     override fun showConfirmationScreen() {
@@ -214,7 +211,9 @@ class MessageCenterView(
     }
 
     override fun onStateUpdated(state: State) {
-        messageView.onStateUpdated(state)
+        binding.root.post {
+            messageView.onStateUpdated(state)
+        }
     }
 
     override fun emitUploadAttachments(attachments: List<FileAttachment>) {
@@ -265,6 +264,7 @@ class MessageCenterView(
     }
 
     fun onSystemBack() {
+        controller?.onSystemBack()
         clearAndDismissDialogs()
     }
 }

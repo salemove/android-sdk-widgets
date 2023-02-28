@@ -42,7 +42,7 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference
 
-class ActivityWatcherForCallVisualizer(
+internal class ActivityWatcherForCallVisualizer(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
     private val dialogController: DialogController,
@@ -52,6 +52,9 @@ class ActivityWatcherForCallVisualizer(
     companion object {
         private val TAG = ActivityWatcherForCallVisualizer::class.java.simpleName
     }
+
+    private val isGliaActivity: Boolean
+        get() = callVisualizerController.isGliaActivity(resumedActivity)
 
     @VisibleForTesting
     var dialogCallback: DialogController.Callback? = null
@@ -67,11 +70,11 @@ class ActivityWatcherForCallVisualizer(
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
      * @return Currently resumed activity.
      */
-    @VisibleForTesting
-    var resumedActivity: WeakReference<Activity?> = WeakReference(null)
+    private var _resumedActivity: WeakReference<Activity> = WeakReference(null)
+    val resumedActivity: Activity? get() = _resumedActivity.get()
 
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) {
+        if (callVisualizerController.isGliaActivity(activity)) {
             // Call and Chat screens process screen sharing requests on their own
             startMediaProjectionLaunchers.remove(activity::class.simpleName)
             return
@@ -87,9 +90,9 @@ class ActivityWatcherForCallVisualizer(
     }
 
     override fun onActivityResumed(activity: Activity) {
-        resumedActivity = WeakReference(activity)
-        addDialogCallback(resumedActivity)
-        addScreenSharingCallback(resumedActivity)
+        _resumedActivity = WeakReference(activity)
+        addDialogCallback()
+        addScreenSharingCallback()
         val gliaOrRootView: View? = getGliaViewOrRootView(activity)
         serviceChatHeadController.onResume(gliaOrRootView)
     }
@@ -105,7 +108,7 @@ class ActivityWatcherForCallVisualizer(
     }
 
     override fun onActivityPaused(activity: Activity) {
-        resumedActivity.clear()
+        _resumedActivity.clear()
         removeDialogCallback()
         removeScreenSharingCallback()
         val gliaOrRootView: View? = getGliaViewOrRootView(activity)
@@ -122,7 +125,7 @@ class ActivityWatcherForCallVisualizer(
     fun registerForMediaProjectionPermissionResult(activity: Activity) {
         // Request a token that grants the app the ability to capture the display contents
         // See https://developer.android.com/guide/topics/large-screens/media-projection
-        val componentActivity = activity as? ComponentActivity?
+        val componentActivity = activity as? ComponentActivity
         if (componentActivity == null) {
             Logger.d(
                 TAG, "Activity does not support ActivityResultRegistry APIs, " +
@@ -153,11 +156,11 @@ class ActivityWatcherForCallVisualizer(
         activity::class.simpleName?.let { startMediaProjectionLaunchers.put(it, launcher) }
     }
 
-    private fun addDialogCallback(resumedActivity: WeakReference<Activity?>) {
+    private fun addDialogCallback() {
         // There are separate dialog callbacks for incoming media requests on Call and Chat screens.
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity.get())) return
+        if (isGliaActivity) return
 
-        setupDialogCallback(resumedActivity)
+        setupDialogCallback()
         dialogController.addCallback(dialogCallback)
     }
 
@@ -165,12 +168,12 @@ class ActivityWatcherForCallVisualizer(
         dialogController.removeCallback(dialogCallback)
     }
 
-    private fun addScreenSharingCallback(resumedActivity: WeakReference<Activity?>) {
+    private fun addScreenSharingCallback() {
         // Call and Chat screens process screen sharing requests on their own.
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(resumedActivity.get())) return
-        val activity = resumedActivity.get() ?: return
+        if (isGliaActivity) return
+        val activity = resumedActivity ?: return
 
-        setupScreenSharingViewCallback(resumedActivity)
+        setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
         screenSharingController.onResume(activity)
     }
@@ -179,8 +182,8 @@ class ActivityWatcherForCallVisualizer(
         screenSharingController.removeViewCallback(screenSharingViewCallback)
     }
 
-    private fun setupScreenSharingViewCallback(resumedActivity: WeakReference<Activity?>) {
-        resumedActivity.get()?.let {
+    private fun setupScreenSharingViewCallback() {
+        resumedActivity?.let {
             screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
                 override fun onScreenSharingRequestError(exception: GliaException?) {
                     exception?.run { showToast(it, exception.debugMessage) }
@@ -198,27 +201,27 @@ class ActivityWatcherForCallVisualizer(
     }
 
     @VisibleForTesting
-    fun setupDialogCallback(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    fun setupDialogCallback() {
+        val activity = resumedActivity ?: return
 
         dialogCallback = DialogController.Callback {
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
                 Dialog.MODE_MEDIA_UPGRADE -> activity.runOnUiThread {
-                    showUpgradeDialog(resumedActivity, it as DialogState.MediaUpgrade)
+                    showUpgradeDialog(it as DialogState.MediaUpgrade)
                 }
                 Dialog.MODE_OVERLAY_PERMISSION -> activity.runOnUiThread {
-                    showOverlayPermissionsDialog(resumedActivity)
+                    showOverlayPermissionsDialog()
                 }
                 Dialog.MODE_START_SCREEN_SHARING -> activity.runOnUiThread {
-                    showScreenSharingDialog(resumedActivity)
+                    showScreenSharingDialog()
                 }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> activity.runOnUiThread {
-                    showAllowNotificationsDialog(resumedActivity)
+                    showAllowNotificationsDialog()
                 }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING ->
                     activity.runOnUiThread {
-                        showAllowScreenSharingNotificationsAndStartSharingDialog(resumedActivity)
+                        showAllowScreenSharingNotificationsAndStartSharingDialog()
                     }
                 Dialog.MODE_VISITOR_CODE ->
                     activity.runOnUiThread {
@@ -231,8 +234,8 @@ class ActivityWatcherForCallVisualizer(
         }
     }
 
-    private fun showOverlayPermissionsDialog(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    private fun showOverlayPermissionsDialog() {
+        val activity = resumedActivity ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
@@ -265,8 +268,8 @@ class ActivityWatcherForCallVisualizer(
             })
     }
 
-    private fun showAllowNotificationsDialog(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    private fun showAllowNotificationsDialog() {
+        val activity = resumedActivity ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
@@ -296,8 +299,8 @@ class ActivityWatcherForCallVisualizer(
         )
     }
 
-    private fun showAllowScreenSharingNotificationsAndStartSharingDialog(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
+        val activity = resumedActivity ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
@@ -345,8 +348,8 @@ class ActivityWatcherForCallVisualizer(
         alertDialog = Dialogs.showVisitorCodeDialog(contextWithStyle, theme)
     }
 
-    private fun showScreenSharingDialog(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    private fun showScreenSharingDialog() {
+        val activity = resumedActivity ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
@@ -387,11 +390,8 @@ class ActivityWatcherForCallVisualizer(
         }
     }
 
-    private fun showUpgradeDialog(
-        resumedActivity: WeakReference<Activity?>,
-        mediaUpgrade: DialogState.MediaUpgrade
-    ) {
-        val activity = resumedActivity.get() ?: return
+    private fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade) {
+        val activity = resumedActivity ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }

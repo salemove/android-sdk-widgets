@@ -8,8 +8,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
-import android.provider.Settings
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -192,6 +192,10 @@ class ActivityWatcherForDialogs(
                     activity.runOnUiThread {
                         showAllowScreenSharingNotificationsAndStartSharingDialog(resumedActivity)
                     }
+                Dialog.MODE_VISITOR_CODE ->
+                    activity.runOnUiThread {
+                        showVisitorCodeDialog(resumedActivity)
+                    }
                 else -> {
                     Logger.d(TAG, "Unexpected dialog mode received")
                 }
@@ -297,6 +301,20 @@ class ActivityWatcherForDialogs(
                 screenSharingController.onScreenSharingDeclined()
             }
         )
+    }
+
+    private fun showVisitorCodeDialog(resumedActivity: WeakReference<Activity?>) {
+        val activity = resumedActivity.get() ?: return
+        if (alertDialog != null && alertDialog!!.isShowing) {
+            return
+        }
+
+        Logger.d(TAG, "Show visitor code dialog")
+        val builder = UiTheme.UiThemeBuilder()
+        val theme = builder.build()
+        val contextWithStyle = prepareContextWithStyle(activity)
+
+        alertDialog = Dialogs.showVisitorCodeDialog(contextWithStyle, theme)
     }
 
     private fun showScreenSharingDialog(resumedActivity: WeakReference<Activity?>) {

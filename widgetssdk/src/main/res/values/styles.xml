@@ -75,6 +75,12 @@
         <item name="operatorPlaceholderIconTintList">?attr/baseLightColor</item>
     </style>
 
+    <style name="Application.Glia.VisitorCode" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:background">@drawable/bg_char_slot</item>
+    </style>
+
     <style name="Application.Glia.Header1" parent="TextAppearance.MaterialComponents.Headline1">
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>

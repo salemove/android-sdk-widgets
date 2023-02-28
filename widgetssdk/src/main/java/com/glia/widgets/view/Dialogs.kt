@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -26,6 +27,7 @@ import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.glia.widgets.GliaWidgets as GliaWidgets
 
 object Dialogs {
     private val alertTheme: AlertTheme?
@@ -63,6 +65,19 @@ object Dialogs {
             ?: tintRes?.let { ContextCompat.getColorStateList(dialog.context, it) }?.also {
                 decorView.backgroundTintList = it
             }
+    }
+
+    private fun showDialogBasedOnView(
+        context: Context,
+        theme: UiTheme,
+        view: VisitorCodeView,
+        cancelable: Boolean
+    ): AlertDialog {
+        return MaterialAlertDialogBuilder(context)
+            .setView(view)
+            .setCancelable(cancelable)
+            .show()
+            .also { setDialogBackground(it, theme.gliaChatBackgroundColor) }
     }
 
     private fun showDialog(
@@ -268,6 +283,30 @@ object Dialogs {
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                     titleIconView.contentDescription =
                         context.getString(R.string.glia_chat_video_icon_content_description)
+                }
+            }
+        }
+    }
+
+    fun showVisitorCodeDialog(
+        context: Context,
+        theme: UiTheme
+    ): AlertDialog {
+        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
+        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
+        val view = GliaWidgets.getCallVisualizer().createVisitorCodeView(context).apply {
+            setClosable(true)
+        }
+        return showDialogBasedOnView(
+            context = context,
+            view = view,
+            theme = theme,
+            cancelable = true
+        ).apply {
+            findViewById<TextView>(R.id.title_view).apply {
+                baseDarkColor?.also {
+                    this?.setTextColor(it)
+                    this?.typeface = fontFamily
                 }
             }
         }

@@ -5,10 +5,9 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
-import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.glia.widgets.R
-import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.UiTheme
+import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
@@ -96,7 +95,7 @@ class EndScreenSharingView (
     }
 
     private fun applyStyle() {
-        val theme = Dependencies.getGliaThemeManager().theme?.endScreenSharingTheme
+        val theme = Dependencies.getGliaThemeManager().theme?.callVisualizerTheme?.endScreenSharingTheme
         binding.appBarView.applyHeaderTheme(theme?.header)
         binding.endSharingButton.applyButtonTheme(theme?.endButton)
         binding.screenSharingLabel.applyTextTheme(theme?.label)

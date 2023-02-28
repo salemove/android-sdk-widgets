@@ -4,7 +4,9 @@ import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.callvisualizer.EndScreenSharingContract;
 import com.glia.widgets.callvisualizer.EndScreenSharingController;
+import com.glia.widgets.callvisualizer.VisitorCodeContract;
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
+import com.glia.widgets.callvisualizer.controller.VisitorCodeController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -293,7 +295,11 @@ public class ControllerFactory {
         return new MessageCenterController();
     }
 
-    public EndScreenSharingContract.Controller getScreenSharingViewController() {
+    public EndScreenSharingContract.Controller getEndScreenSharingController() {
         return new EndScreenSharingController();
+    }
+
+    public VisitorCodeContract.Controller getVisitorCodeController() {
+        return new VisitorCodeController(dialogController);
     }
 }

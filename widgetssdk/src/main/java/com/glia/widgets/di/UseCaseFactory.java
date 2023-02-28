@@ -18,6 +18,7 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
@@ -81,6 +82,7 @@ public class UseCaseFactory {
     private static ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
     private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
+    private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
 
     private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
     private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
@@ -146,6 +148,15 @@ public class UseCaseFactory {
             );
         }
         return resolveChatHeadNavigationUseCase;
+    }
+
+    public VisitorCodeViewBuilderUseCase getVisitorCodeViewBuilderUseCase() {
+        if (visitorCodeViewBuilderUseCase == null) {
+            visitorCodeViewBuilderUseCase = new VisitorCodeViewBuilderUseCase(
+                    repositoryFactory.getVisitorCodeRepository()
+            );
+        }
+        return visitorCodeViewBuilderUseCase;
     }
 
     public ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase() {

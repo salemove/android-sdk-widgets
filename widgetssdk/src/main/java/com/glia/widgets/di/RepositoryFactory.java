@@ -5,6 +5,7 @@ import com.glia.widgets.chat.data.ChatScreenRepository;
 import com.glia.widgets.chat.data.ChatScreenRepositoryImpl;
 import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
@@ -36,6 +37,7 @@ public class RepositoryFactory {
     private static FileAttachmentRepository fileAttachmentRepository;
     private static GliaOperatorRepository operatorRepository;
     private CallVisualizerRepository callVisualizerRepository;
+    private static VisitorCodeRepository visitorCodeRepository;
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
@@ -160,5 +162,12 @@ public class RepositoryFactory {
         }
 
         return callVisualizerRepository;
+    }
+
+    public VisitorCodeRepository getVisitorCodeRepository() {
+        if (visitorCodeRepository == null) {
+            visitorCodeRepository = new VisitorCodeRepository(gliaCore);
+        }
+        return visitorCodeRepository;
     }
 }

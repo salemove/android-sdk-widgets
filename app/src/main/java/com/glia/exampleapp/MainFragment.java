@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -37,6 +38,7 @@ import com.glia.widgets.callvisualizer.EndScreenSharingActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
+import com.glia.widgets.view.VisitorCodeView;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
@@ -60,7 +62,8 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.containerView = (ConstraintLayout) view;
+
+        this.containerView = view.findViewById(R.id.constraint_layout);
         NavController navController = NavHostFragment.findNavController(this);
         setupAuthButtonsVisibility();
         view.findViewById(R.id.settings_button).setOnClickListener(view1 ->
@@ -83,6 +86,8 @@ public class MainFragment extends Fragment {
                 deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
                 clearSession());
+        view.findViewById(R.id.visitor_code_button).setOnClickListener(v ->
+                showVisitorCode());
     }
 
     @Override
@@ -369,6 +374,18 @@ public class MainFragment extends Fragment {
     private void clearSession() {
         GliaWidgets.clearVisitorSession();
         setupAuthButtonsVisibility();
+    }
+
+    private void showVisitorCode() {
+        GliaWidgets.getCallVisualizer().showVisitorCodeDialog(getContext());
+    }
+
+    // For testing the integrated Visitor Code solution
+    private void showVisitorCodeInADedicatedView() {
+        VisitorCodeView visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(getContext());
+        CardView cv = containerView.findViewById(R.id.container);
+        cv.addView(visitorCodeView);
+        cv.setVisibility(View.VISIBLE);
     }
 
     private void showToast(String message) {

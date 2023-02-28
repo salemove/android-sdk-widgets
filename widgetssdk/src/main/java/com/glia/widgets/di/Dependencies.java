@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.Lifecycle;
 
+import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
@@ -27,6 +28,7 @@ public class Dependencies {
 
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
+    private static CallVisualizerManager callVisualizerManager;
     private static GliaSdkConfigurationManager sdkConfigurationManager =
             new GliaSdkConfigurationManager();
     private static UseCaseFactory useCaseFactory;
@@ -66,6 +68,7 @@ public class Dependencies {
                 controllerFactory.getDialogController());
         application.registerActivityLifecycleCallbacks(activityWatcherForDialogs);
         resourceProvider = new ResourceProvider(application.getBaseContext());
+        callVisualizerManager = new CallVisualizerManager(useCaseFactory.getVisitorCodeViewBuilderUseCase());
     }
 
     public static UseCaseFactory getUseCaseFactory() {
@@ -96,6 +99,10 @@ public class Dependencies {
 
     public static GliaCore glia() {
         return gliaCore;
+    }
+
+    public static CallVisualizerManager getCallVisualizerManager() {
+        return callVisualizerManager;
     }
 
     @VisibleForTesting

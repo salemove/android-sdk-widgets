@@ -17,7 +17,7 @@ class EndScreenSharingActivity : AppCompatActivity(), EndScreenSharingView.OnFin
         val screenSharingView = binding.screenSharingScreenView
         screenSharingView.onFinishListener = this
 
-        val controller = Dependencies.getControllerFactory().screenSharingViewController
+        val controller = Dependencies.getControllerFactory().endScreenSharingController
         screenSharingView.setController(controller)
     }
 

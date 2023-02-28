@@ -233,4 +233,7 @@
     <string name="call_visualizer_label">Your Screen is Being Shared</string>
     <string name="call_visualizer_button">End Screen Sharing</string>
 
+    <!-- Visitor Code View -->
+    <string name="glia_visitor_code_view_title">Your Visitor Code</string>
+
 </resources>

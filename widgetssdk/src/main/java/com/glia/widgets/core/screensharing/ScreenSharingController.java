@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ScreenSharingController implements GliaScreenSharingCallback {
-    private static final String TAG = "ScreenSharingController";
+    private static final String TAG = ScreenSharingController.class.getSimpleName();
 
     private final GliaScreenSharingRepository repository;
     private final DialogController dialogController;

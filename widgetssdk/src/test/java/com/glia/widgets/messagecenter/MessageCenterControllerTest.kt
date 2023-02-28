@@ -2,13 +2,14 @@ package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
+import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.mockito.kotlin.*
 
 internal class MessageCenterControllerTest {
@@ -20,6 +21,7 @@ internal class MessageCenterControllerTest {
     private lateinit var getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase
     private lateinit var removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase
     private lateinit var removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase
+    private lateinit var siteInfoUseCase: SiteInfoUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var viewContract: MessageCenterContract.View
     private lateinit var dialogController: DialogController
@@ -33,14 +35,23 @@ internal class MessageCenterControllerTest {
         getFileAttachmentsUseCase = mock()
         removeFileAttachmentObserverUseCase = mock()
         removeFileAttachmentUseCase = mock()
+        siteInfoUseCase = mock()
         viewContract = mock()
         isAuthenticatedUseCase = mock()
         dialogController = mock()
         messageCenterController =
-            MessageCenterController(sendSecureMessageUseCase, isMessageCenterAvailableUseCase,
-                addFileAttachmentsObserverUseCase, addFileToAttachmentAndUploadUseCase,
-                getFileAttachmentsUseCase, removeFileAttachmentObserverUseCase,
-                removeFileAttachmentUseCase, isAuthenticatedUseCase, dialogController)
+            MessageCenterController(
+                sendSecureMessageUseCase = sendSecureMessageUseCase,
+                isMessageCenterAvailableUseCase = isMessageCenterAvailableUseCase,
+                addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
+                addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
+                getFileAttachmentsUseCase = getFileAttachmentsUseCase,
+                removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase,
+                removeFileAttachmentUseCase = removeFileAttachmentUseCase,
+                isAuthenticatedUseCase = isAuthenticatedUseCase,
+                siteInfoUseCase = siteInfoUseCase,
+                dialogController = dialogController
+            )
     }
 
     @Test

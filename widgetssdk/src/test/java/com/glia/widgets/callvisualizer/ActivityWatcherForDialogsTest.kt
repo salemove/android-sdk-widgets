@@ -1,24 +1,23 @@
 package com.glia.widgets.callvisualizer
 
-import android.app.Activity
+import android.content.Intent
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
-import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
+import com.glia.widgets.callvisualizer.domain.IsGliaActivityUseCase
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.screensharing.ScreenSharingController
 import junit.framework.TestCase.assertNull
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import java.lang.ref.WeakReference
 
 internal class ActivityWatcherForDialogsTest {
 
@@ -26,41 +25,41 @@ internal class ActivityWatcherForDialogsTest {
 
     @Before
     fun setUp() {
-        val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
-        val dialogController = mock(DialogController::class.java)
+        val dialogController: DialogController = mock()
         val callVisualizerController = CallVisualizerController(
-            callVisualizerRepository,
+            mock(),
             dialogController,
-            IsCallOrChatScreenActiveUseCase()
+            IsGliaActivityUseCase()
         )
-        val screenSharingController = mock(ScreenSharingController::class.java)
         activityWatcherForDialogs = ActivityWatcherForDialogs(
             callVisualizerController,
-            screenSharingController,
+            mock(),
             dialogController
         )
-        activityWatcherForDialogs.alertDialog = mock(androidx.appcompat.app.AlertDialog::class.java)
-        activityWatcherForDialogs.setupDialogCallback(WeakReference(mock(Activity::class.java)))
+        activityWatcherForDialogs.alertDialog = mock()
+        activityWatcherForDialogs.onActivityResumed(mock())
+        activityWatcherForDialogs.setupDialogCallback()
     }
 
     @Test
     fun resumedActivity_cleared_whenActivityPaused() {
-        activityWatcherForDialogs.onActivityResumed(mock(Activity::class.java))
-        activityWatcherForDialogs.onActivityPaused(mock(Activity::class.java))
+        activityWatcherForDialogs.onActivityResumed(mock())
+        activityWatcherForDialogs.onActivityPaused(mock())
 
-        assertNull(activityWatcherForDialogs.resumedActivity.get())
+        assertNull(activityWatcherForDialogs.resumedActivity)
     }
 
     @Test
     fun resumedActivity_saved_whenActivityResumed() {
-        activityWatcherForDialogs.onActivityResumed(mock(Activity::class.java))
+        activityWatcherForDialogs.onActivityResumed(mock())
 
-        assertNotNull(activityWatcherForDialogs.resumedActivity.get())
+        assertNotNull(activityWatcherForDialogs.resumedActivity)
     }
 
     @Test
     fun alertDialog_dismissed_whenEmitDialogStateModeNone() {
         activityWatcherForDialogs.dialogCallback?.emitDialogState(DialogState(Dialog.MODE_NONE))
+
 
         assertNull(activityWatcherForDialogs.alertDialog)
     }
@@ -101,16 +100,8 @@ internal class ActivityWatcherForDialogsTest {
     }
 
     @Test
-    fun mediaProjectionObjects_null_whenChatActivity() {
-        val activity = mock(ChatActivity::class.java)
-        activityWatcherForDialogs.onActivityPreCreated(activity, null)
-
-        assertNull(activityWatcherForDialogs.startMediaProjection)
-    }
-
-    @Test
-    fun mediaProjectionObjects_null_whenCallActivity() {
-        val activity = mock(CallActivity::class.java)
+    fun mediaProjectionObjects_null_whenGliaActivity() {
+        val activity: ChatActivity = mock()
         activityWatcherForDialogs.onActivityPreCreated(activity, null)
 
         assertNull(activityWatcherForDialogs.startMediaProjection)
@@ -118,22 +109,28 @@ internal class ActivityWatcherForDialogsTest {
 
     @Test
     fun mediaProjectionObjects_creation_whenComponentActivity() {
-        val activity = mock(ComponentActivity::class.java)
+        val activity: ComponentActivity = mock()
         activityWatcherForDialogs.registerForMediaProjectionPermissionResult(activity)
 
-        verify(activity, times(1)).registerForActivityResult(
-            any(ActivityResultContract::class.java),
+        verify(
+            activity,
+            times(1)
+        ).registerForActivityResult<ActivityResultContracts.StartActivityForResult, Intent>(
+            any(),
             any()
         )
     }
 
     @Test
     fun mediaProjectionObjects_creation_whenComponentActivitySubclass() {
-        val activity = mock(FragmentActivity::class.java)
+        val activity: FragmentActivity = mock()
         activityWatcherForDialogs.registerForMediaProjectionPermissionResult(activity)
 
-        verify(activity, times(1)).registerForActivityResult(
-            any(ActivityResultContract::class.java),
+        verify(
+            activity,
+            times(1)
+        ).registerForActivityResult<ActivityResultContracts.StartActivityForResult, Intent>(
+            any(),
             any()
         )
     }

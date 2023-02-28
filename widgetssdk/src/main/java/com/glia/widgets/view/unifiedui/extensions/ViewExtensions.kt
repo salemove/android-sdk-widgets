@@ -207,7 +207,7 @@ internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
 
 internal fun View.changeStatusBarColor(color: Int?) {
     color?.run {
-        Utils.getActivity(context).window.statusBarColor = this
+        Utils.getActivity(context)?.window?.statusBarColor = this
     }
 }
 

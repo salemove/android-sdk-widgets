@@ -303,10 +303,13 @@ public class ControllerFactory {
                 useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),
                 useCaseFactory.createAddSecureFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createGetSecureFileAttachmentsUseCase(),
-                useCaseFactory.createRemoveSecureFileAttachmentObserverUseCase(),
                 useCaseFactory.createRemoveSecureFileAttachmentUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase(),
                 useCaseFactory.createSiteInfoUseCase(),
+                useCaseFactory.createOnNextMessageUseCase(),
+                useCaseFactory.createEnableSendMessageButtonUseCase(),
+                useCaseFactory.createShowMessageLimitErrorUseCase(),
+                useCaseFactory.createResetMessageCenterUseCase(),
                 dialogController
         );
     }

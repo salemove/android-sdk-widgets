@@ -14,7 +14,7 @@ import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCa
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import com.glia.widgets.helper.Logger
-import java.util.*
+import io.reactivex.disposables.CompositeDisposable
 
 internal class MessageCenterController(
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
@@ -22,18 +22,20 @@ internal class MessageCenterController(
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddSecureFileToAttachmentAndUploadUseCase,
     private val getFileAttachmentsUseCase: GetSecureFileAttachmentsUseCase,
-    private val removeFileAttachmentObserverUseCase: RemoveSecureFileAttachmentObserverUseCase,
     private val removeFileAttachmentUseCase: RemoveSecureFileAttachmentUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val siteInfoUseCase: SiteInfoUseCase,
+    private val onNextMessageUseCase: OnNextMessageUseCase,
+    private val sendMessageButtonStateUseCase: SendMessageButtonStateUseCase,
+    private val showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase,
+    private val resetMessageCenterUseCase: ResetMessageCenterUseCase,
     private val dialogController: DialogController
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
-    private var state = State()
+    private val disposables = CompositeDisposable()
 
-    private val fileAttachmentObserver = Observer { _, _ ->
-        view?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
-    }
+    @Volatile
+    private var state = State()
 
     override var photoCaptureFileUri: Uri? = null
 
@@ -48,11 +50,20 @@ internal class MessageCenterController(
     }
 
     private fun initComponents() {
-        addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         setState(state)
 
-        view?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
+        view?.emitUploadAttachments(getFileAttachmentsUseCase())
         view?.setupViewAppearance()
+
+        disposables.add(addFileAttachmentsObserverUseCase().subscribe {
+            view?.emitUploadAttachments(it)
+        })
+        disposables.add(showMessageLimitErrorUseCase().subscribe {
+            setState(state.copy(showMessageLimitError = it))
+        })
+        disposables.add(sendMessageButtonStateUseCase().subscribe {
+            setState(state.copy(sendMessageButtonState = it))
+        })
 
         updateAllowFileSendState()
     }
@@ -70,38 +81,24 @@ internal class MessageCenterController(
 
     override fun onCheckMessagesClicked() {
         view?.navigateToMessaging()
+        reset()
     }
 
     override fun onMessageChanged(message: String) {
-        val showLimitError = message.count() > MAX_MESSAGE_LENGTH
-        if (state.showMessageLimitError != showLimitError) {
-            setState(state.copy(showMessageLimitError = showLimitError))
-        }
-
-        val sendButtonState = if (message.isEmpty() || showLimitError) {
-            State.ButtonState.DISABLE
-        } else {
-            State.ButtonState.NORMAL
-        }
-        if (state.sendMessageButtonState != sendButtonState) {
-            setState(state.copy(sendMessageButtonState = sendButtonState))
-        }
+        onNextMessageUseCase(message)
     }
 
-    override fun onSendMessageClicked(message: String) {
+    override fun onSendMessageClicked() {
         setState(
             state.copy(
-                sendMessageButtonState = State.ButtonState.PROGRESS,
                 messageEditTextEnabled = false,
                 addAttachmentButtonEnabled = false
             )
         )
         view?.hideSoftKeyboard()
-        val callback =
-            RequestCallback { _: VisitorMessage?, gliaException: GliaException? ->
-                handleSendMessageResult(gliaException)
-            }
-        sendSecureMessageUseCase.execute(message, callback)
+        sendSecureMessageUseCase { _: VisitorMessage?, gliaException: GliaException? ->
+            handleSendMessageResult(gliaException)
+        }
     }
 
     @VisibleForTesting
@@ -110,13 +107,18 @@ internal class MessageCenterController(
             view?.showConfirmationScreen()
         } else {
             when (gliaException.cause) {
-                GliaException.Cause.AUTHENTICATION_ERROR -> dialogController.showMessageCenterUnavailableDialog()
-                GliaException.Cause.INTERNAL_ERROR -> dialogController.showUnexpectedErrorDialog()
+                GliaException.Cause.AUTHENTICATION_ERROR -> {
+                    dialogController.showMessageCenterUnavailableDialog()
+                    setState(state.copy(showSendMessageGroup = false))
+                }
+                GliaException.Cause.INTERNAL_ERROR -> {
+                    dialogController.showUnexpectedErrorDialog()
+                    setState(state.copy(showSendMessageGroup = false))
+                }
                 else -> {
                     dialogController.showUnexpectedErrorDialog()
                     setState(
                         state.copy(
-                            sendMessageButtonState = State.ButtonState.NORMAL,
                             messageEditTextEnabled = true,
                             addAttachmentButtonEnabled = true
                         )
@@ -128,6 +130,11 @@ internal class MessageCenterController(
 
     override fun onCloseButtonClicked() {
         view?.finish()
+        reset()
+    }
+
+    override fun onSystemBack() {
+        reset()
     }
 
     override fun onAddAttachmentButtonClicked() {
@@ -149,8 +156,14 @@ internal class MessageCenterController(
     override fun ensureMessageCenterAvailability() {
         isMessageCenterAvailableUseCase(RequestCallback { isAvailable, exception ->
             when {
-                exception != null -> dialogController.showUnexpectedErrorDialog()
-                !isAvailable -> dialogController.showMessageCenterUnavailableDialog()
+                exception != null -> {
+                    dialogController.showUnexpectedErrorDialog()
+                    setState(state.copy(showSendMessageGroup = false))
+                }
+                !isAvailable -> {
+                    dialogController.showMessageCenterUnavailableDialog()
+                    setState(state.copy(showSendMessageGroup = false))
+                }
                 else -> Logger.d(TAG, "Message center is available")
             }
         })
@@ -188,18 +201,21 @@ internal class MessageCenterController(
 
     override fun onDestroy() {
         isMessageCenterAvailableUseCase.dispose()
-        removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
+        disposables.dispose()
     }
 
+    @Synchronized
     private fun setState(state: State) {
         this.state = state
         this.view?.onStateUpdated(state)
     }
 
+    private fun reset() {
+        resetMessageCenterUseCase()
+    }
+
     companion object {
         private const val TAG = "MessageCenterController"
-
-        private const val MAX_MESSAGE_LENGTH = 10000
 
         private const val FILE_TYPE_IMAGES = "image/*"
         private const val FILE_TYPE_ALL = "*/*"

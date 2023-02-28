@@ -48,12 +48,15 @@ import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCal
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
+import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
@@ -438,6 +441,38 @@ public class UseCaseFactory {
     }
 
     @NonNull
+    public OnNextMessageUseCase createOnNextMessageUseCase() {
+        return new OnNextMessageUseCase(repositoryFactory.getSendMessageRepository());
+    }
+
+    @NonNull
+    public SendMessageButtonStateUseCase createEnableSendMessageButtonUseCase() {
+        return new SendMessageButtonStateUseCase(
+                repositoryFactory.getSendMessageRepository(),
+                repositoryFactory.getSecureFileAttachmentRepository(),
+                repositoryFactory.getSecureConversationsRepository(),
+                createShowMessageLimitErrorUseCase(),
+                schedulers
+        );
+    }
+
+    @NonNull
+    public ShowMessageLimitErrorUseCase createShowMessageLimitErrorUseCase() {
+        return new ShowMessageLimitErrorUseCase(
+                repositoryFactory.getSendMessageRepository(),
+                schedulers
+        );
+    }
+
+    @NonNull
+    public ResetMessageCenterUseCase createResetMessageCenterUseCase() {
+        return new ResetMessageCenterUseCase(
+                repositoryFactory.getSecureFileAttachmentRepository(),
+                repositoryFactory.getSendMessageRepository()
+        );
+    }
+
+    @NonNull
     public SiteInfoUseCase createSiteInfoUseCase() {
         return new SiteInfoUseCase(repositoryFactory.getGliaEngagementRepository());
     }
@@ -562,6 +597,7 @@ public class UseCaseFactory {
     public SendSecureMessageUseCase createSendSecureMessageUseCase(String queueId) {
         return new SendSecureMessageUseCase(
                 queueId,
+                repositoryFactory.getSendMessageRepository(),
                 repositoryFactory.getSecureConversationsRepository(),
                 repositoryFactory.getSecureFileAttachmentRepository());
     }
@@ -578,17 +614,15 @@ public class UseCaseFactory {
 
     @NonNull
     public AddSecureFileAttachmentsObserverUseCase createAddSecureFileAttachmentsObserverUseCase() {
-        return new AddSecureFileAttachmentsObserverUseCase(repositoryFactory.getSecureFileAttachmentRepository());
+        return new AddSecureFileAttachmentsObserverUseCase(
+                repositoryFactory.getSecureFileAttachmentRepository(),
+                schedulers
+        );
     }
 
     @NonNull
     public GetSecureFileAttachmentsUseCase createGetSecureFileAttachmentsUseCase() {
         return new GetSecureFileAttachmentsUseCase(repositoryFactory.getSecureFileAttachmentRepository());
-    }
-
-    @NonNull
-    public RemoveSecureFileAttachmentObserverUseCase createRemoveSecureFileAttachmentObserverUseCase() {
-        return new RemoveSecureFileAttachmentObserverUseCase(repositoryFactory.getSecureFileAttachmentRepository());
     }
 
     @NonNull

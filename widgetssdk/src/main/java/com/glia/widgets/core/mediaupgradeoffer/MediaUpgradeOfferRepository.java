@@ -8,13 +8,15 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class MediaUpgradeOfferRepository {
     private final static String TAG = "MediaUpgradeOfferRepository";
 
-    private final List<MediaUpgradeOfferRepositoryCallback> callbacks = new ArrayList<>();
+    private final Set<MediaUpgradeOfferRepositoryCallback> callbacks = new HashSet<>();
     private final Consumer<MediaUpgradeOffer> upgradeOfferConsumer = offer -> {
         Logger.d(TAG, "upgradeOfferConsumer, offer: " + offer.toString());
         for (MediaUpgradeOfferRepositoryCallback callback : callbacks) {

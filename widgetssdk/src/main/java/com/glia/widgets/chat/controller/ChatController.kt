@@ -178,6 +178,7 @@ class ChatController(
         loadChatHistory()
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         initMediaUpgradeCallback()
+        mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback)
         minimizeHandler.addListener { minimizeView() }
         createNewTimerCallback()
         callTimer.addFormattedValueListener(timerStatusListener)

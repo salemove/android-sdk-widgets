@@ -11,7 +11,7 @@ import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
@@ -30,9 +30,9 @@ class EndScreenSharingView (
     var onFinishListener: OnFinishListener? = null
     private var controller: EndScreenSharingContract.Controller? = null
     private var uiTheme: UiTheme by Delegates.notNull()
-    private var defaultStatusBarColor: Int by Delegates.notNull()
     private var statusBarColor: Int by Delegates.notNull()
     private var screenSharingController: ScreenSharingController? = null
+    private var defaultStatusBarColor: Int? = null
 
     private val binding: EndScreenSharingViewBinding by lazy {
         EndScreenSharingViewBinding.inflate(layoutInflater, this)
@@ -61,7 +61,7 @@ class EndScreenSharingView (
         uiTheme.brandPrimaryColor?.let(::getColorCompat)?.also {
             statusBarColor = it
             changeStatusBarColor(it)
-            defaultStatusBarColor = Utils.getActivity(context).window.statusBarColor
+            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
         }
         binding.appBarView.setTheme(uiTheme)
     }

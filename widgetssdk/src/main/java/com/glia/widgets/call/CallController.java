@@ -249,6 +249,7 @@ public class CallController implements
                         )
         );
         onEngagementEndUseCase.execute(this);
+        mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
         connectingTimerCounter.addRawValueListener(connectingTimerStatusListener);
         minimizeHandler.addListener(this::minimizeView);
@@ -347,7 +348,9 @@ public class CallController implements
 
         surveyUseCase.registerListener(this);
         subscribeToEngagementStateChange();
-        addMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
+        if (mediaUpgradeOfferRepositoryCallback != null) {
+            addMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
+        }
     }
 
     public void chatButtonClicked() {

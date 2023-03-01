@@ -1,44 +1,47 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.data.GliaChatRepository
-import com.glia.widgets.chat.data.GliaChatRepository.HistoryLoadedListener
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
+import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.SingleEmitter
 
-class GliaLoadHistoryUseCase(
+internal class GliaLoadHistoryUseCase(
     private val gliaChatRepository: GliaChatRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
-    private val mapOperatorUseCase: MapOperatorUseCase
+    private val mapOperatorUseCase: MapOperatorUseCase,
+    private val getUnreadMessagesCountUseCase: GetUnreadMessagesCountWithTimeoutUseCase
 ) {
 
-    fun execute(): Single<List<ChatMessageInternal>> {
-        return loadHistory()
-            .flatMapPublisher { Flowable.fromIterable(it.asIterable()) }
-            .concatMapSingle(mapOperatorUseCase::execute)
-            .toSortedList(Comparator.comparingLong { o: ChatMessageInternal ->
-                o.chatMessage.timestamp
-            })
+    private val isSecureEngagement get() = isSecureEngagementUseCase()
+
+    fun execute(): Single<ChatHistoryResponse> = if (isSecureEngagement) {
+        loadHistoryWithNewMessagesCount()
+    } else {
+        loadHistoryAndMapOperator().map { ChatHistoryResponse(it) }
     }
 
-    private fun loadHistory() = Single.create { emitter: SingleEmitter<Array<ChatMessage>> ->
-        loadHistory { messages: Array<ChatMessage>, error: Throwable? ->
-            if (error != null) {
-                emitter.onError(error)
-            } else {
-                emitter.onSuccess(messages)
-            }
+    private fun loadHistoryWithNewMessagesCount() = Single.zip(
+        loadHistoryAndMapOperator(), getUnreadMessagesCountUseCase()
+    ) { messages, count -> ChatHistoryResponse(messages, count) }
+
+    private fun loadHistoryAndMapOperator() = loadHistory()
+        .flatMapPublisher { Flowable.fromArray(*it) }
+        .concatMapSingle(mapOperatorUseCase::execute)
+        .toSortedList(Comparator.comparingLong { o -> o.chatMessage.timestamp })
+
+    private fun loadHistory() = Single.create { emitter ->
+        loadHistory { messages, error ->
+            error?.also { emitter.onError(it) } ?: emitter.onSuccess(messages)
         }
     }
 
-    private fun loadHistory(listener: HistoryLoadedListener) {
-        if (isSecureEngagementUseCase()) {
+    private fun loadHistory(listener: GliaChatRepository.HistoryLoadedListener) {
+        if (isSecureEngagement) {
             secureConversationsRepository.fetchChatTranscript(listener)
         } else {
             gliaChatRepository.loadHistory(listener)

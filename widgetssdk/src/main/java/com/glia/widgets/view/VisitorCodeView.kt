@@ -23,11 +23,13 @@ import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
+import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 
 /**
- * TODO: add doc in MOB-1816
- * TODO: N.B: this view is not expected to be used by integrator or view XML
- * TODO: Test what will happen if I add it to XML regardless
+ * A view for displaying the visitor code to the visitor.
+ *
+ * This view should not be instantiated directly - neither programmatically nor inside your XML layouts.
+ * Use [CallVisualizer.createVisitorCodeView] to create an instance of this view.
  */
 class VisitorCodeView internal constructor(
     context: Context

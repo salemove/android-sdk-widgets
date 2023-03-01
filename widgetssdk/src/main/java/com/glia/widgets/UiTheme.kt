@@ -139,19 +139,19 @@ data class UiTheme(
     val gliaChatHeaderExitQueueButtonTintColor: Int? = null,
 
     /**
-     * TODO: MOB-1896
+     * Color for Visitor Code numbers
      */
     @ColorRes
     val visitorCodeTextColor: Int? = null,
 
     /**
-     * TODO: MOB-1896
+     * Color for Visitor Code number slots background
      */
     @ColorRes
     val visitorCodeBackgroundColor: Int? = null,
 
     /**
-     * TODO: MOB-1896
+     * Color for Visitor Code number slots border
      */
     @ColorRes
     val visitorCodeBorderColor: Int? = null,

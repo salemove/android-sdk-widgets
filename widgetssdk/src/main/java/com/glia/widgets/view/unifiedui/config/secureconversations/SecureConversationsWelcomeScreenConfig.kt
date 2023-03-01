@@ -1,10 +1,6 @@
 package com.glia.widgets.view.unifiedui.config.secureconversations
 
 import com.glia.widgets.view.unifiedui.config.base.*
-import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceListRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.FileUploadBarRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
@@ -39,11 +35,11 @@ internal data class SecureConversationsWelcomeScreenConfig(
     val loadingSendButtonRemoteConfig: ButtonRemoteConfig?,
     @SerializedName("activityIndicatorColor")
     val activityIndicatorColorLayerRemoteConfig: ColorLayerRemoteConfig?,
-@SerializedName("messageWarning")
+    @SerializedName("messageWarning")
     val messageWarningRemoteConfig: TextRemoteConfig?,
-@SerializedName("messageWarningIconColor")
+    @SerializedName("messageWarningIconColor")
     val messageWarningIconColorLayerRemoteConfig: ColorLayerRemoteConfig?,
-@SerializedName("filePickerButton")
+    @SerializedName("filePickerButton")
     val filePickerButtonRemoteConfig: ColorLayerRemoteConfig?,
     @SerializedName("filePickerButtonDisabled")
     val filePickerButtonDisabledRemoteConfig: ColorLayerRemoteConfig?,

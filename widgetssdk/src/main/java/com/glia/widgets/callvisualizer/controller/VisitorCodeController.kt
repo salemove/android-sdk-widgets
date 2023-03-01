@@ -1,18 +1,43 @@
 package com.glia.widgets.callvisualizer.controller
 
 import com.glia.widgets.callvisualizer.VisitorCodeContract
+import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.core.dialog.DialogController
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
-class VisitorCodeController(private val dialogController: DialogController) : VisitorCodeContract.Controller {
+class VisitorCodeController(
+    private val dialogController: DialogController,
+    private val visitorCodeRepository: VisitorCodeRepository
+    ) : VisitorCodeContract.Controller {
 
-    private var view: VisitorCodeContract.View? = null
+    private var disposable: Disposable? = null
+
+    private lateinit var view: VisitorCodeContract.View
 
     override fun setView(view: VisitorCodeContract.View) {
         this.view = view
+        this.view.onSetupComplete()
     }
 
     override fun onCloseButtonClicked() {
         dialogController.dismissCurrentDialog()
+    }
+
+    override fun onLoadVisitorCode() {
+        view.startLoading()
+        disposable = visitorCodeRepository.getVisitorCode()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { visitorCode ->
+                    view.onVisitorCode(visitorCode)
+                },
+                { error ->
+                    view.onError(error)
+                }
+            )
     }
 
     override fun onDestroy() {}

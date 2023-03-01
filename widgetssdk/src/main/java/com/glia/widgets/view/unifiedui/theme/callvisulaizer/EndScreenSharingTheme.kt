@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.theme.endscreenshare
+package com.glia.widgets.view.unifiedui.theme.callvisulaizer
 
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme

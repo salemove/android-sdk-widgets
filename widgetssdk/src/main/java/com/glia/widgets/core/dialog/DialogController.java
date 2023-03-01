@@ -75,6 +75,15 @@ public class DialogController {
         dialogManager.addAndEmit(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_VIDEO_ONE_WAY));
     }
 
+    public void showVisitorCodeDialog() {
+        Logger.d(TAG, "Show Visitor Code Dialog");
+        if (isOverlayDialogShown() || isExitQueueDialogShown()) {
+            dialogManager.add(new DialogState(Dialog.MODE_VISITOR_CODE));
+        } else {
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_VISITOR_CODE));
+        }
+    }
+
     public void showNoMoreOperatorsAvailableDialog() {
         Logger.d(TAG, "Show No More Operators Dialog");
         if (isOverlayDialogShown() || isExitQueueDialogShown()) {

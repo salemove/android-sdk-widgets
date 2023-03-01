@@ -28,6 +28,7 @@
         <item name="gliaHeaderEndButtonStyle">
             @style/Application.GliaAndroidSdkWidgetsExample.Header.EndButton
         </item>
+        <item name="gliaBrandPrimaryColor">@color/color_pure_yellow</item>
         <item name="buttonBarNegativeButtonStyle">
             @style/Application.GliaAndroidSdkWidgetsExample.Button.Negative
         </item>
@@ -36,6 +37,9 @@
         </item>
         <item name="choiceCardContentTextStyle">
             @style/Application.GliaAndroidSdkWidgetsExample.ChoiceCard.ContentText
+        </item>
+        <item name="gliaVisitorCodeStyle">
+            @style/TextAppearance.AppCompat
         </item>
 
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>

@@ -4,6 +4,7 @@ import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.google.gson.annotations.SerializedName
 
 internal data class AlertRemoteConfig(

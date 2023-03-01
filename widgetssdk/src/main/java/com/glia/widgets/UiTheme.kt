@@ -139,6 +139,24 @@ data class UiTheme(
     val gliaChatHeaderExitQueueButtonTintColor: Int? = null,
 
     /**
+     * TODO: MOB-1896
+     */
+    @ColorRes
+    val visitorCodeTextColor: Int? = null,
+
+    /**
+     * TODO: MOB-1896
+     */
+    @ColorRes
+    val visitorCodeBackgroundColor: Int? = null,
+
+    /**
+     * TODO: MOB-1896
+     */
+    @ColorRes
+    val visitorCodeBorderColor: Int? = null,
+
+    /**
      * Allow overriding the view's fontFamily
      */
     @FontRes

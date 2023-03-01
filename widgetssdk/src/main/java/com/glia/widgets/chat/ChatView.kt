@@ -443,6 +443,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
+                Dialog.MODE_VISITOR_CODE -> { Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")} // Should never happen inside ChatView
             }
         }
     }

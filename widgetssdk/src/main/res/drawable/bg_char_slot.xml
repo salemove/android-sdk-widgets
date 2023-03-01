@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Important note. This file is used only for default style and in case of compile-time theme changes -->
+    <!-- If doing any changes to this file do not forget to update the CharCodeView.kt programmatic logic also -->
+    <item>
+        <shape
+            android:shape="rectangle">
+            <corners android:radius="@dimen/glia_medium" />
+            <stroke
+                android:width="@dimen/glia_px"
+                android:color="@color/glia_stroke_light" />
+            <padding
+                android:left="@dimen/glia_large"
+                android:right="@dimen/glia_large"
+                android:top="@dimen/glia_small"
+                android:bottom="@dimen/glia_small"/>
+        </shape>
+    </item>
+</layer-list>

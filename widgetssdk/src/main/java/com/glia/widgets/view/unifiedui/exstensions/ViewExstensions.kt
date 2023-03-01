@@ -1,11 +1,14 @@
 package com.glia.widgets.view.unifiedui.exstensions
 
-import android.app.Activity
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.*
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.InsetDrawable
+import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.ShapeDrawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -89,21 +92,22 @@ val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context
 //Unified Ui
 //--------------------------------------------------------------------------------------------------
 internal fun View.applyColorTheme(color: ColorTheme?) {
-    val isGradient = color?.isGradient ?: return
-
-    if (isGradient) {
-        background = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, color.valuesArray)
-    } else {
-        setBackgroundColor(color.primaryColor)
-    }
-
+    background = createBackgroundFromTheme(color ?: return)
     backgroundTintList = null
+}
+
+internal fun View.createBackgroundFromTheme(color: ColorTheme): Drawable {
+    if (color.isGradient) {
+        return GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, color.valuesArray)
+    } else {
+        return ColorDrawable(color.primaryColor)
+    }
 }
 
 /**
  * wii update whole background without keeping old background or stroke
  */
-internal fun View.applyLayerTheme(layer: LayerTheme?) {
+internal fun View.applyLayerTheme(layer: LayerTheme?, padding: Rect? = null) {
     if (layer?.fill == null && layer?.stroke == null) return
 
     val drawable = (background as? GradientDrawable) ?: GradientDrawable()
@@ -129,7 +133,11 @@ internal fun View.applyLayerTheme(layer: LayerTheme?) {
 
     layer.cornerRadius?.also { drawable.cornerRadius = it }
 
-    background = drawable
+    background = padding?.let {
+        LayerDrawable(arrayOf(drawable)).apply {
+            setPadding(padding.left, padding.top, padding.right, padding.bottom)
+        }
+    } ?: drawable
 }
 
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {

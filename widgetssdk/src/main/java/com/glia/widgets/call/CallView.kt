@@ -69,7 +69,7 @@ internal class CallView(
     defStyleAttr,
     defStyleRes
 ), CallViewCallback {
-    private val tag = CallView::class.java.simpleName
+    private val TAG = CallView::class.java.simpleName
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.callTheme
@@ -234,6 +234,7 @@ internal class CallView(
                 Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
+                Dialog.MODE_VISITOR_CODE -> { Logger.e(TAG, "DialogController callback in CallView with MODE_VISITOR_CODE") } // Should never happen inside CallView
             }
         }
         dialogController = Dependencies.getControllerFactory().dialogController
@@ -768,7 +769,7 @@ internal class CallView(
     private fun showOperatorVideo(operatorMediaState: MediaState?) {
         releaseOperatorVideoStream()
         operatorMediaState?.video?.also {
-            Logger.d(tag, "Starting video operator")
+            Logger.d(TAG, "Starting video operator")
             operatorVideoView = it.createVideoView(Utils.getActivity(context))
 
             operatorVideoContainer.apply {

@@ -3,8 +3,9 @@ package com.glia.widgets.view.unifiedui.config
 import com.glia.widgets.view.unifiedui.config.alert.AlertRemoteConfig
 import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.call.CallRemoteConfig
+import com.glia.widgets.view.unifiedui.config.callvisualizer.CallVisualizerConfig
 import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
-import com.glia.widgets.view.unifiedui.config.endscreenshare.EndScreenShareRemoteConfig
+import com.glia.widgets.view.unifiedui.config.callvisualizer.EndScreenShareRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.annotations.SerializedName
@@ -25,8 +26,8 @@ internal data class RemoteConfiguration(
     @SerializedName("alert")
     val alertRemoteConfig: AlertRemoteConfig?,
 
-    @SerializedName("endScreenSharing")
-    val endScreenShareRemoteConfig: EndScreenShareRemoteConfig?
+    @SerializedName("callVisualizer")
+    val callVisualizerRemoteConfig: CallVisualizerConfig?
 ) {
     fun toUnifiedTheme(): UnifiedTheme = UnifiedTheme(
         alertTheme = alertRemoteConfig?.toAlertTheme(),
@@ -34,6 +35,6 @@ internal data class RemoteConfiguration(
         callTheme = callRemoteConfig?.toCallTheme(),
         chatTheme = chatRemoteConfig?.toChatTheme(),
         surveyTheme = surveyRemoteConfig?.toSurveyTheme(),
-        endScreenSharingTheme = endScreenShareRemoteConfig?.toEndScreenShareTheme()
+        callVisualizerTheme = callVisualizerRemoteConfig?.toCallVisualizerTheme()
     )
 }

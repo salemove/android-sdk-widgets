@@ -13,6 +13,7 @@
     <color name="glia_transparent_black_bg">#B3000000</color>
     <color name="glia_transparent_black_buttons_bg">@color/glia_black_color</color>
 
+    <color name="glia_stroke_light">#F3F3F3</color>
     <color name="glia_stroke_gray">#4D6C7683</color>
     <color name="glia_separator_gray">#5C3C3C43</color>
     <color name="glia_attachment_menu_bg">#F2F2F2</color>

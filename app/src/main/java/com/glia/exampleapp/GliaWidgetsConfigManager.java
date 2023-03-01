@@ -10,6 +10,10 @@ import androidx.preference.PreferenceManager;
 import com.glia.androidsdk.SiteApiKey;
 import com.glia.widgets.GliaWidgetsConfig;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  *Helper class to obtain Glia Config params from deep-link or preferences.
  *
@@ -109,12 +113,34 @@ public class GliaWidgetsConfigManager {
         String apiKeyId = preferences.getString(applicationContext.getString(R.string.pref_api_key_id), applicationContext.getString(R.string.glia_api_key_id));
         String apiKeySecret = preferences.getString(applicationContext.getString(R.string.pref_api_key_secret), applicationContext.getString(R.string.glia_api_key_secret));
         String siteId = preferences.getString(applicationContext.getString(R.string.pref_site_id), applicationContext.getString(R.string.site_id));
+
+
         return new GliaWidgetsConfig.Builder()
                 .setSiteApiKey(new SiteApiKey(apiKeyId, apiKeySecret))
                 .setSiteId(siteId)
                 .setRegion(REGION_BETA)
                 .setContext(applicationContext)
+//                .setUiJsonRemoteConfig(getRawResource(applicationContext, R.raw.remote_theme_configs)) // for testing purpose
                 .build();
+    }
+
+    // for testing the remote theme configurations JSON
+    private static String getRawResource(Context context, int resource) {
+        String res = null;
+        InputStream is = context.getResources().openRawResource(resource);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] b = new byte[1];
+        try {
+            while ( is.read(b) != -1 ) {
+                baos.write(b);
+            }
+            res = baos.toString();
+            is.close();
+            baos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
 }

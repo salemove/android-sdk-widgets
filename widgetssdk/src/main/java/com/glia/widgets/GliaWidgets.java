@@ -301,7 +301,7 @@ public class GliaWidgets {
     }
 
     /**
-     * Returns Call Visualizer module
+     * Provides controls related to the {@link CallVisualizer} module.
      */
     public static CallVisualizer getCallVisualizer() {
         return Dependencies.getCallVisualizerManager();

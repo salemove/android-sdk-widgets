@@ -3,6 +3,7 @@ package com.glia.widgets.view.unifiedui.theme.chat
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 
 internal data class ChatTheme(
@@ -18,5 +19,7 @@ internal data class ChatTheme(
     val bubble: BubbleTheme?,
     val attachmentsPopup: AttachmentsPopupTheme?,
     val unreadIndicator: UnreadIndicatorTheme?,
-    val typingIndicator: ColorTheme?
+    val typingIndicator: ColorTheme?,
+    val newMessagesDividerColorTheme: ColorTheme?,
+    val newMessagesDividerTextTheme: TextTheme?
 )

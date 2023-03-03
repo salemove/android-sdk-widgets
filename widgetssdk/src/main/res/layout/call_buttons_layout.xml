@@ -58,7 +58,7 @@
         android:layout_marginBottom="@dimen/glia_small"
         android:src="?attr/gliaIconCallVideoOn"
         app:backgroundTint="@color/call_fab_bg_color_states"
-        app:layout_constraintBottom_toTopOf="@id/mute_button_label"
+        app:layout_constraintBottom_toTopOf="@id/video_button_label"
         app:layout_constraintEnd_toStartOf="@id/mute_button"
         app:layout_constraintStart_toEndOf="@id/chat_button"
         app:rippleColor="@color/call_fab_ripple_color_states"

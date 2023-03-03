@@ -35,6 +35,7 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
+import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
@@ -928,15 +929,6 @@ internal class CallView(
                 appBar.backgroundTintList = getColorStateListCompat(android.R.color.transparent)
             }
 
-            callState.isMuteButtonEnabled.also {
-                muteButtonLabel.isEnabled = it
-                muteButton.isEnabled = it
-            }
-
-            callState.isSpeakerButtonEnabled.also {
-                speakerButton.isEnabled = it
-                speakerButtonLabel.isEnabled = it
-            }
 
             callState.isVideoButtonEnabled.also {
                 videoButton.isEnabled = it
@@ -966,7 +958,16 @@ internal class CallView(
                 if (callState.isMuted) R.string.glia_call_mute_button_unmute else R.string.glia_call_mute_button_mute
             )
 
-            chatButtonBadgeView.isVisible = callState.messagesNotSeen > 0
+            callState.chatButtonViewState.apply {
+                if (this == ViewState.SHOW) {
+                    chatButtonBadgeView.isVisible = callState.messagesNotSeen > 0
+                }
+                applyViewState(this, chatButton, chatButtonLabel)
+
+            }
+            applyViewState(callState.muteButtonViewState, muteButton, muteButtonLabel)
+            applyViewState(callState.speakerButtonViewState, speakerButton, speakerButtonLabel)
+
             videoButton.isVisible = callState.is2WayVideoCall
             videoButtonLabel.isVisible = callState.is2WayVideoCall
             operatorNameView.isVisible = callState.showOperatorNameView()
@@ -999,6 +1000,14 @@ internal class CallView(
         }
     }
 
+    private fun applyViewState(state: ViewState, vararg views: View) {
+        val isVisible = state != ViewState.HIDE
+        val isEnabled = state == ViewState.SHOW
+        views.forEach {
+            it.isVisible = isVisible
+            it.isEnabled = isEnabled
+        }
+    }
     override fun navigateToChat() {
         onNavigateToChatListener?.call()
     }

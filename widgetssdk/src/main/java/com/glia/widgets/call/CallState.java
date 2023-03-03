@@ -24,6 +24,7 @@ class CallState {
     public final boolean isOnHold;
     //    Need this to not update all views when only time is changed.
     public final boolean isOnlyTimeChanged;
+    public final boolean isCallVisualizer;
 
     @NonNull
     @Override
@@ -40,6 +41,7 @@ class CallState {
                 ", requestedMediaType: " + requestedMediaType +
                 ", isSpeakerOn: " + isSpeakerOn +
                 ", isOnHold: " + isOnHold +
+                ", isCallVisualizer: " + isCallVisualizer +
                 '}';
     }
 
@@ -59,14 +61,15 @@ class CallState {
                 Objects.equals(requestedMediaType, callState.requestedMediaType) &&
                 isSpeakerOn == callState.isSpeakerOn &&
                 isOnHold == callState.isOnHold &&
-                isOnlyTimeChanged == callState.isOnlyTimeChanged;
+                isOnlyTimeChanged == callState.isOnlyTimeChanged &&
+                isCallVisualizer == callState.isCallVisualizer;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
                 callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
-                companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged);
+                companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged, isCallVisualizer);
     }
 
     public boolean showOperatorStatusView() {
@@ -328,16 +331,36 @@ class CallState {
                 .createCallState();
     }
 
-    public boolean isMuteButtonEnabled() {
-        return (isAudioCall() || isVideoCall()) && !showOnHold();
+    public ViewState getMuteButtonViewState() {
+        if (isCallVisualizer) {
+            return ViewState.HIDE;
+        } else if ((isAudioCall() || isVideoCall()) && !showOnHold()) {
+            return ViewState.SHOW;
+        } else {
+            return ViewState.DISABLE;
+        }
     }
 
     public boolean isVideoButtonEnabled() {
         return is2WayVideoCall() && !showOnHold();
     }
 
-    public boolean isSpeakerButtonEnabled() {
-        return isAudioCall() || isVideoCall();
+    public ViewState getSpeakerButtonViewState() {
+        if (isCallVisualizer) {
+            return ViewState.HIDE;
+        } else if (isAudioCall() || isVideoCall()) {
+            return ViewState.SHOW;
+        } else {
+            return ViewState.DISABLE;
+        }
+    }
+
+    public ViewState getChatButtonViewState() {
+        if (isCallVisualizer) {
+            return ViewState.HIDE;
+        } else {
+            return ViewState.SHOW;
+        }
     }
 
     public boolean showCallTimerView() {
@@ -404,6 +427,7 @@ class CallState {
         private boolean isOnHold;
         //May be helpful when converting to Kotlin, as android studio makes fields nullable.
         private boolean isOnlyTimeChanged = false;
+        private boolean isCallVisualizer;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -465,6 +489,11 @@ class CallState {
             return this;
         }
 
+        public Builder setIsCallVisualizer(boolean isCallVisualizer) {
+            this.isCallVisualizer = isCallVisualizer;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -479,6 +508,7 @@ class CallState {
             isOnHold = callState.isOnHold;
             //as we are updating this field only when only time is changed, so needs to make it false every time.
             isOnlyTimeChanged = false;
+            isCallVisualizer = callState.isCallVisualizer;
             return this;
         }
 
@@ -500,5 +530,10 @@ class CallState {
         this.isSpeakerOn = builder.isSpeakerOn;
         this.isOnHold = builder.isOnHold;
         this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
+        this.isCallVisualizer = builder.isCallVisualizer;
+    }
+
+    public enum ViewState {
+        SHOW, DISABLE, HIDE
     }
 }

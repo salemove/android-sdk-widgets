@@ -18,7 +18,7 @@ class VisitorCodeController(
 
     override fun setView(view: VisitorCodeContract.View) {
         this.view = view
-        this.view.onSetupComplete()
+        this.view.notifySetupComplete()
     }
 
     override fun onCloseButtonClicked() {
@@ -32,13 +32,16 @@ class VisitorCodeController(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { visitorCode ->
-                    view.onVisitorCode(visitorCode)
+                    view.showVisitorCode(visitorCode)
+                    view.setTimer(visitorCode.duration)
                 },
                 { error ->
-                    view.onError(error)
+                    view.showError(error)
                 }
             )
     }
 
-    override fun onDestroy() {}
+    override fun onDestroy() {
+        view.cleanUpOnDestroy()
+    }
 }

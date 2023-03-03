@@ -20,11 +20,12 @@ internal class VisitorCodeControllerTest {
     private val repository = mock(VisitorCodeRepository::class.java)
     private val controller = VisitorCodeController(dialogController, repository)
     private val view = mock(VisitorCodeContract.View::class.java)
+    private val refreshTime = 1000L
 
     @Before
     fun setView() {
         controller.setView(view)
-        verify(view).onSetupComplete()
+        verify(view).notifySetupComplete()
         verifyNoMoreInteractions(view)
         verifyNoInteractions(dialogController, repository)
         reset(view, dialogController, repository)
@@ -44,10 +45,12 @@ internal class VisitorCodeControllerTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         val vc = mock(VisitorCode::class.java)
         whenever(repository.getVisitorCode()).thenReturn(Observable.just(vc))
+        whenever(vc.duration).thenReturn(refreshTime)
         controller.onLoadVisitorCode()
         verify(view).startLoading()
         verify(repository).getVisitorCode()
-        verify(view).onVisitorCode(vc)
+        verify(view).showVisitorCode(vc)
+        verify(view).setTimer(vc.duration)
         verifyNoMoreInteractions(view, repository)
         verifyNoInteractions(dialogController)
 
@@ -64,7 +67,7 @@ internal class VisitorCodeControllerTest {
         controller.onLoadVisitorCode()
         verify(view).startLoading()
         verify(repository).getVisitorCode()
-        verify(view).onError(cause)
+        verify(view).showError(cause)
         verifyNoMoreInteractions(view, repository)
         verifyNoInteractions(dialogController)
 
@@ -75,6 +78,8 @@ internal class VisitorCodeControllerTest {
     @Test
     fun onDestroy() {
         controller.onDestroy()
-        verifyNoInteractions(view, dialogController, repository)
+        verify(view).cleanUpOnDestroy()
+        verifyNoMoreInteractions(view)
+        verifyNoInteractions(dialogController, repository)
     }
 }

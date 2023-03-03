@@ -12,9 +12,11 @@ interface VisitorCodeContract {
     }
 
     interface View : BaseView<Controller> {
-        fun onSetupComplete()
+        fun notifySetupComplete()
         fun startLoading()
-        fun onError(throwable: Throwable)
-        fun onVisitorCode(visitorCode: VisitorCode)
+        fun showError(throwable: Throwable)
+        fun showVisitorCode(visitorCode: VisitorCode)
+        fun setTimer(duration: Long)
+        fun cleanUpOnDestroy()
     }
 }

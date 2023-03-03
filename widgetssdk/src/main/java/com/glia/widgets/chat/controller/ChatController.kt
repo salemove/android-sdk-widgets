@@ -139,7 +139,7 @@ internal class ChatController(
                 emitViewState {
                     chatState
                         .setLastTypedText(EMPTY_MESSAGE)
-                        .setShowSendButton(isShowSendButtonUseCase.execute(EMPTY_MESSAGE))
+                        .setShowSendButton(isShowSendButtonUseCase(EMPTY_MESSAGE))
                 }
             }
 
@@ -165,7 +165,7 @@ internal class ChatController(
             emitUploadAttachments(getFileAttachmentsUseCase.execute())
             emitViewState{
                 chatState
-                    .setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText))
+                    .setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
                     .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute())
             }
         }
@@ -301,7 +301,7 @@ internal class ChatController(
         emitViewState {
             chatState
                 .setLastTypedText(message)
-                .setShowSendButton(isShowSendButtonUseCase.execute(message))
+                .setShowSendButton(isShowSendButtonUseCase(message))
         }
         sendMessagePreview(message)
     }

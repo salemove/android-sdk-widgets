@@ -301,6 +301,6 @@ public class ControllerFactory {
     }
 
     public VisitorCodeContract.Controller getVisitorCodeController() {
-        return new VisitorCodeController(dialogController);
+        return new VisitorCodeController(dialogController, repositoryFactory.getVisitorCodeRepository());
     }
 }

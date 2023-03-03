@@ -1,7 +1,9 @@
 package com.glia.widgets.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.TypedArray
+import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ProgressBar
@@ -19,6 +21,8 @@ import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.view.button.GliaPositiveButton
+import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
@@ -35,25 +39,37 @@ class VisitorCodeView internal constructor(
     context: Context
 ) : FrameLayout(MaterialThemeOverlay.wrap(context, null, 0, R.style.Application_Glia_Chat), null, 0), VisitorCodeContract.View {
     private val TAG = VisitorCodeView::class.java.simpleName
-    private var controller: VisitorCodeContract.Controller? = null
-    private var visitorCodeRepository: VisitorCodeRepository? = null
+    private lateinit var controller: VisitorCodeContract.Controller
     private var theme: UiTheme? = null
 
-    private var titleView: TextView
+    private var successContainer: View
+    private var failureContainer: View
+    private var successTitle: TextView
+    private var failureTitle: TextView
     private var charCodeView: CharCodeView
     private var progressBar: ProgressBar
+    private var refreshButton: GliaPositiveButton
     private var closeButton: AppCompatImageButton
 
     init {
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
-        titleView = findViewById(R.id.title_view)
+        successContainer = findViewById(R.id.success_container)
+        failureContainer = findViewById(R.id.failure_container)
+        successTitle = findViewById(R.id.title_view)
+        failureTitle = findViewById(R.id.failure_title)
         charCodeView = findViewById(R.id.codeView)
         progressBar = findViewById(R.id.progress_bar)
+        refreshButton = findViewById(R.id.failure_refresh_button)
+        refreshButton.setOnClickListener { controller.onLoadVisitorCode() }
         closeButton = findViewById(R.id.close_button)
-        closeButton.setOnClickListener { controller?.onCloseButtonClicked() }
+        closeButton.setOnClickListener { controller.onCloseButtonClicked() }
         readTypedArray()
         applyRemoteConfigTheme()
         setController(Dependencies.getControllerFactory().visitorCodeController)
+    }
+
+    override fun onSetupComplete() {
+        controller.onLoadVisitorCode()
     }
 
     internal fun setClosable(isClosable: Boolean) {
@@ -70,9 +86,9 @@ class VisitorCodeView internal constructor(
         }
     }
 
-    override fun setController(controller: VisitorCodeContract.Controller?) {
+    override fun setController(controller: VisitorCodeContract.Controller) {
         this.controller = controller
-        this.controller?.setView(this)
+        this.controller.setView(this)
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
@@ -80,50 +96,32 @@ class VisitorCodeView internal constructor(
         applyDialogTheme(theme)
     }
 
-    fun setVisitorCodeRepository(visitorCodeRepository: VisitorCodeRepository) {
-        this.visitorCodeRepository = visitorCodeRepository
-        loadNewVisitorCode()
-    }
-
-    private fun loadNewVisitorCode() {
-        notifyOfLoading()
-        if (visitorCodeRepository == null) {
-            val error: Exception = IllegalStateException("Missing visitor code repository")
-            notifyOfError("Internal error, invalid view setup", error)
-            return
-        }
-
-        visitorCodeRepository?.getVisitorCode { visitorCode, error ->
-            if (error != null) {
-                notifyOfError("Failed to load Visitor Code", error)
-                return@getVisitorCode
-            }
-            if (visitorCode == null || visitorCode.code == null) {
-                val error: Exception = IllegalStateException("Empty Visitor Code returned by the Glia Core")
-                notifyOfError("Failed to load Visitor Code", error)
-                return@getVisitorCode
-            }
-
-            notifyOfNewVisitorCode(visitorCode)
-        }
-    }
-
-    private fun notifyOfLoading() {
+    override fun startLoading() {
         runOnUi {
             showProgressBar(true)
+            showSuccess()
         }
     }
 
-    private fun notifyOfError(publicErrorMessage: String, exception: Throwable?) {
-        Logger.e(TAG, publicErrorMessage, exception)
-
+    override fun onError(throwable: Throwable) {
+        Logger.e(TAG, throwable.message, throwable)
         runOnUi {
             showProgressBar(false)
-            charCodeView.setText("ERROR") // Will be replace and improved in the next ticket MOB-1823
+            showFailure()
         }
     }
 
-    private fun notifyOfNewVisitorCode(visitorCode: VisitorCode) {
+    private fun showSuccess() {
+        successContainer.visibility = VISIBLE
+        failureContainer.visibility = GONE
+    }
+
+    private fun showFailure() {
+        failureContainer.visibility = VISIBLE
+        successContainer.visibility = GONE
+    }
+
+    override fun onVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
             charCodeView.setText(visitorCode.code)
@@ -147,23 +145,37 @@ class VisitorCodeView internal constructor(
     private fun applyRemoteConfigTheme() {
         Dependencies.getGliaThemeManager().theme?.callVisualizerTheme.apply {
             applyLayerTheme(this?.visitorCodeTheme?.background)
-            titleView.applyTextTheme(this?.visitorCodeTheme?.title)
+            successTitle.applyTextTheme(this?.visitorCodeTheme?.title)
+            // TODO MOB-1827
+            failureTitle.applyTextTheme(this?.visitorCodeTheme?.title)
             progressBar.indeterminateTintList = this?.visitorCodeTheme?.loadingProgressBar?.primaryColorStateList
+            // TODO MOB-1827
+            refreshButton.applyButtonTheme(this?.endScreenSharingTheme?.endButton)
         }
     }
 
-    // TODO: make sure it is applied!!!
     private fun applyDialogTheme(theme: UiTheme?) {
         if (theme == null) {
             Logger.d(TAG, "UiTheme is null!")
             return
         }
 
-        theme.baseDarkColor?.run {
-            titleView.setTextColor(ContextCompat.getColor(context, this))
+        theme.baseDarkColor?.let {
+            ContextCompat.getColor(context, it).apply {
+                successTitle.setTextColor(this)
+                failureTitle.setTextColor(this)
+            }
         }
-        theme.fontRes?.run {
-            titleView.typeface = ResourcesCompat.getFont(context, this)
+        theme.fontRes?.let {
+            ResourcesCompat.getFont(context, it)?.run {
+                successTitle.typeface = this
+                failureTitle.typeface = this
+            }
+        }
+        theme.brandPrimaryColor?.let {
+            ContextCompat.getColor(context, it).apply {
+                refreshButton.backgroundTintList = ColorStateList.valueOf(this)
+            }
         }
         theme.baseLightColor?.run {
             rootView.setBackgroundColor(ContextCompat.getColor(context, R.color.glia_base_light_color))

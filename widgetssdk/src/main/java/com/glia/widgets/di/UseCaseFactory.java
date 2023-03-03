@@ -152,9 +152,7 @@ public class UseCaseFactory {
 
     public VisitorCodeViewBuilderUseCase getVisitorCodeViewBuilderUseCase() {
         if (visitorCodeViewBuilderUseCase == null) {
-            visitorCodeViewBuilderUseCase = new VisitorCodeViewBuilderUseCase(
-                    repositoryFactory.getVisitorCodeRepository()
-            );
+            visitorCodeViewBuilderUseCase = new VisitorCodeViewBuilderUseCase();
         }
         return visitorCodeViewBuilderUseCase;
     }

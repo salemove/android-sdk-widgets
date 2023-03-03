@@ -6,7 +6,8 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 // TODO: update JSON scheme
 internal data class VisitorCodeTheme(
-    val numberSlot: NumberSlotTheme?,
+    val numberSlotText: TextTheme?,
+    val numberSlotBackground: LayerTheme?,
     val background: LayerTheme?,
     val title: TextTheme?,
     val loadingProgressBar: ColorTheme?

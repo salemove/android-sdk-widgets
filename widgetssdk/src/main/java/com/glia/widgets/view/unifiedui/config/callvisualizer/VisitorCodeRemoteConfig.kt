@@ -9,8 +9,11 @@ internal data class VisitorCodeRemoteConfig(
     @SerializedName("title")
     val title: TextRemoteConfig?,
 
-    @SerializedName("numberSlot")
-    val numberSlot: NumberSlotRemoteConfig?,
+    @SerializedName("numberSlotText")
+    val numberSlotText: TextRemoteConfig?,
+
+    @SerializedName("numberSlotBackground")
+    val numberSlotBackground: LayerRemoteConfig?,
 
     @SerializedName("background")
     val background: LayerRemoteConfig?,
@@ -21,7 +24,8 @@ internal data class VisitorCodeRemoteConfig(
 ){
     fun toVisitorCodeTheme(): VisitorCodeTheme {
         return VisitorCodeTheme(
-            numberSlot?.toNumberSlotTheme(),
+            numberSlotText?.toTextTheme(),
+            numberSlotBackground?.toLayerTheme(),
             background?.toLayerTheme(),
             title?.toTextTheme(),
             progressBarColor?.toColorTheme()

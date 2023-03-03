@@ -4012,28 +4012,34 @@
         },
         "cornerRadius": 30
       },
-      "numberSlot": {
-        "background": {
-          "border": {
-            "type": "fill",
-            "value": [
-              "#F3F3F3"
-            ]
-          },
-          "borderWidth": 1,
-          "color": {
-            "type": "fill",
-            "value": [
-              "#ffd100"
-            ]
-          },
-          "cornerRadius": 8
+      "closeButtonColor": {
+        "type": "fill",
+        "value": [
+          "#000000"
+        ]
+      },
+      "numberSlotBackground": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#F3F3F3"
+          ]
         },
+        "borderWidth": 1,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#ffd100"
+          ]
+        },
+        "cornerRadius": 8
+      },
+      "numberSlotText": {
         "font": {
           "size": 40,
           "style": "regular"
         },
-        "fontColor": {
+        "foreground": {
           "type": "fill",
           "value": [
             "#000000"

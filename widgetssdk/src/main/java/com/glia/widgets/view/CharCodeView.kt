@@ -125,8 +125,8 @@ class CharCodeView @JvmOverloads constructor(
             charViewProps.horizonPadding,
             charViewProps.verticalPadding
         )
-        charView.applyLayerTheme(theme.numberSlot?.background, padding)
-        charView.applyTextTheme(theme.numberSlot?.toTextTheme(),
+        charView.applyLayerTheme(theme.numberSlotBackground, padding)
+        charView.applyTextTheme(theme.numberSlotText,
             withBackground = false, // background is applied from background directly
             withAlignment = false // no alignment value in JSON
         )

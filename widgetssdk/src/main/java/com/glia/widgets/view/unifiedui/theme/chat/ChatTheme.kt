@@ -6,17 +6,17 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 
 internal data class ChatTheme(
-    val background: LayerTheme?,
-    val header: HeaderTheme?,
-    val operatorMessage: MessageBalloonTheme?,
-    val visitorMessage: MessageBalloonTheme?,
-    val connect: EngagementStatesTheme?,
-    val input: InputTheme?,
-    val responseCard: ResponseCardTheme?,
-    val audioUpgrade: UpgradeTheme?,
-    val videoUpgrade: UpgradeTheme?,
-    val bubble: BubbleTheme?,
-    val attachmentsPopup: AttachmentsPopupTheme?,
-    val unreadIndicator: UnreadIndicatorTheme?,
-    val typingIndicator: ColorTheme?
+    val background: LayerTheme? = null,
+    val header: HeaderTheme? = null,
+    val operatorMessage: MessageBalloonTheme? = null,
+    val visitorMessage: MessageBalloonTheme? = null,
+    val connect: EngagementStatesTheme? = null,
+    val input: InputTheme? = null,
+    val responseCard: ResponseCardTheme? = null,
+    val audioUpgrade: UpgradeTheme? = null,
+    val videoUpgrade: UpgradeTheme? = null,
+    val bubble: BubbleTheme? = null,
+    val attachmentsPopup: AttachmentsPopupTheme? = null,
+    val unreadIndicator: UnreadIndicatorTheme? = null,
+    val typingIndicator: ColorTheme? = null
 )

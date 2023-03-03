@@ -1,6 +1,8 @@
 package com.glia.widgets.view.unifiedui.config.base
 
 import android.os.Parcelable
+import androidx.annotation.ColorInt
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -10,4 +12,6 @@ import kotlinx.parcelize.Parcelize
  */
 @JvmInline
 @Parcelize
-internal value class ColorRemoteConfig(val color: Int): Parcelable
+internal value class ColorRemoteConfig(@ColorInt val color: Int) : Parcelable {
+    fun toColorTheme() = ColorTheme(color)
+}

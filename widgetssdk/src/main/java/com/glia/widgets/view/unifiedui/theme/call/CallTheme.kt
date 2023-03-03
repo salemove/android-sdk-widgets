@@ -6,12 +6,12 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
 
 internal data class CallTheme(
-    val background: LayerTheme?,
-    val bottomText: TextTheme?,
-    val buttonBar: ButtonBarTheme?,
-    val duration: TextTheme?,
-    val header: HeaderTheme?,
-    val operator: TextTheme?,
-    val topText: TextTheme?,
-    val connect: EngagementStatesTheme?
+    val background: LayerTheme? = null,
+    val bottomText: TextTheme? = null,
+    val buttonBar: ButtonBarTheme? = null,
+    val duration: TextTheme? = null,
+    val header: HeaderTheme? = null,
+    val operator: TextTheme? = null,
+    val topText: TextTheme? = null,
+    val connect: EngagementStatesTheme? = null
 )

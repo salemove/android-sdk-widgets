@@ -6,6 +6,8 @@ import androidx.annotation.ColorInt
 internal data class ColorTheme(
     val isGradient: Boolean = false, val values: List<Int>
 ) {
+    internal constructor(@ColorInt color: Int) : this(values = listOf(color))
+
     @get:ColorInt
     val primaryColor: Int
         get() = values.first()

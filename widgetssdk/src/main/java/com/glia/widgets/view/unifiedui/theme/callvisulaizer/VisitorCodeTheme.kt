@@ -8,6 +8,7 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 internal data class VisitorCodeTheme(
     val numberSlotText: TextTheme?,
     val numberSlotBackground: LayerTheme?,
+    val closeButtonColor: ColorTheme?,
     val background: LayerTheme?,
     val title: TextTheme?,
     val loadingProgressBar: ColorTheme?

@@ -15,6 +15,9 @@ internal data class VisitorCodeRemoteConfig(
     @SerializedName("numberSlotBackground")
     val numberSlotBackground: LayerRemoteConfig?,
 
+    @SerializedName("closeButtonColor")
+    val closeButtonColor: ColorLayerRemoteConfig?,
+
     @SerializedName("background")
     val background: LayerRemoteConfig?,
 
@@ -26,6 +29,7 @@ internal data class VisitorCodeRemoteConfig(
         return VisitorCodeTheme(
             numberSlotText?.toTextTheme(),
             numberSlotBackground?.toLayerTheme(),
+            closeButtonColor?.toColorTheme(),
             background?.toLayerTheme(),
             title?.toTextTheme(),
             progressBarColor?.toColorTheme()

@@ -389,7 +389,8 @@ public class UseCaseFactory {
     public IsShowSendButtonUseCase createIsShowSendButtonUseCase() {
         return new IsShowSendButtonUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
-                repositoryFactory.getGliaFileAttachmentRepository()
+                repositoryFactory.getGliaFileAttachmentRepository(),
+                createIsSecureEngagementUseCase()
         );
     }
 

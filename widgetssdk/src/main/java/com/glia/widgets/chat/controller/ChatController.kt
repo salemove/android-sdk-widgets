@@ -25,6 +25,7 @@ import com.glia.widgets.chat.model.history.*
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.*
+import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor
@@ -45,7 +46,6 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
-import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.survey.OnSurveyListener
@@ -112,8 +112,7 @@ internal class ChatController(
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
-    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
-    private val getUnreadMessagesCountWithTimeoutUseCase: GetUnreadMessagesCountWithTimeoutUseCase
+    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -1311,20 +1310,19 @@ internal class ChatController(
 
     private fun loadChatHistory() {
         val historyDisposable = loadHistoryUseCase.execute()
-            .doOnError { error(it) }
-            .doOnSuccess { historyLoaded(it) }
-            .subscribe()
+            .subscribe({ historyLoaded(it) }, { error(it) })
         disposable.add(historyDisposable)
     }
 
     @Synchronized
-    private fun historyLoaded(messages: List<ChatMessageInternal>) {
+    private fun historyLoaded(historyResponse: ChatHistoryResponse) {
         Logger.d(TAG, "historyLoaded")
+        val (messages, count) = historyResponse
         val currentItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         val newItems = removeDuplicates(currentItems, messages)
 
         when {
-            !newItems.isNullOrEmpty() -> submitHistoryItems(newItems, currentItems)
+            !newItems.isNullOrEmpty() -> submitHistoryItems(newItems, currentItems, count)
             !chatState.engagementRequested && !isSecureEngagement -> queueForEngagement()
             else -> Logger.d(TAG, "Opened empty Secure Conversations chat")
         }
@@ -1333,7 +1331,9 @@ internal class ChatController(
     }
 
     private fun submitHistoryItems(
-        newItems: List<ChatMessageInternal>, currentItems: MutableList<ChatItem>
+        newItems: List<ChatMessageInternal>,
+        currentItems: MutableList<ChatItem>,
+        unreadMessagesCount: Int
     ) {
         newItems.forEachIndexed { index, message ->
             appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
@@ -1341,38 +1341,25 @@ internal class ChatController(
 
         val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
 
-        val newState = if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
-            chatState.changeItems(sortedItems)
+        if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
+            emitChatTranscriptItems(sortedItems, unreadMessagesCount)
         } else {
-            chatState.historyLoaded(sortedItems)
-        }
-
-        if (isSecureEngagement) {
-            disposable.add(
-                getUnreadMessagesCountWithTimeoutUseCase().subscribe { count -> tryToAddNewMessagesDivider(count, newState) }
-            )
-        } else {
-            emitChatItems { newState }
+            emitChatItems { chatState.historyLoaded(sortedItems) }
         }
 
     }
 
-    @Synchronized
-    private fun tryToAddNewMessagesDivider(count: Int, newState: ChatState) {
-        if (count < 1) {
-            emitChatItems { newState }
-            return
+    private fun emitChatTranscriptItems(items: List<ChatItem>, unreadMessagesCount: Int) {
+        if (unreadMessagesCount > 0) {
+            val index = items.count().minus(unreadMessagesCount).coerceAtLeast(0)
+
+            val newItems = items.toMutableList().apply { add(index, NewMessagesItem) }
+
+            emitChatItems { chatState.changeItems(newItems) }
+            markMessagesReadWithDelay()
+        } else {
+            emitChatItems { chatState.changeItems(items) }
         }
-
-        val index = newState.chatItems.count().minus(count).coerceAtLeast(0)
-
-        val newItems = newState.chatItems.toMutableList().apply {
-            add(index, NewMessagesItem)
-        }
-
-        emitChatItems { newState.changeItems(newItems) }
-
-        markMessagesReadWithDelay()
     }
 
     private fun markMessagesReadWithDelay() {
@@ -1427,11 +1414,7 @@ internal class ChatController(
 
     @VisibleForTesting
     fun isNewMessage(oldHistory: List<ChatItem>?, newMessage: ChatMessage): Boolean =
-        oldHistory
-            ?.filterIsInstance<LinkedChatItem>()
-            ?.any { oldMessage -> oldMessage.messageId != null && oldMessage.messageId == newMessage.id }
-            ?.not()
-            ?: true
+        oldHistory?.none { (it as? LinkedChatItem)?.messageId == newMessage.id } ?: true
 
     private fun error(error: Throwable?) {
         error?.also { error(it.toString()) }

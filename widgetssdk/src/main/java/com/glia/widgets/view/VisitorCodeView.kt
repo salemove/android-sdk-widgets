@@ -3,7 +3,7 @@ package com.glia.widgets.view
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
-import android.util.AttributeSet
+import android.os.CountDownTimer
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ProgressBar
@@ -17,7 +17,7 @@ import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.VisitorCodeContract
-import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
+import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
@@ -27,7 +27,6 @@ import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
 
 /**
@@ -42,6 +41,8 @@ class VisitorCodeView internal constructor(
     private val TAG = VisitorCodeView::class.java.simpleName
     private lateinit var controller: VisitorCodeContract.Controller
     private var theme: UiTheme? = null
+
+    private var timer : CountDownTimer? = null
 
     private var successContainer: View
     private var failureContainer: View
@@ -69,7 +70,7 @@ class VisitorCodeView internal constructor(
         setController(Dependencies.getControllerFactory().visitorCodeController)
     }
 
-    override fun onSetupComplete() {
+    override fun notifySetupComplete() {
         controller.onLoadVisitorCode()
     }
 
@@ -85,6 +86,23 @@ class VisitorCodeView internal constructor(
         ) {
             setDefaultTheme(this)
         }
+    }
+
+    override fun setTimer(duration: Long) {
+        timer = object : CountDownTimer(duration, duration) {
+            override fun onTick(p0: Long) {
+                //no-op
+            }
+
+            override fun onFinish() {
+                controller.onLoadVisitorCode()
+            }
+        }.start()
+    }
+
+    override fun cleanUpOnDestroy() {
+        timer?.cancel()
+        timer = null
     }
 
     override fun setController(controller: VisitorCodeContract.Controller) {
@@ -104,7 +122,7 @@ class VisitorCodeView internal constructor(
         }
     }
 
-    override fun onError(throwable: Throwable) {
+    override fun showError(throwable: Throwable) {
         Logger.e(TAG, throwable.message, throwable)
         runOnUi {
             showProgressBar(false)
@@ -122,7 +140,7 @@ class VisitorCodeView internal constructor(
         successContainer.visibility = GONE
     }
 
-    override fun onVisitorCode(visitorCode: VisitorCode) {
+    override fun showVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
             charCodeView.setText(visitorCode.code)

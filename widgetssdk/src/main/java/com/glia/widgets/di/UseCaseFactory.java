@@ -225,7 +225,8 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaMessageRepository(),
                 repositoryFactory.getSecureConversationsRepository(),
                 createIsSecureEngagementUseCase(),
-                getMapOperatorUseCase()
+                getMapOperatorUseCase(),
+                createSubscribeToUnreadMessagesCountUseCase()
         );
     }
 

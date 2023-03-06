@@ -14,6 +14,7 @@ import java.util.function.Consumer
 class CallVisualizerRepository(private val gliaCore: GliaCore) {
 
     private lateinit var callback: CallVisualizerCallback
+    private var visitorContext: String? = null
 
     companion object {
         private val TAG = CallVisualizerRepository::class.java.simpleName
@@ -24,6 +25,10 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
         autoAcceptEngagementRequest()
         showDialogOnMediaUpgradeRequest()
         Logger.d(TAG, "CallVisualizerRepository initialized")
+    }
+
+    fun addVisitorContext(visitorContext: String) {
+        this.visitorContext = visitorContext;
     }
 
     private fun showDialogOnMediaUpgradeRequest() {
@@ -47,7 +52,7 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
                     Logger.d(TAG, "Incoming Call Visualizer engagement auto accepted")
                 }
             }
-            engagementRequest.accept(null as String?, onResult)
+            engagementRequest.accept(visitorContext ?: null as String?, onResult)
         }
     }
 

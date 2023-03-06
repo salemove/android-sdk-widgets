@@ -28,6 +28,7 @@ import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
+import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
 
 /**
  * A view for displaying the visitor code to the visitor.
@@ -149,6 +150,7 @@ class VisitorCodeView internal constructor(
             // TODO MOB-1827
             failureTitle.applyTextTheme(this?.visitorCodeTheme?.title)
             progressBar.indeterminateTintList = this?.visitorCodeTheme?.loadingProgressBar?.primaryColorStateList
+            closeButton.applyImageColorTheme(this?.visitorCodeTheme?.closeButtonColor)
             // TODO MOB-1827
             refreshButton.applyButtonTheme(this?.endScreenSharingTheme?.endButton)
         }

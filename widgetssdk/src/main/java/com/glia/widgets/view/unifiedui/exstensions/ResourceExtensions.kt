@@ -16,3 +16,7 @@ fun Context.getDimenRes(@DimenRes dimenId: Int): Float {
 fun Context.getDimenResPx(@DimenRes dimenId: Int): Int {
     return this.resources.getDimensionPixelSize(dimenId)
 }
+
+fun String.separateStringWithSymbol(symbol: String): String {
+    return this.split("").joinToString(symbol)
+}

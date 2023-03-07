@@ -235,6 +235,8 @@
 
     <!-- Visitor Code View -->
     <string name="glia_visitor_code_view_title">Your Visitor Code</string>
+    <string name="glia_visitor_code_content_description">Your visitor code is %1$s</string>
+    <string name="glia_visitor_code_loading">Loading your visitor code</string>
     <string name="glia_visitor_code_error_title">Could not load the visitor code. Please try refreshing.</string>
     <string name="glia_visitor_code_refresh_button">Refresh</string>
 

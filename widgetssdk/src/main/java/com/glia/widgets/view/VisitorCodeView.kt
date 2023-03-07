@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.os.CountDownTimer
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -22,11 +23,12 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.GliaPositiveButton
+import com.google.android.material.theme.overlay.MaterialThemeOverlay
+import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
 
 /**
@@ -57,7 +59,7 @@ class VisitorCodeView internal constructor(
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
         successContainer = findViewById(R.id.success_container)
         failureContainer = findViewById(R.id.failure_container)
-        successTitle = findViewById(R.id.title_view)
+        successTitle = findViewById(R.id.success_title_view)
         failureTitle = findViewById(R.id.failure_title)
         charCodeView = findViewById(R.id.codeView)
         progressBar = findViewById(R.id.progress_bar)
@@ -119,6 +121,9 @@ class VisitorCodeView internal constructor(
         runOnUi {
             showProgressBar(true)
             showSuccess()
+            successTitle.contentDescription = context.getString(R.string.glia_visitor_code_loading)
+            successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
+            closeButton.contentDescription = context.getString(R.string.glia_chat_alert_dialog_close_content_description)
         }
     }
 
@@ -143,6 +148,8 @@ class VisitorCodeView internal constructor(
     override fun showVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
+            successTitle.contentDescription = context.getString(R.string.glia_visitor_code_content_description, visitorCode.code.separateStringWithSymbol("-"))
+            successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
             charCodeView.setText(visitorCode.code)
         }
     }

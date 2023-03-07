@@ -33,4 +33,10 @@ public interface CallVisualizer {
      */
     void showVisitorCodeDialog(Context context);
 
+    /**
+     * Sets visitor context to the upcoming Call Visualizer engagement
+     * @param visitorCodeContext
+     */
+    void addVisitorContext(String visitorCodeContext);
+
 }

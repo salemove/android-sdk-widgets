@@ -36,6 +36,7 @@ import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
 import com.glia.widgets.view.VisitorCodeView;
@@ -377,7 +378,13 @@ public class MainFragment extends Fragment {
     }
 
     private void showVisitorCode() {
-        GliaWidgets.getCallVisualizer().showVisitorCodeDialog(getContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String visitorContext = getContextAssetIdFromPrefs(sharedPreferences);
+        CallVisualizer cv = GliaWidgets.getCallVisualizer();
+        if (visitorContext != null && !visitorContext.trim().isEmpty()) {
+            cv.addVisitorContext(visitorContext);
+        }
+        cv.showVisitorCodeDialog(getContext());
     }
 
     // For testing the integrated Visitor Code solution

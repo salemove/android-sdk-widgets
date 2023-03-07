@@ -68,7 +68,10 @@ public class Dependencies {
                 controllerFactory.getDialogController());
         application.registerActivityLifecycleCallbacks(activityWatcherForDialogs);
         resourceProvider = new ResourceProvider(application.getBaseContext());
-        callVisualizerManager = new CallVisualizerManager(useCaseFactory.getVisitorCodeViewBuilderUseCase());
+        callVisualizerManager = new CallVisualizerManager(
+                useCaseFactory.getVisitorCodeViewBuilderUseCase(),
+                repositoryFactory.getCallVisualizerRepository()
+        );
     }
 
     public static UseCaseFactory getUseCaseFactory() {

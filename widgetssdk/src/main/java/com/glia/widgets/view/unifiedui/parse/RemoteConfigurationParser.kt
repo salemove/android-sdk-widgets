@@ -14,6 +14,7 @@ internal class RemoteConfigurationParser {
      */
     val defaultGson: Gson by lazy {
         GsonBuilder()
+            .registerTypeAdapter(ColorRemoteConfig::class.java, ColorDeserializer())
             .registerTypeAdapter(ColorLayerRemoteConfig::class.java, ColorLayerDeserializer())
             .registerTypeAdapter(
                 SizeDpRemoteConfig::class.java, DpDeserializer(Dependencies.getResourceProvider())

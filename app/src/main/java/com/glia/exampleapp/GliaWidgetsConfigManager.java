@@ -120,7 +120,7 @@ public class GliaWidgetsConfigManager {
                 .setSiteId(siteId)
                 .setRegion(REGION_BETA)
                 .setContext(applicationContext)
-//                .setUiJsonRemoteConfig(getRawResource(applicationContext, R.raw.remote_theme_configs)) // for testing purpose
+                .setUiJsonRemoteConfig(getRawResource(applicationContext, R.raw.global_colors)) // TODO MOB-1919
                 .build();
     }
 

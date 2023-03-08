@@ -205,7 +205,11 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
 
     buttonTheme?.elevation?.also { elevation = it }
     buttonTheme?.shadowColor?.also(::applyShadow)
-    buttonTheme?.text.also(::applyTextTheme)
+    buttonTheme?.text?.also {
+        applyTextTheme(it)
+        // Also apply text color to button icon
+        iconTint = it?.textColor?.primaryColorStateList
+    }
 }
 
 internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {

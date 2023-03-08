@@ -91,10 +91,10 @@ class EndScreenSharingView (
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        applyStyle()
+        applyRemoteTheme()
     }
 
-    private fun applyStyle() {
+    private fun applyRemoteTheme() {
         val theme = Dependencies.getGliaThemeManager().theme?.callVisualizerTheme?.endScreenSharingTheme
         binding.appBarView.applyHeaderTheme(theme?.header)
         binding.endSharingButton.applyButtonTheme(theme?.endButton)

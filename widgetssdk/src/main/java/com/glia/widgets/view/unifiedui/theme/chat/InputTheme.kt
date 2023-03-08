@@ -6,11 +6,11 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 internal data class InputTheme(
-    val text: TextTheme?,
-    val placeholder: TextTheme?,
-    val divider: ColorTheme?,
-    val sendButton: ButtonTheme?,
-    val mediaButton: ButtonTheme?,
-    val background: LayerTheme?,
-    val fileUploadBar: FileUploadBarTheme?
+    val text: TextTheme? = null,
+    val placeholder: TextTheme? = null,
+    val divider: ColorTheme? = null,
+    val sendButton: ButtonTheme? = null,
+    val mediaButton: ButtonTheme? = null,
+    val background: LayerTheme? = null,
+    val fileUploadBar: FileUploadBarTheme? = null
 )

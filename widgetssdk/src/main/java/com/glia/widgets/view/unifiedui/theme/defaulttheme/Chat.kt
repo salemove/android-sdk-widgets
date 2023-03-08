@@ -4,6 +4,8 @@ package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.exstensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.*
@@ -16,16 +18,16 @@ internal fun ChatDefaultTheme(pallet: ColorPallet): ChatTheme =
         background = LayerTheme(fill = pallet.backgroundColorTheme),
         header = ChatHeader(pallet),
         operatorMessage = ChatOperatorMessage(pallet),
-        visitorMessage = ChatVisitorMessage(pallet),
+        visitorMessage = ChatVisitorMessageTheme(pallet),
         connect = ChatEngagementStates(pallet),
-        input = null,
+        input = ChatInputTheme(pallet),
         responseCard = ChatResponseCardTheme(pallet),
         audioUpgrade = MediaUpgradeDefaultTheme(pallet),
         videoUpgrade = MediaUpgradeDefaultTheme(pallet),
-        bubble = null,
-        attachmentsPopup = null,
-        unreadIndicator = null,
-        typingIndicator = null
+        bubble = BubbleDefaultTheme(pallet),
+        attachmentsPopup = ChatAttachmentsPopupDefaultTheme(pallet.baseDarkColorTheme),
+        unreadIndicator = ChatUnreadIndicatorDefaultTheme(pallet),
+        typingIndicator = pallet.primaryColorTheme
     )
 
 /**
@@ -68,7 +70,7 @@ private fun ChatHeader(colorPallet: ColorPallet) = colorPallet.run {
 private fun ChatOperatorMessage(
     pallet: ColorPallet
 ): MessageBalloonTheme? = pallet.run {
-    val userImage = UserImage(this)
+    val userImage = UserImageDefaultTheme(this)
     composeIfAtLeastOneNotNull(userImage, baseDarkColorTheme) {
         MessageBalloonTheme(
             text = TextTheme(textColor = baseDarkColorTheme),
@@ -80,7 +82,7 @@ private fun ChatOperatorMessage(
 /**
  * Default theme for Visitor Message
  */
-private fun ChatVisitorMessage(
+private fun ChatVisitorMessageTheme(
     pallet: ColorPallet
 ): MessageBalloonTheme? = pallet.run {
     composeIfAtLeastOneNotNull(primaryColorTheme, baseDarkColorTheme, baseNormalColorTheme) {
@@ -99,7 +101,7 @@ private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? {
     return pallet.run {
         composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, baseDarkColorTheme) {
             ResponseCardTheme(
-                option = ResponseCardOptionTheme(normal = NeutralDefaultButton(pallet)),
+                option = ResponseCardOptionTheme(normal = NeutralDefaultButton(this)),
                 background = LayerTheme(
                     fill = baseLightColorTheme,
                     stroke = primaryColorTheme?.primaryColor
@@ -109,3 +111,46 @@ private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? {
         }
     }
 }
+
+/**
+ * Default theme for Input
+ */
+private fun ChatInputTheme(pallet: ColorPallet): InputTheme? {
+    return pallet.run {
+        composeIfAtLeastOneNotNull(baseDarkColorTheme, baseNormalColorTheme, primaryColorTheme, baseShadeColorTheme) {
+            InputTheme(
+                text = TextTheme(textColor = baseDarkColorTheme),
+                placeholder = TextTheme(textColor = baseNormalColorTheme),
+                divider = baseShadeColorTheme,
+                sendButton = ButtonTheme(iconColor = primaryColorTheme),
+            )
+        }
+    }
+}
+
+/**
+ * Default theme for Attachments popup
+ */
+private fun ChatAttachmentsPopupDefaultTheme(baseDarkColorTheme: ColorTheme?): AttachmentsPopupTheme? =
+    composeIfAtLeastOneNotNull(baseDarkColorTheme) {
+        val attachmentItem = AttachmentItemTheme(text = TextTheme(textColor = baseDarkColorTheme))
+        AttachmentsPopupTheme(
+            photoLibrary = attachmentItem,
+            takePhoto = attachmentItem,
+            browse = attachmentItem
+        )
+    }
+
+/**
+ * Default theme for Unread messages indicator
+ */
+private fun ChatUnreadIndicatorDefaultTheme(pallet: ColorPallet): UnreadIndicatorTheme? =
+    pallet.run {
+        val bubble = BubbleDefaultTheme(this)
+        composeIfAtLeastOneNotNull(bubble, baseLightColorTheme) {
+            UnreadIndicatorTheme(
+                background = baseLightColorTheme,
+                bubble = bubble
+            )
+        }
+    }

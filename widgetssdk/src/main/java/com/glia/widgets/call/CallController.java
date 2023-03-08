@@ -3,13 +3,16 @@ package com.glia.widgets.call;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.Engagement;
+import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.Operator;
+import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.engagement.Survey;
+import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.Constants;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
@@ -190,14 +193,16 @@ public class CallController implements
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
         this.isCallVisualizerUseCase = isCallVisualizerUseCase;
+
+        if (isCallVisualizerUseCase.execute()) {
+            shouldShowMediaEngagementView(true);
+        }
     }
 
     @Override
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
         Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState);
-        emitViewState(
-                callState.visitorMediaStateChanged(visitorMediaState)
-        );
+        emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
     }
 
     @Override
@@ -315,6 +320,7 @@ public class CallController implements
         Logger.d(TAG, "endEngagementDialogYesClicked");
         isVisitorEndEngagement = true;
         stop();
+        viewCallback.destroyView();
         dialogController.dismissDialogs();
     }
 
@@ -352,7 +358,11 @@ public class CallController implements
         showLandscapeControls();
 
         surveyUseCase.registerListener(this);
-        subscribeToEngagementStateChange();
+        if (isCallVisualizerUseCase.execute()) {
+            subscribeToOmnibrowseEvents();
+        } else {
+            subscribeToEngagementStateChange();
+        }
         if (mediaUpgradeOfferRepositoryCallback != null) {
             addMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
         }
@@ -721,6 +731,29 @@ public class CallController implements
                                 throwable -> Logger.e(TAG, "subscribeToEngagementStateChange error: " + throwable.getMessage())
                         )
         );
+    }
+
+    private void subscribeToOmnibrowseEvents() {
+        Glia.omnibrowse.on(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagement -> {
+            omnibrowseEngagement.getMedia().on(Media.Events.OPERATOR_STATE_UPDATE, this::onNewOperatorMediaState);
+            omnibrowseEngagement.on(Engagement.Events.STATE_UPDATE,  engagementState -> {
+                switch (engagementState.getVisitorStatus()) {
+                    case ENGAGED:
+                        onEngagementOngoing(engagementState.getOperator());
+                        break;
+                    case TRANSFERRING:
+                        Logger.e(TAG, "CallVisualizer state TRANSFERRING", new Exception("CallVisualizer flow does not support engagement transfers"));
+                        break;
+                    case UNKNOWN:
+                        Logger.d(TAG, "CallVisualizer state UNKNOWN");
+                        break;
+                }
+            });
+            omnibrowseEngagement.on(Engagement.Events.END, engagementState -> {
+                Glia.omnibrowse.off(Omnibrowse.Events.ENGAGEMENT);
+                viewCallback.destroyView();
+            });
+        });
     }
 
     private void onEngagementStateChanged(EngagementStateEvent engagementState) {

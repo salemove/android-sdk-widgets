@@ -44,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
      * @param context - Context object
      * @param contextId - Context asset ID
      * @param queueId - Queue ID
-     * @return - Intent for Starting CallActivity
+     * @return - Intent for Starting ChatActivity
      */
     public static Intent getIntent(
             Context context,

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -16,22 +15,31 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.BaseConfigurableButton
+import com.glia.widgets.view.button.GliaPositiveButton
 import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.glia.widgets.GliaWidgets as GliaWidgets
 
 object Dialogs {
     private val alertTheme: AlertTheme?
         get() = Dependencies.getGliaThemeManager().theme?.alertTheme
+
+    private fun BaseConfigurableButton.applyAlertTheme(theme: AlertTheme?) {
+        if (this is GliaPositiveButton) {
+            applyButtonTheme(theme?.positiveButton)
+        } else {
+            applyButtonTheme(theme?.negativeButton)
+        }
+    }
 
     private fun isUseVerticalAlignment(theme: UiTheme) =
         alertTheme?.isVerticalAxis ?: Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme)
@@ -134,14 +142,14 @@ object Dialogs {
                 text = negativeButtonText
                 fontFamily?.also(::setTypeface)
                 setOnClickListener(negativeButtonClickListener)
-                alertTheme?.negativeButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
                 setTheme(theme)
                 text = positiveButtonText
                 fontFamily?.also(::setTypeface)
                 setOnClickListener(positiveButtonClickListener)
-                alertTheme?.positiveButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
                 isVisible = theme.whiteLabel ?: false
@@ -212,7 +220,7 @@ object Dialogs {
                 setTheme(theme)
                 setOnClickListener(buttonClickListener)
                 fontFamily?.also(::setTypeface)
-                alertTheme?.positiveButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
         }
     }
@@ -244,13 +252,13 @@ object Dialogs {
                 setTheme(theme)
                 fontFamily?.also(::setTypeface)
                 setOnClickListener(onCloseClickListener)
-                alertTheme?.negativeButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
                 setTheme(theme)
                 fontFamily?.also(::setTypeface)
                 setOnClickListener(onAcceptOfferClickListener)
-                alertTheme?.positiveButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
                 isVisible = theme.whiteLabel ?: false
@@ -353,7 +361,7 @@ object Dialogs {
                     dismiss()
                     negativeButtonClickListener.onClick(it)
                 }
-                alertTheme?.negativeButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
                 setTheme(theme)
@@ -363,7 +371,7 @@ object Dialogs {
                     dismiss()
                     positiveButtonClickListener.onClick(it)
                 }
-                alertTheme?.positiveButton.also(::applyButtonTheme)
+                applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
                 isVisible = theme.whiteLabel ?: false

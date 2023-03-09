@@ -168,6 +168,12 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private void listenForCallVisualizerEngagements() {
+        GliaWidgets.getCallVisualizer().onEngagementStart(() -> {
+            showToast("Call Visualiser engagement established");
+        });
+    }
+
     private void navigateToChat() {
         Intent intent = new Intent(requireContext(), ChatActivity.class);
         setNavigationIntentData(intent);
@@ -333,6 +339,7 @@ public class MainFragment extends Fragment {
     private void initGliaWidgets() {
         if (Glia.isInitialized()) {
             setupAuthButtonsVisibility();
+            listenForCallVisualizerEngagements();
             return;
         }
 
@@ -340,6 +347,7 @@ public class MainFragment extends Fragment {
 
         GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(getActivity().getApplicationContext()));
         prepareAuthentication();
+        listenForCallVisualizerEngagements();
     }
 
     private void prepareAuthentication() {

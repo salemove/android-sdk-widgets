@@ -70,7 +70,8 @@ public class Dependencies {
         resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(
                 useCaseFactory.getVisitorCodeViewBuilderUseCase(),
-                repositoryFactory.getCallVisualizerRepository()
+                repositoryFactory.getCallVisualizerRepository(),
+                repositoryFactory.getGliaEngagementRepository()
         );
     }
 

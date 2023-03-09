@@ -4,6 +4,6 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 
 internal data class UnreadIndicatorTheme(
-    val background: ColorTheme?,
-    val bubble: BubbleTheme?
+    val background: ColorTheme? = null,
+    val bubble: BubbleTheme? = null
 )

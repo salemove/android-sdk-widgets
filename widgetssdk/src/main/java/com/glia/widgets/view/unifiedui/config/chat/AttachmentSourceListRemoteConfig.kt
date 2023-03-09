@@ -28,8 +28,8 @@ internal data class AttachmentSourceListRemoteConfig(
     fun toAttachmentsPopupTheme(): AttachmentsPopupTheme = AttachmentsPopupTheme(
         dividerColor = separator?.toColorTheme(),
         background = background?.toColorTheme(),
-        photoLibrary = photoLibrary?.toAttachmentsItemTheme(),
-        takePhoto = takePhoto?.toAttachmentsItemTheme(),
-        browse = browse?.toAttachmentsItemTheme()
+        photoLibrary = photoLibrary?.toAttachmentItemTheme(),
+        takePhoto = takePhoto?.toAttachmentItemTheme(),
+        browse = browse?.toAttachmentItemTheme()
     )
 }

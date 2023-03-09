@@ -15,7 +15,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.*
 internal fun ChatEngagementStates(
     pallet: ColorPallet
 ): EngagementStatesTheme? {
-    val operatorTheme = OperatorTheme(pallet)
+    val operatorTheme = OperatorDefaultTheme(pallet)
 
     return pallet.run {
         composeIfAtLeastOneNotNull(
@@ -63,29 +63,16 @@ private fun EngagementState(
 /**
  * Default theme for Operator
  */
-private fun OperatorTheme(pallet: ColorPallet): OperatorTheme? {
-    val userImage = UserImage(pallet)
+internal fun OperatorDefaultTheme(pallet: ColorPallet): OperatorTheme? {
+    val userImage = UserImageDefaultTheme(pallet)
 
     return pallet.run {
-        composeIfAtLeastOneNotNull(primaryColorTheme, userImage) {
+        composeIfAtLeastOneNotNull(userImage, primaryColorTheme, baseLightColorTheme) {
             OperatorTheme(
                 image = userImage,
                 animationColor = primaryColorTheme,
                 onHoldOverlay = OnHoldOverlayTheme(tintColor = baseLightColorTheme)
             )
         }
-    }
-}
-
-/**
- * Default theme for User image
- */
-internal fun UserImage(pallet: ColorPallet): UserImageTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme) {
-        UserImageTheme(
-            placeholderColor = baseLightColorTheme,
-            placeholderBackgroundColor = primaryColorTheme,
-            imageBackgroundColor = primaryColorTheme
-        )
     }
 }

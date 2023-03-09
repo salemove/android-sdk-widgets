@@ -2,7 +2,7 @@ package com.glia.widgets.view.unifiedui.config.chat
 
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
-import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsItemTheme
+import com.glia.widgets.view.unifiedui.theme.chat.AttachmentItemTheme
 import com.google.gson.annotations.SerializedName
 
 internal data class AttachmentSourceRemoteConfig(
@@ -16,7 +16,7 @@ internal data class AttachmentSourceRemoteConfig(
     @SerializedName("tintColor")
     val tintColor: ColorLayerRemoteConfig?
 ) {
-    fun toAttachmentsItemTheme(): AttachmentsItemTheme = AttachmentsItemTheme(
+    fun toAttachmentItemTheme(): AttachmentItemTheme = AttachmentItemTheme(
         text = textRemoteConfig?.toTextTheme(),
         iconColor = tintColor?.toColorTheme()
     )

@@ -24,8 +24,7 @@
         android:layout_marginStart="@dimen/glia_pre_xx_large"
         android:layout_marginEnd="@dimen/glia_pre_xx_large"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/end_screen_sharing_button"
+        app:layout_constraintBottom_toTopOf="@+id/end_sharing_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -44,7 +43,7 @@
         app:cornerRadius="5dp"
         android:textAllCaps="false"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/screen_sharing_label"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

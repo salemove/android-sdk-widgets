@@ -165,12 +165,10 @@ class VisitorCodeView internal constructor(
         Dependencies.getGliaThemeManager().theme?.callVisualizerTheme.apply {
             applyLayerTheme(this?.visitorCodeTheme?.background)
             successTitle.applyTextTheme(this?.visitorCodeTheme?.title)
-            // TODO MOB-1827
             failureTitle.applyTextTheme(this?.visitorCodeTheme?.title)
             progressBar.indeterminateTintList = this?.visitorCodeTheme?.loadingProgressBar?.primaryColorStateList
             closeButton.applyImageColorTheme(this?.visitorCodeTheme?.closeButtonColor)
-            // TODO MOB-1827
-            refreshButton.applyButtonTheme(this?.endScreenSharingTheme?.endButton)
+            refreshButton.applyButtonTheme(this?.visitorCodeTheme?.refreshButton)
         }
     }
 

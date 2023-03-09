@@ -4,7 +4,7 @@ import com.glia.widgets.view.unifiedui.theme.callvisulaizer.CallVisualizerTheme
 import com.google.gson.annotations.SerializedName
 
 internal data class CallVisualizerConfig(
-    @SerializedName("endScreenSharing")
+    @SerializedName("screenSharing")
     val endScreenShareRemoteConfig: EndScreenShareRemoteConfig?,
     @SerializedName("visitorCode")
     val visitorCodeRemoteConfig: VisitorCodeRemoteConfig?

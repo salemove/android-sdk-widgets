@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.RequestCallback;
+import com.glia.androidsdk.omnibrowse.Omnibrowse;
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.di.GliaCore;
@@ -42,8 +44,16 @@ public class GliaEngagementRepository {
         gliaCore.on(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
+    public void listenForCallVisualizerEngagement(Consumer<OmnibrowseEngagement> engagementConsumer) {
+        gliaCore.getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, engagementConsumer);
+    }
+
     public void unregisterEngagementListener(Consumer<OmnicoreEngagement> engagementConsumer) {
         gliaCore.off(Glia.Events.ENGAGEMENT, engagementConsumer);
+    }
+
+    public void unregisterCallVisualizerEngagementListener(Consumer<OmnibrowseEngagement> engagementConsumer) {
+        gliaCore.getCallVisualizer().off(Omnibrowse.Events.ENGAGEMENT, engagementConsumer);
     }
 
     public boolean hasOngoingEngagement() {

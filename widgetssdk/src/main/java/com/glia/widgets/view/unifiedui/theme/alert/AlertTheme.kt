@@ -5,12 +5,12 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 internal data class AlertTheme(
-    val title: TextTheme?,
-    val titleImageColor: ColorTheme?,
-    val message: TextTheme?,
-    val backgroundColor: ColorTheme?,
-    val closeButtonColor: ColorTheme?,
-    val positiveButton: ButtonTheme?,
-    val negativeButton: ButtonTheme?,
-    val isVerticalAxis: Boolean?
+    val title: TextTheme? = null,
+    val titleImageColor: ColorTheme? = null,
+    val message: TextTheme? = null,
+    val backgroundColor: ColorTheme? = null,
+    val closeButtonColor: ColorTheme? = null,
+    val positiveButton: ButtonTheme? = null,
+    val negativeButton: ButtonTheme? = null,
+    val isVerticalAxis: Boolean? = null
 )

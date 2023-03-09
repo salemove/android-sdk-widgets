@@ -12,6 +12,10 @@ import com.glia.widgets.view.unifiedui.theme.base.*
 internal fun DefaultTheme(pallet: ColorPallet?): UnifiedTheme? = pallet?.let {
     UnifiedTheme(
         callTheme = CallDefaultTheme(it),
-        chatTheme = ChatDefaultTheme(it)
+        chatTheme = ChatDefaultTheme(it),
+        alertTheme = AlertDefaultTheme(it),
+        bubbleTheme = null,
+        surveyTheme = null,
+        callVisualizerTheme = null
     )
 }

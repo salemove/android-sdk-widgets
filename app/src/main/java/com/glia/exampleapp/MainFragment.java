@@ -175,8 +175,11 @@ public class MainFragment extends Fragment {
     }
 
     private void navigateToChat() {
-        Intent intent = new Intent(requireContext(), ChatActivity.class);
-        setNavigationIntentData(intent);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        Intent intent = ChatActivity.getIntent(
+                getContext(),
+                getContextAssetIdFromPrefs(sharedPreferences),
+                getQueueIdFromPrefs(sharedPreferences));
         startActivity(intent);
     }
 

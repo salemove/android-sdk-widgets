@@ -1,5 +1,6 @@
 package com.glia.widgets.chat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -37,6 +38,23 @@ public class ChatActivity extends AppCompatActivity {
             };
 
     private GliaSdkConfiguration configuration;
+
+    /**
+     * Creates and fills out Intent for starting ChatActivity
+     * @param context - Context object
+     * @param contextId - Context asset ID
+     * @param queueId - Queue ID
+     * @return - Intent for Starting CallActivity
+     */
+    public static Intent getIntent(
+            Context context,
+            String contextId,
+            String queueId
+    ) {
+        return new Intent(context, ChatActivity.class)
+                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
+                .putExtra(GliaWidgets.QUEUE_ID, queueId);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

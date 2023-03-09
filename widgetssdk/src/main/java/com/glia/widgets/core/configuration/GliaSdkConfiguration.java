@@ -5,6 +5,7 @@ import android.content.Intent;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.unifiedui.config.RemoteConfiguration;
 
 public class GliaSdkConfiguration {
@@ -104,15 +105,18 @@ public class GliaSdkConfiguration {
         }
 
         public Builder intent(Intent intent) {
-            this.companyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
+            String tempCompanyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
+            this.companyName = tempCompanyName != null ? tempCompanyName : Dependencies.getSdkConfigurationManager().getCompanyName();
             this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
             this.remoteConfiguration = intent.getParcelableExtra(GliaWidgets.REMOTE_CONFIGURATION);
-            this.runTimeTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+            UiTheme tempTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
+            this.runTimeTheme = tempTheme != null ? tempTheme : Dependencies.getSdkConfigurationManager().getUiTheme();
             this.contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID);
             this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
-            this.screenSharingMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
+            ScreenSharing.Mode tempMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
                     ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
-                    : DEFAULT_SCREEN_SHARING_MODE;
+                    : Dependencies.getSdkConfigurationManager().getScreenSharingMode();
+            this.screenSharingMode = tempMode != null ? tempMode : DEFAULT_SCREEN_SHARING_MODE;
             return this;
         }
 

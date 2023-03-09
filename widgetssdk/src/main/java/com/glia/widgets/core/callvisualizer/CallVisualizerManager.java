@@ -2,6 +2,8 @@ package com.glia.widgets.core.callvisualizer;
 
 import android.content.Context;
 
+import com.glia.androidsdk.GliaException;
+import com.glia.widgets.GliaWidgets;
 import androidx.annotation.NonNull;
 
 import com.glia.widgets.callvisualizer.CallVisualizerRepository;
@@ -18,6 +20,7 @@ public class CallVisualizerManager implements CallVisualizer {
     private final GliaEngagementRepository engagementRepository;
     private Runnable onEngagementStartRunnable;
     private boolean isListeningForEngagement = false;
+    public static final String TAG = CallVisualizer.class.getSimpleName();
 
     public CallVisualizerManager(
             VisitorCodeViewBuilderUseCase buildVisitorCodeUseCase,
@@ -29,14 +32,22 @@ public class CallVisualizerManager implements CallVisualizer {
         this.engagementRepository = engagementRepository;
     }
 
+    private void checkForProperInit() {
+        if (Dependencies.getSdkConfigurationManager().getCompanyName() == null || Dependencies.getSdkConfigurationManager().getCompanyName().isEmpty()) {
+            throw new GliaException("companyName not set during GliaWidgets.init(GliaWidgetsConfig gliaWidgetsConfig)", GliaException.Cause.INVALID_INPUT);
+        }
+    }
+
     @Override
     public VisitorCodeView createVisitorCodeView(Context context) {
+        checkForProperInit();
         startListeningForEngagements();
         return buildVisitorCodeUseCase.invoke(context, false);
     }
 
     @Override
     public void showVisitorCodeDialog(Context context) {
+        checkForProperInit();
         startListeningForEngagements();
         Dependencies.getControllerFactory().getDialogController().showVisitorCodeDialog();
     }

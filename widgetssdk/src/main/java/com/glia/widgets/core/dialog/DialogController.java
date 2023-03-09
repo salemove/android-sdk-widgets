@@ -84,6 +84,11 @@ public class DialogController {
         }
     }
 
+    public void dismissVisitorCodeDialog() {
+        Logger.d(TAG, "Dismiss Visitor Code Dialog");
+        dialogManager.remove(new DialogState(Dialog.MODE_VISITOR_CODE));
+    }
+
     public void showNoMoreOperatorsAvailableDialog() {
         Logger.d(TAG, "Show No More Operators Dialog");
         if (isOverlayDialogShown() || isExitQueueDialogShown()) {

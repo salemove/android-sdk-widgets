@@ -60,6 +60,23 @@ public final class DialogManager {
         }
     }
 
+    /**
+     * Will remove specified dialog from the screen if it is currently being shown or from the queue.
+     * If this dialog is not found then nothing will happen
+     */
+    public void remove(@NonNull DialogState state) {
+        if (stateDeque.isEmpty()) {
+            // There are no dialogs that are being showed or queued
+            return;
+        }
+        if (state.equals(getCurrent())) {
+            dismissCurrent();
+            return;
+        }
+
+        stateDeque.removeFirstOccurrence(state);
+    }
+
     private DialogState remove() {
         return stateDeque.pollLast();
     }

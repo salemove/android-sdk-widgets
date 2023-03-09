@@ -1,9 +1,11 @@
 package com.glia.widgets.callvisualizer.controller
 
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.engagement.GliaEngagementRepository
 import io.reactivex.Observable
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
@@ -11,14 +13,17 @@ import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.function.Consumer
 
 internal class VisitorCodeControllerTest {
 
     private val dialogController = mock(DialogController::class.java)
-    private val repository = mock(VisitorCodeRepository::class.java)
-    private val controller = VisitorCodeController(dialogController, repository)
+    private val visitorCodeRepository = mock(VisitorCodeRepository::class.java)
+    private val engagementRepository = mock(GliaEngagementRepository::class.java)
+    private val controller = VisitorCodeController(dialogController, visitorCodeRepository, engagementRepository)
     private val view = mock(VisitorCodeContract.View::class.java)
     private val refreshTime = 1000L
 
@@ -27,8 +32,8 @@ internal class VisitorCodeControllerTest {
         controller.setView(view)
         verify(view).notifySetupComplete()
         verifyNoMoreInteractions(view)
-        verifyNoInteractions(dialogController, repository)
-        reset(view, dialogController, repository)
+        verifyNoInteractions(dialogController, visitorCodeRepository)
+        reset(view, dialogController, visitorCodeRepository)
     }
 
     @Test
@@ -36,7 +41,7 @@ internal class VisitorCodeControllerTest {
         controller.onCloseButtonClicked()
         verify(dialogController).dismissCurrentDialog()
         verifyNoMoreInteractions(dialogController)
-        verifyNoInteractions(view, repository)
+        verifyNoInteractions(view, visitorCodeRepository)
     }
 
     @Test
@@ -44,14 +49,14 @@ internal class VisitorCodeControllerTest {
         RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         val vc = mock(VisitorCode::class.java)
-        whenever(repository.getVisitorCode()).thenReturn(Observable.just(vc))
+        whenever(visitorCodeRepository.getVisitorCode()).thenReturn(Observable.just(vc))
         whenever(vc.duration).thenReturn(refreshTime)
         controller.onLoadVisitorCode()
         verify(view).startLoading()
-        verify(repository).getVisitorCode()
+        verify(visitorCodeRepository).getVisitorCode()
         verify(view).showVisitorCode(vc)
         verify(view).setTimer(vc.duration)
-        verifyNoMoreInteractions(view, repository)
+        verifyNoMoreInteractions(view, visitorCodeRepository)
         verifyNoInteractions(dialogController)
 
         RxJavaPlugins.setComputationSchedulerHandler { null }
@@ -63,12 +68,12 @@ internal class VisitorCodeControllerTest {
         RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         val cause = Throwable("error")
-        whenever(repository.getVisitorCode()).thenReturn(Observable.error(cause))
+        whenever(visitorCodeRepository.getVisitorCode()).thenReturn(Observable.error(cause))
         controller.onLoadVisitorCode()
         verify(view).startLoading()
-        verify(repository).getVisitorCode()
+        verify(visitorCodeRepository).getVisitorCode()
         verify(view).showError(cause)
-        verifyNoMoreInteractions(view, repository)
+        verifyNoMoreInteractions(view, visitorCodeRepository)
         verifyNoInteractions(dialogController)
 
         RxJavaPlugins.setComputationSchedulerHandler { null }
@@ -76,10 +81,21 @@ internal class VisitorCodeControllerTest {
     }
 
     @Test
+    fun `auto close is triggered when engagement starts`() {
+        val mockEngagement = mock(OmnibrowseEngagement::class.java)
+        val callbackCaptor = argumentCaptor<Consumer<OmnibrowseEngagement>>()
+        verify(engagementRepository).listenForCallVisualizerEngagement(callbackCaptor.capture())
+
+        callbackCaptor.firstValue.accept(mockEngagement)
+
+        verify(dialogController).dismissVisitorCodeDialog()
+    }
+
+    @Test
     fun onDestroy() {
         controller.onDestroy()
         verify(view).cleanUpOnDestroy()
         verifyNoMoreInteractions(view)
-        verifyNoInteractions(dialogController, repository)
+        verifyNoInteractions(dialogController, visitorCodeRepository)
     }
 }

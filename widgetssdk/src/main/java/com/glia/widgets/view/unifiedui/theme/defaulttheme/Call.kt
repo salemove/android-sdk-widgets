@@ -3,22 +3,29 @@
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.glia.widgets.view.unifiedui.theme.call.ButtonBarTheme
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 
 /**
  * Default theme for Call screen
  */
-internal fun CallDefaultTheme(pallet: ColorPallet) =
+internal fun CallDefaultTheme(pallet: ColorPallet) = pallet.run {
+    val header = CallHeader(this)
+
+    val baseLightText = TextTheme(textColor = baseLightColorTheme)
+    // must not have a background in default theme to imitate native dialler
+
     CallTheme(
-        background = null, // must be null for default theme to imitate native dialler
-        bottomText = null,
-        buttonBar = null,
-        duration = null,
-        header = CallHeader(pallet),
-        operator = null,
-        topText = null,
-        connect = null
+        bottomText = baseLightText,
+        buttonBar = ButtonBarTheme(badge = BadgeDefaultTheme(pallet)),
+        duration = baseLightText,
+        header = header,
+        operator = baseLightText,
+        topText = baseLightText,
+        connect = CallEngagementStates(pallet)
     )
+}
 
 /**
  * Default theme for Call screen header

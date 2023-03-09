@@ -10,7 +10,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.*
 
 
 /**
- * Default theme for Engagement states
+ * Default theme for Chat Engagement states
  */
 internal fun ChatEngagementStates(
     pallet: ColorPallet
@@ -26,19 +26,19 @@ internal fun ChatEngagementStates(
         ) {
             EngagementStatesTheme(
                 operator = operatorTheme,
-                queue = EngagementState(
+                queue = EngagementStateTheme(
                     title = baseDarkColorTheme,
                     description = baseNormalColorTheme
                 ),
-                connecting = EngagementState(
+                connecting = EngagementStateTheme(
                     title = baseDarkColorTheme,
                     description = primaryColorTheme
                 ),
-                connected = EngagementState(
+                connected = EngagementStateTheme(
                     title = baseDarkColorTheme,
                     description = primaryColorTheme
                 ),
-                transferring = EngagementState(
+                transferring = EngagementStateTheme(
                     title = baseDarkColorTheme,
                     description = baseDarkColorTheme
                 )
@@ -48,9 +48,31 @@ internal fun ChatEngagementStates(
 }
 
 /**
+ * Default theme for Call Engagement states
+ */
+internal fun CallEngagementStates(
+    pallet: ColorPallet
+): EngagementStatesTheme? {
+    val operatorTheme = OperatorDefaultTheme(pallet)
+
+    return pallet.run {
+        composeIfAtLeastOneNotNull(operatorTheme, baseLightColorTheme) {
+            val engagementState =
+                EngagementStateTheme(title = baseLightColorTheme, description = baseLightColorTheme)
+            EngagementStatesTheme(
+                operator = operatorTheme,
+                connecting = engagementState,
+                connected = engagementState,
+                onHold = engagementState
+            )
+        }
+    }
+}
+
+/**
  * Default theme for Engagement state
  */
-private fun EngagementState(
+private fun EngagementStateTheme(
     title: ColorTheme? = null,
     description: ColorTheme? = null
 ): EngagementStateTheme? = composeIfAtLeastOneNotNull(title, description) {

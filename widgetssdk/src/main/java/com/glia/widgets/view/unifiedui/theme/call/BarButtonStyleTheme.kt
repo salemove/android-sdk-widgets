@@ -4,7 +4,7 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 internal data class BarButtonStyleTheme(
-    val background: ColorTheme?,
-    val imageColor: ColorTheme?,
-    val title: TextTheme?
+    val background: ColorTheme? = null,
+    val imageColor: ColorTheme? = null,
+    val title: TextTheme? = null
 )

@@ -1,7 +1,6 @@
 package com.glia.widgets.view.unifiedui.parse
 
 import android.graphics.Typeface
-import android.util.Log
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig

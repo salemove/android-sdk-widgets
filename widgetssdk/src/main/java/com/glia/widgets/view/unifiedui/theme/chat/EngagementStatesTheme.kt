@@ -1,10 +1,10 @@
 package com.glia.widgets.view.unifiedui.theme.chat
 
 internal data class EngagementStatesTheme(
-    val operator: OperatorTheme?,
-    val queue: EngagementStateTheme?,
-    val connecting: EngagementStateTheme?,
-    val connected: EngagementStateTheme?,
-    val transferring: EngagementStateTheme?,
-    val onHold: EngagementStateTheme?
+    val operator: OperatorTheme?  = null,
+    val queue: EngagementStateTheme? = null,
+    val connecting: EngagementStateTheme? = null,
+    val connected: EngagementStateTheme? = null,
+    val transferring: EngagementStateTheme? = null,
+    val onHold: EngagementStateTheme? = null
 )

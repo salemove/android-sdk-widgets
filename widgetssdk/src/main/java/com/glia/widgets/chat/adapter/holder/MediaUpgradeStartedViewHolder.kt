@@ -9,7 +9,7 @@ import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
-import com.glia.widgets.view.unifiedui.theme.chat.UpgradeTheme
+import com.glia.widgets.view.unifiedui.theme.chat.MediaUpgradeTheme
 
 class MediaUpgradeStartedViewHolder(
     private val binding: ChatMediaUpgradeLayoutBinding, uiTheme: UiTheme
@@ -47,11 +47,11 @@ class MediaUpgradeStartedViewHolder(
         }
     }
 
-    private fun setUpgradeTheme(upgradeTheme: UpgradeTheme?) {
-        binding.cardView.applyCardLayerTheme(upgradeTheme?.background)
-        binding.iconView.applyImageColorTheme(upgradeTheme?.iconColor)
-        binding.titleView.applyTextTheme(upgradeTheme?.text)
-        binding.timerView.applyTextTheme(upgradeTheme?.description)
+    private fun setMediaUpgradeTheme(mediaUpgradeTheme: MediaUpgradeTheme?) {
+        binding.cardView.applyCardLayerTheme(mediaUpgradeTheme?.background)
+        binding.iconView.applyImageColorTheme(mediaUpgradeTheme?.iconColor)
+        binding.titleView.applyTextTheme(mediaUpgradeTheme?.text)
+        binding.timerView.applyTextTheme(mediaUpgradeTheme?.description)
     }
 
     fun updateTime(time: String) {
@@ -65,14 +65,14 @@ class MediaUpgradeStartedViewHolder(
                 itemView.resources.getString(R.string.glia_chat_audio_icon_content_description)
             binding.titleView.text =
                 itemView.resources.getString(R.string.glia_chat_upgraded_to_audio_call)
-            setUpgradeTheme(chatTheme?.audioUpgrade)
+            setMediaUpgradeTheme(chatTheme?.audioUpgrade)
         } else {
             upgradeVideoIcon?.also(binding.iconView::setImageResource)
             binding.iconView.contentDescription =
                 itemView.resources.getString(R.string.glia_chat_video_icon_content_description)
             binding.titleView.text =
                 itemView.resources.getString(R.string.glia_chat_upgraded_to_video_call)
-            setUpgradeTheme(chatTheme?.videoUpgrade)
+            setMediaUpgradeTheme(chatTheme?.videoUpgrade)
         }
         binding.timerView.text = chatItem.time
     }

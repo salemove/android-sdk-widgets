@@ -39,4 +39,14 @@ public interface CallVisualizer {
      */
     void addVisitorContext(String visitorCodeContext);
 
+    /**
+     * Sets callback that will be called when Call Visualizer engagement is started.
+     *
+     * Callback won't be triggered for engagement started before the callback has been set or the ongoing engagements.
+     * Setting new callback will override the old one.
+     *
+     * @param runnable The Runnable that will be executed on engagement start
+     */
+    void onEngagementStart(Runnable runnable);
+
 }

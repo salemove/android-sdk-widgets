@@ -1,38 +1,37 @@
 package com.glia.widgets.survey
 
-import android.widget.FrameLayout
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
-import com.glia.widgets.UiTheme
-import androidx.cardview.widget.CardView
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-import android.widget.LinearLayout
-import com.google.android.material.button.MaterialButton
-import kotlin.jvm.JvmOverloads
-import com.glia.widgets.R
-import com.glia.widgets.view.configuration.survey.SurveyStyle
-import android.graphics.Typeface
-import com.google.android.material.shape.ShapeAppearanceModel
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
-import android.content.res.ColorStateList
-import com.glia.widgets.view.configuration.ButtonConfiguration
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import com.glia.androidsdk.engagement.Survey
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
+import com.glia.androidsdk.engagement.Survey
+import com.glia.widgets.R
+import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
+import com.glia.widgets.view.configuration.ButtonConfiguration
+import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
 class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -106,6 +105,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
             ?.let(Color::parseColor)
             ?.also(buttonPanel::setBackgroundColor)
         surveyTheme?.layer?.fill?.also(buttonPanel::applyColorTheme)
+        surveyTheme?.title?.also(title::applyTextTheme)
 
         applyButtonStyle(surveyStyle?.submitButton, submitButton)
         applyButtonStyle(surveyStyle?.cancelButton, cancelButton)

@@ -8,6 +8,7 @@ import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.util.AttributeSet
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.glia.widgets.R
@@ -80,8 +81,10 @@ class CharCodeView @JvmOverloads constructor(
     private fun createCharSlotView(character: Char, runtimeTheme: UiTheme?, remoteTheme: VisitorCodeTheme?): TextView {
 
         val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode) // TODO: confirm this
+        charView.isFocusable = false
         charView.text = character.toString()
         charView.gravity = TEXT_ALIGNMENT_CENTER
+        charView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
         runtimeTheme?.let {
             applyRuntimeTheme(it, charView)

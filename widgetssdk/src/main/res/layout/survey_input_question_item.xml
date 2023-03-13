@@ -25,6 +25,7 @@
         android:layout_marginTop="@dimen/glia_large"
         android:autofillHints="auto"
         android:background="@drawable/bg_survey_edit_text"
+        android:textCursorDrawable="@null"
         android:gravity="start"
         android:hint="@string/glia_survey_open_text_item_edit_hint"
         android:imeOptions="actionNone"

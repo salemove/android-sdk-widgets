@@ -76,22 +76,27 @@ public class FileAttachment {
     }
 
     public enum Status {
-        UPLOADING,
-        SECURITY_SCAN,
-        READY_TO_SEND,
+        UPLOADING(false),
+        SECURITY_SCAN(false),
+        READY_TO_SEND(false),
 
-        ERROR_NETWORK_TIMEOUT,
-        ERROR_INTERNAL,
-        ERROR_INVALID_INPUT,
-        ERROR_PERMISSIONS_DENIED,
-        ERROR_FORMAT_UNSUPPORTED,
-        ERROR_FILE_TOO_LARGE,
-        ERROR_ENGAGEMENT_MISSING,
-        ERROR_UNKNOWN,
-        ERROR_SECURITY_SCAN_FAILED,
+        ERROR_NETWORK_TIMEOUT(true),
+        ERROR_INTERNAL(true),
+        ERROR_INVALID_INPUT(true),
+        ERROR_PERMISSIONS_DENIED(true),
+        ERROR_FORMAT_UNSUPPORTED(true),
+        ERROR_FILE_TOO_LARGE(true),
+        ERROR_ENGAGEMENT_MISSING(true),
+        ERROR_UNKNOWN(true),
+        ERROR_SECURITY_SCAN_FAILED(true),
 
-        ERROR_FILE_UPLOAD_FORBIDDEN,
+        ERROR_FILE_UPLOAD_FORBIDDEN(true),
 
-        ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED
+        ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED(true);
+        public final boolean isError;
+
+        Status(boolean isError) {
+            this.isError = isError;
+        }
     }
 }

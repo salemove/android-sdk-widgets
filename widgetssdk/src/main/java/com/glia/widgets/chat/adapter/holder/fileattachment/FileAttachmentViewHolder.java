@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.helper.ExtensionsKt;
 import com.glia.widgets.helper.Utils;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -77,8 +78,7 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         String name = attachmentFile.getName();
         long byteSize = attachmentFile.getSize();
         titleText.setText(String.format("%s • %s", name, Formatter.formatFileSize(itemView.getContext(), byteSize)));
-        String extension = Utils.getExtensionByStringHandling(name).orElse("");
-        extensionTypeText.setText(extension);
+        extensionTypeText.setText(ExtensionsKt.getFileExtensionOrEmpty(name));
     }
 
     private void updateStatusIndicator(boolean isFileExists, boolean isDownloading) {

@@ -764,12 +764,6 @@ public class Utils {
         return new FileAttachment(uri, displayName, size, mimeType);
     }
 
-    public static Optional<String> getExtensionByStringHandling(String filename) {
-        return Optional.ofNullable(filename)
-                .filter(f -> f.contains("."))
-                .map(f -> f.substring(filename.lastIndexOf(".") + 1).toUpperCase());
-    }
-
     public static String toString(AttachmentFile attachmentFile) {
         return "{" +
                 "id=" + attachmentFile.getId() +

@@ -70,9 +70,9 @@ public class NotificationManager implements INotificationManager {
     }
 
     @Override
-    public void showVideoCallNotification() {
+    public void showVideoCallNotification(boolean isCallVisualizer) {
         if (areNotificationsEnabled(applicationContext, NOTIFICATION_CALL_CHANNEL_ID)) {
-            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, NotificationFactory.createVideoCallStartedNotification(applicationContext));
+            notificationManager.notify(NotificationFactory.CALL_NOTIFICATION_ID, NotificationFactory.createVideoCallStartedNotification(applicationContext, isCallVisualizer));
         }
     }
 

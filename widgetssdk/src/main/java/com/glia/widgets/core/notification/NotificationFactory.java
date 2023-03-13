@@ -51,11 +51,12 @@ public class NotificationFactory {
                 .build();
     }
 
-    public static Notification createVideoCallStartedNotification(Context context) {
+    public static Notification createVideoCallStartedNotification(Context context, boolean isCallVisualizer) {
+        String text = context.getString(isCallVisualizer ? R.string.glia_notification_video_call_message_no_audio : R.string.glia_notification_video_call_message);
         return new NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_baseline_videocam)
                 .setContentTitle(context.getString(R.string.glia_notification_video_call_title))
-                .setContentText(context.getString(R.string.glia_notification_video_call_message))
+                .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setOngoing(true)

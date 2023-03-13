@@ -159,6 +159,7 @@
     <string name="glia_notification_audio_call_message">Your microphone is on and the operator can hear you.</string>
     <string name="glia_notification_video_call_title">Ongoing Video Call</string>
     <string name="glia_notification_video_call_message">The operator can see and hear you.</string>
+    <string name="glia_notification_video_call_message_no_audio">The operator can see you.</string>
     <string name="glia_notification_action_end_sharing">End Sharing</string>
 
     <string name="glia_chat_attachment_upload_checking_file">Checking file…</string>

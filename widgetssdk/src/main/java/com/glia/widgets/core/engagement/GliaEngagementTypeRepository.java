@@ -29,6 +29,7 @@ public class GliaEngagementTypeRepository {
 
     public boolean isChatEngagement() {
         return engagementRepository.hasOngoingEngagement() &&
+                !engagementRepository.isCallVisualizerEngagement() &&
                 engagementStateRepository.isOperatorPresent() &&
                 !hasAnyMedia();
     }

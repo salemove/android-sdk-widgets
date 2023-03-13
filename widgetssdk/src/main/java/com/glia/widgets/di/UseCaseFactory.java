@@ -33,6 +33,7 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
@@ -116,6 +117,7 @@ public class UseCaseFactory {
             toggleChatHeadServiceUseCase = new ToggleChatHeadServiceUseCase(
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository(),
+                    repositoryFactory.getGliaScreenSharingRepository(),
                     chatHeadManager,
                     permissionManager,
                     gliaSdkConfigurationManager,
@@ -460,7 +462,7 @@ public class UseCaseFactory {
     }
 
     public IsCallVisualizerUseCase createIsCallVisualizerUseCase() {
-        return new IsCallVisualizerUseCase();
+        return new IsCallVisualizerUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 
     public AddMediaUpgradeOfferCallbackUseCase createAddMediaUpgradeOfferCallbackUseCase() {
@@ -469,5 +471,15 @@ public class UseCaseFactory {
 
     public RemoveMediaUpgradeOfferCallbackUseCase createRemoveMediaUpgradeOfferCallbackUseCase() {
         return new RemoveMediaUpgradeOfferCallbackUseCase(repositoryFactory.getMediaUpgradeOfferRepository());
+    }
+
+    public GliaOnCallVisualizerUseCase createOnCallVisualizerUseCase() {
+        return new GliaOnCallVisualizerUseCase(
+                repositoryFactory.getGliaEngagementRepository(),
+                repositoryFactory.getGliaOperatorMediaRepository(),
+                repositoryFactory.getGliaQueueRepository(),
+                repositoryFactory.getGliaVisitorMediaRepository(),
+                repositoryFactory.getGliaEngagementStateRepository()
+        );
     }
 }

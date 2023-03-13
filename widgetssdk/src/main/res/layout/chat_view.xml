@@ -110,6 +110,7 @@
             android:layout_weight="1"
             android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
+            android:textCursorDrawable="@null"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor"
             tools:ignore="RtlSymmetry" />

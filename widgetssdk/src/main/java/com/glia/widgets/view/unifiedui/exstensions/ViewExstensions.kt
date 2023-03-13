@@ -94,11 +94,11 @@ internal fun View.applyColorTheme(color: ColorTheme?) {
     backgroundTintList = null
 }
 
-internal fun View.createBackgroundFromTheme(color: ColorTheme): Drawable {
-    if (color.isGradient) {
-        return GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, color.valuesArray)
+internal fun createBackgroundFromTheme(color: ColorTheme): Drawable {
+    return if (color.isGradient) {
+        GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, color.valuesArray)
     } else {
-        return ColorDrawable(color.primaryColor)
+        ColorDrawable(color.primaryColor)
     }
 }
 
@@ -141,7 +141,7 @@ internal fun View.applyLayerTheme(layer: LayerTheme?, padding: Rect? = null) {
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
     layer?.fill?.primaryColor?.also {
         /*
-        when the card has opacity/alpha then shadow shapes inner part becomes visible,
+        when the card has opacity/alpha, then shadow shapes inner part becomes visible,
         so in this case we need to make elevation = 0 to prevent this behavior
         */
         if (Color.alpha(it) > 0) cardElevation = 0f
@@ -206,7 +206,7 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     buttonTheme?.text?.also {
         applyTextTheme(it)
         // Also apply text color to button icon
-        iconTint = it?.textColor?.primaryColorStateList
+        iconTint = it.textColor?.primaryColorStateList
     }
 }
 

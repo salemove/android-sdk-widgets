@@ -136,7 +136,7 @@ public class GliaWidgets {
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         Dependencies.glia().init(createGliaConfig(gliaWidgetsConfig));
-        Dependencies.init();
+        Dependencies.init(gliaWidgetsConfig);
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
     }

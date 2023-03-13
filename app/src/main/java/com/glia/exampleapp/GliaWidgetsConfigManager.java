@@ -8,11 +8,13 @@ import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.SiteApiKey;
+import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgetsConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  *Helper class to obtain Glia Config params from deep-link or preferences.
@@ -23,13 +25,11 @@ import java.io.InputStream;
  */
 public class GliaWidgetsConfigManager {
     private static final String SECRET_KEY = "secret";
-
     private static final String SITE_ID_KEY = "site_id";
     private static final String API_KEY_SECRET_KEY = "api_key_secret";
     private static final String API_KEY_ID_KEY = "api_key_id";
     private static final String QUEUE_ID_KEY = "queue_id";
     public static final String VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id";
-
     private static final String REGION_BETA = "beta";
     private static final String REGION_ACCEPTANCE = "acceptance";
 
@@ -113,12 +113,24 @@ public class GliaWidgetsConfigManager {
         String apiKeyId = preferences.getString(applicationContext.getString(R.string.pref_api_key_id), applicationContext.getString(R.string.glia_api_key_id));
         String apiKeySecret = preferences.getString(applicationContext.getString(R.string.pref_api_key_secret), applicationContext.getString(R.string.glia_api_key_secret));
         String siteId = preferences.getString(applicationContext.getString(R.string.pref_site_id), applicationContext.getString(R.string.site_id));
-
+        String companyName = preferences.getString(applicationContext.getString(R.string.pref_company_name), "");
+        boolean useOverlay = preferences.getBoolean(applicationContext.getString(R.string.pref_use_overlay), true);
+        String bounded = applicationContext.getString(R.string.screen_sharing_mode_app_bounded);
+        String unbounded = applicationContext.getString(R.string.screen_sharing_mode_unbounded);
+        ScreenSharing.Mode screenSharingMode;
+        if (Objects.equals(preferences.getString(applicationContext.getString(R.string.pref_screen_sharing_mode), unbounded), bounded)) {
+            screenSharingMode = ScreenSharing.Mode.APP_BOUNDED;
+        } else {
+            screenSharingMode = ScreenSharing.Mode.UNBOUNDED;
+        }
 
         return new GliaWidgetsConfig.Builder()
                 .setSiteApiKey(new SiteApiKey(apiKeyId, apiKeySecret))
                 .setSiteId(siteId)
                 .setRegion(REGION_BETA)
+                .setCompanyName(companyName)
+                .setUseOverlay(useOverlay)
+                .setScreenSharingMode(screenSharingMode)
                 .setContext(applicationContext)
                 .setUiJsonRemoteConfig(getRawResource(applicationContext, R.raw.global_colors)) // TODO MOB-1919
                 .build();

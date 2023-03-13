@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.Lifecycle;
 
+import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -92,8 +93,12 @@ public class Dependencies {
         return UNIFIED_THEME_MANAGER;
     }
 
-    public static void init() {
+    public static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         controllerFactory.init();
+        sdkConfigurationManager.setScreenSharingMode(gliaWidgetsConfig.getScreenSharingMode());
+        sdkConfigurationManager.setUseOverlay(gliaWidgetsConfig.isUseOverlay());
+        sdkConfigurationManager.setCompanyName(gliaWidgetsConfig.getCompanyName());
+        sdkConfigurationManager.setUiTheme(gliaWidgetsConfig.getUiTheme());
     }
 
     public static ControllerFactory getControllerFactory() {

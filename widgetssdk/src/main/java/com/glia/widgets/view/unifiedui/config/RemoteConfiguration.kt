@@ -6,7 +6,7 @@ import com.glia.widgets.view.unifiedui.config.call.CallRemoteConfig
 import com.glia.widgets.view.unifiedui.config.callvisualizer.CallVisualizerConfig
 import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
-import com.glia.widgets.view.unifiedui.exstensions.safeMerge
+import com.glia.widgets.view.unifiedui.exstensions.deepMerge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultTheme
 import com.google.gson.annotations.SerializedName
@@ -45,6 +45,6 @@ internal data class RemoteConfiguration(
             callVisualizerTheme = callVisualizerRemoteConfig?.toCallVisualizerTheme()
         )
 
-        return defaultTheme safeMerge unifiedTheme
+        return defaultTheme deepMerge unifiedTheme
     }
 }

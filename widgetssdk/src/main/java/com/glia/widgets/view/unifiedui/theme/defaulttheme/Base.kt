@@ -15,7 +15,7 @@ internal fun DefaultTheme(pallet: ColorPallet?): UnifiedTheme? = pallet?.let {
         chatTheme = ChatDefaultTheme(it),
         alertTheme = AlertDefaultTheme(it),
         bubbleTheme = BubbleDefaultTheme(it),
-        surveyTheme = null,
+        surveyTheme = SurveyDefaultTheme(it),
         callVisualizerTheme = null
     )
 }

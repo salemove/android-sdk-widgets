@@ -40,11 +40,15 @@ public class GliaEngagementRepository {
         }));
     }
 
-    public void listenForEngagement(Consumer<OmnicoreEngagement> engagementConsumer) {
+    public void listenForOmnicoreEngagement(Consumer<OmnicoreEngagement> engagementConsumer) {
         gliaCore.on(Glia.Events.ENGAGEMENT, engagementConsumer);
     }
 
     public void listenForCallVisualizerEngagement(Consumer<OmnibrowseEngagement> engagementConsumer) {
+        gliaCore.getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, engagementConsumer);
+    }
+
+    public void listenForOmnibrowseEngagement(Consumer<OmnibrowseEngagement> engagementConsumer) {
         gliaCore.getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, engagementConsumer);
     }
 
@@ -58,6 +62,12 @@ public class GliaEngagementRepository {
 
     public boolean hasOngoingEngagement() {
         return gliaCore.getCurrentEngagement().isPresent();
+    }
+
+    public boolean isCallVisualizerEngagement() {
+        return gliaCore.getCurrentEngagement()
+                .filter(engagement -> engagement instanceof OmnibrowseEngagement)
+                .isPresent();
     }
 
     public void getSiteInfo(@NonNull RequestCallback<SiteInfo> callback) {

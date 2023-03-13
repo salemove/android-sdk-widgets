@@ -3,6 +3,7 @@ package com.glia.widgets.core.chathead.domain;
 import android.view.View;
 
 import com.glia.widgets.call.CallView;
+import com.glia.widgets.callvisualizer.EndScreenSharingView;
 import com.glia.widgets.chat.ChatView;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -11,11 +12,13 @@ import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
+import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
 import com.glia.widgets.filepreview.ui.FilePreviewView;
 
 public class ToggleChatHeadServiceUseCase {
     private final GliaEngagementRepository engagementRepository;
     private final GliaQueueRepository queueRepository;
+    private final GliaScreenSharingRepository screenSharingRepository;
     private final ChatHeadManager chatHeadManager;
     private final PermissionManager permissionManager;
     private final GliaSdkConfigurationManager configurationManager;
@@ -24,6 +27,7 @@ public class ToggleChatHeadServiceUseCase {
     public ToggleChatHeadServiceUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository,
+            GliaScreenSharingRepository screenSharingRepository,
             ChatHeadManager chatHeadManager,
             PermissionManager permissionManager,
             GliaSdkConfigurationManager configurationManager,
@@ -31,6 +35,7 @@ public class ToggleChatHeadServiceUseCase {
     ) {
         this.engagementRepository = engagementRepository;
         this.queueRepository = queueRepository;
+        this.screenSharingRepository = screenSharingRepository;
         this.chatHeadManager = chatHeadManager;
         this.permissionManager = permissionManager;
         this.configurationManager = configurationManager;
@@ -38,11 +43,21 @@ public class ToggleChatHeadServiceUseCase {
     }
 
     public void execute(View view) {
-        if (isBubbleEnabled() && hasOverlayPermission() && (isShowForMediaEngagement(view) || isShowForChatEngagement(view))) {
+        if (isBubbleEnabled() && hasOverlayPermission() && (
+                isShowForMediaEngagement(view) || isShowForChatEngagement(view) || isCallVisualizerScreenSharing(view))) {
             chatHeadManager.startChatHeadService();
         } else {
             chatHeadManager.stopChatHeadService();
         }
+    }
+
+    private boolean isCallVisualizerScreenSharing(View view) {
+        return engagementRepository.isCallVisualizerEngagement() &&
+                screenSharingRepository.isSharingScreen() &&
+                isNotInChatView(view) &&
+                isNotInCallView(view) &&
+                isNotInFilePreviewView(view) &&
+                isNotInEndScreenSharingView(view);
     }
 
     private boolean isBubbleEnabled() {
@@ -58,7 +73,11 @@ public class ToggleChatHeadServiceUseCase {
     }
 
     private boolean isShowForChatEngagement(View view) {
-        return isChatEngagementOrQueueingOngoing() && isNotInChatView(view) && isNotInCallView(view) && isNotInFilePreviewView(view);
+        return isChatEngagementOrQueueingOngoing() &&
+                isNotInChatView(view) &&
+                isNotInCallView(view) &&
+                isNotInFilePreviewView(view) &&
+                isNotInEndScreenSharingView(view);
     }
 
     private boolean isChatEngagementOrQueueingOngoing() {
@@ -75,6 +94,10 @@ public class ToggleChatHeadServiceUseCase {
 
     private boolean isNotInChatView(View view) {
         return !(view instanceof ChatView);
+    }
+
+    private boolean isNotInEndScreenSharingView(View view) {
+        return !(view instanceof EndScreenSharingView);
     }
 
     private boolean isNotInFilePreviewView(View view) {

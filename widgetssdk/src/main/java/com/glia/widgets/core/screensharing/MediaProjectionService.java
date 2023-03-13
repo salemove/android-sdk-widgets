@@ -49,7 +49,11 @@ public class MediaProjectionService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (Actions.START.equals(intent.getAction())) {
+        String action = null;
+        if (intent != null) {
+            action = intent.getAction();
+        }
+        if (Actions.START.equals(action)) {
             setupListeners();
         }
 
@@ -68,6 +72,7 @@ public class MediaProjectionService extends Service {
     }
 
     public void removeListeners() {
+        if (!Glia.isInitialized()) return;
         Glia.off(Glia.Events.ENGAGEMENT, omnicoreEngagementStartListener);
         Glia.omnibrowse.off(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagementStartListener);
     }

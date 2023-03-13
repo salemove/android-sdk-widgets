@@ -19,12 +19,15 @@ import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
+import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
+import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
+import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
 class ChatHeadView @JvmOverloads constructor(
@@ -32,7 +35,12 @@ class ChatHeadView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.gliaChatStyle,
     defStyleRes: Int = R.style.Application_Glia_Chat
-) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), ChatHeadContract.View {
+) : ConstraintLayout(
+    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    attrs,
+    defStyleAttr,
+    defStyleRes
+), ChatHeadContract.View {
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
 
     private var sdkConfiguration: GliaSdkConfiguration? = null
@@ -44,8 +52,12 @@ class ChatHeadView @JvmOverloads constructor(
         get() = Dependencies.getGliaThemeManager().theme?.run {
             if (isService) bubbleTheme else chatTheme?.bubble
         }
+    private var serviceChatHeadController: ServiceChatHeadController
+    private var isCallVisualizerUseCase: IsCallVisualizerUseCase
 
     init {
+        serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
+        isCallVisualizerUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerUseCase()
         setAccessibilityLabels()
     }
 
@@ -119,6 +131,7 @@ class ChatHeadView @JvmOverloads constructor(
         buildTimeTheme: UiTheme, sdkConfiguration: GliaSdkConfiguration?
     ) {
         this.sdkConfiguration = sdkConfiguration
+        serviceChatHeadController.setBuildTimeTheme(buildTimeTheme)
         createHybridConfiguration(buildTimeTheme, sdkConfiguration)
         post { updateView() }
     }
@@ -208,9 +221,14 @@ class ChatHeadView @JvmOverloads constructor(
         })
     }
 
-    private fun updateOperatorPlaceholderImageView() {
+    private fun updatePlaceholderImageView() {
+        val placeholderIcon = if (isCallVisualizerUseCase.execute()) {
+            R.drawable.ic_screensharing
+        } else {
+            configuration.operatorPlaceholderIcon
+        }
         binding.placeholderView.apply {
-            setImageResource(configuration.operatorPlaceholderIcon)
+            setImageResource(placeholderIcon)
             setBackgroundColor(getColorCompat(configuration.operatorPlaceholderBackgroundColor))
             imageTintList = getColorStateListCompat(configuration.operatorPlaceholderIconTintList)
         }
@@ -242,7 +260,7 @@ class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun updateView() {
-        updateOperatorPlaceholderImageView()
+        updatePlaceholderImageView()
         updateOnHoldImageView()
         updateBadgeView()
         updateProfilePictureView()

@@ -165,7 +165,7 @@ public class UseCaseFactory {
 
     public ShowVideoCallNotificationUseCase createShowVideoCallNotificationUseCase() {
         if (showVideoCallNotificationUseCase == null)
-            showVideoCallNotificationUseCase = new ShowVideoCallNotificationUseCase(notificationManager);
+            showVideoCallNotificationUseCase = new ShowVideoCallNotificationUseCase(notificationManager, createIsCallVisualizerUseCase());
         return showVideoCallNotificationUseCase;
     }
 

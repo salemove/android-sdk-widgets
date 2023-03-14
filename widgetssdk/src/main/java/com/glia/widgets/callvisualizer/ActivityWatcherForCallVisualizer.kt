@@ -42,7 +42,7 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference
 
-class ActivityWatcherForDialogs(
+class ActivityWatcherForCallVisualizer(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
     private val dialogController: DialogController,
@@ -50,7 +50,7 @@ class ActivityWatcherForDialogs(
 ) : Application.ActivityLifecycleCallbacks {
 
     companion object {
-        private val TAG = ActivityWatcherForDialogs::class.java.simpleName
+        private val TAG = ActivityWatcherForCallVisualizer::class.java.simpleName
     }
 
     @VisibleForTesting

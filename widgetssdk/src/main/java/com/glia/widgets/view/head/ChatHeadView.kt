@@ -223,7 +223,7 @@ class ChatHeadView @JvmOverloads constructor(
 
     private fun updatePlaceholderImageView() {
         val placeholderIcon = if (isCallVisualizerUseCase.execute()) {
-            R.drawable.ic_screensharing
+            R.drawable.ic_screensharing // TODO: 14.03.2023 MOB-1942 add this icon to UiTheme the same way as operatorPlaceholderIcon
         } else {
             configuration.operatorPlaceholderIcon
         }

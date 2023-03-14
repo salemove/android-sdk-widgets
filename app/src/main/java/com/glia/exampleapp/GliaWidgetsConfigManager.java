@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.SiteApiKey;
@@ -19,7 +20,7 @@ import java.util.Objects;
 /**
  *Helper class to obtain Glia Config params from deep-link or preferences.
  *
- *for setup with secret link must be
+ *for setup with a secret link must be
  *      glia://widgets/secret?site_id={site_id}&api_key_secret={api_key_secret}&api_key_id={api_key_id}&queue_id={queue_id}&visitor_context_asset_id={visitor_context_asset_id}
  *      where all query params are mandatory except visitor_context_asset_id
  */
@@ -104,12 +105,21 @@ public class GliaWidgetsConfigManager {
 
     @NonNull
     public static GliaWidgetsConfig createDefaultConfig(@NonNull Context applicationContext) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return configWithSiteApiKeyAuth(sharedPreferences, applicationContext);
+        return createDefaultConfig(applicationContext, null);
     }
 
     @NonNull
-    private static GliaWidgetsConfig configWithSiteApiKeyAuth(@NonNull SharedPreferences preferences, @NonNull Context applicationContext) {
+    public static GliaWidgetsConfig createDefaultConfig(@NonNull Context applicationContext,
+                                                        @Nullable String uiJsonRemoteConfig) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return configWithSiteApiKeyAuth(sharedPreferences, applicationContext, uiJsonRemoteConfig);
+    }
+
+    @NonNull
+    private static GliaWidgetsConfig configWithSiteApiKeyAuth(@NonNull SharedPreferences preferences,
+                                                              @NonNull Context applicationContext,
+                                                              @Nullable String uiJsonRemoteConfig) {
+
         String apiKeyId = preferences.getString(applicationContext.getString(R.string.pref_api_key_id), applicationContext.getString(R.string.glia_api_key_id));
         String apiKeySecret = preferences.getString(applicationContext.getString(R.string.pref_api_key_secret), applicationContext.getString(R.string.glia_api_key_secret));
         String siteId = preferences.getString(applicationContext.getString(R.string.pref_site_id), applicationContext.getString(R.string.site_id));
@@ -132,27 +142,8 @@ public class GliaWidgetsConfigManager {
                 .setUseOverlay(useOverlay)
                 .setScreenSharingMode(screenSharingMode)
                 .setContext(applicationContext)
-                .setUiJsonRemoteConfig(getRawResource(applicationContext, R.raw.global_colors)) // TODO MOB-1919
+                .setUiJsonRemoteConfig(uiJsonRemoteConfig)
                 .build();
-    }
-
-    // for testing the remote theme configurations JSON
-    private static String getRawResource(Context context, int resource) {
-        String res = null;
-        InputStream is = context.getResources().openRawResource(resource);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] b = new byte[1];
-        try {
-            while ( is.read(b) != -1 ) {
-                baos.write(b);
-            }
-            res = baos.toString();
-            is.close();
-            baos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return res;
     }
 
 }

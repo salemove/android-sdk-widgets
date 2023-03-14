@@ -23,7 +23,7 @@ import kotlin.reflect.full.primaryConstructor
  *
  *     val a = MyDataClass(...)
  *     val b = MyDataClass(...)
- *     val c = a safeMerge b
+ *     val c = a deepMerge b
  */
 internal inline infix fun <reified T : Any?> T.deepMerge(other: T): T {
     if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes")

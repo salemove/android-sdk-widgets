@@ -332,7 +332,6 @@ class ActivityWatcherForDialogs(
     }
 
     private fun showVisitorCodeDialog(resumedActivity: WeakReference<Activity?>) {
-        if (!Glia.isInitialized()) return
         val activity = resumedActivity.get() ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return

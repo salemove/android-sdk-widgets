@@ -80,7 +80,8 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.end_engagement_button).setOnClickListener(v ->
                 GliaWidgets.endEngagement());
         view.findViewById(R.id.initGliaWidgetsButton).setOnClickListener(v ->
-                initGliaWidgets());
+                new Thread(this::initGliaWidgets).start()
+        );
         view.findViewById(R.id.authenticationButton).setOnClickListener(v ->
                 showAuthenticationDialog());
         view.findViewById(R.id.deauthenticationButton).setOnClickListener(v ->
@@ -147,10 +148,13 @@ public class MainFragment extends Fragment {
                 containerView.findViewById(R.id.initGliaWidgetsButton).setVisibility(View.VISIBLE);
                 containerView.findViewById(R.id.authenticationButton).setVisibility(View.GONE);
                 containerView.findViewById(R.id.deauthenticationButton).setVisibility(View.GONE);
+                containerView.findViewById(R.id.visitor_code_button).setVisibility(View.GONE);
             });
             return;
         }
-
+        getActivity().runOnUiThread(() -> {
+            containerView.findViewById(R.id.visitor_code_button).setVisibility(View.VISIBLE);
+        });
         if (authentication == null) return;
 
         if (authentication.isAuthenticated()) {

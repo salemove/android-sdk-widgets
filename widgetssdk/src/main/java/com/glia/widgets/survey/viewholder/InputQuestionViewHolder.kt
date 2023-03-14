@@ -18,7 +18,7 @@ import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
-import com.glia.widgets.view.unifiedui.exstensions.safeMerge
+import com.glia.widgets.view.unifiedui.exstensions.deepMerge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
@@ -102,7 +102,7 @@ class InputQuestionViewHolder(
         )
 
         return inputTheme?.option?.let {
-            baseTheme safeMerge it
+            baseTheme deepMerge it
         } ?: baseTheme
     }
 

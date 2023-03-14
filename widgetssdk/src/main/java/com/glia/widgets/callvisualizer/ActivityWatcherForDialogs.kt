@@ -18,8 +18,12 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.comms.MediaDirection
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.call.CallActivity
+import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
@@ -27,7 +31,9 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository.SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference
@@ -375,10 +381,33 @@ class ActivityWatcherForDialogs(
 
         alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
             dialogController.dismissCurrentDialog()
-            // TODO: 07.02.2023 handle media request accepting in the scope of respective ticket
+            mediaUpgrade.mediaUpgradeOffer.accept { error ->
+                error?.let {
+                    Logger.e(TAG, error.message, error)
+                } ?: run {
+                    if (mediaUpgrade.mediaUpgradeOffer.video != null && mediaUpgrade.mediaUpgradeOffer.video != MediaDirection.NONE) {
+                        openCallActivity(contextWithStyle)
+                    } else {
+                        Logger.e(TAG, "Audio upgrade offer in call visualizer", Exception("Audio upgrade offer in call visualizer"))
+                        return@accept
+                    }
+                }
+            }
         }) {
             dialogController.dismissCurrentDialog()
         }
+    }
+
+    private fun openCallActivity(contextWithStyle: Context) {
+        val intent = CallActivity.getIntent(contextWithStyle,
+            getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
+                .setIsUpgradeToCall(true)
+                .build())
+        contextWithStyle.startActivity(intent)
+    }
+
+    private fun getConfigurationBuilder(): Configuration.Builder {
+        return Configuration.Builder().setWidgetsConfiguration(Dependencies.getSdkConfigurationManager().createWidgetsConfiguration())
     }
 
     private fun prepareContextWithStyle(resumedActivity: Activity): Context {

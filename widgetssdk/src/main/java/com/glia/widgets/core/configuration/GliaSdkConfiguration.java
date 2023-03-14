@@ -46,7 +46,7 @@ public class GliaSdkConfiguration {
     }
 
     public UiTheme getRunTimeTheme() {
-        return this.runTimeTheme;
+        return this.runTimeTheme != null ? this.runTimeTheme : Dependencies.getSdkConfigurationManager().getUiTheme();
     }
 
     public boolean getUseOverlay() {
@@ -54,7 +54,7 @@ public class GliaSdkConfiguration {
     }
 
     public ScreenSharing.Mode getScreenSharingMode() {
-        return screenSharingMode;
+        return screenSharingMode != null ? this.screenSharingMode : Dependencies.getSdkConfigurationManager().getScreenSharingMode();
     }
 
     public static class Builder {

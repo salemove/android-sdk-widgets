@@ -2,6 +2,7 @@ package com.glia.widgets.core.callvisualizer.domain;
 
 import android.content.Context;
 
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.VisitorCodeView;
 
 /**

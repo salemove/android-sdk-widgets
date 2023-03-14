@@ -164,7 +164,7 @@ public class GliaWidgetsConfig {
      *   .build();
      * </code>
      * </pre>
-     * <p>
+     * </p>
      */
     public static class Builder {
         String appToken;

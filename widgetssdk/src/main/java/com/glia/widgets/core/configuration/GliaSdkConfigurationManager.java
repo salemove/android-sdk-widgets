@@ -5,6 +5,8 @@ import static com.glia.widgets.core.configuration.GliaSdkConfiguration.DEFAULT_S
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
 
+import org.jetbrains.annotations.Nullable;
+
 public class GliaSdkConfigurationManager {
 
     private boolean useOverlay = false;
@@ -47,5 +49,15 @@ public class GliaSdkConfigurationManager {
 
     public void setScreenSharingMode(ScreenSharing.Mode screenSharingMode) {
         this.screenSharingMode = screenSharingMode;
+    }
+
+    @Nullable
+    public GliaSdkConfiguration createWidgetsConfiguration() {
+        return new GliaSdkConfiguration.Builder()
+                .companyName(companyName)
+                .screenSharingMode(screenSharingMode)
+                .useOverlay(useOverlay)
+                .runTimeTheme(uiTheme)
+                .build();
     }
 }

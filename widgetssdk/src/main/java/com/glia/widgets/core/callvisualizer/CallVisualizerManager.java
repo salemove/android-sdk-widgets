@@ -3,12 +3,12 @@ package com.glia.widgets.core.callvisualizer;
 import android.content.Context;
 
 import com.glia.androidsdk.GliaException;
-import com.glia.widgets.GliaWidgets;
 import androidx.annotation.NonNull;
 
 import com.glia.widgets.callvisualizer.CallVisualizerRepository;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
+import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.VisitorCodeView;
@@ -21,6 +21,8 @@ public class CallVisualizerManager implements CallVisualizer {
     private Runnable onEngagementStartRunnable;
     private boolean isListeningForEngagement = false;
     public static final String TAG = CallVisualizer.class.getSimpleName();
+
+    public GliaSdkConfiguration configuration;
 
     public CallVisualizerManager(
             VisitorCodeViewBuilderUseCase buildVisitorCodeUseCase,

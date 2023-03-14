@@ -462,7 +462,7 @@ public class UseCaseFactory {
     }
 
     public IsCallVisualizerUseCase createIsCallVisualizerUseCase() {
-        return new IsCallVisualizerUseCase();
+        return new IsCallVisualizerUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 
     public AddMediaUpgradeOfferCallbackUseCase createAddMediaUpgradeOfferCallbackUseCase() {

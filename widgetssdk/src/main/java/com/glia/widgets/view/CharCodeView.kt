@@ -14,9 +14,9 @@ import android.widget.TextView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.exstensions.*
-import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.theme.callvisulaizer.VisitorCodeTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 

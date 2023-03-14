@@ -334,8 +334,8 @@ internal class ActivityWatcherForCallVisualizer(
         )
     }
 
-    private fun showVisitorCodeDialog(resumedActivity: WeakReference<Activity?>) {
-        val activity = resumedActivity.get() ?: return
+    private fun showVisitorCodeDialog(activity: Activity?) {
+        if (activity == null) return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }

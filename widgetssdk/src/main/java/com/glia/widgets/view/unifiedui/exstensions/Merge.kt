@@ -4,7 +4,6 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -26,7 +25,7 @@ import kotlin.reflect.full.primaryConstructor
  *     val b = MyDataClass(...)
  *     val c = a safeMerge b
  */
-internal inline infix fun <reified T : Any?> T.safeMerge(other: T): T {
+internal inline infix fun <reified T : Any?> T.deepMerge(other: T): T {
     if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes")
     return merge(other)
 }
@@ -59,13 +58,9 @@ private fun <T : Any?> mergeProperties(
 
     when {
         type.isData -> mergeDataProperties(property, current, other)
-        type.isPrimitiveOrEnum -> mergePrimitiveOrEnumProperties(property, current, other)
-        else -> throw UnsupportedOperationException("Merge supports only `data class`, `enum` or `primitive` properties")
+        else -> mergeEndValues(property, current, other)
     }
 }
-
-private val <T : Any> KClass<T>.isPrimitiveOrEnum: Boolean
-    get() = isSubclassOf(Number::class) || isSubclassOf(String::class) || isSubclassOf(Enum::class)
 
 /**
  * Deep merge two data properties
@@ -83,7 +78,7 @@ private fun <T> mergeDataProperties(
 /**
  * Deep merge two primitive properties
  */
-private fun <T : Any?> mergePrimitiveOrEnumProperties(
+private fun <T : Any?> mergeEndValues(
     property: KProperty1<out T, Any?>,
     current: T,
     other: T

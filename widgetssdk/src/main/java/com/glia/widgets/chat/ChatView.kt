@@ -924,8 +924,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             resources.getString(R.string.glia_dialog_overlay_permissions_ok),
             resources.getString(R.string.glia_dialog_overlay_permissions_no),
             {
-                dismissAlertDialog()
                 controller?.overlayPermissionsDialogDismissed()
+                dismissAlertDialog()
                 val overlayIntent = Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + this.context.packageName)
@@ -934,12 +934,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 this.context.startActivity(overlayIntent)
             },
             {
-                dismissAlertDialog()
                 controller?.overlayPermissionsDialogDismissed()
+                dismissAlertDialog()
             }
-        ) { dialog: DialogInterface ->
+        ) {
             controller?.overlayPermissionsDialogDismissed()
-            dialog.dismiss()
+            dismissAlertDialog()
         }
     }
 

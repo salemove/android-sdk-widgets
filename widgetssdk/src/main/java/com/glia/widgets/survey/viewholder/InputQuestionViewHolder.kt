@@ -2,22 +2,21 @@ package com.glia.widgets.survey.viewholder
 
 import android.graphics.Color
 import android.graphics.Typeface
-import android.text.Editable
 import android.view.View
 import android.widget.EditText
+import androidx.core.widget.doAfterTextChanged
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
 import com.glia.widgets.databinding.SurveyInputQuestionItemBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.configuration.OptionButtonConfiguration
 import com.glia.widgets.view.configuration.survey.InputQuestionConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.exstensions.deepMerge
 import com.glia.widgets.view.unifiedui.exstensions.getColorCompat
 import com.glia.widgets.view.unifiedui.exstensions.deepMerge
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
@@ -120,19 +119,13 @@ class InputQuestionViewHolder(
     private fun setupInputBoxText(optionButtonStyle: OptionButtonConfiguration) {
         comment.setTextColor(optionButtonStyle.normalText.textColor)
         if (optionButtonStyle.normalText.isBold) comment.typeface = Typeface.DEFAULT_BOLD
-        comment.setHintTextColor(
-            itemView.getColorCompat(R.color.glia_base_shade_color)
-        )
+        comment.setHintTextColor(itemView.getColorCompat(R.color.glia_base_shade_color))
         val textSize = optionButtonStyle.normalText.textSize
         comment.textSize = textSize
         comment.onFocusChangeListener = View.OnFocusChangeListener { _, _ ->
             setAnswer(comment.text.toString())
         }
-        comment.addTextChangedListener(object : SimpleTextWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                setAnswer(editable.toString())
-            }
-        })
+        comment.doAfterTextChanged { setAnswer(it.toString()) }
 
         comment.applyTextTheme(inputTheme?.text)
         comment.applyLayerTheme(optionButtonTheme.normalLayer)

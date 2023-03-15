@@ -7,7 +7,7 @@
     android:background="@android:color/white"
     android:focusable="true">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/type_indicator_view"
         android:layout_width="@dimen/glia_chat_attachment_type_indicator_size"
         android:layout_height="@dimen/glia_chat_attachment_type_indicator_size"
@@ -37,7 +37,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             tools:text="PDF" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <ImageButton
         android:id="@+id/remove_item_button"

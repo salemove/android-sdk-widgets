@@ -1,17 +1,15 @@
 package com.glia.widgets.view
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.os.CountDownTimer
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import com.glia.androidsdk.omnibrowse.VisitorCode
@@ -30,6 +28,7 @@ import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
 import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 /**
  * A view for displaying the visitor code to the visitor.
@@ -54,6 +53,7 @@ class VisitorCodeView internal constructor(
     private var progressBar: ProgressBar
     private var refreshButton: GliaPositiveButton
     private var closeButton: AppCompatImageButton
+    private var whiteLabelView: ImageView
 
     init {
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
@@ -67,8 +67,10 @@ class VisitorCodeView internal constructor(
         refreshButton.setOnClickListener { controller.onLoadVisitorCode() }
         closeButton = findViewById(R.id.close_button)
         closeButton.setOnClickListener { controller.onCloseButtonClicked() }
+        whiteLabelView = findViewById(R.id.logo_view)
         readTypedArray()
-        applyRemoteConfigTheme()
+        applyRemoteThemeConfig(Dependencies.getGliaThemeManager().theme)
+
         setController(Dependencies.getControllerFactory().visitorCodeController)
     }
 
@@ -113,8 +115,12 @@ class VisitorCodeView internal constructor(
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        applyDialogTheme(theme)
+        val typedArrayTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        val runtimeGlobalTheme = Dependencies.getSdkConfigurationManager()?.uiTheme
+        theme = if (typedArrayTheme != null && runtimeGlobalTheme != null) {
+            Utils.getFullHybridTheme(runtimeGlobalTheme, typedArrayTheme)
+        } else runtimeGlobalTheme ?: typedArrayTheme
+        applyRuntimeThemeConfig(theme)
     }
 
     override fun startLoading() {
@@ -168,8 +174,8 @@ class VisitorCodeView internal constructor(
         post(function)
     }
 
-    private fun applyRemoteConfigTheme() {
-        Dependencies.getGliaThemeManager().theme?.callVisualizerTheme.apply {
+    private fun applyRemoteThemeConfig(theme: UnifiedTheme?) {
+        theme?.callVisualizerTheme.apply {
             applyLayerTheme(this?.visitorCodeTheme?.background)
             successTitle.applyTextTheme(this?.visitorCodeTheme?.title)
             failureTitle.applyTextTheme(this?.visitorCodeTheme?.title)
@@ -179,31 +185,47 @@ class VisitorCodeView internal constructor(
         }
     }
 
-    private fun applyDialogTheme(theme: UiTheme?) {
+    private fun applyRuntimeThemeConfig(theme: UiTheme?) {
         if (theme == null) {
             Logger.d(TAG, "UiTheme is null!")
             return
         }
+        charCodeView.applyRuntimeTheme(theme)
 
-        theme.baseDarkColor?.let {
-            ContextCompat.getColor(context, it).apply {
-                successTitle.setTextColor(this)
-                failureTitle.setTextColor(this)
+        val brandPrimaryColor = theme.brandPrimaryColor?.let { getColorStateListCompat(it) }
+        val baseLightColor = theme.baseLightColor?.let { getColorCompat(it) }
+        val baseNormalColor = theme.baseNormalColor?.let { getColorStateListCompat(it) }
+        val baseShadeColor = theme.baseShadeColor?.let { getColorStateListCompat(it) }
+        val baseDarkColor = theme.baseDarkColor?.let { getColorCompat(it) }
+        val fontFamily = theme.fontRes?.let { getFontCompat(it) }
+
+        baseLightColor?.also {
+            setBackgroundColor(it)
+        }
+        successTitle.apply {
+            baseDarkColor?.also(::setTextColor)
+            fontFamily?.also(::setTypeface)
+        }
+        failureTitle.apply {
+            baseDarkColor?.also(::setTextColor)
+            fontFamily?.also(::setTypeface)
+        }
+        refreshButton.apply {
+            brandPrimaryColor?.also { backgroundTintList = it }
+            baseLightColor?.also(::setTextColor)
+            fontFamily?.also(::setTypeface)
+        }
+        whiteLabelView.apply {
+            isVisible = theme.whiteLabel ?: false
+            baseShadeColor?.also(::setImageTintList)
+        }
+        progressBar.apply {
+            brandPrimaryColor?.also {
+                indeterminateTintList = it
             }
         }
-        theme.fontRes?.let {
-            ResourcesCompat.getFont(context, it)?.run {
-                successTitle.typeface = this
-                failureTitle.typeface = this
-            }
-        }
-        theme.brandPrimaryColor?.let {
-            ContextCompat.getColor(context, it).apply {
-                refreshButton.backgroundTintList = ColorStateList.valueOf(this)
-            }
-        }
-        theme.baseLightColor?.run {
-            rootView.setBackgroundColor(ContextCompat.getColor(context, R.color.glia_base_light_color))
+        closeButton.apply {
+            baseNormalColor?.also(::setImageTintList)
         }
     }
 }

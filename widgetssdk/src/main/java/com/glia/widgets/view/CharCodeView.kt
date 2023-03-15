@@ -67,7 +67,7 @@ class CharCodeView @JvmOverloads constructor(
         }
     }
 
-    public fun applyRuntimeTheme(theme: UiTheme) {
+    fun applyRuntimeTheme(theme: UiTheme) {
         runtimeTheme = theme
     }
 
@@ -109,15 +109,17 @@ class CharCodeView @JvmOverloads constructor(
 
     private fun applyRuntimeTheme(theme: UiTheme, charView: TextView) {
 
+        val fontFamily = theme.fontRes?.let { getFontCompat(it) }
         val backgroundColor = theme.visitorCodeBackgroundColor?.let { getColorCompat(it) } ?: charViewProps.backgroundColor
         val borderColor = theme.visitorCodeBorderColor?.let { getColorCompat(it) } ?: charViewProps.borderColor
+        val textColor = theme.visitorCodeTextColor?.let { getColorCompat(it) } ?: theme.baseDarkColor?.let { getColorCompat(it) }
         charView.background = createCharBackground(backgroundColor, borderColor, charViewProps.borderWidth, charViewProps.borderRadius)
 
-        theme.baseDarkColor?.let {
-            charView.setTextColor(getColorCompat(it))
+        textColor?.let {
+            charView.setTextColor(it)
         }
-        theme.visitorCodeTextColor?.let {
-            charView.setTextColor(getColorCompat(it))
+        fontFamily?.let {
+            charView.typeface = it
         }
     }
 

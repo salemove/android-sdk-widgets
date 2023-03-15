@@ -1,6 +1,6 @@
 package com.glia.widgets.core.notification.domain;
 
-import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
 
 public class ShowVideoCallNotificationUseCase {

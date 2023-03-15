@@ -1,4 +1,4 @@
-package com.glia.widgets.core.engagement.domain
+package com.glia.widgets.core.callvisualizer.domain
 
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.core.engagement.GliaEngagementRepository
@@ -21,7 +21,7 @@ class GliaOnCallVisualizerUseCase(
 
     private var listener: Listener? = null
     fun execute(listener: Listener) {
-        if (this.listener === listener) {
+        if (this.listener == listener) {
             // Already listening
             return
         }

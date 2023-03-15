@@ -2,7 +2,7 @@ package com.glia.widgets.core.chathead.domain;
 
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
-import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.di.Dependencies;

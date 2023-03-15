@@ -18,6 +18,7 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
@@ -33,10 +34,10 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
-import com.glia.widgets.core.engagement.domain.GliaOnCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
@@ -480,6 +481,18 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaQueueRepository(),
                 repositoryFactory.getGliaVisitorMediaRepository(),
                 repositoryFactory.getGliaEngagementStateRepository()
+        );
+    }
+
+    public GliaOnCallVisualizerEndUseCase createOnCallVisualizerEndUseCase() {
+        return new GliaOnCallVisualizerEndUseCase(
+                repositoryFactory.getCallVisualizerRepository(),
+                repositoryFactory.getGliaOperatorMediaRepository(),
+                createOnCallVisualizerUseCase(),
+                removeCallNotificationUseCase,
+                removeScreenSharingNotificationUseCase,
+                repositoryFactory.getGliaSurveyRepository(),
+                repositoryFactory.getGliaVisitorMediaRepository()
         );
     }
 }

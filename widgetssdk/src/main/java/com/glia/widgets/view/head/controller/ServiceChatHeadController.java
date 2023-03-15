@@ -9,18 +9,18 @@ import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
-import com.glia.widgets.core.engagement.domain.GliaOnCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
@@ -40,6 +40,7 @@ public class ServiceChatHeadController
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
     private final GliaOnCallVisualizerUseCase gliaOnCallVisualizerUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
+    private final GliaOnCallVisualizerEndUseCase gliaOnCallVisualizerEndUseCase;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
@@ -75,6 +76,7 @@ public class ServiceChatHeadController
             GliaOnEngagementUseCase gliaOnEngagementUseCase,
             GliaOnCallVisualizerUseCase gliaOnCallVisualizerUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
+            GliaOnCallVisualizerEndUseCase onCallVisualizerEndUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
@@ -87,6 +89,7 @@ public class ServiceChatHeadController
         this.gliaOnEngagementUseCase = gliaOnEngagementUseCase;
         this.gliaOnCallVisualizerUseCase = gliaOnCallVisualizerUseCase;
         this.gliaOnEngagementEndUseCase = onEngagementEndUseCase;
+        this.gliaOnCallVisualizerEndUseCase = onCallVisualizerEndUseCase;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
         this.chatHeadPosition = chatHeadPosition;
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
@@ -213,7 +216,8 @@ public class ServiceChatHeadController
                         throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
                 );
         engagementDisposables.add(operatorDisposable);
-        gliaOnEngagementEndUseCase.execute(this::engagementEnded);
+        // To recieve callback to engagementEnded() after Call Visualizer engagement ends
+        gliaOnCallVisualizerEndUseCase.execute(this::engagementEnded);
         updateChatHeadView();
     }
 

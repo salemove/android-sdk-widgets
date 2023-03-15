@@ -10,10 +10,13 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.chat.ChatActivity
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import junit.framework.TestCase.assertNull
 import org.junit.Assert.assertNotNull
@@ -33,10 +36,16 @@ internal class ActivityWatcherForCallVisualizerTest {
     fun setUp() {
         val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
         val dialogController = mock(DialogController::class.java)
+        val surveyUseCase = mock(GliaSurveyUseCase::class.java)
+        val onCallVisualizerUseCase = mock(GliaOnCallVisualizerUseCase::class.java)
+        val onCallVisualizerEndUseCase = mock(GliaOnCallVisualizerEndUseCase::class.java)
         val callVisualizerController = CallVisualizerController(
             callVisualizerRepository,
             dialogController,
-            IsCallOrChatScreenActiveUseCase()
+            IsCallOrChatScreenActiveUseCase(),
+            surveyUseCase,
+            onCallVisualizerUseCase,
+            onCallVisualizerEndUseCase
         )
         val serviceChatHeadController = mock(ServiceChatHeadController::class.java)
         val screenSharingController = mock(ScreenSharingController::class.java)

@@ -19,7 +19,7 @@ import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
@@ -151,9 +151,11 @@ class ChatHeadView @JvmOverloads constructor(
         userImageTheme?.placeholderColor.also(binding.placeholderView::applyImageColorTheme)
     }
 
-    override fun navigateToChat() = context.startActivity(
-        getNavigationIntent(context, ChatActivity::class.java, sdkConfiguration!!)
-    )
+    override fun navigateToChat() {
+        sdkConfiguration?.let {
+            context.startActivity(getNavigationIntent(context, ChatActivity::class.java, it))
+        }
+    }
 
     override fun navigateToCall() {
         val activityConfig =

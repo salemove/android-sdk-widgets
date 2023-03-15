@@ -12,10 +12,10 @@ import com.glia.widgets.view.unifiedui.theme.chat.*
 /**
  * Default theme for Chat Engagement states
  */
-internal fun ChatEngagementStates(
+internal fun ChatEngagementStatesTheme(
     pallet: ColorPallet
 ): EngagementStatesTheme? {
-    val operatorTheme = OperatorDefaultTheme(pallet)
+    val operatorTheme = OperatorTheme(pallet)
 
     return pallet.run {
         composeIfAtLeastOneNotNull(
@@ -50,10 +50,10 @@ internal fun ChatEngagementStates(
 /**
  * Default theme for Call Engagement states
  */
-internal fun CallEngagementStates(
+internal fun CallEngagementStatesTheme(
     pallet: ColorPallet
 ): EngagementStatesTheme? {
-    val operatorTheme = OperatorDefaultTheme(pallet)
+    val operatorTheme = OperatorTheme(pallet)
 
     return pallet.run {
         composeIfAtLeastOneNotNull(operatorTheme, baseLightColorTheme) {
@@ -85,8 +85,8 @@ private fun EngagementStateTheme(
 /**
  * Default theme for Operator
  */
-internal fun OperatorDefaultTheme(pallet: ColorPallet): OperatorTheme? {
-    val userImage = UserImageDefaultTheme(pallet)
+internal fun OperatorTheme(pallet: ColorPallet): OperatorTheme? {
+    val userImage = UserImageTheme(pallet)
 
     return pallet.run {
         composeIfAtLeastOneNotNull(userImage, primaryColorTheme, baseLightColorTheme) {

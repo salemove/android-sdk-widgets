@@ -346,9 +346,13 @@ public class MainFragment extends Fragment {
             return;
         }
 
-        if (getActivity() == null) return;
+        /*
+        Example of local remote configuration usage stored in a 'raw' directory
+        String rawConfigs = ExtensionsKt.rawRes(requireContext(), R.raw.global_colors_remote_config);
+        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireContext().getApplicationContext(), rawConfigs));
+         */
 
-        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(getActivity().getApplicationContext()));
+        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireActivity().getApplicationContext()));
         prepareAuthentication();
         listenForCallVisualizerEngagements();
     }

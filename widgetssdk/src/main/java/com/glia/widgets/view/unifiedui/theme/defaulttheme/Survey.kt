@@ -12,19 +12,19 @@ import com.glia.widgets.view.unifiedui.theme.survey.*
 /**
  * Default theme for Survey screen
  */
-internal fun SurveyDefaultTheme(pallet: ColorPallet): SurveyTheme =
+internal fun SurveyTheme(pallet: ColorPallet): SurveyTheme =
     SurveyTheme(
         layer = LayerTheme(fill = pallet.backgroundColorTheme),
         title = TextTheme(textColor = pallet.baseNormalColorTheme),
-        submitButton = PositiveDefaultButton(pallet),
-        cancelButton = NegativeDefaultButton(pallet),
+        submitButton = PositiveDefaultButtonTheme(pallet),
+        cancelButton = NegativeDefaultButtonTheme(pallet),
         booleanQuestion = SurveyBooleanQuestionTheme(
             title = TextTheme(textColor = pallet.baseDarkColorTheme),
-            SurveyDefaultOptionButtonTheme(pallet)
+            SurveyOptionButtonTheme(pallet)
         ),
         scaleQuestion = SurveyScaleQuestionTheme(
             title = TextTheme(textColor = pallet.baseDarkColorTheme),
-            SurveyDefaultOptionButtonTheme(pallet)
+            SurveyOptionButtonTheme(pallet)
         ),
         singleQuestion = SurveySingleQuestionTheme(
             title = TextTheme(textColor = pallet.baseDarkColorTheme),
@@ -33,7 +33,7 @@ internal fun SurveyDefaultTheme(pallet: ColorPallet): SurveyTheme =
         ),
         inputQuestion = SurveyInputQuestionTheme(
             title = TextTheme(textColor = pallet.baseDarkColorTheme),
-            option = SurveyDefaultOptionButtonTheme(pallet),
+            option = SurveyOptionButtonTheme(pallet),
             text = TextTheme(textColor = pallet.baseDarkColorTheme)
         )
     )
@@ -41,7 +41,7 @@ internal fun SurveyDefaultTheme(pallet: ColorPallet): SurveyTheme =
 /**
  * Default theme for Survey option button
  */
-internal fun SurveyDefaultOptionButtonTheme(pallet: ColorPallet): OptionButtonTheme? = pallet.run {
+internal fun SurveyOptionButtonTheme(pallet: ColorPallet): OptionButtonTheme? = pallet.run {
     composeIfAtLeastOneNotNull(
         baseDarkColorTheme,
         baseNormalColorTheme,

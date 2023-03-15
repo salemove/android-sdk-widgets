@@ -12,10 +12,10 @@ import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 /**
  * Default theme for Unread messages indicator
  */
-internal fun BubbleDefaultTheme(pallet: ColorPallet): BubbleTheme? =
+internal fun BubbleTheme(pallet: ColorPallet): BubbleTheme? =
     pallet.run {
-        val badge = BadgeDefaultTheme(this)
-        val userImage = UserImageDefaultTheme(this)
+        val badge = BadgeTheme(this)
+        val userImage = UserImageTheme(this)
         composeIfAtLeastOneNotNull(badge, userImage) {
             BubbleTheme(
                 userImage = userImage,
@@ -27,7 +27,7 @@ internal fun BubbleDefaultTheme(pallet: ColorPallet): BubbleTheme? =
 /**
  * Default theme for User image
  */
-internal fun UserImageDefaultTheme(pallet: ColorPallet): UserImageTheme? = pallet.run {
+internal fun UserImageTheme(pallet: ColorPallet): UserImageTheme? = pallet.run {
     composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme) {
         UserImageTheme(
             placeholderColor = baseLightColorTheme,
@@ -40,7 +40,7 @@ internal fun UserImageDefaultTheme(pallet: ColorPallet): UserImageTheme? = palle
 /**
  * Default theme for Badge
  */
-internal fun BadgeDefaultTheme(pallet: ColorPallet): BadgeTheme? = pallet.run {
+internal fun BadgeTheme(pallet: ColorPallet): BadgeTheme? = pallet.run {
     composeIfAtLeastOneNotNull(baseNormalColorTheme, primaryColorTheme) {
         BadgeTheme(
             textColor = baseNormalColorTheme,

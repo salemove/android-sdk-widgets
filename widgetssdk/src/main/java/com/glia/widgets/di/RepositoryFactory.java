@@ -25,6 +25,7 @@ import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
 public class RepositoryFactory {
 
     private MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
+    private GliaScreenSharingRepository gliaScreenSharingRepository;
     private ChatScreenRepository chatScreenRepository;
     private static GliaEngagementRepository gliaEngagementRepository;
     private static GliaVisitorMediaRepository gliaVisitorMediaRepository;
@@ -59,7 +60,10 @@ public class RepositoryFactory {
     }
 
     public GliaScreenSharingRepository getGliaScreenSharingRepository() {
-        return new GliaScreenSharingRepository(gliaCore);
+        if (gliaScreenSharingRepository == null) {
+            gliaScreenSharingRepository = new GliaScreenSharingRepository(gliaCore);
+        }
+        return gliaScreenSharingRepository;
     }
 
     public GliaChatRepository getGliaMessageRepository() {

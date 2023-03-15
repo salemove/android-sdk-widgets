@@ -26,6 +26,7 @@
         android:layout_gravity="center"
         android:elevation="@dimen/glia_small"
         android:scaleType="fitCenter"
+        app:contentPadding="2dp"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"

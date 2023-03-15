@@ -6,18 +6,21 @@ import androidx.core.util.Pair;
 
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.VisitorMediaState;
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
+import com.glia.widgets.core.engagement.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
@@ -35,6 +38,7 @@ public class ServiceChatHeadController
     private final ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
 
     private final GliaOnEngagementUseCase gliaOnEngagementUseCase;
+    private final GliaOnCallVisualizerUseCase gliaOnCallVisualizerUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
@@ -69,6 +73,7 @@ public class ServiceChatHeadController
             ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase,
             ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase,
             GliaOnEngagementUseCase gliaOnEngagementUseCase,
+            GliaOnCallVisualizerUseCase gliaOnCallVisualizerUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             MessagesNotSeenHandler messagesNotSeenHandler,
             AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
@@ -80,6 +85,7 @@ public class ServiceChatHeadController
         this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
         this.resolveChatHeadNavigationUseCase = resolveChatHeadNavigationUseCase;
         this.gliaOnEngagementUseCase = gliaOnEngagementUseCase;
+        this.gliaOnCallVisualizerUseCase = gliaOnCallVisualizerUseCase;
         this.gliaOnEngagementEndUseCase = onEngagementEndUseCase;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
         this.chatHeadPosition = chatHeadPosition;
@@ -159,6 +165,7 @@ public class ServiceChatHeadController
 
     public void init() {
         gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
+        gliaOnCallVisualizerUseCase.execute(this::newEngagementLoaded);
         messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
         addVisitorMediaStateListenerUseCase.execute(this);
     }
@@ -185,6 +192,19 @@ public class ServiceChatHeadController
     }
 
     private void newEngagementLoaded(OmnicoreEngagement engagement) {
+        state = State.ENGAGEMENT;
+        if (operatorDisposable != null) operatorDisposable.dispose();
+        operatorDisposable = getOperatorFlowableUseCase.execute()
+                .subscribe(
+                        this::operatorDataLoaded,
+                        throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
+                );
+        engagementDisposables.add(operatorDisposable);
+        gliaOnEngagementEndUseCase.execute(this::engagementEnded);
+        updateChatHeadView();
+    }
+
+    private void newEngagementLoaded(OmnibrowseEngagement engagement) {
         state = State.ENGAGEMENT;
         if (operatorDisposable != null) operatorDisposable.dispose();
         operatorDisposable = getOperatorFlowableUseCase.execute()

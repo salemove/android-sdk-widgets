@@ -10,6 +10,7 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -25,6 +26,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
+import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
@@ -32,20 +34,23 @@ import com.glia.widgets.core.notification.device.NotificationManager
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository.SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.lang.ref.WeakReference
 
-class ActivityWatcherForDialogs(
+class ActivityWatcherForCallVisualizer(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
     private val dialogController: DialogController,
+    private var serviceChatHeadController: ServiceChatHeadController,
 ) : Application.ActivityLifecycleCallbacks {
 
     companion object {
-        private val TAG = ActivityWatcherForDialogs::class.java.simpleName
+        private val TAG = ActivityWatcherForCallVisualizer::class.java.simpleName
     }
 
     @VisibleForTesting
@@ -53,7 +58,7 @@ class ActivityWatcherForDialogs(
     private var screenSharingViewCallback: ScreenSharingController.ViewCallback? = null
 
     @VisibleForTesting
-    var startMediaProjection: ActivityResultLauncher<Intent>? = null
+    val startMediaProjectionLaunchers = mutableMapOf<String, ActivityResultLauncher<Intent>?>()
 
     @VisibleForTesting
     var alertDialog: AlertDialog? = null
@@ -68,7 +73,7 @@ class ActivityWatcherForDialogs(
     override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) {
             // Call and Chat screens process screen sharing requests on their own
-            startMediaProjection = null
+            startMediaProjectionLaunchers.remove(activity::class.simpleName)
             return
         }
         registerForMediaProjectionPermissionResult(activity)
@@ -76,19 +81,35 @@ class ActivityWatcherForDialogs(
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-    override fun onActivityDestroyed(activity: Activity) {}
 
+    override fun onActivityDestroyed(activity: Activity) {
+        if (activity.isFinishing) serviceChatHeadController.onDestroy()
+    }
 
     override fun onActivityResumed(activity: Activity) {
         resumedActivity = WeakReference(activity)
         addDialogCallback(resumedActivity)
         addScreenSharingCallback(resumedActivity)
+        val gliaOrRootView: View? = getGliaViewOrRootView(activity)
+        serviceChatHeadController.onResume(gliaOrRootView)
+    }
+
+    @VisibleForTesting
+    fun getGliaViewOrRootView(activity: Activity): View? {
+        return activity.findViewById(R.id.call_view)
+            ?: activity.findViewById<FilePreviewView>(R.id.file_preview_view)
+            ?: activity.findViewById<ChatView>(R.id.chat_view)
+            ?: activity.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
+            ?: activity.findViewById(android.R.id.content)
+            ?: activity.window.decorView.findViewById(android.R.id.content)
     }
 
     override fun onActivityPaused(activity: Activity) {
         resumedActivity.clear()
         removeDialogCallback()
         removeScreenSharingCallback()
+        val gliaOrRootView: View? = getGliaViewOrRootView(activity)
+        serviceChatHeadController.onPause(gliaOrRootView)
     }
 
 
@@ -96,11 +117,7 @@ class ActivityWatcherForDialogs(
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-    override fun onActivityPreDestroyed(activity: Activity) {
-        super.onActivityPreDestroyed(activity)
-        startMediaProjection = null
-    }
-
+    @Suppress("RedundantNullableReturnType")
     @VisibleForTesting
     fun registerForMediaProjectionPermissionResult(activity: Activity) {
         // Request a token that grants the app the ability to capture the display contents
@@ -111,11 +128,11 @@ class ActivityWatcherForDialogs(
                 TAG, "Activity does not support ActivityResultRegistry APIs, " +
                         "legacy onActivityResult() will be used to acquire a media projection token"
             )
-            startMediaProjection = null
+            startMediaProjectionLaunchers.remove(activity::class.simpleName)
             return
         }
 
-        startMediaProjection = componentActivity.registerForActivityResult(
+        val launcher : ActivityResultLauncher<Intent>? = componentActivity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             Logger.d(TAG, "Acquire a media projection token: result received")
@@ -133,6 +150,7 @@ class ActivityWatcherForDialogs(
                 }
             }
         }
+        activity::class.simpleName?.let { startMediaProjectionLaunchers.put(it, launcher) }
     }
 
     private fun addDialogCallback(resumedActivity: WeakReference<Activity?>) {
@@ -169,7 +187,11 @@ class ActivityWatcherForDialogs(
                 }
 
                 override fun onScreenSharingStarted() {
-                    // TODO: 15.02.2023 show bubble
+                    if (Glia.isInitialized()) {
+                        serviceChatHeadController.init()
+                    }
+                    val gliaOrRootView: View? = getGliaViewOrRootView(it)
+                    serviceChatHeadController.onResume(gliaOrRootView)
                 }
             }
         }
@@ -353,10 +375,10 @@ class ActivityWatcherForDialogs(
     }
 
     private fun acquireMediaProjectionToken(activity: Activity) {
-        startMediaProjection?.let { startMediaProjection ->
+        startMediaProjectionLaunchers[activity::class.simpleName].let { startMediaProjection ->
             activity.getSystemService(MediaProjectionManager::class.java)
                 ?.let { mediaProjectionManager ->
-                    startMediaProjection.launch(mediaProjectionManager.createScreenCaptureIntent())
+                    startMediaProjection?.launch(mediaProjectionManager.createScreenCaptureIntent())
                     Logger.d(
                         TAG,
                         "Acquire a media projection token: launching permission request"

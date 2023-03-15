@@ -122,7 +122,7 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     }
 
     public void onScreenSharingAcceptedAndPermissionAsked(Context context) {
-        Logger.d(TAG, "onScreenSharingAccepted");
+        Logger.d(TAG, "onScreenSharingAcceptedAndPermissionAsked");
         dialogController.dismissCurrentDialog();
         showScreenSharingEnabledNotification();
         repository.onScreenSharingAcceptedAndPermissionAsked(

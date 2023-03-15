@@ -237,6 +237,7 @@ public class ControllerFactory {
                     useCaseFactory.getToggleChatHeadServiceUseCase(),
                     useCaseFactory.getResolveChatHeadNavigationUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createOnCallVisualizerUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     messagesNotSeenHandler,
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),

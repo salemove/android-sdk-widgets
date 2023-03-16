@@ -84,14 +84,14 @@ class OperatorStatusViewHolder(
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
     }
 
-    private fun applyInQueueState(companyName: String) {
+    private fun applyInQueueState(companyName: String?) {
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
         itemView.contentDescription =
             itemView.resources.getString(
                 R.string.glia_chat_in_queue_message_content_description,
-                companyName
+                companyName ?: ""
             )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)

@@ -30,18 +30,23 @@ object GliaWidgetsConfigManager {
         saveVisitorContextAssetIdIfPresent(data, applicationContext)
         saveSiteIdToPrefs(data, applicationContext)
 
-//        We're not checking availability for every query param separately because this is for acceptance tests and we assume that link would be correct
-        return if (SECRET_KEY == data.lastPathSegment) {
+//       We're not checking availability for every query param separately because this is for acceptance tests and we assume that link would be correct
+        if (SECRET_KEY == data.lastPathSegment) {
             saveSiteApiKeyAuthToPrefs(data, applicationContext)
-            obtainConfigFromSecretDeepLink(data, applicationContext)
         } else {
             throw RuntimeException("deep link must start with \"glia://widgets/secret\"")
         }
+
+        // By this point all settings from deep link where saved to the shared prefs overriding the
+        // defaults combining both together
+        return createDefaultConfig(
+            context = applicationContext,
+            region = REGION_ACCEPTANCE
+        )
     }
 
     private fun saveVisitorContextAssetIdIfPresent(data: Uri, applicationContext: Context) {
-        val visitorContextAssetId = data.getQueryParameter(VISITOR_CONTEXT_ASSET_ID_KEY)
-            ?: return
+        val visitorContextAssetId = data.getQueryParameter(VISITOR_CONTEXT_ASSET_ID_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         sharedPreferences.edit().putString(
             applicationContext.getString(R.string.pref_context_asset_id),
@@ -53,14 +58,16 @@ object GliaWidgetsConfigManager {
         val queueId = data.getQueryParameter(QUEUE_ID_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_queue_id), queueId).apply()
+            .putString(applicationContext.getString(R.string.pref_queue_id), queueId)
+            .apply()
     }
 
     private fun saveSiteIdToPrefs(data: Uri, applicationContext: Context) {
         val siteId = data.getQueryParameter(SITE_ID_KEY) ?: return
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         sharedPreferences.edit()
-            .putString(applicationContext.getString(R.string.pref_site_id), siteId).apply()
+            .putString(applicationContext.getString(R.string.pref_site_id), siteId)
+            .apply()
     }
 
     private fun saveSiteApiKeyAuthToPrefs(data: Uri, applicationContext: Context) {
@@ -74,60 +81,32 @@ object GliaWidgetsConfigManager {
             .apply()
     }
 
-    private fun obtainConfigFromSecretDeepLink(
-        data: Uri,
-        applicationContext: Context
-    ): GliaWidgetsConfig {
-        return GliaWidgetsConfig.Builder()
-            .setSiteApiKey(
-                SiteApiKey(
-                    data.getQueryParameter(API_KEY_ID_KEY)!!, data.getQueryParameter(
-                        API_KEY_SECRET_KEY
-                    )!!
-                )
-            )
-            .setSiteId(data.getQueryParameter(SITE_ID_KEY))
-            .setRegion(REGION_ACCEPTANCE)
-            .setContext(applicationContext)
-            .build()
-    }
-
+    @JvmStatic
     @JvmOverloads
     fun createDefaultConfig(
-        applicationContext: Context,
-        uiJsonRemoteConfig: String? = null
-    ): GliaWidgetsConfig {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        return configWithSiteApiKeyAuth(sharedPreferences, applicationContext, uiJsonRemoteConfig)
-    }
-
-    private fun configWithSiteApiKeyAuth(
-        preferences: SharedPreferences,
-        applicationContext: Context,
-        uiJsonRemoteConfig: String?
+        context: Context,
+        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
+        uiJsonRemoteConfig: String? = null,
+        region: String = REGION_BETA
     ): GliaWidgetsConfig {
         val apiKeyId = preferences.getString(
-            applicationContext.getString(R.string.pref_api_key_id),
-            applicationContext.getString(R.string.glia_api_key_id)
+            context.getString(R.string.pref_api_key_id),
+            context.getString(R.string.glia_api_key_id)
         )
         val apiKeySecret = preferences.getString(
-            applicationContext.getString(R.string.pref_api_key_secret),
-            applicationContext.getString(R.string.glia_api_key_secret)
+            context.getString(R.string.pref_api_key_secret),
+            context.getString(R.string.glia_api_key_secret)
         )
         val siteId = preferences.getString(
-            applicationContext.getString(R.string.pref_site_id),
-            applicationContext.getString(R.string.site_id)
+            context.getString(R.string.pref_site_id),
+            context.getString(R.string.site_id)
         )
-        val companyName =
-            preferences.getString(applicationContext.getString(R.string.pref_company_name), "")
-        val useOverlay =
-            preferences.getBoolean(applicationContext.getString(R.string.pref_use_overlay), true)
-        val bounded = applicationContext.getString(R.string.screen_sharing_mode_app_bounded)
-        val unbounded = applicationContext.getString(R.string.screen_sharing_mode_unbounded)
-        val screenSharingMode: ScreenSharing.Mode
-        screenSharingMode = if (preferences.getString(
-                applicationContext.getString(R.string.pref_screen_sharing_mode),
-                unbounded
+        val companyName = preferences.getString(context.getString(R.string.pref_company_name), "")
+        val useOverlay = preferences.getBoolean(context.getString(R.string.pref_use_overlay), true)
+        val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
+        val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
+        val screenSharingMode = if (preferences.getString(
+                context.getString(R.string.pref_screen_sharing_mode), unbounded
             ) == bounded
         ) {
             ScreenSharing.Mode.APP_BOUNDED
@@ -137,11 +116,11 @@ object GliaWidgetsConfigManager {
         return GliaWidgetsConfig.Builder()
             .setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret!!))
             .setSiteId(siteId)
-            .setRegion(REGION_BETA)
+            .setRegion(region)
             .setCompanyName(companyName)
             .setUseOverlay(useOverlay)
             .setScreenSharingMode(screenSharingMode)
-            .setContext(applicationContext)
+            .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig)
             .build()
     }

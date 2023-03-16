@@ -1,4 +1,4 @@
-package com.glia.widgets.core.engagement.domain
+package com.glia.widgets.core.callvisualizer.domain
 
 import com.glia.widgets.core.engagement.GliaEngagementRepository
 

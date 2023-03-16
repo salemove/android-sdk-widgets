@@ -239,6 +239,7 @@ public class ControllerFactory {
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createOnCallVisualizerUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
+                    useCaseFactory.createOnCallVisualizerEndUseCase(),
                     messagesNotSeenHandler,
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
@@ -278,7 +279,10 @@ public class ControllerFactory {
             callVisualizerController = new CallVisualizerController(
                     repositoryFactory.getCallVisualizerRepository(),
                     dialogController,
-                    useCaseFactory.createIsCallOrChatScreenActiveUseCase()
+                    useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
+                    useCaseFactory.getGliaSurveyUseCase(),
+                    useCaseFactory.createOnCallVisualizerUseCase(),
+                    useCaseFactory.createOnCallVisualizerEndUseCase()
             );
         }
         return callVisualizerController;

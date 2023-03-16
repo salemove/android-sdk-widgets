@@ -1,5 +1,6 @@
 package com.glia.widgets.callvisualizer
 
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.comms.Media
@@ -25,6 +26,10 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
         autoAcceptEngagementRequest()
         showDialogOnMediaUpgradeRequest()
         Logger.d(TAG, "CallVisualizerRepository initialized")
+    }
+
+    fun listenForEngagementEnd(engagement: OmnibrowseEngagement, engagementEnded: Runnable) {
+        engagement.on(Engagement.Events.END, engagementEnded)
     }
 
     fun addVisitorContext(visitorContext: String) {
@@ -67,6 +72,15 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
             } else if (offer.video == MediaDirection.ONE_WAY) {
                 callback.onOneWayMediaUpgradeRequest(offer, operatorName)
             }
+        }
+    }
+
+    fun unregisterEngagementEndListener(engagementEnded: Runnable) {
+        gliaCore.currentEngagement.ifPresent { engagement: Engagement ->
+            engagement.off(
+                Engagement.Events.END,
+                engagementEnded
+            )
         }
     }
 }

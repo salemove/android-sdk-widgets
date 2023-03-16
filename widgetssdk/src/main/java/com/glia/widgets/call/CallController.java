@@ -25,7 +25,7 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.engagement.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;

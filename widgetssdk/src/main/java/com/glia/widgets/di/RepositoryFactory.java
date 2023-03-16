@@ -51,9 +51,6 @@ public class RepositoryFactory {
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
     private final FileHelper fileHelper = new FileHelper();
-    private MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
-    private ChatScreenRepository chatScreenRepository;
-
     public RepositoryFactory(
             GliaCore gliaCore,
             DownloadsFolderDataSource downloadsFolderDataSource

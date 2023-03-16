@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgets

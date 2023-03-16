@@ -184,8 +184,6 @@ internal class ChatController(
         val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
         engagementConfigUseCase(chatType, queueIds)
 
-        if (isShowOverlayPermissionRequestDialogUseCase.execute()) dialogController.showOverlayPermissionsDialog()
-
         ensureSecureMessagingAvailable()
 
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
@@ -515,6 +513,10 @@ internal class ChatController(
         surveyUseCase.registerListener(this)
         subscribeToEngagementStateChange()
         mediaUpgradeOfferRepositoryCallback?.let { addMediaUpgradeCallbackUseCase(it) }
+
+        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
+            dialogController.showOverlayPermissionsDialog()
+        }
     }
 
     private fun subscribeToEngagementStateChange() {

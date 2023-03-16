@@ -78,6 +78,18 @@ class MessageCenterActivity : AppCompatActivity(),
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        messageCenterView.onResume()
+    }
+
+    override fun onPause() {
+        messageCenterView.onPause()
+
+        super.onPause()
+    }
+
     override fun selectAttachmentFile(type: String) {
         getContent.launch(type)
     }

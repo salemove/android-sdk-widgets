@@ -238,19 +238,23 @@ class MessageCenterView(
         }
     }
 
+    fun onResume() {
+        attachDialogController()
+    }
+
+    fun onPause() {
+        detachDialogController()
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
         window?.statusBarColor = statusBarColor
         defaultStatusBarColor = window?.statusBarColor
-
-        attachDialogController()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-
-        detachDialogController()
 
         window?.statusBarColor = defaultStatusBarColor ?: return
     }

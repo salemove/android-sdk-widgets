@@ -88,7 +88,7 @@ class MessageView(
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     private fun setupViewAppearance() {
-        uploadAttachmentAdapter = UploadAttachmentAdapter(R.layout.message_center_attachment_uploaded_item)
+        uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
         uploadAttachmentAdapter.setItemCallback {
             onRemoveAttachmentListener?.invoke(it)
         }
@@ -110,7 +110,6 @@ class MessageView(
         val states: MutableList<IntArray> = mutableListOf()
 
         val disabledState = intArrayOf(-android.R.attr.state_enabled)
-        val activatedState = intArrayOf(android.R.attr.state_activated)
         val enabledState = intArrayOf()
 
         colors.add(disabledColor)

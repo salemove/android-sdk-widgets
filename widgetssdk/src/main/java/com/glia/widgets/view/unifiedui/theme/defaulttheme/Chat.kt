@@ -26,7 +26,9 @@ internal fun ChatTheme(pallet: ColorPallet): ChatTheme =
         bubble = BubbleTheme(pallet),
         attachmentsPopup = ChatAttachmentsPopupTheme(pallet),
         unreadIndicator = ChatUnreadIndicatorTheme(pallet),
-        typingIndicator = pallet.primaryColorTheme
+        typingIndicator = pallet.primaryColorTheme,
+        newMessagesDividerColorTheme = pallet.primaryColorTheme,
+        newMessagesDividerTextTheme = TextTheme(textColor = pallet.primaryColorTheme)
     )
 
 /**

@@ -3,10 +3,12 @@ package com.glia.widgets.view.head
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
@@ -22,6 +24,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.unifiedui.exstensions.*
@@ -54,11 +57,27 @@ class ChatHeadView @JvmOverloads constructor(
         }
     private var serviceChatHeadController: ServiceChatHeadController
     private var isCallVisualizerUseCase: IsCallVisualizerUseCase
+    private var theme: UiTheme? = null
 
     init {
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
         isCallVisualizerUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerUseCase()
         setAccessibilityLabels()
+        readTypedArray()
+    }
+
+    private fun readTypedArray() {
+        context.withStyledAttributes(
+            set = null,
+            attrs = R.styleable.GliaView,
+            defStyleAttr = 0
+        ) {
+            setDefaultTheme(this)
+        }
+    }
+    private fun setDefaultTheme(typedArray: TypedArray) {
+        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        serviceChatHeadController.setBuildTimeTheme(theme)
     }
 
     override fun showUnreadMessageCount(unreadMessageCount: Int) {

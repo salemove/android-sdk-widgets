@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -45,6 +46,9 @@ import com.glia.widgets.view.head.ChatHeadLayout;
 public class MainFragment extends Fragment {
 
     @Nullable
+    private FrameLayout rootView;
+
+    @Nullable
     private ConstraintLayout containerView;
 
     @Nullable
@@ -64,6 +68,7 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        this.rootView = view.findViewById(R.id.root_view);
         this.containerView = view.findViewById(R.id.constraint_layout);
         NavController navController = NavHostFragment.findNavController(this);
         setupAuthButtonsVisibility();
@@ -130,8 +135,8 @@ public class MainFragment extends Fragment {
                 }
         );
 
-        if (containerView != null) {
-            containerView.addView(chatHeadLayout);
+        if (rootView != null) {
+            rootView.addView(chatHeadLayout);
         }
     }
 

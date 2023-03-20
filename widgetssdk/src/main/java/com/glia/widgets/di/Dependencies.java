@@ -63,11 +63,11 @@ public class Dependencies {
                 new ApplicationLifecycleManager(),
                 controllerFactory.getChatHeadController()
         );
-        ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer = new ActivityWatcherForCallVisualizer(
-                controllerFactory.getCallVisualizerController(),
-                controllerFactory.getScreenSharingController(),
-                controllerFactory.getDialogController(),
-                controllerFactory.getChatHeadController());
+        ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer =
+                new ActivityWatcherForCallVisualizer(
+                        getControllerFactory().getDialogController(),
+                        getControllerFactory().getActivityWatcherController()
+                );
         application.registerActivityLifecycleCallbacks(activityWatcherForCallVisualizer);
         resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(

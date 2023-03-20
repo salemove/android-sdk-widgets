@@ -1,5 +1,7 @@
 package com.glia.widgets.view.unifiedui.exstensions
 
+import android.app.Activity
+import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.graphics.*
@@ -8,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
+import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +35,7 @@ import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -318,5 +322,18 @@ internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTh
             textTheme?.copy(textSize = theme?.fontSize, textStyle = theme?.fontStyle),
             layerTheme, null, null, null
         )
+    )
+}
+
+internal fun Context.wrapWithMaterialThemeOverlay(
+    attrs: AttributeSet? = null,
+    @AttrRes defStyleAttr: Int = R.attr.gliaChatStyle,
+    @StyleRes defStyleRes: Int = R.style.Application_Glia_Chat
+) : Context {
+    return MaterialThemeOverlay.wrap(
+        this,
+        attrs,
+        defStyleAttr,
+        defStyleRes
     )
 }

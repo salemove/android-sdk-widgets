@@ -33,6 +33,8 @@ import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.glia.widgets.view.configuration.survey.SurveyStyle;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -541,7 +543,7 @@ public class Utils {
         return newConf != null ? newConf : oldConf;
     }
 
-    public static UiTheme getFullHybridTheme(UiTheme newTheme, UiTheme oldTheme) {
+    public static UiTheme getFullHybridTheme(@NotNull UiTheme newTheme, @NotNull UiTheme oldTheme) {
         String title = newTheme.getAppBarTitle() != null ? newTheme.getAppBarTitle() : oldTheme.getAppBarTitle();
         Integer baseLightColorRes = newTheme.getBaseLightColor() != null ?
                 newTheme.getBaseLightColor() : oldTheme.getBaseLightColor();

@@ -343,6 +343,9 @@ data class UiTheme(
         systemNegativeColor = builder.systemNegativeColor,
         visitorMessageBackgroundColor = builder.visitorMessageBackgroundColor,
         visitorMessageTextColor = builder.visitorMessageTextColor,
+        visitorCodeTextColor = builder.visitorCodeTextColor,
+        visitorCodeBackgroundColor = builder.visitorCodeBackgroundColor,
+        visitorCodeBorderColor = builder.visitorCodeBorderColor,
         operatorMessageBackgroundColor = builder.operatorMessageBackgroundColor,
         gliaChatBackgroundColor = builder.gliaChatBackgroundColor,
         operatorMessageTextColor = builder.operatorMessageTextColor,
@@ -459,6 +462,27 @@ data class UiTheme(
          */
         @ColorRes
         var visitorMessageTextColor: Int? = null
+            private set
+
+        /**
+         * Color for Visitor Code numbers
+         */
+        @ColorRes
+        var visitorCodeTextColor: Int? = null
+            private set
+
+        /**
+         * Color for Visitor Code number slots background
+         */
+        @ColorRes
+        var visitorCodeBackgroundColor: Int? = null
+            private set
+
+        /**
+         * Color for Visitor Code number slots border
+         */
+        @ColorRes
+        var visitorCodeBorderColor: Int? = null
             private set
 
         /**
@@ -773,6 +797,18 @@ data class UiTheme(
 
         fun setVisitorMessageTextColor(@ColorRes color: Int?) {
             visitorMessageTextColor = color
+        }
+
+        fun setVisitorCodeTextColor(@ColorRes color: Int?) {
+            visitorCodeTextColor = color
+        }
+
+        fun setVisitorCodeBackgroundColor(@ColorRes color: Int?) {
+            visitorCodeBackgroundColor = color
+        }
+
+        fun setVisitorCodeBorderColor(@ColorRes color: Int?) {
+            visitorCodeBorderColor = color
         }
 
         fun setOperatorMessageBackgroundColor(@ColorRes color: Int?) {

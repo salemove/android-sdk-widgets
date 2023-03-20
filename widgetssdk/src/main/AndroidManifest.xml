@@ -38,6 +38,10 @@
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Call.Activity"
             android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".callvisualizer.CallVisualizerSupportActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:theme="@style/Application.Glia.Translucent.Activity"/>
 
         <service
             android:name=".core.chathead.ChatHeadService"

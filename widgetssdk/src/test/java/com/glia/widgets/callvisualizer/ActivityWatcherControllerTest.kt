@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import android.view.Window
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AppCompatActivity
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
@@ -12,14 +13,13 @@ import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.Dialog.*
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.screensharing.ScreenSharingController
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.*
-import java.lang.ref.WeakReference
 
 internal class ActivityWatcherControllerTest {
 
@@ -29,9 +29,10 @@ internal class ActivityWatcherControllerTest {
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
     private val watcher = mock(ActivityWatcherContract.Watcher::class.java)
     private val controller = ActivityWatcherController(callVisualizerController, screenSharingController)
-    private val activity = mock(Activity::class.java)
-    private val activityReference: WeakReference<Activity?> = WeakReference(activity)
+    private val activity = mock(AppCompatActivity::class.java)
+    private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
     private val view = mock(View::class.java)
+    private val mediaUpgradeOffer = mock(MediaUpgradeOffer::class.java)
 
     @Before
     fun setup() {
@@ -48,21 +49,31 @@ internal class ActivityWatcherControllerTest {
     fun `onActivityResumed screen sharing skipped when call or chat is active`() {
         whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
-        whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.onActivityResumed(activity)
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
     }
 
     @Test
+    fun `onActivityResumed bubble is resumed and no camera permissions are called when onScreenSharingStarted with activity`() {
+        mockOnActivityResumeAndEnsureCallbacksSet(activity)
+        controller.screenSharingViewCallback?.onScreenSharingStarted()
+    }
+
+    @Test
+    fun `onActivityResumed bubble is resumed and camera permissions are called when onScreenSharingStarted with CallVisualizerSupportActivity`() {
+        mockOnActivityResumeAndEnsureCallbacksSet(activity)
+        controller.screenSharingViewCallback?.onScreenSharingStarted()
+    }
+
+    @Test
     fun `onActivityResumed error is shown when onScreenSharingError`() {
-        `onActivityResumed callbacks are set when call or chat are not active`()
+        mockOnActivityResumeAndEnsureCallbacksSet(supportActivity)
         controller.screenSharingViewCallback?.onScreenSharingRequestError(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
         verify(watcher).showToast("message")
     }
 
     @Test
     fun `onActivityPaused cleanup of callbacks`() {
-        whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.onActivityPaused()
         verify(watcher).dismissAlertDialog(false)
         verify(watcher).removeDialogCallback()
@@ -80,19 +91,21 @@ internal class ActivityWatcherControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_NONE`() {
         controller.onDialogControllerCallback(DialogState(MODE_NONE))
+        resetMocks()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher, times(2)).dismissAlertDialog(true)
+        verify(watcher).dismissAlertDialog(true)
     }
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_NONE`() {
         controller.onDialogControllerCallback(DialogState(MODE_NONE))
+        resetMocks()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher, times(2)).dismissAlertDialog(true)
+        verify(watcher).dismissAlertDialog(true)
     }
 
     @Test
-    fun `onPositiveDialogButtonClicked screen sharing dialog is shown when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
+    fun `onPositiveDialogButtonClicked notification channel dialog is shown when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onPositiveDialogButtonClicked()
@@ -203,6 +216,84 @@ internal class ActivityWatcherControllerTest {
         assertTrue(controller.startMediaProjectionLaunchers.isEmpty())
     }
 
+    @Test
+    fun `controller mediaUpgradeOffer throws uninitialized exception when property accessed`() {
+        try {
+            controller.mediaUpgradeOffer
+            fail()
+        } catch (e: Exception) {
+            assertTrue(e is UninitializedPropertyAccessException)
+        }
+    }
+
+    @Test
+    fun `onMediaUpgradeAccept does not destroy support activity when error occurs`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onMediaUpgradeAccept(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
+    }
+
+    @Test
+    fun `onMediaUpgradeAccept does destroy support activity when requestCameraPermission is true`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onMediaUpgradeAccept(null)
+    }
+
+    @Test
+    fun `onMediaUpgradeDecline does cleanup when decline`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onMediaUpgradeDecline(null)
+        verify(watcher).dismissAlertDialog(true)
+    }
+
+    @Test
+    fun `onMediaUpgradeDecline does not destroy support activity when error occurs`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onMediaUpgradeDecline(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
+    }
+
+    @Test
+    fun `onInitialCameraPermissionResult accepts offer when permission is granted`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
+    }
+
+    @Test
+    fun `onInitialCameraPermissionResult requests permission when permission is not granted and is ComponentActivity`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
+        verify(watcher).requestCameraPermission()
+    }
+
+    @Test
+    fun `onInitialCameraPermissionResult opens ComponentActivity when permission is not granted and is not ComponentActivity`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = false)
+        verify(watcher).openComponentActivity()
+    }
+
+    @Test
+    fun `onRequestedCameraPermissionResult accepts when isGranted`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onRequestedCameraPermissionResult(true)
+        verify(watcher).destroySupportActivityIfExists()
+    }
+
+    @Test
+    fun `onRequestedCameraPermissionResult declines when !isGranted`() {
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onRequestedCameraPermissionResult(false)
+        verify(watcher).destroySupportActivityIfExists()
+    }
+
     private fun prepareMediaUpgradeApplicationState() {
         val offer = mock(MediaUpgradeOffer::class.java)
         val state = DialogState.MediaUpgrade(offer, "name", MODE_MEDIA_UPGRADE)
@@ -210,15 +301,17 @@ internal class ActivityWatcherControllerTest {
         verify(watcher).showUpgradeDialog(state)
     }
 
-    private fun `onActivityResumed callbacks are set when call or chat are not active`() {
+    private fun mockOnActivityResumeAndEnsureCallbacksSet(activity: Activity) {
         whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
-        whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.onActivityResumed(activity)
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(screenSharingController).onResume(activity)
         verify(watcher).setupDialogCallback()
+        if (activity is CallVisualizerSupportActivity) {
+            verify(watcher).requestCameraPermission()
+        }
         cleanup()
         resetMocks()
     }

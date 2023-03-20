@@ -1,6 +1,5 @@
 package com.glia.widgets.view.unifiedui.extensions
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray

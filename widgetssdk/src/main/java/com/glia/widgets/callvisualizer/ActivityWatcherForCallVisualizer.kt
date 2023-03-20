@@ -1,7 +1,9 @@
 package com.glia.widgets.callvisualizer
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -10,15 +12,17 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.glia.androidsdk.Glia
-import com.glia.androidsdk.comms.MediaDirection
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
+import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer.PermissionStage.*
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
@@ -47,6 +51,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     var alertDialog: AlertDialog? = null
     var dialogCallback: DialogController.Callback? = null
+    var cameraPermissionLauncher: ActivityResultLauncher<String>? = null
 
     /**
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
@@ -61,6 +66,7 @@ internal class ActivityWatcherForCallVisualizer(
             return
         }
         registerForMediaProjectionPermissionResult(activity)
+        registerForCameraPermissionResult(activity)
         super.onActivityPreCreated(activity, savedInstanceState)
     }
 
@@ -72,6 +78,35 @@ internal class ActivityWatcherForCallVisualizer(
     override fun onActivityPaused(activity: Activity) {
         controller.onActivityPaused()
         resumedActivity.clear()
+    }
+
+
+    override fun onActivityStarted(activity: Activity) {}
+    override fun onActivityStopped(activity: Activity) {}
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+    override fun checkCameraPermission() {
+        resumedActivity.get()?.run {
+            controller.onInitialCameraPermissionResult(
+                ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED,
+                this is ComponentActivity
+            )
+        }
+    }
+
+    override fun requestCameraPermission() {
+        if (resumedActivity.get() is ComponentActivity) {
+            cameraPermissionLauncher?.run { this.launch(android.Manifest.permission.CAMERA) }
+        }
+    }
+    @Suppress("RedundantNullableReturnType")
+    fun registerForCameraPermissionResult(activity: Activity) {
+        (activity as? ComponentActivity?)?.let { componentActivity ->
+            cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
+                isGranted: Boolean ->
+                controller.onRequestedCameraPermissionResult(isGranted)
+            }
+        }
     }
 
     @Suppress("RedundantNullableReturnType")
@@ -269,20 +304,7 @@ internal class ActivityWatcherForCallVisualizer(
 
             alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
                 dialogController.dismissCurrentDialog()
-                mediaUpgrade.mediaUpgradeOffer.accept { error ->
-                    error?.let {
-                        Logger.e(TAG, error.message, error)
-                    } ?: run {
-                        if (mediaUpgrade.mediaUpgradeOffer.video != null &&
-                            mediaUpgrade.mediaUpgradeOffer.video != MediaDirection.NONE) {
-                            controller.onPositiveDialogButtonClicked()
-                        } else {
-                            Logger.e(TAG, "Audio upgrade offer in call visualizer",
-                                Exception("Audio upgrade offer in call visualizer"))
-                            return@accept
-                        }
-                    }
-                }
+                controller.onMediaUpgradeReceived(mediaUpgrade.mediaUpgradeOffer)
             }) {
                 controller.onNegativeDialogButtonClicked()
             }
@@ -312,20 +334,28 @@ internal class ActivityWatcherForCallVisualizer(
         alertDialog = Dialogs.showVisitorCodeDialog(contextWithStyle, theme)
     }
 
-    override fun fetchGliaOrRootView(): View? {
-        return resumedActivity.get()?.let {
-            return it.findViewById(R.id.call_view)
-                ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
-                ?: it.findViewById<ChatView>(R.id.chat_view)
-                ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
-                ?: it.findViewById(android.R.id.content)
-                ?: it.window.decorView.findViewById(android.R.id.content)
-        }
-    }
-
     private fun getRuntimeTheme(activity: Activity) : UiTheme {
         val themeFromIntent: UiTheme? = activity.intent?.getParcelableExtra(GliaWidgets.UI_THEME)
         val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager()?.uiTheme
         return Utils.getFullHybridTheme(themeFromIntent, themeFromGlobalSetting)
+    }
+
+    override fun openComponentActivity() {
+        resumedActivity.get()?.run {
+            startActivity(Intent(this, CallVisualizerSupportActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
+        }
+    }
+
+    override fun destroySupportActivityIfExists() {
+        resumedActivity.get()?.run {
+            if (this is CallVisualizerSupportActivity) {
+                this.finish()
+            }
+        }
+    }
+
+    enum class PermissionStage {
+        INITIAL,
+        REQUESTED
     }
 }

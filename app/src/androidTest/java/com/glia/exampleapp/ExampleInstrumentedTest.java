@@ -1,6 +1,6 @@
 package com.glia.exampleapp;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.glia.widgetssdk", appContext.getPackageName());
+        assertTrue(appContext.getPackageName().contains("com.glia.exampleapp"));
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.model.DialogState
 
 class ActivityWatcherContract {
@@ -19,6 +20,9 @@ class ActivityWatcherContract {
         fun onPositiveDialogButtonClicked(activity: Activity? = null)
         fun onNegativeDialogButtonClicked()
         fun onDialogControllerCallback(state: DialogState)
+        fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer)
+        fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean = true)
+        fun onRequestedCameraPermissionResult(isGranted: Boolean)
     }
 
     interface Watcher {
@@ -35,6 +39,9 @@ class ActivityWatcherContract {
         fun openOverlayPermissionView()
         fun setupDialogCallback()
         fun removeDialogCallback()
-        fun fetchGliaOrRootView(): View?
+        fun requestCameraPermission()
+        fun openComponentActivity()
+        fun destroySupportActivityIfExists()
+        fun checkCameraPermission()
     }
 }

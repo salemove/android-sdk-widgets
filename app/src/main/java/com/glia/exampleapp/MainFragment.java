@@ -35,6 +35,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
+import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity;
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;

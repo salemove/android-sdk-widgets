@@ -83,9 +83,6 @@ workflows:
     envs:
     - opts:
         is_expand: false
-      INTEGRATOR_VARIANT: debug
-    - opts:
-        is_expand: false
       VERSION_INCREMENT_TYPE: patch
   authenticated_increment_project_version:
     description: Task builds an SDK and uploads it to Nexus.
@@ -120,10 +117,6 @@ workflows:
         inputs:
         - notify_email_list: $BUILD_EMAILS
     - cache-push@2: {}
-    envs:
-    - opts:
-        is_expand: false
-      INTEGRATOR_VARIANT: debug
   develop:
     steps:
     - activate-ssh-key@4:
@@ -178,10 +171,6 @@ workflows:
         inputs:
         - notify_email_list: $BUILD_EMAILS
     - cache-push@2: {}
-    envs:
-    - opts:
-        is_expand: false
-      INTEGRATOR_VARIANT: master
   master:
     steps:
     - activate-ssh-key@4:
@@ -234,10 +223,6 @@ workflows:
         - pretext: ''
         - webhook_url: $SLACK_ANDROID_WEBHOOK
     - cache-push@2: {}
-    envs:
-    - opts:
-        is_expand: false
-      INTEGRATOR_VARIANT: master
   post_release:
     steps:
     - trigger-bitrise-workflow@0:
@@ -375,10 +360,6 @@ workflows:
         - test_type: instrumentation
         - use_verbose_log: true
     - cache-push@2: {}
-    envs:
-    - opts:
-        is_expand: false
-      INTEGRATOR_VARIANT: debug
   upgrade_dependencies:
     steps:
     - activate-ssh-key@4: {}
@@ -462,6 +443,9 @@ app:
   - opts:
       is_expand: false
     ANDROID_CORTEX_BANKING_APP_SLUG: 0376f45568cb22dd
+  - opts:
+      is_expand: false
+    INTEGRATOR_VARIANT: debug
 trigger_map:
 - push_branch: master
   workflow: master

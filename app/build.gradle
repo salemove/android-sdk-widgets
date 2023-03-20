@@ -45,7 +45,6 @@ android {
     initEnvProperty('FIREBASE_API_KEY')
     initEnvProperty('FIREBASE_APP_ID')
     initEnvProperty('FIREBASE_APP_ID_DEBUG')
-    initEnvProperty('FIREBASE_APP_ID_MASTER')
 
     buildTypes {
         all {
@@ -60,13 +59,6 @@ android {
             signingConfig signingConfigs.debug
             applicationIdSuffix '.debug'
             resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG ?: "")
-        }
-        master {
-            // TODO: look into this build variant, is it really needed?
-            initWith debug
-            applicationIdSuffix '.master'
-            matchingFallbacks = ['debug']
-            resValue("string", "firebase_app_id", FIREBASE_APP_ID_MASTER ?: "")
         }
         release {
             initWith debug

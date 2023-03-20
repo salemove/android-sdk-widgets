@@ -412,6 +412,8 @@ internal class ChatController(
             currentChatItems.add(unsentItem)
             emitViewState { chatState.changeUnsentMessages(unsentMessages) }
 
+            updateQueueing(currentChatItems)
+
             return@emitChatItems chatState.changeItems(currentChatItems)
         }
     }
@@ -695,6 +697,15 @@ internal class ChatController(
             emitViewState { chatState.queueingStarted(operatorStatusItem) }
 
             return@emitChatItems chatState.changeItems(items)
+        }
+    }
+
+    private fun updateQueueing(items: MutableList<ChatItem>) {
+        if (chatState.operatorStatusItem?.status == OperatorStatusItem.Status.IN_QUEUE) {
+            items.remove(chatState.operatorStatusItem)
+            items.add(
+                OperatorStatusItem.QueueingStatusItem(chatState.companyName)
+            )
         }
     }
 
@@ -1342,12 +1353,10 @@ internal class ChatController(
             appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
         }
 
-        val sortedItems = currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp }
-
         if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
-            emitChatTranscriptItems(sortedItems, unreadMessagesCount)
+            emitChatTranscriptItems(currentItems, unreadMessagesCount)
         } else {
-            emitChatItems { chatState.historyLoaded(sortedItems) }
+            emitChatItems { chatState.historyLoaded(currentItems) }
         }
 
     }

@@ -631,12 +631,10 @@ internal class CallView(
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
-                alertDialog = null
             },
             negativeButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogDismissed()
-                alertDialog = null
             },
             cancelListener = {
                 it.dismiss()

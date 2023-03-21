@@ -320,7 +320,6 @@ public class CallController implements
         Logger.d(TAG, "endEngagementDialogYesClicked");
         isVisitorEndEngagement = true;
         stop();
-        viewCallback.destroyView();
         dialogController.dismissDialogs();
     }
 

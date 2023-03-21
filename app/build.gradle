@@ -40,17 +40,18 @@ android {
     initEnvProperty('GLIA_API_KEY_SECRET')
     initEnvProperty('GLIA_API_KEY_ID')
     initEnvProperty('GLIA_SITE_ID')
+    initEnvProperty('GLIA_QUEUE_ID')
     initEnvProperty('FIREBASE_PROJECT_ID')
     initEnvProperty('FIREBASE_API_KEY')
     initEnvProperty('FIREBASE_APP_ID')
     initEnvProperty('FIREBASE_APP_ID_DEBUG')
-    initEnvProperty('FIREBASE_APP_ID_MASTER')
 
     buildTypes {
         all {
             resValue("string", "site_id", GLIA_SITE_ID)
             resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
             resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
+            resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
             resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
             resValue("string", "firebase_api_key", FIREBASE_API_KEY)
         }
@@ -58,12 +59,6 @@ android {
             signingConfig signingConfigs.debug
             applicationIdSuffix '.debug'
             resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG ?: "")
-        }
-        master {
-            initWith debug
-            applicationIdSuffix '.master'
-            matchingFallbacks = ['debug']
-            resValue("string", "firebase_app_id", FIREBASE_APP_ID_MASTER ?: "")
         }
         release {
             initWith debug

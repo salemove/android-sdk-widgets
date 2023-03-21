@@ -280,7 +280,7 @@ public class MainFragment extends Fragment {
     private String getQueueIdFromPrefs(SharedPreferences sharedPreferences) {
         return Utils.getStringFromPrefs(
                 R.string.pref_queue_id,
-                getString(R.string.default_queue_id),
+                getString(R.string.glia_queue_id),
                 sharedPreferences,
                 getResources()
         );

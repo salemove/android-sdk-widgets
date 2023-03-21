@@ -21,7 +21,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:defaultValue="@string/default_queue_id"
+            app:defaultValue="@string/glia_queue_id"
             app:key="@string/pref_queue_id"
             app:title="@string/settings_queue_id"
             app:useSimpleSummaryProvider="true" />

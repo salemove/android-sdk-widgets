@@ -28,7 +28,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.view.unifiedui.exstensions.MergeKt;
+import com.glia.widgets.view.unifiedui.extensions.MergeKt;
 
 import org.jetbrains.annotations.NotNull;
 

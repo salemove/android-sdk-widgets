@@ -39,10 +39,10 @@ internal class ActivityWatcherForCallVisualizerTest {
 
     @Before
     fun setUp() {
-        val dialogController = mock(DialogController::class.java)
-        val surveyUseCase = mock(GliaSurveyUseCase::class.java)
-        val onCallVisualizerUseCase = mock(GliaOnCallVisualizerUseCase::class.java)
-        val onCallVisualizerEndUseCase = mock(GliaOnCallVisualizerEndUseCase::class.java)
+        val dialogController: DialogController = mock()
+        val surveyUseCase: GliaSurveyUseCase = mock()
+        val onCallVisualizerUseCase: GliaOnCallVisualizerUseCase = mock()
+        val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase= mock()
         val callVisualizerController = CallVisualizerController(
             mock(),
             dialogController,

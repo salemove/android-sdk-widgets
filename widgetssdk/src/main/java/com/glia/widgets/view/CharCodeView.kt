@@ -86,13 +86,8 @@ class CharCodeView @JvmOverloads constructor(
         charView.gravity = TEXT_ALIGNMENT_CENTER
         charView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
-        runtimeTheme?.let {
-            applyRuntimeTheme(it, charView)
-        }
-
-        remoteTheme?.let {
-            applyRemoteTheme(it, charView)
-        }
+        applyRuntimeTheme(runtimeTheme, charView)
+        applyRemoteTheme(remoteTheme, charView)
 
         val charViewLayout = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         charViewLayout.setMargins(
@@ -107,7 +102,10 @@ class CharCodeView @JvmOverloads constructor(
         return charView
     }
 
-    private fun applyRuntimeTheme(theme: UiTheme, charView: TextView) {
+    private fun applyRuntimeTheme(theme: UiTheme?, charView: TextView) {
+        if (theme == null) {
+            return
+        }
 
         val fontFamily = theme.fontRes?.let { getFontCompat(it) }
         val backgroundColor = theme.visitorCodeBackgroundColor?.let { getColorCompat(it) } ?: charViewProps.backgroundColor
@@ -115,15 +113,17 @@ class CharCodeView @JvmOverloads constructor(
         val textColor = theme.visitorCodeTextColor?.let { getColorCompat(it) } ?: theme.baseDarkColor?.let { getColorCompat(it) }
         charView.background = createCharBackground(backgroundColor, borderColor, charViewProps.borderWidth, charViewProps.borderRadius)
 
-        textColor?.let {
-            charView.setTextColor(it)
-        }
-        fontFamily?.let {
-            charView.typeface = it
-        }
+        charView.applyTextTheme(
+            textColor = textColor,
+            textFont = fontFamily
+        )
     }
 
-    private fun applyRemoteTheme(theme: VisitorCodeTheme, charView: TextView) {
+    private fun applyRemoteTheme(theme: VisitorCodeTheme?, charView: TextView) {
+        if (theme == null) {
+            return
+        }
+
         val padding = Rect(
             charViewProps.horizonPadding,
             charViewProps.verticalPadding,

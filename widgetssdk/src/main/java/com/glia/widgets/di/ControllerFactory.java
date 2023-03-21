@@ -289,10 +289,10 @@ public class ControllerFactory {
             callVisualizerController = new CallVisualizerController(
                     repositoryFactory.getCallVisualizerRepository(),
                     dialogController,
-                    useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
                     useCaseFactory.getGliaSurveyUseCase(),
                     useCaseFactory.createOnCallVisualizerUseCase(),
-                    useCaseFactory.createOnCallVisualizerEndUseCase()
+                    useCaseFactory.createOnCallVisualizerEndUseCase(),
+                    useCaseFactory.createIsCallOrChatScreenActiveUseCase()
             );
         }
         return callVisualizerController;

@@ -101,7 +101,7 @@ object GliaWidgetsConfigManager {
             context.getString(R.string.pref_site_id),
             context.getString(R.string.site_id)
         )
-        val companyName = preferences.getString(context.getString(R.string.pref_company_name), "")
+        val companyName = preferences.getString(context.getString(R.string.pref_company_name), context.getString(R.string.settings_value_default_company_name))
         val useOverlay = preferences.getBoolean(context.getString(R.string.pref_use_overlay), true)
         val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
         val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)

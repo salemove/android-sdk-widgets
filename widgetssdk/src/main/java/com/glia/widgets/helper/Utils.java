@@ -28,10 +28,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.view.configuration.ButtonConfiguration;
-import com.glia.widgets.view.configuration.ChatHeadConfiguration;
-import com.glia.widgets.view.configuration.TextConfiguration;
-import com.glia.widgets.view.configuration.survey.SurveyStyle;
+import com.glia.widgets.view.unifiedui.exstensions.MergeKt;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +38,6 @@ import java.security.InvalidParameterException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
@@ -536,210 +532,8 @@ public class Utils {
         imm.hideSoftInputFromWindow(windowToken, 0);
     }
 
-    private static <T> T getConfiguration(
-            T newConf,
-            T oldConf
-    ) {
-        return newConf != null ? newConf : oldConf;
-    }
-
     public static UiTheme getFullHybridTheme(@NotNull UiTheme newTheme, @NotNull UiTheme oldTheme) {
-        String title = newTheme.getAppBarTitle() != null ? newTheme.getAppBarTitle() : oldTheme.getAppBarTitle();
-        Integer baseLightColorRes = newTheme.getBaseLightColor() != null ?
-                newTheme.getBaseLightColor() : oldTheme.getBaseLightColor();
-        Integer baseDarkColorRes = newTheme.getBaseDarkColor() != null ?
-                newTheme.getBaseDarkColor() : oldTheme.getBaseDarkColor();
-        Integer baseNormalColorRes = newTheme.getBaseNormalColor() != null ?
-                newTheme.getBaseNormalColor() : oldTheme.getBaseNormalColor();
-        Integer baseShadeColorRes = newTheme.getBaseShadeColor() != null ?
-                newTheme.getBaseShadeColor() : oldTheme.getBaseShadeColor();
-        Integer brandPriamryColorRes = newTheme.getBrandPrimaryColor() != null ?
-                newTheme.getBrandPrimaryColor() : oldTheme.getBrandPrimaryColor();
-        Integer systemAgentBubbleColorRes = newTheme.getSystemAgentBubbleColor() != null ?
-                newTheme.getSystemAgentBubbleColor() : oldTheme.getSystemAgentBubbleColor();
-        Integer chatSendMessageButtonTintColor = newTheme.getSendMessageButtonTintColor() != null ?
-                newTheme.getSendMessageButtonTintColor() : oldTheme.getSendMessageButtonTintColor();
-        Integer gliaChatBackgroundColorRes = newTheme.getGliaChatBackgroundColor() != null ?
-                newTheme.getGliaChatBackgroundColor() : oldTheme.getGliaChatBackgroundColor();
-        Integer chatHeaderTitleColor = newTheme.getGliaChatHeaderTitleTintColor() != null ?
-                newTheme.getGliaChatHeaderTitleTintColor() : oldTheme.getGliaChatHeaderTitleTintColor();
-        Integer chatHeaderHomeButtonTintColor = newTheme.getGliaChatHeaderHomeButtonTintColor() != null ?
-                newTheme.getGliaChatHeaderHomeButtonTintColor() : oldTheme.getGliaChatHeaderHomeButtonTintColor();
-        Integer chatHeaderExitQueueButtonTintColor = newTheme.getGliaChatHeaderExitQueueButtonTintColor() != null ?
-                newTheme.getGliaChatHeaderExitQueueButtonTintColor() : oldTheme.getGliaChatHeaderExitQueueButtonTintColor();
-        Integer fontRes = newTheme.getFontRes() != null ? newTheme.getFontRes() : oldTheme.getFontRes();
-        Integer systemNegativeColorRes = newTheme.getSystemNegativeColor() != null ?
-                newTheme.getSystemNegativeColor() : oldTheme.getSystemNegativeColor();
-        Integer visitorMessageBackgroundColorRes = newTheme.getVisitorMessageBackgroundColor() != null ?
-                newTheme.getVisitorMessageBackgroundColor() : oldTheme.getVisitorMessageBackgroundColor();
-        Integer visitorMessageTextColorRes = newTheme.getVisitorMessageTextColor() != null ?
-                newTheme.getVisitorMessageTextColor() : oldTheme.getVisitorMessageTextColor();
-        Integer operatorMessageBackgroundColorRes = newTheme.getOperatorMessageBackgroundColor() != null ?
-                newTheme.getOperatorMessageBackgroundColor() : oldTheme.getOperatorMessageBackgroundColor();
-        Integer operatorMessageTextColorRes = newTheme.getOperatorMessageTextColor() != null ?
-                newTheme.getOperatorMessageTextColor() : oldTheme.getOperatorMessageTextColor();
-        Integer botActionButtonBackgroundColorRes = newTheme.getBotActionButtonBackgroundColor() != null ?
-                newTheme.getBotActionButtonBackgroundColor() : oldTheme.getBotActionButtonBackgroundColor();
-        Integer botActionButtonTextColorRes = newTheme.getBotActionButtonTextColor() != null ?
-                newTheme.getBotActionButtonTextColor() : oldTheme.getBotActionButtonTextColor();
-        Integer botActionButtonSelectedBackgroundColorRes = newTheme.getBotActionButtonSelectedBackgroundColor() != null ?
-                newTheme.getBotActionButtonSelectedBackgroundColor() : oldTheme.getBotActionButtonSelectedBackgroundColor();
-        Integer botActionButtonSelectedTextColorRes = newTheme.getBotActionButtonSelectedTextColor() != null ?
-                newTheme.getBotActionButtonSelectedTextColor() : oldTheme.getBotActionButtonSelectedTextColor();
-        Integer chatStartingHeadingTextColorRes = newTheme.getGliaChatStartingHeadingTextColor() != null ?
-                newTheme.getGliaChatStartingHeadingTextColor() : oldTheme.getGliaChatStartingHeadingTextColor();
-        Integer chatStartingCaptionTextColorRes = newTheme.getGliaChatStartingCaptionTextColor() != null ?
-                newTheme.getGliaChatStartingCaptionTextColor() : oldTheme.getGliaChatStartingCaptionTextColor();
-        Integer chatStartedCaptionTextColorRes = newTheme.getGliaChatStartedCaptionTextColor() != null ?
-                newTheme.getGliaChatStartedCaptionTextColor() : oldTheme.getGliaChatStartedCaptionTextColor();
-        Integer chatStartedHeadingTextColorRes = newTheme.getGliaChatStartedHeadingTextColor() != null ?
-                newTheme.getGliaChatStartedHeadingTextColor() : oldTheme.getGliaChatStartedHeadingTextColor();
-        Integer iconAppBarBack = newTheme.getIconAppBarBack() != null ?
-                newTheme.getIconAppBarBack() : oldTheme.getIconAppBarBack();
-        Integer iconLeaveQueue = newTheme.getIconLeaveQueue() != null ?
-                newTheme.getIconLeaveQueue() : oldTheme.getIconLeaveQueue();
-        Integer iconSendMessage = newTheme.getIconSendMessage() != null ?
-                newTheme.getIconSendMessage() : oldTheme.getIconSendMessage();
-        Integer iconChatAudioUpgrade = newTheme.getIconChatAudioUpgrade() != null ?
-                newTheme.getIconChatAudioUpgrade() : oldTheme.getIconChatAudioUpgrade();
-        Integer iconUpgradeAudioDialog = newTheme.getIconUpgradeAudioDialog() != null ?
-                newTheme.getIconUpgradeAudioDialog() : oldTheme.getIconUpgradeAudioDialog();
-        Integer iconCallAudioOn = newTheme.getIconCallAudioOn() != null ?
-                newTheme.getIconCallAudioOn() : oldTheme.getIconCallAudioOn();
-        Integer iconChatVideoUpgrade = newTheme.getIconChatVideoUpgrade() != null ?
-                newTheme.getIconChatVideoUpgrade() : oldTheme.getIconChatVideoUpgrade();
-        Integer iconUpgradeVideoDialog = newTheme.getIconUpgradeVideoDialog() != null ?
-                newTheme.getIconUpgradeVideoDialog() : oldTheme.getIconUpgradeVideoDialog();
-        Integer iconScreenSharingDialog = newTheme.getIconScreenSharingDialog() != null ?
-                newTheme.getIconScreenSharingDialog() : oldTheme.getIconScreenSharingDialog();
-        Integer iconCallVideoOn = newTheme.getIconCallVideoOn() != null ?
-                newTheme.getIconCallVideoOn() : oldTheme.getIconCallVideoOn();
-        Integer iconCallAudioOff = newTheme.getIconCallAudioOff() != null ?
-                newTheme.getIconCallAudioOff() : oldTheme.getIconCallAudioOff();
-        Integer iconCallVideoOff = newTheme.getIconCallVideoOff() != null ?
-                newTheme.getIconCallVideoOff() : oldTheme.getIconCallVideoOff();
-        Integer iconCallChat = newTheme.getIconCallChat() != null ?
-                newTheme.getIconCallChat() : oldTheme.getIconCallChat();
-        Integer iconCallSpeakerOn = newTheme.getIconCallSpeakerOn() != null ?
-                newTheme.getIconCallSpeakerOn() : oldTheme.getIconCallSpeakerOn();
-        Integer iconCallSpeakerOff = newTheme.getIconCallSpeakerOff() != null ?
-                newTheme.getIconCallSpeakerOff() : oldTheme.getIconCallSpeakerOff();
-        Integer iconCallMinimize = newTheme.getIconCallMinimize() != null ?
-                newTheme.getIconCallMinimize() : oldTheme.getIconCallMinimize();
-        Integer iconPlaceholder = newTheme.getIconPlaceholder() != null ?
-                newTheme.getIconPlaceholder() : oldTheme.getIconPlaceholder();
-        Integer iconOnHold = newTheme.getIconOnHold() != null ?
-                newTheme.getIconOnHold() : oldTheme.getIconOnHold();
-        Integer iconEndScreenShare = newTheme.getIconEndScreenShare() != null ?
-                newTheme.getIconEndScreenShare() : oldTheme.getIconEndScreenShare();
-        Integer endScreenShareTintColor = newTheme.getEndScreenShareTintColor() != null ?
-                newTheme.getEndScreenShareTintColor() : oldTheme.getEndScreenShareTintColor();
-
-        Boolean whiteLabel = newTheme.getWhiteLabel() != null ? newTheme.getWhiteLabel() : oldTheme.getWhiteLabel();
-        Boolean isUseAlertDialogButtonVerticalAlignment =
-                newTheme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
-                        newTheme.getGliaAlertDialogButtonUseVerticalAlignment() :
-                        oldTheme.getGliaAlertDialogButtonUseVerticalAlignment();
-
-        ButtonConfiguration endButtonConfiguration =
-                getConfiguration(
-                        newTheme.getGliaEndButtonConfiguration(),
-                        oldTheme.getGliaEndButtonConfiguration()
-                );
-
-        ButtonConfiguration positiveButtonConfiguration =
-                getConfiguration(
-                        newTheme.getGliaPositiveButtonConfiguration(),
-                        oldTheme.getGliaPositiveButtonConfiguration()
-                );
-
-        ButtonConfiguration negativeButtonConfiguration =
-                getConfiguration(
-                        newTheme.getGliaNegativeButtonConfiguration(),
-                        oldTheme.getGliaNegativeButtonConfiguration()
-                );
-
-        ButtonConfiguration neutralButtonConfiguration =
-                getConfiguration(
-                        newTheme.getGliaNeutralButtonConfiguration(),
-                        oldTheme.getGliaNeutralButtonConfiguration()
-                );
-
-        TextConfiguration choiceCardContentTextConfiguration =
-                getConfiguration(
-                        newTheme.getGliaChoiceCardContentTextConfiguration(),
-                        oldTheme.getGliaChoiceCardContentTextConfiguration()
-                );
-
-        ChatHeadConfiguration chatHeadConfiguration =
-                getConfiguration(
-                        newTheme.getChatHeadConfiguration(),
-                        oldTheme.getChatHeadConfiguration()
-                );
-
-        SurveyStyle surveyStyle =
-                getConfiguration(
-                        newTheme.getSurveyStyle(),
-                        oldTheme.getSurveyStyle()
-                );
-
-        UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
-        builder.setAppBarTitle(title);
-        builder.setBaseLightColor(baseLightColorRes);
-        builder.setBaseDarkColor(baseDarkColorRes);
-        builder.setBaseNormalColor(baseNormalColorRes);
-        builder.setBaseShadeColor(baseShadeColorRes);
-        builder.setBrandPrimaryColor(brandPriamryColorRes);
-        builder.setSystemAgentBubbleColor(systemAgentBubbleColorRes);
-        builder.setSendMessageButtonTintColor(chatSendMessageButtonTintColor);
-        builder.setGliaChatHeaderHomeButtonTintColor(chatHeaderHomeButtonTintColor);
-        builder.setGliaChatHeaderExitQueueButtonTintColor(chatHeaderExitQueueButtonTintColor);
-        builder.setChatStartingHeadingTextColor(chatStartingHeadingTextColorRes);
-        builder.setChatStartingCaptionTextColor(chatStartingCaptionTextColorRes);
-        builder.setChatStartedHeadingTextColor(chatStartedHeadingTextColorRes);
-        builder.setChatStartedCaptionTextColor(chatStartedCaptionTextColorRes);
-        builder.setFontRes(fontRes);
-        builder.setSystemNegativeColor(systemNegativeColorRes);
-        builder.setVisitorMessageBackgroundColor(visitorMessageBackgroundColorRes);
-        builder.setVisitorMessageTextColor(visitorMessageTextColorRes);
-        builder.setOperatorMessageBackgroundColor(operatorMessageBackgroundColorRes);
-        builder.setGliaChatHeaderTitleTintColor(chatHeaderTitleColor);
-        builder.setGliaChatBackgroundColor(gliaChatBackgroundColorRes);
-        builder.setOperatorMessageTextColor(operatorMessageTextColorRes);
-        builder.setBotActionButtonBackgroundColor(botActionButtonBackgroundColorRes);
-        builder.setBotActionButtonTextColor(botActionButtonTextColorRes);
-        builder.setBotActionButtonSelectedBackgroundColor(botActionButtonSelectedBackgroundColorRes);
-        builder.setBotActionButtonSelectedTextColor(botActionButtonSelectedTextColorRes);
-        builder.setIconAppBarBack(iconAppBarBack);
-        builder.setIconLeaveQueue(iconLeaveQueue);
-        builder.setIconSendMessage(iconSendMessage);
-        builder.setIconChatAudioUpgrade(iconChatAudioUpgrade);
-        builder.setIconUpgradeAudioDialog(iconUpgradeAudioDialog);
-        builder.setIconCallAudioOn(iconCallAudioOn);
-        builder.setIconChatVideoUpgrade(iconChatVideoUpgrade);
-        builder.setIconUpgradeVideoDialog(iconUpgradeVideoDialog);
-        builder.setIconScreenSharingDialog(iconScreenSharingDialog);
-        builder.setIconCallVideoOn(iconCallVideoOn);
-        builder.setIconCallAudioOff(iconCallAudioOff);
-        builder.setIconCallVideoOff(iconCallVideoOff);
-        builder.setIconCallChat(iconCallChat);
-        builder.setIconCallSpeakerOn(iconCallSpeakerOn);
-        builder.setIconCallSpeakerOff(iconCallSpeakerOff);
-        builder.setIconCallMinimize(iconCallMinimize);
-        builder.setIconPlaceholder(iconPlaceholder);
-        builder.setIconOnHold(iconOnHold);
-        builder.setWhiteLabel(whiteLabel);
-        builder.setGliaAlertDialogButtonUseVerticalAlignment(isUseAlertDialogButtonVerticalAlignment);
-        builder.setHeaderEndButtonConfiguration(endButtonConfiguration);
-        builder.setPositiveButtonConfiguration(positiveButtonConfiguration);
-        builder.setNegativeButtonConfiguration(negativeButtonConfiguration);
-        builder.setNeutralButtonConfiguration(neutralButtonConfiguration);
-        builder.setChoiceCardContentTextConfiguration(choiceCardContentTextConfiguration);
-        builder.setChatHeadConfiguration(chatHeadConfiguration);
-        builder.setSurveyStyle(surveyStyle);
-        builder.setIconEndScreenShare(iconEndScreenShare);
-        builder.setEndScreenShareTintColor(endScreenShareTintColor);
-        return builder.build();
+        return MergeKt.deepMerge(oldTheme, newTheme);
     }
 
     public static File createTempPhotoFile(Context context) throws IOException {

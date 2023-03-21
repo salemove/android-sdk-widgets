@@ -12,6 +12,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
@@ -138,6 +139,10 @@ internal fun View.applyLayerTheme(layer: LayerTheme?, padding: Rect? = null) {
     } ?: drawable
 }
 
+internal fun View.applyLayerTheme(@ColorInt backgroundColor: Int?) {
+    backgroundColor?.apply(::setBackgroundColor)
+}
+
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
     layer?.fill?.primaryColor?.also {
         /*
@@ -193,6 +198,14 @@ internal fun TextView.applyTextTheme(
     }
 }
 
+internal fun TextView.applyTextTheme(
+    @ColorInt textColor: Int?,
+    textFont: Typeface?
+) {
+    textColor?.also(::setTextColor)
+    textFont?.also(::setTypeface)
+}
+
 internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     buttonTheme?.background?.also { bg ->
         bg.fill?.also { backgroundTintList = it.primaryColorStateList }
@@ -210,6 +223,19 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     }
 }
 
+internal fun MaterialButton.applyButtonTheme(
+    @ColorInt backgroundColor: Int?,
+    @ColorInt textColor: Int?,
+    textFont: Typeface?
+) {
+    backgroundColor?.also { backgroundTintList = ColorStateList.valueOf(it) }
+    textColor?.also {
+        setTextColor(it)
+        iconTint = ColorStateList.valueOf(it)
+    }
+    textFont?.also(::setTypeface)
+}
+
 internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
     applyImageColorTheme(buttonTheme?.iconColor)
 }
@@ -220,8 +246,24 @@ internal fun View.changeStatusBarColor(color: Int?) {
     }
 }
 
+internal fun ProgressBar.applyProgressColorTheme(colorTheme: ColorTheme?) {
+    colorTheme?.primaryColorStateList?.also(::setIndeterminateTintList)
+}
+
+internal fun ProgressBar.applyProgressColorTheme(@ColorInt progressColor: Int?) {
+    progressColor?.also {
+        indeterminateTintList = ColorStateList.valueOf(it)
+    }
+}
+
 internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {
     colorTheme?.primaryColorStateList?.also(::setImageTintList)
+}
+
+internal fun ImageView.applyImageColorTheme(@ColorInt imageColor: Int?) {
+    imageColor?.let {
+        imageTintList = ColorStateList.valueOf(it)
+    }
 }
 
 internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme: BarButtonStatesTheme?) {

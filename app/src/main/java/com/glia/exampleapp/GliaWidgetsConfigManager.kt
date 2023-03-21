@@ -7,6 +7,7 @@ import androidx.preference.PreferenceManager
 import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.GliaWidgetsConfig
+import com.glia.widgets.UiTheme
 
 /**
  * Helper class to obtain Glia Config params from deep-link or preferences.
@@ -87,6 +88,7 @@ object GliaWidgetsConfigManager {
         context: Context,
         preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
         uiJsonRemoteConfig: String? = null,
+        runtimeConfig: UiTheme? = null,
         region: String = REGION_BETA
     ): GliaWidgetsConfig {
         val apiKeyId = preferences.getString(
@@ -122,6 +124,7 @@ object GliaWidgetsConfigManager {
             .setScreenSharingMode(screenSharingMode)
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig)
+            .setUiTheme(runtimeConfig)
             .build()
     }
 }

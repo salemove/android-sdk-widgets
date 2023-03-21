@@ -179,7 +179,7 @@ class VisitorCodeView internal constructor(
             applyLayerTheme(this?.visitorCodeTheme?.background)
             successTitle.applyTextTheme(this?.visitorCodeTheme?.title)
             failureTitle.applyTextTheme(this?.visitorCodeTheme?.title)
-            progressBar.indeterminateTintList = this?.visitorCodeTheme?.loadingProgressBar?.primaryColorStateList
+            progressBar.applyProgressColorTheme(this?.visitorCodeTheme?.loadingProgressBar)
             closeButton.applyImageColorTheme(this?.visitorCodeTheme?.closeButtonColor)
             refreshButton.applyButtonTheme(this?.visitorCodeTheme?.refreshButton)
         }
@@ -192,40 +192,34 @@ class VisitorCodeView internal constructor(
         }
         charCodeView.applyRuntimeTheme(theme)
 
-        val brandPrimaryColor = theme.brandPrimaryColor?.let { getColorStateListCompat(it) }
-        val baseLightColor = theme.baseLightColor?.let { getColorCompat(it) }
-        val baseNormalColor = theme.baseNormalColor?.let { getColorStateListCompat(it) }
-        val baseShadeColor = theme.baseShadeColor?.let { getColorStateListCompat(it) }
-        val baseDarkColor = theme.baseDarkColor?.let { getColorCompat(it) }
-        val fontFamily = theme.fontRes?.let { getFontCompat(it) }
+        val brandPrimaryColor = theme.brandPrimaryColor?.let(::getColorCompat)
+        val baseLightColor = theme.baseLightColor?.let(::getColorCompat)
+        val baseNormalColor = theme.baseNormalColor?.let(::getColorCompat)
+        val baseShadeColor = theme.baseShadeColor?.let(::getColorCompat)
+        val baseDarkColor = theme.baseDarkColor?.let(::getColorCompat)
+        val fontFamily = theme.fontRes?.let(::getFontCompat)
 
-        baseLightColor?.also {
-            setBackgroundColor(it)
-        }
-        successTitle.apply {
-            baseDarkColor?.also(::setTextColor)
-            fontFamily?.also(::setTypeface)
-        }
-        failureTitle.apply {
-            baseDarkColor?.also(::setTextColor)
-            fontFamily?.also(::setTypeface)
-        }
-        refreshButton.apply {
-            brandPrimaryColor?.also { backgroundTintList = it }
-            baseLightColor?.also(::setTextColor)
-            fontFamily?.also(::setTypeface)
-        }
+        applyLayerTheme(
+            backgroundColor = baseLightColor
+        )
+        successTitle.applyTextTheme(
+            textColor = baseDarkColor,
+            textFont = fontFamily
+        )
+        failureTitle.applyTextTheme(
+            textColor = baseDarkColor,
+            textFont = fontFamily
+        )
+        refreshButton.applyButtonTheme(
+            backgroundColor = brandPrimaryColor,
+            textColor = baseLightColor,
+            textFont = fontFamily
+        )
         whiteLabelView.apply {
             isVisible = theme.whiteLabel ?: false
-            baseShadeColor?.also(::setImageTintList)
+            applyImageColorTheme(baseShadeColor)
         }
-        progressBar.apply {
-            brandPrimaryColor?.also {
-                indeterminateTintList = it
-            }
-        }
-        closeButton.apply {
-            baseNormalColor?.also(::setImageTintList)
-        }
+        progressBar.applyProgressColorTheme(brandPrimaryColor)
+        closeButton.applyImageColorTheme(baseNormalColor)
     }
 }

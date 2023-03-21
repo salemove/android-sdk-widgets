@@ -1,5 +1,6 @@
 package com.glia.widgets.view.unifiedui.exstensions
 
+import com.glia.widgets.UiTheme
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty1
@@ -28,6 +29,11 @@ import kotlin.reflect.full.primaryConstructor
 internal inline infix fun <reified T : Any?> T.deepMerge(other: T): T {
     if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes")
     return merge(other)
+}
+
+// Added to make method above compatible with Java
+internal fun deepMerge(old: UiTheme?, other: UiTheme?): UiTheme? {
+    return old deepMerge other
 }
 
 private fun <T : Any?> T.merge(other: T): T {

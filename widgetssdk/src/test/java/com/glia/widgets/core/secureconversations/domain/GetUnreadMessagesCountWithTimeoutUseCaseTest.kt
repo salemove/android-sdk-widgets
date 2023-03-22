@@ -3,13 +3,11 @@ package com.glia.widgets.core.secureconversations.domain
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
+import io.reactivex.plugins.RxJavaPlugins
 import org.junit.Before
 import org.junit.Test
 import org.mockito.internal.stubbing.answers.AnswersWithDelay
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import org.mockito.stubbing.Answer
 import kotlin.properties.Delegates
 
@@ -19,6 +17,7 @@ class GetUnreadMessagesCountWithTimeoutUseCaseTest {
 
     @Before
     fun setUp() {
+        RxJavaPlugins.reset()
         repository = mock()
         useCase = GetUnreadMessagesCountWithTimeoutUseCase(repository)
     }

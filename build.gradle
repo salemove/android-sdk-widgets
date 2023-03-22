@@ -60,6 +60,7 @@ ext {
     androidXTestVersion = '1.1.5'
     mockitoVersion = '5.1.1'
     mockitoKotlinVersion = '4.1.0'
+    mockitoAndroidTestVersion = '4.3.1'
     archCoreVersion = '2.1.0'
 
     //kotlin

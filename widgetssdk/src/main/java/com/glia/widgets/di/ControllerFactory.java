@@ -2,6 +2,8 @@ package com.glia.widgets.di;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
+import com.glia.widgets.callvisualizer.ActivityWatcherContract;
+import com.glia.widgets.callvisualizer.ActivityWatcherController;
 import com.glia.widgets.callvisualizer.EndScreenSharingContract;
 import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.VisitorCodeContract;
@@ -47,6 +49,7 @@ public class ControllerFactory {
     private final ChatHeadPosition chatHeadPosition;
     private SurveyController surveyController;
     private CallVisualizerController callVisualizerController;
+    private ActivityWatcherController activityWatcherController;
 
     private static ServiceChatHeadController serviceChatHeadController;
 
@@ -307,5 +310,12 @@ public class ControllerFactory {
 
     public VisitorCodeContract.Controller getVisitorCodeController() {
         return new VisitorCodeController(dialogController, repositoryFactory.getVisitorCodeRepository(), repositoryFactory.getGliaEngagementRepository());
+    }
+
+    public ActivityWatcherContract.Controller getActivityWatcherController() {
+        if (activityWatcherController == null) {
+            activityWatcherController = new ActivityWatcherController(getCallVisualizerController(), getScreenSharingController(), serviceChatHeadController);
+        }
+        return activityWatcherController;
     }
 }

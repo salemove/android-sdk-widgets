@@ -175,8 +175,8 @@ internal class CallView(
         screenSharingMode: ScreenSharing.Mode?,
         mediaType: Engagement.MediaType?
     ) {
-        Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
-        Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
+        Dependencies.getSdkConfigurationManager()?.isUseOverlay = useOverlays
+        Dependencies.getSdkConfigurationManager()?.screenSharingMode = screenSharingMode
         callController?.initCall(companyName, queueId, visitorContextAssetId, mediaType)
         serviceChatHeadController?.init()
     }
@@ -561,6 +561,7 @@ internal class CallView(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
     }
 
     fun setUiTheme(uiTheme: UiTheme?) {

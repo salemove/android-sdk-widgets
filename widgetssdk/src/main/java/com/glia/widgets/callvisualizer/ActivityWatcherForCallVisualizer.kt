@@ -30,6 +30,7 @@ import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.unifiedui.exstensions.deepMerge
 import com.glia.widgets.view.unifiedui.exstensions.wrapWithMaterialThemeOverlay
 import java.lang.ref.WeakReference
 
@@ -137,7 +138,7 @@ class ActivityWatcherForCallVisualizer(
     }
 
     private fun getConfigurationBuilder(): Configuration.Builder {
-        return Configuration.Builder().setWidgetsConfiguration(Dependencies.getSdkConfigurationManager().createWidgetsConfiguration())
+        return Configuration.Builder().setWidgetsConfiguration(Dependencies.getSdkConfigurationManager()?.createWidgetsConfiguration())
     }
 
     override fun showToast(message: String, duration: Int) {
@@ -190,8 +191,7 @@ class ActivityWatcherForCallVisualizer(
             return
         }
         Logger.d(TAG, "Show screen sharing and notifications dialog")
-        val builder = UiTheme.UiThemeBuilder()
-        val theme = builder.build()
+        val theme = UiTheme.UiThemeBuilder().build()
         val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
         alertDialog = Dialogs.showOptionsDialog(
             context = contextWithStyle,
@@ -244,8 +244,7 @@ class ActivityWatcherForCallVisualizer(
         }
         activity.runOnUiThread {
             Logger.d(TAG, "Show screen sharing dialog")
-            val builder = UiTheme.UiThemeBuilder()
-            val theme = builder.build()
+            val theme = getRuntimeTheme(activity)
             val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
 
             alertDialog = Dialogs.showScreenSharingDialog(
@@ -279,8 +278,7 @@ class ActivityWatcherForCallVisualizer(
         }
         activity.runOnUiThread {
             Logger.d(TAG, "Show upgrade dialog")
-            val builder = UiTheme.UiThemeBuilder()
-            val theme = builder.build()
+            val theme = getRuntimeTheme(activity)
             val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
 
             alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
@@ -320,8 +318,7 @@ class ActivityWatcherForCallVisualizer(
             return
         }
         Logger.d(TAG, "Show visitor code dialog")
-        val builder = UiTheme.UiThemeBuilder()
-        val theme = builder.build()
+        val theme = UiTheme.UiThemeBuilder().build()
         val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
 
         alertDialog = Dialogs.showVisitorCodeDialog(contextWithStyle, theme)
@@ -336,5 +333,11 @@ class ActivityWatcherForCallVisualizer(
                 ?: it.findViewById(android.R.id.content)
                 ?: it.window.decorView.findViewById(android.R.id.content)
         }
+    }
+
+    private fun getRuntimeTheme(activity: Activity) : UiTheme {
+        val themeFromIntent: UiTheme? = activity.intent?.getParcelableExtra(GliaWidgets.UI_THEME)
+        val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager()?.uiTheme
+        return Utils.getFullHybridTheme(themeFromIntent, themeFromGlobalSetting)
     }
 }

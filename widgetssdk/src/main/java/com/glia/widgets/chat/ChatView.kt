@@ -207,8 +207,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         useOverlays: Boolean = false,
         screenSharingMode: ScreenSharing.Mode? = null
     ) {
-        Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
-        Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
+        Dependencies.getSdkConfigurationManager()?.isUseOverlay = useOverlays
+        Dependencies.getSdkConfigurationManager()?.screenSharingMode = screenSharingMode
         controller?.initChat(companyName, queueId, visitorContextAssetId)
         serviceChatHeadController?.init()
     }
@@ -612,6 +612,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
         theme.brandPrimaryColor?.let(::getColorCompat)?.also { statusBarColor = it }
     }
 

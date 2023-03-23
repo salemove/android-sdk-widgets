@@ -13,6 +13,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -33,6 +34,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -145,6 +147,15 @@ internal fun View.applyLayerTheme(layer: LayerTheme?, padding: Rect? = null) {
 
 internal fun View.applyLayerTheme(@ColorInt backgroundColor: Int?) {
     backgroundColor?.apply(::setBackgroundColor)
+}
+
+internal fun MaterialToolbar.applyToolbarTheme(@ColorInt backgroundColor: Int?, @ColorInt navigationIconColor: Int?) {
+    backgroundColor?.let {
+        backgroundTintList = ColorStateList.valueOf(it)
+    }
+    navigationIconColor?.let {
+        navigationIcon?.setTint(navigationIconColor)
+    }
 }
 
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
@@ -267,6 +278,12 @@ internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {
 internal fun ImageView.applyImageColorTheme(@ColorInt imageColor: Int?) {
     imageColor?.let {
         imageTintList = ColorStateList.valueOf(it)
+    }
+}
+
+internal fun MenuItem.applyIconColorTheme(@ColorInt iconColor: Int?) {
+    iconColor?.let {
+        icon?.setTintCompat(it)
     }
 }
 

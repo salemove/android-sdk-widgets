@@ -76,6 +76,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
                 .build();
     }
 
+    @Deprecated
     public void setTheme(UiTheme theme) {
         if (theme == null) return;
         ButtonConfiguration runTimeConfiguration = getButtonConfigurationFromTheme(theme);

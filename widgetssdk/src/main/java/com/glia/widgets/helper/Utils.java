@@ -83,6 +83,7 @@ public class Utils {
         }
     }
 
+    @NotNull
     public static UiTheme getThemeFromTypedArray(TypedArray typedArray, Context context) {
         UiTheme.UiThemeBuilder defaultThemeBuilder = new UiTheme.UiThemeBuilder();
         defaultThemeBuilder.setAppBarTitle(getAppBarTitleValue(typedArray));
@@ -460,6 +461,7 @@ public class Utils {
     }
 
     public static Boolean getGliaAlertDialogButtonUseVerticalAlignment(UiTheme theme) {
+        if (theme == null) return false;
         return theme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
                 theme.getGliaAlertDialogButtonUseVerticalAlignment() :
                 false;
@@ -532,8 +534,10 @@ public class Utils {
         imm.hideSoftInputFromWindow(windowToken, 0);
     }
 
-    public static UiTheme getFullHybridTheme(@NotNull UiTheme newTheme, @NotNull UiTheme oldTheme) {
-        return MergeKt.deepMerge(oldTheme, newTheme);
+    @NotNull
+    public static UiTheme getFullHybridTheme(@Nullable UiTheme newTheme, @Nullable UiTheme oldTheme) {
+        UiTheme mergedTheme = MergeKt.deepMerge(oldTheme, newTheme);
+        return mergedTheme != null ? mergedTheme : new UiTheme.UiThemeBuilder().build();
     }
 
     public static File createTempPhotoFile(Context context) throws IOException {

@@ -84,25 +84,28 @@ class AppBarView @JvmOverloads constructor(
         }
 
         // colors
-        uiTheme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
-            binding.toolbar.backgroundTintList = it
-        }
-        (uiTheme.gliaChatHeaderExitQueueButtonTintColor ?: uiTheme.baseLightColor)?.also {
-            leaveQueueIcon.icon?.setTintCompat(it)
-        }
-        uiTheme.endScreenShareTintColor?.also {
-            endScreenShareButton.setColorFilter(ContextCompat.getColor(context, it))
-        }
+        val brandPrimaryColor = uiTheme.brandPrimaryColor?.let(::getColorCompat)
+        val baseLightColor = uiTheme.baseLightColor?.let(::getColorCompat)
+        val systemNegativeColor = uiTheme.systemNegativeColor?.let(::getColorCompat)
+        val exitQueueButtonColor = uiTheme.gliaChatHeaderExitQueueButtonTintColor?.let(::getColorCompat)
+            ?: baseLightColor
+        val endScreenShareButtonColor = uiTheme.endScreenShareTintColor?.let(::getColorCompat)
+        val chatHeaderTitleColor = uiTheme.gliaChatHeaderTitleTintColor?.let(::getColorCompat)
+        val chatHeaderHomeButtonColor = uiTheme.gliaChatHeaderHomeButtonTintColor?.let(::getColorCompat)
+        val textFont = uiTheme.fontRes?.let(::getFontCompat)
 
-        uiTheme.gliaChatHeaderTitleTintColor?.let(::getColorStateListCompat)
-            ?.also(binding.title::setTextColor)
-
-        uiTheme.gliaChatHeaderHomeButtonTintColor?.let(::getColorCompat)?.also {
-            binding.toolbar.navigationIcon?.setTint(it)
-        }
-        binding.endButton.setTheme(uiTheme)
-
-        uiTheme.fontRes?.let { binding.title.typeface = getFontCompat(it) }
+        binding.toolbar.applyToolbarTheme(
+            backgroundColor = brandPrimaryColor,
+            navigationIconColor = chatHeaderHomeButtonColor
+        )
+        leaveQueueIcon.applyIconColorTheme(exitQueueButtonColor)
+        endScreenShareButton.applyImageColorTheme(endScreenShareButtonColor)
+        binding.title.applyTextTheme(chatHeaderTitleColor, textFont)
+        binding.endButton.applyButtonTheme(
+            backgroundColor = systemNegativeColor,
+            textColor = baseLightColor,
+            textFont = textFont
+        )
     }
 
     fun setTitle(title: String?) {

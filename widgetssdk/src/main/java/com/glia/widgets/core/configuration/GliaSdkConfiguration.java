@@ -1,6 +1,9 @@
 package com.glia.widgets.core.configuration;
 
+import android.app.Activity;
 import android.content.Intent;
+
+import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;

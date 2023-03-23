@@ -3,6 +3,7 @@ package com.glia.widgets.di;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.Lifecycle;
 
@@ -85,6 +86,7 @@ public class Dependencies {
         return notificationManager;
     }
 
+    @Nullable
     public static GliaSdkConfigurationManager getSdkConfigurationManager() {
         return sdkConfigurationManager;
     }

@@ -123,38 +123,45 @@ object Dialogs {
             setOnCancelListener(cancelListener)
 
             val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
+            val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
+            val brandPrimaryColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
+            val baseShadeColor = theme.baseShadeColor?.let { ContextCompat.getColor(context, it) }
+            val systemNegativeColor = theme.systemNegativeColor?.let { ContextCompat.getColor(context, it) }
             val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
 
             findViewById<TextView>(R.id.dialog_title_view).apply {
                 text = title
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.title)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
                 text = message
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.message.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.message)
             }
             findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                setTheme(theme)
                 text = negativeButtonText
-                fontFamily?.also(::setTypeface)
                 setOnClickListener(negativeButtonClickListener)
+                applyButtonTheme(
+                    backgroundColor = systemNegativeColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                setTheme(theme)
                 text = positiveButtonText
-                fontFamily?.also(::setTypeface)
                 setOnClickListener(positiveButtonClickListener)
+                applyButtonTheme(
+                    backgroundColor = brandPrimaryColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
                 isVisible = theme.whiteLabel ?: false
-                theme.baseShadeColor?.let { ContextCompat.getColorStateList(context, it) }
-                    ?.also(::setImageTintList)
+                applyImageColorTheme(baseShadeColor)
             }
         }
     }
@@ -167,28 +174,25 @@ object Dialogs {
         buttonClickListener: View.OnClickListener
     ): AlertDialog {
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val baseNormalColorStateList =
-            theme.baseNormalColor?.let { ContextCompat.getColorStateList(context, it) }
+        val baseNormalColor = theme.baseNormalColor?.let { ContextCompat.getColor(context, it) }
 
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
 
         return showDialog(context, R.layout.alert_dialog, theme.baseLightColor) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
                 setText(title)
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.title)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
                 setText(message)
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.message.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.message)
             }
             findViewById<ImageButton>(R.id.close_dialog_button).apply {
-                baseNormalColorStateList?.also(::setImageTintList)
                 setOnClickListener(buttonClickListener)
-                alertTheme?.closeButtonColor.also(::applyImageColorTheme)
+                applyImageColorTheme(baseNormalColor)
+                applyImageColorTheme(alertTheme?.closeButtonColor)
             }
         }
     }
@@ -199,6 +203,8 @@ object Dialogs {
         buttonClickListener: View.OnClickListener
     ): AlertDialog {
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
+        val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
+        val brandPrimaryColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
 
         return showDialog(
@@ -207,19 +213,21 @@ object Dialogs {
             theme.baseLightColor
         ) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.title)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.message.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.message)
+
             }
             findViewById<BaseConfigurableButton>(R.id.ok_button).apply {
-                setTheme(theme)
                 setOnClickListener(buttonClickListener)
-                fontFamily?.also(::setTypeface)
+                applyButtonTheme(
+                    backgroundColor = brandPrimaryColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
         }
@@ -232,38 +240,43 @@ object Dialogs {
         onAcceptOfferClickListener: View.OnClickListener,
         onCloseClickListener: View.OnClickListener
     ): AlertDialog {
+        val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val primaryBrandColorStateList =
-            theme.brandPrimaryColor?.let { ContextCompat.getColorStateList(context, it) }
-
+        val systemNegativeColor = theme.systemNegativeColor?.let { ContextCompat.getColor(context, it) }
+        val primaryBrandColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
+        val baseShadeColor = theme.baseShadeColor?.let { ContextCompat.getColor(context, it) }
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
 
         return showDialog(context, getUpgradeDialogLayout(theme), theme.baseLightColor) {
             val titleIconView = findViewById<ImageView>(R.id.chat_title_icon).apply {
-                primaryBrandColorStateList?.also(::setImageTintList)
-                alertTheme?.titleImageColor.also(::applyImageColorTheme)
+                applyImageColorTheme(primaryBrandColor)
+                applyImageColorTheme(alertTheme?.titleImageColor)
             }
             val titleView = findViewById<TextView>(R.id.dialog_title_view).apply {
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.title)
             }
             findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                setTheme(theme)
-                fontFamily?.also(::setTypeface)
                 setOnClickListener(onCloseClickListener)
+                applyButtonTheme(
+                    backgroundColor = systemNegativeColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                setTheme(theme)
-                fontFamily?.also(::setTypeface)
                 setOnClickListener(onAcceptOfferClickListener)
+                applyButtonTheme(
+                    backgroundColor = primaryBrandColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
                 isVisible = theme.whiteLabel ?: false
-                theme.baseShadeColor?.let { ContextCompat.getColorStateList(context, it) }
-                    ?.also(::setImageTintList)
+                applyImageColorTheme(baseShadeColor)
             }
 
             when (mediaUpgrade.mediaUpgradeMode) {
@@ -272,7 +285,7 @@ object Dialogs {
                         R.string.glia_dialog_upgrade_audio_title,
                         mediaUpgrade.operatorName
                     )
-                    titleIconView.setImageResource(theme.iconUpgradeAudioDialog!!)
+                    titleIconView.setImageResource(theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
                     titleIconView.contentDescription =
                         context.getString(R.string.glia_chat_audio_icon_content_description)
                 }
@@ -311,11 +324,8 @@ object Dialogs {
             theme = theme,
             cancelable = true
         ).apply {
-            findViewById<TextView>(R.id.title_view).apply {
-                baseDarkColor?.also {
-                    this?.setTextColor(it)
-                    this?.typeface = fontFamily
-                }
+            findViewById<TextView>(R.id.title_view)?.apply {
+                applyTextTheme(baseDarkColor, fontFamily)
             }
         }
     }
@@ -330,53 +340,57 @@ object Dialogs {
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
+        val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val primaryBrandColorStateList =
-            theme.brandPrimaryColor?.let { ContextCompat.getColorStateList(context, it) }
-
+        val systemNegativeColor = theme.systemNegativeColor?.let { ContextCompat.getColor(context, it) }
+        val primaryBrandColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
+        val baseShadeColor = theme.baseShadeColor?.let { ContextCompat.getColor(context, it) }
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
 
         return showDialog(context, getScreenSharingLayout(theme), theme.baseLightColor) {
             findViewById<ImageView>(R.id.title_icon).apply {
-                primaryBrandColorStateList?.also(::setImageTintList)
-                alertTheme?.titleImageColor.also(::applyImageColorTheme)
+                applyImageColorTheme(primaryBrandColor)
+                applyImageColorTheme(alertTheme?.titleImageColor)
             }
             findViewById<TextView>(R.id.dialog_title_view).apply {
                 text = title
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.title)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
                 text = message
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.message.also(::applyTextTheme)
+                applyTextTheme(baseDarkColor, fontFamily)
+                applyTextTheme(alertTheme?.message)
             }
             findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                setTheme(theme)
                 setText(negativeButtonText)
-                fontFamily?.also(::setTypeface)
                 setOnClickListener {
                     dismiss()
                     negativeButtonClickListener.onClick(it)
                 }
+                applyButtonTheme(
+                    backgroundColor = systemNegativeColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                setTheme(theme)
                 setText(positiveButtonText)
-                fontFamily?.also(::setTypeface)
                 setOnClickListener {
                     dismiss()
                     positiveButtonClickListener.onClick(it)
                 }
+                applyButtonTheme(
+                    backgroundColor = primaryBrandColor,
+                    textColor = baseLightColor,
+                    textFont = fontFamily
+                )
                 applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
                 isVisible = theme.whiteLabel ?: false
-                theme.baseShadeColor?.let { ContextCompat.getColorStateList(context, it) }
-                    ?.also(::setImageTintList)
+                applyImageColorTheme(baseShadeColor)
             }
         }
     }

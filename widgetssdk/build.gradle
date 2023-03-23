@@ -74,6 +74,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:$mockitoAndroidTestVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test:rules:$testRulesVersion"
 
     // Test dependencies to Android native libraries
     // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'

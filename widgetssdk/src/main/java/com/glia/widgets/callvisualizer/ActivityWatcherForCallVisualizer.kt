@@ -1,7 +1,6 @@
 package com.glia.widgets.callvisualizer
 
 import android.app.Activity
-import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,6 +16,7 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.base.BaseActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
 import com.glia.widgets.chat.ChatView
@@ -32,10 +32,10 @@ import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 import java.lang.ref.WeakReference
 
-class ActivityWatcherForCallVisualizer(
+internal class ActivityWatcherForCallVisualizer(
     private val dialogController: DialogController,
     val controller: ActivityWatcherContract.Controller
-    ) : Application.ActivityLifecycleCallbacks, ActivityWatcherContract.Watcher {
+) : BaseActivityWatcher(), ActivityWatcherContract.Watcher {
 
     companion object {
         private val TAG = ActivityWatcherForCallVisualizer::class.java.simpleName
@@ -64,14 +64,6 @@ class ActivityWatcherForCallVisualizer(
         super.onActivityPreCreated(activity, savedInstanceState)
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-
-    override fun onActivityDestroyed(activity: Activity) {
-        if (activity.isFinishing) {
-            controller.onActivityDestroyed()
-        }
-    }
-
     override fun onActivityResumed(activity: Activity) {
         resumedActivity = WeakReference(activity)
         controller.onActivityResumed(activity)
@@ -81,11 +73,6 @@ class ActivityWatcherForCallVisualizer(
         controller.onActivityPaused()
         resumedActivity.clear()
     }
-
-
-    override fun onActivityStarted(activity: Activity) {}
-    override fun onActivityStopped(activity: Activity) {}
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
     @Suppress("RedundantNullableReturnType")
     fun registerForMediaProjectionPermissionResult(activity: Activity) {
@@ -136,7 +123,8 @@ class ActivityWatcherForCallVisualizer(
     }
 
     private fun getConfigurationBuilder(): Configuration.Builder {
-        return Configuration.Builder().setWidgetsConfiguration(Dependencies.getSdkConfigurationManager()?.createWidgetsConfiguration())
+        val configuration = Dependencies.getSdkConfigurationManager()?.createWidgetsConfiguration()
+        return Configuration.Builder().setWidgetsConfiguration(configuration)
     }
 
     override fun showToast(message: String, duration: Int) {
@@ -285,10 +273,12 @@ class ActivityWatcherForCallVisualizer(
                     error?.let {
                         Logger.e(TAG, error.message, error)
                     } ?: run {
-                        if (mediaUpgrade.mediaUpgradeOffer.video != null && mediaUpgrade.mediaUpgradeOffer.video != MediaDirection.NONE) {
+                        if (mediaUpgrade.mediaUpgradeOffer.video != null &&
+                            mediaUpgrade.mediaUpgradeOffer.video != MediaDirection.NONE) {
                             controller.onPositiveDialogButtonClicked()
                         } else {
-                            Logger.e(TAG, "Audio upgrade offer in call visualizer", Exception("Audio upgrade offer in call visualizer"))
+                            Logger.e(TAG, "Audio upgrade offer in call visualizer",
+                                Exception("Audio upgrade offer in call visualizer"))
                             return@accept
                         }
                     }

@@ -25,11 +25,10 @@ internal class ActivityWatcherControllerTest {
 
     private val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
     private val callVisualizerController = mock(CallVisualizerController::class.java)
-    private val serviceChatHeadController = mock(ServiceChatHeadController::class.java)
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
     private val watcher = mock(ActivityWatcherContract.Watcher::class.java)
-    private val controller = ActivityWatcherController(callVisualizerController, screenSharingController, serviceChatHeadController)
+    private val controller = ActivityWatcherController(callVisualizerController, screenSharingController)
     private val activity = mock(Activity::class.java)
     private val activityReference: WeakReference<Activity?> = WeakReference(activity)
     private val view = mock(View::class.java)
@@ -51,18 +50,7 @@ internal class ActivityWatcherControllerTest {
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
         whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.onActivityResumed(activity)
-        verify(watcher).fetchGliaOrRootView()
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
-        verify(serviceChatHeadController).onResume(view)
-    }
-
-    @Test
-    fun `onActivityResumed bubble is resumed when onScreenSharingStarted`() {
-        `onActivityResumed callbacks are set when call or chat are not active`()
-        whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
-        controller.screenSharingViewCallback?.onScreenSharingStarted()
-        verify(watcher).fetchGliaOrRootView()
-        verify(serviceChatHeadController).onResume(view)
     }
 
     @Test
@@ -78,15 +66,7 @@ internal class ActivityWatcherControllerTest {
         controller.onActivityPaused()
         verify(watcher).dismissAlertDialog(false)
         verify(watcher).removeDialogCallback()
-        verify(watcher).fetchGliaOrRootView()
         verify(screenSharingController).removeViewCallback(anyOrNull())
-        verify(serviceChatHeadController).onPause(view)
-    }
-
-    @Test
-    fun `onActivityDestroyed bubble is destroyed`() {
-        controller.onActivityDestroyed()
-        verify(serviceChatHeadController).onDestroy()
     }
 
     @Test
@@ -236,21 +216,19 @@ internal class ActivityWatcherControllerTest {
         whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.onActivityResumed(activity)
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
-        verify(serviceChatHeadController).onResume(view)
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(screenSharingController).onResume(activity)
         verify(watcher).setupDialogCallback()
-        verify(watcher).fetchGliaOrRootView()
         cleanup()
         resetMocks()
     }
 
     private fun resetMocks() {
-        reset(watcher, callVisualizerController, callVisualizerRepository, serviceChatHeadController, screenSharingController)
+        reset(watcher, callVisualizerController, callVisualizerRepository, screenSharingController)
     }
 
     @After
     fun cleanup() {
-        verifyNoMoreInteractions(watcher, callVisualizerController, callVisualizerRepository, serviceChatHeadController, screenSharingController)
+        verifyNoMoreInteractions(watcher, callVisualizerController, callVisualizerRepository, screenSharingController)
     }
 }

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
-import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.Dialog.*
@@ -13,13 +12,11 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 
 internal class ActivityWatcherController(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
-    private var serviceChatHeadController: ServiceChatHeadController
 ) : ActivityWatcherContract.Controller {
 
     companion object {
@@ -42,7 +39,6 @@ internal class ActivityWatcherController(
         Logger.d(TAG, "onActivityResumed(root)")
         addDialogCallback(activity)
         addScreenSharingCallback(activity)
-        serviceChatHeadController.onResume(watcher.fetchGliaOrRootView())
     }
 
     override fun onActivityPaused() {
@@ -50,12 +46,6 @@ internal class ActivityWatcherController(
         watcher.dismissAlertDialog(false)
         watcher.removeDialogCallback()
         removeScreenSharingCallback()
-        serviceChatHeadController.onPause(watcher.fetchGliaOrRootView())
-    }
-
-    override fun onActivityDestroyed() {
-        Logger.d(TAG, "onActivityDestroyed()")
-        serviceChatHeadController.onDestroy()
     }
 
     override fun isCallOrChatActive(activity: Activity): Boolean {
@@ -174,10 +164,8 @@ internal class ActivityWatcherController(
             }
 
             override fun onScreenSharingStarted() {
-                if (Glia.isInitialized()) {
-                    serviceChatHeadController.init()
-                }
-                serviceChatHeadController.onResume(watcher.fetchGliaOrRootView())
+                // Should show screen sharing bubble
+                // Is handled by ActivityWatcherForChatHeadController
             }
 
         }

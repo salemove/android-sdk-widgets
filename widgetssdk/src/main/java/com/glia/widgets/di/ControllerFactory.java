@@ -25,8 +25,11 @@ import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
+import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
+import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
+import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
@@ -50,6 +53,7 @@ public class ControllerFactory {
     private SurveyController surveyController;
     private CallVisualizerController callVisualizerController;
     private ActivityWatcherController activityWatcherController;
+    private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
 
     private static ServiceChatHeadController serviceChatHeadController;
 
@@ -337,13 +341,27 @@ public class ControllerFactory {
     }
 
     public VisitorCodeContract.Controller getVisitorCodeController() {
-        return new VisitorCodeController(dialogController, repositoryFactory.getVisitorCodeRepository(), repositoryFactory.getGliaEngagementRepository());
+        return new VisitorCodeController(
+                dialogController,
+                repositoryFactory.getVisitorCodeRepository(),
+                repositoryFactory.getGliaEngagementRepository());
     }
 
     public ActivityWatcherContract.Controller getActivityWatcherController() {
         if (activityWatcherController == null) {
-            activityWatcherController = new ActivityWatcherController(getCallVisualizerController(), getScreenSharingController(), serviceChatHeadController);
+            activityWatcherController = new ActivityWatcherController(
+                    getCallVisualizerController(),
+                    getScreenSharingController());
         }
         return activityWatcherController;
+    }
+
+    public ActivityWatcherForChatHeadContract.Controller getActivityWatcherForChatHeadController() {
+        if (activityWatcherForChatHeadController == null) {
+            activityWatcherForChatHeadController = new ActivityWatcherForChatHeadController(
+                    serviceChatHeadController,
+                    getScreenSharingController());
+        }
+        return activityWatcherForChatHeadController;
     }
 }

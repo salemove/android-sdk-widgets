@@ -2,7 +2,6 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.*
@@ -15,6 +14,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.adapter.ChatAdapter
@@ -24,10 +24,8 @@ import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.history.*
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
+import com.glia.widgets.core.engagement.domain.*
+import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor
@@ -48,6 +46,8 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
@@ -64,7 +64,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class ChatController(
+internal class ChatController(
     chatViewCallback: ChatViewCallback,
     private val mediaUpgradeOfferRepository: MediaUpgradeOfferRepository,
     private val callTimer: TimeCounter,
@@ -105,8 +105,14 @@ class ChatController(
     private val customCardInteractableUseCase: CustomCardInteractableUseCase,
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
+    private val isQueueingEngagementUseCase: IsQueueingEngagementUseCase,
     private val addMediaUpgradeCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase,
-    private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase
+    private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase,
+    private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
+    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
+    private val engagementConfigUseCase: SetEngagementConfigUseCase,
+    private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
+    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -119,7 +125,7 @@ class ChatController(
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener =
         object : GliaSendMessageUseCase.Listener {
-            override fun messageSent(message: VisitorMessage) {
+            override fun messageSent(message: VisitorMessage?) {
                 onMessageSent(message)
             }
 
@@ -130,11 +136,11 @@ class ChatController(
             override fun onMessageValidated() {
                 viewCallback?.clearMessageInput()
 
-                emitViewState(
+                emitViewState {
                     chatState
                         .setLastTypedText(EMPTY_MESSAGE)
-                        .setShowSendButton(isShowSendButtonUseCase.execute(EMPTY_MESSAGE))
-                )
+                        .setShowSendButton(isShowSendButtonUseCase(EMPTY_MESSAGE))
+                }
             }
 
             override fun errorOperatorNotOnline(message: String) {
@@ -157,25 +163,64 @@ class ChatController(
     private val fileAttachmentObserver = Observer { _, _ ->
         viewCallback?.apply {
             emitUploadAttachments(getFileAttachmentsUseCase.execute())
-            emitViewState(
+            emitViewState{
                 chatState
-                    .setShowSendButton(isShowSendButtonUseCase.execute(chatState.lastTypedText))
+                    .setShowSendButton(isShowSendButtonUseCase(chatState.lastTypedText))
                     .setIsAttachmentButtonEnabled(supportedFileCountCheckUseCase.execute())
-            )
+            }
         }
     }
 
     @Volatile
     private var chatState: ChatState
 
-    fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?) {
+    private val isSecureEngagement get() = isSecureEngagementUseCase()
 
-        if (isShowOverlayPermissionRequestDialogUseCase.execute()) dialogController.showOverlayPermissionsDialog()
+    private val isQueueingOrOngoingEngagement get() = isQueueingEngagementUseCase() || isOngoingEngagementUseCase()
+
+    fun initChat(
+        companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType
+    ) {
+        val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
+        engagementConfigUseCase(chatType, queueIds)
+
+        ensureSecureMessagingAvailable()
+
         if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+            if (isSecureEngagement) {
+                emitViewState { chatState.setSecureMessagingState() }
+            }
             return
         }
-        emitViewState(chatState.initChat(companyName, queueId, visitorContextAssetId))
+
+        var initChatState = chatState.initChat(companyName, queueId, visitorContextAssetId)
+        if (isSecureEngagement) {
+            initChatState = initChatState.setSecureMessagingState()
+        }
+        prepareChatComponents()
+        emitViewState { initChatState }
         loadChatHistory()
+    }
+
+    private fun ensureSecureMessagingAvailable() {
+        if (!isSecureEngagement) return
+
+        disposable.add(
+            isSecureEngagementAvailableUseCase().subscribe({
+                if (it) {
+                    Logger.d(TAG, "Messaging is available")
+                } else {
+                    Logger.d(TAG, "Messaging is unavailable")
+                    dialogController.showMessageCenterUnavailableDialog()
+                }
+            }, {
+                Logger.e(TAG, "Checking for Messaging availability failed", it)
+                dialogController.showUnexpectedErrorDialog()
+            })
+        )
+    }
+
+    private fun prepareChatComponents() {
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         initMediaUpgradeCallback()
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback)
@@ -195,15 +240,19 @@ class ChatController(
     }
 
     @Synchronized
-    private fun emitViewState(state: ChatState) {
+    private fun emitViewState(callback: () -> ChatState?) {
+        val state = callback() ?: return
+
         if (setState(state) && viewCallback != null) {
             Logger.d(TAG, "Emit state:\n$state")
-            viewCallback!!.emitState(chatState)
+            viewCallback?.emitState(chatState)
         }
     }
 
     @Synchronized
-    private fun emitChatItems(state: ChatState) {
+    private fun emitChatItems(callback: () -> ChatState?) {
+        val state = callback() ?: return
+
         if (setState(state) && viewCallback != null) {
             Logger.d(
                 TAG, """
@@ -213,8 +262,8 @@ class ChatController(
      """.trimIndent()
             )
 
-            viewCallback!!.emitItems(state.chatItems)
-            viewCallback!!.emitUploadAttachments(getFileAttachmentsUseCase.execute())
+            viewCallback?.emitItems(state.chatItems)
+            viewCallback?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
         }
     }
 
@@ -248,11 +297,11 @@ class ChatController(
     }
 
     fun onMessageTextChanged(message: String) {
-        emitViewState(
+        emitViewState {
             chatState
                 .setLastTypedText(message)
-                .setShowSendButton(isShowSendButtonUseCase.execute(message))
-        )
+                .setShowSendButton(isShowSendButtonUseCase(message))
+        }
         sendMessagePreview(message)
     }
 
@@ -292,48 +341,57 @@ class ChatController(
             "onMessage: ${message.content}, id: ${message.id}, isUnsentMessage: $isUnsentMessage"
         )
         if (isUnsentMessage) {
-            val unsentMessages: MutableList<VisitorMessageItem> =
-                chatState.unsentMessages.toMutableList()
-            val currentMessage = unsentMessages[0]
-            unsentMessages.remove(currentMessage)
-            val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-            val currentMessageIndex = currentChatItems.indexOf(currentMessage)
-            currentChatItems.remove(currentMessage)
-            currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message))
-
             // emitting state because there is no need to change recyclerview items here
-            emitViewState(
-                chatState.changeItems(currentChatItems).changeUnsentMessages(unsentMessages)
-            )
+            emitViewState {
+                val unsentMessages: MutableList<VisitorMessageItem> =
+                    chatState.unsentMessages.toMutableList()
+                val currentMessage = unsentMessages[0]
+                unsentMessages.remove(currentMessage)
+                val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                val currentMessageIndex = currentChatItems.indexOf(currentMessage)
+                currentChatItems.remove(currentMessage)
+                currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message))
+
+                return@emitViewState chatState.changeItems(currentChatItems).changeUnsentMessages(unsentMessages)
+            }
             if (chatState.unsentMessages.isNotEmpty()) {
                 sendMessageUseCase.execute(chatState.unsentMessages[0].message, sendMessageCallback)
             }
             return
         }
-        val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        appendMessageItem(items, messageInternal)
-        emitChatItems(chatState.changeItems(items))
+        emitChatItems {
+            val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            appendMessageItem(items, messageInternal)
+
+            return@emitChatItems chatState.changeItems(items)
+        }
     }
 
     private fun onMessageSent(message: VisitorMessage?) {
         if (message != null) {
             Logger.d(TAG, "messageSent: $message, id: ${message.id}")
-            val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-            changeDeliveredIndex(currentChatItems, message)
+            emitChatItems {
+                val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                if (isQueueingOrOngoingEngagement) {
+                    changeDeliveredIndex(currentChatItems, message)
+                } else if (isSecureEngagementUseCase()) {
+                    appendSentMessage(currentChatItems, message)
+                    addVisitorAttachmentItemsToChatItems(currentChatItems, message)
+                }
 
-            // chat input mode has to be set to enable after a message is sent
-            if (isEnableChatEditTextUseCase(currentChatItems)) {
-                emitViewState(chatState.chatInputModeChanged(ChatInputMode.ENABLED))
+                // chat input mode has to be set to enable after a message is sent
+                if (isEnableChatEditTextUseCase(currentChatItems)) {
+                    emitViewState { chatState.chatInputModeChanged(ChatInputMode.ENABLED) }
+                }
+
+                return@emitChatItems chatState.changeItems(currentChatItems)
             }
-            emitChatItems(chatState.changeItems(currentChatItems))
         }
     }
 
-    private fun onMessageSendError(ex: GliaException?) {
-        ex?.also {
-            Logger.d(TAG, "messageSent exception")
-            error(it)
-        }
+    private fun onMessageSendError(exception: GliaException) {
+        Logger.d(TAG, "messageSent exception")
+        error(exception)
     }
 
     private fun onSendMessageOperatorOffline(message: String) {
@@ -345,31 +403,40 @@ class ChatController(
 
     private fun appendUnsentMessage(message: String) {
         Logger.d(TAG, "appendUnsentMessage: $message")
-        val unsentMessages: MutableList<VisitorMessageItem> =
-            chatState.unsentMessages.toMutableList()
-        val unsentItem = VisitorMessageItem.asUnsentItem(message)
-        unsentMessages.add(unsentItem)
-        val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        currentChatItems.add(unsentItem)
-        emitViewState(chatState.changeUnsentMessages(unsentMessages))
-        emitChatItems(chatState.changeItems(currentChatItems))
+        emitChatItems {
+            val unsentMessages: MutableList<VisitorMessageItem> =
+                chatState.unsentMessages.toMutableList()
+            val unsentItem = VisitorMessageItem.asUnsentItem(message)
+            unsentMessages.add(unsentItem)
+            val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            currentChatItems.add(unsentItem)
+            emitViewState { chatState.changeUnsentMessages(unsentMessages) }
+
+            updateQueueing(currentChatItems)
+
+            return@emitChatItems chatState.changeItems(currentChatItems)
+        }
     }
 
     private fun onOperatorTyping(isOperatorTyping: Boolean) {
-        emitViewState(chatState.setIsOperatorTyping(isOperatorTyping))
+        emitViewState { chatState.setIsOperatorTyping(isOperatorTyping) }
     }
 
     fun show() {
         Logger.d(TAG, "show")
         if (!chatState.isVisible) {
-            emitViewState(chatState.changeVisibility(true))
+            emitViewState { chatState.changeVisibility(true) }
         }
     }
 
     fun onBackArrowClicked() {
         Logger.d(TAG, "onBackArrowClicked")
-        emitViewState(chatState.changeVisibility(false))
-        messagesNotSeenHandler.chatOnBackClicked()
+        if (isQueueingOrOngoingEngagement) {
+            emitViewState { chatState.changeVisibility(false) }
+            messagesNotSeenHandler.chatOnBackClicked()
+        } else {
+            Dependencies.getControllerFactory().destroyControllers()
+        }
     }
 
     fun onBackArrowClicked(onBackClickedListener: ChatView.OnBackClickedListener?) {
@@ -410,9 +477,13 @@ class ChatController(
         if (chatState.isOperatorOnline) dialogController.showExitChatDialog(chatState.formattedOperatorName)
     }
 
-    fun leaveChatQueueClicked() {
-        Logger.d(TAG, "leaveChatQueueClicked")
-        dialogController.showExitQueueDialog()
+    fun onXButtonClicked() {
+        Logger.d(TAG, "onXButtonClicked")
+        if (isQueueingEngagementUseCase()) {
+            dialogController.showExitQueueDialog()
+        } else {
+            Dependencies.getControllerFactory().destroyControllers()
+        }
     }
 
     val isChatVisible: Boolean
@@ -429,9 +500,9 @@ class ChatController(
         viewCallback?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
 
         // always start in bottom
-        emitViewState(
+        emitViewState {
             chatState.isInBottomChanged(true).changeVisibility(true)
-        )
+        }
         viewCallback?.scrollToBottomImmediate()
 
         chatState.pendingNavigationType?.also { viewCallback?.navigateToCall(it) }
@@ -444,6 +515,10 @@ class ChatController(
         surveyUseCase.registerListener(this)
         subscribeToEngagementStateChange()
         mediaUpgradeOfferRepositoryCallback?.let { addMediaUpgradeCallbackUseCase(it) }
+
+        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
+            dialogController.showOverlayPermissionsDialog()
+        }
     }
 
     private fun subscribeToEngagementStateChange() {
@@ -475,7 +550,7 @@ class ChatController(
     private fun onEngagementOngoing(operator: Operator) {
         val name = operator.name
         val imageUrl = Utils.getOperatorImageUrl(operator)
-        emitViewState(chatState.operatorConnected(name, imageUrl))
+        emitViewState { chatState.operatorConnected(name, imageUrl) }
     }
 
     private fun onOperatorConnected(operator: Operator) {
@@ -491,19 +566,22 @@ class ChatController(
     }
 
     private fun onTransferring() {
-        val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        if (chatState.operatorStatusItem != null) {
-            items.remove(chatState.operatorStatusItem)
+        emitChatItems {
+            val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            if (chatState.operatorStatusItem != null) {
+                items.remove(chatState.operatorStatusItem)
+            }
+            items.add(OperatorStatusItem.TransferringStatusItem())
+            emitViewState { chatState.transferring() }
+
+            return@emitChatItems chatState.changeItems(items)
         }
-        items.add(OperatorStatusItem.TransferringStatusItem())
-        emitViewState(chatState.transferring())
-        emitChatItems(chatState.changeItems(items))
     }
 
     fun overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed")
         dialogController.dismissCurrentDialog()
-        emitViewState(chatState)
+        emitViewState { chatState }
     }
 
     fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer?) {
@@ -521,7 +599,7 @@ class ChatController(
 
     fun navigateToCallSuccess() {
         Logger.d(TAG, "navigateToCallSuccess")
-        emitViewState(chatState.setPendingNavigationType(null))
+        emitViewState { chatState.setPendingNavigationType(null) }
     }
 
     @Synchronized
@@ -534,7 +612,7 @@ class ChatController(
     private fun error(error: String) {
         Logger.e(TAG, error)
         dialogController.showUnexpectedErrorDialog()
-        emitViewState(chatState.stop())
+        emitViewState { chatState.stop() }
     }
 
     private fun onOperatorMediaStateVideo() {
@@ -591,7 +669,7 @@ class ChatController(
                         } else {
                             GliaWidgets.MEDIA_TYPE_AUDIO
                         }
-                    emitViewState(chatState.setPendingNavigationType(requestedMediaType))
+                    emitViewState { chatState.setPendingNavigationType(requestedMediaType) }
                     viewCallback?.apply {
                         navigateToCall(requestedMediaType)
                         Logger.d(TAG, "navigateToCall")
@@ -609,14 +687,26 @@ class ChatController(
 
     private fun viewInitQueueing() {
         Logger.d(TAG, "viewInitQueueing")
-        val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        if (chatState.operatorStatusItem != null) {
-            items.remove(chatState.operatorStatusItem)
+        emitChatItems {
+            val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            if (chatState.operatorStatusItem != null) {
+                items.remove(chatState.operatorStatusItem)
+            }
+            val operatorStatusItem = OperatorStatusItem.QueueingStatusItem(chatState.companyName)
+            items.add(operatorStatusItem)
+            emitViewState { chatState.queueingStarted(operatorStatusItem) }
+
+            return@emitChatItems chatState.changeItems(items)
         }
-        val operatorStatusItem = OperatorStatusItem.QueueingStatusItem(chatState.companyName)
-        items.add(operatorStatusItem)
-        emitViewState(chatState.queueingStarted(operatorStatusItem))
-        emitChatItems(chatState.changeItems(items))
+    }
+
+    private fun updateQueueing(items: MutableList<ChatItem>) {
+        if (chatState.operatorStatusItem?.status == OperatorStatusItem.Status.IN_QUEUE) {
+            items.remove(chatState.operatorStatusItem)
+            items.add(
+                OperatorStatusItem.QueueingStatusItem(chatState.companyName)
+            )
+        }
     }
 
     private fun destroyView() {
@@ -631,46 +721,56 @@ class ChatController(
     }
 
     private fun operatorConnected(operatorName: String, profileImgUrl: String?) {
-        val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        if (chatState.operatorStatusItem != null) {
-            // remove previous operator status item
-            val operatorStatusItemIndex = items.indexOf(chatState.operatorStatusItem)
-            Logger.d(
-                TAG,
-                "operatorStatusItemIndex: " + operatorStatusItemIndex + ", size: " + items.size
-            )
-            items.remove(chatState.operatorStatusItem)
-            items.add(
-                operatorStatusItemIndex,
-                OperatorStatusItem.OperatorFoundStatusItem(
-                    chatState.companyName,
-                    Utils.formatOperatorName(operatorName),
-                    profileImgUrl
+        emitChatItems {
+            val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            if (chatState.operatorStatusItem != null) {
+                // remove previous operator status item
+                val operatorStatusItemIndex = items.indexOf(chatState.operatorStatusItem)
+                Logger.d(
+                    TAG,
+                    "operatorStatusItemIndex: " + operatorStatusItemIndex + ", size: " + items.size
                 )
-            )
-        } else {
-            items.add(
-                OperatorStatusItem.OperatorFoundStatusItem(
-                    chatState.companyName,
-                    Utils.formatOperatorName(operatorName),
-                    profileImgUrl
+                items.remove(chatState.operatorStatusItem)
+                items.add(
+                    operatorStatusItemIndex,
+                    OperatorStatusItem.OperatorFoundStatusItem(
+                        chatState.companyName,
+                        Utils.formatOperatorName(operatorName),
+                        profileImgUrl
+                    )
                 )
-            )
+            } else {
+                items.add(
+                    OperatorStatusItem.OperatorFoundStatusItem(
+                        chatState.companyName,
+                        Utils.formatOperatorName(operatorName),
+                        profileImgUrl
+                    )
+                )
+            }
+            emitViewState {
+                chatState
+                    .operatorConnected(operatorName, profileImgUrl)
+                    .setLiveChatState()
+            }
+
+            return@emitChatItems chatState.changeItems(items)
         }
-        emitViewState(chatState.operatorConnected(operatorName, profileImgUrl))
-        emitChatItems(chatState.changeItems(items))
     }
 
     private fun operatorChanged(operatorName: String, profileImgUrl: String?) {
-        val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        val operatorStatusItem = OperatorStatusItem.OperatorJoinedStatusItem(
-            chatState.companyName,
-            Utils.formatOperatorName(operatorName),
-            profileImgUrl
-        )
-        items.add(operatorStatusItem)
-        emitChatItems(chatState.changeItems(items))
-        emitViewState(chatState.operatorConnected(operatorName, profileImgUrl))
+        emitChatItems {
+            val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            val operatorStatusItem = OperatorStatusItem.OperatorJoinedStatusItem(
+                chatState.companyName,
+                Utils.formatOperatorName(operatorName),
+                profileImgUrl
+            )
+            items.add(operatorStatusItem)
+
+            return@emitChatItems chatState.changeItems(items)
+        }
+        emitViewState { chatState.operatorConnected(operatorName, profileImgUrl) }
     }
 
     private fun stop() {
@@ -683,7 +783,7 @@ class ChatController(
         )
         endEngagementUseCase.execute()
         mediaUpgradeOfferRepository.stopAll()
-        emitViewState(chatState.stop())
+        emitViewState { chatState.stop() }
     }
 
     private fun appendHistoryChatItem(
@@ -733,7 +833,7 @@ class ChatController(
     private fun changeChatInputMode(currentChatItems: List<ChatItem>, message: ChatMessage) {
         val newInputMode = getChatInputMode(currentChatItems, message)
         if (chatState.chatInputMode != newInputMode) {
-            emitViewState(chatState.chatInputModeChanged(newInputMode))
+            emitViewState { chatState.chatInputModeChanged(newInputMode) }
         }
     }
 
@@ -781,11 +881,11 @@ class ChatController(
     }
 
     private fun appendMessagesNotSeen() {
-        emitViewState(
+        emitViewState {
             chatState.messagesNotSeenChanged(
                 if (chatState.isChatInBottom) 0 else chatState.messagesNotSeen + 1
             )
-        )
+        }
     }
 
     private fun initGliaEngagementObserving() {
@@ -1062,36 +1162,41 @@ class ChatController(
 
     private fun upgradeMediaItem() {
         Logger.d(TAG, "upgradeMediaItem")
-        val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        val mediaUpgradeStartedTimerItem = MediaUpgradeStartedTimerItem(
-            MediaUpgradeStartedTimerItem.Type.VIDEO,
-            chatState.mediaUpgradeStartedTimerItem.time
-        )
-        newItems.remove(chatState.mediaUpgradeStartedTimerItem)
-        newItems.add(mediaUpgradeStartedTimerItem)
-        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem))
+        emitChatItems {
+            val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            val mediaUpgradeStartedTimerItem = MediaUpgradeStartedTimerItem(
+                MediaUpgradeStartedTimerItem.Type.VIDEO,
+                chatState.mediaUpgradeStartedTimerItem.time
+            )
+            newItems.remove(chatState.mediaUpgradeStartedTimerItem)
+            newItems.add(mediaUpgradeStartedTimerItem)
+
+            return@emitChatItems chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem)
+        }
     }
 
     private fun createNewTimerCallback() {
         timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
         timerStatusListener = object : FormattedTimerStatusListener {
             override fun onNewFormattedTimerValue(formatedValue: String) {
-                if (chatState.isMediaUpgradeStarted) {
-                    val index = chatState.chatItems.indexOf(chatState.mediaUpgradeStartedTimerItem)
-                    if (index != -1) {
-                        val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                        val type = chatState.mediaUpgradeStartedTimerItem.type
-                        newItems.removeAt(index)
-                        val mediaUpgradeStartedTimerItem =
-                            MediaUpgradeStartedTimerItem(type, formatedValue)
-                        newItems.add(index, mediaUpgradeStartedTimerItem)
-                        emitChatItems(
-                            chatState.changeTimerItem(
+                emitChatItems {
+                    if (chatState.isMediaUpgradeStarted) {
+                        val index = chatState.chatItems.indexOf(chatState.mediaUpgradeStartedTimerItem)
+                        if (index != -1) {
+                            val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                            val type = chatState.mediaUpgradeStartedTimerItem.type
+                            newItems.removeAt(index)
+                            val mediaUpgradeStartedTimerItem =
+                                MediaUpgradeStartedTimerItem(type, formatedValue)
+                            newItems.add(index, mediaUpgradeStartedTimerItem)
+
+                            return@emitChatItems chatState.changeTimerItem(
                                 newItems,
                                 mediaUpgradeStartedTimerItem
                             )
-                        )
+                        }
                     }
+                    return@emitChatItems null
                 }
             }
 
@@ -1099,73 +1204,79 @@ class ChatController(
                 if (chatState.isMediaUpgradeStarted &&
                     chatState.chatItems.contains(chatState.mediaUpgradeStartedTimerItem)
                 ) {
-                    val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                    newItems.remove(chatState.mediaUpgradeStartedTimerItem)
-                    emitChatItems(chatState.changeTimerItem(newItems, null))
+                    emitChatItems {
+                        val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                        newItems.remove(chatState.mediaUpgradeStartedTimerItem)
+
+                        return@emitChatItems chatState.changeTimerItem(newItems, null)
+                    }
                 }
             }
         }
     }
 
     fun singleChoiceOptionClicked(
-        id: String,
-        indexInList: Int,
-        optionIndex: Int
+        item: ResponseCardItem,
+        selectedOption: SingleChoiceOption
     ) {
-        Logger.d(TAG, "singleChoiceOptionClicked, id: $id")
-        if (indexInList == RecyclerView.NO_POSITION) {
-            return
-        }
-        val item = chatState.chatItems[indexInList]
-        if (item.id == id && item is ResponseCardItem) {
-            val selectedOption = item.singleChoiceOptions[optionIndex]
-            sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback)
-            val choiceCardItemWithSelected = OperatorMessageItem(
-                id,
-                item.operatorName,
-                item.operatorProfileImgUrl,
-                item.showChatHead,
-                item.content,
-                item.operatorId,
-                item.timestamp
-            )
+        Logger.d(TAG, "singleChoiceOptionClicked, id: ${item.id}")
+        sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback)
+        val choiceCardItemWithSelected = OperatorMessageItem(
+            item.id,
+            item.operatorName,
+            item.operatorProfileImgUrl,
+            item.showChatHead,
+            item.content,
+            item.operatorId,
+            item.timestamp
+        )
+        emitChatItems {
             val modifiedItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-            modifiedItems.removeAt(indexInList)
-            modifiedItems.add(indexInList, choiceCardItemWithSelected)
-            emitChatItems(chatState.changeItems(modifiedItems))
+            val indexInList = modifiedItems.indexOf(item)
+            modifiedItems.remove(item)
+            if (indexInList >= 0) {
+                modifiedItems.add(indexInList, choiceCardItemWithSelected)
+            } else {
+                Logger.e(TAG, "singleChoiceOptionClicked, ResponseCardItem is not in the list!")
+            }
+
+            return@emitChatItems chatState.changeItems(modifiedItems)
         }
     }
 
     fun sendCustomCardResponse(messageId: String, text: String?, value: String?) {
         sendMessageUseCase.execute(messageId, text, value, sendMessageCallback)
-        chatState.chatItems
-            .firstOrNull { messageId == it.id }
-            ?.let { it as CustomCardItem }
-            ?.also {
-                val customCardType = customCardTypeUseCase.execute(it.viewType) ?: return@also
-                val currentMessage = it.message
-                val showCustomCard = customCardShouldShowUseCase.execute(
-                    currentMessage,
-                    customCardType,
-                    false
-                )
-                val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                var indexForResponseMessage = chatItems.indexOf(it)
-                if (showCustomCard) {
-                    // The index for the response message should be next to the card
-                    // when the card is shown after the response.
-                    indexForResponseMessage += 1
-                } else {
-                    // If the card should be hidden after the response, we remove it from the
-                    // item list. The response message will be shown instead of the card.
-                    chatItems.remove(it)
+        emitChatItems {
+            chatState.chatItems
+                .firstOrNull { messageId == it.id }
+                ?.let { it as CustomCardItem }
+                ?.also {
+                    val customCardType = customCardTypeUseCase.execute(it.viewType) ?: return@also
+                    val currentMessage = it.message
+                    val showCustomCard = customCardShouldShowUseCase.execute(
+                        currentMessage,
+                        customCardType,
+                        false
+                    )
+                    val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                    var indexForResponseMessage = chatItems.indexOf(it)
+                    if (showCustomCard) {
+                        // The index for the response message should be next to the card
+                        // when the card is shown after the response.
+                        indexForResponseMessage += 1
+                    } else {
+                        // If the card should be hidden after the response, we remove it from the
+                        // item list. The response message will be shown instead of the card.
+                        chatItems.remove(it)
+                    }
+                    chatItems.add(
+                        indexForResponseMessage,
+                        VisitorMessageItem.asUnsentCardResponse(text)
+                    )
+                    return@emitChatItems chatState.changeItems(chatItems)
                 }
-                chatItems.add(
-                    indexForResponseMessage,
-                    VisitorMessageItem.asUnsentCardResponse(text)
-                )
-                emitChatItems(chatState.changeItems(chatItems))
-            }
+            return@emitChatItems null
+        }
     }
 
     private fun updateCustomCard(message: OperatorMessage) {
@@ -1173,9 +1284,12 @@ class ChatController(
             .firstOrNull { message.id == it.id }
             ?.let { it as CustomCardItem }
             ?.also {
-                val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                updateCustomCardSelectedOption(it, message, chatItems)
-                emitChatItems(chatState.changeItems(chatItems))
+                emitChatItems {
+                    val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                    updateCustomCardSelectedOption(it, message, chatItems)
+
+                    return@emitChatItems chatState.changeItems(chatItems)
+                }
             }
     }
 
@@ -1196,10 +1310,10 @@ class ChatController(
     fun onRecyclerviewPositionChanged(isBottom: Boolean) {
         if (isBottom) {
             Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom = true")
-            emitViewState(chatState.isInBottomChanged(true).messagesNotSeenChanged(0))
+            emitViewState { chatState.isInBottomChanged(true).messagesNotSeenChanged(0) }
         } else {
             Logger.d(TAG, "onRecyclerviewPositionChanged, isBottom = false")
-            emitViewState(chatState.isInBottomChanged(false))
+            emitViewState { chatState.isInBottomChanged(false) }
         }
     }
 
@@ -1210,31 +1324,68 @@ class ChatController(
 
     private fun loadChatHistory() {
         val historyDisposable = loadHistoryUseCase.execute()
-            .doOnError { error(it) }
-            .doOnSuccess { historyLoaded(it) }
-            .subscribe()
+            .subscribe({ historyLoaded(it) }, { error(it) })
         disposable.add(historyDisposable)
     }
 
     @Synchronized
-    private fun historyLoaded(messages: List<ChatMessageInternal>) {
+    private fun historyLoaded(historyResponse: ChatHistoryResponse) {
         Logger.d(TAG, "historyLoaded")
+        val (messages, count) = historyResponse
         val currentItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         val newItems = removeDuplicates(currentItems, messages)
 
-        if (!newItems.isNullOrEmpty()) {
-            newItems.forEachIndexed { index, message ->
-                appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
-            }
-
-            emitChatItems(
-                chatState.historyLoaded(currentItems.sortedBy { (it as? LinkedChatItem)?.timestamp })
-            )
-            initGliaEngagementObserving()
-        } else if (!chatState.engagementRequested) {
-            initGliaEngagementObserving()
-            queueForEngagement()
+        when {
+            !newItems.isNullOrEmpty() -> submitHistoryItems(newItems, currentItems, count)
+            !chatState.engagementRequested && !isSecureEngagement -> queueForEngagement()
+            else -> Logger.d(TAG, "Opened empty Secure Conversations chat")
         }
+
+        initGliaEngagementObserving()
+    }
+
+    private fun submitHistoryItems(
+        newItems: List<ChatMessageInternal>,
+        currentItems: MutableList<ChatItem>,
+        unreadMessagesCount: Int
+    ) {
+        newItems.forEachIndexed { index, message ->
+            appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
+        }
+
+        if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
+            emitChatTranscriptItems(currentItems, unreadMessagesCount)
+        } else {
+            emitChatItems { chatState.historyLoaded(currentItems) }
+        }
+
+    }
+
+    private fun emitChatTranscriptItems(items: List<ChatItem>, unreadMessagesCount: Int) {
+        if (unreadMessagesCount > 0) {
+            val index = items.count().minus(unreadMessagesCount).coerceAtLeast(0)
+
+            val newItems = items.toMutableList().apply { add(index, NewMessagesItem) }
+
+            emitChatItems { chatState.changeItems(newItems) }
+            markMessagesReadWithDelay()
+        } else {
+            emitChatItems { chatState.changeItems(items) }
+        }
+    }
+
+    private fun markMessagesReadWithDelay() {
+        disposable.add(
+            markMessagesReadWithDelayUseCase().subscribe({
+                removeNewMessagesDivider()
+            }, {
+                Logger.e(TAG, "Marking messages read failed", it)
+            })
+        )
+    }
+
+    private fun removeNewMessagesDivider() {
+        emitChatItems { chatState.run { changeItems(chatItems - NewMessagesItem) } }
     }
 
     init {
@@ -1275,11 +1426,7 @@ class ChatController(
 
     @VisibleForTesting
     fun isNewMessage(oldHistory: List<ChatItem>?, newMessage: ChatMessage): Boolean =
-        oldHistory
-            ?.filterIsInstance<LinkedChatItem>()
-            ?.any { oldMessage -> oldMessage.messageId != null && oldMessage.messageId == newMessage.id }
-            ?.not()
-            ?: true
+        oldHistory?.none { (it as? LinkedChatItem)?.messageId == newMessage.id } ?: true
 
     private fun error(error: Throwable?) {
         error?.also { error(it.toString()) }
@@ -1295,7 +1442,7 @@ class ChatController(
             sendMessageUseCase.execute(chatState.unsentMessages[0].message, sendMessageCallback)
             Logger.d(TAG, "unsentMessage sent!")
         }
-        emitViewState(chatState.engagementStarted())
+        emitViewState { chatState.engagementStarted() }
         // Loading chat history again on engagement start in case it was an-authenticated visitor that restored ongoing engagement
         // Currently there is no direct way to know if Visitor is authenticated.
         loadChatHistory()
@@ -1346,10 +1493,13 @@ class ChatController(
             Logger.d(TAG, "starting video timer")
             type = MediaUpgradeStartedTimerItem.Type.VIDEO
         }
-        val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-        val mediaUpgradeStartedTimerItem = MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0))
-        newItems.add(mediaUpgradeStartedTimerItem)
-        emitChatItems(chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem))
+        emitChatItems {
+            val newItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+            val mediaUpgradeStartedTimerItem = MediaUpgradeStartedTimerItem(type, Utils.toMmSs(0))
+            newItems.add(mediaUpgradeStartedTimerItem)
+
+            return@emitChatItems chatState.changeTimerItem(newItems, mediaUpgradeStartedTimerItem)
+        }
     }
 
     fun notificationsDialogDismissed() {
@@ -1377,18 +1527,18 @@ class ChatController(
                 GliaException.Cause.QUEUE_CLOSED, GliaException.Cause.QUEUE_FULL -> dialogController.showNoMoreOperatorsAvailableDialog()
                 else -> dialogController.showUnexpectedErrorDialog()
             }
-            emitViewState(chatState.stop())
+            emitViewState { chatState.stop() }
         } ?: (exception as? QueueingOngoingException)?.also {
             queueForEngagementStarted()
         }
 
     }
 
-    fun onRemoveAttachment(attachment: FileAttachment?) {
+    fun onRemoveAttachment(attachment: FileAttachment) {
         removeFileAttachmentUseCase.execute(attachment)
     }
 
-    fun onAttachmentReceived(file: FileAttachment?) {
+    fun onAttachmentReceived(file: FileAttachment) {
         addFileToAttachmentAndUploadUseCase
             .execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
@@ -1407,7 +1557,7 @@ class ChatController(
                     Logger.d(TAG, "fileUploadSecurityCheckStarted")
                 }
 
-                override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult) {
+                override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
                     Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
                 }
             })
@@ -1440,7 +1590,11 @@ class ChatController(
     }
 
     private fun onSiteInfoReceived(siteInfo: SiteInfo?) {
-        emitViewState(chatState.allowSendAttachmentStateChanged(siteInfo == null || siteInfo.allowedFileSenders.isVisitorAllowed))
+        emitViewState {
+            chatState.allowSendAttachmentStateChanged(
+                siteInfo == null || siteInfo.allowedFileSenders.isVisitorAllowed
+            )
+        }
     }
 
     private fun observeQueueTicketState() {

@@ -55,7 +55,9 @@ public class FilePreviewActivity extends AppCompatActivity {
     }
 
     private void handleStatusBarColor() {
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, this.theme.getBrandPrimaryColor()));
+        if (theme != null && theme.getBrandPrimaryColor() != null) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, theme.getBrandPrimaryColor()));
+        }
     }
 
     @Override

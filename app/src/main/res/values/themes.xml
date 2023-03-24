@@ -44,6 +44,8 @@
 
         <item name="gliaAlertDialogButtonUseVerticalAlignment">true</item>
         <item name="whiteLabel">false</item>
+        <item name="gliaNewMessagesDividerColor">@color/color_red</item>
+        <item name="gliaNewMessagesDividerTextColor">@color/color_pure_yellow</item>
     </style>
 
     <style name="Application.GliaAndroidSdkWidgetsExample.Button" parent="@style/Widget.MaterialComponents.Button.TextButton.Icon">

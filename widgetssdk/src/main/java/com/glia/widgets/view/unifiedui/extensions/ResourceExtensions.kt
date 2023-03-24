@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.exstensions
+package com.glia.widgets.view.unifiedui.extensions
 
 import android.content.Context
 import android.content.res.ColorStateList

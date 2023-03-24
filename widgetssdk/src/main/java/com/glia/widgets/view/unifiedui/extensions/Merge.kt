@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.exstensions
+package com.glia.widgets.view.unifiedui.extensions
 
 import com.glia.widgets.UiTheme
 import kotlin.reflect.KClass

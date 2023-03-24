@@ -19,4 +19,10 @@
     <color name="glia_attachment_menu_bg">#F2F2F2</color>
     <color name="glia_chat_background_color">#FFFFFF</color>
     <color name="glia_dark_transparent_bg">#99000000</color>
+
+    <color name="glia_disable_button_bg">#F3F3F3</color>
+    <color name="glia_disable_button_border">#33616A75</color>
+    <color name="glia_disable_button_text">#66000000</color>
+
+    <color name="glia_button_progress_bar">#C4C4C4</color>
 </resources>

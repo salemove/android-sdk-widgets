@@ -16,12 +16,14 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import android.Manifest;
 import android.content.Context;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.CallController;
@@ -36,6 +38,7 @@ import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContra
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,6 +52,10 @@ public class CallActivityTest {
     private GliaSdkConfigurationManager sdkConfigurationManager;
     private ResourceProvider resourceProvider;
     private FloatingVisitorVideoContract.Controller floatingVisitorVideoController;
+
+    @Rule
+    public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule
+            .grant(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO);
 
     @Before
     public void setUp() {

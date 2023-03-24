@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
@@ -15,7 +15,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.appbar.AppBarLayout
@@ -28,6 +28,9 @@ class AppBarView @JvmOverloads constructor(
     private val toolbarTitleText: TextView?
         get() = binding.toolbar.children.firstOrNull { it.isVisible && it is TextView } as? TextView
 
+    @DrawableRes
+    private var iconAppBarBackRes: Int? = null
+
     init {
         setDefaults(attrs)
     }
@@ -38,11 +41,11 @@ class AppBarView @JvmOverloads constructor(
 
     private fun setDefaults(attrs: AttributeSet?) {
         context.withStyledAttributes(attrs, R.styleable.AppBarView) {
-            binding.toolbar.setNavigationIcon(
-                getTypedArrayResId(
-                    this, R.styleable.AppBarView_backIcon, R.attr.gliaIconAppBarBack
-                )
-            )
+            iconAppBarBackRes = getTypedArrayResId(
+                this, R.styleable.AppBarView_backIcon, R.attr.gliaIconAppBarBack
+            ).also {
+                binding.toolbar.setNavigationIcon(it)
+            }
 
             val titleColorRes = getTypedArrayResId(
                 this, R.styleable.AppBarView_lightTint, R.attr.gliaChatHeaderTitleTintColor
@@ -108,12 +111,20 @@ class AppBarView @JvmOverloads constructor(
         )
     }
 
+    fun hideBackButton() {
+        binding.toolbar.navigationIcon = null
+    }
+
+    fun showBackButton() {
+        iconAppBarBackRes?.let { binding.toolbar.setNavigationIcon(it) }
+    }
+
     fun setTitle(title: String?) {
         binding.title.text = title
     }
 
-    fun showToolbar() {
-        isVisible = true
+    fun setVisibility(visibility: Boolean = true) {
+        isVisible = visibility
     }
 
     fun showXButton() {

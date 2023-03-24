@@ -22,12 +22,12 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import com.glia.widgets.view.unifiedui.extensions.*
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.exstensions.*
+import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
+import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 /**

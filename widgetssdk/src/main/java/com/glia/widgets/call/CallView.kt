@@ -54,7 +54,7 @@ import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContai
 import com.glia.widgets.view.head.BadgeTextView
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.theme.overlay.MaterialThemeOverlay

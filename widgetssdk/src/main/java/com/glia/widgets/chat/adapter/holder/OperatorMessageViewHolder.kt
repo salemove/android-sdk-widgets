@@ -17,7 +17,7 @@ import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.SingleChoiceCardView
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 class OperatorMessageViewHolder(
@@ -77,8 +77,12 @@ class OperatorMessageViewHolder(
         val singleChoiceCardView = SingleChoiceCardView(itemView.context)
         singleChoiceCardView.setOnOptionClickedListener(onOptionClickedListener)
         singleChoiceCardView.setData(
-            item,
-            uiTheme
+            item.id,
+            item.choiceCardImageUrl,
+            item.content,
+            item.singleChoiceOptions,
+            uiTheme,
+            adapterPosition
         )
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,

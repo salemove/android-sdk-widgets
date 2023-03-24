@@ -1,4 +1,4 @@
-package com.glia.widgets.view.unifiedui.extensions
+package com.glia.widgets.view.unifiedui.exstensions
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

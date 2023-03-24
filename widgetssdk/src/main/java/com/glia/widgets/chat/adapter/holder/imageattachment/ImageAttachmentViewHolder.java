@@ -50,6 +50,8 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
     public void bind(AttachmentFile attachmentFile) {
         String imageName = FileHelper.getFileName(attachmentFile);
         disposable = getImageFileFromCacheUseCase.execute(imageName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> Logger.e(TAG, "failed loading from cache: " + imageName + " reason: " + error.getMessage()))
                 .doOnSuccess(_b -> Logger.d(TAG, "loaded from cache: " + imageName))
                 .onErrorResumeNext(getImageFileFromDownloadsUseCase.execute(imageName))
@@ -58,8 +60,6 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
                 .onErrorResumeNext(getImageFileFromNetworkUseCase.execute(attachmentFile))
                 .doOnError(error -> Logger.e(TAG, imageName + "failed loading from network: " + error.getMessage()))
                 .doOnSuccess(_b -> Logger.d(TAG, "loaded from network: " + imageName))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(imageView::setImageBitmap, error -> {
                             Logger.e(TAG, error.getMessage());
                             imageView.setBackgroundColor(Color.BLACK);

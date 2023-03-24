@@ -14,9 +14,10 @@ import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
+import com.glia.widgets.view.unifiedui.exstensions.wrapWithMaterialThemeOverlay
+import java.lang.ref.WeakReference
 
-internal class ActivityWatcherController(
+class ActivityWatcherController(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
     private var serviceChatHeadController: ServiceChatHeadController
@@ -132,6 +133,7 @@ internal class ActivityWatcherController(
     private fun addScreenSharingCallback(activity: Activity) {
         // Call and Chat screens process screen sharing requests on their own.
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
+        val activity = activity
 
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)

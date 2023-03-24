@@ -32,9 +32,6 @@
     <string name="glia_chat_attachment_item_content_description">Attachment %1$s, size %2$s. %3$s</string>
     <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
     <string name="glia_chat_visitor_status_transferring">Transferring</string>
-    <string name="glia_chat_new_messages">New Messages</string>
-
-    <string name="glia_messaging_title">Messaging</string>
 
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>
@@ -107,11 +104,6 @@
     <!-- Permission error AlertDialog -->
     <string name="glia_dialog_permission_error_title">Additional Permissions Required</string>
     <string name="glia_dialog_permission_error_message">Please make sure all required permissions are enabled.</string>
-
-    <!-- Message Center unavailable AlertDialog -->
-    <string name="glia_dialog_message_center_unavailable_title">Message Center Unavailable</string>
-    <string name="glia_dialog_message_center_unavailable_message">Message center is currently not available. Please try again later.</string>
-    <string name="glia_dialog_message_center_unauthorized_message">We could not verify your authentication status.</string>
 
     <string name="glia_dialog_yes">Yes</string>
     <string name="glia_dialog_no">No</string>
@@ -236,11 +228,6 @@
     <string name="message_center_message_edit_text_hint">Enter your message</string>
     <string name="message_center_check_messages_btn">Check messages</string>
     <string name="message_center_send_message_btn">Send</string>
-    <string name="message_center_message_limit_error_message">The message cannot exceed 10000 characters.</string>
-    <string name="message_center_confirmation_screen_title">Thank you!</string>
-    <string name="message_center_confirmation_screen_message">Your message has been sent.\nWe will get back to you within 48 hours.</string>
-    <string name="message_center_confirmation_screen_check_messages_btn">Check messages</string>
-    <string name="message_center_progress_bar_content_description">Sending</string>
 
     <!-- Call Visualizer -->
     <string name="call_visualizer_screen_sharing_title">Screen Sharing</string>

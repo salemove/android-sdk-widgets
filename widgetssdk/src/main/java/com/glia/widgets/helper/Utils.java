@@ -28,7 +28,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.view.unifiedui.extensions.MergeKt;
+import com.glia.widgets.view.unifiedui.exstensions.MergeKt;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -172,12 +172,6 @@ public class Utils {
                         R.styleable.GliaView_operatorMessageTextColor,
                         R.attr.operatorMessageTextColor
                 )
-        );
-        defaultThemeBuilder.setNewMessagesDividerColor(
-                getTypedArrayIntegerValue(typedArray, context, R.styleable.GliaView_newMessagesDividerColor, R.attr.gliaNewMessagesDividerColor)
-        );
-        defaultThemeBuilder.setNewMessagesDividerTextColor(
-                getTypedArrayIntegerValue(typedArray, context, R.styleable.GliaView_newMessagesDividerTextColor, R.attr.gliaNewMessagesDividerTextColor)
         );
         defaultThemeBuilder.setBotActionButtonBackgroundColor(
                 getTypedArrayIntegerValue(
@@ -525,7 +519,6 @@ public class Utils {
         return null;
     }
 
-    @Nullable
     public static Activity getActivity(Context context) {
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {

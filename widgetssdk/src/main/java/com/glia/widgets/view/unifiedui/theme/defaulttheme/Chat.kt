@@ -2,7 +2,7 @@
 
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
-import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
+import com.glia.widgets.view.unifiedui.exstensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
@@ -26,9 +26,7 @@ internal fun ChatTheme(pallet: ColorPallet): ChatTheme =
         bubble = BubbleTheme(pallet),
         attachmentsPopup = ChatAttachmentsPopupTheme(pallet),
         unreadIndicator = ChatUnreadIndicatorTheme(pallet),
-        typingIndicator = pallet.primaryColorTheme,
-        newMessagesDividerColorTheme = pallet.primaryColorTheme,
-        newMessagesDividerTextTheme = TextTheme(textColor = pallet.primaryColorTheme)
+        typingIndicator = pallet.primaryColorTheme
     )
 
 /**

@@ -2,7 +2,7 @@
 
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
-import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
+import com.glia.widgets.view.unifiedui.exstensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme

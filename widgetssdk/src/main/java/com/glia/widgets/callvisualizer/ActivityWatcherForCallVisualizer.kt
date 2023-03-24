@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.comms.MediaDirection
@@ -29,7 +30,8 @@ import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
+import com.glia.widgets.view.unifiedui.exstensions.deepMerge
+import com.glia.widgets.view.unifiedui.exstensions.wrapWithMaterialThemeOverlay
 import java.lang.ref.WeakReference
 
 class ActivityWatcherForCallVisualizer(

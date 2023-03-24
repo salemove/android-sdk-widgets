@@ -12,7 +12,7 @@ import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
@@ -32,10 +32,9 @@ class EndScreenSharingView (
     var onFinishListener: OnFinishListener? = null
     private val TAG = EndScreenSharingView::class.java.simpleName
     private var controller: EndScreenSharingContract.Controller? = null
-    private var uiTheme: UiTheme by Delegates.notNull()
+    private var defaultStatusBarColor: Int by Delegates.notNull()
     private var statusBarColor: Int by Delegates.notNull()
     private var screenSharingController: ScreenSharingController? = null
-    private var defaultStatusBarColor: Int? = null
 
     private val binding: EndScreenSharingViewBinding by lazy {
         EndScreenSharingViewBinding.inflate(layoutInflater, this)
@@ -60,13 +59,12 @@ class EndScreenSharingView (
     }
 
     private fun setDefaultTheme(typedArray: TypedArray) {
-        uiTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        uiTheme.brandPrimaryColor?.let(::getColorCompat)?.also {
-            statusBarColor = it
-            changeStatusBarColor(it)
-            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
-        }
-        binding.appBarView.setTheme(uiTheme)
+        val typedArrayTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        val runtimeGlobalTheme = Dependencies.getSdkConfigurationManager()?.uiTheme
+        val theme = if (typedArrayTheme != null && runtimeGlobalTheme != null) {
+            Utils.getFullHybridTheme(runtimeGlobalTheme, typedArrayTheme)
+        } else runtimeGlobalTheme ?: typedArrayTheme
+        applyRuntimeTheme(theme)
     }
 
     private fun prepareView() {
@@ -120,7 +118,7 @@ class EndScreenSharingView (
         primaryColor?.also {
             statusBarColor = it
             changeStatusBarColor(it)
-            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
+            defaultStatusBarColor = Utils.getActivity(context).window.statusBarColor
         }
         binding.appBarView.setTheme(theme)
         binding.root.applyLayerTheme(

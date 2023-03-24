@@ -85,18 +85,6 @@ data class UiTheme(
     val operatorMessageTextColor: Int? = null,
 
     /**
-     * The color of "new messages" divider in the chat
-     */
-    @ColorRes
-    val newMessageDividerColor: Int? = null,
-
-    /**
-     * The color of "new messages" divider text in the chat
-     */
-    @ColorRes
-    val newMessageDividerTextColor: Int? = null,
-
-    /**
      * Color for bot action button background color
      */
     @ColorRes
@@ -359,8 +347,6 @@ data class UiTheme(
         visitorCodeBackgroundColor = builder.visitorCodeBackgroundColor,
         visitorCodeBorderColor = builder.visitorCodeBorderColor,
         operatorMessageBackgroundColor = builder.operatorMessageBackgroundColor,
-        newMessageDividerColor = builder.newMessageDividerColor,
-        newMessageDividerTextColor = builder.newMessageDividerTextColor,
         gliaChatBackgroundColor = builder.gliaChatBackgroundColor,
         operatorMessageTextColor = builder.operatorMessageTextColor,
         botActionButtonBackgroundColor = builder.botActionButtonBackgroundColor,
@@ -512,20 +498,6 @@ data class UiTheme(
         @ColorRes
         var operatorMessageTextColor: Int? = null
             private set
-
-        /**
-         * The color of "new messages" divider in the chat
-         */
-        @ColorRes
-        var newMessageDividerColor: Int? = null
-        private set
-
-        /**
-         * The color of "new messages" divider text in the chat
-         */
-        @ColorRes
-        var newMessageDividerTextColor: Int? = null
-        private set
 
         /**
          * Color for bot action button background color
@@ -847,14 +819,6 @@ data class UiTheme(
             operatorMessageTextColor = color
         }
 
-        fun setNewMessagesDividerColor(@ColorRes color: Int?) {
-            newMessageDividerColor = color
-        }
-
-        fun setNewMessagesDividerTextColor(@ColorRes color: Int?) {
-            newMessageDividerTextColor = color
-        }
-
         fun setBotActionButtonBackgroundColor(@ColorRes color: Int?) {
             botActionButtonBackgroundColor = color
         }
@@ -1036,8 +1000,6 @@ data class UiTheme(
             visitorMessageBackgroundColor = theme.visitorMessageBackgroundColor
             visitorMessageTextColor = theme.visitorMessageTextColor
             operatorMessageBackgroundColor = theme.operatorMessageBackgroundColor
-            newMessageDividerColor = theme.newMessageDividerColor
-            newMessageDividerTextColor = theme.newMessageDividerTextColor
             operatorMessageTextColor = theme.operatorMessageTextColor
             botActionButtonBackgroundColor = theme.botActionButtonBackgroundColor
             botActionButtonTextColor = theme.botActionButtonTextColor

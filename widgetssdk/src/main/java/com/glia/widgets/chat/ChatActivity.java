@@ -85,8 +85,7 @@ public class ChatActivity extends AppCompatActivity {
                 configuration.getQueueId(),
                 configuration.getContextAssetId(),
                 configuration.getUseOverlay(),
-                configuration.getScreenSharingMode(),
-                configuration.getChatType()
+                configuration.getScreenSharingMode()
         );
     }
 

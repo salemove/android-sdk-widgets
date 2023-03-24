@@ -1,6 +1,5 @@
 package com.glia.widgets.callvisualizer.controller
 
-import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
@@ -16,13 +15,13 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 
-internal class CallVisualizerController(
+class CallVisualizerController(
     private val callVisualizerRepository: CallVisualizerRepository,
     private val dialogController: DialogController,
+    val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase,
     private val surveyUseCase: GliaSurveyUseCase,
     private val onCallVisualizerUseCase: GliaOnCallVisualizerUseCase,
-    private val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase,
-    @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
+    private val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase
 ) : CallVisualizerCallback,
     GliaOnCallVisualizerUseCase.Listener,
     GliaOnCallVisualizerEndUseCase.Listener, OnSurveyListener {

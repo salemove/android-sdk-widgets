@@ -52,8 +52,7 @@ public class Dependencies {
                 notificationManager,
                 sdkConfigurationManager,
                 new ChatHeadManager(application),
-                new GliaWidgetsSchedulers(),
-                gliaCore
+                new GliaWidgetsSchedulers()
         );
 
         controllerFactory = new ControllerFactory(

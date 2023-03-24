@@ -13,7 +13,7 @@ import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.ViewHelpers
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.exstensions.layoutInflater
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates

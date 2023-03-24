@@ -5,7 +5,9 @@ import android.content.Intent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.model.DialogState
+import java.lang.ref.WeakReference
 
 class ActivityWatcherContract {
 
@@ -26,7 +28,7 @@ class ActivityWatcherContract {
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun openCallActivity()
         fun dismissAlertDialog(manualDismiss: Boolean)
-        fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade)
+        fun showUpgradeDialog(dialogState: DialogState.MediaUpgrade)
         fun showOverlayPermissionsDialog()
         fun showScreenSharingDialog()
         fun showAllowNotificationsDialog()

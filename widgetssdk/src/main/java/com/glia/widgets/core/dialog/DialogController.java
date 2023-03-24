@@ -99,8 +99,8 @@ public class DialogController {
     }
 
     public void showEngagementEndedDialog() {
-        Logger.d(TAG, "Show Engagement EngagementEndedEvent Dialog");
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENGAGEMENT_ENDED));
+            Logger.d(TAG, "Show Engagement EngagementEndedEvent Dialog");
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENGAGEMENT_ENDED));
     }
 
     public void showUnexpectedErrorDialog() {
@@ -110,35 +110,25 @@ public class DialogController {
     }
 
     public void showOverlayPermissionsDialog() {
-        Logger.d(TAG, "Show Overlay permissions Dialog");
-        setOverlayPermissionRequestDialogShownUseCase.execute();
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
+            Logger.d(TAG, "Show Overlay permissions Dialog");
+            setOverlayPermissionRequestDialogShownUseCase.execute();
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
     }
 
     public void showStartScreenSharingDialog() {
-        Logger.d(TAG, "Show Start Screen Sharing Dialog");
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_START_SCREEN_SHARING));
+            Logger.d(TAG, "Show Start Screen Sharing Dialog");
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_START_SCREEN_SHARING));
     }
 
     public void showEnableCallNotificationChannelDialog() {
-        Logger.d(TAG, "Show Enable Notification Channel Dialog");
-        setEnableCallNotificationChannelDialogShownUseCase.execute();
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL));
+            Logger.d(TAG, "Show Enable Notification Channel Dialog");
+            setEnableCallNotificationChannelDialogShownUseCase.execute();
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL));
     }
 
     public void showEnableScreenSharingNotificationsAndStartSharingDialog() {
         Logger.d(TAG, "Show Enable Notification Channel Dialog");
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING));
-    }
-
-    public void showMessageCenterUnavailableDialog() {
-        Logger.d(TAG, "Show Message Center Unavailable Dialog");
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE));
-    }
-
-    public void showUnauthenticatedDialog() {
-        Logger.d(TAG, "Show Unauthenticated Dialog");
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_UNAUTHENTICATED));
     }
 
     public void addCallback(Callback callback) {

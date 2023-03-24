@@ -23,7 +23,6 @@ import com.glia.androidsdk.site.SiteInfo;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.core.authentication.Authentication;
-import com.glia.widgets.core.secureconversations.SecureConversations;
 
 import java.io.InputStream;
 import java.util.List;
@@ -186,12 +185,7 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
-        return new Authentication(Glia.getAuthentication(behavior));
-    }
-
-    @Override
-    public SecureConversations getSecureConversations() {
-        return new SecureConversations(Glia.getSecureConversations());
+        return new Authentication(Glia.authentication(behavior));
     }
 
     @Override

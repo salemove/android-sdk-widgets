@@ -3,7 +3,8 @@ package com.glia.widgets.view
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -13,7 +14,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
@@ -23,9 +23,9 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.BaseConfigurableButton
 import com.glia.widgets.view.button.GliaPositiveButton
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -93,28 +93,14 @@ object Dialogs {
         @LayoutRes layoutRes: Int,
         @ColorRes backgroundTint: Int? = null,
         cancelable: Boolean = false,
-        onShow: ((AlertDialog) -> Unit)? = null,
         onLayout: Dialog.() -> Unit
-    ): AlertDialog {
-        val verticalInset = context.resources.getDimensionPixelSize(R.dimen.glia_large_x_large)
-        val alertDialog = MaterialAlertDialogBuilder(context)
-            //With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
-            .setView(LayoutInflater.from(context).inflate(layoutRes, null))
-            .setCancelable(cancelable)
-            .setBackgroundInsetBottom(verticalInset)
-            .setBackgroundInsetTop(verticalInset)
-            .create()
-
-        onShow?.also { listener -> alertDialog.setOnShowListener { listener.invoke(alertDialog) } }
-
-        alertDialog.show()
-
-        return alertDialog.also {
-            it.show()
-            setDialogBackground(it, backgroundTint)
-            onLayout(it)
-        }
-    }
+    ): AlertDialog = MaterialAlertDialogBuilder(context)
+        //With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
+        .setView(LayoutInflater.from(context).inflate(layoutRes, null))
+        .setCancelable(cancelable)
+        .show()
+        .also { setDialogBackground(it, backgroundTint) }
+        .also(onLayout)
 
     @JvmOverloads
     fun showOptionsDialog(
@@ -407,44 +393,5 @@ object Dialogs {
                 applyImageColorTheme(baseShadeColor)
             }
         }
-    }
-
-    fun showMessageCenterUnavailableDialog(
-        context: Context,
-        theme: UiTheme,
-        onShow: ((AlertDialog) -> Unit)? = null,
-    ): AlertDialog {
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
-
-        return showDialog(context, R.layout.alert_dialog, theme.baseLightColor, false, onShow) {
-            findViewById<TextView>(R.id.dialog_title_view).apply {
-                setText(R.string.glia_dialog_message_center_unavailable_title)
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
-            }
-            findViewById<TextView>(R.id.dialog_message_view).apply {
-                setText(R.string.glia_dialog_message_center_unavailable_message)
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.message.also(::applyTextTheme)
-            }
-            findViewById<ImageButton>(R.id.close_dialog_button).apply {
-                isGone = true
-            }
-            window?.apply {
-                setGravity(Gravity.BOTTOM)
-                allowOutsideTouch()
-            }
-        }
-    }
-
-    private fun Window.allowOutsideTouch() {
-        setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        )
-        clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 }

@@ -18,7 +18,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getFileExtensionOrEmpty
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.exstensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.FilePreviewTheme
 import com.glia.widgets.view.unifiedui.theme.chat.FileUploadBarTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UploadFileTheme
@@ -40,7 +40,7 @@ class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachment>() {
 /**
  * Upload File Attachment Adapter
  */
-class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
+class UploadAttachmentAdapter :
     ListAdapter<FileAttachment, ViewHolder>(UploadAttachmentItemCallback()) {
     private var callback: ItemCallback? = null
 
@@ -49,26 +49,21 @@ class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-        ViewHolder(
-            ChatAttachmentUploadedItemBinding.inflate(parent.layoutInflater, parent, false),
-            isMessageCenter
-        )
+        ViewHolder(ChatAttachmentUploadedItemBinding.inflate(parent.layoutInflater, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.onBind(getItem(position), callback)
 
     fun interface ItemCallback {
-        fun onRemoveItemClicked(attachment: FileAttachment)
+        fun onRemoveItemClicked(attachment: FileAttachment?)
     }
 }
 
 /**
  * ViewHolder
  */
-class ViewHolder(
-    private val binding: ChatAttachmentUploadedItemBinding,
-    isMessageCenter: Boolean
-) : RecyclerView.ViewHolder(binding.root) {
+class ViewHolder(private val binding: ChatAttachmentUploadedItemBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     private val extensionContainerView: MaterialCardView get() = binding.typeIndicatorView
     private val extensionTypeText: TextView get() = binding.typeIndicatorText
@@ -87,9 +82,6 @@ class ViewHolder(
     private val filePreviewTheme: FilePreviewTheme? get() = theme?.filePreview
 
     init {
-        if (isMessageCenter) {
-            itemView.setBackgroundResource(R.drawable.bg_attachment)
-        }
         progressIndicator.applyColorTheme(theme?.progressBackground)
         removeItemButton.applyImageColorTheme(theme?.removeButton)
         extensionTypeText.applyTextTheme(filePreviewTheme?.text, withAlignment = false)

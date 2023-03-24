@@ -2,7 +2,7 @@ package com.glia.widgets.call
 
 import android.content.Context
 import android.util.AttributeSet
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.exstensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 
 class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :

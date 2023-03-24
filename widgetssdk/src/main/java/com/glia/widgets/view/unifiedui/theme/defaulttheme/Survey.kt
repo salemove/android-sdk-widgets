@@ -3,7 +3,7 @@
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import android.graphics.Color
-import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
+import com.glia.widgets.view.unifiedui.exstensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme

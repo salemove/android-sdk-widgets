@@ -13,7 +13,6 @@ import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.base.GliaActivity;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -21,7 +20,7 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 import com.glia.widgets.view.head.ChatHeadLayout;
 
-public class ChatActivity extends AppCompatActivity implements GliaActivity {
+public class ChatActivity extends AppCompatActivity {
     private ChatView chatView;
     private ChatView.OnBackClickedListener onBackClickedListener = () -> {
         if (chatView.backPressed()) finish();

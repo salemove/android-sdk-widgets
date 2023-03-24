@@ -3,6 +3,7 @@ package com.glia.widgets.messagecenter
 import android.net.Uri
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
+import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 
 interface MessageCenterContract {
@@ -21,6 +22,10 @@ interface MessageCenterContract {
         fun ensureMessageCenterAvailability()
         fun onAttachmentReceived(file: FileAttachment)
         fun onRemoveAttachment(file: FileAttachment)
+        fun addCallback(dialogCallback: DialogController.Callback)
+        fun removeCallback(dialogCallback: DialogController.Callback)
+        fun dismissDialogs()
+        fun dismissCurrentDialog()
     }
 
     interface View : BaseView<Controller> {

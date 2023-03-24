@@ -1,14 +1,14 @@
 package com.glia.widgets.callvisualizer.controller
 
-import android.app.Activity
+import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.callvisualizer.CallVisualizerCallback
 import com.glia.widgets.callvisualizer.CallVisualizerRepository
+import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase
-import com.glia.widgets.callvisualizer.domain.IsGliaActivityUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
@@ -22,7 +22,7 @@ internal class CallVisualizerController(
     private val surveyUseCase: GliaSurveyUseCase,
     private val onCallVisualizerUseCase: GliaOnCallVisualizerUseCase,
     private val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase,
-    private val isGliaActivityUseCase: IsGliaActivityUseCase
+    @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
 ) : CallVisualizerCallback,
     GliaOnCallVisualizerUseCase.Listener,
     GliaOnCallVisualizerEndUseCase.Listener, OnSurveyListener {
@@ -40,8 +40,6 @@ internal class CallVisualizerController(
         onCallVisualizerUseCase.execute(this)    // newEngagementLoaded() callback
         onCallVisualizerEndUseCase.execute(this) // engagementEnded callback
     }
-
-    fun isGliaActivity(activity: Activity?) = isGliaActivityUseCase(activity)
 
     override fun onOneWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String) {
         val formattedOperatorName = Utils.formatOperatorName(operatorName)

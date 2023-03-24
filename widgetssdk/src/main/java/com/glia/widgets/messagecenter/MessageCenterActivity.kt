@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.glia.widgets.GliaWidgets.CHAT_TYPE
-import com.glia.widgets.base.GliaActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.helper.FileHelper
@@ -27,7 +26,7 @@ import java.io.IOException
 
 class MessageCenterActivity : AppCompatActivity(),
         MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener,
-        MessageCenterView.OnAttachFileListener, GliaActivity {
+        MessageCenterView.OnAttachFileListener {
 
     private lateinit var binding: MessageCenterActivityBinding
     private val messageCenterView  get() = binding.messageCenterView

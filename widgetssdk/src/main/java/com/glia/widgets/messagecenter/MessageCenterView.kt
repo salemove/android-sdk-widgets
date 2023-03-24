@@ -17,7 +17,6 @@ import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
@@ -75,7 +74,6 @@ class MessageCenterView(
 
     private val window: Window? by lazy { Utils.getActivity(this.context)?.window }
 
-    private val dialogController by lazy { Dependencies.getControllerFactory().dialogController }
     private val dialogCallback: DialogController.Callback = DialogController.Callback {
         onDialogState(it)
     }
@@ -149,7 +147,7 @@ class MessageCenterView(
             R.string.glia_dialog_message_center_unavailable_title,
             R.string.glia_dialog_message_center_unauthorized_message
         ) {
-            dialogController.dismissCurrentDialog()
+            controller?.dismissCurrentDialog()
             controller?.onCloseButtonClicked()
         }
     }
@@ -170,7 +168,7 @@ class MessageCenterView(
     }
 
     private fun clearAndDismissDialogs() {
-        dialogController.dismissDialogs()
+        controller?.dismissDialogs()
         dismissAlertDialog()
     }
 
@@ -181,7 +179,7 @@ class MessageCenterView(
             R.string.glia_dialog_unexpected_error_title,
             R.string.glia_dialog_unexpected_error_message
         ) {
-            dialogController.dismissCurrentDialog()
+            controller?.dismissCurrentDialog()
         }
     }
 
@@ -260,11 +258,11 @@ class MessageCenterView(
     }
 
     private fun attachDialogController() {
-        dialogController.addCallback(dialogCallback)
+        controller?.addCallback(dialogCallback)
     }
 
     private fun detachDialogController() {
-        dialogController.removeCallback(dialogCallback)
+        controller?.removeCallback(dialogCallback)
     }
 
     fun onSystemBack() {

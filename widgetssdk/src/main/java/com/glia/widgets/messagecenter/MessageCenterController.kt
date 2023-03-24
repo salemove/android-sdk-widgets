@@ -214,6 +214,22 @@ internal class MessageCenterController(
         resetMessageCenterUseCase()
     }
 
+    override fun addCallback(dialogCallback: DialogController.Callback) {
+        dialogController.addCallback(dialogCallback)
+    }
+
+    override fun removeCallback(dialogCallback: DialogController.Callback) {
+        dialogController.removeCallback(dialogCallback)
+    }
+
+    override fun dismissDialogs() {
+        dialogController.dismissDialogs()
+    }
+
+    override fun dismissCurrentDialog() {
+        dialogController.dismissCurrentDialog()
+    }
+
     companion object {
         private const val TAG = "MessageCenterController"
 

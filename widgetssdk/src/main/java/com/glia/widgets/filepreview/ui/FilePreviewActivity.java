@@ -11,10 +11,9 @@ import androidx.core.content.ContextCompat;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.base.GliaActivity;
 import com.glia.widgets.di.Dependencies;
 
-public class FilePreviewActivity extends AppCompatActivity implements GliaActivity {
+public class FilePreviewActivity extends AppCompatActivity {
 
     private static final String TAG = FilePreviewActivity.class.getSimpleName();
     private static final String IMAGE_ID_KEY = "image_id";

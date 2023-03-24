@@ -231,6 +231,13 @@ public class ControllerFactory {
         return dialogController;
     }
 
+    public DialogController createDialogController() {
+        return new DialogController(
+                useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
+                useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
+        );
+    }
+
     public void init() {
         messagesNotSeenHandler.init();
         getCallVisualizerController().init();
@@ -321,7 +328,7 @@ public class ControllerFactory {
                 useCaseFactory.createEnableSendMessageButtonUseCase(),
                 useCaseFactory.createShowMessageLimitErrorUseCase(),
                 useCaseFactory.createResetMessageCenterUseCase(),
-                dialogController
+                createDialogController()
         );
     }
 

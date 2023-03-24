@@ -6,7 +6,7 @@ import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
-import com.glia.widgets.callvisualizer.domain.IsGliaActivityUseCase;
+import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
@@ -588,8 +588,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public IsGliaActivityUseCase createIsCallOrChatScreenActiveUseCase() {
-        return new IsGliaActivityUseCase();
+    public IsCallOrChatScreenActiveUseCase createIsCallOrChatScreenActiveUseCase() {
+        return new IsCallOrChatScreenActiveUseCase();
     }
 
     @NonNull

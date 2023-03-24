@@ -361,22 +361,7 @@ public class MainFragment extends Fragment {
         GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireContext().getApplicationContext(), rawConfigs));
          */
 
-        Context context = requireActivity().getApplicationContext();
-        UiTheme.UiThemeBuilder theme = new UiTheme.UiThemeBuilder();
-        theme.setBrandPrimaryColor(android.R.color.holo_orange_dark);
-        theme.setSystemNegativeColor(android.R.color.holo_purple);
-        theme.setBaseDarkColor(android.R.color.background_light);
-        theme.setBaseLightColor(android.R.color.background_dark);
-        theme.setBaseShadeColor(android.R.color.holo_green_light);
-        theme.setBaseNormalColor(android.R.color.holo_green_dark);
-        theme.setWhiteLabel(true);
-
-        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(
-                context,
-                PreferenceManager.getDefaultSharedPreferences(context),
-                null,
-                theme.build()
-        ));
+        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireActivity().getApplicationContext()));
         prepareAuthentication();
         listenForCallVisualizerEngagements();
     }

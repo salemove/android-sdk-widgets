@@ -12,7 +12,6 @@ class ActivityWatcherContract {
     interface Controller {
         fun onActivityPaused()
         fun onActivityResumed(activity: Activity)
-        fun onActivityDestroyed()
         fun isCallOrChatActive(activity: Activity): Boolean
         fun removeMediaProjectionLaunchers(activityName: String?)
         fun startMediaProjectionLaunchers(activityName: String, launcher: ActivityResultLauncher<Intent>?)

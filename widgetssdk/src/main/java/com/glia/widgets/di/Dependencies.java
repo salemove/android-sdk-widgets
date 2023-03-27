@@ -21,6 +21,7 @@ import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
+import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
@@ -65,12 +66,20 @@ public class Dependencies {
                 new ApplicationLifecycleManager(),
                 controllerFactory.getChatHeadController()
         );
+
         ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer =
                 new ActivityWatcherForCallVisualizer(
                         getControllerFactory().getDialogController(),
                         getControllerFactory().getActivityWatcherController()
                 );
         application.registerActivityLifecycleCallbacks(activityWatcherForCallVisualizer);
+
+        ActivityWatcherForChatHead activityWatcherForChatHead =
+                new ActivityWatcherForChatHead(
+                        getControllerFactory().getActivityWatcherForChatHeadController()
+                );
+        application.registerActivityLifecycleCallbacks(activityWatcherForChatHead);
+
         resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(
                 useCaseFactory.getVisitorCodeViewBuilderUseCase(),

@@ -17,6 +17,6 @@ interface VisitorCodeContract {
         fun showError(throwable: Throwable)
         fun showVisitorCode(visitorCode: VisitorCode)
         fun setTimer(duration: Long)
-        fun cleanUpOnDestroy()
+        fun destroyTimer()
     }
 }

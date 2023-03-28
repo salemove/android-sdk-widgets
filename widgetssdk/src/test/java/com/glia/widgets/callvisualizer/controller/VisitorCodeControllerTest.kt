@@ -40,8 +40,9 @@ internal class VisitorCodeControllerTest {
     fun onCloseButtonClicked() {
         controller.onCloseButtonClicked()
         verify(dialogController).dismissCurrentDialog()
-        verifyNoMoreInteractions(dialogController)
-        verifyNoInteractions(view, visitorCodeRepository)
+        verify(view).destroyTimer()
+        verifyNoMoreInteractions(dialogController, view)
+        verifyNoInteractions(visitorCodeRepository)
     }
 
     @Test
@@ -94,7 +95,7 @@ internal class VisitorCodeControllerTest {
     @Test
     fun onDestroy() {
         controller.onDestroy()
-        verify(view).cleanUpOnDestroy()
+        verify(view).destroyTimer()
         verifyNoMoreInteractions(view)
         verifyNoInteractions(dialogController, visitorCodeRepository)
     }

@@ -1,7 +1,5 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlin.math.roundToInt
 
 
@@ -11,9 +9,8 @@ import kotlin.math.roundToInt
  *
  * @see [com.glia.widgets.view.unifiedui.parse.SpDeserializer]
  */
-@Parcelize
 @JvmInline
-internal value class SizeSpRemoteConfig(val value: Float) : Parcelable {
+internal value class SizeSpRemoteConfig(val value: Float) {
     val intValue: Int
         get() = value.roundToInt()
 }
@@ -24,9 +21,8 @@ internal value class SizeSpRemoteConfig(val value: Float) : Parcelable {
  *
  * @see [com.glia.widgets.view.unifiedui.parse.DpDeserializer]
  */
-@Parcelize
 @JvmInline
-internal value class SizeDpRemoteConfig(val valuePx: Float) : Parcelable {
+internal value class SizeDpRemoteConfig(val valuePx: Float) {
     val intValuePx: Int
         get() = valuePx.roundToInt()
 }

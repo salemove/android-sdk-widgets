@@ -22,7 +22,7 @@ object GliaWidgetsConfigManager {
     private const val API_KEY_SECRET_KEY = "api_key_secret"
     private const val API_KEY_ID_KEY = "api_key_id"
     private const val QUEUE_ID_KEY = "queue_id"
-    const val VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id"
+    private const val VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id"
     private const val REGION_BETA = "beta"
     private const val REGION_ACCEPTANCE = "acceptance"
     @JvmStatic

@@ -1,16 +1,13 @@
 package com.glia.widgets.view.unifiedui.config.base
 
-import android.os.Parcelable
 import android.widget.TextView
-import kotlinx.parcelize.Parcelize
 
 /**
  * Represents Alignment from remote config.
  *
  * @see [com.glia.widgets.view.unifiedui.parse.AlignmentDeserializer]
  */
-@Parcelize
-internal enum class AlignmentTypeRemoteConfig(val type: String) : Parcelable {
+internal enum class AlignmentTypeRemoteConfig(val type: String) {
     LEADING("leading"),
     CENTER("center"),
     TRAILING("trailing");

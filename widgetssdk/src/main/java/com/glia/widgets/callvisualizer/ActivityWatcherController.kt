@@ -5,7 +5,11 @@ import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.VisibleForTesting
+import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.comms.MediaDirection
+import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.Dialog.*
 import com.glia.widgets.core.dialog.model.DialogState
@@ -23,6 +27,9 @@ internal class ActivityWatcherController(
         private val TAG = ActivityWatcherController::class.java.simpleName
     }
 
+    @VisibleForTesting
+    internal lateinit var mediaUpgradeOffer: MediaUpgradeOffer
+
     @Mode
     private var currentDialogMode: Int = MODE_NONE
 
@@ -39,6 +46,9 @@ internal class ActivityWatcherController(
         Logger.d(TAG, "onActivityResumed(root)")
         addDialogCallback(activity)
         addScreenSharingCallback(activity)
+        if (activity is CallVisualizerSupportActivity) {
+            watcher.requestCameraPermission()
+        }
     }
 
     override fun onActivityPaused() {
@@ -122,7 +132,6 @@ internal class ActivityWatcherController(
     private fun addScreenSharingCallback(activity: Activity) {
         // Call and Chat screens process screen sharing requests on their own.
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
-
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
         screenSharingController.onResume(activity)
@@ -167,7 +176,61 @@ internal class ActivityWatcherController(
                 // Should show screen sharing bubble
                 // Is handled by ActivityWatcherForChatHeadController
             }
-
         }
+    }
+
+    override fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean) {
+        if (!isGranted) {
+            if (isComponentActivity) {
+                watcher.requestCameraPermission()
+            } else {
+                watcher.openComponentActivity()
+            }
+        } else {
+            mediaUpgradeOffer.accept { error ->
+                onMediaUpgradeAccept(error)
+            }
+        }
+    }
+
+    override fun onRequestedCameraPermissionResult(isGranted: Boolean) {
+        watcher.destroySupportActivityIfExists()
+        if (isGranted) {
+            mediaUpgradeOffer.accept { error ->
+                onMediaUpgradeAccept(error)
+            }
+        } else {
+            mediaUpgradeOffer.decline { error ->
+                onMediaUpgradeDecline(error)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    internal fun onMediaUpgradeAccept(error: GliaException?) {
+        error?.let {
+            Logger.e(TAG, error.message, error)
+        } ?: run {
+            if (mediaUpgradeOffer.video != null && mediaUpgradeOffer.video != MediaDirection.NONE) {
+                onPositiveDialogButtonClicked()
+            } else {
+                Logger.e(TAG, "Audio upgrade offer in call visualizer", Exception("Audio upgrade offer in call visualizer"))
+                return
+            }
+        }
+    }
+
+    @VisibleForTesting
+    internal fun onMediaUpgradeDecline(error: GliaException?) {
+        error?.let {
+            Logger.e(TAG, error.message, error)
+        } ?: run {
+            onNegativeDialogButtonClicked()
+        }
+    }
+
+    override fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer) {
+        this.mediaUpgradeOffer = mediaUpgrade
+        watcher.checkCameraPermission()
     }
 }

@@ -44,7 +44,7 @@ internal class GliaOnCallVisualizerEndUseCase(
             return
         }
         this.listener = listener
-        callVisualizerUseCase.execute(this)
+        callVisualizerUseCase(this)
     }
 
     fun unregisterListener(listener: Listener) {

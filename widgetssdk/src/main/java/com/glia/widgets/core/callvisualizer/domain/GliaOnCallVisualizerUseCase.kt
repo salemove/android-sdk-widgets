@@ -20,7 +20,7 @@ class GliaOnCallVisualizerUseCase(
     }
 
     private var listener: Listener? = null
-    fun execute(listener: Listener) {
+    operator fun invoke(listener: Listener) {
         if (this.listener == listener) {
             // Already listening
             return

@@ -159,6 +159,7 @@ public class UseCaseFactory {
             isDisplayApplicationChatHeadUseCase = new IsDisplayApplicationChatHeadUseCase(
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository(),
+                    repositoryFactory.getGliaScreenSharingRepository(),
                     permissionManager,
                     gliaSdkConfigurationManager,
                     repositoryFactory.getGliaEngagementTypeRepository()

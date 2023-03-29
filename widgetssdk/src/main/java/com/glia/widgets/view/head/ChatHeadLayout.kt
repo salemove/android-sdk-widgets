@@ -34,8 +34,6 @@ class ChatHeadLayout @JvmOverloads constructor(
     private var navigationCallback: NavigationCallback? = null
     private var chatHeadClickedListener: OnChatHeadClickedListener? = null
     private var uiTheme: UiTheme by Delegates.notNull()
-    private var isChatView = false
-
 
     private val chatHeadViewPosition: Pair<Int?, Int?>
         get() = Pair(chatHeadView.x.roundToInt(), chatHeadView.y.roundToInt())
@@ -82,8 +80,11 @@ class ChatHeadLayout @JvmOverloads constructor(
     }
 
     override fun navigateToChat() {
-        navigationCallback?.apply { navigateToEndScreenSharing() } ?:
-            chatHeadView.navigateToEndScreenSharing()
+        if (navigationCallback != null) {
+            navigationCallback!!.onNavigateToChat()
+        } else {
+            chatHeadView.navigateToChat()
+        }
     }
 
     override fun navigateToCall() {
@@ -102,10 +103,6 @@ class ChatHeadLayout @JvmOverloads constructor(
         }
     }
 
-    override fun isInChatView(): Boolean {
-        return isChatView
-    }
-
     override fun show() {
         post { visibility = VISIBLE }
     }
@@ -119,6 +116,9 @@ class ChatHeadLayout @JvmOverloads constructor(
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        val isPositioned = chatHeadView.x != 0f && chatHeadView.y != 0f
+        if (isPositioned) return
+
         val floatingViewX = w - chatHeadSize - chatHeadMargin
         val floatingViewY = h / 10f * 8f
         chatHeadView.x = floatingViewX
@@ -152,14 +152,6 @@ class ChatHeadLayout @JvmOverloads constructor(
      */
     fun setNavigationCallback(callback: NavigationCallback) {
         navigationCallback = callback
-    }
-
-    fun setConfiguration(configuration: GliaSdkConfiguration?) {
-        updateChatHeadConfiguration(uiTheme, configuration)
-    }
-
-    fun setIsChatView(value: Boolean) {
-        isChatView = value
     }
 
     private fun init(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -213,6 +205,16 @@ class ChatHeadLayout @JvmOverloads constructor(
 
     private fun onChatHeadClicked() {
         chatHeadClickedListener?.onClicked(null) ?: chatHeadController.onChatHeadClicked()
+    }
+
+    fun getPosition(): Pair<Int?, Int?> {
+        return chatHeadViewPosition
+    }
+
+    fun setPosition(x: Float, y: Float) {
+        chatHeadView.x = x
+        chatHeadView.y = y
+        chatHeadView.invalidate()
     }
 
     fun interface OnChatHeadClickedListener {

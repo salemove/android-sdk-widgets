@@ -3,9 +3,11 @@ package com.glia.widgets.view.head
 import android.app.Activity
 import android.view.View
 import android.view.Window
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController
+import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import org.junit.After
 import org.junit.Before
@@ -17,8 +19,15 @@ internal class ActivityWatcherForChatHeadTest {
 
     private val watcher = Mockito.mock(ActivityWatcherForChatHeadContract.Watcher::class.java)
     private val serviceChatHeadController = Mockito.mock(ServiceChatHeadController::class.java)
+    private val applicationChatHeadController = Mockito.mock(ApplicationChatHeadLayoutController::class.java)
     private val screenSharingController = Mockito.mock(ScreenSharingController::class.java)
-    private val controller = ActivityWatcherForChatHeadController(serviceChatHeadController, screenSharingController)
+    private val onEngagementUseCase = Mockito.mock(GliaOnEngagementUseCase::class.java)
+    private val controller = ActivityWatcherForChatHeadController(
+        serviceChatHeadController,
+        applicationChatHeadController,
+        screenSharingController,
+        onEngagementUseCase,
+    )
     private val activity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)
 
@@ -49,11 +58,12 @@ internal class ActivityWatcherForChatHeadTest {
         verify(watcher).fetchGliaOrRootView()
         verify(screenSharingController).removeViewCallback(anyOrNull())
         verify(serviceChatHeadController).onPause(view)
+        verify(applicationChatHeadController).onPause(view.javaClass.simpleName)
     }
 
     private fun `onActivityResumed callbacks are set when call or chat are not active`() {
         whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
-        controller.onActivityResumed(activity)
+        controller.onActivityResumed()
         verify(serviceChatHeadController).onResume(view)
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(watcher).fetchGliaOrRootView()

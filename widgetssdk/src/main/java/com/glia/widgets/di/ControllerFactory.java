@@ -54,8 +54,8 @@ public class ControllerFactory {
     private CallVisualizerController callVisualizerController;
     private ActivityWatcherController activityWatcherController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
-
     private static ServiceChatHeadController serviceChatHeadController;
+    private static ApplicationChatHeadLayoutController applicationChatHeadController;
 
     public ControllerFactory(
             RepositoryFactory repositoryFactory,
@@ -205,6 +205,7 @@ public class ControllerFactory {
         destroyCallController();
         destroyChatController();
         serviceChatHeadController.onDestroy();
+        applicationChatHeadController.onDestroy();
     }
 
     public void destroyCallController() {
@@ -246,6 +247,7 @@ public class ControllerFactory {
         messagesNotSeenHandler.init();
         getCallVisualizerController().init();
         getScreenSharingController().init();
+        getActivityWatcherForChatHeadController().init();
     }
 
     public FilePreviewController getImagePreviewController() {
@@ -272,18 +274,23 @@ public class ControllerFactory {
         return serviceChatHeadController;
     }
 
-    public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
-        return new ApplicationChatHeadLayoutController(
-                useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
-                useCaseFactory.getResolveChatHeadNavigationUseCase(),
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                messagesNotSeenHandler,
-                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createGetOperatorFlowableUseCase(),
-                useCaseFactory.createIsCallVisualizerUseCase()
-        );
+    public ApplicationChatHeadLayoutController getChatHeadLayoutController() {
+        if (applicationChatHeadController == null) {
+            applicationChatHeadController = new ApplicationChatHeadLayoutController(
+                    useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
+                    useCaseFactory.getResolveChatHeadNavigationUseCase(),
+                    useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createOnEngagementEndUseCase(),
+                    useCaseFactory.createOnCallVisualizerUseCase(),
+                    useCaseFactory.createOnCallVisualizerEndUseCase(),
+                    messagesNotSeenHandler,
+                    useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
+                    useCaseFactory.createGetOperatorFlowableUseCase(),
+                    useCaseFactory.createIsCallVisualizerUseCase()
+            );
+        }
+        return applicationChatHeadController;
     }
 
     public SurveyContract.Controller getSurveyController() {
@@ -360,7 +367,9 @@ public class ControllerFactory {
         if (activityWatcherForChatHeadController == null) {
             activityWatcherForChatHeadController = new ActivityWatcherForChatHeadController(
                     serviceChatHeadController,
-                    getScreenSharingController());
+                    getChatHeadLayoutController(),
+                    getScreenSharingController(),
+                    useCaseFactory.createOnEngagementUseCase());
         }
         return activityWatcherForChatHeadController;
     }

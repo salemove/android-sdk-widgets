@@ -1,17 +1,20 @@
 package com.glia.widgets.view.head.controller
 
-import android.app.Activity
 import android.view.View
 
 internal class ActivityWatcherForChatHeadContract {
     interface Controller {
-        fun onActivityPaused()
-        fun onActivityResumed(activity: Activity)
+        fun init()
         fun setWatcher(watcher: Watcher)
+        fun onActivityPaused()
+        fun onActivityResumed()
+        fun shouldShowBubble(gliaOrRootView: String?): Boolean
     }
 
     interface Watcher {
         fun openCallActivity()
         fun fetchGliaOrRootView(): View?
+        fun addChatHeadLayoutIfAbsent()
+        fun removeChatHeadLayoutIfPresent()
     }
 }

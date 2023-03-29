@@ -95,7 +95,7 @@ class VisitorCodeView internal constructor(
     override fun setTimer(duration: Long) {
         timer = object : CountDownTimer(duration, duration) {
             override fun onTick(p0: Long) {
-                //no-op
+            //no-op
             }
 
             override fun onFinish() {
@@ -104,7 +104,7 @@ class VisitorCodeView internal constructor(
         }.start()
     }
 
-    override fun cleanUpOnDestroy() {
+    override fun destroyTimer() {
         timer?.cancel()
         timer = null
     }

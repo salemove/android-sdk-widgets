@@ -123,7 +123,8 @@ public class RepositoryFactory {
                     InAppBitmapCache.getInstance(),
                     downloadsFolderDataSource,
                     gliaCore,
-                    fileHelper
+                    fileHelper,
+                    getEngagementConfigRepository()
             );
         }
         return gliaFileRepository;

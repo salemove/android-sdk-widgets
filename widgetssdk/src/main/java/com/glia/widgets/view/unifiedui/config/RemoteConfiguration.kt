@@ -5,7 +5,7 @@ import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.call.CallRemoteConfig
 import com.glia.widgets.view.unifiedui.config.callvisualizer.CallVisualizerConfig
 import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
-import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsWelcomeScreenConfig
+import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsWelcomeScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
 import com.glia.widgets.view.unifiedui.extensions.deepMerge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -35,7 +35,7 @@ internal data class RemoteConfiguration(
     val callVisualizerRemoteConfig: CallVisualizerConfig?,
 
     @SerializedName("secureConversationsWelcomeScreen")
-    val secureConversationsWelcomeScreenConfig: SecureConversationsWelcomeScreenConfig?
+    val secureConversationsWelcomeScreenRemoteConfig: SecureConversationsWelcomeScreenRemoteConfig?
 ) {
     fun toUnifiedTheme(): UnifiedTheme? {
         val defaultTheme = DefaultTheme(globalColorsConfig?.toColorPallet())
@@ -47,7 +47,7 @@ internal data class RemoteConfiguration(
             chatTheme = chatRemoteConfig?.toChatTheme(),
             surveyTheme = surveyRemoteConfig?.toSurveyTheme(),
             callVisualizerTheme = callVisualizerRemoteConfig?.toCallVisualizerTheme(),
-            secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenConfig?.toSecureConversationsWelcomeScreenTheme()
+            secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenRemoteConfig?.toSecureConversationsWelcomeScreenTheme()
         )
 
         return defaultTheme deepMerge unifiedTheme

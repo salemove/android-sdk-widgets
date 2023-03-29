@@ -85,7 +85,7 @@
 
     <!-- Overlay permissions required Dialog -->
     <string name="glia_dialog_overlay_permissions_title">Screen Overlay Permissions Required</string>
-    <string name="glia_dialog_overlay_permissions_message">Allow screen overlay for your app to see the chat message bubbles</string>
+    <string name="glia_dialog_overlay_permissions_message">Allow screen overlay for the proper functioning of the app</string>
     <string name="glia_dialog_overlay_permissions_ok">@string/glia_dialog_ok</string>
     <string name="glia_dialog_overlay_permissions_no">@string/glia_dialog_no</string>
 

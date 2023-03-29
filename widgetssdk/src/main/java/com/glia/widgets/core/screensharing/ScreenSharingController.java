@@ -56,7 +56,7 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     public void onScreenSharingRequest() {
         Logger.d(TAG, "on screen sharing request");
         if (!viewCallbacks.isEmpty()) {
-            if (!hasScreenSharingNotificationChannelEnabledUseCase.execute()) {
+            if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
                 hasPendingScreenSharingRequest = true;
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog();
             } else {
@@ -93,7 +93,7 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     public void onResume(Context context) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
-            if (!hasScreenSharingNotificationChannelEnabledUseCase.execute()) {
+            if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog();
             } else {
                 onScreenSharingAccepted(context);
@@ -152,11 +152,11 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     }
 
     private void showScreenSharingEnabledNotification() {
-        showScreenSharingNotificationUseCase.execute();
+        showScreenSharingNotificationUseCase.invoke();
     }
 
     private void hideScreenSharingEnabledNotification() {
-        removeScreenSharingNotificationUseCase.execute();
+        removeScreenSharingNotificationUseCase.invoke();
     }
 
     public interface ViewCallback {
@@ -167,6 +167,6 @@ public class ScreenSharingController implements GliaScreenSharingCallback {
     @Override
     public void onForceStopScreenSharing() {
         repository.forceEndScreenSharing();
-        removeScreenSharingNotificationUseCase.execute();
+        removeScreenSharingNotificationUseCase.invoke();
     }
 }

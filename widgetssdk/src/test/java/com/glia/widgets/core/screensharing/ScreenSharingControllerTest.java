@@ -59,7 +59,7 @@ public class ScreenSharingControllerTest {
 
     @Test
     public void onScreenSharingRequest_showsEnableNotificationsDialog_whenNotificationChannelDisabled() {
-        when(hasScreenSharingNotificationChannelEnabledUseCase.execute()).thenReturn(false);
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke()).thenReturn(false);
         subjectUnderTest.setViewCallback(mock(ScreenSharingController.ViewCallback.class));
 
         subjectUnderTest.onScreenSharingRequest();
@@ -69,7 +69,7 @@ public class ScreenSharingControllerTest {
 
     @Test
     public void onScreenSharingRequest_showsStartScreenSharingDialog_whenNotificationChannelEnabled() {
-        when(hasScreenSharingNotificationChannelEnabledUseCase.execute()).thenReturn(true);
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke()).thenReturn(true);
         subjectUnderTest.setViewCallback(mock(ScreenSharingController.ViewCallback.class));
 
         subjectUnderTest.onScreenSharingRequest();
@@ -86,26 +86,26 @@ public class ScreenSharingControllerTest {
         subjectUnderTest.onScreenSharingRequestError(exception);
 
         verify(viewCallback).onScreenSharingRequestError(exception);
-        verify(removeScreenSharingNotificationUseCase).execute();
+        verify(removeScreenSharingNotificationUseCase).invoke();
     }
 
     @Test
     public void onResume_hidesDialogShowsNotificationAcceptsScreenSharing_whenNotificationChannelEnabled() {
         subjectUnderTest.hasPendingScreenSharingRequest = true;
-        when(hasScreenSharingNotificationChannelEnabledUseCase.execute())
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
                 .thenReturn(true);
 
         subjectUnderTest.onResume(mock(Context.class));
 
         verify(dialogController).dismissCurrentDialog();
-        verify(showScreenSharingNotificationUseCase).execute();
+        verify(showScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
 
     @Test
     public void onResume_showsEnableNotifications_whenNotificationChannelDisabled() {
         subjectUnderTest.hasPendingScreenSharingRequest = true;
-        when(hasScreenSharingNotificationChannelEnabledUseCase.execute())
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
                 .thenReturn(false);
 
         subjectUnderTest.onResume(mock(Context.class));
@@ -118,7 +118,7 @@ public class ScreenSharingControllerTest {
         subjectUnderTest.onScreenSharingAccepted(mock(Context.class));
 
         verify(dialogController).dismissCurrentDialog();
-        verify(showScreenSharingNotificationUseCase).execute();
+        verify(showScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
 
@@ -134,7 +134,7 @@ public class ScreenSharingControllerTest {
     public void onScreenSharingNotificationEndPressed_hidesNotificationEndsScreenSharing() {
         subjectUnderTest.onScreenSharingNotificationEndPressed();
 
-        verify(removeScreenSharingNotificationUseCase).execute();
+        verify(removeScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onEndScreenSharing();
     }
 }

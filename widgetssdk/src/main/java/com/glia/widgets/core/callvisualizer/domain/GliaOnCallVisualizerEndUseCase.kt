@@ -9,7 +9,7 @@ import com.glia.widgets.core.operator.GliaOperatorMediaRepository
 import com.glia.widgets.core.survey.GliaSurveyRepository
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository
 
-class GliaOnCallVisualizerEndUseCase(
+internal class GliaOnCallVisualizerEndUseCase(
     private val repository: CallVisualizerRepository,
     private val operatorMediaRepository: GliaOperatorMediaRepository,
     private val callVisualizerUseCase: GliaOnCallVisualizerUseCase,
@@ -28,8 +28,8 @@ class GliaOnCallVisualizerEndUseCase(
             surveyRepository.onEngagementEnded(engagement)
             listener?.engagementEnded()
             operatorMediaRepository.stopListening(engagement)
-            removeScreenSharingNotificationUseCase.execute()
-            removeCallNotificationUseCase.execute()
+            removeScreenSharingNotificationUseCase()
+            removeCallNotificationUseCase()
             gliaVisitorMediaRepository.onEngagementEnded(engagement)
         }
     }

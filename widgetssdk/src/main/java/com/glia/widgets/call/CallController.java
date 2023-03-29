@@ -18,6 +18,7 @@ import com.glia.widgets.Constants;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
@@ -25,7 +26,6 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;
@@ -159,7 +159,7 @@ public class CallController implements
                 .setIsSpeakerOn(false)
                 .setIsMuted(false)
                 .setHasVideo(false)
-                .setIsCallVisualizer(isCallVisualizerUseCase.execute())
+                .setIsCallVisualizer(isCallVisualizerUseCase.invoke())
                 .createCallState();
         this.dialogController = dialogController;
         this.callTimer = sharedTimer;
@@ -194,7 +194,7 @@ public class CallController implements
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
         this.isCallVisualizerUseCase = isCallVisualizerUseCase;
 
-        if (isCallVisualizerUseCase.execute()) {
+        if (isCallVisualizerUseCase.invoke()) {
             shouldShowMediaEngagementView(true);
         }
     }
@@ -357,7 +357,7 @@ public class CallController implements
         showLandscapeControls();
 
         surveyUseCase.registerListener(this);
-        if (isCallVisualizerUseCase.execute()) {
+        if (isCallVisualizerUseCase.invoke()) {
             subscribeToOmnibrowseEvents();
         } else {
             subscribeToEngagementStateChange();
@@ -689,7 +689,7 @@ public class CallController implements
                 operatorMediaState,
                 formattedTime
         ));
-        showVideoCallNotificationUseCase.execute();
+        showVideoCallNotificationUseCase.invoke();
         connectingTimerCounter.stop();
     }
 
@@ -704,7 +704,7 @@ public class CallController implements
                 formattedTime
         ));
 
-        showAudioCallNotificationUseCase.execute();
+        showAudioCallNotificationUseCase.invoke();
         connectingTimerCounter.stop();
     }
 
@@ -713,7 +713,7 @@ public class CallController implements
         if (callState.isMediaEngagementStarted()) {
             emitViewState(callState.backToOngoing());
         }
-        removeCallNotificationUseCase.execute();
+        removeCallNotificationUseCase.invoke();
         if (!connectingTimerCounter.isRunning()) {
             connectingTimerCounter.startNew(
                     Constants.CALL_TIMER_DELAY,
@@ -836,11 +836,11 @@ public class CallController implements
     }
 
     private void showCallNotification() {
-        if (hasCallNotificationChannelEnabledUseCase.execute()) {
+        if (hasCallNotificationChannelEnabledUseCase.invoke()) {
             if (callState.isVideoCall() || callState.is2WayVideoCall()) {
-                showVideoCallNotificationUseCase.execute();
+                showVideoCallNotificationUseCase.invoke();
             } else if (callState.isAudioCall()) {
-                showAudioCallNotificationUseCase.execute();
+                showAudioCallNotificationUseCase.invoke();
             }
         }
     }

@@ -51,7 +51,7 @@ import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.notification.device.NotificationManager
+import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
@@ -530,7 +530,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
-                    NotificationManager.openNotificationChannelScreen(this.context)
+                    this.context.openNotificationChannelScreen()
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
@@ -558,7 +558,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     controller?.notificationsDialogDismissed()
-                    NotificationManager.openNotificationChannelScreen(this.context)
+                    this.context.openNotificationChannelScreen()
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()

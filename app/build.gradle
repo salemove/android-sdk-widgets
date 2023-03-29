@@ -25,6 +25,9 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     signingConfigs {
+        release {
+            storeFile file('debug.keystore')
+        }
         debug {
             storeFile file('debug.keystore')
         }
@@ -85,6 +88,10 @@ def initEnvProperty(String propertyName) {
     }
 }
 
+repositories {
+    maven { url LOCAL_MAVEN_LOCATION }
+}
+
 dependencies {
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "com.google.android.material:material:$materialVersion"
@@ -94,7 +101,8 @@ dependencies {
     implementation "androidx.preference:preference:$preferenceVersion"
     implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
     implementation "com.google.firebase:firebase-messaging"
-    implementation project(path: ':widgetssdk')
+    debugImplementation project(path: ':widgetssdk')
+    releaseImplementation "com.glia:android-widgets:1.9.11-SNAPSHOT"
     implementation "androidx.core:core-ktx:$coreKtxVersion"
 
     testImplementation "junit:junit:$junitVersion"

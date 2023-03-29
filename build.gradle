@@ -17,6 +17,11 @@ plugins {
 }
 
 allprojects {
+    project.ext {
+        // Settings the location to project build folder so it would be auto-deleted on 'clean' task
+        LOCAL_MAVEN_LOCATION = new File(rootProject.buildDir, 'maven_repo').toURI()
+    }
+
     repositories {
         google()
         mavenCentral()
@@ -27,6 +32,7 @@ allprojects {
         }
         // Needed to use not public new Core SDK release
         maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1179' }
+        maven { url LOCAL_MAVEN_LOCATION }
     }
 }
 

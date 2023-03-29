@@ -7,45 +7,96 @@ version = PUBLISH_VERSION
 afterEvaluate {
     publishing {
         publications {
-            release(MavenPublication) {
+            snapshot(MavenPublication) {
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version = PUBLISH_VERSION + '-SNAPSHOT'
 
+                setupFilesForPublishing(it)
+            }
+            release(MavenPublication) {
                 groupId PUBLISH_GROUP_ID
                 artifactId PUBLISH_ARTIFACT_ID
                 version PUBLISH_VERSION
 
-                // Two artifacts, the `aar` (or `jar`) and the sources
-                if (project.plugins.findPlugin("com.android.library")) {
-                    from components.release
-                } else {
-                    from components.java
-                }
+                setupFilesForPublishing(it)
+            }
+        }
 
-                pom {
-                    name = PUBLISH_ARTIFACT_ID
-                    description = PUBLISH_MODULE_DESCRIPTION
-                    url = PUBLISH_ORGANISATION_URL
-                    licenses {
-                        license {
-                            url = 'https://raw.githubusercontent.com/salemove/android-sdk-widgets/master/LICENSE.txt'
-                        }
-                    }
-                    organization {
-                        name = PUBLISH_ORGANISATION_NAME
-                        url = PUBLISH_ORGANISATION_URL
-                    }
-                    developers {
-                        developer {
-                            name = 'Glia Technologies'
-                            url = PUBLISH_ORGANISATION_URL
-                        }
-                    }
-                    scm {
-                        url = 'https://github.com/salemove/android-sdk-widgets.git'
-                    }
-                }
+        repositories {
+            maven {
+                name = 'local'
+                url = LOCAL_MAVEN_LOCATION
             }
         }
     }
+
+    // Disable the publishing task if criteria are not met.
+    // This especially applies to all generic tasks. For example task 'publish' by default will
+    // attempt to publish both the 'snapshot' and the 'release' files to local repo and also
+    // to Sonatype (nexus) repository.
+    //
+    // P.S: There is also a separate task type `PublishToMavenLocal` but for now we don't care what
+    // is upload in this case
+    tasks.withType(PublishToMavenRepository) {
+        onlyIf {
+            if (repository == publishing.repositories.local &&
+                    publication == publishing.publications.snapshot) {
+                // Allow uploading 'snapshot' files to local repository
+                return true
+            }
+            if (repository == publishing.repositories.sonatype &&
+                    publication == publishing.publications.release) {
+                // Allow uploading 'release' files to sonatype (nexus) repository
+                return true
+            }
+            // Otherwise skip this publishing task and log in gradle task
+            println '\tdisabled because files do not match repository settings'
+            return false
+        }
+    }
+}
+
+def setupFilesForPublishing(publication) {
+
+    // Two artifacts, the `aar` (or `jar`) and the sources
+    if (project.plugins.findPlugin("com.android.library")) {
+        publication.from components.release
+    } else {
+        publication.from components.java
+    }
+
+    publication.pom {
+        name = PUBLISH_ARTIFACT_ID
+        description = PUBLISH_MODULE_DESCRIPTION
+        url = PUBLISH_ORGANISATION_URL
+        licenses {
+            license {
+                url = 'https://raw.githubusercontent.com/salemove/android-sdk-widgets/master/LICENSE.txt'
+            }
+        }
+        organization {
+            name = PUBLISH_ORGANISATION_NAME
+            url = PUBLISH_ORGANISATION_URL
+        }
+        developers {
+            developer {
+                name = 'Glia Technologies'
+                url = PUBLISH_ORGANISATION_URL
+            }
+        }
+        scm {
+            url = 'https://github.com/salemove/android-sdk-widgets.git'
+        }
+    }
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    // Disabling generation of the .module file for the Glia SDK.
+    // It solves issue with firebase-messaging dependency for the integrators if they don't want
+    // to use the Push notification feature.
+    // Without metadata, gradle should use .pom file to setup dependency for a project.
+    enabled = false
 }
 
 signing {

@@ -59,7 +59,7 @@ dependencies {
     // https://square.github.io/leakcanary/changelog/
     // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
 
-    api "com.glia:android-sdk:$gliaSdkVersion"
+    api "com.glia:android-sdk:0.26.9-SNAPSHOT"
     // Glia sdk aar
     // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 //    api "com.glia:android-sdk:0.26.6-SNAPSHOT" // Used when testing local Core SDK snapshot releases
@@ -80,6 +80,10 @@ dependencies {
     // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
     testImplementation "org.json:json:20220924"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+}
+
+task publishToLocalMaven() {
+    dependsOn ':androidSdk:publishSnapshotPublicationToLocalRepository'
 }
 
 ext {

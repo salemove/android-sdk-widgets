@@ -3,12 +3,12 @@ package com.glia.widgets.view.head.controller;
 import com.glia.androidsdk.Operator;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
@@ -168,7 +168,7 @@ public class ApplicationChatHeadLayoutController
     }
 
     private void decideOnEngagementBubbleDesign(ChatHeadLayoutContract.View view) {
-        if (isCallVisualizerUseCase.execute()) {
+        if (isCallVisualizerUseCase.invoke()) {
             view.showScreenSharing();
         } else if (operatorProfileImgUrl != null) {
             view.showOperatorImage(operatorProfileImgUrl);

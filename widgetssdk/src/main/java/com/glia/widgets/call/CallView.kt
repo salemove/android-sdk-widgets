@@ -41,7 +41,7 @@ import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.dialog.model.DialogState.OperatorName
-import com.glia.widgets.core.notification.device.NotificationManager
+import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
@@ -364,7 +364,7 @@ internal class CallView(
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
-                    NotificationManager.openNotificationChannelScreen(this.context)
+                    this.context.openNotificationChannelScreen()
 
                 },
                 negativeButtonClickListener = {
@@ -393,7 +393,7 @@ internal class CallView(
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
-                    NotificationManager.openNotificationChannelScreen(this.context)
+                    this.context.openNotificationChannelScreen()
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()

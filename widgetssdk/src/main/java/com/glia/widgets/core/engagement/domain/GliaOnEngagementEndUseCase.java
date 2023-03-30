@@ -46,8 +46,8 @@ public class GliaOnEngagementEndUseCase implements
             operatorMediaRepository.stopListening(engagement);
             fileAttachmentRepository.clearObservers();
             fileAttachmentRepository.detachAllFiles();
-            removeScreenSharingNotificationUseCase.execute();
-            removeCallNotificationUseCase.execute();
+            removeScreenSharingNotificationUseCase.invoke();
+            removeCallNotificationUseCase.invoke();
             gliaVisitorMediaRepository.onEngagementEnded(engagement);
             gliaEngagementConfigRepository.reset();
         }

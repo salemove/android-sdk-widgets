@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -22,14 +21,11 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
-import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer.PermissionStage.*
-import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.notification.device.NotificationManager
+import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
@@ -96,7 +92,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     override fun requestCameraPermission() {
         if (resumedActivity.get() is ComponentActivity) {
-            cameraPermissionLauncher?.run { this.launch(android.Manifest.permission.CAMERA) }
+            cameraPermissionLauncher?.run { this.launch(Manifest.permission.CAMERA) }
         }
     }
     @Suppress("RedundantNullableReturnType")
@@ -201,9 +197,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun openNotificationChannelScreen() {
-        val activity = resumedActivity.get() ?: return
-        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-        NotificationManager.openNotificationChannelScreen(contextWithStyle)
+        resumedActivity.get()?.openNotificationChannelScreen()
     }
 
     override fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
@@ -352,10 +346,5 @@ internal class ActivityWatcherForCallVisualizer(
                 this.finish()
             }
         }
-    }
-
-    enum class PermissionStage {
-        INITIAL,
-        REQUESTED
     }
 }

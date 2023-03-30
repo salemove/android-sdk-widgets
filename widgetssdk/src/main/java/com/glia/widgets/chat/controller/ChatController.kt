@@ -617,17 +617,17 @@ internal class ChatController(
 
     private fun onOperatorMediaStateVideo() {
         Logger.d(TAG, "newOperatorMediaState: video")
-        showVideoCallNotificationUseCase.execute()
+        showVideoCallNotificationUseCase()
     }
 
     private fun onOperatorMediaStateAudio() {
         Logger.d(TAG, "newOperatorMediaState: audio")
-        showAudioCallNotificationUseCase.execute()
+        showAudioCallNotificationUseCase()
     }
 
     private fun onOperatorMediaStateUnknown() {
         Logger.d(TAG, "newOperatorMediaState: null")
-        removeCallNotificationUseCase.execute()
+        removeCallNotificationUseCase()
     }
 
     private fun initMediaUpgradeCallback() {

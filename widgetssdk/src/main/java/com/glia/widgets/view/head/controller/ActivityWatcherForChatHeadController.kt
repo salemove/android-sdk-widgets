@@ -63,6 +63,10 @@ internal class ActivityWatcherForChatHeadController(
                 // Is handled by com.glia.widgets.callvisualizer.ActivityWatcherController
             }
 
+            override fun onScreenSharingRequestSuccess() {
+                // no-op
+            }
+
             override fun onScreenSharingStarted() {
                 showBubble()
             }
@@ -81,7 +85,6 @@ internal class ActivityWatcherForChatHeadController(
                     applicationChatHeadController.updateChatHeadView()
                 }
             }
-
         }
     }
 

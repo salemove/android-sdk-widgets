@@ -82,8 +82,12 @@ internal class CallView(
             ex?.run { showToast(this.debugMessage) }
         }
 
-        override fun onScreenSharingStarted() {
+        override fun onScreenSharingRequestSuccess() {
             Handler(Looper.getMainLooper()).post { appBar.showEndScreenSharingButton() }
+        }
+
+        override fun onScreenSharingStarted() {
+            // no-op
         }
     }
 

@@ -13,6 +13,7 @@ import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
@@ -358,7 +359,8 @@ public class ControllerFactory {
         if (activityWatcherController == null) {
             activityWatcherController = new ActivityWatcherController(
                     getCallVisualizerController(),
-                    getScreenSharingController());
+                    getScreenSharingController(),
+                    useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase());
         }
         return activityWatcherController;
     }

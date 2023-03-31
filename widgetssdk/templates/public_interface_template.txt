@@ -1,0 +1,9 @@
+package com.glia.widgets.${packageReplacement}.domain;
+
+/**
+ * // TODO fill out public interface description
+ */
+public interface ${nameReplacement} {
+    // TODO Implement public functions, and write JavaDoc
+
+}

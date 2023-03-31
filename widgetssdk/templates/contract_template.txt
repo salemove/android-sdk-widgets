@@ -1,0 +1,16 @@
+package com.glia.widgets.${packageReplacement}
+
+import com.glia.widgets.base.BaseController
+import com.glia.widgets.base.BaseView
+
+interface ${nameReplacement}Contract {
+
+    interface Controller : BaseController {
+        fun setView(view: View)
+        // TODO: Add implementation
+    }
+
+    interface View : BaseView<Controller> {
+        // TODO: Add implementation
+    }
+}

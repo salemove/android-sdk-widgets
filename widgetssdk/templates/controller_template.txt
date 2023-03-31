@@ -1,0 +1,12 @@
+package com.glia.widgets.${packageReplacement}
+
+class ${nameReplacement}Controller : ${nameReplacement}Contract.Controller {
+
+    private var view: ${nameReplacement}Contract.View? = null
+
+    override fun setView(view: ${nameReplacement}Contract.View) {
+        this.view = view
+    }
+
+    override fun onDestroy() {}
+}

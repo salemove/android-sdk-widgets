@@ -1,0 +1,48 @@
+package com.glia.widgets.${packageReplacement}
+
+import android.content.Context
+import android.util.AttributeSet
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.glia.widgets.R
+import com.glia.widgets.databinding.${nameReplacement}ViewBinding
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.google.android.material.theme.overlay.MaterialThemeOverlay
+
+class ${nameReplacement}View (
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int,
+    defStyleRes: Int)
+    : ConstraintLayout(
+    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    attrs,
+    defStyleAttr,
+    defStyleRes
+), ${nameReplacement}Contract.View {
+
+
+    private var controller: ${nameReplacement}Contract.Controller? = null
+    private val binding: ${nameReplacement}ViewBinding = ${nameReplacement}ViewBinding.inflate(layoutInflater, this, true)
+
+    companion object {
+        private val TAG = ${nameReplacement}View::class.java.simpleName
+    }
+
+    @JvmOverloads
+    constructor(
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+
+
+    init {
+
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+    }
+
+    override fun setController(controller: ${nameReplacement}Contract.Controller?) {
+            TODO("Not yet implemented")
+        }
+}

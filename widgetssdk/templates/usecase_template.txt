@@ -1,0 +1,9 @@
+package com.glia.widgets.${packageReplacement}.domain
+
+class ${nameReplacement}UseCase(
+    private val repository: ${nameReplacement}Repository
+) {
+    operator fun invoke() {
+        // TODO implement
+    }
+}

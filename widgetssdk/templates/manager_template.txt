@@ -1,0 +1,10 @@
+package com.glia.widgets.${packageReplacement}
+import com.glia.widgets.${packageReplacement}.domain.${nameReplacement}Repository
+import com.glia.widgets.${packageReplacement}.domain.${nameReplacement}
+
+class ${nameReplacement}Manager(private val repository: ${nameReplacement}Repository) : ${nameReplacement} {
+
+    companion object {
+        val TAG = ${nameReplacement}Manager::class.java.simpleName
+    }
+}

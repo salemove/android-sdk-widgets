@@ -1,0 +1,16 @@
+package com.glia.widgets.${packageReplacement}
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.glia.widgets.databinding.${nameReplacement}ActivityBinding
+
+class ${nameReplacement}Activity : AppCompatActivity() {
+
+    private lateinit var binding: ${nameReplacement}ActivityBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ${nameReplacement}ActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+}

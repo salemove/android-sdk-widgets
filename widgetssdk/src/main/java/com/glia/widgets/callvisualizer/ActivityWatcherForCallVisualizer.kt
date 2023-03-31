@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -13,7 +12,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.glia.androidsdk.Glia
@@ -57,21 +55,12 @@ internal class ActivityWatcherForCallVisualizer(
      */
     var resumedActivity: WeakReference<Activity?> = WeakReference(null)
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-        // Media projection is mandatory only for Android API 29+
-        // Source: https://developer.android.com/reference/android/media/projection/MediaProjectionManager#getMediaProjection(int,%20android.content.Intent)
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         if (controller.isCallOrChatActive(activity)) {
             // Call and Chat screens process screen sharing requests on their own
             controller.removeMediaProjectionLaunchers(activity::class.simpleName)
-            return
-        }
-        registerForMediaProjectionPermissionResult(activity)
-        super.onActivityPreCreated(activity, savedInstanceState)
-    }
-
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        if (!controller.isCallOrChatActive(activity)) {
+        } else {
+            registerForMediaProjectionPermissionResult(activity)
             registerForCameraPermissionResult(activity)
         }
         super.onActivityCreated(activity, savedInstanceState)

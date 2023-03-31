@@ -180,7 +180,8 @@ internal class ActivityWatcherController(
     }
 
     override fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean) {
-        if (!isGranted) {
+        if (mediaUpgradeOffer.video == MediaDirection.TWO_WAY && !isGranted) {
+            // No need for visitor camera permission if it is not TWO_WAY video
             if (isComponentActivity) {
                 watcher.requestCameraPermission()
             } else {

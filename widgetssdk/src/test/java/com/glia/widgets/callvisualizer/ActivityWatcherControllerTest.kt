@@ -7,6 +7,7 @@ import android.view.Window
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
@@ -20,6 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.*
+import java.util.function.Consumer
 
 internal class ActivityWatcherControllerTest {
 
@@ -31,7 +33,6 @@ internal class ActivityWatcherControllerTest {
     private val controller = ActivityWatcherController(callVisualizerController, screenSharingController)
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
-    private val view = mock(View::class.java)
     private val mediaUpgradeOffer = mock(MediaUpgradeOffer::class.java)
 
     @Before
@@ -256,14 +257,26 @@ internal class ActivityWatcherControllerTest {
     }
 
     @Test
+    fun `onInitialCameraPermissionResult accepts offer when permission is not needed`() {
+        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.ONE_WAY)
+        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        resetMocks()
+        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
+        verify(mediaUpgradeOffer).accept(notNull())
+    }
+
+    @Test
     fun `onInitialCameraPermissionResult accepts offer when permission is granted`() {
+        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
+        verify(mediaUpgradeOffer).accept(notNull())
     }
 
     @Test
     fun `onInitialCameraPermissionResult requests permission when permission is not granted and is ComponentActivity`() {
+        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
@@ -272,6 +285,7 @@ internal class ActivityWatcherControllerTest {
 
     @Test
     fun `onInitialCameraPermissionResult opens ComponentActivity when permission is not granted and is not ComponentActivity`() {
+        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = false)
@@ -280,18 +294,22 @@ internal class ActivityWatcherControllerTest {
 
     @Test
     fun `onRequestedCameraPermissionResult accepts when isGranted`() {
+        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onRequestedCameraPermissionResult(true)
         verify(watcher).destroySupportActivityIfExists()
+        verify(mediaUpgradeOffer).accept(notNull())
     }
 
     @Test
     fun `onRequestedCameraPermissionResult declines when !isGranted`() {
+        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onRequestedCameraPermissionResult(false)
         verify(watcher).destroySupportActivityIfExists()
+        verify(mediaUpgradeOffer).decline(notNull())
     }
 
     private fun prepareMediaUpgradeApplicationState() {
@@ -314,6 +332,22 @@ internal class ActivityWatcherControllerTest {
         }
         cleanup()
         resetMocks()
+    }
+
+    // Required because MediaUpgradeOffer has 'final' fields which Mockito can't mock
+    private fun dummyMediaVideoUpgradeOffer(
+        audioDirection: MediaDirection = MediaDirection.NONE,
+        videoDirection: MediaDirection = MediaDirection.NONE
+    ): MediaUpgradeOffer {
+        return spy(object: MediaUpgradeOffer(audioDirection, videoDirection) {
+            override fun accept(callback: Consumer<GliaException?>?) {
+                // Do nothing
+            }
+
+            override fun decline(callback: Consumer<GliaException?>?) {
+                // Do nothing
+            }
+        })
     }
 
     private fun resetMocks() {

@@ -1,0 +1,158 @@
+package com.glia.widgets.messagecenter
+
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.Button
+import android.widget.FrameLayout
+import androidx.annotation.ColorInt
+import androidx.core.view.isVisible
+import androidx.transition.TransitionManager
+import com.glia.widgets.R
+import com.glia.widgets.databinding.ProgressButtonBinding
+import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.google.android.material.transition.MaterialFade
+
+class ProgressButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    FrameLayout(context, attrs) {
+
+    private val adapterCallback: StatefulWidgetAdapterCallback<State, ButtonTheme> =
+        object : StatefulWidgetAdapterCallback<State, ButtonTheme> {
+            override fun onNewTheme(theme: ButtonTheme) {
+                updateTheme(theme)
+            }
+
+            override fun onNewState(newState: State) {
+                showIndicator(newState == State.PROGRESS)
+            }
+        }
+
+    private val statefulWidgetAdapter: StatefulWidgetAdapter<State, ButtonTheme> by lazy {
+        SimpleStatefulWidgetAdapter(State.ENABLED, adapterCallback)
+    }
+
+    val binding: ProgressButtonBinding by lazy {
+        ProgressButtonBinding.inflate(layoutInflater, this)
+    }
+
+    @get:ColorInt
+    private val gliaBrandPrimaryColor: Int by lazy {//btn bg
+        getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_brand_primary_color))
+    }
+
+    @get:ColorInt
+    private val gliaBaseLightColor: Int by lazy {//text
+        getColorCompat(getAttr(R.attr.gliaBaseLightColor, R.color.glia_base_light_color))
+    }
+
+    @get:ColorInt
+    private val gliaDisabledBackgroundColor: Int by lazy { getColorCompat(R.color.glia_disable_button_bg) }
+
+    @get:ColorInt
+    private val gliaDisabledBorderColor: Int by lazy { getColorCompat(R.color.glia_disable_button_border) }
+
+    @get:ColorInt
+    private val gliaDisabledTextColor: Int by lazy { getColorCompat(R.color.glia_disable_button_text) }
+
+
+    enum class State {
+        ENABLED,
+        DISABLED,
+        PROGRESS
+    }
+
+    init {
+        isFocusable = true
+        isClickable = true
+        accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
+        contentDescription = this.context.getString(R.string.message_center_send_message_btn)
+        foreground = getDrawableCompat(
+            getAttr(android.R.attr.selectableItemBackground, android.R.color.transparent)
+        )
+        applyDefaultTheme()
+    }
+
+    override fun getAccessibilityClassName(): CharSequence {
+        return Button::class.java.name
+    }
+
+    private fun updateTheme(buttonTheme: ButtonTheme) {
+        applyLayerTheme(buttonTheme.background)
+        buttonTheme.elevation?.also { elevation = it }
+        buttonTheme.shadowColor?.also(::applyShadow)
+        binding.btnSendMessageText.applyTextTheme(buttonTheme.text)
+    }
+
+    internal fun updateProgressTheme(colorTheme: ColorTheme?) {
+        colorTheme?.primaryColor?.also {
+            binding.progressBar.setIndicatorColor(it)
+        }
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+
+        statefulWidgetAdapter.updateState(if (enabled) State.ENABLED else State.DISABLED)
+    }
+
+    fun setProgress(progress: Boolean) {
+        val state = when {
+            progress -> State.PROGRESS
+            isEnabled -> State.ENABLED
+            else -> State.DISABLED
+        }
+        statefulWidgetAdapter.updateState(state)
+    }
+
+    internal fun updateStatefulTheme(theme: Map<State, ButtonTheme>) {
+        statefulWidgetAdapter.updateStatefulTheme(theme)
+    }
+
+    private fun showIndicator(show: Boolean) {
+        TransitionManager.beginDelayedTransition(this, MaterialFade())
+        binding.progressBar.isVisible = show
+    }
+
+    private fun applyDefaultTheme() {
+        val defaultLayer = LayerTheme(
+            fill = ColorTheme(gliaBrandPrimaryColor),
+            stroke = gliaBrandPrimaryColor,
+            borderWidth = context.getDimenRes(R.dimen.glia_px),
+            cornerRadius = context.getDimenRes(R.dimen.glia_small)
+        )
+
+        val defaultText = TextTheme(
+            textColor = ColorTheme(gliaBaseLightColor),
+            backgroundColor = ColorTheme(),
+            textSize = binding.btnSendMessageText.textSize / resources.displayMetrics.scaledDensity,
+            textStyle = binding.btnSendMessageText.typeface.style
+        )
+
+        val defaultTheme = ButtonTheme(
+            text = defaultText,
+            background = defaultLayer,
+            elevation = context.getDimenRes(R.dimen.glia_small)
+        )
+
+        val disabledTheme = ButtonTheme(
+            text = defaultText.copy(textColor = ColorTheme(gliaDisabledTextColor)),
+            background = defaultLayer.copy(
+                fill = ColorTheme(gliaDisabledBackgroundColor),
+                stroke = gliaDisabledBorderColor
+            ),
+            elevation = 0f
+        )
+
+        updateStatefulTheme(
+            mapOf(
+                State.ENABLED to defaultTheme,
+                State.DISABLED to disabledTheme,
+                State.PROGRESS to disabledTheme
+            )
+        )
+    }
+
+}

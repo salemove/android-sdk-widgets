@@ -28,7 +28,7 @@ import kotlin.reflect.full.primaryConstructor
  */
 internal inline infix fun <reified T : Any?> T.deepMerge(other: T): T {
     if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes")
-    return merge(other)
+    return unsafeMerge(other)
 }
 
 // Added to make method above compatible with Java
@@ -36,7 +36,7 @@ internal fun deepMerge(old: UiTheme?, other: UiTheme?): UiTheme? {
     return old deepMerge other
 }
 
-private fun <T : Any?> T.merge(other: T): T {
+internal fun <T : Any?> T.unsafeMerge(other: T): T {
     if (this == null) return other
     if (other == null) return this
     return mergeNonNull(other)
@@ -78,7 +78,7 @@ private fun <T> mergeDataProperties(
 ): Any? = property.getter.run {
     val currentValue: T? = call(current)
     val otherValue: T? = call(other)
-    currentValue.merge(otherValue)
+    currentValue.unsafeMerge(otherValue)
 }
 
 /**

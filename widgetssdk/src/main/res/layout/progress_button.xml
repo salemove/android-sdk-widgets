@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_height="wrap_content"
+    tools:layout_width="match_parent"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:importantForAccessibility="no"
+        android:minHeight="48dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/glia_medium"
+            android:accessibilityLiveRegion="polite"
+            android:contentDescription="@string/message_center_progress_bar_content_description"
+            android:importantForAccessibility="yes"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/glia_disable_button_text"
+            app:indicatorSize="24sp"
+            app:trackCornerRadius="4dp"
+            app:trackThickness="2dp"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/btn_send_message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:text="@string/message_center_send_message_btn"
+            android:textAppearance="?attr/textAppearanceSubtitle2"
+            android:textColor="?attr/gliaBaseLightColor"
+            tools:textColor="@color/glia_disable_button_text" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</merge>

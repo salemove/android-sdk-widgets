@@ -1,6 +1,7 @@
 package com.glia.widgets.view.unifiedui.theme.base
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.core.graphics.ColorUtils
 import kotlin.math.roundToInt
@@ -8,7 +9,9 @@ import kotlin.math.roundToInt
 internal data class ColorTheme(
     val isGradient: Boolean = false, val values: List<Int>
 ) {
-    internal constructor(@ColorInt color: Int) : this(values = listOf(color))
+    constructor(@ColorInt color: Int) : this(values = listOf(color))
+
+    constructor() : this(Color.TRANSPARENT)
 
     @get:ColorInt
     val primaryColor: Int

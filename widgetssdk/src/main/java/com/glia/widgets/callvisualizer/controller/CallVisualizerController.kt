@@ -43,12 +43,12 @@ internal class CallVisualizerController(
 
     override fun onOneWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String) {
         val formattedOperatorName = Utils.formatOperatorName(operatorName)
-        dialogController.showUpgradeVideoDialog2Way(mediaUpgradeOffer, formattedOperatorName)
+        dialogController.showUpgradeVideoDialog1Way(mediaUpgradeOffer, formattedOperatorName)
     }
 
     override fun onTwoWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String) {
         val formattedOperatorName = Utils.formatOperatorName(operatorName)
-        dialogController.showUpgradeVideoDialog1Way(mediaUpgradeOffer, formattedOperatorName)
+        dialogController.showUpgradeVideoDialog2Way(mediaUpgradeOffer, formattedOperatorName)
     }
 
     override fun onSurveyLoaded(survey: Survey?) {

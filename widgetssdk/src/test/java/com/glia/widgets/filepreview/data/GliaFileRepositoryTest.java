@@ -11,7 +11,10 @@ import android.graphics.Bitmap;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.AttachmentFile;
+import com.glia.androidsdk.secureconversations.SecureConversations;
+import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
@@ -32,6 +35,8 @@ public class GliaFileRepositoryTest {
     private DownloadsFolderDataSource downloadsFolderDataSource;
     private GliaCore gliaCore;
     private FileHelper fileHelper;
+    private GliaEngagementConfigRepository engagementConfigRepository;
+    private SecureConversations secureConversations;
 
     @Before
     public void setUp() {
@@ -39,11 +44,15 @@ public class GliaFileRepositoryTest {
         downloadsFolderDataSource = mock(DownloadsFolderDataSource.class);
         gliaCore = mock(GliaCore.class);
         fileHelper = mock(FileHelper.class);
+        engagementConfigRepository = mock(GliaEngagementConfigRepository.class);
+        secureConversations = mock(SecureConversations.class);
+        when(gliaCore.getSecureConversations()).thenReturn(secureConversations);
         gliaFileRepository = new GliaFileRepositoryImpl(
                 bitmapCache,
                 downloadsFolderDataSource,
                 gliaCore,
-                fileHelper
+                fileHelper,
+                engagementConfigRepository
         );
     }
 
@@ -62,33 +71,8 @@ public class GliaFileRepositoryTest {
     }
 
     @Test
-    public void loadImageFromCache_emitsCacheFileNotFoundException_whenNullArgument() {
-        when(bitmapCache.getBitmapById(any())).thenReturn(null);
-        Maybe<Bitmap> result = gliaFileRepository.loadImageFromCache(null);
-        result.test().assertError(CacheFileNotFoundException.class);
-    }
-
-    @Test
     public void putImageToCache_completesSuccessfully_whenValidArguments() {
         Completable result = gliaFileRepository.putImageToCache(FILENAME, BITMAP);
-        result.test().assertComplete();
-    }
-
-    @Test
-    public void putImageToCache_completesSuccessfully_whenFileNameArgumentNull() {
-        Completable result = gliaFileRepository.putImageToCache(null, BITMAP);
-        result.test().assertComplete();
-    }
-
-    @Test
-    public void putImageToCache_completesSuccessfully_whenBitmapArgumentNull() {
-        Completable result = gliaFileRepository.putImageToCache(FILENAME, null);
-        result.test().assertComplete();
-    }
-
-    @Test
-    public void putImageToCache_completesSuccessfully_whenArgumentsNull() {
-        Completable result = gliaFileRepository.putImageToCache(null, null);
         result.test().assertComplete();
     }
 
@@ -137,6 +121,46 @@ public class GliaFileRepositoryTest {
     }
 
     @Test
+    public void loadImageFileFromNetwork_emitsBitmap_whenValidArgumentsForSecureMessaging() {
+        when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
+        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
+                .thenReturn(MAYBE_BITMAP);
+        doAnswer(invocation -> {
+            RequestCallback<InputStream> callback = invocation.getArgument(1);
+            callback.onResult(INPUT_STREAM, null);
+            return null;
+        }).when(secureConversations).fetchFile(any(), any());
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertResult(BITMAP);
+    }
+
+    @Test
+    public void loadImageFileFromNetwork_emitsGliaException_whenGliaCoreReturnsExceptionForSecureMessaging() {
+        when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
+        doAnswer(invocation -> {
+            RequestCallback<InputStream> callback = invocation.getArgument(1);
+            callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
+            return null;
+        }).when(secureConversations).fetchFile(any(), any());
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertError(GLIA_EXCEPTION);
+    }
+
+    @Test
+    public void loadImageFileFromNetwork_emitsException_whenBitmapDecodingThrowsForSecureMessaging() {
+        when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
+        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
+                .thenReturn(MAYBE_EXCEPTION);
+        doAnswer(invocation -> {
+            RequestCallback<InputStream> callback = invocation.getArgument(1);
+            callback.onResult(INPUT_STREAM, null);
+            return null;
+        }).when(secureConversations).fetchFile(any(), any());
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertError(EXCEPTION.getClass());
+    }
+
+    @Test
     public void downloadFileFromNetwork_completesSuccessfully_whenValidArguments() {
         when(downloadsFolderDataSource.downloadFileToDownloads(any(), any(), any()))
                 .thenReturn(COMPLETABLE);
@@ -156,6 +180,32 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertError(GLIA_EXCEPTION.getClass());
+    }
+
+    @Test
+    public void downloadFileFromNetwork_completesSuccessfully_whenValidArgumentsForSecureMessaging() {
+        when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
+        when(downloadsFolderDataSource.downloadFileToDownloads(any(), any(), any()))
+                .thenReturn(COMPLETABLE);
+        doAnswer(invocation -> {
+            RequestCallback<InputStream> callback = invocation.getArgument(1);
+            callback.onResult(INPUT_STREAM, null);
+            return null;
+        }).when(secureConversations).fetchFile(any(), any());
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
+                .test().assertComplete();
+    }
+
+    @Test
+    public void downloadFileFromNetwork_emitsGliaException_whenGliaCoreReturnsExceptionForSecureMessaging() {
+        when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
+        doAnswer(invocation -> {
+            RequestCallback<InputStream> callback = invocation.getArgument(1);
+            callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
+            return null;
+        }).when(secureConversations).fetchFile(any(), any());
         gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
                 .test().assertError(GLIA_EXCEPTION.getClass());
     }

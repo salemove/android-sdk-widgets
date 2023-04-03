@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 
@@ -99,7 +100,7 @@ public class DownloadsFolderDataSource {
         });
     }
 
-    public Maybe<Bitmap> getImageFromDownloadsFolder(String imageName) {
+    public Maybe<Bitmap> getImageFromDownloadsFolder(@Nullable String imageName) {
         if (imageName == null) return Maybe.error(new NullPointerException("Image name cannot be null"));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

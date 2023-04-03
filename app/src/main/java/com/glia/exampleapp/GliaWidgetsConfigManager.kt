@@ -23,6 +23,7 @@ object GliaWidgetsConfigManager {
     private const val API_KEY_ID_KEY = "api_key_id"
     private const val QUEUE_ID_KEY = "queue_id"
     private const val VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id"
+    private const val REGION_KEY = "environment"
     private const val REGION_BETA = "beta"
     private const val REGION_ACCEPTANCE = "acceptance"
     @JvmStatic
@@ -37,12 +38,13 @@ object GliaWidgetsConfigManager {
         } else {
             throw RuntimeException("deep link must start with \"glia://widgets/secret\"")
         }
+        val region = data.getQueryParameter(REGION_KEY) ?: REGION_ACCEPTANCE
 
         // By this point all settings from deep link where saved to the shared prefs overriding the
         // defaults combining both together
         return createDefaultConfig(
             context = applicationContext,
-            region = REGION_ACCEPTANCE
+            region = region
         )
     }
 

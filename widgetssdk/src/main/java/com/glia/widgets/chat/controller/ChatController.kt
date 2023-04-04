@@ -1323,7 +1323,7 @@ internal class ChatController(
     }
 
     private fun loadChatHistory() {
-        val historyDisposable = loadHistoryUseCase.execute()
+        val historyDisposable = loadHistoryUseCase()
             .subscribe({ historyLoaded(it) }, { error(it) })
         disposable.add(historyDisposable)
     }
@@ -1331,12 +1331,16 @@ internal class ChatController(
     @Synchronized
     private fun historyLoaded(historyResponse: ChatHistoryResponse) {
         Logger.d(TAG, "historyLoaded")
-        val (messages, count) = historyResponse
+        val (messages, newMessagesDividerIndex) = historyResponse
         val currentItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         val newItems = removeDuplicates(currentItems, messages)
 
         when {
-            !newItems.isNullOrEmpty() -> submitHistoryItems(newItems, currentItems, count)
+            !newItems.isNullOrEmpty() -> submitHistoryItems(
+                newItems,
+                currentItems,
+                newMessagesDividerIndex
+            )
             !chatState.engagementRequested && !isSecureEngagement -> queueForEngagement()
             else -> Logger.d(TAG, "Opened empty Secure Conversations chat")
         }
@@ -1347,27 +1351,27 @@ internal class ChatController(
     private fun submitHistoryItems(
         newItems: List<ChatMessageInternal>,
         currentItems: MutableList<ChatItem>,
-        unreadMessagesCount: Int
+        newMessagesDividerIndex: Int
     ) {
         newItems.forEachIndexed { index, message ->
             appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
         }
 
         if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
-            emitChatTranscriptItems(currentItems, unreadMessagesCount)
+            emitChatTranscriptItems(currentItems, newMessagesDividerIndex)
         } else {
             emitChatItems { chatState.historyLoaded(currentItems) }
         }
 
     }
 
-    private fun emitChatTranscriptItems(items: List<ChatItem>, unreadMessagesCount: Int) {
-        if (unreadMessagesCount > 0) {
-            val index = items.count().minus(unreadMessagesCount).coerceAtLeast(0)
+    private fun emitChatTranscriptItems(
+        items: MutableList<ChatItem>, newMessagesDividerIndex: Int
+    ) {
+        if (newMessagesDividerIndex > -1) {
+            items.add(newMessagesDividerIndex, NewMessagesItem)
 
-            val newItems = items.toMutableList().apply { add(index, NewMessagesItem) }
-
-            emitChatItems { chatState.changeItems(newItems) }
+            emitChatItems { chatState.changeItems(items) }
             markMessagesReadWithDelay()
         } else {
             emitChatItems { chatState.changeItems(items) }

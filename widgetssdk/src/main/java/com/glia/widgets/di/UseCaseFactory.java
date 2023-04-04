@@ -11,6 +11,7 @@ import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
+import com.glia.widgets.chat.domain.FindNewMessagesDividerIndexUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
@@ -24,6 +25,8 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
+import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
@@ -39,28 +42,11 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
-import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
-import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
-import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
-import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
-import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
-import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
-import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
-import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
-import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
-import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
-import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -69,6 +55,8 @@ import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
@@ -82,10 +70,23 @@ import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChan
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
-import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
+import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
+import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsMessagingAvailableUseCase;
+import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase;
+import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase;
+import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase;
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase;
+import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase;
+import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase;
+import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
+import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
+import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
@@ -230,7 +231,8 @@ public class UseCaseFactory {
                 repositoryFactory.getSecureConversationsRepository(),
                 createIsSecureEngagementUseCase(),
                 getMapOperatorUseCase(),
-                createSubscribeToUnreadMessagesCountUseCase()
+                createSubscribeToUnreadMessagesCountUseCase(),
+                createFindNewMessagesDividerIndexUseCase()
         );
     }
 
@@ -696,6 +698,7 @@ public class UseCaseFactory {
         return new MarkMessagesReadWithDelayUseCase(repositoryFactory.getSecureConversationsRepository());
     }
 
+    @NonNull
     public GliaOnCallVisualizerUseCase createOnCallVisualizerUseCase() {
         return new GliaOnCallVisualizerUseCase(
                 repositoryFactory.getGliaEngagementRepository(),
@@ -706,6 +709,7 @@ public class UseCaseFactory {
         );
     }
 
+    @NonNull
     public GliaOnCallVisualizerEndUseCase createOnCallVisualizerEndUseCase() {
         return new GliaOnCallVisualizerEndUseCase(
                 repositoryFactory.getCallVisualizerRepository(),
@@ -716,5 +720,10 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaSurveyRepository(),
                 repositoryFactory.getGliaVisitorMediaRepository()
         );
+    }
+
+    @NonNull
+    public FindNewMessagesDividerIndexUseCase createFindNewMessagesDividerIndexUseCase() {
+        return new FindNewMessagesDividerIndexUseCase();
     }
 }

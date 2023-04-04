@@ -55,15 +55,15 @@ internal class ActivityWatcherForCallVisualizer(
      */
     var resumedActivity: WeakReference<Activity?> = WeakReference(null)
 
-    override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         if (controller.isCallOrChatActive(activity)) {
             // Call and Chat screens process screen sharing requests on their own
             controller.removeMediaProjectionLaunchers(activity::class.simpleName)
-            return
+        } else {
+            registerForMediaProjectionPermissionResult(activity)
+            registerForCameraPermissionResult(activity)
         }
-        registerForMediaProjectionPermissionResult(activity)
-        registerForCameraPermissionResult(activity)
-        super.onActivityPreCreated(activity, savedInstanceState)
+        super.onActivityCreated(activity, savedInstanceState)
     }
 
     override fun onActivityResumed(activity: Activity) {

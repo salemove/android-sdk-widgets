@@ -1,11 +1,14 @@
 package com.glia.widgets.messagecenter
 
 import com.glia.androidsdk.GliaException
+import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
+import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
@@ -14,6 +17,7 @@ import org.mockito.Mockito.verify
 import org.mockito.kotlin.*
 
 internal class MessageCenterControllerTest {
+    private lateinit var serviceChatHeadController: ServiceChatHeadController
     private lateinit var messageCenterController: MessageCenterController
     private lateinit var sendSecureMessageUseCase: SendSecureMessageUseCase
     private lateinit var isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase
@@ -32,6 +36,7 @@ internal class MessageCenterControllerTest {
 
     @Before
     fun setUp() {
+        serviceChatHeadController = mock()
         sendSecureMessageUseCase = mock()
         isMessageCenterAvailableUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
@@ -48,6 +53,7 @@ internal class MessageCenterControllerTest {
         dialogController = mock()
         messageCenterController =
             MessageCenterController(
+                serviceChatHeadController = serviceChatHeadController,
                 sendSecureMessageUseCase = sendSecureMessageUseCase,
                 isMessageCenterAvailableUseCase = isMessageCenterAvailableUseCase,
                 addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
@@ -62,6 +68,22 @@ internal class MessageCenterControllerTest {
                 resetMessageCenterUseCase = resetMessageCenterUseCase,
                 dialogController = dialogController
             )
+    }
+
+    @Test
+    fun setConfiguration_setBuildTimeTheme_onTrigger() {
+        val uiTheme = mock<UiTheme>()
+        messageCenterController.setConfiguration(uiTheme, mock())
+
+        verify(serviceChatHeadController, times(1)).setBuildTimeTheme(uiTheme)
+    }
+
+    @Test
+    fun setConfiguration_setSdkConfiguration_onTrigger() {
+        val configuration = mock<GliaSdkConfiguration>()
+        messageCenterController.setConfiguration(mock(), configuration)
+
+        verify(serviceChatHeadController, times(1)).setSdkConfiguration(configuration)
     }
 
     @Test

@@ -7,16 +7,20 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
+import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import io.reactivex.disposables.CompositeDisposable
 
 internal class MessageCenterController(
+    private var serviceChatHeadController: ServiceChatHeadController,
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
     private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase,
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,
@@ -38,6 +42,11 @@ internal class MessageCenterController(
     private var state = State()
 
     override var photoCaptureFileUri: Uri? = null
+
+    override fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?) {
+        serviceChatHeadController.setBuildTimeTheme(uiTheme)
+        serviceChatHeadController.setSdkConfiguration(configuration)
+    }
 
     override fun setView(view: MessageCenterContract.View) {
         this.view = view
@@ -105,6 +114,7 @@ internal class MessageCenterController(
     fun handleSendMessageResult(gliaException: GliaException?) {
         if (gliaException == null) {
             view?.showConfirmationScreen()
+            serviceChatHeadController?.init()
         } else {
             when (gliaException.cause) {
                 GliaException.Cause.AUTHENTICATION_ERROR -> {

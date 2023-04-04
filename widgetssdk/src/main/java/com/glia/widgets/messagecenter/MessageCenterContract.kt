@@ -1,14 +1,17 @@
 package com.glia.widgets.messagecenter
 
 import android.net.Uri
+import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
+import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 
 interface MessageCenterContract {
     interface Controller : BaseController {
         var photoCaptureFileUri: Uri?
+        fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?)
         fun setView(view: View)
         fun onCheckMessagesClicked()
         fun onMessageChanged(message: String)

@@ -205,6 +205,7 @@ public class ServiceChatHeadController
                 );
         engagementDisposables.add(operatorDisposable);
         gliaOnEngagementEndUseCase.execute(this::engagementEnded);
+        toggleChatHeadServiceUseCase.invoke(resumedViewName);
         updateChatHeadView();
     }
 

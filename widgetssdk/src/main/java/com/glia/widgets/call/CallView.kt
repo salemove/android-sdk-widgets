@@ -181,14 +181,14 @@ internal class CallView(
         serviceChatHeadController?.init()
     }
 
-    fun onDestroy(isFinishing: Boolean) {
+    fun onDestroy() {
         releaseOperatorVideoStream()
         dismissAlertDialog()
         onEndListener = null
         onBackClickedListener = null
         onNavigateToChatListener = null
         onNavigateToSurveyListener = null
-        destroyControllers(isFinishing)
+        destroyControllers()
     }
 
     fun onResume() {
@@ -210,10 +210,7 @@ internal class CallView(
         callController?.onPause()
     }
 
-    private fun destroyControllers(isFinishing: Boolean) {
-        if (serviceChatHeadController != null && isFinishing) {
-            serviceChatHeadController!!.onDestroy()
-        }
+    private fun destroyControllers() {
         callController?.setViewCallback(null)
         callController = null
         screenSharingController = null

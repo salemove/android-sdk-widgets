@@ -37,7 +37,7 @@ internal class CallVisualizerController(
     }
 
     private fun registerCallVisualizerListeners() {
-        onCallVisualizerUseCase.execute(this)    // newEngagementLoaded() callback
+        onCallVisualizerUseCase(this)    // newEngagementLoaded() callback
         onCallVisualizerEndUseCase.execute(this) // engagementEnded callback
     }
 

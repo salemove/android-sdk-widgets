@@ -115,7 +115,7 @@ public class CallActivity extends AppCompatActivity {
         }
         onBackClickedListener = null;
         onNavigateToChatListener = null;
-        callView.onDestroy(isFinishing());
+        callView.onDestroy();
         super.onDestroy();
     }
 

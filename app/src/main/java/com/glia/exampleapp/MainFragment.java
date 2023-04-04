@@ -2,7 +2,6 @@ package com.glia.exampleapp;
 
 import static com.glia.androidsdk.visitor.Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -35,25 +33,17 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
-import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity;
-import com.glia.widgets.callvisualizer.EndScreenSharingActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
 import com.glia.widgets.view.VisitorCodeView;
-import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class MainFragment extends Fragment {
 
-    @Nullable
-    private FrameLayout rootView;
 
     @Nullable
     private ConstraintLayout containerView;
-
-    @Nullable
-    private ChatHeadLayout chatHeadLayout;
 
     private Authentication authentication;
 
@@ -69,7 +59,6 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        this.rootView = view.findViewById(R.id.root_view);
         this.containerView = view.findViewById(R.id.constraint_layout);
         NavController navController = NavHostFragment.findNavController(this);
         setupAuthButtonsVisibility();
@@ -104,40 +93,6 @@ public class MainFragment extends Fragment {
 
         if (Glia.isInitialized() && authentication == null) {
             prepareAuthentication();
-        }
-
-        if (!Glia.isInitialized() || chatHeadLayout != null) return;
-
-        Context context = getContext();
-        if (context == null) return;
-
-        chatHeadLayout = new ChatHeadLayout(context);
-        chatHeadLayout.setLayoutParams(new ConstraintLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                )
-        );
-        chatHeadLayout.setNavigationCallback(
-                new ChatHeadLayout.NavigationCallback() {
-                    @Override
-                    public void onNavigateToEndScreenSharing() {
-                        navigateToEndScreenSharing();
-                    }
-
-                    @Override
-                    public void onNavigateToChat() {
-                        navigateToChat();
-                    }
-
-                    @Override
-                    public void onNavigateToCall() {
-                        navigateToCall(null);
-                    }
-                }
-        );
-
-        if (rootView != null) {
-            rootView.addView(chatHeadLayout);
         }
     }
 
@@ -190,12 +145,6 @@ public class MainFragment extends Fragment {
                 getContext(),
                 getContextAssetIdFromPrefs(sharedPreferences),
                 getQueueIdFromPrefs(sharedPreferences));
-        startActivity(intent);
-    }
-
-    private void navigateToEndScreenSharing() {
-        Intent intent = new Intent(requireContext(), EndScreenSharingActivity.class);
-        setNavigationIntentData(intent);
         startActivity(intent);
     }
 

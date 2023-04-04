@@ -285,14 +285,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         screenSharingController?.setViewCallback(screenSharingViewCallback)
         screenSharingController?.onResume(this.context)
         dialogController?.addCallback(dialogCallback)
-        serviceChatHeadController?.onResume(this)
     }
 
     fun onPause() {
         controller?.onPause()
         screenSharingController?.removeViewCallback(screenSharingViewCallback)
         dialogController?.removeCallback(dialogCallback)
-        serviceChatHeadController?.onPause(this)
     }
 
     /**
@@ -315,7 +313,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.chatRecyclerView.adapter = null
         binding.chatRecyclerView.removeOnScrollListener(onScrollListener)
         binding.addAttachmentQueue.adapter = null
-        if (isFinishing) serviceChatHeadController?.onDestroy()
         dialogController = null
     }
 

@@ -61,12 +61,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity);
         chatView = findViewById(R.id.chat_view);
-        ChatHeadLayout chatHeadLayout = findViewById(R.id.chat_head_layout);
-        chatHeadLayout.setIsChatView(true);
 
         chatView.setOnTitleUpdatedListener(this::setTitle);
         configuration = createConfiguration(getIntent());
-        chatHeadLayout.setConfiguration(configuration);
         chatView.setConfiguration(configuration);
         chatView.setUiTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);

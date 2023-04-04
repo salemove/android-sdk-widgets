@@ -100,7 +100,7 @@ public class ServiceChatHeadController
 
     @Override
     public void onDestroy() {
-        toggleChatHeadServiceUseCase.execute(null);
+        toggleChatHeadServiceUseCase.invoke(null);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class ServiceChatHeadController
         // see the comment on resumedViewName field declaration above
         if (!isResumedView(view)) return;
 
-        toggleChatHeadServiceUseCase.execute(view);
+        toggleChatHeadServiceUseCase.invoke(view.getClass().getSimpleName());
     }
 
     public void onPause(View view) {
@@ -124,7 +124,8 @@ public class ServiceChatHeadController
 
     @Override
     public void onApplicationStop() {
-        toggleChatHeadServiceUseCase.execute(null);
+        Logger.d(TAG, "onApplicationStop()");
+        toggleChatHeadServiceUseCase.invoke(null);
     }
 
     @Override
@@ -168,7 +169,7 @@ public class ServiceChatHeadController
 
     public void init() {
         gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
-        gliaOnCallVisualizerUseCase.execute(this::newEngagementLoaded);
+        gliaOnCallVisualizerUseCase.invoke(this::newEngagementLoaded);
         messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
         addVisitorMediaStateListenerUseCase.execute(this);
     }

@@ -14,6 +14,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -21,6 +22,7 @@ import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.children
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
@@ -395,3 +397,5 @@ internal fun Context.wrapWithMaterialThemeOverlay(
         defStyleRes
     )
 }
+
+internal fun ViewGroup.hasChildOfType(clazz: Class<*>) = children.any{ clazz.isInstance(it) }

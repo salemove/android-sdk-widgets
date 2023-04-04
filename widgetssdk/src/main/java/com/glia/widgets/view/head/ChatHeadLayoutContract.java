@@ -6,7 +6,7 @@ import com.glia.widgets.base.BaseView;
 public interface ChatHeadLayoutContract {
     interface Controller extends BaseController {
         void onChatHeadClicked();
-
+        void onResume(String viewName);
         void setView(View view);
     }
 
@@ -29,8 +29,6 @@ public interface ChatHeadLayoutContract {
         void navigateToCall();
 
         void navigateToEndScreenSharing();
-
-        boolean isInChatView();
 
         void show();
 

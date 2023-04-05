@@ -12,6 +12,7 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
@@ -138,6 +139,10 @@ class MessageCenterView(
         confirmationView.setOnCheckMessagesButtonClickListener {
             controller?.onCheckMessagesClicked()
         }
+    }
+
+    fun setConfiguration(configuration: GliaSdkConfiguration?) {
+        controller?.setConfiguration(theme, configuration)
     }
 
     private fun showUnAuthenticatedDialog() {

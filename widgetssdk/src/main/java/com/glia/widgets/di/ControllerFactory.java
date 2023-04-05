@@ -327,6 +327,7 @@ public class ControllerFactory {
 
     public MessageCenterContract.Controller getMessageCenterController(String queueId) {
         return new MessageCenterController(
+                serviceChatHeadController,
                 useCaseFactory.createSendSecureMessageUseCase(queueId),
                 useCaseFactory.createIsMessageCenterAvailableUseCase(queueId),
                 useCaseFactory.createAddSecureFileAttachmentsObserverUseCase(),

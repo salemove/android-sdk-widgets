@@ -69,6 +69,7 @@ class MessageCenterActivity : AppCompatActivity(),
         messageCenterView.onAttachFileListener = this
 
         messageCenterView.setController(controller)
+        messageCenterView.setConfiguration(configuration)
         onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 messageCenterView.onSystemBack()

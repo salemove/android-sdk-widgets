@@ -7,8 +7,6 @@ import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.media.AudioManager
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.util.AttributeSet
 import android.view.Gravity
@@ -83,7 +81,7 @@ internal class CallView(
         }
 
         override fun onScreenSharingRequestSuccess() {
-            Handler(Looper.getMainLooper()).post { appBar.showEndScreenSharingButton() }
+            post { appBar.showEndScreenSharingButton() }
         }
     }
 

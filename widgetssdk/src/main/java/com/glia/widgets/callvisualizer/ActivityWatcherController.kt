@@ -34,7 +34,6 @@ internal class ActivityWatcherController(
 
     @Mode
     private var currentDialogMode: Int = MODE_NONE
-    //private var permissionType: PermissionType? = null
 
     private lateinit var watcher: ActivityWatcherContract.Watcher
 
@@ -171,8 +170,8 @@ internal class ActivityWatcherController(
     @VisibleForTesting
     internal fun setupScreenSharingViewCallback() {
         screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-            override fun onScreenSharingRequestError(exception: GliaException?) {
-                exception?.run { watcher.showToast(exception.debugMessage) }
+            override fun onScreenSharingRequestError(ex: GliaException?) {
+                ex?.run { watcher.showToast(ex.debugMessage) }
             }
 
             override fun onScreenSharingStarted() {

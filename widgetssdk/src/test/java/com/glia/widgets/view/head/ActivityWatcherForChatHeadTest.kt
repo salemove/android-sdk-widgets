@@ -47,6 +47,9 @@ internal class ActivityWatcherForChatHeadTest {
         `onActivityResumed callbacks are set when call or chat are not active`()
         whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.screenSharingViewCallback?.onScreenSharingRequestSuccess()
+        verify(watcher).fetchGliaOrRootView()
+        verify(serviceChatHeadController).onResume(view)
+        verify(applicationChatHeadController, times(2)).onResume(any())
     }
 
     @Test

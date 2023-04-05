@@ -108,7 +108,7 @@ internal class ActivityWatcherForCallVisualizer(
         val activity = resumedActivity.get() ?: return
         val overlayIntent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-            Uri.parse("package:" + activity.packageName)
+            Uri.parse("package:${activity.packageName}")
         )
         overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         activity.startActivity(overlayIntent)

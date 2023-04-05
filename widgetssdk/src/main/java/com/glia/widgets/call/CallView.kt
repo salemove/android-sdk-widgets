@@ -85,10 +85,6 @@ internal class CallView(
         override fun onScreenSharingRequestSuccess() {
             Handler(Looper.getMainLooper()).post { appBar.showEndScreenSharingButton() }
         }
-
-        override fun onScreenSharingStarted() {
-            // no-op
-        }
     }
 
     private val binding: CallViewBinding by lazy {

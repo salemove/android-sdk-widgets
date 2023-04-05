@@ -99,10 +99,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         override fun onScreenSharingRequestSuccess() {
             Handler(Looper.getMainLooper()).post { binding.appBarView.showEndScreenSharingButton() }
         }
-
-        override fun onScreenSharingStarted() {
-            // no-op
-        }
     }
     private var screenSharingController: ScreenSharingController? = null
     private var serviceChatHeadController: ServiceChatHeadController? = null

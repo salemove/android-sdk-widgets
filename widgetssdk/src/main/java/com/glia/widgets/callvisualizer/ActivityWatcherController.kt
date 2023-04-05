@@ -175,11 +175,6 @@ internal class ActivityWatcherController(
                 exception?.run { watcher.showToast(exception.debugMessage) }
             }
 
-            override fun onScreenSharingRequestSuccess() {
-                // Should show screen sharing bubble
-                // Is handled by ActivityWatcherForChatHeadController
-            }
-
             override fun onScreenSharingStarted() {
                 if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
                     currentDialogMode = MODE_OVERLAY_PERMISSION

@@ -2,8 +2,9 @@ package com.glia.widgets.callvisualizer
 
 import android.Manifest
 import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -48,6 +49,7 @@ internal class ActivityWatcherForCallVisualizer(
     var alertDialog: AlertDialog? = null
     var dialogCallback: DialogController.Callback? = null
     var cameraPermissionLauncher: ActivityResultLauncher<String>? = null
+    var overlayPermissionLauncher: ActivityResultLauncher<String>? = null
 
     /**
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
@@ -62,6 +64,7 @@ internal class ActivityWatcherForCallVisualizer(
         } else {
             registerForMediaProjectionPermissionResult(activity)
             registerForCameraPermissionResult(activity)
+            registerForOverlayPermissionResult(activity)
         }
         super.onActivityCreated(activity, savedInstanceState)
     }
@@ -76,16 +79,15 @@ internal class ActivityWatcherForCallVisualizer(
         resumedActivity.clear()
     }
 
-
     override fun onActivityStarted(activity: Activity) {}
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
-    override fun checkCameraPermission() {
+    override fun checkInitialCameraPermission() {
         resumedActivity.get()?.run {
             controller.onInitialCameraPermissionResult(
-                ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED,
-                this is ComponentActivity
+                isGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED,
+                isComponentActivity = this is ComponentActivity
             )
         }
     }
@@ -95,12 +97,41 @@ internal class ActivityWatcherForCallVisualizer(
             cameraPermissionLauncher?.run { this.launch(Manifest.permission.CAMERA) }
         }
     }
-    @Suppress("RedundantNullableReturnType")
+
+    override fun requestOverlayPermission() {
+        if (resumedActivity.get() is ComponentActivity) {
+            overlayPermissionLauncher?.run { this.launch(Settings.ACTION_MANAGE_OVERLAY_PERMISSION) }
+        }
+    }
+
+    override fun openOverlayPermissionView() {
+        val activity = resumedActivity.get() ?: return
+        val overlayIntent = Intent(
+            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            Uri.parse("package:${activity.packageName}")
+        )
+        overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        activity.startActivity(overlayIntent)
+    }
+
     fun registerForCameraPermissionResult(activity: Activity) {
         (activity as? ComponentActivity?)?.let { componentActivity ->
             cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
                 isGranted: Boolean ->
                 controller.onRequestedCameraPermissionResult(isGranted)
+            }
+        }
+    }
+
+    override fun callOverlayDialog() {
+        dialogController.showOverlayPermissionsDialog()
+    }
+
+    fun registerForOverlayPermissionResult(activity: Activity) {
+        (activity as? ComponentActivity?)?.let { componentActivity ->
+            overlayPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
+                    isGranted: Boolean ->
+                controller.onMediaProjectionPermissionResult(isGranted, componentActivity)
             }
         }
     }
@@ -119,11 +150,11 @@ internal class ActivityWatcherForCallVisualizer(
             return
         }
 
-        val launcher: ActivityResultLauncher<Intent>? = componentActivity.registerForActivityResult(
+        val launcher: ActivityResultLauncher<Intent> = componentActivity.registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             Logger.d(TAG, "Acquire a media projection token: result received")
-            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            if (result.resultCode == RESULT_OK && result.data != null) {
                 Logger.d(
                     TAG,
                     "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK"
@@ -167,6 +198,11 @@ internal class ActivityWatcherForCallVisualizer(
     override fun dismissAlertDialog(manualDismiss: Boolean) {
         Logger.d(TAG, "Dismiss alert dialog")
         alertDialog?.dismiss()
+        alertDialog = null
+    }
+
+    override fun dismissOverlayDialog() {
+        dialogController.dismissOverlayPermissionsDialog()
         alertDialog = null
     }
 
@@ -232,24 +268,26 @@ internal class ActivityWatcherForCallVisualizer(
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
-        Logger.d(TAG, "Show overlay permissions dialog")
-        alertDialog = Dialogs.showOptionsDialog(
-            activity.wrapWithMaterialThemeOverlay(),
-            UiTheme.UiThemeBuilder().build(),
-            activity.getString(R.string.glia_dialog_overlay_permissions_title),
-            activity.getString(R.string.glia_dialog_overlay_permissions_message),
-            activity.getString(R.string.glia_dialog_overlay_permissions_ok),
-            activity.getString(R.string.glia_dialog_overlay_permissions_no),
-            {
-                controller.onPositiveDialogButtonClicked()
-            },
-            {
-                controller.onNegativeDialogButtonClicked()
-            },
-            {
-                controller.onNegativeDialogButtonClicked()
-            }
-        )
+        activity.runOnUiThread {
+            Logger.d(TAG, "Show overlay permissions dialog")
+            alertDialog = Dialogs.showOptionsDialog(
+                activity.wrapWithMaterialThemeOverlay(),
+                UiTheme.UiThemeBuilder().build(),
+                activity.getString(R.string.glia_dialog_overlay_permissions_title),
+                activity.getString(R.string.glia_dialog_overlay_permissions_message),
+                activity.getString(R.string.glia_dialog_overlay_permissions_ok),
+                activity.getString(R.string.glia_dialog_overlay_permissions_no),
+                {
+                    controller.onPositiveDialogButtonClicked()
+                },
+                {
+                    controller.onNegativeDialogButtonClicked()
+                },
+                {
+                    controller.onNegativeDialogButtonClicked()
+                }
+            )
+        }
     }
 
     override fun showScreenSharingDialog() {
@@ -274,16 +312,6 @@ internal class ActivityWatcherForCallVisualizer(
                 }
             ) { controller.onNegativeDialogButtonClicked() }
         }
-    }
-
-    override fun openOverlayPermissionView() {
-        val activity = resumedActivity.get() ?: return
-        val overlayIntent = Intent(
-            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-            Uri.parse("package:" + activity.packageName)
-        )
-        overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        activity.startActivity(overlayIntent)
     }
 
     override fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade) {

@@ -59,11 +59,7 @@ internal class ActivityWatcherForChatHeadController(
 
     private fun setupScreenSharingViewCallback() {
         screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-            override fun onScreenSharingRequestError(exception: GliaException?) {
-                // Is handled by com.glia.widgets.callvisualizer.ActivityWatcherController
-            }
-
-            override fun onScreenSharingStarted() {
+            override fun onScreenSharingRequestSuccess() {
                 showBubble()
             }
 
@@ -81,7 +77,6 @@ internal class ActivityWatcherForChatHeadController(
                     applicationChatHeadController.updateChatHeadView()
                 }
             }
-
         }
     }
 

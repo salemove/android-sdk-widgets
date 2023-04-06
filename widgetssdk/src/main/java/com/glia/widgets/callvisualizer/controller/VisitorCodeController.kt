@@ -21,7 +21,7 @@ class VisitorCodeController(
         dialogController.dismissVisitorCodeDialog()
     }
 
-    private val defaultRefreshDurationMilliseconds: Long = 3 * 60 * 1000L
+    private val defaultRefreshDurationMilliseconds: Long = 30 * 60 * 1000L
 
     private lateinit var view: VisitorCodeContract.View
 

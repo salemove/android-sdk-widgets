@@ -1,8 +1,10 @@
 package com.glia.widgets.callvisualizer
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import android.view.View
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.glia.androidsdk.comms.MediaUpgradeOffer
@@ -23,6 +25,7 @@ class ActivityWatcherContract {
         fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer)
         fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean = true)
         fun onRequestedCameraPermissionResult(isGranted: Boolean)
+        fun onMediaProjectionPermissionResult(isGranted: Boolean, context: Context)
     }
 
     interface Watcher {
@@ -40,8 +43,11 @@ class ActivityWatcherContract {
         fun setupDialogCallback()
         fun removeDialogCallback()
         fun requestCameraPermission()
+        fun requestOverlayPermission()
         fun openComponentActivity()
         fun destroySupportActivityIfExists()
-        fun checkCameraPermission()
+        fun checkInitialCameraPermission()
+        fun callOverlayDialog()
+        fun dismissOverlayDialog()
     }
 }

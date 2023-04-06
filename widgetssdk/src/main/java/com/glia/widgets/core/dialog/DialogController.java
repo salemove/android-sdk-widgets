@@ -115,6 +115,11 @@ public class DialogController {
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
     }
 
+    public void dismissOverlayPermissionsDialog() {
+        Logger.d(TAG, "Dismiss Visitor Code Dialog");
+        dialogManager.remove(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
+    }
+
     public void showStartScreenSharingDialog() {
         Logger.d(TAG, "Show Start Screen Sharing Dialog");
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_START_SCREEN_SHARING));

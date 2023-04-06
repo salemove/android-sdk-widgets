@@ -12,6 +12,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.Dialog.*
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import junit.framework.TestCase.assertTrue
@@ -30,7 +31,8 @@ internal class ActivityWatcherControllerTest {
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
     private val watcher = mock(ActivityWatcherContract.Watcher::class.java)
-    private val controller = ActivityWatcherController(callVisualizerController, screenSharingController)
+    private val isShowOverlayPermissionRequestDialogUseCase = mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
+    private val controller = ActivityWatcherController(callVisualizerController, screenSharingController, isShowOverlayPermissionRequestDialogUseCase)
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
     private val mediaUpgradeOffer = mock(MediaUpgradeOffer::class.java)
@@ -55,15 +57,12 @@ internal class ActivityWatcherControllerTest {
     }
 
     @Test
-    fun `onActivityResumed bubble is resumed and no camera permissions are called when onScreenSharingStarted with activity`() {
-        mockOnActivityResumeAndEnsureCallbacksSet(activity)
+    fun `onScreenSharingStarted calls for a overlay dialog when isShowOverlayPermissionRequestDialogUseCase returns true`() {
+        controller.setupScreenSharingViewCallback()
+        whenever(isShowOverlayPermissionRequestDialogUseCase.execute()).thenReturn(true)
         controller.screenSharingViewCallback?.onScreenSharingStarted()
-    }
-
-    @Test
-    fun `onActivityResumed bubble is resumed and camera permissions are called when onScreenSharingStarted with CallVisualizerSupportActivity`() {
-        mockOnActivityResumeAndEnsureCallbacksSet(activity)
-        controller.screenSharingViewCallback?.onScreenSharingStarted()
+        verify(isShowOverlayPermissionRequestDialogUseCase).execute()
+        verify(watcher).callOverlayDialog()
     }
 
     @Test
@@ -90,7 +89,17 @@ internal class ActivityWatcherControllerTest {
     }
 
     @Test
-    fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_NONE`() {
+    fun `onPositiveDialogButtonClicked dialog is dismissed and permission view is opened when MODE_OVERLAY_PERMISSION`() {
+        controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
+        resetMocks()
+        controller.onPositiveDialogButtonClicked()
+        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).dismissOverlayDialog()
+        verify(watcher).openOverlayPermissionView()
+    }
+
+    @Test
+    fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_OVERLAY_PERMISSION`() {
         controller.onDialogControllerCallback(DialogState(MODE_NONE))
         resetMocks()
         controller.onPositiveDialogButtonClicked()
@@ -143,6 +152,7 @@ internal class ActivityWatcherControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
         verify(watcher).showOverlayPermissionsDialog()
         controller.onPositiveDialogButtonClicked()
+        verify(watcher).dismissOverlayDialog()
         verify(watcher).dismissAlertDialog(true)
         verify(watcher).openOverlayPermissionView()
     }
@@ -153,6 +163,7 @@ internal class ActivityWatcherControllerTest {
         verify(watcher).showOverlayPermissionsDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).dismissAlertDialog(true)
+        verify(watcher).dismissOverlayDialog()
     }
 
     @Test
@@ -261,17 +272,16 @@ internal class ActivityWatcherControllerTest {
         val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.ONE_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
-        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
+        controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
         verify(mediaUpgradeOffer).accept(notNull())
     }
 
     @Test
-    fun `onInitialCameraPermissionResult accepts offer when permission is granted`() {
+    fun `onInitialCameraPermissionResult accepts offer when permission is granted and permissionType = CAMERA`() {
         val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
-        verify(mediaUpgradeOffer).accept(notNull())
     }
 
     @Test
@@ -312,6 +322,18 @@ internal class ActivityWatcherControllerTest {
         verify(mediaUpgradeOffer).decline(notNull())
     }
 
+    @Test
+    fun `onMediaProjectionPermissionResult accepts screen sharing when isGranted`() {
+        controller.onMediaProjectionPermissionResult(isGranted = true, context = activity)
+        verify(screenSharingController).onScreenSharingAccepted(activity)
+    }
+
+    @Test
+    fun `onMediaProjectionPermissionResult declines screen sharing when isGranted = false`() {
+        controller.onMediaProjectionPermissionResult(isGranted = false, context = activity)
+        verify(screenSharingController).onScreenSharingDeclined()
+    }
+
     private fun prepareMediaUpgradeApplicationState() {
         val offer = mock(MediaUpgradeOffer::class.java)
         val state = DialogState.MediaUpgrade(offer, "name", MODE_MEDIA_UPGRADE)
@@ -322,14 +344,16 @@ internal class ActivityWatcherControllerTest {
     private fun mockOnActivityResumeAndEnsureCallbacksSet(activity: Activity) {
         whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        controller.onInitialCameraPermissionResult(
+            isGranted = false,
+            isComponentActivity = true
+        )
         controller.onActivityResumed(activity)
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(screenSharingController).onResume(activity)
         verify(watcher).setupDialogCallback()
-        if (activity is CallVisualizerSupportActivity) {
-            verify(watcher).requestCameraPermission()
-        }
+        verify(watcher).requestCameraPermission()
         cleanup()
         resetMocks()
     }
@@ -356,6 +380,12 @@ internal class ActivityWatcherControllerTest {
 
     @After
     fun cleanup() {
-        verifyNoMoreInteractions(watcher, callVisualizerController, callVisualizerRepository, screenSharingController)
+        verifyNoMoreInteractions(
+            watcher,
+            callVisualizerController,
+            callVisualizerRepository,
+            screenSharingController,
+            isShowOverlayPermissionRequestDialogUseCase
+        )
     }
 }

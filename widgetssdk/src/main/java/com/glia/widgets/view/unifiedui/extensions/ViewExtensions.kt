@@ -295,13 +295,13 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     val states: MutableList<IntArray> = mutableListOf()
 
     val disabledState = intArrayOf(-android.R.attr.state_enabled)
-    val activatedState = intArrayOf(android.R.attr.state_activated)
+    val activatedState = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_activated)
     val enabledState = intArrayOf()
 
-    val oldBgTint = supportBackgroundTintList
+    val oldBgTint = supportBackgroundTintList ?: backgroundTintList
 
     val bgDisabledColor = barButtonStatesTheme.disabled?.background?.primaryColor
-        ?: oldBgTint.colorForStateOrNull(disabledState)
+        ?: oldBgTint.colorForState(disabledState)
 
     if (bgDisabledColor != null) {
         colors.add(bgDisabledColor)
@@ -309,7 +309,7 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     }
 
     val bgActivatedColor = barButtonStatesTheme.activated?.background?.primaryColor
-        ?: oldBgTint.colorForStateOrNull(activatedState)
+        ?: oldBgTint.colorForState(activatedState)
 
     if (bgActivatedColor != null) {
         colors.add(bgActivatedColor)
@@ -317,7 +317,7 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     }
 
     val bgEnabledColor = barButtonStatesTheme.enabled?.background?.primaryColor
-        ?: oldBgTint.colorForStateOrNull(enabledState)
+        ?: oldBgTint.colorForState(enabledState)
 
 //        Default value must be at the latest position
     if (bgEnabledColor != null) {
@@ -329,10 +329,10 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     states.clear()
     colors.clear()
 
-    val oldImageTintList = supportImageTintList
+    val oldImageTintList = supportImageTintList ?: imageTintList
 
     val disabledColor = barButtonStatesTheme.disabled?.imageColor?.primaryColor
-        ?: oldImageTintList.colorForStateOrNull(disabledState)
+        ?: oldImageTintList.colorForState(disabledState)
 
     if (disabledColor != null) {
         colors.add(disabledColor)
@@ -340,7 +340,7 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     }
 
     val activatedColor = barButtonStatesTheme.activated?.imageColor?.primaryColor
-        ?: oldImageTintList.colorForStateOrNull(activatedState)
+        ?: oldImageTintList.colorForState(activatedState)
 
     if (activatedColor != null) {
         colors.add(activatedColor)
@@ -348,7 +348,7 @@ internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme
     }
 
     val enabledColor = barButtonStatesTheme.enabled?.imageColor?.primaryColor
-        ?: oldImageTintList.colorForStateOrNull(enabledState)
+        ?: oldImageTintList.colorForState(enabledState)
 
     if (enabledColor != null) {
         colors.add(enabledColor)

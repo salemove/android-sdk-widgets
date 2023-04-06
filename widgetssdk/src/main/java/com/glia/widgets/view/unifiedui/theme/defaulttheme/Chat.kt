@@ -84,10 +84,10 @@ private fun ChatOperatorMessageTheme(
 private fun ChatVisitorMessageTheme(
     pallet: ColorPallet
 ): MessageBalloonTheme? = pallet.run {
-    composeIfAtLeastOneNotNull(primaryColorTheme, baseDarkColorTheme, baseNormalColorTheme) {
+    composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, baseNormalColorTheme) {
         MessageBalloonTheme(
             background = LayerTheme(fill = primaryColorTheme),
-            text = TextTheme(textColor = baseDarkColorTheme),
+            text = TextTheme(textColor = baseLightColorTheme),
             status = TextTheme(textColor = baseNormalColorTheme)
         )
     }

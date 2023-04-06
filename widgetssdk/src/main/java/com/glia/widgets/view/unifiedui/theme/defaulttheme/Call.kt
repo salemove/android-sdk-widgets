@@ -2,8 +2,11 @@
 
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
+import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
+import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
+import com.glia.widgets.view.unifiedui.theme.call.BarButtonStyleTheme
 import com.glia.widgets.view.unifiedui.theme.call.ButtonBarTheme
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 
@@ -18,7 +21,7 @@ internal fun CallTheme(pallet: ColorPallet) = pallet.run {
 
     CallTheme(
         bottomText = baseLightText,
-        buttonBar = ButtonBarTheme(badge = BadgeTheme(pallet)),
+        buttonBar = ButtonBarTheme(pallet),
         duration = baseLightText,
         header = header,
         operator = baseLightText,
@@ -35,3 +38,27 @@ private fun CallHeaderTheme(colorPallet: ColorPallet) = DefaultHeader(
     lightColor = colorPallet.baseLightColorTheme,
     negative = colorPallet.systemNegativeColorTheme
 )
+
+private fun ButtonBarTheme(pallet: ColorPallet) = ButtonBarTheme(
+    badge = BadgeTheme(pallet),
+    chatButton = CallButtonBarButtonTheme(pallet),
+    minimizeButton = CallButtonBarButtonTheme(pallet),
+    muteButton = CallButtonBarButtonTheme(pallet),
+    speakerButton = CallButtonBarButtonTheme(pallet),
+    videoButton = CallButtonBarButtonTheme(pallet)
+)
+
+private fun CallButtonBarButtonTheme(pallet: ColorPallet) = pallet.run {
+    composeIfAtLeastOneNotNull(baseLightColorTheme) {
+        val titleTextTheme = TextTheme(textColor = baseLightColorTheme)
+        BarButtonStatesTheme(
+            disabled = BarButtonStyleTheme(
+                imageColor = baseLightColorTheme?.withAlpha(20f),
+                title = titleTextTheme
+            ),
+            enabled = BarButtonStyleTheme(imageColor = baseLightColorTheme, title = titleTextTheme),
+            activated = BarButtonStyleTheme(imageColor = baseDarkColorTheme, title = titleTextTheme)
+        )
+
+    }
+}

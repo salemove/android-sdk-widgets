@@ -6,8 +6,8 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 
 @ColorInt
-fun ColorStateList?.colorForStateOrNull(state: IntArray?): Int? =
-    this?.getColorForState(state, 0)?.takeIf { it > 0 }
+fun ColorStateList?.colorForState(state: IntArray): Int? =
+    this?.getColorForState(state, defaultColor)
 
 fun Context.getDimenRes(@DimenRes dimenId: Int): Float {
     return this.resources.getDimension(dimenId)

@@ -14,12 +14,13 @@ internal class GliaLoadHistoryUseCase(
     private val secureConversationsRepository: SecureConversationsRepository,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
     private val mapOperatorUseCase: MapOperatorUseCase,
-    private val getUnreadMessagesCountUseCase: GetUnreadMessagesCountWithTimeoutUseCase
+    private val getUnreadMessagesCountUseCase: GetUnreadMessagesCountWithTimeoutUseCase,
+    private val findNewMessagesDividerIndexUseCase: FindNewMessagesDividerIndexUseCase
 ) {
 
     private val isSecureEngagement get() = isSecureEngagementUseCase()
 
-    fun execute(): Single<ChatHistoryResponse> = if (isSecureEngagement) {
+    operator fun invoke(): Single<ChatHistoryResponse> = if (isSecureEngagement) {
         loadHistoryWithNewMessagesCount()
     } else {
         loadHistoryAndMapOperator().map { ChatHistoryResponse(it) }
@@ -27,7 +28,12 @@ internal class GliaLoadHistoryUseCase(
 
     private fun loadHistoryWithNewMessagesCount() = Single.zip(
         loadHistoryAndMapOperator(), getUnreadMessagesCountUseCase()
-    ) { messages, count -> ChatHistoryResponse(messages, count) }
+    ) { messages, count ->
+        ChatHistoryResponse(
+            messages,
+            findNewMessagesDividerIndexUseCase(messages, count)
+        )
+    }
 
     private fun loadHistoryAndMapOperator() = loadHistory()
         .flatMapPublisher { Flowable.fromArray(*it) }

@@ -5,7 +5,6 @@ import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
-import com.glia.widgets.di.Dependencies;
 
 public class ResolveChatHeadNavigationUseCase {
     private final GliaEngagementRepository engagementRepository;
@@ -50,6 +49,6 @@ public class ResolveChatHeadNavigationUseCase {
     }
 
     private boolean isSharingScreen() {
-        return Dependencies.getUseCaseFactory().createIsCallVisualizerUseCase().invoke();
+        return isCallVisualizerUseCase.invoke();
     }
 }

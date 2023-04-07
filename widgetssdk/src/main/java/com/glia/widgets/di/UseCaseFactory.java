@@ -26,6 +26,7 @@ import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
@@ -598,6 +599,11 @@ public class UseCaseFactory {
     @NonNull
     public IsCallVisualizerUseCase createIsCallVisualizerUseCase() {
         return new IsCallVisualizerUseCase(repositoryFactory.getGliaEngagementRepository());
+    }
+
+    @NonNull
+    public IsCallVisualizerScreenSharingUseCase createIsCallVisualizerScreenSharingUseCase() {
+        return new IsCallVisualizerScreenSharingUseCase(repositoryFactory.getGliaEngagementTypeRepository());
     }
 
     @NonNull

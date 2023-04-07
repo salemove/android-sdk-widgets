@@ -6,7 +6,7 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
@@ -33,7 +33,7 @@ internal class ApplicationChatHeadLayoutController(
     private val addVisitorMediaStateListenerUseCase: AddVisitorMediaStateListenerUseCase,
     private val removeVisitorMediaStateListenerUseCase: RemoveVisitorMediaStateListenerUseCase,
     private val getOperatorFlowableUseCase: GetOperatorFlowableUseCase,
-    private val isCallVisualizerUseCase: IsCallVisualizerUseCase
+    private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
 ) : ChatHeadLayoutContract.Controller,
     VisitorMediaUpdatesListener,
     GliaOnEngagementUseCase.Listener,
@@ -159,7 +159,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun decideOnEngagementBubbleDesign(view: ChatHeadLayoutContract.View?) {
-        if (isCallVisualizerUseCase()) {
+        if (isCallVisualizerScreenSharingUseCase()) {
             view?.showScreenSharing()
         } else if (operatorProfileImgUrl != null) {
             view?.showOperatorImage(operatorProfileImgUrl)

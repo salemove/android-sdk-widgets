@@ -101,6 +101,7 @@ public class ServiceChatHeadController
     @Override
     public void onDestroy() {
         toggleChatHeadServiceUseCase.invoke(null);
+        removeVisitorMediaStateListenerUseCase.execute(this);
     }
 
     @Override

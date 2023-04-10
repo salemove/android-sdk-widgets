@@ -16,7 +16,6 @@ import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogU
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import junit.framework.TestCase.assertTrue
-import junit.framework.TestCase.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -229,16 +228,6 @@ internal class ActivityWatcherControllerTest {
     }
 
     @Test
-    fun `controller mediaUpgradeOffer throws uninitialized exception when property accessed`() {
-        try {
-            controller.mediaUpgradeOffer
-            fail()
-        } catch (e: Exception) {
-            assertTrue(e is UninitializedPropertyAccessException)
-        }
-    }
-
-    @Test
     fun `onMediaUpgradeAccept does not destroy support activity when error occurs`() {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
@@ -270,7 +259,7 @@ internal class ActivityWatcherControllerTest {
     @Test
     fun `onInitialCameraPermissionResult accepts offer when permission is not needed`() {
         val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.ONE_WAY)
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
+        controller.mediaUpgradeOffer = mediaUpgradeOffer
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
         verify(mediaUpgradeOffer).accept(notNull())

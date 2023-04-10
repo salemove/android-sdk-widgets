@@ -87,6 +87,7 @@ internal class ApplicationChatHeadLayoutController(
 
     override fun onHoldChanged(isOnHold: Boolean) {
         this.isOnHold = isOnHold
+        updateChatHeadView()
     }
 
     fun updateChatHeadView() {

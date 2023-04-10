@@ -30,7 +30,7 @@ internal class ActivityWatcherController(
     }
 
     @VisibleForTesting
-    internal lateinit var mediaUpgradeOffer: MediaUpgradeOffer
+    internal var mediaUpgradeOffer: MediaUpgradeOffer? = null
 
     @Mode
     private var currentDialogMode: Int = MODE_NONE
@@ -191,7 +191,7 @@ internal class ActivityWatcherController(
                 watcher.openComponentActivity()
             }
         } else {
-            mediaUpgradeOffer.accept { error ->
+            mediaUpgradeOffer?.accept { error ->
                 onMediaUpgradeAccept(error)
             }
         }
@@ -200,11 +200,11 @@ internal class ActivityWatcherController(
     override fun onRequestedCameraPermissionResult(isGranted: Boolean) {
         watcher.destroySupportActivityIfExists()
         if (isGranted) {
-            mediaUpgradeOffer.accept { error ->
+            mediaUpgradeOffer?.accept { error ->
                 onMediaUpgradeAccept(error)
             }
         } else {
-            mediaUpgradeOffer.decline { error ->
+            mediaUpgradeOffer?.decline { error ->
                 onMediaUpgradeDecline(error)
             }
         }
@@ -223,7 +223,7 @@ internal class ActivityWatcherController(
         error?.let {
             Logger.e(TAG, error.message, error)
         } ?: run {
-            if (mediaUpgradeOffer.video != null && mediaUpgradeOffer.video != MediaDirection.NONE) {
+            if (mediaUpgradeOffer?.video != null && mediaUpgradeOffer?.video != MediaDirection.NONE) {
                 onPositiveDialogButtonClicked()
             } else {
                 Logger.e(TAG, "Audio upgrade offer in call visualizer", Exception("Audio upgrade offer in call visualizer"))
@@ -243,6 +243,11 @@ internal class ActivityWatcherController(
 
     override fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer) {
         this.mediaUpgradeOffer = mediaUpgrade
-        watcher.checkInitialCameraPermission()
+        val isPermissionRequired = mediaUpgradeOffer?.video == MediaDirection.TWO_WAY
+        if (isPermissionRequired) {
+            watcher.checkInitialCameraPermission()
+        } else {
+            mediaUpgradeOffer?.accept { error -> onMediaUpgradeAccept(error) }
+        }
     }
 }

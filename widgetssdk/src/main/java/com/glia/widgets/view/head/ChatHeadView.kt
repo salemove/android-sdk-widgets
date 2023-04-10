@@ -20,7 +20,7 @@ import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
@@ -55,13 +55,14 @@ class ChatHeadView @JvmOverloads constructor(
         get() = Dependencies.getGliaThemeManager().theme?.run {
             if (isService) bubbleTheme else chatTheme?.bubble
         }
+    @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ServiceChatHeadController
-    private var isCallVisualizerUseCase: IsCallVisualizerUseCase
+    private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
     private var theme: UiTheme? = null
 
     init {
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
-        isCallVisualizerUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerUseCase()
+        isCallVisualizerScreenSharingUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerScreenSharingUseCase()
         setAccessibilityLabels()
         readTypedArray()
     }
@@ -243,7 +244,7 @@ class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun updatePlaceholderImageView() {
-        val placeholderIcon = if (isCallVisualizerUseCase()) {
+        val placeholderIcon = if (isCallVisualizerScreenSharingUseCase()) {
             R.drawable.ic_screensharing // TODO: 14.03.2023 MOB-1942 add this icon to UiTheme the same way as operatorPlaceholderIcon
         } else {
             configuration.operatorPlaceholderIcon

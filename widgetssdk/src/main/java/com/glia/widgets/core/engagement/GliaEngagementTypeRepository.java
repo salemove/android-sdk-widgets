@@ -43,4 +43,8 @@ public class GliaEngagementTypeRepository {
         return visitorMediaRepository.hasVisitorVideoMedia().blockingGet() ||
                 visitorMediaRepository.hasVisitorAudioMedia().blockingGet();
     }
+
+    public boolean isCallVisualizerScreenSharing() {
+        return engagementRepository.isCallVisualizerEngagement() && !hasAnyMedia();
+    }
 }

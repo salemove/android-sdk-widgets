@@ -269,7 +269,7 @@ public class ControllerFactory {
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     chatHeadPosition,
                     useCaseFactory.createGetOperatorFlowableUseCase(),
-                    useCaseFactory.createIsCallVisualizerUseCase()
+                    useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
             );
         }
         return serviceChatHeadController;
@@ -288,7 +288,7 @@ public class ControllerFactory {
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createGetOperatorFlowableUseCase(),
-                    useCaseFactory.createIsCallVisualizerUseCase()
+                    useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
             );
         }
         return applicationChatHeadController;

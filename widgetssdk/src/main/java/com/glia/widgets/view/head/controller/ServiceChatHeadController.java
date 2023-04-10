@@ -11,7 +11,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -45,7 +45,7 @@ public class ServiceChatHeadController
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final GetOperatorFlowableUseCase getOperatorFlowableUseCase;
-    private final IsCallVisualizerUseCase isCallVisualizerUseCase;
+    private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
     private final ChatHeadPosition chatHeadPosition;
 
 
@@ -82,7 +82,7 @@ public class ServiceChatHeadController
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
             ChatHeadPosition chatHeadPosition,
             GetOperatorFlowableUseCase getOperatorFlowableUseCase,
-            IsCallVisualizerUseCase isCallVisualizerUseCase
+            IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
         this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
         this.resolveChatHeadNavigationUseCase = resolveChatHeadNavigationUseCase;
@@ -95,7 +95,7 @@ public class ServiceChatHeadController
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
         this.getOperatorFlowableUseCase = getOperatorFlowableUseCase;
-        this.isCallVisualizerUseCase = isCallVisualizerUseCase;
+        this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
 
     @Override
@@ -248,7 +248,7 @@ public class ServiceChatHeadController
     }
 
     private void decideOnBubbleDesign() {
-        if (isCallVisualizerUseCase.invoke()) {
+        if (isCallVisualizerScreenSharingUseCase.invoke()) {
             chatHeadView.showScreenSharing();
         } else if (operatorProfileImgUrl != null) {
             chatHeadView.showOperatorImage(operatorProfileImgUrl);

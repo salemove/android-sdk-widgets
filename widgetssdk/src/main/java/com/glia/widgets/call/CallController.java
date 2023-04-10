@@ -26,6 +26,7 @@ import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent;
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor;
@@ -106,12 +107,14 @@ public class CallController implements
     private final UpdateFromCallScreenUseCase updateFromCallScreenUseCase;
     private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
     private final IsCallVisualizerUseCase isCallVisualizerUseCase;
+    private final IsOngoingEngagementUseCase isOngoingEngagementUseCase;
 
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
 
     private final String TAG = "CallController";
     private volatile CallState callState;
     private boolean isVisitorEndEngagement = false;
+    private boolean shouldHandleEndedEngagement = false;
 
     private final CompositeDisposable disposable = new CompositeDisposable();
 
@@ -147,7 +150,8 @@ public class CallController implements
             GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
             UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
             QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
-            IsCallVisualizerUseCase isCallVisualizerUseCase) {
+            IsCallVisualizerUseCase isCallVisualizerUseCase,
+            IsOngoingEngagementUseCase isOngoingEngagementUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
@@ -193,6 +197,7 @@ public class CallController implements
         this.updateFromCallScreenUseCase = updateFromCallScreenUseCase;
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
         this.isCallVisualizerUseCase = isCallVisualizerUseCase;
+        this.isOngoingEngagementUseCase = isOngoingEngagementUseCase;
 
         if (isCallVisualizerUseCase.invoke()) {
             shouldShowMediaEngagementView(true);
@@ -352,10 +357,25 @@ public class CallController implements
 
     public void onResume() {
         Logger.d(TAG, "onResume\n");
+        if (shouldHandleEndedEngagement) {
+            //Engagement has been started
+            if (!isOngoingEngagementUseCase.invoke()) {
+                // Engagement has ended
+                surveyUseCase.registerListener(this);
+            } else {
+                // Engagement is ongoing
+                onResumeSetup();
+            }
+        } else {
+            // New session
+            onResumeSetup();
+        }
+    }
+
+    private void onResumeSetup() {
         addVisitorMediaStateListenerUseCase.execute(this);
         showCallNotification();
         showLandscapeControls();
-
         surveyUseCase.registerListener(this);
         if (isCallVisualizerUseCase.invoke()) {
             subscribeToOmnibrowseEvents();
@@ -465,7 +485,8 @@ public class CallController implements
         if (viewCallback != null && survey != null) {
             viewCallback.navigateToSurvey(survey);
             Dependencies.getControllerFactory().destroyControllers();
-        } else if (!isVisitorEndEngagement) {
+        } else if (shouldHandleEndedEngagement && !isVisitorEndEngagement) {
+            shouldHandleEndedEngagement = false;
             dialogController.showEngagementEndedDialog();
         } else {
             Dependencies.getControllerFactory().destroyControllers();
@@ -762,6 +783,7 @@ public class CallController implements
                 onOperatorChanged(visitor.visit(engagementState));
                 break;
             case ENGAGEMENT_OPERATOR_CONNECTED:
+                shouldHandleEndedEngagement = true;
                 onOperatorConnected(visitor.visit(engagementState));
                 break;
             case ENGAGEMENT_TRANSFERRING:

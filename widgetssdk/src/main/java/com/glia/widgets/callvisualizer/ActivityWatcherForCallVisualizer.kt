@@ -35,8 +35,8 @@ import java.lang.ref.WeakReference
 
 internal class ActivityWatcherForCallVisualizer(
     private val dialogController: DialogController,
-    val controller: ActivityWatcherContract.Controller
-) : BaseActivityWatcher(), ActivityWatcherContract.Watcher {
+    val controller: ActivityWatcherForCallVisualizerContract.Controller
+) : BaseActivityWatcher(), ActivityWatcherForCallVisualizerContract.Watcher {
 
     companion object {
         private val TAG = ActivityWatcherForCallVisualizer::class.java.simpleName

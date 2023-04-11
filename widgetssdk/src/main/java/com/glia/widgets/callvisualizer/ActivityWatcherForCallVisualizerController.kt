@@ -19,14 +19,14 @@ import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 
-internal class ActivityWatcherController(
+internal class ActivityWatcherForCallVisualizerController(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
-) : ActivityWatcherContract.Controller {
+) : ActivityWatcherForCallVisualizerContract.Controller {
 
     companion object {
-        private val TAG = ActivityWatcherController::class.java.simpleName
+        private val TAG = ActivityWatcherForCallVisualizerController::class.java.simpleName
     }
 
     @VisibleForTesting
@@ -35,9 +35,9 @@ internal class ActivityWatcherController(
     @Mode
     private var currentDialogMode: Int = MODE_NONE
 
-    private lateinit var watcher: ActivityWatcherContract.Watcher
+    private lateinit var watcher: ActivityWatcherForCallVisualizerContract.Watcher
 
-    override fun setWatcher(watcher: ActivityWatcherContract.Watcher) {
+    override fun setWatcher(watcher: ActivityWatcherForCallVisualizerContract.Watcher) {
         this.watcher = watcher
     }
 

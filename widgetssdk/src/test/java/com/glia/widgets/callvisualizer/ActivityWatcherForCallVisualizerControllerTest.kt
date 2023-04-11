@@ -23,15 +23,15 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.*
 import java.util.function.Consumer
 
-internal class ActivityWatcherControllerTest {
+internal class ActivityWatcherForCallVisualizerControllerTest {
 
     private val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
     private val callVisualizerController = mock(CallVisualizerController::class.java)
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
-    private val watcher = mock(ActivityWatcherContract.Watcher::class.java)
+    private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
     private val isShowOverlayPermissionRequestDialogUseCase = mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
-    private val controller = ActivityWatcherController(callVisualizerController, screenSharingController, isShowOverlayPermissionRequestDialogUseCase)
+    private val controller = ActivityWatcherForCallVisualizerController(callVisualizerController, screenSharingController, isShowOverlayPermissionRequestDialogUseCase)
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
     private val mediaUpgradeOffer = mock(MediaUpgradeOffer::class.java)

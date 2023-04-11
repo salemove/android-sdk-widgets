@@ -2,8 +2,8 @@ package com.glia.widgets.di;
 
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
-import com.glia.widgets.callvisualizer.ActivityWatcherContract;
-import com.glia.widgets.callvisualizer.ActivityWatcherController;
+import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerContract;
+import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerController;
 import com.glia.widgets.callvisualizer.EndScreenSharingContract;
 import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.VisitorCodeContract;
@@ -13,7 +13,6 @@ import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
@@ -26,8 +25,6 @@ import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
-import com.glia.widgets.view.head.ActivityWatcherForChatHead;
-import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
@@ -53,7 +50,7 @@ public class ControllerFactory {
     private final ChatHeadPosition chatHeadPosition;
     private SurveyController surveyController;
     private CallVisualizerController callVisualizerController;
-    private ActivityWatcherController activityWatcherController;
+    private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private static ServiceChatHeadController serviceChatHeadController;
     private static ApplicationChatHeadLayoutController applicationChatHeadController;
@@ -356,14 +353,14 @@ public class ControllerFactory {
                 repositoryFactory.getGliaEngagementRepository());
     }
 
-    public ActivityWatcherContract.Controller getActivityWatcherController() {
-        if (activityWatcherController == null) {
-            activityWatcherController = new ActivityWatcherController(
+    public ActivityWatcherForCallVisualizerContract.Controller getActivityWatcherForCallVisualizerController() {
+        if (activityWatcherforCallVisualizerController == null) {
+            activityWatcherforCallVisualizerController = new ActivityWatcherForCallVisualizerController(
                     getCallVisualizerController(),
                     getScreenSharingController(),
                     useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase());
         }
-        return activityWatcherController;
+        return activityWatcherforCallVisualizerController;
     }
 
     public ActivityWatcherForChatHeadContract.Controller getActivityWatcherForChatHeadController() {

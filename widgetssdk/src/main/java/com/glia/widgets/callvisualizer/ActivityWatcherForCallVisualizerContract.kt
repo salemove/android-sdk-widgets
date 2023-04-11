@@ -1,16 +1,14 @@
 package com.glia.widgets.callvisualizer
 
-import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.model.DialogState
 
-class ActivityWatcherContract {
+class ActivityWatcherForCallVisualizerContract {
 
     interface Controller {
         fun onActivityPaused()

@@ -70,7 +70,7 @@ public class Dependencies {
         ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer =
                 new ActivityWatcherForCallVisualizer(
                         getControllerFactory().getDialogController(),
-                        getControllerFactory().getActivityWatcherController()
+                        getControllerFactory().getActivityWatcherForCallVisualizerController()
                 );
         application.registerActivityLifecycleCallbacks(activityWatcherForCallVisualizer);
 

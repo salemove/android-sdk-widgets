@@ -127,7 +127,6 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             gliaView = it.findViewById(R.id.call_view)
                 ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
-                        ?: it.findViewById<ChatView>(R.id.chat_view)
                         ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
         }
         return gliaView != null

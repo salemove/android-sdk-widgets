@@ -18,6 +18,7 @@ class SimpleStatefulWidgetAdapterTest {
     private val newTheme = mapOf(
         State.ENABLED to Theme(Color.BLACK),
         State.DISABLED to Theme(size = -10),
+        State.FOCUSED to null
     )
 
     data class Theme(val color: Int? = null, val size: Int? = null)
@@ -71,6 +72,9 @@ class SimpleStatefulWidgetAdapterTest {
 
         adapter.updateState(State.DISABLED)
         verify(callback).onNewTheme(defaultTheme[State.DISABLED]!!.copy(size = -10))
+
+        adapter.updateState(State.FOCUSED)
+        verify(callback).onNewTheme(defaultTheme[State.FOCUSED]!!)
     }
 
     @Test

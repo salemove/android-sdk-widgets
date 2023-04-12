@@ -12,7 +12,7 @@ internal interface StatefulWidgetAdapter<S : Enum<S>, T> {
 
     val callback: StatefulWidgetAdapterCallback<S, T>
 
-    fun updateStatefulTheme(newStatefulTheme: Map<out S, T>)
+    fun updateStatefulTheme(newStatefulTheme: Map<out S, T?>)
 
     fun updateState(state: S)
 }
@@ -68,7 +68,7 @@ internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
     }
 
 
-    override fun updateStatefulTheme(newStatefulTheme: Map<out S, T>) {
+    override fun updateStatefulTheme(newStatefulTheme: Map<out S, T?>) {
         statefulTheme = when {
             statefulTheme.isEmpty() -> newStatefulTheme
             statefulTheme == newStatefulTheme -> return
@@ -80,10 +80,10 @@ internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
         this.state = state
     }
 
-    private fun composeHybridTheme(newStatefulTheme: Map<out S, T>): Map<S, T?> =
+    private fun composeHybridTheme(newStatefulTheme: Map<out S, T?>): Map<S, T?> =
         states.associate { composeThemeForState(it, newStatefulTheme) }
 
-    private fun composeThemeForState(state: S, newStatefulTheme: Map<out S, T>): Pair<S, T?> =
+    private fun composeThemeForState(state: S, newStatefulTheme: Map<out S, T?>): Pair<S, T?> =
         state to statefulTheme[state].unsafeMerge(newStatefulTheme[state])
 
 }

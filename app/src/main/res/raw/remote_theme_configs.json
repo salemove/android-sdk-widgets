@@ -53,7 +53,7 @@
         "color": {
           "type": "fill",
           "value": [
-            "#FF0000"
+            "FF0000"
           ]
         },
         "offset": 0,
@@ -65,7 +65,7 @@
         "background": {
           "type": "fill",
           "value": [
-            "#FF0000"
+            "FF0000"
           ]
         },
         "font": {
@@ -107,7 +107,7 @@
         "color": {
           "type": "fill",
           "value": [
-            "#FF0000"
+            "FF0000"
           ]
         },
         "offset": 0,
@@ -119,7 +119,7 @@
         "background": {
           "type": "fill",
           "value": [
-            "#FF0000"
+            "FF0000"
           ]
         },
         "font": {
@@ -234,7 +234,7 @@
       "border": {
         "type": "fill",
         "value": [
-          "#FF0000"
+          "FF0000"
         ]
       },
       "borderWidth": 2,
@@ -2588,7 +2588,7 @@
             "background": {
               "type": "fill",
               "value": [
-                "#FF0000"
+                "FF0000"
               ]
             },
             "font": {
@@ -2642,7 +2642,7 @@
             "background": {
               "type": "fill",
               "value": [
-                "#FF0000"
+                "FF0000"
               ]
             },
             "font": {
@@ -2696,7 +2696,7 @@
             "background": {
               "type": "fill",
               "value": [
-                "#FF0000"
+                "FF0000"
               ]
             },
             "font": {
@@ -2723,7 +2723,7 @@
         "background": {
           "type": "fill",
           "value": [
-            "#8E8E93"
+            "8E8E93"
           ]
         },
         "font": {
@@ -2971,6 +2971,24 @@
             "#8E8E93"
           ]
         }
+      }
+    },
+    "newMessagesDividerColor": {
+      "type": "fill",
+      "value": [
+        "#f9d12b"
+      ]
+    },
+    "newMessagesDividerText": {
+      "font": {
+        "size": 16,
+        "style": "regular"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#FFFF00"
+        ]
       }
     }
   },
@@ -3891,7 +3909,7 @@
           "color": {
             "type": "fill",
             "value": [
-              "#FF0000"
+              "FF0000"
             ]
           },
           "offset": 0,
@@ -3903,7 +3921,7 @@
           "background": {
             "type": "fill",
             "value": [
-              "#FF0000"
+              "FF0000"
             ]
           },
           "font": {
@@ -3963,7 +3981,7 @@
           "color": {
             "type": "fill",
             "value": [
-              "#FF0000"
+              "FF0000"
             ]
           },
           "offset": 0,
@@ -3975,7 +3993,7 @@
           "background": {
             "type": "fill",
             "value": [
-              "#FF0000"
+              "FF0000"
             ]
           },
           "font": {
@@ -4070,6 +4088,806 @@
             "#000000"
           ]
         }
+      }
+    }
+  },
+  "secureConversationsConfirmationScreen": {
+    "header": {
+      "backButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      },
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "borderWidth": 2,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#f9d12b"
+          ]
+        },
+        "cornerRadius": 8
+      },
+      "closeButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      },
+      "endButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 0,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#3e95a6"
+          ]
+        }
+      },
+      "endScreenSharingButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "font": {
+          "size": 20,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      }
+    },
+    "background": {
+      "type": "fill",
+      "value": [
+        "#FFFFFF"
+      ]
+    },
+    "iconColor": {
+      "type": "fill",
+      "value": [
+        "#f9d12b"
+      ]
+    },
+    "title": {
+      "font": {
+        "style": "bold",
+        "size": 22
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
+        ]
+      }
+    },
+    "subtitle": {
+      "font": {
+        "style": "regular",
+        "size": 18
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
+        ]
+      }
+    },
+    "checkMessagesButton": {
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#f9d12b"
+          ]
+        }
+      },
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      }
+    }
+  },
+  "secureConversationsWelcomeScreen": {
+    "activityIndicatorColor": {
+      "type": "fill",
+      "value": [
+        "#f9d12b"
+      ]
+    },
+    "enabledSendButton": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#f9d12b"
+          ]
+        }
+      }
+    },
+    "messageWarningIconColor": {
+      "type": "fill",
+      "value": [
+        "#FB8074"
+      ]
+    },
+    "filePickerButtonDisabled": {
+      "type": "fill",
+      "value": [
+        "#f9d12b"
+      ]
+    },
+    "disabledSendButton": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#cfcaca"
+          ]
+        }
+      }
+    },
+    "welcomeSubtitle": {
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
+        ]
+      }
+    },
+    "titleImage": {
+      "type": "fill",
+      "value": [
+        "#f9d12b"
+      ]
+    },
+    "header": {
+      "backButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      },
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "borderWidth": 2,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#f9d12b"
+          ]
+        },
+        "cornerRadius": 8
+      },
+      "closeButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      },
+      "endButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 0,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#3e95a6"
+          ]
+        }
+      },
+      "endScreenSharingButton": {
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "cornerRadius": 8
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 5
+        },
+        "text": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "font": {
+          "size": 20,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      }
+    },
+    "messageWarning": {
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#FB8074"
+        ]
+      }
+    },
+    "messageInputNormal": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#3B3B40"
+          ]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#CFCACA"
+          ]
+        }
+      }
+    },
+    "messageInputActive": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#3B3B40"
+          ]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#F9D12B"
+          ]
+        }
+      }
+    },
+    "messageInputDisabled": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#4D4D53"
+          ]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#CFCACA"
+          ]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#4D4D53"
+          ]
+        }
+      }
+    },
+    "messageInputError": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#3B3B40"
+          ]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FB8074"
+          ]
+        }
+      }
+    },
+    "messageInputHint": {
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#CFCACA"
+        ]
+      }
+    },
+    "loadingSendButton": {
+      "text": {
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": [
+          "#f9d12b"
+        ]
+      }
+    },
+    "messageTitle": {
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
+        ]
+      }
+    },
+    "checkMessagesButton": {
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
+        ]
+      }
+    },
+    "filePickerButton": {
+      "type": "fill",
+      "value": [
+        "#f9d12b"
+      ]
+    },
+    "background": {
+      "type": "fill",
+      "value": [
+        "#FFFFFF"
+      ]
+    },
+    "welcomeTitle": {
+      "font": {
+        "style": "bold",
+        "size": 22
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#3B3B40"
+        ]
       }
     }
   }

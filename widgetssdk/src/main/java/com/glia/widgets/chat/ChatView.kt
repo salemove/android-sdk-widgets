@@ -162,7 +162,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private var binding by Delegates.notNull<ChatViewBinding>()
-    private val attachmentPopup by lazy { AttachmentPopup(binding.chatMessageLayout) }
+    private val attachmentPopup by lazy {
+        AttachmentPopup(
+            binding.chatMessageLayout,
+            Dependencies.getGliaThemeManager().theme?.chatTheme?.attachmentsPopup
+        )
+    }
 
     init {
         initConfigurations()

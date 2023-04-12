@@ -88,10 +88,10 @@ object GliaWidgetsConfigManager {
     @JvmOverloads
     fun createDefaultConfig(
         context: Context,
-        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
         uiJsonRemoteConfig: String? = null,
         runtimeConfig: UiTheme? = null,
-        region: String = REGION_BETA
+        region: String = REGION_BETA,
+        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     ): GliaWidgetsConfig {
         val apiKeyId = preferences.getString(
             context.getString(R.string.pref_api_key_id),

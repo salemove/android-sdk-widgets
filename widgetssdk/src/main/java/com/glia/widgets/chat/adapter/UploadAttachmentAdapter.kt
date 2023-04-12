@@ -81,7 +81,12 @@ class ViewHolder(
     private val context: Context get() = itemView.context
 
     private val theme: FileUploadBarTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.input?.fileUploadBar
+        Dependencies.getGliaThemeManager().theme?.run {
+            if (isMessageCenter)
+                secureConversationsWelcomeScreenTheme?.attachmentListTheme
+            else
+                chatTheme?.input?.fileUploadBar
+        }
     }
 
     private val filePreviewTheme: FilePreviewTheme? get() = theme?.filePreview

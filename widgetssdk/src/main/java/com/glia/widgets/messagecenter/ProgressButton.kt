@@ -1,6 +1,7 @@
 package com.glia.widgets.messagecenter
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.Button
 import android.widget.FrameLayout
@@ -34,9 +35,15 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         SimpleStatefulWidgetAdapter(State.ENABLED, adapterCallback)
     }
 
-    val binding: ProgressButtonBinding by lazy {
+    //Widgets + Binding
+    private val binding: ProgressButtonBinding by lazy {
         ProgressButtonBinding.inflate(layoutInflater, this)
     }
+
+    private val title get() = binding.titleBtn
+
+    private val progressBar get() = binding.progressBar
+    //End Widgets + Binding
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy {//btn bg
@@ -83,13 +90,11 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         applyLayerTheme(buttonTheme.background)
         buttonTheme.elevation?.also { elevation = it }
         buttonTheme.shadowColor?.also(::applyShadow)
-        binding.btnSendMessageText.applyTextTheme(buttonTheme.text)
+        title.applyTextTheme(buttonTheme.text)
     }
 
     internal fun updateProgressTheme(colorTheme: ColorTheme?) {
-        colorTheme?.primaryColor?.also {
-            binding.progressBar.setIndicatorColor(it)
-        }
+        progressBar.applyIndicatorColorTheme(colorTheme)
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -107,34 +112,34 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         statefulWidgetAdapter.updateState(state)
     }
 
-    internal fun updateStatefulTheme(theme: Map<State, ButtonTheme>) {
+    internal fun updateStatefulTheme(theme: Map<State, ButtonTheme?>) {
         statefulWidgetAdapter.updateStatefulTheme(theme)
     }
 
     private fun showIndicator(show: Boolean) {
         TransitionManager.beginDelayedTransition(this, MaterialFade())
-        binding.progressBar.isVisible = show
+        progressBar.isVisible = show
     }
 
     private fun applyDefaultTheme() {
         val defaultLayer = LayerTheme(
             fill = ColorTheme(gliaBrandPrimaryColor),
-            stroke = gliaBrandPrimaryColor,
-            borderWidth = context.getDimenRes(R.dimen.glia_px),
+            stroke = Color.TRANSPARENT,
+            borderWidth = 0f,
             cornerRadius = context.getDimenRes(R.dimen.glia_small)
         )
 
         val defaultText = TextTheme(
             textColor = ColorTheme(gliaBaseLightColor),
             backgroundColor = ColorTheme(),
-            textSize = binding.btnSendMessageText.textSize / resources.displayMetrics.scaledDensity,
-            textStyle = binding.btnSendMessageText.typeface.style
+            textSize = title.textSize / resources.displayMetrics.scaledDensity,
+            textStyle = title.typeface.style
         )
 
         val defaultTheme = ButtonTheme(
             text = defaultText,
             background = defaultLayer,
-            elevation = context.getDimenRes(R.dimen.glia_small)
+            elevation = context.getDimenRes(R.dimen.glia_px)
         )
 
         val disabledTheme = ButtonTheme(

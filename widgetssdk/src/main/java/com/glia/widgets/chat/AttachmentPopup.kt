@@ -8,13 +8,13 @@ import android.view.View
 import android.widget.PopupWindow
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentPopupBinding
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.extensions.setTintCompat
+import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 
-internal class AttachmentPopup(anchor: View) {
+internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopupTheme?) {
 
     private val margin by lazy { anchor.context.resources.getDimensionPixelSize(R.dimen.glia_chat_attachment_menu_margin) }
     private val binding: ChatAttachmentPopupBinding by lazy { bindLayout(anchor.context) }
@@ -64,8 +64,6 @@ internal class AttachmentPopup(anchor: View) {
                 context.resources.getDimension(R.dimen.glia_chat_attachment_menu_corner_radius)
             setColor(binding.root.getColorCompat(R.color.glia_attachment_menu_bg))
         }
-
-        val theme = Dependencies.getGliaThemeManager().theme?.chatTheme?.attachmentsPopup
 
         if (theme != null) {
             theme.background?.also {

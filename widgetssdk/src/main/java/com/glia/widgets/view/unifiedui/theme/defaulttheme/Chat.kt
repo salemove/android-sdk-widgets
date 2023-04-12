@@ -15,7 +15,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.*
 internal fun ChatTheme(pallet: ColorPallet): ChatTheme =
     ChatTheme(
         background = LayerTheme(fill = pallet.backgroundColorTheme),
-        header = ChatHeaderTheme(pallet),
+        header = PrimaryColorHeaderTheme(pallet),
         operatorMessage = ChatOperatorMessageTheme(pallet),
         visitorMessage = ChatVisitorMessageTheme(pallet),
         connect = ChatEngagementStatesTheme(pallet),
@@ -24,7 +24,7 @@ internal fun ChatTheme(pallet: ColorPallet): ChatTheme =
         audioUpgrade = MediaUpgradeTheme(pallet),
         videoUpgrade = MediaUpgradeTheme(pallet),
         bubble = BubbleTheme(pallet),
-        attachmentsPopup = ChatAttachmentsPopupTheme(pallet),
+        attachmentsPopup = DefaultAttachmentsPopupTheme(pallet),
         unreadIndicator = ChatUnreadIndicatorTheme(pallet),
         typingIndicator = pallet.primaryColorTheme,
         newMessagesDividerColorTheme = pallet.primaryColorTheme,
@@ -52,17 +52,6 @@ private fun MediaUpgradeTheme(pallet: ColorPallet) = pallet.run {
             )
         )
     }
-}
-
-/**
- * Default theme for Chat screen header
- */
-private fun ChatHeaderTheme(colorPallet: ColorPallet) = colorPallet.run {
-    DefaultHeader(
-        background = primaryColorTheme,
-        lightColor = baseLightColorTheme,
-        negative = systemNegativeColorTheme
-    )
 }
 
 /**
@@ -128,25 +117,6 @@ private fun ChatInputTheme(pallet: ColorPallet): InputTheme? {
         }
     }
 }
-
-/**
- * Default theme for Attachments popup
- */
-private fun ChatAttachmentsPopupTheme(pallet: ColorPallet): AttachmentsPopupTheme? =
-    pallet.run {
-        composeIfAtLeastOneNotNull(baseDarkColorTheme, baseShadeColorTheme) {
-            val attachmentItem = AttachmentItemTheme(
-                text = TextTheme(textColor = baseDarkColorTheme),
-                iconColor = baseDarkColorTheme
-            )
-            AttachmentsPopupTheme(
-                photoLibrary = attachmentItem,
-                takePhoto = attachmentItem,
-                browse = attachmentItem,
-                dividerColor = baseShadeColorTheme
-            )
-        }
-    }
 
 /**
  * Default theme for Unread messages indicator

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -46,6 +47,7 @@ public class MainFragment extends Fragment {
     private ConstraintLayout containerView;
 
     private Authentication authentication;
+    private SwitchCompat switchCompat;
 
     @Nullable
     @Override
@@ -83,8 +85,14 @@ public class MainFragment extends Fragment {
                 deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
                 clearSession());
-        view.findViewById(R.id.visitor_code_button).setOnClickListener(v ->
-                showVisitorCode());
+        view.findViewById(R.id.visitor_code_button).setOnClickListener(v -> {
+                if (((SwitchCompat) view.findViewById(R.id.visitor_code_switch)).isChecked()) {
+                    showVisitorCodeInADedicatedView();
+                } else {
+                    showVisitorCode();
+                }
+            }
+        );
     }
 
     @Override
@@ -110,11 +118,13 @@ public class MainFragment extends Fragment {
                 containerView.findViewById(R.id.authenticationButton).setVisibility(View.GONE);
                 containerView.findViewById(R.id.deauthenticationButton).setVisibility(View.GONE);
                 containerView.findViewById(R.id.visitor_code_button).setVisibility(View.GONE);
+                containerView.findViewById(R.id.visitor_code_switch_container).setVisibility(View.GONE);
             });
             return;
         }
         getActivity().runOnUiThread(() -> {
             containerView.findViewById(R.id.visitor_code_button).setVisibility(View.VISIBLE);
+            containerView.findViewById(R.id.visitor_code_switch_container).setVisibility(View.VISIBLE);
         });
         if (authentication == null) return;
 

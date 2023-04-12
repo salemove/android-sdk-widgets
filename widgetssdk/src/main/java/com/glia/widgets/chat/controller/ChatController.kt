@@ -804,7 +804,7 @@ internal class ChatController(
         currentChatItems: MutableList<ChatItem>,
         message: ChatMessage
     ) {
-        if (!message.content.isNullOrEmpty()) {
+        if (message.content.isNotEmpty()) {
             currentChatItems.add(VisitorMessageItem.asHistoryItem(message))
         }
     }
@@ -875,7 +875,7 @@ internal class ChatController(
     }
 
     private fun appendSentMessage(items: MutableList<ChatItem>, message: ChatMessage) {
-        if (!message.content.isNullOrEmpty()) {
+        if (message.content.isNotEmpty()) {
             items.add(VisitorMessageItem.asNewMessage(message))
         }
     }
@@ -1140,16 +1140,8 @@ internal class ChatController(
         currentChatItems.add(item)
     }
 
-    private fun getSingleChoiceAttachmentImgUrl(attachment: MessageAttachment): String? {
-        var imageUrl: String? = null
-        if (attachment is SingleChoiceAttachment) {
-            val optionalImageUrl = attachment.imageUrl
-            if (optionalImageUrl.isPresent) {
-                imageUrl = optionalImageUrl.get()
-            }
-        }
-        return imageUrl
-    }
+    private fun getSingleChoiceAttachmentImgUrl(attachment: MessageAttachment?): String? =
+        (attachment as? SingleChoiceAttachment)?.imageUrl?.orElse(null)
 
     private fun getSingleChoiceAttachmentOptions(attachment: MessageAttachment?): List<SingleChoiceOption>? {
         return (attachment as? SingleChoiceAttachment)?.options?.toList()

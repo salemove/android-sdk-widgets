@@ -1017,4 +1017,12 @@ internal class CallView(
     override fun minimizeView() {
         onMinimizeListener?.onMinimize()
     }
+
+    fun checkForPermissions(
+        applicationContext: Context,
+        mediaType: Engagement.MediaType,
+        missingPermissionsCallBack: CallActivity.MissingPermissionsCallBack
+    ) {
+        callController?.checkForPermissions(applicationContext, mediaType, missingPermissionsCallBack)
+    }
 }

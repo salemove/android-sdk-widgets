@@ -1,6 +1,11 @@
 package com.glia.widgets.call;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
@@ -55,6 +60,10 @@ import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -863,5 +872,23 @@ public class CallController implements
                                 error -> Logger.e(TAG, "Error happened while observing queue state : " + error.toString())
                         )
         );
+    }
+
+    public void checkForPermissions(@NotNull Context applicationContext, @NotNull Engagement.MediaType mediaType, @NotNull CallActivity.MissingPermissionsCallBack missingPermissionsCallBack) {
+        List<String> missingPermissions = new ArrayList<>();
+        if (mediaType == Engagement.MediaType.VIDEO && missingPermission(applicationContext, Manifest.permission.CAMERA)) {
+            missingPermissions.add(Manifest.permission.CAMERA);
+        }
+        if (!isCallVisualizerUseCase.invoke()) {
+            if ((mediaType == Engagement.MediaType.VIDEO || mediaType == Engagement.MediaType.AUDIO)
+                    && missingPermission(applicationContext, Manifest.permission.RECORD_AUDIO)) {
+                missingPermissions.add(Manifest.permission.RECORD_AUDIO);
+            }
+        }
+        missingPermissionsCallBack.onMissingPermissionsGathered(missingPermissions);
+    }
+
+    private boolean missingPermission(Context applicationContext, String permission) {
+        return ContextCompat.checkSelfPermission(applicationContext, permission) != PackageManager.PERMISSION_GRANTED;
     }
 }

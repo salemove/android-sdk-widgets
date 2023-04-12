@@ -1,6 +1,5 @@
 package com.glia.widgets.call;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
-import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
@@ -24,7 +22,6 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -140,16 +137,17 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void startCallWithPermissions() {
-        List<String> missingPermissions = new ArrayList<>();
         if (!configuration.getIsUpgradeToCall()) { // In upgrading to call, permissions handle on the Core SDK side.
-            if (configuration.getMediaType() == Engagement.MediaType.VIDEO && missingPermission(Manifest.permission.CAMERA)) {
-                missingPermissions.add(Manifest.permission.CAMERA);
-            }
-            if ((configuration.getMediaType() == Engagement.MediaType.VIDEO || configuration.getMediaType() == Engagement.MediaType.AUDIO)
-                    && missingPermission(Manifest.permission.RECORD_AUDIO)) {
-                missingPermissions.add(Manifest.permission.RECORD_AUDIO);
-            }
+            callView.checkForPermissions(
+                    getApplicationContext(),
+                    configuration.getMediaType(),
+                    this::handleMissingPermissions);
+        } else {
+            onCallPermissionsAvailable();
         }
+    }
+
+    private void handleMissingPermissions(List<String> missingPermissions) {
         if (missingPermissions.size() > 0) {
             permissionSubjectDisposable = permissionSubject
                     .filter(this::isPermissionDataMediaRequestCode)
@@ -177,8 +175,8 @@ public class CallActivity extends AppCompatActivity {
         }
     }
 
-    private boolean missingPermission(String permission) {
-        return ContextCompat.checkSelfPermission(getApplicationContext(), permission) != PackageManager.PERMISSION_GRANTED;
+    public interface MissingPermissionsCallBack {
+        void onMissingPermissionsGathered(List<String> missingPermissions);
     }
 
     private boolean isPermissionDataMediaRequestCode(Pair<Integer, Integer[]> permissionData) {

@@ -53,7 +53,7 @@ class VisitorCodeView internal constructor(
     private var progressBar: ProgressBar
     private var refreshButton: GliaPositiveButton
     private var closeButton: AppCompatImageButton
-    private var whiteLabelView: ImageView
+    private var logoView: ImageView
 
     init {
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
@@ -67,7 +67,7 @@ class VisitorCodeView internal constructor(
         refreshButton.setOnClickListener { controller.onLoadVisitorCode() }
         closeButton = findViewById(R.id.close_button)
         closeButton.setOnClickListener { controller.onCloseButtonClicked() }
-        whiteLabelView = findViewById(R.id.logo_view)
+        logoView = findViewById(R.id.logo_view)
         readTypedArray()
         applyRemoteThemeConfig(Dependencies.getGliaThemeManager().theme)
 
@@ -218,8 +218,8 @@ class VisitorCodeView internal constructor(
             textColor = baseLightColor,
             textFont = fontFamily
         )
-        whiteLabelView.apply {
-            isVisible = theme.whiteLabel ?: false
+        logoView.apply {
+            isVisible = theme.whiteLabel?.not() ?: true
             applyImageColorTheme(baseShadeColor)
         }
         progressBar.applyProgressColorTheme(brandPrimaryColor)

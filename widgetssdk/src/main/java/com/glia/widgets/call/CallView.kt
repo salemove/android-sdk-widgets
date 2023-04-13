@@ -888,11 +888,8 @@ internal class CallView(
             //No need to manage the remaining view's states if only time has changed
             if (callState.isOnlyTimeChanged) return@post
 
-            if (callState.isMediaEngagementStarted) {
-                appBar.showEndButton()
-            } else {
-                appBar.showXButton()
-            }
+            setupEndButton(callState)
+
             if (screenSharingController?.isSharingScreen == true) {
                 appBar.showEndScreenSharingButton()
             } else {
@@ -991,6 +988,16 @@ internal class CallView(
                 )
 
             applyTextThemeBasedOnCallState(callState)
+        }
+    }
+
+    private fun setupEndButton(callState: CallState) {
+        if (callState.isCallVisualizer) {
+            appBar.hideXAndEndButton()
+        } else if (callState.isMediaEngagementStarted) {
+            appBar.showEndButton()
+        } else {
+            appBar.showXButton()
         }
     }
 

@@ -1,16 +1,20 @@
 package com.glia.widgets.chat.model.history;
 
+import com.glia.widgets.chat.adapter.ChatAdapter;
+
 import java.util.Objects;
 
 public class ChatItem {
+    @ChatAdapter.Type
     private final int viewType;
     private final String id;
 
-    protected ChatItem(String id, int viewType) {
+    protected ChatItem(String id, @ChatAdapter.Type int viewType) {
         this.id = id;
         this.viewType = viewType;
     }
 
+    @ChatAdapter.Type
     public int getViewType() {
         return viewType;
     }

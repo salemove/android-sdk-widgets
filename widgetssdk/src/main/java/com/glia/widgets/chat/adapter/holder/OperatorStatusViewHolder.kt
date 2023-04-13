@@ -16,7 +16,7 @@ import com.glia.widgets.view.unifiedui.extensions.getFontCompat
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
 
-class OperatorStatusViewHolder(
+internal class OperatorStatusViewHolder(
     binding: ChatOperatorStatusLayoutBinding, uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val statusPictureView: OperatorStatusView by lazy { binding.statusPictureView }

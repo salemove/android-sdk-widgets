@@ -1,7 +1,6 @@
 package com.glia.widgets.chat.adapter.holder
 
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -20,7 +19,7 @@ import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
-class OperatorMessageViewHolder(
+internal class OperatorMessageViewHolder(
     private val binding: ChatOperatorMessageLayoutBinding, private val uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
@@ -29,7 +28,7 @@ class OperatorMessageViewHolder(
 
     private val messageContentView: TextView by lazy {
         ChatReceiveMessageContentBinding.inflate(
-            LayoutInflater.from(itemView.context), binding.contentLayout, false
+            itemView.layoutInflater, binding.contentLayout, false
         ).root.apply {
             uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
                 backgroundTintList = it

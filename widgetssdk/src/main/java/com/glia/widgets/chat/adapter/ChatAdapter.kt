@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.IntDef
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
@@ -19,6 +19,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 
 class ChatAdapter(
     private val uiTheme: UiTheme,
@@ -33,8 +34,10 @@ class ChatAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val differ = AsyncListDiffer(this, ChatAdapterDillCallback())
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
+    override fun onCreateViewHolder(
+        parent: ViewGroup, @Type viewType: Int
+    ): RecyclerView.ViewHolder {
+        val inflater = parent.layoutInflater
         return when (viewType) {
             OPERATOR_STATUS_VIEW_TYPE -> {
                 OperatorStatusViewHolder(
@@ -99,6 +102,13 @@ class ChatAdapter(
                     uiTheme
                 )
             }
+            SYSTEM_MESSAGE_TYPE -> SystemMessageViewHolder(
+                ChatReceiveMessageContentBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                ), uiTheme
+            )
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {
@@ -169,6 +179,7 @@ class ChatAdapter(
                     }
                 }
             }
+            is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is CustomCardItem -> {
                 (holder as CustomCardViewHolder).bind(chatItem.message) { text: String?, value: String? ->
                     onCustomCardResponse.onCustomCardResponse(chatItem.getId(), text, value)
@@ -220,6 +231,23 @@ class ChatAdapter(
         const val VISITOR_FILE_VIEW_TYPE = 6
         const val VISITOR_IMAGE_VIEW_TYPE = 7
         const val NEW_MESSAGES_DIVIDER_TYPE = 8
-        const val CUSTOM_CARD_TYPE = 9 // Should be the last type with the highest value
+        const val SYSTEM_MESSAGE_TYPE = 9
+        const val CUSTOM_CARD_TYPE = 10 // Should be the last type with the highest value
     }
+
+    @IntDef(
+        OPERATOR_STATUS_VIEW_TYPE,
+        VISITOR_MESSAGE_TYPE,
+        OPERATOR_MESSAGE_VIEW_TYPE,
+        MEDIA_UPGRADE_ITEM_TYPE,
+        OPERATOR_FILE_VIEW_TYPE,
+        OPERATOR_IMAGE_VIEW_TYPE,
+        VISITOR_FILE_VIEW_TYPE,
+        VISITOR_IMAGE_VIEW_TYPE,
+        NEW_MESSAGES_DIVIDER_TYPE,
+        SYSTEM_MESSAGE_TYPE,
+        CUSTOM_CARD_TYPE
+    )
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class Type
 }

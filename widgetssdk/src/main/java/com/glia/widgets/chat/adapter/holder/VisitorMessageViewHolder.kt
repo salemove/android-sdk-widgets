@@ -10,7 +10,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
-class VisitorMessageViewHolder(
+internal class VisitorMessageViewHolder(
     private val binding: ChatVisitorMessageLayoutBinding, uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
 

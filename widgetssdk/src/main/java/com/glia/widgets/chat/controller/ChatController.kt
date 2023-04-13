@@ -821,11 +821,18 @@ internal class ChatController(
         isLastItem: Boolean
     ) {
         val message = chatMessageInternal.chatMessage
-        if (message.senderType == Chat.Participant.VISITOR) {
-            appendHistoryMessage(currentChatItems, message)
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message)
-        } else if (message.senderType == Chat.Participant.OPERATOR) {
-            appendOperatorMessage(currentChatItems, chatMessageInternal, isLastItem)
+        when (message.senderType) {
+            Chat.Participant.VISITOR -> {
+                appendHistoryMessage(currentChatItems, message)
+                addVisitorAttachmentItemsToChatItems(currentChatItems, message)
+            }
+            Chat.Participant.OPERATOR -> {
+                appendOperatorMessage(currentChatItems, chatMessageInternal, isLastItem)
+            }
+            Chat.Participant.SYSTEM -> {
+                appendSystemMessage(currentChatItems, chatMessageInternal)
+            }
+            Chat.Participant.UNKNOWN -> Logger.d(TAG, "Unknown type `chat item` received: $message")
         }
     }
 
@@ -843,19 +850,32 @@ internal class ChatController(
         messageInternal: ChatMessageInternal
     ) {
         val message = messageInternal.chatMessage
-        if (message.senderType == Chat.Participant.VISITOR) {
-            appendSentMessage(currentChatItems, message)
-            addVisitorAttachmentItemsToChatItems(currentChatItems, message)
-        } else if (message.senderType == Chat.Participant.OPERATOR) {
-            onOperatorMessageReceived(currentChatItems, messageInternal)
+        when (message.senderType) {
+            Chat.Participant.VISITOR -> {
+                appendSentMessage(currentChatItems, message)
+                addVisitorAttachmentItemsToChatItems(currentChatItems, message)
+            }
+            Chat.Participant.OPERATOR -> {
+                onOperatorMessageReceived(currentChatItems, messageInternal)
+            }
+            Chat.Participant.SYSTEM -> {
+                onSystemMessageReceived(currentChatItems, messageInternal)
+            }
+            Chat.Participant.UNKNOWN -> Logger.d(TAG, "Unknown type `chat item` received: $message")
         }
     }
 
     private fun onOperatorMessageReceived(
-        currentChatItems: MutableList<ChatItem>,
-        messageInternal: ChatMessageInternal
+        currentChatItems: MutableList<ChatItem>, messageInternal: ChatMessageInternal
     ) {
         appendOperatorMessage(currentChatItems, messageInternal, true)
+        appendMessagesNotSeen()
+    }
+
+    private fun onSystemMessageReceived(
+        currentChatItems: MutableList<ChatItem>, messageInternal: ChatMessageInternal
+    ) {
+        appendSystemMessage(currentChatItems, messageInternal)
         appendMessagesNotSeen()
     }
 
@@ -967,6 +987,14 @@ internal class ChatController(
         delivered: Boolean
     ) {
         currentChatItems[i] = VisitorAttachmentItem.editDeliveredStatus(item, delivered)
+    }
+
+    private fun appendSystemMessage(
+        currentChatItems: MutableList<ChatItem>, chatMessageInternal: ChatMessageInternal
+    ) {
+        chatMessageInternal.chatMessage.apply {
+            currentChatItems += SystemChatItem(id, timestamp, content)
+        }
     }
 
     private fun appendOperatorMessage(

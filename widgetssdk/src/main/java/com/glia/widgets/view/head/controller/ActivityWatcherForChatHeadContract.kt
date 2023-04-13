@@ -9,6 +9,8 @@ internal class ActivityWatcherForChatHeadContract {
         fun onActivityPaused()
         fun onActivityResumed()
         fun shouldShowBubble(gliaOrRootView: String?): Boolean
+        fun isFromCallScreen(): Boolean
+        fun resetFromCallScreen()
     }
 
     interface Watcher {

@@ -3,6 +3,8 @@ package com.glia.widgets.view.head
 import android.app.Activity
 import android.view.View
 import android.view.Window
+import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
@@ -22,11 +24,15 @@ internal class ActivityWatcherForChatHeadTest {
     private val applicationChatHeadController = Mockito.mock(ApplicationChatHeadLayoutController::class.java)
     private val screenSharingController = Mockito.mock(ScreenSharingController::class.java)
     private val onEngagementUseCase = Mockito.mock(GliaOnEngagementUseCase::class.java)
+    private val isFromCallScreenUseCase = Mockito.mock(IsFromCallScreenUseCase::class.java)
+    private val updateFromCallScreenUseCase = Mockito.mock(UpdateFromCallScreenUseCase::class.java)
     private val controller = ActivityWatcherForChatHeadController(
         serviceChatHeadController,
         applicationChatHeadController,
         screenSharingController,
         onEngagementUseCase,
+        isFromCallScreenUseCase,
+        updateFromCallScreenUseCase
     )
     private val activity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)

@@ -75,6 +75,11 @@ internal class ActivityWatcherForChatHead(
 
                 override fun onNavigateToCall() {
                     navigateToCall(resumedActivity.get())
+                    if (controller.isFromCallScreen()) {
+                        // Finish ChatActivity if bubble is tapped from ChatActivity
+                        controller.resetFromCallScreen()
+                        resumedActivity.get()?.finish()
+                    }
                 }
             }
         )

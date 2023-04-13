@@ -120,6 +120,7 @@ internal class ChatController(
     private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
+    private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
     private var timerStatusListener: FormattedTimerStatusListener? = null
@@ -283,6 +284,7 @@ internal class ChatController(
         // viewCallback is accessed from multiple threads
         // and must be protected from race condition
         synchronized(this) { viewCallback = null }
+        backClickedListener = null
         if (!retain) {
             disposable.dispose()
             mediaUpgradeOfferRepository.stopAll()
@@ -443,16 +445,17 @@ internal class ChatController(
         if (isQueueingOrOngoingEngagement) {
             emitViewState { chatState.changeVisibility(false) }
             messagesNotSeenHandler.chatOnBackClicked()
-        } else {
-            Dependencies.getControllerFactory().destroyControllers()
         }
+
+        navigateBack()
     }
 
-    fun onBackArrowClicked(onBackClickedListener: ChatView.OnBackClickedListener?) {
+    private fun navigateBack() {
         if (isFromCallScreenUseCase.isFromCallScreen) {
             viewCallback?.backToCall()
         } else {
-            onBackClickedListener?.onBackClicked()
+            backClickedListener?.onBackClicked()
+            Dependencies.getControllerFactory().destroyControllers()
         }
         updateFromCallScreenUseCase.updateFromCallScreen(false)
     }
@@ -515,6 +518,11 @@ internal class ChatController(
         viewCallback?.scrollToBottomImmediate()
 
         chatState.pendingNavigationType?.also { viewCallback?.navigateToCall(it) }
+    }
+
+
+    fun setOnBackClickedListener(finishCallback: ChatView.OnBackClickedListener?) {
+        this.backClickedListener = finishCallback
     }
 
     fun onResume() {
@@ -626,11 +634,6 @@ internal class ChatController(
         Logger.d(TAG, "closeUpgradeDialogClicked")
         mediaUpgradeOfferRepository.declineOffer(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()
-    }
-
-    fun navigateToCallSuccess() {
-        Logger.d(TAG, "navigateToCallSuccess")
-        emitViewState { chatState.setPendingNavigationType(null) }
     }
 
     @Synchronized

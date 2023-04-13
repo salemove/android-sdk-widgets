@@ -18,24 +18,9 @@ import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
-import com.glia.widgets.view.head.ChatHeadLayout;
 
 public class ChatActivity extends AppCompatActivity {
     private ChatView chatView;
-    private ChatView.OnBackClickedListener onBackClickedListener = () -> {
-        if (chatView.backPressed()) finish();
-    };
-
-    private ChatView.OnNavigateToCallListener onNavigateToCallListener =
-            (UiTheme theme, String mediaType) -> {
-                navigateToCall(mediaType);
-                chatView.navigateToCallSuccess();
-            };
-    private ChatView.OnNavigateToSurveyListener onNavigateToSurveyListener =
-            (UiTheme theme, Survey survey) -> {
-                navigateToSurvey(theme, survey);
-                finish();
-            };
 
     private GliaSdkConfiguration configuration;
 
@@ -72,8 +57,8 @@ public class ChatActivity extends AppCompatActivity {
 
         chatView.setConfiguration(configuration);
         chatView.setUiTheme(configuration.getRunTimeTheme());
-        chatView.setOnBackClickedListener(onBackClickedListener);
-        chatView.setOnBackToCallListener(this::backToCall);
+        chatView.setOnBackClickedListener(this::finish);
+        chatView.setOnBackToCallListener(this::backToCallScreen);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
         // to avoid app users to accidentally start queueing for another call when they resume
@@ -81,8 +66,8 @@ public class ChatActivity extends AppCompatActivity {
         chatView.setOnEndListener(this::finishAndRemoveTask);
 
         chatView.setOnMinimizeListener(this::finish);
-        chatView.setOnNavigateToCallListener(onNavigateToCallListener);
-        chatView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
+        chatView.setOnNavigateToCallListener(this::startCallScreen);
+        chatView.setOnNavigateToSurveyListener(this::navigateToSurvey);
         chatView.startChat(
                 configuration.getCompanyName(),
                 configuration.getQueueId(),
@@ -107,16 +92,13 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        onBackClickedListener = null;
-        onNavigateToCallListener = null;
-        onNavigateToSurveyListener = null;
         chatView.onDestroyView(isFinishing());
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-        if (chatView.backPressed()) super.onBackPressed();
+        chatView.onBackPressed();
     }
 
     @Override
@@ -139,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
                 .build();
     }
 
-    private void navigateToCall(String mediaType) {
+    private void startCallScreen(UiTheme theme, String mediaType) {
         startActivity(
                 CallActivity.getIntent(
                         getApplicationContext(),
@@ -148,12 +130,12 @@ public class ChatActivity extends AppCompatActivity {
                                 .build()
                 )
         );
+        finish();
     }
 
-    private void backToCall() {
+    private void backToCallScreen() {
         startActivity(CallActivity.getIntent(getApplicationContext(), getConfigurationBuilder().build()));
-
-        chatView.navigateToCallSuccess();
+        finish();
     }
 
     private Configuration.Builder getConfigurationBuilder() {
@@ -165,5 +147,6 @@ public class ChatActivity extends AppCompatActivity {
         newIntent.putExtra(GliaWidgets.UI_THEME, theme);
         newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
+        finish();
     }
 }

@@ -3,6 +3,7 @@
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
+import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.*
 
 
@@ -25,4 +26,17 @@ internal fun DefaultHeader(
             background = LayerTheme(fill = negative)
         )
     )
+}
+
+/**
+ * Default theme for Chat screen header
+ */
+internal fun PrimaryColorHeaderTheme(colorPallet: ColorPallet) = colorPallet.run {
+    composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, systemNegativeColorTheme) {
+        DefaultHeader(
+            background = primaryColorTheme,
+            lightColor = baseLightColorTheme,
+            negative = systemNegativeColorTheme
+        )
+    }
 }

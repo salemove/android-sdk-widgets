@@ -18,11 +18,14 @@ import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
+import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
 import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
@@ -39,6 +42,9 @@ class MessageCenterView(
 ), MessageCenterContract.View {
 
     private var theme: UiTheme by Delegates.notNull()
+    private val unifiedTheme: SecureConversationsWelcomeScreenTheme? by lazy {
+        Dependencies.getGliaThemeManager().theme?.secureConversationsWelcomeScreenTheme
+    }
 
     interface OnFinishListener {
         fun finish()
@@ -86,12 +92,21 @@ class MessageCenterView(
 
     init {
         orientation = VERTICAL
+        initConfigurations()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
+        setupUnifiedTheme()
+    }
+
+    private fun setupUnifiedTheme() {
+        unifiedTheme?.headerTheme?.background?.fill?.primaryColor?.also {
+            statusBarColor = it
+        }
+        appBar.applyHeaderTheme(unifiedTheme?.headerTheme)
+        applyColorTheme(unifiedTheme?.backgroundTheme)
     }
 
     override fun setupViewAppearance() {
         initCallbacks()
-        initConfigurations()
         controller?.ensureMessageCenterAvailability()
     }
 

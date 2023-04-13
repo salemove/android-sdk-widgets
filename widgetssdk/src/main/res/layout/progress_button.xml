@@ -32,7 +32,7 @@
             tools:visibility="visible" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/btn_send_message_text"
+            android:id="@+id/title_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"

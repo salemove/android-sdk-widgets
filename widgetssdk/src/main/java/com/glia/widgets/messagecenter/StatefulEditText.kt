@@ -93,11 +93,11 @@ class StatefulEditText @JvmOverloads constructor(context: Context, attrs: Attrib
         applyLayerTheme(theme.backgroundTheme)
     }
 
-    internal fun updateHintTheme(theme: TextTheme) {
-        theme.textColor?.primaryColor?.also { setHintTextColor(it) }
+    internal fun updateHintTheme(theme: TextTheme?) {
+        theme?.textColor?.primaryColor?.also { setHintTextColor(it) }
     }
 
-    internal fun updateStatefulTheme(newStatefulTheme: Map<State, TextInputTheme>) {
+    internal fun updateStatefulTheme(newStatefulTheme: Map<State, TextInputTheme?>) {
         statefulWidgetAdapter.updateStatefulTheme(newStatefulTheme)
     }
 

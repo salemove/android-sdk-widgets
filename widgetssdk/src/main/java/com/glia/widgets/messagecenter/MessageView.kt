@@ -2,23 +2,28 @@ package com.glia.widgets.messagecenter
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.widget.*
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.AttachmentPopup
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Utils
+import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates
 
@@ -49,7 +54,15 @@ class MessageView(
     private val sendMessageGroup: Group get() = binding.sendMessageGroup
     private val bottomSpace: Space get() = binding.bottomSpace
 
-    private val attachmentPopup by lazy { AttachmentPopup(addAttachmentButton) }
+    private val unifiedTheme: SecureConversationsWelcomeScreenTheme? by lazy {
+        Dependencies.getGliaThemeManager().theme?.secureConversationsWelcomeScreenTheme
+    }
+
+    private var theme: UiTheme by Delegates.notNull()
+
+    private val attachmentPopup by lazy {
+        AttachmentPopup(addAttachmentButton, unifiedTheme?.pickMediaTheme)
+    }
 
     private var checkMessageButtonClickListener: OnClickListener? = null
     private var attachmentButtonClickListener: OnClickListener? = null
@@ -64,13 +77,67 @@ class MessageView(
         setupViewAppearance()
         handleScrollView()
         initCallbacks()
-        setupTheme()
+        readTypedArray(attrs, defStyleAttr, defStyleRes)
+        setupUnifiedTheme()
     }
 
     @JvmOverloads
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+
+    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
+        context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
+            setDefaultTheme(this)
+        }
+    }
+
+    private fun setDefaultTheme(typedArray: TypedArray) {
+        theme = Utils.getThemeFromTypedArray(typedArray, this.context)
+        setupAttachmentIconTheme()
+        setupMessageErrorTextTheme()
+    }
+
+    private fun setupMessageErrorTextTheme() {
+        val systemNegativeColorId = theme.systemNegativeColor ?: return
+
+        TextViewCompat.setCompoundDrawableTintList(
+            messageErrorTextView,
+            getColorStateListCompat(systemNegativeColorId)
+        )
+
+        messageErrorTextView.setTextColor(getColorCompat(systemNegativeColorId))
+    }
+
+    private fun setupUnifiedTheme() {
+        unifiedTheme?.apply {
+            icon.applyImageColorTheme(titleImageTheme)
+            title.applyTextTheme(welcomeTitleTheme, withAlignment = false)
+            description.applyTextTheme(welcomeSubtitleTheme, withAlignment = false)
+            checkMessagesButton.applyTextTheme(checkMessagesButtonTheme, withAlignment = false)
+            messageTitle.applyTextTheme(messageTitleTheme, withAlignment = false)
+            messageErrorTextView.applyTextTheme(messageWarningTheme, withAlignment = false)
+            messageErrorTextView.setCompoundDrawableTintListCompat(messageWarningIconColorTheme?.primaryColorStateList)
+            messageEditText.updateStatefulTheme(
+                mapOf(
+                    StatefulEditText.State.ENABLED to messageInputNormalTheme,
+                    StatefulEditText.State.FOCUSED to messageInputActiveTheme,
+                    StatefulEditText.State.DISABLED to messageInputDisabledTheme,
+                    StatefulEditText.State.ERROR to messageInputErrorTheme
+                )
+            )
+            sendMessageButton.updateProgressTheme(activityIndicatorColorTheme)
+
+            sendMessageButton.updateStatefulTheme(
+                mapOf(
+                    ProgressButton.State.ENABLED to enabledSendButtonTheme,
+                    ProgressButton.State.DISABLED to disabledSendButtonTheme,
+                    ProgressButton.State.PROGRESS to loadingSendButtonTheme
+                )
+            )
+            messageEditText.updateHintTheme(messageInputHintTheme)
+        }
+    }
 
     private fun setupViewAppearance() {
         uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
@@ -88,9 +155,11 @@ class MessageView(
         attachmentRecyclerView.adapter = uploadAttachmentAdapter
     }
 
-    private fun setupTheme() {
-        val normalColor = getColorCompat(R.color.glia_base_normal_color)
-        val disabledColor = getColorCompat(R.color.glia_base_shade_color)
+    private fun setupAttachmentIconTheme() {
+        val normalColor = unifiedTheme?.filePickerButtonTheme?.primaryColor
+            ?: theme.baseNormalColor?.let { getColorCompat(it) }
+        val disabledColor = unifiedTheme?.filePickerButtonDisabledTheme?.primaryColor
+            ?: theme.baseShadeColor?.let { getColorCompat(it) }
 
         val colors: MutableList<Int> = mutableListOf()
         val states: MutableList<IntArray> = mutableListOf()
@@ -98,10 +167,10 @@ class MessageView(
         val disabledState = intArrayOf(-android.R.attr.state_enabled)
         val enabledState = intArrayOf()
 
-        colors.add(disabledColor)
+        colors.add(disabledColor ?: return)
         states.add(disabledState)
 
-        colors.add(normalColor)
+        colors.add(normalColor ?: return)
         states.add(enabledState)
 
         addAttachmentButton.imageTintList =

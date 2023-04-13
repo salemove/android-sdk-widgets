@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.children
+import androidx.core.widget.TextViewCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
@@ -39,6 +40,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -94,6 +96,10 @@ internal fun ImageView.load(
 }
 
 internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
+
+internal fun TextView.setCompoundDrawableTintListCompat(tint: ColorStateList?) {
+    TextViewCompat.setCompoundDrawableTintList(this, tint)
+}
 
 //Unified Ui
 //--------------------------------------------------------------------------------------------------
@@ -260,6 +266,10 @@ internal fun View.changeStatusBarColor(color: Int?) {
     color?.run {
         Utils.getActivity(context)?.window?.statusBarColor = this
     }
+}
+
+internal fun CircularProgressIndicator.applyIndicatorColorTheme(colorTheme: ColorTheme?) {
+    colorTheme?.primaryColor?.also { setIndicatorColor(it) }
 }
 
 internal fun ProgressBar.applyProgressColorTheme(colorTheme: ColorTheme?) {

@@ -13,6 +13,7 @@ import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCas
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
+import com.glia.widgets.core.chathead.domain.SetPendingSurveyUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
@@ -45,6 +46,7 @@ public class ServiceChatHeadController
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final GetOperatorFlowableUseCase getOperatorFlowableUseCase;
+    private final SetPendingSurveyUseCase setPendingSurveyUseCase;
     private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
     private final ChatHeadPosition chatHeadPosition;
 
@@ -82,6 +84,7 @@ public class ServiceChatHeadController
             RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
             ChatHeadPosition chatHeadPosition,
             GetOperatorFlowableUseCase getOperatorFlowableUseCase,
+            SetPendingSurveyUseCase setPendingSurveyUseCase,
             IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
         this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
@@ -95,6 +98,7 @@ public class ServiceChatHeadController
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
         this.getOperatorFlowableUseCase = getOperatorFlowableUseCase;
+        this.setPendingSurveyUseCase = setPendingSurveyUseCase;
         this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
 
@@ -189,6 +193,7 @@ public class ServiceChatHeadController
     }
 
     private void engagementEnded() {
+        setPendingSurveyUseCase.invoke();
         state = State.ENDED;
         operatorProfileImgUrl = null;
         unreadMessagesCount = 0;

@@ -5,6 +5,8 @@ import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.domain.*
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
+import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
+import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.*
@@ -82,6 +84,8 @@ class ChatControllerTest {
     private lateinit var isSecureConversationsChatAvailableUseCase: IsSecureConversationsChatAvailableUseCase
     private lateinit var markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
     private lateinit var isQueueingEngagementUseCase: IsQueueingEngagementUseCase
+    private lateinit var hasPendingSurveyUseCase: HasPendingSurveyUseCase
+    private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
 
     private lateinit var chatController: ChatController
 
@@ -135,6 +139,8 @@ class ChatControllerTest {
         isSecureConversationsChatAvailableUseCase = mock()
         markMessagesReadWithDelayUseCase = mock()
         isQueueingEngagementUseCase = mock()
+        hasPendingSurveyUseCase = mock()
+        setPendingSurveyUsedUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -184,7 +190,9 @@ class ChatControllerTest {
             removeMediaUpgradeCallbackUseCase = removeMediaUpgradeOfferCallbackUseCase,
             isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase,
             markMessagesReadWithDelayUseCase = markMessagesReadWithDelayUseCase,
-            isQueueingEngagementUseCase = isQueueingEngagementUseCase
+            isQueueingEngagementUseCase = isQueueingEngagementUseCase,
+            hasPendingSurveyUseCase = hasPendingSurveyUseCase,
+            setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase
         )
     }
 

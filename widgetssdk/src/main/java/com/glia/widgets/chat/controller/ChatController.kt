@@ -22,6 +22,8 @@ import com.glia.widgets.chat.domain.*
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.history.*
+import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
+import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.*
@@ -112,7 +114,9 @@ internal class ChatController(
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
-    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase
+    private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
+    private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
+    private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -156,6 +160,7 @@ internal class ChatController(
 
     @Volatile
     private var isChatViewPaused = false
+    private var shouldHandleEndedEngagement = false
 
     // TODO pending photoCaptureFileUri - need to move some place better
     var photoCaptureFileUri: Uri? = null
@@ -181,25 +186,27 @@ internal class ChatController(
     fun initChat(
         companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType
     ) {
-        val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
-        engagementConfigUseCase(chatType, queueIds)
+        if (!hasPendingSurveyUseCase.invoke()) {
+            val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
+            engagementConfigUseCase(chatType, queueIds)
 
-        ensureSecureMessagingAvailable()
+            ensureSecureMessagingAvailable()
 
-        if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
-            if (isSecureEngagement) {
-                emitViewState { chatState.setSecureMessagingState() }
+            if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+                if (isSecureEngagement) {
+                    emitViewState { chatState.setSecureMessagingState() }
+                }
+                return
             }
-            return
-        }
 
-        var initChatState = chatState.initChat(companyName, queueId, visitorContextAssetId)
-        if (isSecureEngagement) {
-            initChatState = initChatState.setSecureMessagingState()
+            var initChatState = chatState.initChat(companyName, queueId, visitorContextAssetId)
+            if (isSecureEngagement) {
+                initChatState = initChatState.setSecureMessagingState()
+            }
+            prepareChatComponents()
+            emitViewState { initChatState }
+            loadChatHistory()
         }
-        prepareChatComponents()
-        emitViewState { initChatState }
-        loadChatHistory()
     }
 
     private fun ensureSecureMessagingAvailable() {
@@ -510,10 +517,31 @@ internal class ChatController(
 
     fun onResume() {
         Logger.d(TAG, "onResume")
+        if (hasPendingSurveyUseCase.invoke()) {
+            shouldHandleEndedEngagement = true
+            surveyUseCase.registerListener(this)
+            return
+        }
+        if (shouldHandleEndedEngagement) {
+            // Engagement has been started
+            if (!isOngoingEngagementUseCase.invoke()) {
+                // Engagement has ended
+                surveyUseCase.registerListener(this)
+            } else {
+                // Engagement is ongoing
+                onResumeSetup()
+            }
+        } else {
+            // New session
+            onResumeSetup()
+        }
+    }
+
+    private fun onResumeSetup() {
         isChatViewPaused = false
         messagesNotSeenHandler.callChatButtonClicked()
-        surveyUseCase.registerListener(this)
         subscribeToEngagementStateChange()
+        surveyUseCase.registerListener(this)
         mediaUpgradeOfferRepositoryCallback?.let { addMediaUpgradeCallbackUseCase(it) }
 
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
@@ -536,9 +564,10 @@ internal class ChatController(
             EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CHANGED -> onOperatorChanged(
                 visitor.visit(engagementState)
             )
-            EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CONNECTED -> onOperatorConnected(
-                visitor.visit(engagementState)
-            )
+            EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CONNECTED -> {
+                shouldHandleEndedEngagement = true
+                onOperatorConnected(visitor.visit(engagementState))
+            }
             EngagementStateEvent.Type.ENGAGEMENT_TRANSFERRING -> onTransferring()
             EngagementStateEvent.Type.ENGAGEMENT_ONGOING -> onEngagementOngoing(
                 visitor.visit(engagementState)
@@ -1459,10 +1488,12 @@ internal class ChatController(
 
     override fun onSurveyLoaded(survey: Survey?) {
         Logger.d(TAG, "newSurveyLoaded")
+        setPendingSurveyUsedUseCase.invoke()
         if (viewCallback != null && survey != null) {
             viewCallback!!.navigateToSurvey(survey)
             Dependencies.getControllerFactory().destroyControllers()
-        } else if (!isVisitorEndEngagement) {
+        } else if (shouldHandleEndedEngagement && !isVisitorEndEngagement) {
+            shouldHandleEndedEngagement = false
             dialogController.showEngagementEndedDialog()
         } else {
             Dependencies.getControllerFactory().destroyControllers()
@@ -1524,7 +1555,6 @@ internal class ChatController(
     }
 
     private fun queueForEngagementError(exception: Throwable?) {
-
         (exception as? GliaException)?.also {
             Logger.e(TAG, it.toString())
             when (it.cause) {

@@ -30,8 +30,12 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
+import com.glia.widgets.core.chathead.SurveyStateManager;
+import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
+import com.glia.widgets.core.chathead.domain.SetPendingSurveyUseCase;
+import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
@@ -116,6 +120,7 @@ public class UseCaseFactory {
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
     private final GliaSdkConfigurationManager gliaSdkConfigurationManager;
+    private static final SurveyStateManager surveyStateManager = new SurveyStateManager();
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final Schedulers schedulers;
@@ -177,7 +182,7 @@ public class UseCaseFactory {
                     repositoryFactory.getGliaEngagementRepository(),
                     repositoryFactory.getGliaQueueRepository(),
                     repositoryFactory.getGliaEngagementTypeRepository(),
-                    createIsCallVisualizerUseCase()
+                    createIsCallVisualizerScreenSharingUseCase()
             );
         }
         return resolveChatHeadNavigationUseCase;
@@ -304,6 +309,21 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaVisitorMediaRepository(),
                 repositoryFactory.getEngagementConfigRepository()
         );
+    }
+
+    @NonNull
+    public SetPendingSurveyUseCase createSetPendingSurveyUseCase() {
+        return new SetPendingSurveyUseCase(surveyStateManager);
+    }
+
+    @NonNull
+    public HasPendingSurveyUseCase createHasPendingSurveyUseCase() {
+        return new HasPendingSurveyUseCase(surveyStateManager);
+    }
+
+    @NonNull
+    public SetPendingSurveyUsedUseCase createSetPendingSurveyUsed() {
+        return new SetPendingSurveyUsedUseCase(surveyStateManager);
     }
 
     @NonNull

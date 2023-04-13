@@ -1,6 +1,6 @@
 package com.glia.widgets.core.chathead.domain;
 
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
@@ -10,18 +10,18 @@ public class ResolveChatHeadNavigationUseCase {
     private final GliaEngagementRepository engagementRepository;
     private final GliaQueueRepository queueRepository;
     private final GliaEngagementTypeRepository gliaEngagementTypeRepository;
-    private final IsCallVisualizerUseCase isCallVisualizerUseCase;
+    private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
 
     public ResolveChatHeadNavigationUseCase(
             GliaEngagementRepository engagementRepository,
             GliaQueueRepository queueRepository,
             GliaEngagementTypeRepository gliaEngagementTypeRepository,
-            IsCallVisualizerUseCase isCallVisualizerUseCase
+            IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
         this.engagementRepository = engagementRepository;
         this.queueRepository = queueRepository;
         this.gliaEngagementTypeRepository = gliaEngagementTypeRepository;
-        this.isCallVisualizerUseCase = isCallVisualizerUseCase;
+        this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
 
     public Destinations execute() {
@@ -49,6 +49,6 @@ public class ResolveChatHeadNavigationUseCase {
     }
 
     private boolean isSharingScreen() {
-        return isCallVisualizerUseCase.invoke();
+        return isCallVisualizerScreenSharingUseCase.invoke();
     }
 }

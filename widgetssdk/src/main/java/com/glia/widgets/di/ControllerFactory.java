@@ -132,7 +132,9 @@ public class ControllerFactory {
                     useCaseFactory.createIsOngoingEngagementUseCase(),
                     useCaseFactory.createSetEngagementConfigUseCase(),
                     useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
-                    useCaseFactory.createMarkMessagesReadUseCase()
+                    useCaseFactory.createMarkMessagesReadUseCase(),
+                    useCaseFactory.createHasPendingSurveyUseCase(),
+                    useCaseFactory.createSetPendingSurveyUsed()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -176,7 +178,8 @@ public class ControllerFactory {
                     useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                     useCaseFactory.createUpdateFromCallScreenUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
-                    useCaseFactory.createIsCallVisualizerUseCase());
+                    useCaseFactory.createIsCallVisualizerUseCase(),
+                    useCaseFactory.createIsOngoingEngagementUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);
@@ -266,6 +269,7 @@ public class ControllerFactory {
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     chatHeadPosition,
                     useCaseFactory.createGetOperatorFlowableUseCase(),
+                    useCaseFactory.createSetPendingSurveyUseCase(),
                     useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
             );
         }
@@ -285,6 +289,7 @@ public class ControllerFactory {
                     useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                     useCaseFactory.createGetOperatorFlowableUseCase(),
+                    useCaseFactory.createSetPendingSurveyUseCase(),
                     useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
             );
         }

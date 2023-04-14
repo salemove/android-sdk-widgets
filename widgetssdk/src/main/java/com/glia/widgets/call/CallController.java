@@ -24,6 +24,7 @@ import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
@@ -108,6 +109,7 @@ public class CallController implements
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase;
     private final RemoveMediaUpgradeOfferCallbackUseCase removeMediaUpgradeCallbackUseCase;
+    private final SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase;
     private final DialogController dialogController;
     private final GliaSurveyUseCase surveyUseCase;
     private final ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase;
@@ -160,7 +162,8 @@ public class CallController implements
             UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
             QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
             IsCallVisualizerUseCase isCallVisualizerUseCase,
-            IsOngoingEngagementUseCase isOngoingEngagementUseCase) {
+            IsOngoingEngagementUseCase isOngoingEngagementUseCase,
+            SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
@@ -207,6 +210,7 @@ public class CallController implements
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
         this.isCallVisualizerUseCase = isCallVisualizerUseCase;
         this.isOngoingEngagementUseCase = isOngoingEngagementUseCase;
+        this.setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase;
 
         if (isCallVisualizerUseCase.invoke()) {
             shouldShowMediaEngagementView(true);
@@ -490,7 +494,7 @@ public class CallController implements
     @Override
     public void onSurveyLoaded(@Nullable Survey survey) {
         Logger.d(TAG, "newSurveyLoaded");
-
+        setPendingSurveyUsedUseCase.invoke();
         if (viewCallback != null && survey != null) {
             viewCallback.navigateToSurvey(survey);
             Dependencies.getControllerFactory().destroyControllers();

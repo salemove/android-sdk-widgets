@@ -179,7 +179,8 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateFromCallScreenUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                     useCaseFactory.createIsCallVisualizerUseCase(),
-                    useCaseFactory.createIsOngoingEngagementUseCase());
+                    useCaseFactory.createIsOngoingEngagementUseCase(),
+                    useCaseFactory.createSetPendingSurveyUsed());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

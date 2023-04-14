@@ -93,18 +93,21 @@ class VisitorCodeView internal constructor(
     }
 
     override fun setTimer(duration: Long) {
+        Logger.d(TAG, "Setting visitor code timeout to $duration")
         timer = object : CountDownTimer(duration, duration) {
             override fun onTick(p0: Long) {
-            //no-op
+                // no-op
             }
 
             override fun onFinish() {
+                Logger.d(TAG, "Reloading Visitor Code")
                 controller.onLoadVisitorCode()
             }
         }.start()
     }
 
     override fun destroyTimer() {
+        Logger.d(TAG, "Dismissing Visitor Code reload timer")
         timer?.cancel()
         timer = null
     }

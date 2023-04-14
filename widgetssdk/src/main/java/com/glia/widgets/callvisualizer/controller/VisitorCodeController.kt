@@ -18,6 +18,7 @@ class VisitorCodeController(
 
     private var disposable: Disposable? = null
     private val onEngagementStartConsumer: (Engagement) -> Unit = {
+        view.destroyTimer()
         dialogController.dismissVisitorCodeDialog()
     }
 

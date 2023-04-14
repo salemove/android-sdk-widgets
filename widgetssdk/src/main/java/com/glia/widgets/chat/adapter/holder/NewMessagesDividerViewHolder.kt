@@ -10,7 +10,10 @@ import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.extensions.getFontCompat
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 
-class NewMessagesDividerViewHolder(binding: ChatNewMessagesDividerLayoutBinding, uiTheme: UiTheme) :
+internal class NewMessagesDividerViewHolder(
+    binding: ChatNewMessagesDividerLayoutBinding,
+    uiTheme: UiTheme
+) :
     RecyclerView.ViewHolder(binding.root) {
 
     private val theme: ChatTheme? by lazy {

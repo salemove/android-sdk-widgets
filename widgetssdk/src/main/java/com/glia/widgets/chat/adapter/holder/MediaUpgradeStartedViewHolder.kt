@@ -11,7 +11,7 @@ import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MediaUpgradeTheme
 
-class MediaUpgradeStartedViewHolder(
+internal class MediaUpgradeStartedViewHolder(
     private val binding: ChatMediaUpgradeLayoutBinding, uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
 

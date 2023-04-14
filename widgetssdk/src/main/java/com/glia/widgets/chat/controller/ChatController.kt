@@ -119,12 +119,14 @@ internal class ChatController(
     private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
     private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
+    private val unengagementMessageUseCase: UnengagementMessageUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
     private var timerStatusListener: FormattedTimerStatusListener? = null
     private var engagementStateEventDisposable: Disposable? = null
+    private var unengagementMessagesDisposable: Disposable? = null
 
     private val disposable = CompositeDisposable()
     private val operatorMediaStateListener =
@@ -340,37 +342,61 @@ internal class ChatController(
                 .subscribe())
     }
 
-    private fun onMessage(messageInternal: ChatMessageInternal) {
-        val message = messageInternal.chatMessage
-        if (!isNewMessage(chatState.chatItems, message)) {
-            return
-        }
-        val isUnsentMessage =
-            chatState.unsentMessages.isNotEmpty() && chatState.unsentMessages[0].message == message.content
-        Logger.d(
-            TAG,
-            "onMessage: ${message.content}, id: ${message.id}, isUnsentMessage: $isUnsentMessage"
-        )
-        if (isUnsentMessage) {
-            // emitting state because there is no need to change recyclerview items here
-            emitViewState {
-                val unsentMessages: MutableList<VisitorMessageItem> =
-                    chatState.unsentMessages.toMutableList()
-                val currentMessage = unsentMessages[0]
-                unsentMessages.remove(currentMessage)
-                val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                val currentMessageIndex = currentChatItems.indexOf(currentMessage)
-                currentChatItems.remove(currentMessage)
-                currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message))
+    private fun subscribeToUnengagementMessages() {
+        val subscribe = unengagementMessageUseCase.execute()
+            .doOnNext { onUnengagementMessage(it) }
+            .subscribe()
+        disposable.add(subscribe)
+        unengagementMessagesDisposable = subscribe
+    }
 
-                return@emitViewState chatState.changeItems(currentChatItems).changeUnsentMessages(unsentMessages)
-            }
-            if (chatState.unsentMessages.isNotEmpty()) {
-                sendMessageUseCase.execute(chatState.unsentMessages[0].message, sendMessageCallback)
-            }
-            return
-        }
+    private fun onUnengagementMessage(messageInternal: ChatMessageInternal) {
         emitChatItems {
+            val message = messageInternal.chatMessage
+            if (message.senderType == Chat.Participant.VISITOR && message.attachment != null
+                && !isNewMessage(chatState.chatItems, message)) {
+
+                val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                val currentMessage = items.first { (it as? LinkedChatItem)?.messageId == message.id }
+                val currentMessageIndex = items.indexOf(currentMessage)
+                items.removeAll { (it as? VisitorAttachmentItem)?.messageId == message.id }
+                addVisitorAttachmentItemsToChatItems(items, message, currentMessageIndex + 1)
+                return@emitChatItems chatState.changeItems(items)
+            } else {
+                onMessage(messageInternal)
+            }
+            return@emitChatItems null
+        }
+    }
+
+    private fun onMessage(messageInternal: ChatMessageInternal) {
+        emitChatItems {
+            val message = messageInternal.chatMessage
+            if (!isNewMessage(chatState.chatItems, message)) {
+                return@emitChatItems null
+            }
+            val isUnsentMessage = chatState.unsentMessages.isNotEmpty() && chatState.unsentMessages[0].message == message.content
+            Logger.d(TAG, "onMessage: ${message.content}, id: ${message.id}, isUnsentMessage: $isUnsentMessage")
+            if (isUnsentMessage) {
+                // emitting state because there is no need to change recyclerview items here
+                emitViewState {
+                    val unsentMessages: MutableList<VisitorMessageItem> =
+                        chatState.unsentMessages.toMutableList()
+                    val currentMessage = unsentMessages[0]
+                    unsentMessages.remove(currentMessage)
+                    val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+                    val currentMessageIndex = currentChatItems.indexOf(currentMessage)
+                    currentChatItems.remove(currentMessage)
+                    currentChatItems.add(currentMessageIndex, VisitorMessageItem.asNewMessage(message))
+
+                    return@emitViewState chatState.changeItems(currentChatItems).changeUnsentMessages(unsentMessages)
+                }
+                if (chatState.unsentMessages.isNotEmpty()) {
+                    sendMessageUseCase.execute(chatState.unsentMessages[0].message, sendMessageCallback)
+                }
+                return@emitChatItems null
+            }
+
             val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
             appendMessageItem(items, messageInternal)
 
@@ -385,9 +411,8 @@ internal class ChatController(
                 val currentChatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
                 if (isQueueingOrOngoingEngagement) {
                     changeDeliveredIndex(currentChatItems, message)
-                } else if (isSecureEngagementUseCase()) {
+                } else if (isSecureEngagementUseCase() && isNewMessage(currentChatItems, message)) {
                     appendSentMessage(currentChatItems, message)
-                    addVisitorAttachmentItemsToChatItems(currentChatItems, message)
                 }
 
                 // chat input mode has to be set to enable after a message is sent
@@ -911,19 +936,22 @@ internal class ChatController(
 
     private fun addVisitorAttachmentItemsToChatItems(
         currentChatItems: MutableList<ChatItem>,
-        chatMessage: ChatMessage
+        chatMessage: ChatMessage,
+        index: Int? = null
     ) {
         val attachment = chatMessage.attachment
         if (attachment is FilesAttachment) {
-            val files = attachment.files
-            for (file in files) {
-                currentChatItems.add(
-                    VisitorAttachmentItem.fromAttachmentFile(
-                        chatMessage.id,
-                        chatMessage.timestamp,
-                        file
-                    )
+            val visitorAttachmentItems = attachment.files.map {
+                VisitorAttachmentItem.fromAttachmentFile(
+                    chatMessage.id,
+                    chatMessage.timestamp,
+                    it
                 )
+            }
+            if (index != null) {
+                currentChatItems.addAll(index, visitorAttachmentItems)
+            } else {
+                currentChatItems.addAll(visitorAttachmentItems)
             }
         }
     }
@@ -1377,6 +1405,7 @@ internal class ChatController(
     }
 
     private fun loadChatHistory() {
+        unengagementMessagesDisposable?.dispose()
         val historyDisposable = loadHistoryUseCase()
             .subscribe({ historyLoaded(it) }, { error(it) })
         disposable.add(historyDisposable)
@@ -1400,6 +1429,7 @@ internal class ChatController(
         }
 
         initGliaEngagementObserving()
+        subscribeToUnengagementMessages()
     }
 
     private fun submitHistoryItems(

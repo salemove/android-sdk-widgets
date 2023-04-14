@@ -4,7 +4,6 @@ package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
-import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.AttachmentItemTheme
 import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 
@@ -15,7 +14,7 @@ internal fun DefaultAttachmentsPopupTheme(pallet: ColorPallet): AttachmentsPopup
     pallet.run {
         composeIfAtLeastOneNotNull(baseDarkColorTheme, baseShadeColorTheme) {
             val attachmentItem = AttachmentItemTheme(
-                text = TextTheme(textColor = baseDarkColorTheme),
+                text = BaseDarkColorTextTheme(this),
                 iconColor = baseDarkColorTheme
             )
             AttachmentsPopupTheme(

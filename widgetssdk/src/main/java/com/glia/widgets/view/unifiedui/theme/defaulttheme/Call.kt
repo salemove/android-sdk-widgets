@@ -4,7 +4,6 @@ package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
-import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStyleTheme
 import com.glia.widgets.view.unifiedui.theme.call.ButtonBarTheme
@@ -16,16 +15,14 @@ import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 internal fun CallTheme(pallet: ColorPallet) = pallet.run {
     val header = CallHeaderTheme(this)
 
-    val baseLightText = TextTheme(textColor = baseLightColorTheme)
     // must not have a background in default theme to imitate native dialler
-
     CallTheme(
-        bottomText = baseLightText,
+        bottomText = BaseLightColorTextTheme(this),
         buttonBar = ButtonBarTheme(pallet),
-        duration = baseLightText,
+        duration = BaseLightColorTextTheme(this),
         header = header,
-        operator = baseLightText,
-        topText = baseLightText,
+        operator = BaseLightColorTextTheme(this),
+        topText = BaseLightColorTextTheme(this),
         connect = CallEngagementStatesTheme(pallet)
     )
 }
@@ -50,14 +47,19 @@ private fun ButtonBarTheme(pallet: ColorPallet) = ButtonBarTheme(
 
 private fun CallButtonBarButtonTheme(pallet: ColorPallet) = pallet.run {
     composeIfAtLeastOneNotNull(baseLightColorTheme) {
-        val titleTextTheme = TextTheme(textColor = baseLightColorTheme)
         BarButtonStatesTheme(
             disabled = BarButtonStyleTheme(
                 imageColor = baseLightColorTheme?.withAlpha(20f),
-                title = titleTextTheme
+                title = BaseLightColorTextTheme(this)
             ),
-            enabled = BarButtonStyleTheme(imageColor = baseLightColorTheme, title = titleTextTheme),
-            activated = BarButtonStyleTheme(imageColor = baseDarkColorTheme, title = titleTextTheme)
+            enabled = BarButtonStyleTheme(
+                imageColor = baseLightColorTheme,
+                title = BaseLightColorTextTheme(this)
+            ),
+            activated = BarButtonStyleTheme(
+                imageColor = baseDarkColorTheme,
+                title = BaseLightColorTextTheme(this)
+            )
         )
 
     }

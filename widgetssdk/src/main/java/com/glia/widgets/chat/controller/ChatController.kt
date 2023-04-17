@@ -22,6 +22,7 @@ import com.glia.widgets.chat.domain.*
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.history.*
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
@@ -116,7 +117,8 @@ internal class ChatController(
     private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
     private val markMessagesReadWithDelayUseCase: MarkMessagesReadWithDelayUseCase,
     private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
-    private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
+    private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
+    private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -1660,6 +1662,10 @@ internal class ChatController(
                     Logger.e(TAG, "Error happened while observing queue state : $it")
                 }
         )
+    }
+
+    fun isCallVisualizerOngoing(): Boolean {
+        return isCallVisualizerUseCase()
     }
 
     companion object {

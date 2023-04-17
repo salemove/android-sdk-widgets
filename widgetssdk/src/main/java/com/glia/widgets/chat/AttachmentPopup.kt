@@ -28,7 +28,7 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
             popupView.measuredHeight,
             true
         ).apply {
-            animationStyle = R.style.Animation_AppCompat_Dialog
+            animationStyle = androidx.appcompat.R.style.Animation_AppCompat_Dialog
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
         }
     }

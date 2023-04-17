@@ -23,7 +23,7 @@ public abstract class BaseConfigurableTextView extends MaterialTextView {
     }
 
     public BaseConfigurableTextView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, R.attr.textAppearanceBody1);
+        this(context, attrs, com.google.android.material.R.attr.textAppearanceBody1);
     }
 
     public BaseConfigurableTextView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {

@@ -7,11 +7,15 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
 import com.glia.widgets.R
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextColorTheme
+import com.glia.widgets.view.unifiedui.extensions.getAttr
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.theme.base.BadgeTheme
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.max
+import com.google.android.material.R as Material_R
 
 class BadgeTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     MaterialTextView(context, attrs) {
@@ -30,7 +34,10 @@ class BadgeTextView @JvmOverloads constructor(context: Context, attrs: Attribute
         elevation = resources.getDimension(R.dimen.glia_chat_head_badge_elevation)
 
         setTextAppearance(
-            getAttr(R.attr.textAppearanceCaption, R.style.Application_Glia_Caption)
+            getAttr(
+                Material_R.attr.textAppearanceCaption,
+                R.style.Application_Glia_Caption
+            )
         )
 
         setTextColor(

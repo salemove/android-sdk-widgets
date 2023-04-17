@@ -1,32 +1,31 @@
 buildscript {
     ext {
-        kotlin_version = '1.7.21'
+        kotlin_version = '1.8.20'
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("org.jetbrains.kotlin.android") version "$kotlin_version" apply false
 }
 
 allprojects {
     repositories {
         google()
         mavenCentral()
-//        Needed for some libraries e.g. Webrtc
-        maven { url 'https://plugins.gradle.org/m2/' }
         flatDir {
             dirs '../libs'
         }
         //TODO Needed to use not public new Core SDK release, remove before release
-        maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1183' }
+        maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1184' }
     }
 }
 
@@ -56,12 +55,12 @@ ext {
     leakCanaryVersion = '2.6'
     espressoVersion = '3.5.1'
     junitVersion = '4.13.2'
-    testLibraryVersion = '1.1.3'
+    testLibraryVersion = '1.1.5'
     androidXTestVersion = '1.1.5'
     mockitoVersion = '5.1.1'
     mockitoKotlinVersion = '4.1.0'
     mockitoAndroidTestVersion = '4.3.1'
-    archCoreVersion = '2.1.0'
+    archCoreVersion = '2.2.0'
     testRulesVersion = '1.5.0'
 
     //kotlin

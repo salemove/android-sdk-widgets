@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion 31
@@ -24,8 +26,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
     lint {
         disable 'WrongLayoutName',
@@ -40,6 +45,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
     namespace 'com.glia.widgets'
 }
@@ -92,5 +98,3 @@ ext {
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-parcelize'

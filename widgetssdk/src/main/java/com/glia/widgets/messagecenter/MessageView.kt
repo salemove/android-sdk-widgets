@@ -5,8 +5,13 @@ import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.ScrollView
+import android.widget.Space
+import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -22,7 +27,14 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterMessageViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getColorStateListCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.setCompoundDrawableTintListCompat
+import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates
@@ -74,6 +86,7 @@ class MessageView(
 
     init {
         isFillViewport = true
+        setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         setupViewAppearance()
         handleScrollView()
         initCallbacks()
@@ -111,6 +124,7 @@ class MessageView(
 
     private fun setupUnifiedTheme() {
         unifiedTheme?.apply {
+            applyColorTheme(backgroundTheme)
             icon.applyImageColorTheme(titleImageTheme)
             title.applyTextTheme(welcomeTitleTheme, withAlignment = false)
             description.applyTextTheme(welcomeSubtitleTheme, withAlignment = false)
@@ -141,9 +155,7 @@ class MessageView(
 
     private fun setupViewAppearance() {
         uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
-        uploadAttachmentAdapter.setItemCallback {
-            onRemoveAttachmentListener?.invoke(it)
-        }
+        uploadAttachmentAdapter.setItemCallback { onRemoveAttachmentListener?.invoke(it) }
         uploadAttachmentAdapter.registerAdapterDataObserver(object :
             RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {

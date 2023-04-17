@@ -43,7 +43,7 @@ private fun MediaUpgradeTheme(pallet: ColorPallet) = pallet.run {
         baseShadeColorTheme
     ) {
         MediaUpgradeTheme(
-            text = TextTheme(textColor = baseDarkColorTheme),
+            text = BaseDarkColorTextTheme(this),
             description = TextTheme(textColor = baseNormalColorTheme),
             iconColor = primaryColorTheme,
             background = LayerTheme(
@@ -63,7 +63,7 @@ private fun ChatOperatorMessageTheme(
     val userImage = UserImageTheme(this)
     composeIfAtLeastOneNotNull(userImage, baseDarkColorTheme) {
         MessageBalloonTheme(
-            text = TextTheme(textColor = baseDarkColorTheme),
+            text = BaseDarkColorTextTheme(this),
             userImage = userImage
         )
     }
@@ -78,7 +78,7 @@ private fun ChatVisitorMessageTheme(
     composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, baseNormalColorTheme) {
         MessageBalloonTheme(
             background = LayerTheme(fill = primaryColorTheme),
-            text = TextTheme(textColor = baseLightColorTheme),
+            text = BaseLightColorTextTheme(this),
             status = TextTheme(textColor = baseNormalColorTheme)
         )
     }
@@ -96,7 +96,7 @@ private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? {
                     fill = baseLightColorTheme,
                     stroke = primaryColorTheme?.primaryColor
                 ),
-                text = TextTheme(textColor = baseDarkColorTheme)
+                text = BaseDarkColorTextTheme(this)
             )
         }
     }
@@ -109,8 +109,8 @@ private fun ChatInputTheme(pallet: ColorPallet): InputTheme? {
     return pallet.run {
         composeIfAtLeastOneNotNull(baseDarkColorTheme, baseNormalColorTheme, primaryColorTheme, baseShadeColorTheme) {
             InputTheme(
-                text = TextTheme(textColor = baseDarkColorTheme),
-                placeholder = TextTheme(textColor = baseNormalColorTheme),
+                text = BaseDarkColorTextTheme(this),
+                placeholder = BaseNormalColorTextTheme(pallet),
                 divider = baseShadeColorTheme,
                 sendButton = ButtonTheme(iconColor = primaryColorTheme),
             )

@@ -4,13 +4,22 @@ import android.graphics.Typeface
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.*
+import com.glia.widgets.view.unifiedui.config.base.AlignmentTypeRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorTypeRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.SizeDpRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.SizeSpRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.TextStyleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceTypeRemoteConfig
 import com.glia.widgets.view.unifiedui.parse.TextStyleDeserializer.Companion.BOLD
 import com.glia.widgets.view.unifiedui.parse.TextStyleDeserializer.Companion.BOLD_ITALIC
 import com.glia.widgets.view.unifiedui.parse.TextStyleDeserializer.Companion.ITALIC
 import com.glia.widgets.view.unifiedui.parse.TextStyleDeserializer.Companion.REGULAR
-import com.google.gson.*
+import com.google.gson.JsonArray
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import java.lang.reflect.Type
 import android.graphics.Color as SystemColor
 
@@ -45,7 +54,9 @@ internal class ColorDeserializer : JsonDeserializer<ColorRemoteConfig?> {
 
     override fun deserialize(
         json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
-    ): ColorRemoteConfig? = tryOrNull {
+    ): ColorRemoteConfig? = tryOrNull(onError = {
+        Logger.e(TAG, "ColorDeserializer", IllegalArgumentException("${it.message}: -> $json"))
+    }) {
         ColorRemoteConfig(SystemColor.parseColor(json.asString))
     }
 

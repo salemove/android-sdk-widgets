@@ -12,6 +12,7 @@
         android:layout_weight="0.5" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/confirmation_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
@@ -19,6 +20,7 @@
         app:tint="?attr/gliaBrandPrimaryColor" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/title"
         style="@style/Application.Glia.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,6 +28,7 @@
         android:text="@string/message_center_confirmation_screen_title" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/subtitle"
         style="@style/Application.Glia.Body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -7,7 +7,6 @@ import android.util.AttributeSet
 import android.view.Window
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
 import com.glia.widgets.R
@@ -22,10 +21,13 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.extensions.deepMerge
 import com.glia.widgets.view.unifiedui.extensions.getColorCompat
 import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
+import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultHeader
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
@@ -42,22 +44,7 @@ class MessageCenterView(
 ), MessageCenterContract.View {
 
     private var theme: UiTheme by Delegates.notNull()
-    private val unifiedTheme: SecureConversationsWelcomeScreenTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.secureConversationsWelcomeScreenTheme
-    }
-
-    interface OnFinishListener {
-        fun finish()
-    }
-
-    interface OnNavigateToMessagingListener {
-        fun navigateToMessaging()
-    }
-
-    interface OnAttachFileListener {
-        fun selectAttachmentFile(type: String)
-        fun takePhoto()
-    }
+    private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.getGliaThemeManager().theme }
 
     var onFinishListener: OnFinishListener? = null
     var onNavigateToMessagingListener: OnNavigateToMessagingListener? = null
@@ -85,24 +72,27 @@ class MessageCenterView(
         onDialogState(it)
     }
 
+    init {
+        orientation = VERTICAL
+        defaultStatusBarColor = window?.statusBarColor
+        initConfigurations()
+        readTypedArray(attrs, defStyleAttr, defStyleRes)
+        setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
+    }
+
     @JvmOverloads
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
-    init {
-        orientation = VERTICAL
-        initConfigurations()
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
-        setupUnifiedTheme()
-    }
+    private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {
+        appBar.applyHeaderTheme(headerTheme)
 
-    private fun setupUnifiedTheme() {
-        unifiedTheme?.headerTheme?.background?.fill?.primaryColor?.also {
+        headerTheme?.background?.fill?.primaryColor?.also {
             statusBarColor = it
         }
-        appBar.applyHeaderTheme(unifiedTheme?.headerTheme)
-        applyColorTheme(unifiedTheme?.backgroundTheme)
+
+        window?.statusBarColor = statusBarColor
     }
 
     override fun setupViewAppearance() {
@@ -122,7 +112,6 @@ class MessageCenterView(
     }
 
     private fun initConfigurations() {
-        setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f)
 
@@ -209,6 +198,21 @@ class MessageCenterView(
 
     override fun showConfirmationScreen() {
         confirmationView.fadeThrough(messageView)
+
+        showConfirmationAppBar()
+    }
+
+    private fun showConfirmationAppBar() {
+        val primaryColorId = theme.brandPrimaryColor ?: R.color.glia_brand_primary_color
+        val baseLightColorId = theme.baseLightColor ?: R.color.glia_base_light_color
+
+        val appBarTheme = DefaultHeader(
+            ColorTheme(getColorCompat(primaryColorId)),
+            ColorTheme(getColorCompat(baseLightColorId)),
+            null
+        ) deepMerge unifiedTheme?.secureConversationsConfirmationScreenTheme?.headerTheme
+
+        setupAppBarUnifiedTheme(appBarTheme)
     }
 
     override fun hideSoftKeyboard() {
@@ -263,14 +267,6 @@ class MessageCenterView(
     fun onPause() {
         detachDialogController()
     }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-
-        window?.statusBarColor = statusBarColor
-        defaultStatusBarColor = window?.statusBarColor
-    }
-
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
@@ -288,5 +284,18 @@ class MessageCenterView(
     fun onSystemBack() {
         controller?.onSystemBack()
         clearAndDismissDialogs()
+    }
+
+    interface OnFinishListener {
+        fun finish()
+    }
+
+    interface OnNavigateToMessagingListener {
+        fun navigateToMessaging()
+    }
+
+    interface OnAttachFileListener {
+        fun selectAttachmentFile(type: String)
+        fun takePhoto()
     }
 }

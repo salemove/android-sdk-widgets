@@ -6,6 +6,7 @@ import androidx.annotation.ColorInt
 import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.*
+import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 
 internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet): SecureConversationsWelcomeScreenTheme =
@@ -17,7 +18,7 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet): SecureC
             welcomeTitleTheme = baseDarkColorText,
             titleImageTheme = it.primaryColorTheme,
             welcomeSubtitleTheme = baseDarkColorText,
-            checkMessagesButtonTheme = TextTheme(textColor = it.primaryColorTheme),
+            checkMessagesButtonTheme = BasePrimaryColorTextTheme(it),
             messageTitleTheme = baseDarkColorText,
             messageInputNormalTheme = DefaultInputTheme(
                 stroke = it.baseShadeColorTheme?.primaryColor,
@@ -35,12 +36,12 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet): SecureC
                 stroke = it.systemNegativeColorTheme?.primaryColor,
                 textColor = it.baseDarkColorTheme
             ),
-            messageInputHintTheme = TextTheme(textColor = it.baseNormalColorTheme),
+            messageInputHintTheme = BaseNormalColorTextTheme(it),
             enabledSendButtonTheme = SecureConversationsEnabledSendButtonTheme(it),
             disabledSendButtonTheme = null,
             loadingSendButtonTheme = null,
             activityIndicatorColorTheme = null,
-            messageWarningTheme = TextTheme(textColor = it.systemNegativeColorTheme),
+            messageWarningTheme = BaseNegativeColorTextTheme(it),
             messageWarningIconColorTheme = it.systemNegativeColorTheme,
             filePickerButtonTheme = it.baseNormalColorTheme,
             filePickerButtonDisabledTheme = it.baseShadeColorTheme,
@@ -54,17 +55,7 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet): SecureC
  * Default theme for `Send message` button
  */
 private fun SecureConversationsEnabledSendButtonTheme(pallet: ColorPallet): ButtonTheme? =
-    pallet.run {
-        composeIfAtLeastOneNotNull(baseLightColorTheme, primaryColorTheme) {
-            ButtonTheme(
-                text = TextTheme(textColor = baseLightColorTheme),
-                background = LayerTheme(
-                    fill = primaryColorTheme,
-                    stroke = primaryColorTheme?.primaryColor
-                )
-            )
-        }
-    }
+    PositiveDefaultButtonTheme(pallet)
 
 /**
  * Default theme for TextInput
@@ -77,3 +68,15 @@ private fun DefaultInputTheme(
         backgroundTheme = LayerTheme(fill = fill, stroke = stroke)
     )
 }
+
+internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet): SecureConversationsConfirmationScreenTheme =
+    pallet.let {
+        SecureConversationsConfirmationScreenTheme(
+            headerTheme = PrimaryColorHeaderTheme(it),
+            backgroundTheme = it.backgroundColorTheme,
+            iconColorTheme = it.primaryColorTheme,
+            titleTheme = BaseDarkColorTextTheme(it),
+            subtitleTheme = BaseDarkColorTextTheme(it),
+            checkMessagesButtonTheme = PositiveDefaultButtonTheme(pallet)
+        )
+    }

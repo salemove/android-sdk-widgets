@@ -5,6 +5,7 @@ import com.glia.widgets.view.unifiedui.config.bubble.BubbleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.call.CallRemoteConfig
 import com.glia.widgets.view.unifiedui.config.callvisualizer.CallVisualizerConfig
 import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
+import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsConfirmationScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsWelcomeScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
 import com.glia.widgets.view.unifiedui.extensions.deepMerge
@@ -35,7 +36,10 @@ internal data class RemoteConfiguration(
     val callVisualizerRemoteConfig: CallVisualizerConfig?,
 
     @SerializedName("secureConversationsWelcomeScreen")
-    val secureConversationsWelcomeScreenRemoteConfig: SecureConversationsWelcomeScreenRemoteConfig?
+    val secureConversationsWelcomeScreenRemoteConfig: SecureConversationsWelcomeScreenRemoteConfig?,
+
+    @SerializedName("secureConversationsConfirmationScreen")
+    val secureConversationsConfirmationScreenRemoteConfig: SecureConversationsConfirmationScreenRemoteConfig?
 ) {
     fun toUnifiedTheme(): UnifiedTheme? {
         val defaultTheme = DefaultTheme(globalColorsConfig?.toColorPallet())
@@ -47,7 +51,8 @@ internal data class RemoteConfiguration(
             chatTheme = chatRemoteConfig?.toChatTheme(),
             surveyTheme = surveyRemoteConfig?.toSurveyTheme(),
             callVisualizerTheme = callVisualizerRemoteConfig?.toCallVisualizerTheme(),
-            secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenRemoteConfig?.toSecureConversationsWelcomeScreenTheme()
+            secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenRemoteConfig?.toSecureConversationsWelcomeScreenTheme(),
+            secureConversationsConfirmationScreenTheme = secureConversationsConfirmationScreenRemoteConfig?.toSecureConversationsConfirmationScreenTheme()
         )
 
         return defaultTheme deepMerge unifiedTheme

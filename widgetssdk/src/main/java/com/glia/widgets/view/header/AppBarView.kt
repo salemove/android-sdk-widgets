@@ -6,7 +6,6 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
 import androidx.core.view.isGone
@@ -143,6 +142,11 @@ class AppBarView @JvmOverloads constructor(
 
     fun showEndButton() {
         binding.endButton.isVisible = true
+        leaveQueueIcon.isVisible = false
+    }
+
+    fun hideXAndEndButton() {
+        binding.endButton.isGone = true
         leaveQueueIcon.isVisible = false
     }
 

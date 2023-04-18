@@ -315,11 +315,13 @@ public class MainFragment extends Fragment {
             return;
         }
 
-        /*
-        Example of local remote configuration usage stored in a 'raw' directory
-        String rawConfigs = ExtensionsKt.rawRes(requireContext(), R.raw.global_colors_remote_config);
-        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireContext().getApplicationContext(), rawConfigs));
-         */
+        //To load local raw file
+//        String rawConfigs = UnifiedUiConfigurationLoader.fetchLocalConfiguration(requireContext(), R.raw.global_colors_remote_config);
+//        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireContext().getApplicationContext(), rawConfigs));
+
+        //To load remote configs
+//        String remoteConfigs = UnifiedUiConfigurationLoader.fetchRemoteConfiguration();
+//        GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireContext().getApplicationContext(), remoteConfigs));
 
         GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(requireActivity().getApplicationContext()));
         prepareAuthentication();

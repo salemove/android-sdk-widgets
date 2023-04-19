@@ -329,6 +329,14 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         controller?.navigateToCallSuccess()
     }
 
+    fun shouldShow(): Boolean {
+        return controller?.let { !it.isCallVisualizerOngoing() }
+            ?: run {
+                Logger.e(TAG, "ChatController is unexpectedly null")
+                false
+            }
+    }
+
     private fun setupControllers() {
         setupChatStateCallback()
         controller = Dependencies.getControllerFactory().getChatController(callback)

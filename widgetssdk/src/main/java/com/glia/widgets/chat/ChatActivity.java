@@ -64,6 +64,12 @@ public class ChatActivity extends AppCompatActivity {
 
         chatView.setOnTitleUpdatedListener(this::setTitle);
         configuration = createConfiguration(getIntent());
+
+        if (!chatView.shouldShow()) {
+            finishAndRemoveTask();
+            return;
+        }
+
         chatView.setConfiguration(configuration);
         chatView.setUiTheme(configuration.getRunTimeTheme());
         chatView.setOnBackClickedListener(onBackClickedListener);

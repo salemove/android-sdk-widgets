@@ -134,7 +134,8 @@ public class ControllerFactory {
                     useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
                     useCaseFactory.createMarkMessagesReadUseCase(),
                     useCaseFactory.createHasPendingSurveyUseCase(),
-                    useCaseFactory.createSetPendingSurveyUsed()
+                    useCaseFactory.createSetPendingSurveyUsed(),
+                    useCaseFactory.createIsCallVisualizerUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

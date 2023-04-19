@@ -5,6 +5,7 @@ import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.domain.*
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
@@ -86,6 +87,7 @@ class ChatControllerTest {
     private lateinit var isQueueingEngagementUseCase: IsQueueingEngagementUseCase
     private lateinit var hasPendingSurveyUseCase: HasPendingSurveyUseCase
     private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
+    private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
 
     private lateinit var chatController: ChatController
 
@@ -141,6 +143,7 @@ class ChatControllerTest {
         isQueueingEngagementUseCase = mock()
         hasPendingSurveyUseCase = mock()
         setPendingSurveyUsedUseCase = mock()
+        isCallVisualizerUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -192,7 +195,8 @@ class ChatControllerTest {
             markMessagesReadWithDelayUseCase = markMessagesReadWithDelayUseCase,
             isQueueingEngagementUseCase = isQueueingEngagementUseCase,
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
-            setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase
+            setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
+            isCallVisualizerUseCase = isCallVisualizerUseCase
         )
     }
 

@@ -13,11 +13,13 @@ afterEvaluate {
                 artifactId PUBLISH_ARTIFACT_ID
                 version PUBLISH_VERSION
 
-                // Two artifacts, the `aar` (or `jar`) and the sources
-                if (project.plugins.findPlugin("com.android.library")) {
-                    from components.release
-                } else {
-                    from components.java
+                afterEvaluate {
+                    // Two artifacts, the `aar` (or `jar`) and the sources
+                    if (project.plugins.findPlugin("com.android.library")) {
+                        from components.release
+                    } else {
+                        from components.java
+                    }
                 }
 
                 pom {
@@ -28,21 +30,21 @@ afterEvaluate {
                         license {
                             url = 'https://raw.githubusercontent.com/salemove/android-sdk-widgets/master/LICENSE.txt'
                         }
-                    }
-                    organization {
-                        name = PUBLISH_ORGANISATION_NAME
-                        url = PUBLISH_ORGANISATION_URL
-                    }
-                    developers {
-                        developer {
-                            name = 'Glia Technologies'
+                        }
+                        organization {
+                            name = PUBLISH_ORGANISATION_NAME
                             url = PUBLISH_ORGANISATION_URL
                         }
+                        developers {
+                            developer {
+                                name = 'Glia Technologies'
+                                url = PUBLISH_ORGANISATION_URL
+                            }
+                        }
+                        scm {
+                            url = 'https://github.com/salemove/android-sdk-widgets.git'
+                        }
                     }
-                    scm {
-                        url = 'https://github.com/salemove/android-sdk-widgets.git'
-                    }
-                }
             }
         }
     }

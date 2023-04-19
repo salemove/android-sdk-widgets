@@ -288,7 +288,7 @@ public class Utils {
                         typedArray,
                         context,
                         R.styleable.GliaView_android_fontFamily,
-                        R.attr.fontFamily
+                        androidx.appcompat.R.attr.fontFamily
                 )
         );
         defaultThemeBuilder.setIconAppBarBack(
@@ -515,7 +515,7 @@ public class Utils {
     @Nullable
     public static Typeface getFont(TypedArray typedArray, Context context) {
         int resId = getTypedArrayIntegerValue(
-                typedArray, context, R.styleable.GliaView_android_fontFamily, R.attr.fontFamily
+                typedArray, context, R.styleable.GliaView_android_fontFamily, androidx.appcompat.R.attr.fontFamily
         );
 
         if (resId > 0) {

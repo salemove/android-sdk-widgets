@@ -18,13 +18,20 @@ import com.glia.widgets.core.fileupload.model.FileAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getFileExtensionOrEmpty
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.extensions.applyCardLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getColorStateListCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.chat.FilePreviewTheme
 import com.glia.widgets.view.unifiedui.theme.chat.FileUploadBarTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UploadFileTheme
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.squareup.picasso.Picasso
+import com.google.android.material.R as Material_R
 
 /**
  * [DiffUtil.ItemCallback] for [FileAttachment] type
@@ -180,7 +187,7 @@ class ViewHolder(
 
     private fun updateTitleAndStatusText(fileName: String, byteSize: String, status: Status) {
         val textColorRes =
-            if (status.isError) R.color.design_default_color_error else R.color.glia_base_normal_color
+            if (status.isError) Material_R.color.design_default_color_error else R.color.glia_base_normal_color
         titleText.setTextColor(itemView.getColorCompat(textColorRes))
 
         titleText.text =
@@ -231,7 +238,7 @@ class ViewHolder(
         val normalColor = theme?.progress?.primaryColor
             ?: itemView.getColorCompat(R.color.glia_brand_primary_color)
         val errorColor = theme?.errorProgress?.primaryColor
-            ?: itemView.getColorCompat(R.color.design_default_color_error)
+            ?: itemView.getColorCompat(com.google.android.material.R.color.design_default_color_error)
 
         when {
             status == Status.UPLOADING -> updateProgress(

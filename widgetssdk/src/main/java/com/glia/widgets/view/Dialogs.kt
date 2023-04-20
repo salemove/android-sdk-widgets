@@ -174,7 +174,7 @@ object Dialogs {
                 applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
-                isVisible = theme.whiteLabel ?: false
+                isVisible = theme.whiteLabel?.not() ?: true
                 applyImageColorTheme(baseShadeColor)
             }
         }
@@ -289,7 +289,7 @@ object Dialogs {
                 applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
-                isVisible = theme.whiteLabel ?: false
+                isVisible = theme.whiteLabel?.not() ?: true
                 applyImageColorTheme(baseShadeColor)
             }
 
@@ -403,7 +403,7 @@ object Dialogs {
                 applyAlertTheme(alertTheme)
             }
             findViewById<ImageView>(R.id.logo_view).apply {
-                isVisible = theme.whiteLabel ?: false
+                isVisible = theme.whiteLabel?.not() ?: true
                 applyImageColorTheme(baseShadeColor)
             }
         }

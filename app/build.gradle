@@ -100,6 +100,11 @@ dependencies {
     implementation project(path: ':widgetssdk')
     implementation "androidx.core:core-ktx:$coreKtxVersion"
 
+    implementation "io.ktor:ktor-client-android:2.2.4"
+    implementation "io.ktor:ktor-client-logging:2.2.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+
+
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"

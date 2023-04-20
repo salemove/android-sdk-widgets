@@ -114,7 +114,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var defaultStatusBarColor: Int? = null
     private var statusBarColor: Int by Delegates.notNull()
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
-    private var onBackClickedListener: OnBackClickedListener? = null
     private var onEndListener: OnEndListener? = null
     private var onMinimizeListener: OnMinimizeListener? = null
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
@@ -228,9 +227,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
      * Used to tell the view that the user has pressed the back button so that the view can
      * set its state accordingly.
      */
-    fun backPressed(): Boolean {
+    fun onBackPressed() {
         controller?.onBackArrowClicked()
-        return true
     }
 
     fun setOnTitleUpdatedListener(onTitleUpdatedListener: OnTitleUpdatedListener?) {
@@ -244,7 +242,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
      * @param onBackClicked The callback which is fired when the button is clicked.
      */
     fun setOnBackClickedListener(onBackClicked: OnBackClickedListener?) {
-        onBackClickedListener = onBackClicked
+        controller?.setOnBackClickedListener(onBackClicked)
     }
 
     /**
@@ -309,7 +307,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         alertDialog = null
 
         onEndListener = null
-        onBackClickedListener = null
         onNavigateToCallListener = null
         onNavigateToSurveyListener = null
         destroyController()
@@ -319,14 +316,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.chatRecyclerView.removeOnScrollListener(onScrollListener)
         binding.addAttachmentQueue.adapter = null
         dialogController = null
-    }
-
-    /**
-     * Use this method together with [.setOnNavigateToCallListener]
-     * to notify the view that you have finished navigating.
-     */
-    fun navigateToCallSuccess() {
-        controller?.navigateToCallSuccess()
     }
 
     fun shouldShow(): Boolean {
@@ -733,7 +722,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             controller?.sendMessage(message)
         }
         setupAddAttachmentButton()
-        binding.appBarView.setOnBackClickedListener { controller?.onBackArrowClicked(onBackClickedListener) }
+        binding.appBarView.setOnBackClickedListener { controller?.onBackArrowClicked() }
         binding.appBarView.setOnEndChatClickedListener { controller?.leaveChatClicked() }
         binding.appBarView.setOnEndCallButtonClickedListener {
             screenSharingController?.onForceStopScreenSharing()

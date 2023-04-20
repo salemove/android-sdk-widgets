@@ -1,7 +1,8 @@
 package com.glia.widgets.view.head.controller
 
 import com.glia.androidsdk.Glia
-import com.glia.androidsdk.GliaException
+import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
@@ -11,6 +12,8 @@ internal class ActivityWatcherForChatHeadController(
     private var applicationChatHeadController: ApplicationChatHeadLayoutController,
     private val screenSharingController: ScreenSharingController,
     private val gliaOnEngagementUseCase: GliaOnEngagementUseCase,
+    private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
+    private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
 ) : ActivityWatcherForChatHeadContract.Controller {
 
     private lateinit var watcher: ActivityWatcherForChatHeadContract.Watcher
@@ -27,6 +30,14 @@ internal class ActivityWatcherForChatHeadController(
 
     override fun shouldShowBubble(gliaOrRootView: String?): Boolean {
         return shouldShowAppBubble(gliaOrRootView)
+    }
+
+    override fun isFromCallScreen(): Boolean {
+        return isFromCallScreenUseCase.isFromCallScreen
+    }
+
+    override fun resetFromCallScreen() {
+        updateFromCallScreenUseCase.updateFromCallScreen(false)
     }
 
     override fun onActivityResumed() {

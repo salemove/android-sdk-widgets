@@ -376,7 +376,9 @@ public class ControllerFactory {
                     serviceChatHeadController,
                     getChatHeadLayoutController(),
                     getScreenSharingController(),
-                    useCaseFactory.createOnEngagementUseCase());
+                    useCaseFactory.createOnEngagementUseCase(),
+                    useCaseFactory.createIsFromCallScreenUseCase(),
+                    useCaseFactory.createUpdateFromCallScreenUseCase());
         }
         return activityWatcherForChatHeadController;
     }

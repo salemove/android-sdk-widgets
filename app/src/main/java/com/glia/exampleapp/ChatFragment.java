@@ -21,17 +21,7 @@ public class ChatFragment extends Fragment {
 
     private NavController navController;
     private ChatView chatView;
-    private ChatView.OnBackClickedListener onBackClickedListener = () -> {
-        chatView.backPressed();
-        navController.popBackStack();
-    };
     private ChatView.OnEndListener onEndListener = () -> navController.popBackStack();
-    private final NavController.OnDestinationChangedListener onDestinationChangedListener =
-            (controller, destination, arguments) -> {
-                if (destination.getId() == R.id.main_fragment && chatView != null) {
-                    chatView.backPressed();
-                }
-            };
 
     @Nullable
     @Override
@@ -46,13 +36,11 @@ public class ChatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         navController = NavHostFragment.findNavController(this);
-        navController.addOnDestinationChangedListener(onDestinationChangedListener);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         chatView = view.findViewById(R.id.chat_view);
         UiTheme theme = Utils.getUiThemeByPrefs(sharedPreferences, getResources());
         chatView.setUiTheme(theme);
         chatView.setOnEndListener(onEndListener);
-        chatView.setOnBackClickedListener(onBackClickedListener);
         chatView.startChat(
                 Utils.getStringFromPrefs(R.string.pref_company_name, getString(R.string.settings_value_default_company_name), sharedPreferences, getResources()),
                 Utils.getStringFromPrefs(R.string.pref_queue_id, getString(R.string.glia_queue_id), sharedPreferences, getResources()),
@@ -67,10 +55,7 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        onBackClickedListener = null;
         onEndListener = null;
-        navController.removeOnDestinationChangedListener(onDestinationChangedListener);
-        onBackClickedListener = null;
         chatView.onDestroyView(true);
         super.onDestroyView();
     }

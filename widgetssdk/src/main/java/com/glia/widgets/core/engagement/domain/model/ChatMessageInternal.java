@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.Operator;
+import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class ChatMessageInternal {
         return getOperator().map(Operator::getPicture).flatMap(Operator.Picture::getURL);
     }
 
-    public boolean isOperator() {
-        return getChatMessage().isOperator();
+    public boolean isNotVisitor() {
+        return getChatMessage().getSenderType() != Chat.Participant.VISITOR;
     }
 }

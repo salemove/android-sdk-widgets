@@ -37,8 +37,8 @@ internal class GliaLoadHistoryUseCase(
 
     private fun loadHistoryAndMapOperator() = loadHistory()
         .flatMapPublisher { Flowable.fromArray(*it) }
-        .concatMapSingle(mapOperatorUseCase::execute)
-        .toSortedList(Comparator.comparingLong { o -> o.chatMessage.timestamp })
+        .concatMapSingle { mapOperatorUseCase(it) }
+        .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
 
     private fun loadHistory() = Single.create { emitter ->
         loadHistory { messages, error ->

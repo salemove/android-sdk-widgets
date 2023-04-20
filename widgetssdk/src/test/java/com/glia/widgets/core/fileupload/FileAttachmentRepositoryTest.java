@@ -27,12 +27,12 @@ import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.engagement.EngagementFile;
+import com.glia.androidsdk.secureconversations.SecureConversations;
 import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.core.secureconversations.SecureConversations;
 import com.glia.widgets.di.GliaCore;
 
 import org.junit.Before;

@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
-import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
+import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.Logger;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -55,7 +55,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
                 .onErrorResumeNext(getImageFileFromDownloadsUseCase.execute(imageName))
                 .doOnError(error -> Logger.e(TAG, imageName + " failed loading from downloads: " + error.getMessage()))
                 .doOnSuccess(_b -> Logger.d(TAG, "loaded from downloads: " + imageName))
-                .onErrorResumeNext(getImageFileFromNetworkUseCase.execute(attachmentFile))
+                .onErrorResumeNext(getImageFileFromNetworkUseCase.invoke(attachmentFile))
                 .doOnError(error -> Logger.e(TAG, imageName + " failed loading from network: " + error.getMessage()))
                 .doOnSuccess(_b -> Logger.d(TAG, "loaded from network: " + imageName))
                 .subscribeOn(Schedulers.io())
@@ -72,7 +72,7 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
     private void setAccessibilityActions() {
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
-            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+            public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
                 String actionLabel = host.getResources().getString(R.string.glia_chat_attachment_open_button_label);

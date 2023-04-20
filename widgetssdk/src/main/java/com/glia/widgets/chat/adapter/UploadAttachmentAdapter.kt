@@ -17,7 +17,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.fileupload.model.FileAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.getFileExtensionOrEmpty
+import com.glia.widgets.helper.toFileExtensionOrEmpty
 import com.glia.widgets.view.unifiedui.extensions.applyCardLayerTheme
 import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
 import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
@@ -154,7 +154,7 @@ class ViewHolder(
                     .into(extensionTypeImage)
             } else {
                 showExtensionTypeText()
-                extensionTypeText.text = displayName.getFileExtensionOrEmpty()
+                extensionTypeText.text = displayName.toFileExtensionOrEmpty().uppercase()
             }
 
             extensionContainerView.applyCardLayerTheme(filePreviewTheme?.background)

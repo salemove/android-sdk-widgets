@@ -21,7 +21,7 @@ import androidx.core.content.FileProvider;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.header.AppBarView;
 import com.google.android.material.theme.overlay.MaterialThemeOverlay;
@@ -29,7 +29,6 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay;
 import java.io.File;
 
 public class FilePreviewView extends ConstraintLayout implements FilePreviewContract.View {
-    private static final String TAG = FilePreviewView.class.getSimpleName();
     private static final int WRITE_PERMISSION_REQUEST = 110011;
 
     private AppBarView appBar;
@@ -104,7 +103,10 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
                     if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         filePreviewController.onDownloadPressed();
                     } else {
-                        Utils.getActivity(getContext()).requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
+                        Activity activity = Utils.getActivity(getContext());
+                        if (activity == null) return;
+
+                        activity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
                     }
                 }
             }
@@ -112,7 +114,7 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
         previewImageView = findViewById(R.id.preview_iv);
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, int[] grantResults) {
         if (requestCode == WRITE_PERMISSION_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             filePreviewController.onDownloadPressed();
         }
@@ -130,7 +132,10 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
     }
 
     private void setupViewAppearance() {
-        setBackgroundColor(ContextCompat.getColor(getContext(), theme.getBaseLightColor()));
+        Integer baseLightColor = theme.getBaseLightColor();
+        if (baseLightColor != null) {
+            setBackgroundColor(ContextCompat.getColor(getContext(), baseLightColor));
+        }
         appBar.setTheme(this.theme);
     }
 

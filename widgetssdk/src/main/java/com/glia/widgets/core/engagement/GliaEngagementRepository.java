@@ -26,10 +26,13 @@ public class GliaEngagementRepository {
         engagement.on(Engagement.Events.END, engagementEnded);
     }
 
+    public void listenForEngagementEnd(OmnibrowseEngagement engagement, Runnable engagementEnded) {
+        engagement.on(Engagement.Events.END, engagementEnded);
+    }
+
     public void unregisterEngagementEndListener(Runnable engagementEnded) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement -> {
-            engagement.off(Engagement.Events.END, engagementEnded);
-        });
+        gliaCore.getCurrentEngagement().ifPresent(
+                engagement -> engagement.off(Engagement.Events.END, engagementEnded));
     }
 
     public void endEngagement() {

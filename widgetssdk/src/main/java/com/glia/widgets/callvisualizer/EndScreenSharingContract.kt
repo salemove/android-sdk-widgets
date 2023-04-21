@@ -7,6 +7,7 @@ interface EndScreenSharingContract {
 
     interface Controller : BaseController {
         fun setView(view: View)
+        fun onActivityCreate()
         fun onBackArrowClicked()
         fun onEndScreenSharingButtonClicked()
     }

@@ -1,5 +1,7 @@
 package com.glia.widgets.callvisualizer
 
+import com.glia.widgets.GliaWidgets
+
 class EndScreenSharingController : EndScreenSharingContract.Controller {
 
     private var view: EndScreenSharingContract.View? = null
@@ -15,6 +17,10 @@ class EndScreenSharingController : EndScreenSharingContract.Controller {
     override fun onEndScreenSharingButtonClicked() {
         view?.stopScreenSharing()
         view?.finish()
+    }
+
+    override fun onActivityCreate() {
+        GliaWidgets.getCallVisualizer().onEngagementEnd { view?.finish() }
     }
 
     override fun onDestroy() {}

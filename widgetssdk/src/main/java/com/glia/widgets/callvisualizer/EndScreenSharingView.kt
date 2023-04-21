@@ -29,8 +29,9 @@ class EndScreenSharingView (
     defStyleRes
 ), EndScreenSharingContract.View {
 
-    var onFinishListener: OnFinishListener? = null
     private val TAG = EndScreenSharingView::class.java.simpleName
+
+    var onFinishListener: OnFinishListener? = null
     private var controller: EndScreenSharingContract.Controller? = null
     private var uiTheme: UiTheme by Delegates.notNull()
     private var statusBarColor: Int by Delegates.notNull()

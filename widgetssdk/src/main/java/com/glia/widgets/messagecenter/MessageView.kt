@@ -4,10 +4,8 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ScrollView
 import android.widget.Space
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
@@ -15,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.TextViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -41,18 +40,16 @@ import kotlin.properties.Delegates
 
 class MessageView(
     context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int
-) : ScrollView(
+) : NestedScrollView(
     context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
-    defStyleRes
 ) {
 
     private val binding: MessageCenterMessageViewBinding by lazy {
         MessageCenterMessageViewBinding.inflate(layoutInflater, this)
     }
 
-    private val scrollContainer: View get() = binding.scrollContainer
     private val icon: ImageView get() = binding.icon
     private val title: TextView get() = binding.title
     private val description: TextView get() = binding.description
@@ -86,9 +83,9 @@ class MessageView(
 
     init {
         isFillViewport = true
+        isNestedScrollingEnabled = false
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         setupViewAppearance()
-        handleScrollView()
         initCallbacks()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
         setupUnifiedTheme()
@@ -203,39 +200,6 @@ class MessageView(
 
         messageEditText.doAfterTextChanged {
             onMessageTextChangedListener?.invoke(it.toString())
-        }
-    }
-
-    private fun handleScrollView() {
-        var scrollContainerHeight = 0
-        scrollContainer.viewTreeObserver.addOnGlobalLayoutListener {
-            val scrollViewWidth = width
-            val scrollViewHeight = height
-
-            // Set to the container the size of the scroll view.
-            // 1. Ignore if the scroll view height is less than the value that was previous set.
-            // 2. Skip if the content height is more than the scroll view height (small screen/landscape mode)
-            if (
-                scrollContainerHeight < scrollViewHeight && // 1
-                scrollContainer.height <= scrollViewHeight // 2
-            ) {
-                // Set new layout params.
-                scrollContainer.layoutParams = LayoutParams(scrollViewWidth, scrollViewHeight)
-
-                // Remember the maximum size to prevent cyclically layout params updates.
-                scrollContainerHeight = scrollViewHeight
-            }
-
-            // Scroll to the top of the send message group when keyboard appears.
-            // 1. Ignore if the content is more than scroll view (landscape mode). In this case, Android
-            //    will automatically scroll to the edit text view. Or will use a fullscreen keyboard.
-            // 2. Check possible keyboard appearing.
-            if (
-                scrollContainerHeight > 0 && // 1
-                scrollContainer.height > scrollViewHeight // 2
-            ) {
-                post { smoothScrollTo(0, addAttachmentButton.top) }
-            }
         }
     }
 

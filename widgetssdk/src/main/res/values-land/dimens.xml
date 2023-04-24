@@ -4,4 +4,6 @@
     <dimen name="glia_call_bottom_margin">20dp</dimen>
     <dimen name="glia_call_operator_status_image_margin_top">0dp</dimen>
 
+    <dimen name="glia_welcome_screen_input_min_height">56dp</dimen>
+    <dimen name="glia_welcome_screen_input_title_margin">16dp</dimen>
 </resources>

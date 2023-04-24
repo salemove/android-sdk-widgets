@@ -30,18 +30,20 @@
             android:launchMode="singleTop"
             android:theme="@style/Application.Glia.Translucent.Activity"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name="com.glia.widgets.messagecenter.MessageCenterActivity"
+        <activity
+            android:name="com.glia.widgets.messagecenter.MessageCenterActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Chat.Activity"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
-        <activity android:name=".callvisualizer.EndScreenSharingActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".callvisualizer.EndScreenSharingActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Application.Glia.Call.Activity"
-            android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".callvisualizer.CallVisualizerSupportActivity"
+            android:theme="@style/Application.Glia.Call.Activity" />
+        <activity
+            android:name=".callvisualizer.CallVisualizerSupportActivity"
             android:launchMode="singleTask"
             android:noHistory="true"
-            android:theme="@style/Application.Glia.Translucent.Activity"/>
+            android:theme="@style/Application.Glia.Translucent.Activity" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

@@ -88,6 +88,7 @@ class ChatControllerTest {
     private lateinit var hasPendingSurveyUseCase: HasPendingSurveyUseCase
     private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
     private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
+    private lateinit var unengagementMessageUseCase: UnengagementMessageUseCase
 
     private lateinit var chatController: ChatController
 
@@ -144,6 +145,7 @@ class ChatControllerTest {
         hasPendingSurveyUseCase = mock()
         setPendingSurveyUsedUseCase = mock()
         isCallVisualizerUseCase = mock()
+        unengagementMessageUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -196,7 +198,8 @@ class ChatControllerTest {
             isQueueingEngagementUseCase = isQueueingEngagementUseCase,
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
-            isCallVisualizerUseCase = isCallVisualizerUseCase
+            isCallVisualizerUseCase = isCallVisualizerUseCase,
+            unengagementMessageUseCase = unengagementMessageUseCase
         )
     }
 

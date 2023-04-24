@@ -38,13 +38,13 @@ public class GliaOnMessageUseCase implements
     }
 
     public void unregisterListener() {
-            messageRepository.unregisterMessageListener(this);
-            onEngagementUseCase.unregisterListener(this);
+        messageRepository.unregisterEngagementMessageListener(this);
+        onEngagementUseCase.unregisterListener(this);
     }
 
     @Override
     public void newEngagementLoaded(OmnicoreEngagement engagement) {
-        messageRepository.listenForMessages(this, engagement);
+        messageRepository.listenForEngagementMessages(this, engagement);
     }
 
     @Override

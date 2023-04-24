@@ -72,7 +72,7 @@ public class RepositoryFactory {
     }
 
     public GliaChatRepository getGliaMessageRepository() {
-        return new GliaChatRepository();
+        return new GliaChatRepository(gliaCore);
     }
 
     public GliaEngagementRepository getGliaEngagementRepository() {

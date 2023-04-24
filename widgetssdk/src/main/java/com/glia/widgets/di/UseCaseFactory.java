@@ -24,6 +24,7 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
+import com.glia.widgets.chat.domain.UnengagementMessageUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
@@ -325,6 +326,16 @@ public class UseCaseFactory {
     @NonNull
     public SetPendingSurveyUsedUseCase createSetPendingSurveyUsed() {
         return new SetPendingSurveyUsedUseCase(surveyStateManager);
+    }
+
+    @NonNull
+    public UnengagementMessageUseCase createUnengagementMessageUseCase() {
+        return new UnengagementMessageUseCase(
+                repositoryFactory.getGliaMessageRepository(),
+                repositoryFactory.getGliaEngagementRepository(),
+                createOnEngagementUseCase(),
+                getMapOperatorUseCase()
+        );
     }
 
     @NonNull

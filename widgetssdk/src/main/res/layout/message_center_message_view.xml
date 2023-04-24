@@ -10,7 +10,6 @@
         android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/scroll_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -100,7 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="@dimen/glia_welcome_screen_input_title_margin"
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="16dp"
             android:text="@string/message_center_message_title"
@@ -136,7 +135,6 @@
             android:layout_marginEnd="24dp"
             android:gravity="start"
             android:hint="@string/message_center_message_edit_text_hint"
-            android:imeOptions="actionNone"
             android:inputType="textCapSentences|textMultiLine"
             android:textColor="?attr/gliaBaseDarkColor"
             android:importantForAutofill="no"
@@ -145,7 +143,7 @@
             android:textCursorDrawable="@null"
             app:layout_constraintBottom_toTopOf="@id/error_text_view"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_min="56dp"
+            app:layout_constraintHeight_min="@dimen/glia_welcome_screen_input_min_height"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/message_title"
             app:layout_constraintVertical_weight="7" />
@@ -178,7 +176,6 @@
             android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="@id/btn_send_message"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="172dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/error_text_view"
             tools:itemCount="1"

@@ -40,9 +40,7 @@ import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository;
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
@@ -92,9 +90,7 @@ public class CallController implements
     private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
     private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
 
-    private final ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
-    private final ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
-    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
+    private final CallNotificationUseCase callNotificationUseCase;
     private final GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaOnEngagementUseCase onEngagementUseCase;
@@ -138,9 +134,7 @@ public class CallController implements
             MinimizeHandler minimizeHandler,
             DialogController dialogController,
             MessagesNotSeenHandler messagesNotSeenHandler,
-            ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase,
-            ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase,
-            RemoveCallNotificationUseCase removeCallNotificationUseCase,
+            CallNotificationUseCase callNotificationUseCase,
             GliaQueueForMediaEngagementUseCase queueForMediaEngagementUseCase,
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
@@ -185,9 +179,7 @@ public class CallController implements
         this.minimizeHandler = minimizeHandler;
         this.messagesNotSeenHandler = messagesNotSeenHandler;
 
-        this.showAudioCallNotificationUseCase = showAudioCallNotificationUseCase;
-        this.showVideoCallNotificationUseCase = showVideoCallNotificationUseCase;
-        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
+        this.callNotificationUseCase = callNotificationUseCase;
         this.gliaQueueForMediaEngagementUseCase = queueForMediaEngagementUseCase;
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
@@ -723,7 +715,7 @@ public class CallController implements
                 operatorMediaState,
                 formattedTime
         ));
-        showVideoCallNotificationUseCase.invoke();
+        callNotificationUseCase.invoke(callState.callStatus.getVisitorMediaState(), operatorMediaState);
         connectingTimerCounter.stop();
     }
 
@@ -738,7 +730,7 @@ public class CallController implements
                 formattedTime
         ));
 
-        showAudioCallNotificationUseCase.invoke();
+        callNotificationUseCase.invoke(callState.callStatus.getVisitorMediaState(), operatorMediaState);
         connectingTimerCounter.stop();
     }
 
@@ -747,7 +739,7 @@ public class CallController implements
         if (callState.isMediaEngagementStarted()) {
             emitViewState(callState.backToOngoing());
         }
-        removeCallNotificationUseCase.invoke();
+        callNotificationUseCase.removeAllNotifications();
         if (!connectingTimerCounter.isRunning()) {
             connectingTimerCounter.startNew(
                     Constants.CALL_TIMER_DELAY,
@@ -872,11 +864,10 @@ public class CallController implements
 
     private void showCallNotification() {
         if (hasCallNotificationChannelEnabledUseCase.invoke()) {
-            if (callState.isVideoCall() || callState.is2WayVideoCall()) {
-                showVideoCallNotificationUseCase.invoke();
-            } else if (callState.isAudioCall()) {
-                showAudioCallNotificationUseCase.invoke();
-            }
+            callNotificationUseCase.invoke(
+                    callState.callStatus.getVisitorMediaState(),
+                    callState.callStatus.getOperatorMediaState()
+            );
         }
     }
 

@@ -160,14 +160,17 @@
 
     <!--    statusbar notifications-->
     <string name="glia_notification_screen_sharing_channel_name">Screen sharing notification channel</string>
-    <string name="glia_notification_screen_sharing_title">You are currently sharing your screen</string>
-    <string name="glia_notification_screen_sharing_message">To stop sharing your screen, select \'End Sharing\'.</string>
+    <string name="glia_notification_screen_sharing_title">Screen Sharing Started</string>
+    <string name="glia_notification_screen_sharing_message">You are currently sharing your screen.\nSelect \'End Sharing\' to stop.</string>
     <string name="glia_notification_call_channel_name">Call notification channel</string>
-    <string name="glia_notification_audio_call_title">Ongoing Audio Call</string>
-    <string name="glia_notification_audio_call_message">Your microphone is on and the operator can hear you.</string>
-    <string name="glia_notification_video_call_title">Ongoing Video Call</string>
-    <string name="glia_notification_video_call_message">The operator can see and hear you.</string>
-    <string name="glia_notification_video_call_message_no_audio">The operator can see you.</string>
+    <string name="glia_notification_audio_call_title">Audio Call Started</string>
+    <string name="glia_notification_audio_call_message">Your microphone is now on, and the operator can hear you.</string>
+    <string name="glia_notification_two_way_video_call_title">Two-Way Video Started</string>
+    <string name="glia_notification_two_way_video_call_message">The video exchange is on. You and the operator can see and hear each other.</string>
+    <string name="glia_notification_two_way_video_call_message_no_audio">The video exchange is on. You and the operator can see each other.</string>
+    <string name="glia_notification_one_way_video_call_title">One-Way Video Started</string>
+    <string name="glia_notification_one_way_video_call_message">The operator’s camera is on. You can now see and hear them.</string>
+    <string name="glia_notification_one_way_video_call_message_no_audio">The operator’s camera is on. You can now see them.</string>
     <string name="glia_notification_action_end_sharing">End Sharing</string>
 
     <string name="glia_chat_attachment_upload_checking_file">Checking file…</string>

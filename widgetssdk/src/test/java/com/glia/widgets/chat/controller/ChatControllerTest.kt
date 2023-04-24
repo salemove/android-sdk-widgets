@@ -16,9 +16,7 @@ import com.glia.widgets.core.fileupload.domain.*
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase
+import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
@@ -43,9 +41,7 @@ class ChatControllerTest {
     private lateinit var minimizeHandler: MinimizeHandler
     private lateinit var dialogController: DialogController
     private lateinit var messagesNotSeenHandler: MessagesNotSeenHandler
-    private lateinit var showAudioCallNotificationUseCase: ShowAudioCallNotificationUseCase
-    private lateinit var showVideoCallNotificationUseCase: ShowVideoCallNotificationUseCase
-    private lateinit var removeCallNotificationUseCase: RemoveCallNotificationUseCase
+    private lateinit var callNotificationUseCase: CallNotificationUseCase
     private lateinit var loadHistoryUseCase: GliaLoadHistoryUseCase
     private lateinit var queueForChatEngagementUseCase: GliaQueueForChatEngagementUseCase
     private lateinit var getEngagementUseCase: GliaOnEngagementUseCase
@@ -100,9 +96,7 @@ class ChatControllerTest {
         minimizeHandler = mock()
         dialogController = mock()
         messagesNotSeenHandler = mock()
-        showAudioCallNotificationUseCase = mock()
-        showVideoCallNotificationUseCase = mock()
-        removeCallNotificationUseCase = mock()
+        callNotificationUseCase = mock()
         loadHistoryUseCase = mock()
         queueForChatEngagementUseCase = mock()
         getEngagementUseCase = mock()
@@ -154,9 +148,7 @@ class ChatControllerTest {
             minimizeHandler = minimizeHandler,
             dialogController = dialogController,
             messagesNotSeenHandler = messagesNotSeenHandler,
-            showAudioCallNotificationUseCase = showAudioCallNotificationUseCase,
-            showVideoCallNotificationUseCase = showVideoCallNotificationUseCase,
-            removeCallNotificationUseCase = removeCallNotificationUseCase,
+            callNotificationUseCase = callNotificationUseCase,
             loadHistoryUseCase = loadHistoryUseCase,
             queueForChatEngagementUseCase = queueForChatEngagementUseCase,
             getEngagementUseCase = getEngagementUseCase,

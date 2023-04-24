@@ -58,25 +58,22 @@ internal class NotificationManager(private val applicationContext: Application) 
         if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID)) {
             notificationManager.notify(
                 NotificationFactory.CALL_NOTIFICATION_ID,
-                NotificationFactory.createCallStartedNotification(applicationContext)
+                NotificationFactory.createAudioCallNotification(applicationContext)
+            )
+        }
+    }
+
+    override fun showVideoCallNotification(isTwoWayVideo: Boolean, hasAudio: Boolean) {
+        if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID)) {
+            notificationManager.notify(
+                NotificationFactory.CALL_NOTIFICATION_ID,
+                NotificationFactory.createVideoCallNotification(applicationContext, isTwoWayVideo, hasAudio)
             )
         }
     }
 
     override fun removeCallNotification() {
         notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID)
-    }
-
-    override fun showVideoCallNotification(isCallVisualizer: Boolean) {
-        if (areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID)) {
-            notificationManager.notify(
-                NotificationFactory.CALL_NOTIFICATION_ID,
-                NotificationFactory.createVideoCallStartedNotification(
-                    applicationContext,
-                    isCallVisualizer
-                )
-            )
-        }
     }
 
     /**

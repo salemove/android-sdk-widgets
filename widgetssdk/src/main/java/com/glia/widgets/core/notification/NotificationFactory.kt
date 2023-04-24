@@ -3,6 +3,8 @@ package com.glia.widgets.core.notification
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.glia.widgets.R
 import com.glia.widgets.core.notification.NotificationActionReceiver.Companion.getScreenSharingEndPressedActionIntent
@@ -37,26 +39,60 @@ internal object NotificationFactory {
             ).build()
     }
 
-    fun createCallStartedNotification(context: Context): Notification =
-        NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_mic)
-            .setContentTitle(context.getString(R.string.glia_notification_audio_call_title))
-            .setContentText(context.getString(R.string.glia_notification_audio_call_message))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setOngoing(true)
-            .build()
+    fun createAudioCallNotification(context: Context): Notification =
+        createCallNotification(
+            context = context,
+            icon = R.drawable.ic_baseline_mic,
+            title = R.string.glia_notification_audio_call_title,
+            message = R.string.glia_notification_audio_call_message
+        )
 
-    fun createVideoCallStartedNotification(
-        context: Context, isCallVisualizer: Boolean
+    fun createVideoCallNotification(
+        context: Context,
+        isTwoWayVideo: Boolean,
+        hasAudio: Boolean
     ): Notification {
-        val text =
-            context.getString(if (isCallVisualizer) R.string.glia_notification_video_call_message_no_audio else R.string.glia_notification_video_call_message)
+        return if (isTwoWayVideo) {
+            createTwoWayVideoNotification(context, hasAudio)
+        } else {
+            createOneWayVideoNotification(context, hasAudio)
+        }
+    }
 
+    private fun createOneWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
+        val message =
+            if (hasAudio) R.string.glia_notification_one_way_video_call_message
+            else R.string.glia_notification_one_way_video_call_message_no_audio
+        return createCallNotification(
+            context = context,
+            icon = R.drawable.ic_baseline_videocam,
+            title = R.string.glia_notification_one_way_video_call_title,
+            message = message
+        )
+    }
+
+    private fun createTwoWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
+        val message =
+            if (hasAudio) R.string.glia_notification_two_way_video_call_message
+            else R.string.glia_notification_two_way_video_call_message_no_audio
+        return createCallNotification(
+            context = context,
+            icon = R.drawable.ic_baseline_videocam,
+            title = R.string.glia_notification_two_way_video_call_title,
+            message = message
+        )
+    }
+
+    private fun createCallNotification(
+        context: Context,
+        @DrawableRes icon: Int,
+        @StringRes title: Int,
+        @StringRes message: Int
+    ): Notification {
         return NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_videocam)
-            .setContentTitle(context.getString(R.string.glia_notification_video_call_title))
-            .setContentText(text)
+            .setSmallIcon(icon)
+            .setContentTitle(context.getString(title))
+            .setContentText(context.getString(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setOngoing(true)

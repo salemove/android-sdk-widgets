@@ -9,7 +9,7 @@ import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import io.reactivex.Observable
 import java.util.function.Consumer
 
-class UnengagementMessageUseCase(
+internal class UnengagementMessageUseCase(
     private val messageRepository: GliaChatRepository,
     private val engagementRepository: GliaEngagementRepository,
     private val onEngagementUseCase: GliaOnEngagementUseCase,
@@ -37,7 +37,7 @@ class UnengagementMessageUseCase(
                 onEngagementUseCase.unregisterListener(engagementListener)
             }
         }
-            .flatMapSingle { chatMessage: ChatMessage? -> mapOperatorUseCase.execute(chatMessage) }
+            .flatMapSingle { chatMessage: ChatMessage -> mapOperatorUseCase(chatMessage) }
             .doOnError { obj: Throwable -> obj.printStackTrace() }
             .share()
     }

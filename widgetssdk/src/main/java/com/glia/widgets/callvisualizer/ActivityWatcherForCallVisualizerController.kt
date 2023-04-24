@@ -52,7 +52,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     override fun onActivityPaused() {
         Logger.d(TAG, "onActivityPaused()")
-        watcher.dismissAlertDialog(false)
+        watcher.dismissAlertDialog()
         watcher.removeDialogCallback()
         removeScreenSharingCallback()
     }
@@ -85,7 +85,7 @@ internal class ActivityWatcherForCallVisualizerController(
             currentDialogMode = state.mode
         }
         when (state.mode) {
-            MODE_NONE -> watcher.dismissAlertDialog(true)
+            MODE_NONE -> watcher.dismissAlertDialog()
             MODE_MEDIA_UPGRADE -> watcher.showUpgradeDialog(state as MediaUpgrade)
             MODE_OVERLAY_PERMISSION -> watcher.showOverlayPermissionsDialog()
             MODE_ENABLE_NOTIFICATION_CHANNEL -> watcher.showAllowNotificationsDialog()
@@ -100,7 +100,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     override fun onPositiveDialogButtonClicked(activity: Activity?) {
         Logger.d(TAG, "onPositiveButtonDialogButtonClicked() - $currentDialogMode")
-        watcher.dismissAlertDialog(true)
+        watcher.removeDialogFromStack()
         when (currentDialogMode) {
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.openNotificationChannelScreen()
@@ -118,7 +118,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     override fun onNegativeDialogButtonClicked() {
         Logger.d(TAG, "onNegativeButtonDialogButtonClicked() - $currentDialogMode")
-        watcher.dismissAlertDialog(true)
+        watcher.removeDialogFromStack()
         when (currentDialogMode) {
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING,
@@ -126,7 +126,11 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_OVERLAY_PERMISSION -> {
                 watcher.dismissOverlayDialog()
             }
-            MODE_MEDIA_UPGRADE,
+            MODE_MEDIA_UPGRADE -> {
+                mediaUpgradeOffer?.decline { error ->
+                    onMediaUpgradeDecline(error)
+                }
+            }
             MODE_VISITOR_CODE,
             MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
         }
@@ -237,7 +241,8 @@ internal class ActivityWatcherForCallVisualizerController(
         error?.let {
             Logger.e(TAG, error.message, error)
         } ?: run {
-            onNegativeDialogButtonClicked()
+            currentDialogMode = MODE_NONE
+            mediaUpgradeOffer = null
         }
     }
 

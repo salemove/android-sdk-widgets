@@ -48,6 +48,11 @@ public class MediaProjectionService extends Service {
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        stopSelf();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = null;
         if (intent != null) {

@@ -19,11 +19,11 @@ import com.glia.androidsdk.fcm.PushNotifications;
 import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.queuing.Queue;
 import com.glia.androidsdk.queuing.QueueTicket;
+import com.glia.androidsdk.secureconversations.SecureConversations;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.androidsdk.visitor.VisitorInfo;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.core.authentication.Authentication;
-import com.glia.widgets.core.secureconversations.SecureConversations;
 
 import java.io.InputStream;
 import java.util.List;
@@ -191,7 +191,7 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public SecureConversations getSecureConversations() {
-        return new SecureConversations(Glia.getSecureConversations());
+        return Glia.getSecureConversations();
     }
 
     @Override

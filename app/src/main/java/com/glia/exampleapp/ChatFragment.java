@@ -56,7 +56,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onDestroyView() {
         onEndListener = null;
-        chatView.onDestroyView(true);
+        chatView.onDestroyView();
         super.onDestroyView();
     }
 

@@ -32,7 +32,7 @@ public class GliaOnMessageUseCase implements
     public Observable<ChatMessageInternal> execute() {
         this.onEngagementUseCase.execute(this);
         return publishSubject
-                .flatMapSingle(mapOperatorUseCase::execute)
+                .flatMapSingle(mapOperatorUseCase::invoke)
                 .doOnError(Throwable::printStackTrace)
                 .share();
     }

@@ -23,7 +23,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.withStyledAttributes
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.isGone
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
@@ -35,11 +39,12 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
-import com.glia.widgets.chat.adapter.ChatAdapter.*
+import com.glia.widgets.chat.adapter.ChatAdapter.OnCustomCardResponse
+import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
+import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
 import com.glia.widgets.chat.adapter.holder.WebViewViewHolder
 import com.glia.widgets.chat.controller.ChatController
-import com.glia.widgets.chat.helper.FileHelper
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.history.ChatItem
@@ -59,10 +64,23 @@ import com.glia.widgets.filepreview.ui.FilePreviewActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.fileName
+import com.glia.widgets.helper.fileProviderAuthority
+import com.glia.widgets.helper.fixCapturedPhotoRotation
+import com.glia.widgets.helper.getContentUriCompat
+import com.glia.widgets.helper.isDownloaded
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.extensions.addColorFilter
+import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getColorStateListCompat
+import com.glia.widgets.view.unifiedui.extensions.getFontCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
@@ -299,10 +317,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     /**
      * Use this method to notify the view that your activity or fragment's view is being destroyed.
      * Used to dispose of any loose resources.
-     *
-     * @param isFinishing - indicates if activity is being recreated - "isFinishing = false" or is being completely destroyed - "isFinishing = true"
      */
-    fun onDestroyView(isFinishing: Boolean) {
+    fun onDestroyView() {
         alertDialog?.dismiss()
         alertDialog = null
 
@@ -453,31 +469,26 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.addAttachmentButton.isVisible = chatState.isAttachmentButtonVisible
     }
 
-    private fun updateIsFileDownloaded(item: ChatItem): ChatItem {
-        return when (item) {
-            is OperatorAttachmentItem -> {
-                val isFileDownloaded = FileHelper.isFileDownloaded(item.attachmentFile)
-                OperatorAttachmentItem(
-                    item.id,
-                    item.viewType,
-                    item.showChatHead,
-                    item.attachmentFile,
-                    item.operatorProfileImgUrl,
-                    isFileDownloaded,
-                    item.isDownloading,
-                    item.operatorId,
-                    item.messageId,
-                    item.timestamp
-                )
-            }
-            is VisitorAttachmentItem -> {
-                val isFileDownloaded = FileHelper.isFileDownloaded(item.attachmentFile)
-                VisitorAttachmentItem.editDownloadedStatus(item, isFileDownloaded)
-            }
-            else -> {
-                item
-            }
-        }
+    private fun updateIsFileDownloaded(item: ChatItem): ChatItem = when (item) {
+        is OperatorAttachmentItem -> OperatorAttachmentItem(
+            item.id,
+            item.viewType,
+            item.showChatHead,
+            item.attachmentFile,
+            item.operatorProfileImgUrl,
+            item.attachmentFile.isDownloaded,
+            item.isDownloading,
+            item.operatorId,
+            item.messageId,
+            item.timestamp
+        )
+
+        is VisitorAttachmentItem -> VisitorAttachmentItem.editDownloadedStatus(
+            item,
+            item.attachmentFile.isDownloaded
+        )
+
+        else -> item
     }
 
     private fun updateShowSendButton(chatState: ChatState) {
@@ -784,7 +795,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         if (photoFile != null) {
             controller?.photoCaptureFileUri = FileProvider.getUriForFile(
                 context,
-                FileHelper.getFileProviderAuthority(context),
+                context.fileProviderAuthority,
                 photoFile
             )
             if (controller?.photoCaptureFileUri != null) {
@@ -976,7 +987,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun handleCaptureImageActionResult() {
         controller?.apply {
             photoCaptureFileUri?.also {
-                FileHelper.fixCapturedPhotoRotation(context, it)
+                fixCapturedPhotoRotation(it, context)
                 onAttachmentReceived(Utils.mapUriToFileAttachment(context.contentResolver, it))
             }
         }
@@ -1062,7 +1073,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     override fun onFileOpenClick(file: AttachmentFile) {
-        val contentUri = FileHelper.getContentUri(file, context)
+        val contentUri = getContentUriCompat(file.fileName, context)
         val openIntent = Intent(Intent.ACTION_VIEW)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             .setDataAndType(contentUri, file.contentType)

@@ -2,28 +2,21 @@ package com.glia.widgets.filepreview.data.source.local;
 
 import android.graphics.Bitmap;
 
-import java.util.HashMap;
-import java.util.Map;
+import androidx.collection.ArrayMap;
 
 public class InAppBitmapCache {
-
-    private static InAppBitmapCache instance;
 
     private InAppBitmapCache() {
     }
 
-    private final Map<String, Bitmap> bitmapsById = new HashMap<>();
+    private final ArrayMap<String, Bitmap> bitmapsById = new ArrayMap<>();
 
     public static InAppBitmapCache getInstance() {
-        if (instance == null) {
-            synchronized (InAppBitmapCache.class) {
-                if (instance == null) {
-                    instance = new InAppBitmapCache();
-                }
-            }
-        }
+        return InstanceHolder.instance;
+    }
 
-        return instance;
+    private static final class InstanceHolder {
+        private static final InAppBitmapCache instance = new InAppBitmapCache();
     }
 
     public void putBitmap(String id, Bitmap bitmap) {

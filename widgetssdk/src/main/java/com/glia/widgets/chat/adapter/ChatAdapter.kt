@@ -21,7 +21,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCas
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 
-class ChatAdapter(
+internal class ChatAdapter(
     private val uiTheme: UiTheme,
     private val onOptionClickedListener: OnOptionClickedListener,
     private val onFileItemClickListener: OnFileItemClickListener,

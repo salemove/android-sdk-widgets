@@ -4,7 +4,6 @@ import com.glia.widgets.callvisualizer.CallVisualizerRepository;
 import com.glia.widgets.chat.data.ChatScreenRepository;
 import com.glia.widgets.chat.data.ChatScreenRepositoryImpl;
 import com.glia.widgets.chat.data.GliaChatRepository;
-import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
@@ -50,7 +49,6 @@ public class RepositoryFactory {
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
-    private final FileHelper fileHelper = new FileHelper();
     public RepositoryFactory(
             GliaCore gliaCore,
             DownloadsFolderDataSource downloadsFolderDataSource
@@ -123,7 +121,6 @@ public class RepositoryFactory {
                     InAppBitmapCache.getInstance(),
                     downloadsFolderDataSource,
                     gliaCore,
-                    fileHelper,
                     getEngagementConfigRepository()
             );
         }

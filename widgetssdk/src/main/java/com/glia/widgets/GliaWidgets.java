@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
-import com.glia.androidsdk.secureconversations.SecureConversations;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
@@ -72,7 +71,7 @@ public class GliaWidgets {
      * use the chat head bubble as an overlay as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
      * If set to true then the chat head will appear in the overlay and the sdk will ask for
-     * overlay permissions. If false, then the {@link ChatHeadsController} will notify any
+     * overlay permissions. If false, then the {@link com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController} will notify any
      * listening {@link com.glia.widgets.view.head.ChatHeadLayout} of any visibility changes.
      * It is up to the integrator to integrate {@link com.glia.widgets.view.head.ChatHeadLayout} in their
      * application.
@@ -311,18 +310,7 @@ public class GliaWidgets {
     }
 
     /**
-     * Creates `SecureConversations` instance for secure conversations.
-     *
-     * @return {@code SecureConversations} object or throws {@link GliaException} if error happened.
-     * Exception may have the following cause:
-     * {@link GliaException.Cause#INVALID_INPUT} - when SDK is not initialized
-     */
-    public static SecureConversations getSecureConversations() {
-        return Dependencies.glia().getSecureConversations();
-    }
-
-    /**
-     * Build time version of Glia Widgets SDK
+     * Build-time version of Glia Widgets SDK
      *
      * @return Glia Widgets SDK version name
      */
@@ -331,7 +319,7 @@ public class GliaWidgets {
     }
 
     /**
-     * Build time version of Glia Core SDK that is used by Glia Widgets SDK
+     * Build-time version of Glia Core SDK that is used by Glia Widgets SDK
      *
      * @return Glia Core SDK version name that is used by Glia Widgets SDK
      */

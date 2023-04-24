@@ -69,7 +69,7 @@ public class FilePreviewActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        filePreviewView.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        filePreviewView.onRequestPermissionsResult(requestCode, grantResults);
     }
 
     public static Intent intent(Context context, String itemId, String itemName, UiTheme theme) {

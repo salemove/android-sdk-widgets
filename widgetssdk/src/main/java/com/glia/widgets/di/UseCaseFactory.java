@@ -11,6 +11,7 @@ import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
+import com.glia.widgets.chat.domain.DecodeSampledBitmapFromInputStreamUseCase;
 import com.glia.widgets.chat.domain.FindNewMessagesDividerIndexUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
@@ -460,7 +461,10 @@ public class UseCaseFactory {
 
     @NonNull
     public GetImageFileFromNetworkUseCase createGetImageFileFromNetworkUseCase() {
-        return new GetImageFileFromNetworkUseCase(repositoryFactory.getGliaFileRepository());
+        return new GetImageFileFromNetworkUseCase(
+                repositoryFactory.getGliaFileRepository(),
+                createDecodeSampledBitmapFromInputStreamUseCase()
+        );
     }
 
     @NonNull
@@ -752,5 +756,10 @@ public class UseCaseFactory {
     @NonNull
     public FindNewMessagesDividerIndexUseCase createFindNewMessagesDividerIndexUseCase() {
         return new FindNewMessagesDividerIndexUseCase();
+    }
+
+    @NonNull
+    DecodeSampledBitmapFromInputStreamUseCase createDecodeSampledBitmapFromInputStreamUseCase() {
+        return new DecodeSampledBitmapFromInputStreamUseCase();
     }
 }

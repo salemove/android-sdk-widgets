@@ -16,12 +16,13 @@ import androidx.core.content.FileProvider
 import com.glia.widgets.GliaWidgets.CHAT_TYPE
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
-import com.glia.widgets.chat.helper.FileHelper
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.fileProviderAuthority
+import com.glia.widgets.helper.fixCapturedPhotoRotation
 import java.io.IOException
 
 class MessageCenterActivity : AppCompatActivity(),
@@ -42,10 +43,10 @@ class MessageCenterActivity : AppCompatActivity(),
         }
     }
 
-    private val getImage = registerForActivityResult(TakePicture()) { _: Boolean ->
+    private val getImage = registerForActivityResult(TakePicture()) {
         // Handle the returned Uri
         controller.photoCaptureFileUri?.also {
-            FileHelper.fixCapturedPhotoRotation(this, it)
+            fixCapturedPhotoRotation(it, this)
             controller.onAttachmentReceived(Utils.mapUriToFileAttachment(contentResolver, it))
         }
     }
@@ -108,7 +109,7 @@ class MessageCenterActivity : AppCompatActivity(),
             val photoFile = Utils.createTempPhotoFile(this)
             val uri = FileProvider.getUriForFile(
                 this,
-                FileHelper.getFileProviderAuthority(this),
+                fileProviderAuthority,
                 photoFile
             )
             controller.photoCaptureFileUri = uri

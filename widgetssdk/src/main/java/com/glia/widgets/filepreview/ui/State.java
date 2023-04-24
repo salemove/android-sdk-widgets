@@ -2,7 +2,7 @@ package com.glia.widgets.filepreview.ui;
 
 import android.graphics.Bitmap;
 
-import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.helper.FileHelper;
 
 class State {
     private final ImageLoadingState imageLoadingState;
@@ -88,24 +88,6 @@ class State {
                 .build();
     }
 
-    public State setImageLoadingFromNetwork() {
-        return new StateBuilder()
-                .copyFrom(this)
-                .setImageLoadingState(ImageLoadingState.LOADING_FROM_NETWORK)
-                .setIsShowShareButton(false)
-                .setIsShowDownloadButton(false)
-                .build();
-    }
-
-    public State setImageLoadedFromNetwork() {
-        return new StateBuilder()
-                .copyFrom(this)
-                .setImageLoadingState(ImageLoadingState.SUCCESS_FROM_NETWORK)
-                .setIsShowShareButton(false)
-                .setIsShowDownloadButton(true)
-                .build();
-    }
-
     public State setImageLoadedFromCache() {
         return new StateBuilder()
                 .copyFrom(this)
@@ -129,7 +111,7 @@ class State {
                 .copyFrom(this)
                 .setImageName(id)
                 .setImageId(name)
-                .setImageIdName(FileHelper.getFileName(id, name))
+                .setImageIdName(FileHelper.toFileName(id, name))
                 .build();
     }
 
@@ -147,14 +129,6 @@ class State {
                 .build();
     }
 
-    public State setImageSaved() {
-        return new StateBuilder()
-                .copyFrom(this)
-                .setIsShowShareButton(true)
-                .setIsShowDownloadButton(false)
-                .build();
-    }
-
     public State reset() {
         return new StateBuilder()
                 .copyFrom(new State())
@@ -165,10 +139,8 @@ class State {
         INITIAL,
         LOADING_FROM_DOWNLOADS,
         LOADING_FROM_CACHE,
-        LOADING_FROM_NETWORK,
         SUCCESS_FROM_DOWNLOADS,
         SUCCESS_FROM_CACHE,
-        SUCCESS_FROM_NETWORK,
         FAILURE
     }
 

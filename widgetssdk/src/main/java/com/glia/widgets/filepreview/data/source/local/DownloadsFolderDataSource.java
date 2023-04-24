@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 
-import com.glia.widgets.chat.helper.FileHelper;
+import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.Logger;
 
 import java.io.File;

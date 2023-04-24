@@ -82,7 +82,7 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
     }
 
     public void onMessage(ChatMessageInternal messageInternal) {
-        if (isCounting && messageInternal.isOperator()) {
+        if (isCounting && messageInternal.isNotVisitor()) {
             emitCount(count + 1);
         }
     }

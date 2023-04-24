@@ -2,7 +2,6 @@ package com.glia.widgets.filepreview.data;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,7 +12,6 @@ import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.secureconversations.SecureConversations;
 import com.glia.widgets.chat.ChatType;
-import com.glia.widgets.chat.helper.FileHelper;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
@@ -34,7 +32,6 @@ public class GliaFileRepositoryTest {
     private InAppBitmapCache bitmapCache;
     private DownloadsFolderDataSource downloadsFolderDataSource;
     private GliaCore gliaCore;
-    private FileHelper fileHelper;
     private GliaEngagementConfigRepository engagementConfigRepository;
     private SecureConversations secureConversations;
 
@@ -43,7 +40,6 @@ public class GliaFileRepositoryTest {
         bitmapCache = mock(InAppBitmapCache.class);
         downloadsFolderDataSource = mock(DownloadsFolderDataSource.class);
         gliaCore = mock(GliaCore.class);
-        fileHelper = mock(FileHelper.class);
         engagementConfigRepository = mock(GliaEngagementConfigRepository.class);
         secureConversations = mock(SecureConversations.class);
         when(gliaCore.getSecureConversations()).thenReturn(secureConversations);
@@ -51,7 +47,6 @@ public class GliaFileRepositoryTest {
                 bitmapCache,
                 downloadsFolderDataSource,
                 gliaCore,
-                fileHelper,
                 engagementConfigRepository
         );
     }
@@ -72,28 +67,19 @@ public class GliaFileRepositoryTest {
 
     @Test
     public void putImageToCache_completesSuccessfully_whenValidArguments() {
-        Completable result = gliaFileRepository.putImageToCache(FILENAME, BITMAP);
-        result.test().assertComplete();
+        when(bitmapCache.getBitmapById(FILENAME)).thenReturn(BITMAP);
+        gliaFileRepository.loadImageFromCache(FILENAME).test().assertResult(BITMAP);
     }
 
     @Test
-    public void putImageToCache_emitsException_whenSomethingGoesWrong() {
-        doThrow(RUNTIME_EXCEPTION).when(bitmapCache).putBitmap(any(), any());
-        Completable result = gliaFileRepository.putImageToCache(FILENAME, BITMAP);
-        result.test().assertError(RuntimeException.class);
-    }
-
-    @Test
-    public void loadImageFileFromNetwork_emitsBitmap_whenValidArguments() {
-        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
-                .thenReturn(MAYBE_BITMAP);
+    public void loadImageFileFromNetwork_emitsInputStream_whenValidArguments() {
         doAnswer(invocation -> {
             RequestCallback<InputStream> callback = invocation.getArgument(1);
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
         gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertResult(BITMAP);
+                .test().assertResult(INPUT_STREAM);
     }
 
     @Test
@@ -107,31 +93,18 @@ public class GliaFileRepositoryTest {
                 .test().assertError(GLIA_EXCEPTION);
     }
 
-    @Test
-    public void loadImageFileFromNetwork_emitsException_whenBitmapDecodingThrows() {
-        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
-                .thenReturn(MAYBE_EXCEPTION);
-        doAnswer(invocation -> {
-            RequestCallback<InputStream> callback = invocation.getArgument(1);
-            callback.onResult(INPUT_STREAM, null);
-            return null;
-        }).when(gliaCore).fetchFile(any(), any());
-        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertError(EXCEPTION.getClass());
-    }
+
 
     @Test
     public void loadImageFileFromNetwork_emitsBitmap_whenValidArgumentsForSecureMessaging() {
         when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
-        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
-                .thenReturn(MAYBE_BITMAP);
         doAnswer(invocation -> {
             RequestCallback<InputStream> callback = invocation.getArgument(1);
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(secureConversations).fetchFile(any(), any());
         gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertResult(BITMAP);
+                .test().assertResult(INPUT_STREAM);
     }
 
     @Test
@@ -144,20 +117,6 @@ public class GliaFileRepositoryTest {
         }).when(secureConversations).fetchFile(any(), any());
         gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
                 .test().assertError(GLIA_EXCEPTION);
-    }
-
-    @Test
-    public void loadImageFileFromNetwork_emitsException_whenBitmapDecodingThrowsForSecureMessaging() {
-        when(engagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
-        when(fileHelper.decodeSampledBitmapFromInputStream(any()))
-                .thenReturn(MAYBE_EXCEPTION);
-        doAnswer(invocation -> {
-            RequestCallback<InputStream> callback = invocation.getArgument(1);
-            callback.onResult(INPUT_STREAM, null);
-            return null;
-        }).when(secureConversations).fetchFile(any(), any());
-        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertError(EXCEPTION.getClass());
     }
 
     @Test
@@ -215,9 +174,5 @@ public class GliaFileRepositoryTest {
     private static final AttachmentFile ATTACHMENT_FILE = mock(AttachmentFile.class);
     private static final InputStream INPUT_STREAM = mock(InputStream.class);
     private static final Bitmap BITMAP = mock(Bitmap.class);
-    private static final Maybe<Bitmap> MAYBE_BITMAP = Maybe.just(BITMAP);
-    private static final RuntimeException RUNTIME_EXCEPTION = new RuntimeException();
     private static final GliaException GLIA_EXCEPTION = mock(GliaException.class);
-    private static final Exception EXCEPTION = mock(Exception.class);
-    private static final Maybe<Bitmap> MAYBE_EXCEPTION = Maybe.error(EXCEPTION);
 }

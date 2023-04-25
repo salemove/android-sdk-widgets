@@ -29,7 +29,8 @@ class ActivityWatcherForCallVisualizerContract {
     interface Watcher {
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
         fun openCallActivity()
-        fun dismissAlertDialog(manualDismiss: Boolean)
+        fun removeDialogFromStack()
+        fun dismissAlertDialog()
         fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade)
         fun showOverlayPermissionsDialog()
         fun showScreenSharingDialog()

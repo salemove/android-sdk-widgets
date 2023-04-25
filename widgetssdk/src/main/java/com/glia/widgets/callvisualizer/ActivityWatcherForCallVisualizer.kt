@@ -195,10 +195,14 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    override fun dismissAlertDialog(manualDismiss: Boolean) {
+    override fun dismissAlertDialog() {
         Logger.d(TAG, "Dismiss alert dialog")
         alertDialog?.dismiss()
         alertDialog = null
+    }
+
+    override fun removeDialogFromStack() {
+        dialogController.dismissCurrentDialog()
     }
 
     override fun dismissOverlayDialog() {

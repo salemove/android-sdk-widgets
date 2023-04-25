@@ -74,7 +74,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onActivityPaused cleanup of callbacks`() {
         controller.onActivityPaused()
-        verify(watcher).dismissAlertDialog(false)
+        verify(watcher).dismissAlertDialog()
         verify(watcher).removeDialogCallback()
         verify(screenSharingController).removeViewCallback(anyOrNull())
     }
@@ -92,7 +92,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
         resetMocks()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
         verify(watcher).openOverlayPermissionView()
     }
@@ -102,7 +102,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_NONE))
         resetMocks()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -110,7 +110,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_NONE))
         resetMocks()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -118,7 +118,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
     }
 
@@ -127,7 +127,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
     }
 
@@ -135,7 +135,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onPositiveDialogButtonClicked call activity is called when MODE_MEDIA_UPGRADE`() {
         prepareMediaUpgradeApplicationState()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(watcher).openCallActivity()
     }
 
@@ -143,7 +143,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_MEDIA_UPGRADE`() {
         prepareMediaUpgradeApplicationState()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -152,7 +152,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).showOverlayPermissionsDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).dismissOverlayDialog()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(watcher).openOverlayPermissionView()
     }
 
@@ -161,7 +161,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
         verify(watcher).showOverlayPermissionsDialog()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
     }
 
@@ -170,7 +170,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_NOTIFICATION_CHANNEL))
         verify(watcher).showAllowNotificationsDialog()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
     }
 
@@ -179,7 +179,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_NOTIFICATION_CHANNEL))
         verify(watcher).showAllowNotificationsDialog()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -187,7 +187,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
         verify(watcher).showVisitorCodeDialog()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -195,7 +195,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
         verify(watcher).showVisitorCodeDialog()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -203,7 +203,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
         verify(watcher).showScreenSharingDialog()
         controller.onPositiveDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
     }
 
     @Test
@@ -211,7 +211,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
         verify(watcher).showScreenSharingDialog()
         controller.onNegativeDialogButtonClicked()
-        verify(watcher).dismissAlertDialog(true)
+        verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
     }
 
@@ -246,7 +246,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onMediaUpgradeDecline(null)
-        verify(watcher).dismissAlertDialog(true)
     }
 
     @Test

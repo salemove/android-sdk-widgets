@@ -10,6 +10,7 @@ import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUs
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import java.util.function.Consumer
 
@@ -143,9 +144,5 @@ internal class ScreenSharingController(
     override fun onForceStopScreenSharing() {
         repository.forceEndScreenSharing()
         removeScreenSharingNotificationUseCase.invoke()
-    }
-
-    companion object {
-        private val TAG = ScreenSharingController::class.java.simpleName
     }
 }

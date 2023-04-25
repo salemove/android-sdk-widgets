@@ -18,6 +18,7 @@ import androidx.core.util.Pair
 import com.glia.widgets.R
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.ViewHelpers
 import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
@@ -127,8 +128,6 @@ class ChatHeadService : Service() {
     private fun getDefaultYPosition(screenHeight: Int): Int = screenHeight / 10 * 8
 
     companion object {
-        private val TAG = ChatHeadService::class.java.simpleName
-
         @JvmStatic
         fun getIntent(context: Context?): Intent {
             return Intent(context, ChatHeadService::class.java)

@@ -11,6 +11,7 @@ import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -28,8 +29,6 @@ class EndScreenSharingView (
     defStyleAttr,
     defStyleRes
 ), EndScreenSharingContract.View {
-
-    private val TAG = EndScreenSharingView::class.java.simpleName
 
     var onFinishListener: OnFinishListener? = null
     private var controller: EndScreenSharingContract.Controller? = null

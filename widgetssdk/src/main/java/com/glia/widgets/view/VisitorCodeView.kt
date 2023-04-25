@@ -19,6 +19,7 @@ import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -39,7 +40,6 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 class VisitorCodeView internal constructor(
     context: Context
 ) : FrameLayout(MaterialThemeOverlay.wrap(context, null, 0, R.style.Application_Glia_Chat), null, 0), VisitorCodeContract.View {
-    private val TAG = VisitorCodeView::class.java.simpleName
     private lateinit var controller: VisitorCodeContract.Controller
     private var theme: UiTheme? = null
 

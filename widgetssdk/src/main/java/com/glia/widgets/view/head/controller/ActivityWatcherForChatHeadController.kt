@@ -6,6 +6,7 @@ import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 internal class ActivityWatcherForChatHeadController(
     private var serviceChatHeadController: ServiceChatHeadController,
@@ -89,9 +90,5 @@ internal class ActivityWatcherForChatHeadController(
                 }
             }
         }
-    }
-
-    companion object {
-        private val TAG = ActivityWatcherForChatHeadController::class.java.simpleName
     }
 }

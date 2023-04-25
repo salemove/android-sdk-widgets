@@ -17,6 +17,7 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 
 internal class ActivityWatcherForCallVisualizerController(
@@ -24,10 +25,6 @@ internal class ActivityWatcherForCallVisualizerController(
     private val screenSharingController: ScreenSharingController,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
 ) : ActivityWatcherForCallVisualizerContract.Controller {
-
-    companion object {
-        private val TAG = ActivityWatcherForCallVisualizerController::class.java.simpleName
-    }
 
     @VisibleForTesting
     internal var mediaUpgradeOffer: MediaUpgradeOffer? = null

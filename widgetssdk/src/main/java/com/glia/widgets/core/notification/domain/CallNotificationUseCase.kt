@@ -5,6 +5,7 @@ import com.glia.androidsdk.comms.OperatorMediaState
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 internal class CallNotificationUseCase(
     private val notificationManager: INotificationManager
@@ -62,9 +63,5 @@ internal class CallNotificationUseCase(
             throw IllegalStateException("GliaHub does not support one-way audio calls")
         }
         return MediaDirection.TWO_WAY
-    }
-
-    companion object {
-        private val TAG = CallNotificationUseCase::class.java.simpleName
     }
 }

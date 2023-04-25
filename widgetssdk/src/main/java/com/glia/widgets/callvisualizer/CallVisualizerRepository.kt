@@ -10,16 +10,13 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import java.util.function.Consumer
 
 class CallVisualizerRepository(private val gliaCore: GliaCore) {
 
     private lateinit var callback: CallVisualizerCallback
     private var visitorContext: String? = null
-
-    companion object {
-        private val TAG = CallVisualizerRepository::class.java.simpleName
-    }
 
     fun init(callVisualizerCallback: CallVisualizerCallback) {
         this.callback = callVisualizerCallback

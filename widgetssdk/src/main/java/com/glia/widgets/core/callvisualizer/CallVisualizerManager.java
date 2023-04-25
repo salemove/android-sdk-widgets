@@ -5,6 +5,7 @@ import android.content.Context;
 import com.glia.androidsdk.GliaException;
 import androidx.annotation.NonNull;
 
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.widgets.callvisualizer.CallVisualizerRepository;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
@@ -19,6 +20,7 @@ public class CallVisualizerManager implements CallVisualizer {
     private final VisitorCodeViewBuilderUseCase buildVisitorCodeUseCase;
     private final GliaEngagementRepository engagementRepository;
     private Runnable onEngagementStartRunnable;
+    private Runnable onEngagementEndRunnable;
     private boolean isListeningForEngagement = false;
     public static final String TAG = CallVisualizer.class.getSimpleName();
 
@@ -64,6 +66,11 @@ public class CallVisualizerManager implements CallVisualizer {
         onEngagementStartRunnable = runnable;
     }
 
+    @Override
+    public void onEngagementEnd(Runnable runnable) {
+        onEngagementEndRunnable = runnable;
+    }
+
     private void startListeningForEngagements() {
         // Can't start Core SDK listener on this class init/construction because this class is initialized
         // on `Application.onCreate()` before the Glia Core SDK is initialised.
@@ -73,6 +80,17 @@ public class CallVisualizerManager implements CallVisualizer {
         engagementRepository.listenForCallVisualizerEngagement((engagement) -> {
             if (onEngagementStartRunnable != null) {
                 onEngagementStartRunnable.run();
+            }
+
+            startListeningForEngagementEnd(engagement);
+        });
+    }
+
+    private void startListeningForEngagementEnd(OmnibrowseEngagement engagement) {
+        engagementRepository.listenForEngagementEnd(engagement, () -> {
+            if (onEngagementEndRunnable != null) {
+                onEngagementEndRunnable.run();
+                engagementRepository.unregisterEngagementEndListener(onEngagementEndRunnable);
             }
         });
     }

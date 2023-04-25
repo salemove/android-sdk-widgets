@@ -2,7 +2,6 @@ package com.glia.widgets.core.callvisualizer.domain;
 
 import android.content.Context;
 
-import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.view.VisitorCodeView;
 
 /**
@@ -49,5 +48,15 @@ public interface CallVisualizer {
      * @param runnable The Runnable that will be executed on engagement start
      */
     void onEngagementStart(Runnable runnable);
+
+    /**
+     * Sets callback that will be called when Call Visualizer engagement is ended.
+     *
+     * Callback won't be triggered for engagement ended before the callback has been set.
+     * Setting new callback will override the old one.
+     *
+     * @param runnable The Runnable that will be executed on engagement end
+     */
+    void onEngagementEnd(Runnable runnable);
 
 }

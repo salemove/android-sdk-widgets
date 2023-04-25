@@ -192,8 +192,12 @@ public class ServiceChatHeadController
         this.buildTimeTheme = theme;
     }
 
-    private void engagementEnded() {
-        setPendingSurveyUseCase.invoke();
+    private void omnicoreEngagementEnded() {
+        setPendingSurveyUseCase.invoke(); // Survey is supported by omnicore engagement only
+        omnibrowseEngagementEnded();
+    }
+
+    private void omnibrowseEngagementEnded() {
         state = State.ENDED;
         operatorProfileImgUrl = null;
         unreadMessagesCount = 0;
@@ -210,7 +214,7 @@ public class ServiceChatHeadController
                         throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
                 );
         engagementDisposables.add(operatorDisposable);
-        gliaOnEngagementEndUseCase.execute(this::engagementEnded);
+        gliaOnEngagementEndUseCase.execute(this::omnicoreEngagementEnded);
         toggleChatHeadServiceUseCase.invoke(resumedViewName);
         updateChatHeadView();
     }
@@ -225,7 +229,7 @@ public class ServiceChatHeadController
                 );
         engagementDisposables.add(operatorDisposable);
         // To recieve callback to engagementEnded() after Call Visualizer engagement ends
-        gliaOnCallVisualizerEndUseCase.execute(this::engagementEnded);
+        gliaOnCallVisualizerEndUseCase.execute(this::omnibrowseEngagementEnded);
         updateChatHeadView();
     }
 

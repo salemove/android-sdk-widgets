@@ -23,11 +23,13 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 
 import com.glia.androidsdk.Glia;
+import com.glia.androidsdk.fcm.GliaPushMessage;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
@@ -93,6 +95,21 @@ public class MainFragment extends Fragment {
                 }
             }
         );
+        handleOpensFromPushNotification();
+    }
+
+    private void handleOpensFromPushNotification() {
+        FragmentActivity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+
+        GliaPushMessage push = Glia.getPushNotifications()
+                .handleOnMainActivityCreate(activity.getIntent().getExtras());
+
+        if (push != null) {
+            navigateToChat();
+        }
     }
 
     @Override

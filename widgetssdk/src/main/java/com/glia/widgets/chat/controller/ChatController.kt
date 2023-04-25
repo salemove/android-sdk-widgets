@@ -40,9 +40,7 @@ import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository.Submi
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase
+import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository.OperatorMediaStateListener
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
@@ -74,9 +72,7 @@ internal class ChatController(
     private val minimizeHandler: MinimizeHandler,
     private val dialogController: DialogController,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
-    private val showAudioCallNotificationUseCase: ShowAudioCallNotificationUseCase,
-    private val showVideoCallNotificationUseCase: ShowVideoCallNotificationUseCase,
-    private val removeCallNotificationUseCase: RemoveCallNotificationUseCase,
+    private val callNotificationUseCase: CallNotificationUseCase,
     private val loadHistoryUseCase: GliaLoadHistoryUseCase,
     private val queueForChatEngagementUseCase: GliaQueueForChatEngagementUseCase,
     private val getEngagementUseCase: GliaOnEngagementUseCase,
@@ -672,21 +668,6 @@ internal class ChatController(
         Logger.e(TAG, error)
         dialogController.showUnexpectedErrorDialog()
         emitViewState { chatState.stop() }
-    }
-
-    private fun onOperatorMediaStateVideo() {
-        Logger.d(TAG, "newOperatorMediaState: video")
-        showVideoCallNotificationUseCase()
-    }
-
-    private fun onOperatorMediaStateAudio() {
-        Logger.d(TAG, "newOperatorMediaState: audio")
-        showAudioCallNotificationUseCase()
-    }
-
-    private fun onOperatorMediaStateUnknown() {
-        Logger.d(TAG, "newOperatorMediaState: null")
-        removeCallNotificationUseCase()
     }
 
     private fun initMediaUpgradeCallback() {
@@ -1565,13 +1546,8 @@ internal class ChatController(
                 startTimer()
             }
         }
-        if (operatorMediaState.video != null) {
-            onOperatorMediaStateVideo()
-        } else if (operatorMediaState.audio != null) {
-            onOperatorMediaStateAudio()
-        } else {
-            onOperatorMediaStateUnknown()
-        }
+
+        callNotificationUseCase(operatorMedia = operatorMediaState)
     }
 
     private fun addMediaUpgradeItemToChatItems(operatorMediaState: OperatorMediaState) {

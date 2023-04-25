@@ -65,11 +65,9 @@ import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowAudioCallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
-import com.glia.widgets.core.notification.domain.ShowVideoCallNotificationUseCase;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
@@ -106,9 +104,7 @@ import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
 
 public class UseCaseFactory {
-    private static ShowAudioCallNotificationUseCase showAudioCallNotificationUseCase;
-    private static ShowVideoCallNotificationUseCase showVideoCallNotificationUseCase;
-    private static RemoveCallNotificationUseCase removeCallNotificationUseCase;
+    private static CallNotificationUseCase callNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
     private static ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
@@ -199,24 +195,10 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public ShowAudioCallNotificationUseCase createShowAudioCallNotificationUseCase() {
-        if (showAudioCallNotificationUseCase == null)
-            showAudioCallNotificationUseCase = new ShowAudioCallNotificationUseCase(notificationManager);
-        return showAudioCallNotificationUseCase;
-    }
-
-    @NonNull
-    public ShowVideoCallNotificationUseCase createShowVideoCallNotificationUseCase() {
-        if (showVideoCallNotificationUseCase == null)
-            showVideoCallNotificationUseCase = new ShowVideoCallNotificationUseCase(notificationManager, createIsCallVisualizerUseCase());
-        return showVideoCallNotificationUseCase;
-    }
-
-    @NonNull
-    public RemoveCallNotificationUseCase createRemoveCallNotificationUseCase() {
-        if (removeCallNotificationUseCase == null)
-            removeCallNotificationUseCase = new RemoveCallNotificationUseCase(notificationManager);
-        return removeCallNotificationUseCase;
+    public CallNotificationUseCase createCallNotificationUseCase() {
+        if (callNotificationUseCase == null)
+            callNotificationUseCase = new CallNotificationUseCase(notificationManager);
+        return callNotificationUseCase;
     }
 
     @NonNull
@@ -305,7 +287,7 @@ public class UseCaseFactory {
                 repositoryFactory.getGliaOperatorMediaRepository(),
                 repositoryFactory.getGliaFileAttachmentRepository(),
                 createOnEngagementUseCase(),
-                createRemoveCallNotificationUseCase(),
+                createCallNotificationUseCase(),
                 createRemoveScreenSharingNotificationUseCase(),
                 repositoryFactory.getGliaSurveyRepository(),
                 repositoryFactory.getGliaVisitorMediaRepository(),
@@ -757,7 +739,7 @@ public class UseCaseFactory {
                 repositoryFactory.getCallVisualizerRepository(),
                 repositoryFactory.getGliaOperatorMediaRepository(),
                 createOnCallVisualizerUseCase(),
-                removeCallNotificationUseCase,
+                callNotificationUseCase,
                 removeScreenSharingNotificationUseCase,
                 repositoryFactory.getGliaSurveyRepository(),
                 repositoryFactory.getGliaVisitorMediaRepository()

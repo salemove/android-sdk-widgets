@@ -3,7 +3,7 @@ package com.glia.widgets.core.callvisualizer.domain
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.callvisualizer.CallVisualizerRepository
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase
+import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository
 import com.glia.widgets.core.survey.GliaSurveyRepository
@@ -13,7 +13,7 @@ internal class GliaOnCallVisualizerEndUseCase(
     private val repository: CallVisualizerRepository,
     private val operatorMediaRepository: GliaOperatorMediaRepository,
     private val callVisualizerUseCase: GliaOnCallVisualizerUseCase,
-    private val removeCallNotificationUseCase: RemoveCallNotificationUseCase,
+    private val callNotificationUseCase: CallNotificationUseCase,
     private val removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase,
     private val surveyRepository: GliaSurveyRepository,
     private val gliaVisitorMediaRepository: GliaVisitorMediaRepository
@@ -29,7 +29,7 @@ internal class GliaOnCallVisualizerEndUseCase(
             listener?.engagementEnded()
             operatorMediaRepository.stopListening(engagement)
             removeScreenSharingNotificationUseCase()
-            removeCallNotificationUseCase()
+            callNotificationUseCase.removeAllNotifications()
             gliaVisitorMediaRepository.onEngagementEnded(engagement)
         }
     }

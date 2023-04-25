@@ -5,7 +5,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
-import com.glia.widgets.core.notification.domain.RemoveCallNotificationUseCase;
+import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
@@ -20,7 +20,7 @@ public class GliaOnEngagementEndUseCase implements
 
     private final GliaOnEngagementUseCase engagementUseCase;
     private final RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
-    private final RemoveCallNotificationUseCase removeCallNotificationUseCase;
+    private final CallNotificationUseCase callNotificationUseCase;
     private final GliaEngagementRepository repository;
     private final GliaOperatorMediaRepository operatorMediaRepository;
     private final FileAttachmentRepository fileAttachmentRepository;
@@ -47,7 +47,7 @@ public class GliaOnEngagementEndUseCase implements
             fileAttachmentRepository.clearObservers();
             fileAttachmentRepository.detachAllFiles();
             removeScreenSharingNotificationUseCase.invoke();
-            removeCallNotificationUseCase.invoke();
+            callNotificationUseCase.removeAllNotifications();
             gliaVisitorMediaRepository.onEngagementEnded(engagement);
             gliaEngagementConfigRepository.reset();
         }
@@ -60,7 +60,7 @@ public class GliaOnEngagementEndUseCase implements
             GliaOperatorMediaRepository operatorMediaRepository,
             FileAttachmentRepository fileAttachmentRepository,
             GliaOnEngagementUseCase engagementUseCase,
-            RemoveCallNotificationUseCase removeCallNotificationUseCase,
+            CallNotificationUseCase callNotificationUseCase,
             RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase,
             GliaSurveyRepository surveyRepository,
             GliaVisitorMediaRepository gliaVisitorMediaRepository,
@@ -68,7 +68,7 @@ public class GliaOnEngagementEndUseCase implements
     ) {
         this.repository = repository;
         this.engagementUseCase = engagementUseCase;
-        this.removeCallNotificationUseCase = removeCallNotificationUseCase;
+        this.callNotificationUseCase = callNotificationUseCase;
         this.removeScreenSharingNotificationUseCase = removeScreenSharingNotificationUseCase;
         this.operatorMediaRepository = operatorMediaRepository;
         this.fileAttachmentRepository = fileAttachmentRepository;

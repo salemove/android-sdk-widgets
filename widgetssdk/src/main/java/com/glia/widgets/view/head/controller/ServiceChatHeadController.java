@@ -270,7 +270,8 @@ public class ServiceChatHeadController
     }
 
     private void clearResumedViewName(View view) {
-        if (isResumedView(view)) {
+        // On quick configuration changes view can be null
+        if (view != null && isResumedView(view)) {
             resumedViewName = null;
         }
     }

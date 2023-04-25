@@ -38,6 +38,7 @@ internal class ActivityWatcherForChatHead(
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
      * @return Currently resumed activity.
      */
+
     private var resumedActivity: WeakReference<Activity?> = WeakReference(null)
     private var chatHeadLayout: WeakReference<ChatHeadLayout> = WeakReference(null)
     private var screenOrientation: Int? = null

@@ -1,7 +1,6 @@
 package com.glia.widgets.callvisualizer
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
@@ -33,7 +32,6 @@ class EndScreenSharingView (
 
     var onFinishListener: OnFinishListener? = null
     private var controller: EndScreenSharingContract.Controller? = null
-    private var uiTheme: UiTheme by Delegates.notNull()
     private var statusBarColor: Int by Delegates.notNull()
     private var screenSharingController: ScreenSharingController? = null
     private var defaultStatusBarColor: Int? = null
@@ -50,24 +48,17 @@ class EndScreenSharingView (
 
     init {
         initCallbacks()
-        readTypedArray(attrs, defStyleAttr, defStyleRes)
+        applyDefaultTheme(attrs, defStyleAttr, defStyleRes)
+        applyRemoteTheme(Dependencies.getGliaThemeManager().theme)
         prepareView()
     }
 
-    private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
+    private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            setDefaultTheme(this)
+            var theme = Utils.getThemeFromTypedArray(this, context)
+            theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
+            applyRuntimeTheme(theme)
         }
-    }
-
-    private fun setDefaultTheme(typedArray: TypedArray) {
-        uiTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        uiTheme.brandPrimaryColor?.let(::getColorCompat)?.also {
-            statusBarColor = it
-            changeStatusBarColor(it)
-            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
-        }
-        binding.appBarView.setTheme(uiTheme)
     }
 
     private fun prepareView() {
@@ -91,11 +82,6 @@ class EndScreenSharingView (
         this.controller = controller
         controller?.setView(this)
         screenSharingController = Dependencies.getControllerFactory().screenSharingController
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        applyRemoteTheme(Dependencies.getGliaThemeManager().theme)
     }
 
     private fun applyRemoteTheme(unifiedTheme: UnifiedTheme?) {

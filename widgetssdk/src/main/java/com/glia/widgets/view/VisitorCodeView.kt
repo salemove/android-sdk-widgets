@@ -22,14 +22,17 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.button.GliaPositiveButton
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyProgressColorTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getFontCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.separateStringWithSymbol
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
+import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 /**
  * A view for displaying the visitor code to the visitor.
@@ -120,9 +123,9 @@ class VisitorCodeView internal constructor(
     private fun setDefaultTheme(typedArray: TypedArray) {
         val typedArrayTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
         val runtimeGlobalTheme = Dependencies.getSdkConfigurationManager()?.uiTheme
-        theme = if (typedArrayTheme != null && runtimeGlobalTheme != null) {
-            Utils.getFullHybridTheme(runtimeGlobalTheme, typedArrayTheme)
-        } else runtimeGlobalTheme ?: typedArrayTheme
+        theme = runtimeGlobalTheme?.let {
+            Utils.getFullHybridTheme(it, typedArrayTheme)
+        } ?: typedArrayTheme
         applyRuntimeThemeConfig(theme)
     }
 
@@ -201,10 +204,6 @@ class VisitorCodeView internal constructor(
         val baseShadeColor = theme.baseShadeColor?.let(::getColorCompat)
         val baseDarkColor = theme.baseDarkColor?.let(::getColorCompat)
         val fontFamily = theme.fontRes?.let(::getFontCompat)
-
-        applyLayerTheme(
-            backgroundColor = baseLightColor
-        )
         successTitle.applyTextTheme(
             textColor = baseDarkColor,
             textFont = fontFamily
@@ -224,5 +223,7 @@ class VisitorCodeView internal constructor(
         }
         progressBar.applyProgressColorTheme(brandPrimaryColor)
         closeButton.applyImageColorTheme(baseNormalColor)
+
+        setBackgroundColor(baseLightColor ?: return)
     }
 }

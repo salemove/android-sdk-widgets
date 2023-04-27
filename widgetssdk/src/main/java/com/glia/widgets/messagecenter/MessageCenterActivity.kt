@@ -20,6 +20,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.fileProviderAuthority
 import com.glia.widgets.helper.fixCapturedPhotoRotation
@@ -131,9 +132,5 @@ class MessageCenterActivity : AppCompatActivity(),
         return GliaSdkConfiguration.Builder()
             .intent(intent)
             .build()
-    }
-
-    companion object {
-        private const val TAG = "MessageCenterActivity"
     }
 }

@@ -18,6 +18,7 @@ import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadLayoutContract
@@ -204,9 +205,5 @@ internal class ApplicationChatHeadLayoutController(
 
     private enum class State {
         ENDED, QUEUEING, ENGAGEMENT
-    }
-
-    companion object {
-        private val TAG = ApplicationChatHeadLayoutController::class.java.simpleName
     }
 }

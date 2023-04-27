@@ -54,6 +54,7 @@ import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.Utils
@@ -1678,7 +1679,6 @@ internal class ChatController(
     }
 
     companion object {
-        private val TAG = ChatController::class.java.simpleName
         private const val EMPTY_MESSAGE = ""
     }
 }

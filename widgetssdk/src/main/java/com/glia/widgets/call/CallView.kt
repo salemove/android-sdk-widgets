@@ -45,6 +45,7 @@ import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.OperatorStatusView
@@ -68,7 +69,6 @@ internal class CallView(
     defStyleAttr,
     defStyleRes
 ), CallViewCallback {
-    private val TAG = CallView::class.java.simpleName
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.callTheme

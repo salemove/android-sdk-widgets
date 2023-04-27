@@ -16,6 +16,7 @@ import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCa
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.*
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import io.reactivex.disposables.CompositeDisposable
 
@@ -241,8 +242,6 @@ internal class MessageCenterController(
     }
 
     companion object {
-        private const val TAG = "MessageCenterController"
-
         private const val FILE_TYPE_IMAGES = "image/*"
         private const val FILE_TYPE_ALL = "*/*"
     }

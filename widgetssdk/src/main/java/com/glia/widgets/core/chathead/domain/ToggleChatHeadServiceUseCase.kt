@@ -8,6 +8,7 @@ import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.queue.GliaQueueRepository
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 internal class ToggleChatHeadServiceUseCase(
     engagementRepository: GliaEngagementRepository,
@@ -39,9 +40,5 @@ internal class ToggleChatHeadServiceUseCase(
 
     override fun isDisplayBasedOnPermission(): Boolean {
         return permissionManager.hasOverlayPermission()
-    }
-
-    companion object {
-        private val TAG = ToggleChatHeadServiceUseCase::class.java.simpleName
     }
 }

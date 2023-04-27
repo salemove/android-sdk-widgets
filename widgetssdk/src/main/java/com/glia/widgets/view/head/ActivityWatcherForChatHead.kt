@@ -19,6 +19,7 @@ import com.glia.widgets.chat.ChatView
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
@@ -193,9 +194,5 @@ internal class ActivityWatcherForChatHead(
             )
             it.startActivity(intent)
         }
-    }
-
-    companion object {
-        private val TAG = ActivityWatcherForChatHead::class.java.simpleName
     }
 }

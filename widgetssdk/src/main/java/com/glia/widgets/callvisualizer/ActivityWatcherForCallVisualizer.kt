@@ -28,6 +28,7 @@ import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
@@ -37,10 +38,6 @@ internal class ActivityWatcherForCallVisualizer(
     private val dialogController: DialogController,
     val controller: ActivityWatcherForCallVisualizerContract.Controller
 ) : BaseActivityWatcher(), ActivityWatcherForCallVisualizerContract.Watcher {
-
-    companion object {
-        private val TAG = ActivityWatcherForCallVisualizer::class.java.simpleName
-    }
 
     init {
         controller.setWatcher(this)

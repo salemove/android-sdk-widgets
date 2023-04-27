@@ -63,6 +63,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.fileProviderAuthority
@@ -1147,7 +1148,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     companion object {
-        private const val TAG = "ChatView"
         private const val OPEN_DOCUMENT_ACTION_REQUEST = 100
         private const val CAPTURE_IMAGE_ACTION_REQUEST = 101
         private const val CAPTURE_VIDEO_ACTION_REQUEST = 102

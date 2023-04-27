@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
+import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer
 import com.glia.widgets.callvisualizer.CallVisualizerCallback
 import com.glia.widgets.callvisualizer.CallVisualizerRepository
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
@@ -14,6 +15,7 @@ import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 
 internal class CallVisualizerController(
@@ -26,9 +28,6 @@ internal class CallVisualizerController(
 ) : CallVisualizerCallback,
     GliaOnCallVisualizerUseCase.Listener,
     GliaOnCallVisualizerEndUseCase.Listener, OnSurveyListener {
-    companion object {
-        private val TAG = CallVisualizerController::class.java.simpleName
-    }
 
     fun init() {
         Logger.d(TAG, "CallVisualizerController initialized")

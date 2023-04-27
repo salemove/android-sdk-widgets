@@ -112,6 +112,7 @@ internal class ScreenSharingController(
         dialogController.dismissCurrentDialog()
         repository.onScreenSharingDeclined()
         hasPendingScreenSharingRequest = false
+        hideScreenSharingEnabledNotification()
     }
 
     fun onScreenSharingNotificationEndPressed() {
@@ -131,7 +132,7 @@ internal class ScreenSharingController(
         showScreenSharingNotificationUseCase.invoke()
     }
 
-    private fun hideScreenSharingEnabledNotification() {
+    override fun hideScreenSharingEnabledNotification() {
         removeScreenSharingNotificationUseCase.invoke()
     }
 

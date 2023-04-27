@@ -2,6 +2,7 @@ package com.glia.widgets.callvisualizer
 
 import android.Manifest
 import android.app.Activity
+import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -22,6 +23,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
+import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.openNotificationChannelScreen
@@ -111,7 +113,7 @@ internal class ActivityWatcherForCallVisualizer(
         activity.startActivity(overlayIntent)
     }
 
-    fun registerForCameraPermissionResult(activity: Activity) {
+    private fun registerForCameraPermissionResult(activity: Activity) {
         (activity as? ComponentActivity?)?.let { componentActivity ->
             cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
                 isGranted: Boolean ->
@@ -124,7 +126,7 @@ internal class ActivityWatcherForCallVisualizer(
         dialogController.showOverlayPermissionsDialog()
     }
 
-    fun registerForOverlayPermissionResult(activity: Activity) {
+    private fun registerForOverlayPermissionResult(activity: Activity) {
         (activity as? ComponentActivity?)?.let { componentActivity ->
             overlayPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
                     isGranted: Boolean ->
@@ -133,15 +135,14 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    @Suppress("RedundantNullableReturnType")
-    fun registerForMediaProjectionPermissionResult(activity: Activity) {
+    private fun registerForMediaProjectionPermissionResult(activity: Activity) {
         // Request a token that grants the app the ability to capture the display contents
         // See https://developer.android.com/guide/topics/large-screens/media-projection
         val componentActivity = activity as? ComponentActivity?
         if (componentActivity == null) {
             Logger.d(
                 TAG, "Activity does not support ActivityResultRegistry APIs, " +
-                        "legacy onActivityResult() will be used to acquire a media projection token"
+                        "legacy onActivityResult() should be used to acquire a media projection token"
             )
             controller.removeMediaProjectionLaunchers(activity::class.java.simpleName)
             return
@@ -152,18 +153,20 @@ internal class ActivityWatcherForCallVisualizer(
         ) { result ->
             Logger.d(TAG, "Acquire a media projection token: result received")
             if (result.resultCode == RESULT_OK && result.data != null) {
-                Logger.d(
-                    TAG,
-                    "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK"
-                )
+                Logger.d(TAG, "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK")
                 Glia.getCurrentEngagement().ifPresent { engagement ->
-                    engagement.onActivityResult(
+                    engagement.onActivityResult( // Requires MediaProjectionService running already
                         GliaScreenSharingRepository.SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE,
                         result.resultCode,
                         result.data
                     )
                 }
+            } else if (result.resultCode == RESULT_CANCELED) {
+                Logger.d(TAG, "Acquire a media projection token: RESULT_CANCELED")
+                // Visitor rejected system permission required for screen sharing
+                controller.onMediaProjectionRejected()
             }
+            destroySupportActivityIfExists(componentActivity)
         }
         activity::class.simpleName?.let {
             controller.startMediaProjectionLaunchers(it, launcher)
@@ -363,17 +366,21 @@ internal class ActivityWatcherForCallVisualizer(
         return Utils.getFullHybridTheme(themeFromIntent, themeFromGlobalSetting)
     }
 
-    override fun openComponentActivity() {
+    override fun openSupportActivity(permissionType: PermissionType) {
         resumedActivity.get()?.run {
-            startActivity(Intent(this, CallVisualizerSupportActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
+            val intent = Intent(this, CallVisualizerSupportActivity::class.java)
+            intent.putExtra(PERMISSION_TYPE_TAG, permissionType)
+            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
         }
     }
 
     override fun destroySupportActivityIfExists() {
-        resumedActivity.get()?.run {
-            if (this is CallVisualizerSupportActivity) {
-                this.finish()
-            }
+        resumedActivity.get()?.let { destroySupportActivityIfExists(it) }
+    }
+
+    private fun destroySupportActivityIfExists(activity: Activity) {
+        if (activity is CallVisualizerSupportActivity) {
+            activity.finish()
         }
     }
 }

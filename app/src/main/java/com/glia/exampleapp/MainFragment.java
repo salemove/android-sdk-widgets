@@ -37,6 +37,7 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.chat.ChatActivity;
+import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
@@ -49,7 +50,6 @@ public class MainFragment extends Fragment {
     private ConstraintLayout containerView;
 
     private Authentication authentication;
-    private SwitchCompat switchCompat;
 
     @Nullable
     @Override
@@ -69,7 +69,7 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.settings_button).setOnClickListener(view1 ->
                 navController.navigate(R.id.settings));
         view.findViewById(R.id.chat_activity_button).setOnClickListener(v ->
-                navigateToChat());
+                navigateToChat(ChatType.LIVE_CHAT));
         view.findViewById(R.id.audio_call_button).setOnClickListener(v ->
                 navigateToCall(GliaWidgets.MEDIA_TYPE_AUDIO));
         view.findViewById(R.id.video_call_button).setOnClickListener(v ->
@@ -82,7 +82,7 @@ public class MainFragment extends Fragment {
                 new Thread(this::initGliaWidgets).start()
         );
         view.findViewById(R.id.authenticationButton).setOnClickListener(v ->
-                showAuthenticationDialog());
+                showAuthenticationDialog(null));
         view.findViewById(R.id.deauthenticationButton).setOnClickListener(v ->
                 deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
@@ -107,8 +107,34 @@ public class MainFragment extends Fragment {
         GliaPushMessage push = Glia.getPushNotifications()
                 .handleOnMainActivityCreate(activity.getIntent().getExtras());
 
-        if (push != null) {
-            navigateToChat();
+        if (push == null) {
+            return;
+        }
+
+        if (push.getType() == GliaPushMessage.PushType.QUEUED_MESSAGE) {
+            authenticate(() -> {
+                navigateToChat(ChatType.SECURE_MESSAGING);
+            });
+        } else {
+            navigateToChat(ChatType.LIVE_CHAT);
+        }
+    }
+
+    private void authenticate(OnAuthCallback callback) {
+        if (Glia.isInitialized() && authentication == null) {
+            prepareAuthentication();
+        }
+        if (!Glia.isInitialized()) {
+            new Thread(() -> {
+                initGliaWidgets();
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> showAuthenticationDialog(callback));
+                }
+            }).start();
+        } else if (authentication != null && authentication.isAuthenticated()) {
+            callback.onAuthenticated();
+        } else {
+            showAuthenticationDialog(callback);
         }
     }
 
@@ -166,12 +192,13 @@ public class MainFragment extends Fragment {
         });
     }
 
-    private void navigateToChat() {
+    private void navigateToChat(ChatType chatType) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
         Intent intent = ChatActivity.getIntent(
                 getContext(),
                 getContextAssetIdFromPrefs(sharedPreferences),
-                getQueueIdFromPrefs(sharedPreferences));
+                getQueueIdFromPrefs(sharedPreferences),
+                chatType);
         startActivity(intent);
     }
 
@@ -281,14 +308,14 @@ public class MainFragment extends Fragment {
         );
     }
 
-    private void showAuthenticationDialog() {
+    private void showAuthenticationDialog(@Nullable OnAuthCallback callback) {
         if (getContext() == null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final EditText tokenInput = prepareTokenInputViewEditText(builder);
         builder.setPositiveButton(
                 getString(R.string.authentication_dialog_authenticate_button),
-                (dialog, which) -> authenticate(tokenInput));
+                (dialog, which) -> authenticate(tokenInput, callback));
         builder.setNegativeButton(
                 R.string.authentication_dialog_cancel_button,
                 (dialog, which) -> dialog.cancel());
@@ -350,13 +377,16 @@ public class MainFragment extends Fragment {
         setupAuthButtonsVisibility();
     }
 
-    private void authenticate(EditText input) {
+    private void authenticate(EditText input, @Nullable OnAuthCallback callback) {
         if (getActivity() == null || containerView == null) return;
 
         String jwt = input.getText().toString();
         authentication.authenticate((response, exception) -> {
             if (exception == null && authentication.isAuthenticated()) {
                 setupAuthButtonsVisibility();
+                if (callback != null) {
+                    callback.onAuthenticated();
+                }
             } else {
                 showToast("Error: " + exception);
             }
@@ -402,5 +432,9 @@ public class MainFragment extends Fragment {
         if (getActivity() == null) return;
 
         getActivity().runOnUiThread(() -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
+    }
+
+    private interface OnAuthCallback {
+        void onAuthenticated();
     }
 }

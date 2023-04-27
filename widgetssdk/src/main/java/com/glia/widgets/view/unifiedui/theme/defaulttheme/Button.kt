@@ -29,10 +29,14 @@ internal fun NegativeDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
     DefaultButtonTheme(text = baseLightColorTheme, background = systemNegativeColorTheme)
 }
 
-private fun DefaultButtonTheme(text: ColorTheme? = null, background: ColorTheme? = null) =
-    composeIfAtLeastOneNotNull(text, background) {
-        ButtonTheme(
-            background = LayerTheme(fill = background),
-            text = TextTheme(textColor = text)
-        )
-    }
+private fun DefaultButtonTheme(
+    text: ColorTheme? = null,
+    background: ColorTheme? = null,
+    iconColor: ColorTheme? = null
+) = composeIfAtLeastOneNotNull(text, background, iconColor) {
+    ButtonTheme(
+        background = LayerTheme(fill = background),
+        text = TextTheme(textColor = text),
+        iconColor = iconColor ?: text
+    )
+}

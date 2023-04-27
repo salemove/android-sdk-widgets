@@ -1,12 +1,6 @@
 package com.glia.widgets.view
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RoundRectShape
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
@@ -14,9 +8,14 @@ import android.widget.TextView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.extensions.*
 import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getDimenRes
+import com.glia.widgets.view.unifiedui.extensions.getDimenResPx
+import com.glia.widgets.view.unifiedui.extensions.getFontCompat
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.callvisulaizer.VisitorCodeTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
@@ -98,7 +97,13 @@ class CharCodeView @JvmOverloads constructor(
         )
         charView.layoutParams = charViewLayout
 
-        // TODO: work a bit more on sizes and margins in layout XMLs
+        charView.setPadding(
+            charViewProps.horizonPadding,
+            charViewProps.verticalPadding,
+            charViewProps.horizonPadding,
+            charViewProps.verticalPadding
+        )
+
         return charView
     }
 
@@ -108,15 +113,26 @@ class CharCodeView @JvmOverloads constructor(
         }
 
         val fontFamily = theme.fontRes?.let { getFontCompat(it) }
-        val backgroundColor = theme.visitorCodeBackgroundColor?.let { getColorCompat(it) } ?: charViewProps.backgroundColor
-        val borderColor = theme.visitorCodeBorderColor?.let { getColorCompat(it) } ?: charViewProps.borderColor
-        val textColor = theme.visitorCodeTextColor?.let { getColorCompat(it) } ?: theme.baseDarkColor?.let { getColorCompat(it) }
-        charView.background = createCharBackground(backgroundColor, borderColor, charViewProps.borderWidth, charViewProps.borderRadius)
+        val backgroundColor = theme.visitorCodeBackgroundColor?.let { getColorCompat(it) }
+            ?: charViewProps.backgroundColor
+        val borderColor =
+            theme.visitorCodeBorderColor?.let { getColorCompat(it) } ?: charViewProps.borderColor
+        val textColor = theme.visitorCodeTextColor?.let { getColorCompat(it) }
+            ?: theme.baseDarkColor?.let { getColorCompat(it) }
+
+        val backgroundTheme = LayerTheme(
+            fill = ColorTheme(backgroundColor),
+            stroke = borderColor,
+            borderWidth = charViewProps.borderWidth,
+            cornerRadius = charViewProps.borderRadius
+        )
 
         charView.applyTextTheme(
             textColor = textColor,
             textFont = fontFamily
         )
+
+        charView.applyLayerTheme(backgroundTheme)
     }
 
     private fun applyRemoteTheme(theme: VisitorCodeTheme?, charView: TextView) {
@@ -124,51 +140,8 @@ class CharCodeView @JvmOverloads constructor(
             return
         }
 
-        val padding = Rect(
-            charViewProps.horizonPadding,
-            charViewProps.verticalPadding,
-            charViewProps.horizonPadding,
-            charViewProps.verticalPadding
-        )
-        charView.applyLayerTheme(theme.numberSlotBackground, padding)
-        charView.applyTextTheme(theme.numberSlotText,
-            withBackground = false, // background is applied from background directly
-            withAlignment = false // no alignment value in JSON
-        )
+        charView.applyLayerTheme(theme.numberSlotBackground)
+        charView.applyTextTheme(theme.numberSlotText, withAlignment = false)
     }
 
-    // More or less creates same shape as in bg_char_slot.xml but programmatically for runtime and remote themes
-    private fun createCharBackground(backgroundColor: Int, borderColor: Int, borderWidth: Float, cornerRadius: Float): Drawable {
-        return LayerDrawable(arrayOf(
-            createCharBackgroundShape(backgroundColor, cornerRadius),
-            createCharBorderShape(borderColor, borderWidth, cornerRadius)
-        ))
-    }
-
-    private fun createCharBackgroundShape(backgroundColor: Int, cornerRadius: Float): Drawable {
-        return ShapeDrawable().apply {
-            shape = RoundRectShape(createBorderRadii(cornerRadius), null, null)
-            paint.color = backgroundColor
-            paint.style = Paint.Style.FILL_AND_STROKE
-        }
-    }
-
-    private fun createCharBorderShape(borderColor: Int, borderWidth: Float, cornerRadius: Float): Drawable {
-        return ShapeDrawable().apply {
-            shape = RoundRectShape(createBorderRadii(cornerRadius), null, null)
-            paint.color = borderColor
-            paint.style = Paint.Style.STROKE
-            paint.strokeWidth = borderWidth
-            setPadding(
-                charViewProps.horizonPadding,
-                charViewProps.verticalPadding,
-                charViewProps.horizonPadding,
-                charViewProps.verticalPadding
-            )
-        }
-    }
-
-    private fun createBorderRadii(borderRadius: Float): FloatArray {
-        return floatArrayOf(borderRadius, borderRadius, borderRadius, borderRadius, borderRadius, borderRadius, borderRadius, borderRadius)
-    }
 }

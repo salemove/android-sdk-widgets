@@ -26,6 +26,7 @@ import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
 import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
 import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
 import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.shape.CornerFamily
@@ -36,7 +37,7 @@ import kotlin.properties.Delegates
 
 class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
     FrameLayout(
-        MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+        context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
         attrs,
         defStyleAttr,
         defStyleRes
@@ -69,8 +70,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = R.attr.gliaChatStyle
-    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat) {
-    }
+    ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     init {
         readTypedArray(attrs, defStyleAttr, defStyleRes)

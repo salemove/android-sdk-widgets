@@ -12,7 +12,13 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
+import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
+import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.extensions.changeStatusBarColor
+import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.view.unifiedui.extensions.getFontCompat
+import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
@@ -54,6 +60,7 @@ class EndScreenSharingView (
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
+            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
             var theme = Utils.getThemeFromTypedArray(this, context)
             theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
             applyRuntimeTheme(theme)
@@ -84,11 +91,15 @@ class EndScreenSharingView (
     }
 
     private fun applyRemoteTheme(unifiedTheme: UnifiedTheme?) {
-        val theme = unifiedTheme?.callVisualizerTheme?.endScreenSharingTheme
-        binding.appBarView.applyHeaderTheme(theme?.header)
-        binding.endSharingButton.applyButtonTheme(theme?.endButton)
-        binding.screenSharingLabel.applyTextTheme(theme?.label)
-        binding.root.applyLayerTheme(theme?.background)
+        val theme = unifiedTheme?.callVisualizerTheme?.endScreenSharingTheme ?: return
+        binding.appBarView.applyHeaderTheme(theme.header)
+        binding.endSharingButton.applyButtonTheme(theme.endButton)
+        binding.screenSharingLabel.applyTextTheme(theme.label)
+        binding.root.applyLayerTheme(theme.background)
+        theme.header?.background?.fill?.primaryColor?.also {
+            statusBarColor = it
+            changeStatusBarColor(it)
+        }
     }
 
     private fun applyRuntimeTheme(theme: UiTheme?) {
@@ -106,12 +117,8 @@ class EndScreenSharingView (
         primaryColor?.also {
             statusBarColor = it
             changeStatusBarColor(it)
-            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
         }
         binding.appBarView.setTheme(theme)
-        binding.root.applyLayerTheme(
-            backgroundColor = baseLightColor
-        )
         binding.endSharingButton.applyButtonTheme(
             backgroundColor = systemNegativeColor,
             textColor = baseLightColor,
@@ -121,6 +128,7 @@ class EndScreenSharingView (
             textColor = baseDarkColor,
             textFont = fontFamily
         )
+        binding.root.setBackgroundColor(baseLightColor ?: return)
     }
 
     fun onDestroy() {

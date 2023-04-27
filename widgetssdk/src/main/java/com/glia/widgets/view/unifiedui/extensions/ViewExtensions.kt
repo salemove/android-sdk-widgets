@@ -3,11 +3,14 @@ package com.glia.widgets.view.unifiedui.extensions
 import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
-import android.graphics.*
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.Shader
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -18,7 +21,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.*
+import androidx.annotation.AnyRes
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.FontRes
+import androidx.annotation.StyleRes
+import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -108,18 +118,19 @@ internal fun View.applyColorTheme(color: ColorTheme?) {
     backgroundTintList = null
 }
 
-internal fun createBackgroundFromTheme(color: ColorTheme): Drawable {
-    return if (color.isGradient) {
-        GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, color.valuesArray)
+internal fun createBackgroundFromTheme(color: ColorTheme): Drawable = color.run {
+    if (isGradient) {
+        GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, valuesArray)
     } else {
-        ColorDrawable(color.primaryColor)
+        GradientDrawable().apply { setColor(primaryColor) }
     }
 }
 
 /**
- * wii update whole background without keeping old background or stroke
+ * will update whole background without keeping an old background or stroke
+ * in case when the old background differs from [GradientDrawable]
  */
-internal fun View.applyLayerTheme(layer: LayerTheme?, padding: Rect? = null) {
+internal fun View.applyLayerTheme(layer: LayerTheme?) {
     if (layer?.fill == null && layer?.stroke == null) return
 
     val drawable = (background as? GradientDrawable) ?: GradientDrawable()
@@ -145,15 +156,7 @@ internal fun View.applyLayerTheme(layer: LayerTheme?, padding: Rect? = null) {
 
     layer.cornerRadius?.also { drawable.cornerRadius = it }
 
-    background = padding?.let {
-        LayerDrawable(arrayOf(drawable)).apply {
-            setPadding(padding.left, padding.top, padding.right, padding.bottom)
-        }
-    } ?: drawable
-}
-
-internal fun View.applyLayerTheme(@ColorInt backgroundColor: Int?) {
-    backgroundColor?.apply(::setBackgroundColor)
+    background = drawable
 }
 
 internal fun MaterialToolbar.applyToolbarTheme(@ColorInt backgroundColor: Int?, @ColorInt navigationIconColor: Int?) {
@@ -240,8 +243,11 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     buttonTheme?.shadowColor?.also(::applyShadow)
     buttonTheme?.text?.also {
         applyTextTheme(it)
-        // Also apply text color to button icon
-        iconTint = it.textColor?.primaryColorStateList
+    }
+
+    //If no `iconColor` provided use text color
+    buttonTheme?.let { it.iconColor ?: it.text?.textColor }?.primaryColorStateList?.also {
+        iconTint = it
     }
 }
 

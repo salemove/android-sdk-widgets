@@ -16,6 +16,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
+        android:adjustViewBounds="true"
+        android:maxHeight="@dimen/glia_confirmation_screen_confirmation_icon_size"
         app:srcCompat="@drawable/ic_checkmark_message_center_confirmation_screen"
         app:tint="?attr/gliaBrandPrimaryColor" />
 
@@ -24,7 +26,7 @@
         style="@style/Application.Glia.Header3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="@dimen/glia_confirmation_screen_title_top_margin"
         android:text="@string/message_center_confirmation_screen_title" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -33,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="42dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/glia_confirmation_screen_message_top_margin"
         android:gravity="center"
         android:text="@string/message_center_confirmation_screen_message"
         android:textSize="16sp" />
@@ -48,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="@dimen/glia_confirmation_screen_button_bottom_margin"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/message_center_confirmation_screen_check_messages_btn"

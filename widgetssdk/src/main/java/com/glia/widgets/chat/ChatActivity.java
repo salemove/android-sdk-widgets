@@ -41,6 +41,26 @@ public class ChatActivity extends AppCompatActivity {
                 .putExtra(GliaWidgets.QUEUE_ID, queueId);
     }
 
+    /**
+     * Creates and fills out Intent for starting ChatActivity
+     * @param context - Context object
+     * @param contextId - Context asset ID
+     * @param queueId - Queue ID
+     * @param chatType - Type of chat screen
+     * @return - Intent for Starting ChatActivity
+     */
+    public static Intent getIntent(
+            Context context,
+            String contextId,
+            String queueId,
+            ChatType chatType
+    ) {
+        return new Intent(context, ChatActivity.class)
+                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
+                .putExtra(GliaWidgets.QUEUE_ID, queueId)
+                .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

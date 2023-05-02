@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.Dialog.*
@@ -69,6 +70,16 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         mockOnActivityResumeAndEnsureCallbacksSet(supportActivity)
         controller.screenSharingViewCallback?.onScreenSharingRequestError(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
         verify(watcher).showToast("message")
+    }
+
+    @Test
+    fun `onActivityResumed does not call permissions when not CallVisualizerSupportActivity`() {
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        val nonCallVisualizerSupportActivity = mock(Activity::class.java)
+        controller.onActivityResumed(nonCallVisualizerSupportActivity)
+        resetMocks()
+        verify(watcher, never()).requestCameraPermission()
+        verify(nonCallVisualizerSupportActivity, never()).getSystemService(any())
     }
 
     @Test
@@ -287,7 +298,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = false)
-        verify(watcher).openComponentActivity()
+        verify(watcher).openSupportActivity(any())
     }
 
     @Test
@@ -332,6 +343,9 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     private fun mockOnActivityResumeAndEnsureCallbacksSet(activity: Activity) {
         whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        val intent = mock(Intent::class.java)
+        whenever(supportActivity.intent).thenReturn(intent)
+        whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(ScreenSharing)
         controller.onInitialCameraPermissionResult(
             isGranted = false,
             isComponentActivity = true

@@ -10,6 +10,7 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.Dialog.*
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -45,6 +46,13 @@ internal class ActivityWatcherForCallVisualizerController(
         Logger.d(TAG, "onActivityResumed(root)")
         addDialogCallback(activity)
         addScreenSharingCallback(activity)
+        if (activity is CallVisualizerSupportActivity) {
+            when (activity.intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)) {
+                is ScreenSharing -> acquireMediaProjectionToken(activity)
+                is Camera -> watcher.requestCameraPermission()
+                else -> { /* Shouldn't happen. No need to do anything. */}
+            }
+        }
     }
 
     override fun onActivityPaused() {
@@ -146,19 +154,19 @@ internal class ActivityWatcherForCallVisualizerController(
         screenSharingController.removeViewCallback(screenSharingViewCallback)
     }
 
-    private fun startScreenSharing(activity: Activity) {
-        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
+    @VisibleForTesting
+    internal fun startScreenSharing(activity: Activity) {
         if (activity is ComponentActivity) {
             acquireMediaProjectionToken(activity)
-            screenSharingController.onScreenSharingAcceptedAndPermissionAsked(
-                contextWithStyle
-            )
         } else {
-            screenSharingController.onScreenSharingAccepted(contextWithStyle)
+            watcher.openSupportActivity(ScreenSharing)
         }
+        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
+        screenSharingController.onScreenSharingAcceptedAndPermissionAsked(contextWithStyle)
     }
 
     private fun acquireMediaProjectionToken(activity: Activity) {
+        Logger.d(TAG, "Acquiring Media Projection Token")
         startMediaProjectionLaunchers[activity::class.simpleName].let { startMediaProjection ->
             activity.getSystemService(MediaProjectionManager::class.java)
                 ?.let { mediaProjectionManager ->
@@ -189,7 +197,7 @@ internal class ActivityWatcherForCallVisualizerController(
             if (isComponentActivity) {
                 watcher.requestCameraPermission()
             } else {
-                watcher.openComponentActivity()
+                watcher.openSupportActivity(Camera)
             }
         } else {
             mediaUpgradeOffer?.accept { error ->
@@ -209,6 +217,10 @@ internal class ActivityWatcherForCallVisualizerController(
                 onMediaUpgradeDecline(error)
             }
         }
+    }
+
+    override fun onMediaProjectionRejected() {
+        screenSharingController.onScreenSharingDeclined()
     }
 
     override fun onMediaProjectionPermissionResult(isGranted: Boolean, context: Context) {

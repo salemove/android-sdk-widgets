@@ -14,4 +14,6 @@ public interface GliaScreenSharingCallback {
     void onScreenSharingRequestSuccess();
 
     void onForceStopScreenSharing();
+
+    void hideScreenSharingEnabledNotification();
 }

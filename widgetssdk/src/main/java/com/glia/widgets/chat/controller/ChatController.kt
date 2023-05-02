@@ -4,7 +4,15 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
-import com.glia.androidsdk.chat.*
+import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.androidsdk.chat.Chat
+import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.FilesAttachment
+import com.glia.androidsdk.chat.MessageAttachment
+import com.glia.androidsdk.chat.OperatorMessage
+import com.glia.androidsdk.chat.SingleChoiceAttachment
+import com.glia.androidsdk.chat.SingleChoiceOption
+import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.OperatorMediaState
@@ -18,22 +26,61 @@ import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.adapter.ChatAdapter
-import com.glia.widgets.chat.domain.*
+import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
+import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase
+import com.glia.widgets.chat.domain.CustomCardInteractableUseCase
+import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase
+import com.glia.widgets.chat.domain.CustomCardTypeUseCase
+import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
+import com.glia.widgets.chat.domain.GliaOnMessageUseCase
+import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase
+import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
+import com.glia.widgets.chat.domain.GliaSendMessageUseCase
+import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase
+import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
+import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
+import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.chat.domain.UnengagementMessageUseCase
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.chat.model.history.*
+import com.glia.widgets.chat.model.history.ChatItem
+import com.glia.widgets.chat.model.history.CustomCardItem
+import com.glia.widgets.chat.model.history.LinkedChatItem
+import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
+import com.glia.widgets.chat.model.history.NewMessagesItem
+import com.glia.widgets.chat.model.history.OperatorAttachmentItem
+import com.glia.widgets.chat.model.history.OperatorChatItem
+import com.glia.widgets.chat.model.history.OperatorMessageItem
+import com.glia.widgets.chat.model.history.OperatorStatusItem
+import com.glia.widgets.chat.model.history.ResponseCardItem
+import com.glia.widgets.chat.model.history.SystemChatItem
+import com.glia.widgets.chat.model.history.VisitorAttachmentItem
+import com.glia.widgets.chat.model.history.VisitorMessageItem
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.engagement.domain.*
+import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
+import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
+import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
+import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor.OperatorVisitor
-import com.glia.widgets.core.fileupload.domain.*
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository.Submitter
@@ -64,7 +111,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.*
+import java.util.Observer
+import java.util.UUID
 
 internal class ChatController(
     chatViewCallback: ChatViewCallback,
@@ -116,7 +164,8 @@ internal class ChatController(
     private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
     private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
-    private val unengagementMessageUseCase: UnengagementMessageUseCase
+    private val unengagementMessageUseCase: UnengagementMessageUseCase,
+    private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
@@ -1396,7 +1445,7 @@ internal class ChatController(
     @Synchronized
     private fun historyLoaded(historyResponse: ChatHistoryResponse) {
         Logger.d(TAG, "historyLoaded")
-        val (messages, newMessagesDividerIndex) = historyResponse
+        val (messages, newMessagesCount) = historyResponse
         val currentItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
         val newItems = removeDuplicates(currentItems, messages)
 
@@ -1404,7 +1453,7 @@ internal class ChatController(
             !newItems.isNullOrEmpty() -> submitHistoryItems(
                 newItems,
                 currentItems,
-                newMessagesDividerIndex
+                newMessagesCount
             )
             !chatState.engagementRequested && !isSecureEngagement -> queueForEngagement()
             else -> Logger.d(TAG, "Opened empty Secure Conversations chat")
@@ -1417,26 +1466,25 @@ internal class ChatController(
     private fun submitHistoryItems(
         newItems: List<ChatMessageInternal>,
         currentItems: MutableList<ChatItem>,
-        newMessagesDividerIndex: Int
+        newMessagesCount: Int
     ) {
         newItems.forEachIndexed { index, message ->
             appendHistoryChatItem(currentItems, message, index == newItems.lastIndex)
         }
 
         if (isSecureEngagementUseCase() && !isQueueingOrOngoingEngagement) {
-            emitChatTranscriptItems(currentItems, newMessagesDividerIndex)
+            emitChatTranscriptItems(currentItems, newMessagesCount)
         } else {
             emitChatItems { chatState.historyLoaded(currentItems) }
         }
 
     }
 
-    private fun emitChatTranscriptItems(
-        items: MutableList<ChatItem>, newMessagesDividerIndex: Int
+    @VisibleForTesting
+    fun emitChatTranscriptItems(
+        items: MutableList<ChatItem>, newMessagesCount: Int
     ) {
-        if (newMessagesDividerIndex > -1) {
-            items.add(newMessagesDividerIndex, NewMessagesItem)
-
+        if (addNewMessagesDividerUseCase(items, newMessagesCount)) {
             emitChatItems { chatState.changeItems(items) }
             markMessagesReadWithDelay()
         } else {

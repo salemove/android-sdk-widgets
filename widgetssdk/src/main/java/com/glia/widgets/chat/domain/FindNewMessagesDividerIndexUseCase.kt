@@ -1,14 +1,19 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.androidsdk.chat.Chat
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
+import com.glia.widgets.chat.model.history.ChatItem
+import com.glia.widgets.chat.model.history.ServerChatItem
 
-class FindNewMessagesDividerIndexUseCase {
+internal const val NOT_PROVIDED = -1
+internal class FindNewMessagesDividerIndexUseCase {
 
-    operator fun invoke(messages: List<ChatMessageInternal>, unreadMessagesCount: Int): Int {
-        if (messages.isEmpty() || unreadMessagesCount <= 0) return -1
+    /**
+     * Calculates the `new messages divider` index.
+     * @return the index between [NOT_PROVIDED] and [messages] count.
+     */
+    operator fun invoke(messages: List<ChatItem>, unreadMessagesCount: Int): Int {
+        if (unreadMessagesCount !in (1..messages.count())) return NOT_PROVIDED
 
-        var dividerIndex = -1
+        var dividerIndex = NOT_PROVIDED
         var remainingUnreadMessagesCount = unreadMessagesCount
 
         val iterator = messages.run { listIterator(size) }
@@ -17,14 +22,14 @@ class FindNewMessagesDividerIndexUseCase {
 
             val message = iterator.previous()
 
-            if (message.chatMessage.senderType != Chat.Participant.VISITOR) {
+            if (message is ServerChatItem) {
                 --remainingUnreadMessagesCount
             }
 
             dividerIndex = iterator.nextIndex()
         }
 
-        return dividerIndex.coerceAtLeast(0)
+        return dividerIndex
     }
 
 }

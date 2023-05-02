@@ -1,67 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory app:title="Authorization">
-        <EditTextPreference
-            app:defaultValue="@string/glia_api_key_id"
-            app:key="@string/pref_api_key_id"
-            app:title="@string/settings_site_api_key_id"
-            app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
-            app:defaultValue="@string/glia_api_key_secret"
-            app:key="@string/pref_api_key_secret"
-            app:title="@string/settings_site_api_key_secret"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            app:defaultValue="@string/site_id"
-            app:key="@string/pref_site_id"
-            app:title="@string/settings_site_id"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            app:defaultValue="@string/glia_queue_id"
-            app:key="@string/pref_queue_id"
-            app:title="@string/settings_queue_id"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/settings_sdk_title">
-        <EditTextPreference
-            app:defaultValue="@string/settings_value_default_company_name"
-            app:key="@string/pref_company_name"
-            app:title="@string/settings_company_name"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            app:defaultValue=""
-            app:key="@string/pref_context_asset_id"
-            app:title="@string/settings_visitor_context_asset_id"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory app:title="Behavior">
 
         <SwitchPreference
             app:defaultValue="false"
             app:key="@string/pref_white_label"
             app:title="@string/settings_white_label" />
-
-        <SwitchPreference
-            app:defaultValue="true"
-            app:key="@string/pref_use_overlay"
-            app:title="@string/settings_use_overlay" />
-
-        <SwitchPreference
-            app:defaultValue="false"
-            app:key="@string/pref_use_alert_dialog_button_vertical_alignment"
-            app:title="@string/settings_use_alert_dialog_button_vertical_alignment" />
-
-        <ListPreference
-            android:defaultValue="@string/screen_sharing_mode_unbounded"
-            android:entries="@array/screen_sharing_mode_keys"
-            android:entryValues="@array/screen_sharing_mode_values"
-            android:key="@string/pref_screen_sharing_mode"
-            android:title="@string/settings_screen_sharing_mode_title"
-            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/settings_colors_title">
@@ -261,24 +207,5 @@
             android:key="@string/pref_font_family"
             android:title="@string/settings_chat_font_family"
             app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/settings_other">
-
-        <EditTextPreference
-            app:key="@string/pref_header_title"
-            app:title="@string/settings_header_title"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="Versions">
-        <Preference
-            android:key="@string/pref_glia_widgets_sdk_version"
-            android:title="Glia Widgets SDK Version" />
-        <Preference
-            android:key="@string/pref_glia_core_sdk_version"
-            android:title="Glia Core SDK Version" />
     </PreferenceCategory>
 </PreferenceScreen>

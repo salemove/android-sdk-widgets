@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="SDK Settings">
+
+        <Preference
+            android:key="@string/pref_glia_basic_settings"
+            android:title="SDK Basic Settings" />
+
+        <Preference
+            android:key="@string/pref_glia_runtime_theme_settings"
+            android:title="Runtime Theme Settings" />
+
+        <Preference
+            android:key="@string/pref_glia_remote_theme_settings"
+            android:title="Remote Theme Settings" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Versions">
+
+        <Preference
+            android:key="@string/pref_glia_widgets_sdk_version"
+            android:title="Glia Widgets SDK Version" />
+
+        <Preference
+            android:key="@string/pref_glia_core_sdk_version"
+            android:title="Glia Core SDK Version" />
+    </PreferenceCategory>
+</PreferenceScreen>

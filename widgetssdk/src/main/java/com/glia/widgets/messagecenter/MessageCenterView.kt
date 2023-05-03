@@ -3,12 +3,14 @@ package com.glia.widgets.messagecenter
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Color
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.Window
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
@@ -29,6 +31,7 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultHeader
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
+import kotlinx.parcelize.Parcelize
 import kotlin.properties.Delegates
 
 class MessageCenterView(
@@ -78,6 +81,7 @@ class MessageCenterView(
         initConfigurations()
         readTypedArray(attrs, defStyleAttr, defStyleRes)
         setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
+        isSaveEnabled = true
     }
 
     @JvmOverloads
@@ -297,5 +301,23 @@ class MessageCenterView(
     interface OnAttachFileListener {
         fun selectAttachmentFile(type: String)
         fun takePhoto()
+    }
+
+    @Parcelize
+    internal class SavedState(val state: Parcelable?, val isConfirmationScreen: Boolean) :
+        BaseSavedState(state)
+
+    override fun onSaveInstanceState(): Parcelable {
+        return SavedState(super.onSaveInstanceState(), confirmationView.isVisible)
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable) {
+        if (state !is SavedState) {
+            super.onRestoreInstanceState(state)
+            return
+        }
+
+        super.onRestoreInstanceState(state.superState)
+        if (state.isConfirmationScreen) showConfirmationScreen()
     }
 }

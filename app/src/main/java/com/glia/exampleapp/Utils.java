@@ -20,6 +20,10 @@ class Utils {
         return sharedPreferences.getString(resources.getString(keyValue), defaultValue);
     }
 
+    public static void putStringToPrefs(@StringRes int keyValue, String value, SharedPreferences sharedPreferences, Resources resources) {
+        sharedPreferences.edit().putString(resources.getString(keyValue), value).apply();
+    }
+
     public static UiTheme getUiThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) {
         String title = Utils.getStringFromPrefs(R.string.pref_header_title, null, sharedPreferences, resources);
         Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences, resources);

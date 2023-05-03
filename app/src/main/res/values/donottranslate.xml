@@ -24,6 +24,7 @@
     <string name="pref_api_key_id">api_key</string>
     <string name="pref_api_key_secret">api_key_secret</string>
     <string name="pref_company_name">company_name</string>
+    <string name="pref_auth_token">auth_token</string>
     <string name="pref_queue_id">queue_id</string>
     <string name="pref_context_asset_id">context_asset_id</string>
     <string name="pref_white_label">white_label_toggle</string>

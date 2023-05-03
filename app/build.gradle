@@ -44,6 +44,7 @@ android {
     initEnvProperty('GLIA_API_KEY_ID')
     initEnvProperty('GLIA_SITE_ID')
     initEnvProperty('GLIA_QUEUE_ID')
+    initEnvProperty('GLIA_JWT', "")
     initEnvProperty('FIREBASE_PROJECT_ID')
     initEnvProperty('FIREBASE_API_KEY')
     initEnvProperty('FIREBASE_APP_ID')
@@ -55,6 +56,7 @@ android {
             resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
             resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
             resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
+            resValue("string", "glia_jwt", GLIA_JWT)
             resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
             resValue("string", "firebase_api_key", FIREBASE_API_KEY)
         }
@@ -82,9 +84,9 @@ android {
     namespace 'com.glia.exampleapp'
 }
 
-def initEnvProperty(String propertyName) {
+def initEnvProperty(String propertyName, String defaultValue = "UNDEFINED") {
     if (!project.hasProperty(propertyName)) {
-        ext[propertyName] = System.getenv(propertyName) as String ?: "UNDEFINED"
+        ext[propertyName] = System.getenv(propertyName) as String ?: defaultValue
     }
 }
 

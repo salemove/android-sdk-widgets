@@ -6,7 +6,7 @@ import com.glia.androidsdk.chat.ChatMessage;
 
 import java.util.Objects;
 
-public class CustomCardItem extends LinkedChatItem {
+public class CustomCardItem extends LinkedChatItem implements ServerChatItem {
     private final ChatMessage message;
 
     public CustomCardItem(ChatMessage message, int viewType) {
@@ -30,7 +30,7 @@ public class CustomCardItem extends LinkedChatItem {
         if (message.getTimestamp() != that.message.getTimestamp()) return false;
         if (!message.getId().equals(that.message.getId())) return false;
         if (!message.getContent().equals(that.message.getContent())) return false;
-        if (message.getSender() != that.message.getSender()) return false;
+        if (message.getSenderType() != that.message.getSenderType()) return false;
         if (!Objects.equals(message.getAttachment(), that.message.getAttachment())) return false;
         return Objects.equals(message.getMetadata(), that.message.getMetadata());
     }
@@ -40,7 +40,7 @@ public class CustomCardItem extends LinkedChatItem {
         int result = (int) (message.getTimestamp() ^ (message.getTimestamp() >>> 32));
         result = 31 * result + message.getId().hashCode();
         result = 31 * result + message.getContent().hashCode();
-        result = 31 * result + (message.getSender() != null ? message.getSender().hashCode() : 0);
+        result = 31 * result + message.getSenderType().hashCode();
         result = 31 * result + (message.getAttachment() != null ? message.getAttachment().hashCode() : 0);
         result = 31 * result + (message.getMetadata() != null ? message.getMetadata().hashCode() : 0);
         return result;
@@ -54,7 +54,7 @@ public class CustomCardItem extends LinkedChatItem {
                 "timestamp=" + message.getTimestamp() +
                 ", id='" + message.getId() + '\'' +
                 ", content='" + message.getContent() + '\'' +
-                ", sender=" + message.getSender() +
+                ", sender=" + message.getSenderType() +
                 ", attachment=" + message.getAttachment() +
                 ", metadata=" + message.getMetadata() +
                 "}" +

@@ -2,7 +2,23 @@ package com.glia.widgets.chat.controller
 
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.ChatViewCallback
-import com.glia.widgets.chat.domain.*
+import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
+import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase
+import com.glia.widgets.chat.domain.CustomCardInteractableUseCase
+import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase
+import com.glia.widgets.chat.domain.CustomCardTypeUseCase
+import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
+import com.glia.widgets.chat.domain.GliaOnMessageUseCase
+import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase
+import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
+import com.glia.widgets.chat.domain.GliaSendMessageUseCase
+import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase
+import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
+import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
+import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
+import com.glia.widgets.chat.domain.SiteInfoUseCase
+import com.glia.widgets.chat.domain.UnengagementMessageUseCase
+import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
@@ -10,9 +26,20 @@ import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.engagement.domain.*
+import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
+import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
+import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
+import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
+import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
-import com.glia.widgets.core.fileupload.domain.*
+import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
+import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
+import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
+import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
@@ -28,10 +55,18 @@ import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
-import junit.framework.TestCase.*
+import io.reactivex.Completable
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ChatControllerTest {
@@ -85,6 +120,7 @@ class ChatControllerTest {
     private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
     private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
     private lateinit var unengagementMessageUseCase: UnengagementMessageUseCase
+    private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
 
     private lateinit var chatController: ChatController
 
@@ -140,6 +176,7 @@ class ChatControllerTest {
         setPendingSurveyUsedUseCase = mock()
         isCallVisualizerUseCase = mock()
         unengagementMessageUseCase = mock()
+        addNewMessagesDividerUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -191,7 +228,8 @@ class ChatControllerTest {
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
             isCallVisualizerUseCase = isCallVisualizerUseCase,
-            unengagementMessageUseCase = unengagementMessageUseCase
+            unengagementMessageUseCase = unengagementMessageUseCase,
+            addNewMessagesDividerUseCase = addNewMessagesDividerUseCase
         )
     }
 
@@ -343,5 +381,23 @@ class ChatControllerTest {
         whenever(newMessage.id).thenReturn("oldId2")
 
         assertTrue(chatController.isNewMessage(oldHistory, newMessage))
+    }
+
+    @Test
+    fun `emitChatTranscriptItems triggers remove new messages divider when divider is added`() {
+        whenever(addNewMessagesDividerUseCase(any(), any())) doReturn true
+        whenever(markMessagesReadWithDelayUseCase()) doReturn Completable.complete()
+
+        chatController.emitChatTranscriptItems(mutableListOf(), 10)
+        verify(markMessagesReadWithDelayUseCase).invoke()
+    }
+
+    @Test
+    fun `emitChatTranscriptItems not triggers remove new messages divider when divider is added`() {
+        whenever(addNewMessagesDividerUseCase(any(), any())) doReturn false
+        whenever(markMessagesReadWithDelayUseCase()) doReturn Completable.complete()
+
+        chatController.emitChatTranscriptItems(mutableListOf(), 10)
+        verify(markMessagesReadWithDelayUseCase, never()).invoke()
     }
 }

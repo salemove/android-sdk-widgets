@@ -37,9 +37,7 @@ public class VisitorMessageItem extends LinkedChatItem {
         String selectedOptionText = null;
         if (message.getAttachment() != null && message.getAttachment() instanceof SingleChoiceAttachment) {
             SingleChoiceAttachment singleChoiceAttachment = (SingleChoiceAttachment) message.getAttachment();
-            if (singleChoiceAttachment != null) {
-                selectedOptionText = singleChoiceAttachment.getSelectedOptionText();
-            }
+            selectedOptionText = singleChoiceAttachment.getSelectedOptionText();
         }
         return new VisitorMessageItem(CARD_RESPONSE_ID, message.getId(), selectedOptionText, message.getTimestamp(), false);
     }

@@ -134,7 +134,8 @@ public class ControllerFactory {
                     useCaseFactory.createHasPendingSurveyUseCase(),
                     useCaseFactory.createSetPendingSurveyUsed(),
                     useCaseFactory.createIsCallVisualizerUseCase(),
-                    useCaseFactory.createUnengagementMessageUseCase()
+                    useCaseFactory.createUnengagementMessageUseCase(),
+                    useCaseFactory.createAddNewMessagesDividerUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -213,14 +214,6 @@ public class ControllerFactory {
         if (retainedCallController != null) {
             retainedCallController.onDestroy(false);
             retainedCallController = null;
-        }
-    }
-
-    public void destroyScreenSharingController() {
-        Logger.d(TAG, "destroyScreenSharingController");
-        if (retainedScreenSharingController != null) {
-            retainedScreenSharingController.onDestroy();
-            retainedScreenSharingController = null;
         }
     }
 

@@ -2,7 +2,7 @@ package com.glia.widgets.chat.model.history;
 
 import java.util.Objects;
 
-public abstract class OperatorChatItem extends LinkedChatItem {
+public abstract class OperatorChatItem extends LinkedChatItem implements ServerChatItem {
 
     public final boolean showChatHead;
     public final String operatorProfileImgUrl;

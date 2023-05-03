@@ -18,14 +18,16 @@ private const val TAG = "GetUnreadMessagesCountUseCase"
 @VisibleForTesting
 const val TIMEOUT_SEC = 3L
 
+internal const val NO_UNREAD_MESSAGES = 0
+
 internal class GetUnreadMessagesCountWithTimeoutUseCase(private val repository: SecureConversationsRepository) {
 
     /**
-     * @return 0 if the current socket doesn't signal a success value within the specified [TIMEOUT_SEC] window.
+     * @return [NO_UNREAD_MESSAGES] if the current socket doesn't signal a success value within the specified [TIMEOUT_SEC] window.
      *
      * This is combined with the chat transcript result to avoid "Jumping UI" when adding new messages'
      * divider [SecureConversationsRepository.getUnreadMessagesCount] is a socket call and
-     * there is no warranty that it will return anything so timeout is added to make sure that it will return 0
+     * there is no warranty that it will return anything so timeout is added to make sure that it will return [NO_UNREAD_MESSAGES]
      * after the timeout if there is no answer from socket yet.
      */
     operator fun invoke(): Single<Int> = Single.create {
@@ -35,8 +37,8 @@ internal class GetUnreadMessagesCountWithTimeoutUseCase(private val repository: 
                 it.tryOnError(exception)
                 Logger.e(TAG, "Failed to get unread messages count", exception)
             } else {
-                it.onSuccess(count ?: 0)
+                it.onSuccess(count ?: NO_UNREAD_MESSAGES)
             }
         }
-    }.timeout(TIMEOUT_SEC, TimeUnit.SECONDS).onErrorReturnItem(0)
+    }.timeout(TIMEOUT_SEC, TimeUnit.SECONDS).onErrorReturnItem(NO_UNREAD_MESSAGES)
 }

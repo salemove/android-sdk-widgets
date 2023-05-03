@@ -7,6 +7,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
+import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
@@ -222,8 +223,7 @@ public class UseCaseFactory {
                 repositoryFactory.getSecureConversationsRepository(),
                 createIsSecureEngagementUseCase(),
                 getMapOperatorUseCase(),
-                createSubscribeToUnreadMessagesCountUseCase(),
-                createFindNewMessagesDividerIndexUseCase()
+                createSubscribeToUnreadMessagesCountUseCase()
         );
     }
 
@@ -749,6 +749,11 @@ public class UseCaseFactory {
     @NonNull
     public FindNewMessagesDividerIndexUseCase createFindNewMessagesDividerIndexUseCase() {
         return new FindNewMessagesDividerIndexUseCase();
+    }
+
+    @NonNull
+    public AddNewMessagesDividerUseCase createAddNewMessagesDividerUseCase() {
+        return new AddNewMessagesDividerUseCase(createFindNewMessagesDividerIndexUseCase());
     }
 
     @NonNull

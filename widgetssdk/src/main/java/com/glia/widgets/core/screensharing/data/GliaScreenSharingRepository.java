@@ -80,7 +80,11 @@ public class GliaScreenSharingRepository {
 
     public void onScreenSharingDeclined() {
         Logger.d(TAG, "screen sharing declined by the user");
-
+        gliaCore.getCurrentEngagement().ifPresent(engagement -> {
+            // Pass RESULT_CANCELED to Core SDK to stop waiting for permission result. Otherwise, subsequent screen sharing requests won't be shown to the visitor.
+            // Also see related bug ticket: MOB-2102
+            engagement.onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, Activity.RESULT_CANCELED, null);
+        });
         screenSharingRequest.decline();
     }
 

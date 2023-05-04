@@ -15,7 +15,6 @@ import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import com.glia.androidsdk.chat.AttachmentFile
 import java.io.File
-import java.io.IOException
 
 internal fun String?.toFileExtensionOrEmpty() = this?.let { File(it) }?.extension.orEmpty()
 
@@ -34,9 +33,8 @@ internal val Context.fileProviderAuthority: String
     get() = "$packageName.com.glia.widgets.fileprovider"
 
 internal fun fixCapturedPhotoRotation(uri: Uri, context: Context) {
-    try {
         with(context.contentResolver) {
-            openInputStream(uri)?.use {
+            val matrix: Matrix = openInputStream(uri)?.use {
                 val orientation = ExifInterface(it).getAttributeInt(
                     ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL
@@ -48,10 +46,13 @@ internal fun fixCapturedPhotoRotation(uri: Uri, context: Context) {
                     else -> 0f
                 }
 
-                val matrix = Matrix().apply { postRotate(rotation) }
+                Matrix().apply { postRotate(rotation) }
+            } ?: Matrix()
+
+            val bitmap: Bitmap = openInputStream(uri)?.use {
                 val rawBitmap = BitmapFactory.decodeStream(it)
 
-                val bitmap = Bitmap.createBitmap(
+                Bitmap.createBitmap(
                     rawBitmap,
                     0,
                     0,
@@ -60,19 +61,12 @@ internal fun fixCapturedPhotoRotation(uri: Uri, context: Context) {
                     matrix,
                     true
                 )
+            } ?: return@with
 
-                openOutputStream(uri)?.use { outputStream ->
-                    bitmap.compress(
-                        Bitmap.CompressFormat.JPEG,
-                        100,
-                        outputStream
-                    )
-                }
+            openOutputStream(uri)?.use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
             }
         }
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
 }
 
 internal fun getContentUriCompat(fileName: String, context: Context): Uri =

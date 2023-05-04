@@ -6,7 +6,7 @@ data class State(
     val messageEditTextEnabled: Boolean = true,
     val sendMessageButtonState: ButtonState = ButtonState.DISABLE,
     val showMessageLimitError: Boolean = false,
-    val showSendMessageGroup: Boolean = true
+    val showSendMessageGroup: Boolean = false
 ) {
     enum class ButtonState {
         NORMAL,

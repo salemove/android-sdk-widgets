@@ -84,6 +84,7 @@ class MessageView(
     init {
         isFillViewport = true
         isNestedScrollingEnabled = false
+        overScrollMode = OVER_SCROLL_NEVER
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         setupViewAppearance()
         initCallbacks()

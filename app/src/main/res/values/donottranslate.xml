@@ -5,7 +5,9 @@
     <string name="pref_base_normal_color">base_normal_color</string>
     <string name="pref_base_shade_color">base_shade_color</string>
     <string name="pref_brand_primary_color">brand_primary_color</string>
+    <string name="pref_brand_secondary_color">brand_secondary_color</string>
     <string name="pref_system_agent_bubble_color">system_agent_bubble_color</string>
+    <string name="pref_background_color">background_color</string>
     <string name="pref_system_negative_color">system_negative_color</string>
     <string name="pref_chat_header_title_tint_color">chat_header_title_tint_color</string>
     <string name="pref_chat_header_home_button_tint_color">chat_header_home_button_tint_color</string>
@@ -29,6 +31,7 @@
     <string name="pref_context_asset_id">context_asset_id</string>
     <string name="pref_white_label">white_label_toggle</string>
     <string name="pref_use_overlay">use_overlay</string>
+    <string name="pref_unified_ui">unified_ui_toggle</string>
     <string name="pref_use_alert_dialog_button_vertical_alignment">use_alert_dialog_button_vertical_alignment</string>
     <string name="pref_visitor_message_bg_color">visitor_message_bg_color</string>
     <string name="pref_visitor_message_txt_color">visitor_message_txt_color</string>

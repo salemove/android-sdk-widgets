@@ -25,12 +25,14 @@
     <string name="settings_chat_base_normal_color">Base normal color</string>
     <string name="settings_chat_base_shade_color">Base shade color</string>
     <string name="settings_chat_brand_primary_color">Brand primary color</string>
+    <string name="settings_chat_brand_secondary_color">Brand secondary color</string>
     <string name="settings_chat_system_agent_bubble_color">System agent bubble color</string>
     <string name="settings_chat_font_family">Chat message font family</string>
     <string name="settings_header_title">Title</string>
     <string name="settings_site_api_key_id">Site Api Key id</string>
     <string name="settings_site_api_key_secret">Site Api Key Secret</string>
     <string name="settings_site_id">Site id (needs restart)</string>
+    <string name="settings_chat_background_color">Background color</string>
     <string name="settings_chat_negative_color">Negative color</string>
     <string name="settings_chat_visitor_message_bg_color">Visitor message bg color</string>
     <string name="settings_chat_visitor_message_txt_color">Visitor message txt color</string>
@@ -60,6 +62,7 @@
     <string name="settings_queue_id">Queue id</string>
     <string name="settings_white_label">White label</string>
     <string name="settings_use_overlay">Use Overlay</string>
+    <string name="settings_unified_ui">Enable Unified UI</string>
     <string name="settings_visitor_context_asset_id">Visitor context asset id</string>
     <string name="settings_use_alert_dialog_button_vertical_alignment">Align AlertDialog Buttons Vertically</string>
     <string name="settings_screen_sharing_mode_title">Screen sharing mode</string>

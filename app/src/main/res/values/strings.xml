@@ -84,6 +84,7 @@
     <string name="authentication_dialog_title">Authentication</string>
     <string name="authentication_dialog_token_input_hint">JSON Web Token</string>
     <string name="authentication_dialog_authenticate_button">Authenticate</string>
+    <string name="authentication_dialog_clear_button">Clear</string>
     <string name="authentication_dialog_cancel_button">Cancel</string>
 
 </resources>

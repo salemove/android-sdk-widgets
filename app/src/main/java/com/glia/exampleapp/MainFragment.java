@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -308,19 +309,73 @@ public class MainFragment extends Fragment {
         );
     }
 
+    private String getAuthToken() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(requireContext());
+        String authTokenFromPrefs = getAuthTokenFromPrefs(sharedPreferences);
+        if (!authTokenFromPrefs.isEmpty()) {
+            return authTokenFromPrefs;
+        }
+        return getString(R.string.glia_jwt);
+    }
+
+    private void saveAuthToken(String jwt) {
+        if (!jwt.equals(getString(R.string.glia_jwt))) {
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(requireContext());
+            putAuthTokenToPrefs(sharedPreferences, jwt);
+        }
+    }
+
+    private void clearAuthToken() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(requireContext());
+        putAuthTokenToPrefs(sharedPreferences, null);
+    }
+
+    private String getAuthTokenFromPrefs(SharedPreferences sharedPreferences) {
+        return Utils.getStringFromPrefs(
+                R.string.pref_auth_token,
+                "",
+                sharedPreferences,
+                getResources()
+        );
+    }
+
+    private void putAuthTokenToPrefs(SharedPreferences sharedPreferences, String jwt) {
+        Utils.putStringToPrefs(
+                R.string.pref_auth_token,
+                jwt,
+                sharedPreferences,
+                getResources()
+        );
+    }
+
     private void showAuthenticationDialog(@Nullable OnAuthCallback callback) {
         if (getContext() == null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final EditText tokenInput = prepareTokenInputViewEditText(builder);
+        tokenInput.setText(getAuthToken());
         builder.setPositiveButton(
                 getString(R.string.authentication_dialog_authenticate_button),
                 (dialog, which) -> authenticate(tokenInput, callback));
+        builder.setNeutralButton(
+                getString(R.string.authentication_dialog_clear_button),
+                null);
         builder.setNegativeButton(
                 R.string.authentication_dialog_cancel_button,
                 (dialog, which) -> dialog.cancel());
         builder.setView(prepareDialogLayout(tokenInput));
-        builder.show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(dialogInterface -> {
+            Button button = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            button.setOnClickListener(v -> {
+                tokenInput.setText("");
+                clearAuthToken();
+            });
+        });
+        alertDialog.show();
     }
 
     @NonNull
@@ -391,6 +446,8 @@ public class MainFragment extends Fragment {
                 showToast("Error: " + exception);
             }
         }, jwt);
+
+        saveAuthToken(jwt);
     }
 
     private void deauthenticate() {

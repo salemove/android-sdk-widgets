@@ -279,7 +279,7 @@ public class MainFragment extends Fragment {
     }
 
     private UiTheme getRuntimeThemeFromPrefs(SharedPreferences sharedPreferences) {
-        return Utils.getUiThemeByPrefs(sharedPreferences, getResources());
+        return Utils.getRunTimeThemeByPrefs(sharedPreferences, getResources());
     }
 
     private String getQueueIdFromPrefs(SharedPreferences sharedPreferences) {

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
@@ -13,6 +14,9 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 class Utils {
 
@@ -24,7 +28,46 @@ class Utils {
         sharedPreferences.edit().putString(resources.getString(keyValue), value).apply();
     }
 
-    public static UiTheme getUiThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) {
+    @Nullable
+    public static String getRemoteThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) throws JSONException {
+        boolean isRemoteThemeEnabled = sharedPreferences.getBoolean(resources.getString(R.string.pref_unified_ui), false);
+        if (!isRemoteThemeEnabled) {
+            return null;
+        }
+
+        Integer brandPrimaryColorId = getColorValueFromPrefs(R.string.pref_brand_primary_color, sharedPreferences, resources);
+        Integer brandSecondaryColorId = getColorValueFromPrefs(R.string.pref_brand_secondary_color, sharedPreferences, resources);
+        Integer baseNormalColorId = getColorValueFromPrefs(R.string.pref_base_normal_color, sharedPreferences, resources);
+        Integer baseLightColorId = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences, resources);
+        Integer baseDarkColorId = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences, resources);
+        Integer baseShadeColorId = getColorValueFromPrefs(R.string.pref_base_shade_color, sharedPreferences, resources);
+        Integer backgroundColorId = getColorValueFromPrefs(R.string.pref_background_color, sharedPreferences, resources);
+        Integer systemNegativeColorId = getColorValueFromPrefs(R.string.pref_system_negative_color, sharedPreferences, resources);
+
+        JSONObject remoteThemeJson = new JSONObject()
+                .put("globalColors", new JSONObject()
+                        .put("primary", toHexColor(brandPrimaryColorId, resources))
+                        .put("secondary", toHexColor(brandSecondaryColorId, resources))
+                        .put("baseNormal", toHexColor(baseNormalColorId, resources))
+                        .put("baseLight", toHexColor(baseLightColorId, resources))
+                        .put("baseDark", toHexColor(baseDarkColorId, resources))
+                        .put("baseShade", toHexColor(baseShadeColorId, resources))
+                        .put("background", toHexColor(backgroundColorId, resources))
+                        .put("systemNegative", toHexColor(systemNegativeColorId, resources))
+                );
+        return remoteThemeJson.toString();
+    }
+
+    private static String toHexColor(Integer intColor, Resources resources) {
+        if (intColor == null) {
+            return null;
+        }
+
+        // %08X gives you zero-padded hex that is 8 chars long)
+        return String.format("#%08X", resources.getColor(intColor, null));
+    }
+
+    public static UiTheme getRunTimeThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) {
         String title = Utils.getStringFromPrefs(R.string.pref_header_title, null, sharedPreferences, resources);
         Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences, resources);
         Integer baseDarkColor = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences, resources);

@@ -46,14 +46,12 @@ internal class GliaFileRepositoryImpl(
     }
 
     override fun downloadFileFromNetwork(attachmentFile: AttachmentFile): Completable {
-        return fetchFileMaybe(attachmentFile).flatMapCompletable { inputStream ->
-            inputStream.use {
-                downloadsFolderDataSource.downloadFileToDownloads(
-                    attachmentFile.fileName,
-                    attachmentFile.contentType,
-                    it
-                )
-            }
+        return fetchFileMaybe(attachmentFile).flatMapCompletable {
+            downloadsFolderDataSource.downloadFileToDownloads(
+                attachmentFile.fileName,
+                attachmentFile.contentType,
+                it
+            )
         }
     }
 

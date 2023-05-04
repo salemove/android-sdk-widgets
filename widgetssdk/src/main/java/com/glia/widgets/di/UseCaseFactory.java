@@ -686,7 +686,11 @@ public class UseCaseFactory {
 
     @NonNull
     public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
-        return new SetEngagementConfigUseCase(repositoryFactory.getEngagementConfigRepository());
+        return new SetEngagementConfigUseCase(
+                repositoryFactory.getEngagementConfigRepository(),
+                surveyStateManager,
+                repositoryFactory.getGliaSurveyRepository()
+        );
     }
 
     @NonNull

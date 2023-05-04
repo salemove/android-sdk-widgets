@@ -58,6 +58,10 @@ public class GliaSurveyRepository implements RequestCallback<Survey> {
         return result != null;
     }
 
+    public void reset() {
+        result = null;
+    }
+
     public void unregisterListener(OnSurveyListener listener) {
         listeners.remove(listener);
     }

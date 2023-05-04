@@ -15,6 +15,10 @@ class SurveyStateManager {
         surveyStep = SurveyStep.ENDED
     }
 
+    fun preEngagement() {
+        surveyStep = SurveyStep.PRE_ENGAGEMENT
+    }
+
 }
 
 enum class SurveyStep {

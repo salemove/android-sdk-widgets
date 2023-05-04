@@ -237,10 +237,10 @@ internal class ChatController(
     fun initChat(
         companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType
     ) {
-        if (!hasPendingSurveyUseCase.invoke()) {
-            val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
-            engagementConfigUseCase(chatType, queueIds)
+        val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
+        engagementConfigUseCase(chatType, queueIds)
 
+        if (!hasPendingSurveyUseCase.invoke()) {
             ensureSecureMessagingAvailable()
 
             if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {

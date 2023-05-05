@@ -11,12 +11,12 @@
 
     <SwitchPreference
         app:defaultValue="false"
-        app:key="@string/pref_unified_ui"
-        app:title="@string/settings_unified_ui" />
+        app:key="@string/pref_remote_theme"
+        app:title="@string/settings_remote_theme" />
 
     <PreferenceCategory
         app:title="Global colors"
-        android:dependency="@string/pref_unified_ui">
+        android:dependency="@string/pref_remote_theme">
 
         <ListPreference
             android:defaultValue="@string/default_value"

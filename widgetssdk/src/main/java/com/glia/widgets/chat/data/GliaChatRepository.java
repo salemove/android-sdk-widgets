@@ -3,6 +3,7 @@ package com.glia.widgets.chat.data;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.androidsdk.chat.MessageAttachment;
@@ -65,6 +66,11 @@ public class GliaChatRepository {
                 value.getChat().sendMessagePreview(message));
     }
 
+    public void sendMessage(String message, RequestCallback<VisitorMessage> callback) {
+        gliaCore.getCurrentEngagement().ifPresent(engagement ->
+                engagement.getChat().sendMessage(message, callback));
+    }
+
     public void sendMessage(String message, Listener listener) {
         gliaCore.getCurrentEngagement().ifPresent(engagement ->
                 engagement.getChat().sendMessage(message, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
@@ -73,6 +79,12 @@ public class GliaChatRepository {
     public void sendMessageSingleChoice(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
         gliaCore.getCurrentEngagement().ifPresent(engagement ->
                 engagement.getChat().sendMessage(singleChoiceAttachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
+    }
+
+    public void sendMessageWithAttachment(String message, MessageAttachment attachment, RequestCallback<VisitorMessage> callback) {
+        gliaCore.getCurrentEngagement().ifPresent(engagement ->
+                engagement.getChat().sendMessage(message, attachment, callback)
+        );
     }
 
     public void sendMessageWithAttachment(String message, MessageAttachment attachment, Listener listener) {

@@ -639,7 +639,10 @@ public class UseCaseFactory {
                 queueId,
                 repositoryFactory.getSendMessageRepository(),
                 repositoryFactory.getSecureConversationsRepository(),
-                repositoryFactory.getSecureFileAttachmentRepository());
+                repositoryFactory.getSecureFileAttachmentRepository(),
+                repositoryFactory.getGliaMessageRepository(),
+                repositoryFactory.getGliaEngagementRepository()
+        );
     }
 
     @NonNull

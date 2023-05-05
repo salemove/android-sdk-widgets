@@ -14,7 +14,16 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.secureconversations.domain.*
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase
+import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
+import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
+import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
+import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
+import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
@@ -62,8 +71,8 @@ internal class MessageCenterController(
     private fun initComponents() {
         setState(state)
 
-        view?.emitUploadAttachments(getFileAttachmentsUseCase())
         view?.setupViewAppearance()
+        view?.emitUploadAttachments(getFileAttachmentsUseCase())
 
         disposables.add(addFileAttachmentsObserverUseCase().subscribe {
             view?.emitUploadAttachments(it)
@@ -115,7 +124,7 @@ internal class MessageCenterController(
     fun handleSendMessageResult(gliaException: GliaException?) {
         if (gliaException == null) {
             view?.showConfirmationScreen()
-            serviceChatHeadController?.init()
+            serviceChatHeadController.init()
         } else {
             when (gliaException.cause) {
                 GliaException.Cause.AUTHENTICATION_ERROR -> {
@@ -166,17 +175,20 @@ internal class MessageCenterController(
 
     override fun ensureMessageCenterAvailability() {
         isMessageCenterAvailableUseCase(RequestCallback { isAvailable, exception ->
-            when {
+            val showSendMessageGroup = when {
                 exception != null -> {
                     dialogController.showUnexpectedErrorDialog()
-                    setState(state.copy(showSendMessageGroup = false))
+                    false
                 }
+
                 !isAvailable -> {
                     dialogController.showMessageCenterUnavailableDialog()
-                    setState(state.copy(showSendMessageGroup = false))
+                    false
                 }
-                else -> Logger.d(TAG, "Message center is available")
+
+                else -> true
             }
+            setState(state.copy(showSendMessageGroup = showSendMessageGroup))
         })
     }
 

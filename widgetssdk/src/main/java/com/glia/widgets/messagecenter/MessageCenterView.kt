@@ -55,9 +55,7 @@ class MessageCenterView(
 
     private var controller: MessageCenterContract.Controller? = null
 
-    private val binding: MessageCenterViewBinding by lazy {
-        MessageCenterViewBinding.inflate(layoutInflater, this)
-    }
+    private var binding: MessageCenterViewBinding by Delegates.notNull()
 
     private val appBar: AppBarView get() = binding.appBarView
     private val messageView: MessageView get() = binding.messageView
@@ -76,18 +74,28 @@ class MessageCenterView(
     }
 
     init {
+        isSaveEnabled = true
         orientation = VERTICAL
         defaultStatusBarColor = window?.statusBarColor
-        initConfigurations()
+        // Is needed to overlap existing app bar in existing view with this view's app bar.
+        ViewCompat.setElevation(this, 100.0f)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
-        setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
-        isSaveEnabled = true
     }
 
     @JvmOverloads
     constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
+
+    override fun setupViewAppearance() {
+        //This is done to avoid view appearance when a visitor is not authenticated.
+        binding = MessageCenterViewBinding.inflate(layoutInflater, this)
+
+        controller?.ensureMessageCenterAvailability()
+        setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
+        appBar.hideBackButton()
+        initCallbacks()
+    }
 
     private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {
         appBar.applyHeaderTheme(headerTheme)
@@ -99,11 +107,6 @@ class MessageCenterView(
         window?.statusBarColor = statusBarColor
     }
 
-    override fun setupViewAppearance() {
-        initCallbacks()
-        controller?.ensureMessageCenterAvailability()
-    }
-
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
             setDefaultTheme(this)
@@ -113,13 +116,6 @@ class MessageCenterView(
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
         statusBarColor = theme.brandPrimaryColor?.let(::getColorCompat) ?: Color.TRANSPARENT
-    }
-
-    private fun initConfigurations() {
-        // Is needed to overlap existing app bar in existing view with this view's app bar.
-        ViewCompat.setElevation(this, 100.0f)
-
-        appBar.hideBackButton()
     }
 
     private fun initCallbacks() {
@@ -154,6 +150,7 @@ class MessageCenterView(
     }
 
     private fun showUnAuthenticatedDialog() {
+        window?.statusBarColor = Color.TRANSPARENT
         alertDialog = Dialogs.showAlertDialog(
             context,
             theme,
@@ -237,9 +234,7 @@ class MessageCenterView(
     }
 
     override fun onStateUpdated(state: State) {
-        binding.root.post {
-            messageView.onStateUpdated(state)
-        }
+        post { messageView.onStateUpdated(state) }
     }
 
     override fun emitUploadAttachments(attachments: List<FileAttachment>) {

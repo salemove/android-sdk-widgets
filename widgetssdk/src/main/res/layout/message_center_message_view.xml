@@ -92,6 +92,7 @@
             android:id="@+id/send_message_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             app:constraint_referenced_ids="message_title, add_attachment_button, message_edit_text, attachments_recycler_view, btn_send_message" />
 
         <TextView
@@ -173,7 +174,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:scrollbars="vertical"
+            android:overScrollMode="never"
             app:layout_constraintBottom_toTopOf="@id/btn_send_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -181,6 +181,9 @@ internal class ActivityWatcherForCallVisualizer(
                     .setIsUpgradeToCall(true)
                     .build())
             contextWithStyle.startActivity(intent)
+            if (it is EndScreenSharingActivity) {
+                it.finish()
+            }
         }
     }
 

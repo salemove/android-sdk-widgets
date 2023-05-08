@@ -30,7 +30,7 @@ class Utils {
 
     @Nullable
     public static String getRemoteThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) throws JSONException {
-        boolean isRemoteThemeEnabled = sharedPreferences.getBoolean(resources.getString(R.string.pref_unified_ui), false);
+        boolean isRemoteThemeEnabled = sharedPreferences.getBoolean(resources.getString(R.string.pref_remote_theme), false);
         if (!isRemoteThemeEnabled) {
             return null;
         }
@@ -68,6 +68,11 @@ class Utils {
     }
 
     public static UiTheme getRunTimeThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) {
+        boolean isRunTimeThemeEnabled = sharedPreferences.getBoolean(resources.getString(R.string.pref_runtime_theme), false);
+        if (!isRunTimeThemeEnabled) {
+            return null;
+        }
+
         String title = Utils.getStringFromPrefs(R.string.pref_header_title, null, sharedPreferences, resources);
         Integer baseLightColor = getColorValueFromPrefs(R.string.pref_base_light_color, sharedPreferences, resources);
         Integer baseDarkColor = getColorValueFromPrefs(R.string.pref_base_dark_color, sharedPreferences, resources);

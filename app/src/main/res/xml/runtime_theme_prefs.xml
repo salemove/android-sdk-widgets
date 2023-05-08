@@ -2,7 +2,20 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="Behavior">
+    <Preference
+        android:title="N.B: For CV elements restart is needed"
+        android:selectable="false"
+        android:enabled="true"
+        android:summary="For live engagement and secure messaging should work without the restart but for Call Visualizer app restart is needed"/>
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:key="@string/pref_runtime_theme"
+        app:title="@string/settings_runtime_theme" />
+
+    <PreferenceCategory
+        app:title="Behavior"
+        android:dependency="@string/pref_runtime_theme">
 
         <SwitchPreference
             app:defaultValue="false"
@@ -10,7 +23,9 @@
             app:title="@string/settings_white_label" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_colors_title">
+    <PreferenceCategory
+        app:title="@string/settings_colors_title"
+        android:dependency="@string/pref_runtime_theme">
 
         <ListPreference
             android:defaultValue="@string/default_value"
@@ -141,7 +156,10 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_operator_layout_styling">
+    <PreferenceCategory
+        app:title="@string/settings_operator_layout_styling"
+        android:dependency="@string/pref_runtime_theme">
+
         <ListPreference
             android:defaultValue="@string/default_value"
             android:entries="@array/colors"
@@ -172,7 +190,10 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_header_styling">
+    <PreferenceCategory
+        app:title="@string/settings_header_styling"
+        android:dependency="@string/pref_runtime_theme">
+
         <ListPreference
             android:defaultValue="@string/default_value"
             android:entries="@array/colors"
@@ -198,7 +219,9 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/settings_typography">
+    <PreferenceCategory
+        app:title="@string/settings_typography"
+        android:dependency="@string/pref_runtime_theme">
 
         <ListPreference
             android:defaultValue="@string/default_value"

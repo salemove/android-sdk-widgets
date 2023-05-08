@@ -126,7 +126,7 @@ object GliaWidgetsConfigManager {
             .setScreenSharingMode(screenSharingMode)
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))
-            .setUiTheme(runtimeConfig)
+            .setUiTheme(runtimeConfig ?: Utils.getRunTimeThemeByPrefs(preferences, context.resources))
             .build()
     }
 }

@@ -79,7 +79,7 @@
     <dimen name="glia_single_choice_card_image_height">200dp</dimen>
 
     <!--    Message Center Welcome Screen-->
-    <dimen name="glia_welcome_screen_input_min_height">256dp</dimen>
+    <dimen name="glia_welcome_screen_input_min_height">168dp</dimen>
     <dimen name="glia_welcome_screen_input_title_margin">56dp</dimen>
 
     <!--    Message Center Confirmation Screen-->

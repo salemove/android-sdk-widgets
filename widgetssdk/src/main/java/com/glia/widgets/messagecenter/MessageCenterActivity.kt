@@ -27,11 +27,11 @@ import com.glia.widgets.helper.fixCapturedPhotoRotation
 import java.io.IOException
 
 class MessageCenterActivity : AppCompatActivity(),
-        MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener,
-        MessageCenterView.OnAttachFileListener {
+    MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener,
+    MessageCenterView.OnAttachFileListener {
 
     private lateinit var binding: MessageCenterActivityBinding
-    private val messageCenterView  get() = binding.messageCenterView
+    private val messageCenterView get() = binding.messageCenterView
     private var configuration: GliaSdkConfiguration? = null
 
     private val controller: MessageCenterContract.Controller by lazy {

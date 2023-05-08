@@ -9,7 +9,9 @@ import android.view.Window
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.withStyledAttributes
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
@@ -20,7 +22,12 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.hideKeyboard
+import com.glia.widgets.helper.insetsController
+import com.glia.widgets.helper.isKeyboardVisible
+import com.glia.widgets.helper.rootWindowInsetsCompat
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.extensions.deepMerge
@@ -80,6 +87,21 @@ class MessageCenterView(
         // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
+
+        handleInsetChanges()
+    }
+
+    private fun handleInsetChanges() {
+        WindowCompat.setDecorFitsSystemWindows(window ?: return, false)
+        SimpleWindowInsetsAndAnimationHandler(this) { onKeyboardAnimation(it) }
+    }
+
+    private fun onKeyboardAnimation(insets: Insets) {
+        if (rootWindowInsetsCompat?.isKeyboardVisible == false) return
+
+        messageView.apply {
+            smoothScrollTo(0, insets.bottom.coerceAtMost(messageTitleTop))
+        }
     }
 
     @JvmOverloads
@@ -242,10 +264,12 @@ class MessageCenterView(
     }
 
     override fun selectAttachmentFile(type: String) {
+        insetsController?.hideKeyboard()
         onAttachFileListener?.selectAttachmentFile(type)
     }
 
     override fun takePhoto() {
+        insetsController?.hideKeyboard()
         onAttachFileListener?.takePhoto()
     }
 

@@ -21,12 +21,12 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/placeholder_view"
-        android:layout_width="@dimen/glia_chat_head_placeholder_size"
-        android:layout_height="@dimen/glia_chat_head_placeholder_size"
+        android:layout_width="@dimen/glia_chat_head_size"
+        android:layout_height="@dimen/glia_chat_head_size"
         android:layout_gravity="center"
         android:elevation="@dimen/glia_small"
         android:scaleType="fitCenter"
-        app:contentPadding="2dp"
+        app:contentPadding="18dp"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"

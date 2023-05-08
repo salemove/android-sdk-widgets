@@ -43,7 +43,7 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         SimpleStatefulWidgetAdapter(State.ENABLED, adapterCallback)
     }
 
-    //Widgets + Binding
+    // Widgets + Binding
     private val binding: ProgressButtonBinding by lazy {
         ProgressButtonBinding.inflate(layoutInflater, this)
     }
@@ -51,15 +51,15 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
     private val title get() = binding.titleBtn
 
     private val progressBar get() = binding.progressBar
-    //End Widgets + Binding
+    // End Widgets + Binding
 
     @get:ColorInt
-    private val gliaBrandPrimaryColor: Int by lazy {//btn bg
+    private val gliaBrandPrimaryColor: Int by lazy { // btn bg
         getColorCompat(getAttr(R.attr.gliaBrandPrimaryColor, R.color.glia_brand_primary_color))
     }
 
     @get:ColorInt
-    private val gliaBaseLightColor: Int by lazy {//text
+    private val gliaBaseLightColor: Int by lazy { // text
         getColorCompat(getAttr(R.attr.gliaBaseLightColor, R.color.glia_base_light_color))
     }
 
@@ -71,7 +71,6 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
 
     @get:ColorInt
     private val gliaDisabledTextColor: Int by lazy { getColorCompat(R.color.glia_disable_button_text) }
-
 
     enum class State {
         ENABLED,
@@ -167,5 +166,4 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
             )
         )
     }
-
 }

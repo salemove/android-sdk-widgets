@@ -19,7 +19,6 @@ internal class VisitorCodeRepositoryTest {
     private val vc: VisitorCode = mock()
     private val CODE = "11121"
 
-
     @Test
     fun `getVisitorCode glia not initialized`() {
         whenever(gliaCore.isInitialized).thenReturn(false)

@@ -9,7 +9,7 @@ import java.lang.ref.WeakReference
 
 internal open class BaseActivityWatcher : Application.ActivityLifecycleCallbacks {
 
-    private val resumedActivities = object: ArrayList<WeakReference<Activity>>(1) {
+    private val resumedActivities = object : ArrayList<WeakReference<Activity>>(1) {
         fun add(activity: Activity) {
             super.add(WeakReference(activity))
         }

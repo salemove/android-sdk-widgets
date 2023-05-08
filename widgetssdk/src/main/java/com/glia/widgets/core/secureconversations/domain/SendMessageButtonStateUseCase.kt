@@ -4,7 +4,7 @@ import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
-import com.glia.widgets.messagecenter.State
+import com.glia.widgets.messagecenter.MessageCenterState
 import io.reactivex.Observable
 
 class SendMessageButtonStateUseCase(
@@ -15,23 +15,23 @@ class SendMessageButtonStateUseCase(
     private val schedulers: Schedulers
 ) {
 
-    operator fun invoke(): Observable<State.ButtonState> {
+    operator fun invoke(): Observable<MessageCenterState.ButtonState> {
         val array = arrayOf(
             showMessageLimitObservable(),
             messageSendingObservable(),
             messageOrFilesReadyToSendObservable()
         )
         return Observable.combineLatest(array) { values ->
-            val list = values.map { it as State.ButtonState }
+            val list = values.map { it as MessageCenterState.ButtonState }
 
-            if (list.any { it == State.ButtonState.PROGRESS }) {
-                return@combineLatest State.ButtonState.PROGRESS
+            if (list.any { it == MessageCenterState.ButtonState.PROGRESS }) {
+                return@combineLatest MessageCenterState.ButtonState.PROGRESS
             }
-            if (list.any { it != State.ButtonState.NORMAL }) {
-                return@combineLatest State.ButtonState.DISABLE
+            if (list.any { it != MessageCenterState.ButtonState.NORMAL }) {
+                return@combineLatest MessageCenterState.ButtonState.DISABLE
             }
 
-            return@combineLatest State.ButtonState.NORMAL
+            return@combineLatest MessageCenterState.ButtonState.NORMAL
         }
             .subscribeOn(schedulers.computationScheduler)
             .observeOn(schedulers.mainScheduler)
@@ -43,10 +43,10 @@ class SendMessageButtonStateUseCase(
     private fun showMessageLimitObservable() = showMessageLimitErrorUseCase()
         .map { buttonEnableStateMap(!it) }
 
-    private fun messageOrFilesReadyToSendObservable(): Observable<State.ButtonState> {
+    private fun messageOrFilesReadyToSendObservable(): Observable<MessageCenterState.ButtonState> {
         val array = arrayOf(
             messageIsNotEmptyObservable(),
-            filesObservable(),
+            filesObservable()
         )
         return Observable.combineLatest(array) {
             val messageIsNotEmpty = it[0] as Boolean
@@ -73,14 +73,14 @@ class SendMessageButtonStateUseCase(
         }
 
     private fun buttonEnableStateMap(enable: Boolean) = if (enable) {
-        State.ButtonState.NORMAL
+        MessageCenterState.ButtonState.NORMAL
     } else {
-        State.ButtonState.DISABLE
+        MessageCenterState.ButtonState.DISABLE
     }
 
     private fun buttonProgressStateMap(enable: Boolean) = if (enable) {
-        State.ButtonState.PROGRESS
+        MessageCenterState.ButtonState.PROGRESS
     } else {
-        State.ButtonState.NORMAL
+        MessageCenterState.ButtonState.NORMAL
     }
 }

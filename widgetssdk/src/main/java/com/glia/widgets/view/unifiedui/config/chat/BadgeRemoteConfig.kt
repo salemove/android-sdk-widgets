@@ -14,13 +14,13 @@ internal data class BadgeRemoteConfig(
     val fontColor: ColorLayerRemoteConfig?,
 
     @SerializedName("background")
-    val background: LayerRemoteConfig?,
+    val background: LayerRemoteConfig?
 ) {
 
     fun toBadgeTheme() = BadgeTheme(
         textColor = fontColor?.toColorTheme(),
         background = background?.toLayerTheme(),
         textSize = fontRemoteConfig?.size?.value,
-        textStyle = fontRemoteConfig?.style?.style,
+        textStyle = fontRemoteConfig?.style?.style
     )
 }

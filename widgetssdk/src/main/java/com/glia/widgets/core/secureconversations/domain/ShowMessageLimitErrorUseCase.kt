@@ -10,9 +10,9 @@ class ShowMessageLimitErrorUseCase(
 ) {
 
     operator fun invoke(): Observable<Boolean> = sendMessageRepository.observable
-            .map { it.count() > MAX_MESSAGE_LENGTH }
-            .subscribeOn(schedulers.computationScheduler)
-            .observeOn(schedulers.mainScheduler)
+        .map { it.count() > MAX_MESSAGE_LENGTH }
+        .subscribeOn(schedulers.computationScheduler)
+        .observeOn(schedulers.mainScheduler)
 
     companion object {
         private const val MAX_MESSAGE_LENGTH = 10000

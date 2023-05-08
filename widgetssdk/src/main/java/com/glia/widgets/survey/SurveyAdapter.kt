@@ -9,7 +9,11 @@ import com.glia.widgets.databinding.SurveyBooleanQuestionItemBinding
 import com.glia.widgets.databinding.SurveyInputQuestionItemBinding
 import com.glia.widgets.databinding.SurveyScaleQuestionItemBinding
 import com.glia.widgets.databinding.SurveySingleQuestionItemBinding
-import com.glia.widgets.survey.viewholder.*
+import com.glia.widgets.survey.viewholder.BooleanQuestionViewHolder
+import com.glia.widgets.survey.viewholder.InputQuestionViewHolder
+import com.glia.widgets.survey.viewholder.ScaleQuestionViewHolder
+import com.glia.widgets.survey.viewholder.SingleQuestionViewHolder
+import com.glia.widgets.survey.viewholder.SurveyViewHolder
 import com.glia.widgets.view.configuration.survey.SurveyStyle
 
 class SurveyAdapter(private val listener: SurveyAdapterListener) :

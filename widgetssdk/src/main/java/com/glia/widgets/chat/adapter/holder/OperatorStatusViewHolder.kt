@@ -17,7 +17,8 @@ import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
 
 internal class OperatorStatusViewHolder(
-    binding: ChatOperatorStatusLayoutBinding, uiTheme: UiTheme
+    binding: ChatOperatorStatusLayoutBinding,
+    uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val statusPictureView: OperatorStatusView by lazy { binding.statusPictureView }
     private val chatStartingHeadingView: TextView by lazy { binding.chatStartingHeadingView }
@@ -97,7 +98,6 @@ internal class OperatorStatusViewHolder(
         engagementStatesTheme?.queue.also(::applyEngagementState)
     }
 
-
     private fun applyConnectedState(operatorName: String, profileImgUrl: String?) {
         profileImgUrl?.let { statusPictureView.showProfileImage(it) }
             ?: statusPictureView.showPlaceholder()
@@ -114,7 +114,6 @@ internal class OperatorStatusViewHolder(
         )
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
-
     }
 
     private fun applyJoinedState(operatorName: String) {
@@ -142,7 +141,6 @@ internal class OperatorStatusViewHolder(
             itemView.resources.getString(R.string.glia_chat_visitor_status_transferring)
 
         engagementStatesTheme?.transferring.also(::applyEngagementState)
-
     }
 
     private fun applyChatStartingViewsVisibility(visible: Boolean = true) {

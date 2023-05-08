@@ -24,7 +24,10 @@ import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversat
 import com.google.android.material.transition.MaterialFadeThrough
 
 class ConfirmationScreenView(
-    context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int,
+    defStyleRes: Int
 ) : LinearLayout(
     context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
     attrs,
@@ -64,7 +67,9 @@ class ConfirmationScreenView(
 
     @JvmOverloads
     constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     fun setOnCheckMessagesButtonClickListener(listener: OnClickListener) {
@@ -76,5 +81,4 @@ class ConfirmationScreenView(
         viewToHide.isGone = true
         isVisible = true
     }
-
 }

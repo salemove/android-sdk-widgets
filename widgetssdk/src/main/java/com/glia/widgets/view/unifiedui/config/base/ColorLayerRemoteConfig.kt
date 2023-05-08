@@ -41,5 +41,4 @@ internal data class ColorLayerRemoteConfig(
         get() = values.first().color
 
     fun toColorTheme(): ColorTheme = ColorTheme(isGradient = isGradient, values = valuesExpanded)
-
 }

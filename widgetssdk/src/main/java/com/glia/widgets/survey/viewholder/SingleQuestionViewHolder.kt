@@ -25,7 +25,7 @@ import java.util.Optional
 class SingleQuestionViewHolder(
     private val binding: SurveySingleQuestionItemBinding,
     var style: SurveyStyle
-    ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
+) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {
     private val singleTheme: SurveySingleQuestionTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.surveyTheme?.singleQuestion
     }
@@ -105,12 +105,13 @@ class SingleQuestionViewHolder(
             arrayOf(
                 intArrayOf(-android.R.attr.state_checked),
                 intArrayOf(android.R.attr.state_checked)
-            ), intArrayOf(
+            ),
+            intArrayOf(
                 ContextCompat.getColor(
                     containerView.context,
                     android.R.color.transparent
-                ),  //disabled
-                radiobuttonColor //enabled
+                ), // disabled
+                radiobuttonColor // enabled
             )
         )
     }

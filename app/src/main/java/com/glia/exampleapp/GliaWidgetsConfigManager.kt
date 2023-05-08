@@ -28,6 +28,7 @@ object GliaWidgetsConfigManager {
     private const val REGION_ACCEPTANCE = "acceptance"
     private const val BASE_DOMAIN = "base_domain"
     private const val DEFAULT_BASE_DOMAIN = "at.samo.io"
+
     @JvmStatic
     fun obtainConfigFromDeepLink(data: Uri, applicationContext: Context): GliaWidgetsConfig {
         saveQueueIdToPrefs(data, applicationContext)
@@ -110,13 +111,15 @@ object GliaWidgetsConfigManager {
             context.getString(R.string.pref_site_id),
             context.getString(R.string.site_id)
         )
-        val companyName = preferences.getString(context.getString(R.string.pref_company_name), context.getString(R.string.settings_value_default_company_name))
+        val companyName = preferences.getString(
+            context.getString(R.string.pref_company_name),
+            context.getString(R.string.settings_value_default_company_name)
+        )
         val useOverlay = preferences.getBoolean(context.getString(R.string.pref_use_overlay), true)
         val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
         val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
-        val screenSharingMode = if (preferences.getString(
-                context.getString(R.string.pref_screen_sharing_mode), unbounded
-            ) == bounded
+        val screenSharingMode = if (
+            preferences.getString(context.getString(R.string.pref_screen_sharing_mode), unbounded) == bounded
         ) {
             ScreenSharing.Mode.APP_BOUNDED
         } else {

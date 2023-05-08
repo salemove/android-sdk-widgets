@@ -26,6 +26,6 @@ internal data class HeaderRemoteConfig(
         background = background?.toLayerTheme(),
         backButton = backButtonRemoteConfig?.toButtonTheme(),
         closeButton = closeButtonRemoteConfig?.toButtonTheme(),
-        endButton = endButtonRemoteConfig?.toButtonTheme(),
+        endButton = endButtonRemoteConfig?.toButtonTheme()
     )
 }

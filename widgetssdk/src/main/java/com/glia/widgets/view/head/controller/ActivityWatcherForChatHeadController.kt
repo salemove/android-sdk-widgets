@@ -14,7 +14,7 @@ internal class ActivityWatcherForChatHeadController(
     private val screenSharingController: ScreenSharingController,
     private val gliaOnEngagementUseCase: GliaOnEngagementUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
-    private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
+    private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
 ) : ActivityWatcherForChatHeadContract.Controller {
 
     private lateinit var watcher: ActivityWatcherForChatHeadContract.Watcher

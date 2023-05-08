@@ -28,7 +28,8 @@ class ChatHeadLayout @JvmOverloads constructor(
     attrs,
     defStyleAttr,
     defStyleRes
-), ChatHeadLayoutContract.View {
+),
+    ChatHeadLayoutContract.View {
     private var chatHeadController: ChatHeadLayoutContract.Controller by Delegates.notNull()
 
     private var navigationCallback: NavigationCallback? = null
@@ -180,7 +181,8 @@ class ChatHeadLayout @JvmOverloads constructor(
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        @SuppressLint("CustomViewStyleable") val typedArray =
+        @SuppressLint("CustomViewStyleable")
+        val typedArray =
             context.obtainStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes)
         setBuildTimeTheme(Utils.getThemeFromTypedArray(typedArray, context))
         typedArray.recycle()
@@ -192,7 +194,8 @@ class ChatHeadLayout @JvmOverloads constructor(
     }
 
     private fun updateChatHeadConfiguration(
-        buildTimeTheme: UiTheme, sdkConfiguration: GliaSdkConfiguration? = null
+        buildTimeTheme: UiTheme,
+        sdkConfiguration: GliaSdkConfiguration? = null
     ) {
         chatHeadView.updateConfiguration(buildTimeTheme, sdkConfiguration)
     }

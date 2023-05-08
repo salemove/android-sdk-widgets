@@ -7,7 +7,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.verifyNoMoreInteractions
 
-internal class ScreenSharingScreenControllerTest {
+internal class EndScreenSharingControllerTest {
 
     private val controller = EndScreenSharingController()
     private val view = mock(EndScreenSharingContract.View::class.java)

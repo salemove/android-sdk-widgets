@@ -1,6 +1,10 @@
 package com.glia.widgets.view.unifiedui.config.secureconversations
 
-import com.glia.widgets.view.unifiedui.config.base.*
+import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.TextInputRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceListRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.FileUploadBarRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme

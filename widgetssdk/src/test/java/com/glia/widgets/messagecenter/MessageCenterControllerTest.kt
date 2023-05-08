@@ -7,14 +7,27 @@ import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.secureconversations.domain.*
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
+import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
+import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase
+import com.glia.widgets.core.secureconversations.domain.IsMessageCenterAvailableUseCase
+import com.glia.widgets.core.secureconversations.domain.OnNextMessageUseCase
+import com.glia.widgets.core.secureconversations.domain.RemoveSecureFileAttachmentUseCase
+import com.glia.widgets.core.secureconversations.domain.ResetMessageCenterUseCase
+import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUseCase
+import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
+import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 internal class MessageCenterControllerTest {
     private lateinit var serviceChatHeadController: ServiceChatHeadController

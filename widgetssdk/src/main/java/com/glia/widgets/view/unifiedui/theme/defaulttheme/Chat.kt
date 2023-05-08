@@ -7,7 +7,13 @@ import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
-import com.glia.widgets.view.unifiedui.theme.chat.*
+import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
+import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
+import com.glia.widgets.view.unifiedui.theme.chat.MediaUpgradeTheme
+import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
+import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardOptionTheme
+import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardTheme
+import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
 
 /**
  * Default theme for Chat screen
@@ -107,12 +113,17 @@ private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? {
  */
 private fun ChatInputTheme(pallet: ColorPallet): InputTheme? {
     return pallet.run {
-        composeIfAtLeastOneNotNull(baseDarkColorTheme, baseNormalColorTheme, primaryColorTheme, baseShadeColorTheme) {
+        composeIfAtLeastOneNotNull(
+            baseDarkColorTheme,
+            baseNormalColorTheme,
+            primaryColorTheme,
+            baseShadeColorTheme
+        ) {
             InputTheme(
                 text = BaseDarkColorTextTheme(this),
                 placeholder = BaseNormalColorTextTheme(pallet),
                 divider = baseShadeColorTheme,
-                sendButton = ButtonTheme(iconColor = primaryColorTheme),
+                sendButton = ButtonTheme(iconColor = primaryColorTheme)
             )
         }
     }

@@ -47,14 +47,13 @@ class BadgeTextView @JvmOverloads constructor(context: Context, attrs: Attribute
                 getColorCompat(R.color.glia_base_light_color)
             )
         )
-
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         val size = max(measuredHeight, measuredWidth) +
-                resources.getDimensionPixelSize(R.dimen.glia_x_small)
+            resources.getDimensionPixelSize(R.dimen.glia_x_small)
         setMeasuredDimension(size, size)
     }
 
@@ -66,5 +65,4 @@ class BadgeTextView @JvmOverloads constructor(context: Context, attrs: Attribute
             textSize?.also { setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
         }
     }
-
 }

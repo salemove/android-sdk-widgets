@@ -19,7 +19,7 @@ internal fun BubbleTheme(pallet: ColorPallet): BubbleTheme? =
         composeIfAtLeastOneNotNull(badge, userImage) {
             BubbleTheme(
                 userImage = userImage,
-                badge = badge,
+                badge = badge
             )
         }
     }
@@ -49,4 +49,3 @@ internal fun BadgeTheme(pallet: ColorPallet): BadgeTheme? = pallet.run {
         )
     }
 }
-

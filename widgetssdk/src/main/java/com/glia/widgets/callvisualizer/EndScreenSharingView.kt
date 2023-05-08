@@ -37,7 +37,8 @@ class EndScreenSharingView(
     attrs,
     defStyleAttr,
     defStyleRes
-), EndScreenSharingContract.View {
+),
+    EndScreenSharingContract.View {
 
     var onFinishListener: OnFinishListener? = null
     private var controller: EndScreenSharingContract.Controller? = null
@@ -51,9 +52,10 @@ class EndScreenSharingView(
 
     @JvmOverloads
     constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
-
 
     init {
         initCallbacks()
@@ -138,7 +140,6 @@ class EndScreenSharingView(
     fun onDestroy() {
         changeStatusBarColor(defaultStatusBarColor)
     }
-
 
     interface OnFinishListener {
         fun finish()

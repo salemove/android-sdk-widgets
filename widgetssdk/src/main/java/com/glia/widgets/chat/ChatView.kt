@@ -109,11 +109,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         attrs,
         defStyleAttr,
         defStyleRes
-    ), OnFileItemClickListener, OnImageItemClickListener {
+    ),
+    OnFileItemClickListener,
+    OnImageItemClickListener {
 
     @JvmOverloads
     constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     private var alertDialog: AlertDialog? = null
@@ -494,7 +498,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
                 Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
-                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
+                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
+                    showAllowScreenSharingNotificationsAndStartSharingDialog()
+                }
                 Dialog.MODE_VISITOR_CODE -> {
                     Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
                 } // Should never happen inside ChatView
@@ -711,8 +717,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTheme(theme)
 
-
-        //icons
+        // icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
 
         // new messages indicator shape
@@ -922,7 +927,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showAlertDialog(
-        @StringRes title: Int, @StringRes message: Int, buttonClickListener: OnClickListener
+        @StringRes title: Int,
+        @StringRes message: Int,
+        buttonClickListener: OnClickListener
     ) {
         dismissAlertDialog()
         alertDialog = Dialogs.showAlertDialog(context, theme, title, message, buttonClickListener)
@@ -1045,7 +1052,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ), WRITE_PERMISSION_REQUEST
+                ),
+                WRITE_PERMISSION_REQUEST
             )
             downloadFileHolder = file
         }
@@ -1064,12 +1072,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     fun fileDownloadCompleted(file: AttachmentFile) {
         submitUpdatedItems(file, isDownloading = false, isFileExists = true)
         showToast(
-            context.getString(R.string.glia_chat_file_download_success_message), Toast.LENGTH_LONG
+            context.getString(R.string.glia_chat_file_download_success_message),
+            Toast.LENGTH_LONG
         )
     }
 
     private fun submitUpdatedItems(
-        attachmentFile: AttachmentFile, isDownloading: Boolean, isFileExists: Boolean
+        attachmentFile: AttachmentFile,
+        isDownloading: Boolean,
+        isFileExists: Boolean
     ) {
         val updatedItems = adapter.currentList
             .asSequence()
@@ -1119,7 +1130,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             setDataAndType(contentUri, file.contentType)
             resolveActivity(context.packageManager)?.also { context.startActivity(this) }
         } ?: showToast(message = context.getString(R.string.glia_view_file_error_message))
-
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {
@@ -1211,7 +1221,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         chatTheme.typingIndicator?.primaryColor?.also(binding.operatorTypingAnimationView::addColorFilter)
 
         chatTheme.unreadIndicator?.also(::applyUnreadMessagesTheme)
-
     }
 
     private fun applyHeaderTheme(headerTheme: HeaderTheme) {
@@ -1249,5 +1258,4 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             groupChatControls.isGone = true
         }
     }
-
 }

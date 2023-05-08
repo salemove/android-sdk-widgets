@@ -27,7 +27,7 @@ internal class GliaFileRepositoryImpl(
 
     override fun isReadyForPreview(attachmentFile: AttachmentFile): Boolean =
         downloadsFolderDataSource.isDownloaded(attachmentFile) ||
-        bitmapCache.getBitmapById(attachmentFile.fileName) != null
+            bitmapCache.getBitmapById(attachmentFile.fileName) != null
 
     override fun loadImageFromCache(fileName: String): Maybe<Bitmap> = Maybe.create { emitter ->
         bitmapCache.getBitmapById(fileName)?.let {

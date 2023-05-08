@@ -6,8 +6,10 @@ import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
-import com.glia.widgets.view.unifiedui.theme.chat.*
-
+import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
+import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
+import com.glia.widgets.view.unifiedui.theme.chat.OnHoldOverlayTheme
+import com.glia.widgets.view.unifiedui.theme.chat.OperatorTheme
 
 /**
  * Default theme for Chat Engagement states

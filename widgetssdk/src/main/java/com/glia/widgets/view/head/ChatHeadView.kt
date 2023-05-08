@@ -49,7 +49,8 @@ class ChatHeadView @JvmOverloads constructor(
     attrs,
     defStyleAttr,
     defStyleRes
-), ChatHeadContract.View {
+),
+    ChatHeadContract.View {
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
 
     private var sdkConfiguration: GliaSdkConfiguration? = null
@@ -61,6 +62,7 @@ class ChatHeadView @JvmOverloads constructor(
         get() = Dependencies.getGliaThemeManager().theme?.run {
             if (isService) bubbleTheme else chatTheme?.bubble
         }
+
     @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ServiceChatHeadController
     private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
@@ -97,7 +99,7 @@ class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun setController(controller: ChatHeadContract.Controller) {
-        //Unused
+        // Unused
     }
 
     override fun showOperatorImage(operatorProfileImgUrl: String) {
@@ -154,7 +156,8 @@ class ChatHeadView @JvmOverloads constructor(
     }
 
     override fun updateConfiguration(
-        buildTimeTheme: UiTheme, sdkConfiguration: GliaSdkConfiguration?
+        buildTimeTheme: UiTheme,
+        sdkConfiguration: GliaSdkConfiguration?
     ) {
         this.sdkConfiguration = sdkConfiguration
         serviceChatHeadController.setBuildTimeTheme(buildTimeTheme)
@@ -212,7 +215,8 @@ class ChatHeadView @JvmOverloads constructor(
     }
 
     private fun createHybridConfiguration(
-        buildTimeTheme: UiTheme, sdkConfiguration: GliaSdkConfiguration?
+        buildTimeTheme: UiTheme,
+        sdkConfiguration: GliaSdkConfiguration?
     ) {
         configuration = createBuildTimeConfiguration(buildTimeTheme)
 
@@ -239,14 +243,18 @@ class ChatHeadView @JvmOverloads constructor(
         view.contentDescription =
             context.getString(R.string.glia_chat_head_view_content_description)
 
-        ViewCompat.setAccessibilityDelegate(view, object : AccessibilityDelegateCompat() {
-            override fun onInitializeAccessibilityNodeInfo(
-                host: View, info: AccessibilityNodeInfoCompat
-            ) {
-                super.onInitializeAccessibilityNodeInfo(host, info)
-                info.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK)
+        ViewCompat.setAccessibilityDelegate(
+            view,
+            object : AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(
+                    host: View,
+                    info: AccessibilityNodeInfoCompat
+                ) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_CLICK)
+                }
             }
-        })
+        )
     }
 
     private fun updatePlaceholderImageView() {
@@ -306,7 +314,9 @@ class ChatHeadView @JvmOverloads constructor(
 
         @JvmStatic
         private fun getNavigationIntent(
-            context: Context, cls: Class<*>, sdkConfiguration: GliaSdkConfiguration
+            context: Context,
+            cls: Class<*>,
+            sdkConfiguration: GliaSdkConfiguration
         ): Intent = Intent(context, cls)
             .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.companyName)
             .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.queueId)

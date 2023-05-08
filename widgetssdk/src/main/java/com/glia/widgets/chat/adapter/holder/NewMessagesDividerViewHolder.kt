@@ -29,7 +29,6 @@ internal class NewMessagesDividerViewHolder(
         uiTheme: UiTheme,
         binding: ChatNewMessagesDividerLayoutBinding
     ) {
-
         uiTheme.newMessageDividerColor?.also {
             binding.newMessagesDividerLeft.setBackgroundResource(it)
             binding.newMessagesDividerRight.setBackgroundResource(it)
@@ -59,5 +58,4 @@ internal class NewMessagesDividerViewHolder(
             binding.newMessagesTv.applyTextTheme(newMessagesDividerTextTheme, withAlignment = false)
         }
     }
-
 }

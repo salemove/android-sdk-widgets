@@ -12,5 +12,4 @@ internal class UnifiedThemeManager {
     fun applyJsonConfig(jsonConfig: String?) {
         _theme = jsonConfig?.let(parser::parseRemoteConfiguration)?.toUnifiedTheme()
     }
-
 }

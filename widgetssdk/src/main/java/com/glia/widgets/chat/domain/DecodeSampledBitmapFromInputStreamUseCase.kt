@@ -21,7 +21,8 @@ internal class DecodeSampledBitmapFromInputStreamUseCase {
             val rawWidth = rawBitmap.width.toDouble()
             val ratio = rawWidth / rawHeight
             val scaledBitmap = Bitmap.createScaledBitmap(
-                rawBitmap, (DESIRED_IMAGE_SIZE * ratio).roundToInt(),
+                rawBitmap,
+                (DESIRED_IMAGE_SIZE * ratio).roundToInt(),
                 DESIRED_IMAGE_SIZE,
                 false
             )

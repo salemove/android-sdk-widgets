@@ -54,7 +54,6 @@ internal class ActivityWatcherForChatHead(
         super.onActivityResumed(activity)
         controller.onActivityResumed()
         if (isSameOrientation(activity)) restoreBubblePosition()
-
     }
 
     override fun onActivityPaused(activity: Activity) {
@@ -124,7 +123,6 @@ internal class ActivityWatcherForChatHead(
         }
     }
 
-
     private fun isSameOrientation(activity: Activity) =
         screenOrientation == activity.resources.configuration.orientation
 
@@ -139,7 +137,7 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             gliaView = it.findViewById(R.id.call_view)
                 ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
-                        ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
+                ?: it.findViewById<EndScreenSharingView>(R.id.screen_sharing_screen_view)
         }
         return gliaView != null
     }
@@ -178,7 +176,7 @@ internal class ActivityWatcherForChatHead(
             val intent = ChatActivity.getIntent(
                 it,
                 null, // No need to set contextId because engagement is already ongoing
-                null  // No need to set queueId because engagement is already ongoing
+                null // No need to set queueId because engagement is already ongoing
             )
             it.startActivity(intent)
         }
@@ -194,7 +192,9 @@ internal class ActivityWatcherForChatHead(
         activity?.let {
             val intent = CallActivity.getIntent(
                 it,
-                getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
+                getConfigurationBuilder().setMediaType(
+                    Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO)
+                )
                     .setIsUpgradeToCall(true)
                     .build()
             )

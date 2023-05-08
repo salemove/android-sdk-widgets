@@ -28,9 +28,11 @@ internal class AuthenticationManager(
         authentication.authenticate(jwtToken, null, requestCallback)
     }
 
-    override fun authenticate(jwtToken: String,
-                              externalAccessToken: String?,
-                              requestCallback: RequestCallback<Void>) {
+    override fun authenticate(
+        jwtToken: String,
+        externalAccessToken: String?,
+        requestCallback: RequestCallback<Void>
+    ) {
         cleanup()
         authentication.authenticate(jwtToken, externalAccessToken, requestCallback)
     }

@@ -37,7 +37,9 @@ abstract class SurveyViewHolder(
             val color = ContextCompat.getColor(context, R.color.glia_system_negative_color)
             val colorString = String.format("%X", color).substring(2)
             val source = context.getString(
-                R.string.glia_survey_require_label, questionText, colorString
+                R.string.glia_survey_require_label,
+                questionText,
+                colorString
             )
             title.text = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
             title.contentDescription = context.getString(

@@ -47,8 +47,13 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
-    private val isShowOverlayPermissionRequestDialogUseCase = mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
-    private val controller = ActivityWatcherForCallVisualizerController(callVisualizerController, screenSharingController, isShowOverlayPermissionRequestDialogUseCase)
+    private val isShowOverlayPermissionRequestDialogUseCase =
+        mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
+    private val controller = ActivityWatcherForCallVisualizerController(
+        callVisualizerController,
+        screenSharingController,
+        isShowOverlayPermissionRequestDialogUseCase
+    )
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
     private val mediaUpgradeOffer = mock(MediaUpgradeOffer::class.java)
@@ -66,7 +71,8 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onActivityResumed screen sharing skipped when call or chat is active`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase)
+            .thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
         controller.onActivityResumed(activity)
         verify(callVisualizerController).setOnEngagementEndedCallback(any())
@@ -85,13 +91,20 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onActivityResumed error is shown when onScreenSharingError`() {
         mockOnActivityResumeAndEnsureCallbacksSet(supportActivity)
-        controller.screenSharingViewCallback?.onScreenSharingRequestError(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
+        controller.screenSharingViewCallback?.onScreenSharingRequestError(
+            GliaException(
+                "message",
+                GliaException.Cause.INTERNAL_ERROR
+            )
+        )
         verify(watcher).showToast("message")
     }
 
     @Test
     fun `onActivityResumed does not call permissions when not CallVisualizerSupportActivity`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(
+            isCallOrChatActiveUseCase
+        )
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
         controller.onActivityResumed(nonCallVisualizerSupportActivity)
         resetMocks()
@@ -110,7 +123,8 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `isCallOrChatActive returns mocked value when called`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase)
+            .thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
         assertTrue(controller.isCallOrChatActive(activity))
         verify(callVisualizerController).isCallOrChatScreenActiveUseCase
@@ -144,7 +158,11 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onPositiveDialogButtonClicked notification channel dialog is shown when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
-        controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
+        controller.onDialogControllerCallback(
+            DialogState(
+                MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
+            )
+        )
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -153,7 +171,11 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onNegativeDialogButtonClicked decline is sent and dialog is dismissed when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
-        controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
+        controller.onDialogControllerCallback(
+            DialogState(
+                MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
+            )
+        )
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -260,7 +282,12 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onMediaUpgradeAccept does not destroy support activity when error occurs`() {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
-        controller.onMediaUpgradeAccept(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
+        controller.onMediaUpgradeAccept(
+            GliaException(
+                "message",
+                GliaException.Cause.INTERNAL_ERROR
+            )
+        )
     }
 
     @Test
@@ -281,7 +308,12 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onMediaUpgradeDecline does not destroy support activity when error occurs`() {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
-        controller.onMediaUpgradeDecline(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
+        controller.onMediaUpgradeDecline(
+            GliaException(
+                "message",
+                GliaException.Cause.INTERNAL_ERROR
+            )
+        )
     }
 
     @Test
@@ -359,11 +391,15 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     }
 
     private fun mockOnActivityResumeAndEnsureCallbacksSet(activity: Activity) {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(
+            isCallOrChatActiveUseCase
+        )
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
         val intent = mock(Intent::class.java)
         whenever(supportActivity.intent).thenReturn(intent)
-        whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(ScreenSharing)
+        whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(
+            ScreenSharing
+        )
         controller.onInitialCameraPermissionResult(
             isGranted = false,
             isComponentActivity = true
@@ -384,7 +420,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         audioDirection: MediaDirection = MediaDirection.NONE,
         videoDirection: MediaDirection = MediaDirection.NONE
     ): MediaUpgradeOffer {
-        return spy(object: MediaUpgradeOffer(audioDirection, videoDirection) {
+        return spy(object : MediaUpgradeOffer(audioDirection, videoDirection) {
             override fun accept(callback: Consumer<GliaException?>?) {
                 // Do nothing
             }

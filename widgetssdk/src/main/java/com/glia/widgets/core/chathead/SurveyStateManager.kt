@@ -3,7 +3,7 @@ package com.glia.widgets.core.chathead
 class SurveyStateManager {
     private var surveyStep: SurveyStep = SurveyStep.PRE_ENGAGEMENT
 
-    fun getEngagementStep() : SurveyStep {
+    fun getEngagementStep(): SurveyStep {
         return surveyStep
     }
 
@@ -18,7 +18,6 @@ class SurveyStateManager {
     fun preEngagement() {
         surveyStep = SurveyStep.PRE_ENGAGEMENT
     }
-
 }
 
 enum class SurveyStep {

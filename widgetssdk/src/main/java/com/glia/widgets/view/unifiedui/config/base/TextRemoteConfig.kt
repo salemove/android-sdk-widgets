@@ -14,7 +14,7 @@ internal data class TextRemoteConfig(
     val fontRemoteConfig: FontRemoteConfig?,
 
     @SerializedName("alignment")
-    val alignment: AlignmentTypeRemoteConfig?,
+    val alignment: AlignmentTypeRemoteConfig?
 ) {
     fun toTextTheme(): TextTheme = TextTheme(
         textColor = textColor?.toColorTheme(),
@@ -23,5 +23,4 @@ internal data class TextRemoteConfig(
         textStyle = fontRemoteConfig?.style?.style,
         textAlignment = alignment?.nativeAlignment
     )
-
 }

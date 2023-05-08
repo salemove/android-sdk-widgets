@@ -6,7 +6,8 @@ import androidx.appcompat.widget.AppCompatImageView
 import com.glia.widgets.R
 
 class FilePreviewView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : AppCompatImageView(context, attrs) {
 
     init {

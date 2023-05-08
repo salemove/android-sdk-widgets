@@ -25,7 +25,8 @@ internal class CallVisualizerController(
     @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
 ) : CallVisualizerCallback,
     GliaOnCallVisualizerUseCase.Listener,
-    GliaOnCallVisualizerEndUseCase.Listener, OnSurveyListener {
+    GliaOnCallVisualizerEndUseCase.Listener,
+    OnSurveyListener {
 
     private var engagementEndedCallback: (() -> Unit)? = null
 
@@ -36,7 +37,7 @@ internal class CallVisualizerController(
     }
 
     private fun registerCallVisualizerListeners() {
-        onCallVisualizerUseCase(this)    // newEngagementLoaded() callback
+        onCallVisualizerUseCase(this) // newEngagementLoaded() callback
         onCallVisualizerEndUseCase.execute(this) // engagementEnded callback
     }
 

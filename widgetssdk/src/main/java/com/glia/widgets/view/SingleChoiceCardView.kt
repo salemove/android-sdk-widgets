@@ -30,7 +30,9 @@ import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates
 
 class SingleChoiceCardView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : LinearLayoutCompat(context, attrs, defStyleAttr) {
     private var onOptionClickedListener: OnOptionClickedListener? = null
     private var binding: SingleChoiceCardViewBinding by Delegates.notNull()
@@ -64,7 +66,7 @@ class SingleChoiceCardView @JvmOverloads constructor(
 
     fun setData(
         item: ResponseCardItem,
-        theme: UiTheme,
+        theme: UiTheme
     ) {
         setupCardView(theme)
         setupImage(item.choiceCardImageUrl)
@@ -81,7 +83,6 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     private fun setupCardView(theme: UiTheme) {
-
         responseCardTheme?.background?.fill?.also {
             if (it.isGradient) {
                 bgDrawable.colors = it.valuesArray
@@ -136,7 +137,6 @@ class SingleChoiceCardView @JvmOverloads constructor(
         val horizontalMargin = resources.getDimensionPixelOffset(R.dimen.glia_large)
         val topMargin = resources.getDimensionPixelOffset(R.dimen.glia_medium)
         for (option in item.singleChoiceOptions) {
-
             val onClickListener = onOptionClickedListener?.run {
                 OnClickListener { onClicked(item, option) }
             }
@@ -150,7 +150,6 @@ class SingleChoiceCardView @JvmOverloads constructor(
             val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             params.setMargins(horizontalMargin, topMargin, horizontalMargin, 0)
             addView(button, params)
-
         }
     }
 }

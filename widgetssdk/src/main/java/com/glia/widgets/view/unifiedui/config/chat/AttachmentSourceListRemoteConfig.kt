@@ -13,7 +13,7 @@ internal data class AttachmentSourceListRemoteConfig(
     val background: ColorLayerRemoteConfig?,
 
     @SerializedName("items")
-    val items: List<AttachmentSourceRemoteConfig>?,
+    val items: List<AttachmentSourceRemoteConfig>?
 ) {
 
     private val photoLibrary: AttachmentSourceRemoteConfig?

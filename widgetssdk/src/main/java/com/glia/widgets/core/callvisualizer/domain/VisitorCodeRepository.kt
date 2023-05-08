@@ -1,7 +1,6 @@
 package com.glia.widgets.core.callvisualizer.domain
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.di.GliaCore
 import io.reactivex.Observable

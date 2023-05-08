@@ -195,8 +195,6 @@ internal class ApplicationChatHeadLayoutController(
         )
         updateChatHeadView()
     }
-
-
     override fun newEngagementLoaded(engagement: OmnibrowseEngagement) {
         onNewEngagementLoaded()
     }

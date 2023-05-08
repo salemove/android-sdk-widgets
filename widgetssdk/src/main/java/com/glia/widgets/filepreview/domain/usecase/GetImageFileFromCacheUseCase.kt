@@ -9,6 +9,8 @@ internal class GetImageFileFromCacheUseCase(private val gliaFileRepository: Glia
     operator fun invoke(fileName: String?): Maybe<Bitmap> {
         return if (fileName.isNullOrEmpty()) {
             Maybe.error(FileNameMissingException())
-        } else gliaFileRepository.loadImageFromCache(fileName)
+        } else {
+            gliaFileRepository.loadImageFromCache(fileName)
+        }
     }
 }

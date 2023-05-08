@@ -2,7 +2,6 @@ package com.glia.widgets.view.unifiedui.config.base
 
 import kotlin.math.roundToInt
 
-
 /**
  * Represents size in Sp (Scalable pixel)
  * Used by deserializer to differ sp from dp

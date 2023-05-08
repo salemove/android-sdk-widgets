@@ -41,7 +41,7 @@ internal class CallNotificationUseCase(
 
     private fun getVideoDirection(visitorMedia: VisitorMediaState?, operatorMedia: OperatorMediaState?): MediaDirection {
         if (operatorMedia?.video == null && visitorMedia?.video == null) {
-            return MediaDirection.NONE;
+            return MediaDirection.NONE
         }
         if (operatorMedia?.video == null && visitorMedia?.video != null) {
             throw IllegalStateException("GliaHub does not support one-way visitor video calls")
@@ -54,7 +54,7 @@ internal class CallNotificationUseCase(
 
     private fun getAudioDirection(visitorMedia: VisitorMediaState?, operatorMedia: OperatorMediaState?): MediaDirection {
         if (operatorMedia?.audio == null && visitorMedia?.audio == null) {
-            return MediaDirection.NONE;
+            return MediaDirection.NONE
         }
         if (operatorMedia?.audio == null && visitorMedia?.audio != null) {
             throw IllegalStateException("GliaHub does not support one-way audio calls")

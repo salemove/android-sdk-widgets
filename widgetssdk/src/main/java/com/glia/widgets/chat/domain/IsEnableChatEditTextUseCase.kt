@@ -10,5 +10,4 @@ class IsEnableChatEditTextUseCase {
     operator fun invoke(items: List<ChatItem>?): Boolean = items?.lastOrNull()?.let {
         it.viewType != ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE || it !is ResponseCardItem
     } ?: true
-
 }

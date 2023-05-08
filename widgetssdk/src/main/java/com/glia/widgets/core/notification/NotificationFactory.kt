@@ -61,8 +61,11 @@ internal object NotificationFactory {
 
     private fun createOneWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
         val message =
-            if (hasAudio) R.string.glia_notification_one_way_video_call_message
-            else R.string.glia_notification_one_way_video_call_message_no_audio
+            if (hasAudio) {
+                R.string.glia_notification_one_way_video_call_message
+            } else {
+                R.string.glia_notification_one_way_video_call_message_no_audio
+            }
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
@@ -73,8 +76,11 @@ internal object NotificationFactory {
 
     private fun createTwoWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
         val message =
-            if (hasAudio) R.string.glia_notification_two_way_video_call_message
-            else R.string.glia_notification_two_way_video_call_message_no_audio
+            if (hasAudio) {
+                R.string.glia_notification_two_way_video_call_message
+            } else {
+                R.string.glia_notification_two_way_video_call_message_no_audio
+            }
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,

@@ -8,14 +8,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.adapter.holder.*
+import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
+import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder
+import com.glia.widgets.chat.adapter.holder.NewMessagesDividerViewHolder
+import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder
+import com.glia.widgets.chat.adapter.holder.OperatorStatusViewHolder
+import com.glia.widgets.chat.adapter.holder.SystemMessageViewHolder
+import com.glia.widgets.chat.adapter.holder.VisitorMessageViewHolder
 import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
-import com.glia.widgets.chat.model.history.*
-import com.glia.widgets.databinding.*
+import com.glia.widgets.chat.model.history.ChatItem
+import com.glia.widgets.chat.model.history.CustomCardItem
+import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
+import com.glia.widgets.chat.model.history.OperatorAttachmentItem
+import com.glia.widgets.chat.model.history.OperatorMessageItem
+import com.glia.widgets.chat.model.history.OperatorStatusItem
+import com.glia.widgets.chat.model.history.SystemChatItem
+import com.glia.widgets.chat.model.history.VisitorAttachmentItem
+import com.glia.widgets.chat.model.history.VisitorMessageItem
+import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
+import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
+import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
+import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
+import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
+import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
@@ -36,7 +55,8 @@ internal class ChatAdapter(
     private val differ = AsyncListDiffer(this, ChatAdapterDillCallback())
 
     override fun onCreateViewHolder(
-        parent: ViewGroup, @Type viewType: Int
+        parent: ViewGroup,
+        @Type viewType: Int
     ): RecyclerView.ViewHolder {
         val inflater = parent.layoutInflater
         return when (viewType) {
@@ -62,7 +82,8 @@ internal class ChatAdapter(
             }
             VISITOR_MESSAGE_TYPE -> {
                 VisitorMessageViewHolder(
-                    ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false), uiTheme
+                    ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false),
+                    uiTheme
                 )
             }
             OPERATOR_IMAGE_VIEW_TYPE -> {
@@ -80,17 +101,20 @@ internal class ChatAdapter(
                         R.layout.chat_attachment_operator_file_layout,
                         parent,
                         false
-                    ), uiTheme
+                    ),
+                    uiTheme
                 )
             }
             OPERATOR_MESSAGE_VIEW_TYPE -> {
                 OperatorMessageViewHolder(
-                    ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false), uiTheme
+                    ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false),
+                    uiTheme
                 )
             }
             MEDIA_UPGRADE_ITEM_TYPE -> {
                 MediaUpgradeStartedViewHolder(
-                    ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false), uiTheme
+                    ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false),
+                    uiTheme
                 )
             }
             NEW_MESSAGES_DIVIDER_TYPE -> {
@@ -108,7 +132,8 @@ internal class ChatAdapter(
                     inflater,
                     parent,
                     false
-                ), uiTheme
+                ),
+                uiTheme
             )
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
@@ -128,9 +153,10 @@ internal class ChatAdapter(
     }
 
     override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
     ) {
-
         if (differ.currentList[position] is MediaUpgradeStartedTimerItem) {
             val time = (payloads.firstOrNull() as? String)
 
@@ -138,9 +164,7 @@ internal class ChatAdapter(
                 (holder as? MediaUpgradeStartedViewHolder)?.updateTime(time)
                 return
             }
-
         }
-
         super.onBindViewHolder(holder, position, payloads)
     }
 
@@ -149,7 +173,8 @@ internal class ChatAdapter(
             is OperatorStatusItem -> (holder as OperatorStatusViewHolder).bind(chatItem)
             is VisitorMessageItem -> (holder as VisitorMessageViewHolder).bind(chatItem)
             is OperatorMessageItem -> (holder as OperatorMessageViewHolder).bind(
-                chatItem, onOptionClickedListener
+                chatItem,
+                onOptionClickedListener
             )
             is MediaUpgradeStartedTimerItem -> (holder as MediaUpgradeStartedViewHolder).bind(
                 chatItem
@@ -157,7 +182,8 @@ internal class ChatAdapter(
             is OperatorAttachmentItem -> {
                 if (chatItem.getViewType() == OPERATOR_FILE_VIEW_TYPE) {
                     (holder as OperatorFileAttachmentViewHolder).bind(
-                        chatItem, onFileItemClickListener
+                        chatItem,
+                        onFileItemClickListener
                     )
                 } else {
                     (holder as OperatorImageAttachmentViewHolder).bind(

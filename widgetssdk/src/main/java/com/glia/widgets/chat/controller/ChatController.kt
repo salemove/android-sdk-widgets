@@ -240,7 +240,10 @@ internal class ChatController(
     private val isQueueingOrOngoingEngagement get() = isQueueingEngagementUseCase() || isOngoingEngagementUseCase()
 
     fun initChat(
-        companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType
+        companyName: String?,
+        queueId: String?,
+        visitorContextAssetId: String?,
+        chatType: ChatType
     ) {
         val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
         engagementConfigUseCase(chatType, queueIds)
@@ -317,13 +320,7 @@ internal class ChatController(
         val state = callback() ?: return
 
         if (setState(state) && viewCallback != null) {
-            Logger.d(
-                TAG, """
-     Emit chat items:
-     ${state.chatItems}
-     (State): $state
-     """.trimIndent()
-            )
+            Logger.d(TAG, """Emit chat items: ${state.chatItems} (State): $state""".trimIndent())
 
             viewCallback?.emitItems(state.chatItems)
             viewCallback?.emitUploadAttachments(getFileAttachmentsUseCase.execute())
@@ -400,7 +397,8 @@ internal class ChatController(
         disposable.add(
             onMessageUseCase.execute()
                 .doOnNext { onMessage(it) }
-                .subscribe())
+                .subscribe()
+        )
     }
 
     private fun subscribeToPreEngagementMessage() {
@@ -414,10 +412,9 @@ internal class ChatController(
     private fun onPreEngagementMessage(messageInternal: ChatMessageInternal) {
         emitChatItems {
             val message = messageInternal.chatMessage
-            if (message.senderType == Chat.Participant.VISITOR && message.attachment != null
-                && !isNewMessage(chatState.chatItems, message)
+            if (message.senderType == Chat.Participant.VISITOR && message.attachment != null &&
+                !isNewMessage(chatState.chatItems, message)
             ) {
-
                 val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
                 val currentMessage =
                     items.first { (it as? LinkedChatItem)?.messageId == message.id }
@@ -621,7 +618,6 @@ internal class ChatController(
         chatState.pendingNavigationType?.also { viewCallback?.navigateToCall(it) }
     }
 
-
     fun setOnBackClickedListener(finishCallback: ChatView.OnBackClickedListener?) {
         this.backClickedListener = finishCallback
     }
@@ -755,27 +751,33 @@ internal class ChatController(
                     offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY -> {
                         // audio call
                         Logger.d(TAG, "audioUpgradeRequested")
-                        if (chatState.isOperatorOnline) dialogController.showUpgradeAudioDialog(
-                            offer,
-                            chatState.formattedOperatorName
-                        )
+                        if (chatState.isOperatorOnline) {
+                            dialogController.showUpgradeAudioDialog(
+                                offer,
+                                chatState.formattedOperatorName
+                            )
+                        }
                     }
 
                     offer.video == MediaDirection.TWO_WAY -> {
                         // video call
                         Logger.d(TAG, "2 way videoUpgradeRequested")
-                        if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog2Way(
-                            offer,
-                            chatState.formattedOperatorName
-                        )
+                        if (chatState.isOperatorOnline) {
+                            dialogController.showUpgradeVideoDialog2Way(
+                                offer,
+                                chatState.formattedOperatorName
+                            )
+                        }
                     }
 
                     offer.video == MediaDirection.ONE_WAY -> {
                         Logger.d(TAG, "1 way videoUpgradeRequested")
-                        if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog1Way(
-                            offer,
-                            chatState.formattedOperatorName
-                        )
+                        if (chatState.isOperatorOnline) {
+                            dialogController.showUpgradeVideoDialog1Way(
+                                offer,
+                                chatState.formattedOperatorName
+                            )
+                        }
                     }
                 }
             }
@@ -966,14 +968,16 @@ internal class ChatController(
     }
 
     private fun onOperatorMessageReceived(
-        currentChatItems: MutableList<ChatItem>, messageInternal: ChatMessageInternal
+        currentChatItems: MutableList<ChatItem>,
+        messageInternal: ChatMessageInternal
     ) {
         appendOperatorMessage(currentChatItems, messageInternal, true)
         appendMessagesNotSeen()
     }
 
     private fun onSystemMessageReceived(
-        currentChatItems: MutableList<ChatItem>, messageInternal: ChatMessageInternal
+        currentChatItems: MutableList<ChatItem>,
+        messageInternal: ChatMessageInternal
     ) {
         appendSystemMessage(currentChatItems, messageInternal)
         appendMessagesNotSeen()
@@ -1099,7 +1103,8 @@ internal class ChatController(
     }
 
     private fun appendSystemMessage(
-        currentChatItems: MutableList<ChatItem>, chatMessageInternal: ChatMessageInternal
+        currentChatItems: MutableList<ChatItem>,
+        chatMessageInternal: ChatMessageInternal
     ) {
         chatMessageInternal.chatMessage.apply {
             currentChatItems += SystemChatItem(id, timestamp, content)
@@ -1112,7 +1117,8 @@ internal class ChatController(
         isLastItem: Boolean
     ) {
         setLastOperatorItemChatHeadVisibility(
-            currentChatItems, isOperatorChanged(currentChatItems, chatMessageInternal)
+            currentChatItems,
+            isOperatorChanged(currentChatItems, chatMessageInternal)
         )
         appendOperatorOrCustomCardItem(currentChatItems, chatMessageInternal, isLastItem)
         appendOperatorAttachmentItems(currentChatItems, chatMessageInternal)
@@ -1528,12 +1534,12 @@ internal class ChatController(
         } else {
             emitChatItems { chatState.historyLoaded(currentItems) }
         }
-
     }
 
     @VisibleForTesting
     fun emitChatTranscriptItems(
-        items: MutableList<ChatItem>, newMessagesCount: Int
+        items: MutableList<ChatItem>,
+        newMessagesCount: Int
     ) {
         if (addNewMessagesDividerUseCase(items, newMessagesCount)) {
             emitChatItems { chatState.changeItems(items) }
@@ -1586,11 +1592,14 @@ internal class ChatController(
 
     @VisibleForTesting
     fun removeDuplicates(
-        oldHistory: List<ChatItem>?, newHistory: List<ChatMessageInternal>?
+        oldHistory: List<ChatItem>?,
+        newHistory: List<ChatMessageInternal>?
     ): List<ChatMessageInternal>? {
         return if (newHistory.isNullOrEmpty() || oldHistory.isNullOrEmpty()) {
             newHistory
-        } else newHistory.filter { isNewMessage(oldHistory, it.chatMessage) }
+        } else {
+            newHistory.filter { isNewMessage(oldHistory, it.chatMessage) }
+        }
     }
 
     @VisibleForTesting
@@ -1707,7 +1716,6 @@ internal class ChatController(
         } ?: (exception as? QueueingOngoingException)?.also {
             queueForEngagementStarted()
         }
-
     }
 
     fun onRemoveAttachment(attachment: FileAttachment) {
@@ -1715,8 +1723,9 @@ internal class ChatController(
     }
 
     fun onAttachmentReceived(file: FileAttachment) {
-        addFileToAttachmentAndUploadUseCase
-            .execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
+        addFileToAttachmentAndUploadUseCase.execute(
+            file,
+            object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
                     Logger.d(TAG, "fileUploadFinished")
                 }
@@ -1736,7 +1745,8 @@ internal class ChatController(
                 override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
                     Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
                 }
-            })
+            }
+        )
     }
 
     fun onFileDownloadClicked(attachmentFile: AttachmentFile) {

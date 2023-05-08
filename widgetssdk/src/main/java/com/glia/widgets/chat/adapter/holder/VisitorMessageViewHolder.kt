@@ -15,7 +15,8 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class VisitorMessageViewHolder(
-    private val binding: ChatVisitorMessageLayoutBinding, uiTheme: UiTheme
+    private val binding: ChatVisitorMessageLayoutBinding,
+    uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val visitorTheme: MessageBalloonTheme? by lazy {
@@ -37,7 +38,7 @@ internal class VisitorMessageViewHolder(
         uiTheme.baseNormalColor?.let(itemView::getColorCompat)
             ?.also(binding.deliveredView::setTextColor)
 
-        //Unified Ui
+        // Unified Ui
         binding.content.applyLayerTheme(visitorTheme?.background)
         binding.content.applyTextTheme(visitorTheme?.text)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
@@ -47,7 +48,11 @@ internal class VisitorMessageViewHolder(
         binding.content.text = item.message
         binding.deliveredView.isVisible = item.isShowDelivered
         val contentDescription = itemView.resources.getString(
-            if (item.isShowDelivered) R.string.glia_chat_visitor_message_delivered_content_description else R.string.glia_chat_visitor_message_content_description,
+            if (item.isShowDelivered) {
+                R.string.glia_chat_visitor_message_delivered_content_description
+            } else {
+                R.string.glia_chat_visitor_message_content_description
+            },
             item.message
         )
         itemView.contentDescription = contentDescription

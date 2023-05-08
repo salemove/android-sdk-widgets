@@ -4,7 +4,6 @@ package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import com.glia.widgets.view.unifiedui.theme.base.*
 
 /**
  * Default [UnifiedTheme] generated for [ColorPallet]

@@ -5,12 +5,17 @@ package com.glia.widgets.view.unifiedui.theme.defaulttheme
 import androidx.annotation.ColorInt
 import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
-import com.glia.widgets.view.unifiedui.theme.base.*
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 
-internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet): SecureConversationsWelcomeScreenTheme =
-    pallet.let {
+internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet):
+    SecureConversationsWelcomeScreenTheme {
+    return pallet.let {
         val baseDarkColorText = TextTheme(textColor = pallet.baseDarkColorTheme)
 
         SecureConversationsWelcomeScreenTheme(
@@ -50,6 +55,7 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet): SecureC
             backgroundTheme = it.backgroundColorTheme
         )
     }
+}
 
 /**
  * Default theme for `Send message` button
@@ -61,7 +67,9 @@ private fun SecureConversationsEnabledSendButtonTheme(pallet: ColorPallet): Butt
  * Default theme for TextInput
  */
 private fun DefaultInputTheme(
-    fill: ColorTheme? = null, @ColorInt stroke: Int? = null, textColor: ColorTheme? = null
+    fill: ColorTheme? = null,
+    @ColorInt stroke: Int? = null,
+    textColor: ColorTheme? = null
 ): TextInputTheme? = composeIfAtLeastOneNotNull(fill, stroke, textColor) {
     TextInputTheme(
         textTheme = TextTheme(textColor = textColor),
@@ -69,8 +77,9 @@ private fun DefaultInputTheme(
     )
 }
 
-internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet): SecureConversationsConfirmationScreenTheme =
-    pallet.let {
+internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet):
+    SecureConversationsConfirmationScreenTheme {
+    return pallet.let {
         SecureConversationsConfirmationScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
             backgroundTheme = it.backgroundColorTheme,
@@ -80,3 +89,4 @@ internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet): Se
             checkMessagesButtonTheme = PositiveDefaultButtonTheme(pallet)
         )
     }
+}

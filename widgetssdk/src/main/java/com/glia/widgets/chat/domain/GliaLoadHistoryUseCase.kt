@@ -26,7 +26,8 @@ internal class GliaLoadHistoryUseCase(
     }
 
     private fun loadHistoryWithNewMessagesCount() = Single.zip(
-        loadHistoryAndMapOperator(), getUnreadMessagesCountUseCase()
+        loadHistoryAndMapOperator(),
+        getUnreadMessagesCountUseCase()
     ) { messages, count -> ChatHistoryResponse(messages, count) }
 
     private fun loadHistoryAndMapOperator() = loadHistory()

@@ -1,7 +1,14 @@
 package com.glia.widgets.chat.adapter
 
 import androidx.recyclerview.widget.DiffUtil
-import com.glia.widgets.chat.model.history.*
+import com.glia.widgets.chat.model.history.ChatItem
+import com.glia.widgets.chat.model.history.CustomCardItem
+import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
+import com.glia.widgets.chat.model.history.OperatorAttachmentItem
+import com.glia.widgets.chat.model.history.OperatorMessageItem
+import com.glia.widgets.chat.model.history.OperatorStatusItem
+import com.glia.widgets.chat.model.history.VisitorAttachmentItem
+import com.glia.widgets.chat.model.history.VisitorMessageItem
 
 class ChatAdapterDillCallback : DiffUtil.ItemCallback<ChatItem>() {
     override fun areItemsTheSame(oldItem: ChatItem, newItem: ChatItem): Boolean {
@@ -23,9 +30,9 @@ class ChatAdapterDillCallback : DiffUtil.ItemCallback<ChatItem>() {
 
     override fun getChangePayload(oldItem: ChatItem, newItem: ChatItem): Any? {
         if (
-            oldItem is MediaUpgradeStartedTimerItem
-            && newItem is MediaUpgradeStartedTimerItem
-            && oldItem.type == newItem.type
+            oldItem is MediaUpgradeStartedTimerItem &&
+            newItem is MediaUpgradeStartedTimerItem &&
+            oldItem.type == newItem.type
         ) {
             return newItem.time
         }

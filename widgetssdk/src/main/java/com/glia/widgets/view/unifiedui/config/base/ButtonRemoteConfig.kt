@@ -24,5 +24,4 @@ internal data class ButtonRemoteConfig(
         elevation = shadowRemoteConfig?.elevationPx,
         shadowColor = shadowRemoteConfig?.color
     )
-
 }

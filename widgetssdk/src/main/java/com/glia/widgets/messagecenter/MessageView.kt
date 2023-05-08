@@ -38,11 +38,14 @@ import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates
 
 class MessageView(
-    context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int,
+    defStyleRes: Int
 ) : NestedScrollView(
     context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
     attrs,
-    defStyleAttr,
+    defStyleAttr
 ) {
 
     private val binding: MessageCenterMessageViewBinding by lazy {
@@ -95,7 +98,9 @@ class MessageView(
 
     @JvmOverloads
     constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -155,13 +160,14 @@ class MessageView(
     private fun setupViewAppearance() {
         uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
         uploadAttachmentAdapter.setItemCallback { onRemoveAttachmentListener?.invoke(it) }
-        uploadAttachmentAdapter.registerAdapterDataObserver(object :
-            RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                attachmentRecyclerView.smoothScrollToPosition(uploadAttachmentAdapter.itemCount)
+        uploadAttachmentAdapter.registerAdapterDataObserver(
+            object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    attachmentRecyclerView.smoothScrollToPosition(uploadAttachmentAdapter.itemCount)
+                }
             }
-        })
+        )
         attachmentRecyclerView.layoutManager = LinearLayoutManager(this.context)
         attachmentRecyclerView.adapter = uploadAttachmentAdapter
     }
@@ -246,7 +252,7 @@ class MessageView(
         onRemoveAttachmentListener = listener
     }
 
-    fun onStateUpdated(state: State) {
+    fun onStateUpdated(state: MessageCenterState) {
         updateSendButtonState(state.sendMessageButtonState)
         updateSendMessageError(state.showMessageLimitError)
         updateMessageEditText(state.messageEditTextEnabled, state.showMessageLimitError)
@@ -287,11 +293,11 @@ class MessageView(
         messageEditText.setError(showError)
     }
 
-    private fun updateSendButtonState(state: State.ButtonState) {
+    private fun updateSendButtonState(state: MessageCenterState.ButtonState) {
         when (state) {
-            State.ButtonState.PROGRESS -> sendMessageButton.setProgress(true)
-            State.ButtonState.NORMAL -> sendMessageButton.isEnabled = true
-            State.ButtonState.DISABLE -> sendMessageButton.isEnabled = false
+            MessageCenterState.ButtonState.PROGRESS -> sendMessageButton.setProgress(true)
+            MessageCenterState.ButtonState.NORMAL -> sendMessageButton.isEnabled = true
+            MessageCenterState.ButtonState.DISABLE -> sendMessageButton.isEnabled = false
         }
     }
 }

@@ -4,7 +4,6 @@ import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
-import com.glia.widgets.view.unifiedui.config.chat.*
 import com.glia.widgets.view.unifiedui.theme.callvisulaizer.EndScreenSharingTheme
 import com.google.gson.annotations.SerializedName
 

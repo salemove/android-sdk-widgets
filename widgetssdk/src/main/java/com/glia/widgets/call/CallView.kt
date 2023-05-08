@@ -74,19 +74,23 @@ import com.google.android.material.transition.SlideDistanceProvider
 import kotlin.properties.Delegates
 
 internal class CallView(
-    context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int
+    context: Context,
+    attrs: AttributeSet?,
+    defStyleAttr: Int,
+    defStyleRes: Int
 ) : ConstraintLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
     defStyleRes
-), CallViewCallback {
+),
+    CallViewCallback {
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.callTheme
     }
 
-    //should be used only with `applicationContext` otherwise `audioManager` won’t
+    // should be used only with `applicationContext` otherwise `audioManager` won’t
     // work properly for more than one call
     private val audioManager: AudioManager by lazy { context.applicationContext.getSystemService()!! }
     private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
@@ -158,7 +162,9 @@ internal class CallView(
 
     @JvmOverloads
     constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     init {
@@ -252,7 +258,12 @@ internal class CallView(
                 Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
                 Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
-                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
+                Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
+                    showAllowScreenSharingNotificationsAndStartSharingDialog()
+                }
+                Dialog.MODE_VISITOR_CODE -> {
+                    Logger.e(TAG, "DialogController callback in CallView with MODE_VISITOR_CODE")
+                } // Should never happen inside CallView
                 else -> Logger.e(TAG, "DialogController callback in CallView with ${it.mode}")
             }
         }
@@ -274,7 +285,7 @@ internal class CallView(
     private fun handleContinueBrowsingView(callState: CallState) {
         continueBrowsingView.isVisible =
             resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE &&
-                    callState.showContinueBrowsingView()
+            callState.showContinueBrowsingView()
 
         continueBrowsingView.text = resources.getString(
             if (callState.showOnHold()) R.string.glia_call_continue_browsing_on_hold else R.string.glia_call_continue_browsing
@@ -383,7 +394,6 @@ internal class CallView(
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     this.context.openNotificationChannelScreen()
-
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
@@ -426,16 +436,18 @@ internal class CallView(
     }
 
     private fun showScreenSharingDialog() {
-        if (alertDialog == null || !alertDialog!!.isShowing) alertDialog =
-            Dialogs.showScreenSharingDialog(
-                this.context,
-                theme,
-                resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
-                resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
-                R.string.glia_dialog_screen_sharing_offer_accept,
-                R.string.glia_dialog_screen_sharing_offer_decline,
-                { screenSharingController!!.onScreenSharingAccepted(context.requireActivity()) }
-            ) { screenSharingController!!.onScreenSharingDeclined() }
+        if (alertDialog == null || !alertDialog!!.isShowing) {
+            alertDialog =
+                Dialogs.showScreenSharingDialog(
+                    this.context,
+                    theme,
+                    resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
+                    resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
+                    R.string.glia_dialog_screen_sharing_offer_accept,
+                    R.string.glia_dialog_screen_sharing_offer_decline,
+                    { screenSharingController!!.onScreenSharingAccepted(context.requireActivity()) }
+                ) { screenSharingController!!.onScreenSharingDeclined() }
+        }
     }
 
     private fun setButtonActivated(
@@ -523,30 +535,30 @@ internal class CallView(
             minimizeButtonLabel.typeface = it
         }
 
-        //ButtonBar Buttons
+        // ButtonBar Buttons
         chatButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.chatButton)
         videoButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.videoButton)
         muteButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.muteButton)
         speakerButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.speakerButton)
         minimizeButton.applyBarButtonStatesTheme(callTheme?.buttonBar?.minimizeButton)
 
-        //ButtonBar Labels
+        // ButtonBar Labels
         chatButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.chatButton)
         videoButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.videoButton)
         muteButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.muteButton)
         speakerButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.speakerButton)
         minimizeButtonLabel.setBarButtonStatesTheme(callTheme?.buttonBar?.minimizeButton)
 
-        //Badge
+        // Badge
         chatButtonBadgeView.applyBadgeTheme(callTheme?.buttonBar?.badge)
 
-        //Texts
+        // Texts
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)
         callTheme?.operator.also(operatorNameView::applyThemeAsDefault)
         callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
 
-        //Background
+        // Background
         callTheme?.background?.fill.also(::applyColorTheme)
     }
 
@@ -701,11 +713,17 @@ internal class CallView(
     }
 
     private fun showAlertDialog(
-        @StringRes title: Int, @StringRes message: Int, buttonClickListener: OnClickListener
+        @StringRes title: Int,
+        @StringRes message: Int,
+        buttonClickListener: OnClickListener
     ) {
         dismissAlertDialog()
         alertDialog = Dialogs.showAlertDialog(
-            this.context, theme, title, message, buttonClickListener
+            this.context,
+            theme,
+            title,
+            message,
+            buttonClickListener
         )
     }
 
@@ -869,7 +887,7 @@ internal class CallView(
     private fun applyTextThemeBasedOnCallState(callState: CallState) {
         when {
             callState.showOnHold() -> {
-                //onHold operatorNameView, onHoldText
+                // onHold operatorNameView, onHoldText
                 callTheme?.connect?.onHold?.apply {
                     title?.also(operatorNameView::applyThemeOrDefault)
                     description?.also(onHoldTextView::applyThemeOrDefault)
@@ -877,7 +895,7 @@ internal class CallView(
             }
 
             callState.isCallOngoingAndOperatorIsConnecting -> {
-                //connecting connectingView, operatorNameView, callTimerView
+                // connecting connectingView, operatorNameView, callTimerView
                 callTheme?.connect?.connecting?.apply {
                     title?.also(operatorNameView::applyThemeOrDefault)
                     description?.also(connectingView::applyThemeOrDefault)
@@ -885,17 +903,17 @@ internal class CallView(
             }
 
             callState.isCallOngoingAndOperatorConnected -> {
-                //connected operatorNameView, callTimerView
+                // connected operatorNameView, callTimerView
                 invalidateOperatorNameViewTheme()
             }
 
             callState.isTransferring -> {
-                //transferring operatorNameView, callTimerView
+                // transferring operatorNameView, callTimerView
                 invalidateOperatorNameViewTheme()
             }
 
             else -> {
-                //queue companyNameView, msrView
+                // queue companyNameView, msrView
                 // this is the same as [callState.isCallNotOngoing] or queue state
                 callTheme?.connect?.connecting?.apply {
                     title?.also(companyNameView::applyTextTheme)
@@ -922,7 +940,7 @@ internal class CallView(
             )
             handleCallTimerView(callState)
 
-            //No need to manage the remaining view's states if only time has changed
+            // No need to manage the remaining view's states if only time has changed
             if (callState.isOnlyTimeChanged) return@post
 
             setupEndButton(callState)
@@ -957,7 +975,6 @@ internal class CallView(
                 appBar.backgroundTintList = getColorStateListCompat(android.R.color.transparent)
             }
 
-
             callState.isVideoButtonEnabled.also {
                 videoButton.isEnabled = it
                 videoButtonLabel.isEnabled = it
@@ -975,8 +992,8 @@ internal class CallView(
 
             setButtonActivated(
                 muteButton,
-                theme.iconCallAudioOff,  // mute (eg. mic-off) button activated icon
-                theme.iconCallAudioOn,  // mute (eg. mic-off) button deactivated icon
+                theme.iconCallAudioOff, // mute (eg. mic-off) button activated icon
+                theme.iconCallAudioOn, // mute (eg. mic-off) button deactivated icon
                 R.string.glia_call_mute_content_description,
                 R.string.glia_call_unmute_content_description,
                 callState.isMuted
@@ -991,7 +1008,6 @@ internal class CallView(
                     chatButtonBadgeView.isVisible = callState.messagesNotSeen > 0
                 }
                 applyViewState(this, chatButton, chatButtonLabel)
-
             }
             applyViewState(callState.muteButtonViewState, muteButton, muteButtonLabel)
             applyViewState(callState.speakerButtonViewState, speakerButton, speakerButtonLabel)
@@ -1019,10 +1035,15 @@ internal class CallView(
             }
 
             chatButton.contentDescription =
-                if (callState.messagesNotSeen == 0) resources.getString(R.string.glia_call_chat_zero_content_description) else resources.getQuantityString(
-                    R.plurals.glia_call_chat_content_description,
-                    callState.messagesNotSeen, callState.messagesNotSeen
-                )
+                if (callState.messagesNotSeen == 0) {
+                    resources.getString(R.string.glia_call_chat_zero_content_description)
+                } else {
+                    resources.getQuantityString(
+                        R.plurals.glia_call_chat_content_description,
+                        callState.messagesNotSeen,
+                        callState.messagesNotSeen
+                    )
+                }
 
             applyTextThemeBasedOnCallState(callState)
         }

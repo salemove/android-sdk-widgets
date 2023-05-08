@@ -44,7 +44,9 @@ internal fun View.getFontCompat(@FontRes resId: Int) = ResourcesCompat.getFont(c
 
 @AnyRes
 internal fun View.getTypedArrayResId(
-    typedArray: TypedArray, @StyleableRes index: Int, @AttrRes fallbackAttr: Int
+    typedArray: TypedArray,
+    @StyleableRes index: Int,
+    @AttrRes fallbackAttr: Int
 ) = Utils.getTypedArrayIntegerValue(typedArray, context, index, fallbackAttr)
 
 @AnyRes
@@ -123,10 +125,9 @@ internal fun ImageView.load(
     onSuccess: (() -> Unit)? = null,
     onError: ((ex: Exception) -> Unit)? = null
 ) {
-
-    val callback = if (onSuccess == null && onError == null)
+    val callback = if (onSuccess == null && onError == null) {
         null
-    else
+    } else {
         object : Callback {
             override fun onSuccess() {
                 onSuccess?.invoke()
@@ -136,7 +137,7 @@ internal fun ImageView.load(
                 onError?.invoke(e)
             }
         }
-
+    }
     Picasso.get().load(url).into(this, callback)
 }
 

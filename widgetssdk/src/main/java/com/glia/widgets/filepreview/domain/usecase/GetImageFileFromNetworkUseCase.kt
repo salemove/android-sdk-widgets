@@ -20,5 +20,4 @@ internal class GetImageFileFromNetworkUseCase(
             .flatMap { decodeSampledBitmapFromInputStreamUseCase(it) }
             .doOnSuccess { gliaFileRepository.putImageToCache(file.fileName, it) }
     }
-
 }

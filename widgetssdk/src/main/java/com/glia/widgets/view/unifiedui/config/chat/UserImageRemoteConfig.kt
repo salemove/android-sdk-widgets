@@ -12,7 +12,7 @@ internal data class UserImageRemoteConfig(
     val placeholderBackgroundColor: ColorLayerRemoteConfig?,
 
     @SerializedName("imageBackgroundColor")
-    val imageBackgroundColor: ColorLayerRemoteConfig?,
+    val imageBackgroundColor: ColorLayerRemoteConfig?
 ) {
     fun toUserImageTheme(): UserImageTheme = UserImageTheme(
         placeholderColor = placeholderColor?.toColorTheme(),

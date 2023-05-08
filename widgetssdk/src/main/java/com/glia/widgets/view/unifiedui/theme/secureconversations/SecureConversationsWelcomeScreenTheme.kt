@@ -1,6 +1,10 @@
 package com.glia.widgets.view.unifiedui.theme.secureconversations
 
-import com.glia.widgets.view.unifiedui.theme.base.*
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme
+import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 import com.glia.widgets.view.unifiedui.theme.chat.FileUploadBarTheme
 

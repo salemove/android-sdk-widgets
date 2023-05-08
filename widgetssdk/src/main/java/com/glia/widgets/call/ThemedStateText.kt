@@ -10,7 +10,8 @@ import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
 open class ThemedStateText @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null
+    context: Context,
+    attrs: AttributeSet? = null
 ) : AppCompatTextView(context, attrs) {
 
     private var defaultTheme: TextTheme? = null
@@ -42,4 +43,3 @@ open class ThemedStateText @JvmOverloads constructor(
         theme.also(::applyTextTheme) ?: restoreDefaultTheme()
     }
 }
-

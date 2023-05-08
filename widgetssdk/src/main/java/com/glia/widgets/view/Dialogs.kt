@@ -52,7 +52,8 @@ object Dialogs {
         alertTheme?.isVerticalAxis ?: theme.isAlertDialogButtonUseVerticalAlignment()
 
     private fun getOptionsAlertDialogLayout(
-        theme: UiTheme, isButtonsColorsReversed: Boolean
+        theme: UiTheme,
+        isButtonsColorsReversed: Boolean
     ): Int {
         val useVerticalAlignment = isUseVerticalAlignment(theme)
 
@@ -65,10 +66,11 @@ object Dialogs {
     }
 
     private fun getUpgradeDialogLayout(theme: UiTheme) =
-        if (isUseVerticalAlignment(theme))
+        if (isUseVerticalAlignment(theme)) {
             R.layout.upgrade_dialog_vertical
-        else
+        } else {
             R.layout.upgrade_dialog
+        }
 
     private fun getScreenSharingLayout(theme: UiTheme): Int =
         if (isUseVerticalAlignment(theme)) R.layout.screensharing_dialog_vertical else R.layout.screensharing_dialog
@@ -108,7 +110,7 @@ object Dialogs {
     ): AlertDialog {
         val verticalInset = context.resources.getDimensionPixelSize(R.dimen.glia_large_x_large)
         val alertDialog = MaterialAlertDialogBuilder(context)
-            //With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
+            // With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
             .setView(LayoutInflater.from(context).inflate(layoutRes, null))
             .setCancelable(cancelable)
             .setBackgroundInsetBottom(verticalInset)
@@ -243,7 +245,6 @@ object Dialogs {
             findViewById<TextView>(R.id.dialog_message_view).apply {
                 applyTextTheme(baseDarkColor, fontFamily)
                 applyTextTheme(alertTheme?.message)
-
             }
             findViewById<BaseConfigurableButton>(R.id.ok_button).apply {
                 setOnClickListener(buttonClickListener)
@@ -345,7 +346,7 @@ object Dialogs {
         return showDialogBasedOnView(
             context = context,
             view = view,
-            theme = theme,
+            theme = theme
         ).apply {
             findViewById<TextView>(R.id.title_view)?.apply {
                 applyTextTheme(baseDarkColor, fontFamily)
@@ -421,7 +422,7 @@ object Dialogs {
     fun showMessageCenterUnavailableDialog(
         context: Context,
         theme: UiTheme,
-        onShow: ((AlertDialog) -> Unit)? = null,
+        onShow: ((AlertDialog) -> Unit)? = null
     ): AlertDialog {
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }

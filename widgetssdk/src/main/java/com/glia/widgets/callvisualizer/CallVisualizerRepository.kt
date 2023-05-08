@@ -35,8 +35,7 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
     }
 
     private fun showDialogOnMediaUpgradeRequest() {
-        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT)
-        { engagement: OmnibrowseEngagement ->
+        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT) { engagement: OmnibrowseEngagement ->
             Logger.d(TAG, "New Call Visualizer engagement started")
             val upgradeOfferConsumer = prepareMediaUpgradeOfferConsumer(engagement)
             engagement.media.on(Media.Events.MEDIA_UPGRADE_OFFER, upgradeOfferConsumer)
@@ -44,13 +43,10 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
     }
 
     private fun autoAcceptEngagementRequest() {
-        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST)
-        { engagementRequest: IncomingEngagementRequest ->
+        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST) { engagementRequest: IncomingEngagementRequest ->
             val onResult = Consumer { error: GliaException? ->
                 if (error != null) {
-                    Logger.e(
-                        TAG, "Error during accepting engagement request, reason" + error.message
-                    )
+                    Logger.e(TAG, "Error during accepting engagement request, reason" + error.message)
                 } else {
                     Logger.d(TAG, "Incoming Call Visualizer engagement auto accepted")
                 }
@@ -62,7 +58,8 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
     private fun prepareMediaUpgradeOfferConsumer(engagement: OmnibrowseEngagement): Consumer<MediaUpgradeOffer> {
         return Consumer { offer: MediaUpgradeOffer ->
             Logger.d(
-                TAG, "upgradeOfferConsumer, offer: $offer"
+                TAG,
+                "upgradeOfferConsumer, offer: $offer"
             )
             val operatorNameFormatted = engagement.state.operator.formattedName
             if (offer.video == MediaDirection.TWO_WAY) {

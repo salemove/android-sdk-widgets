@@ -41,9 +41,9 @@ object UnifiedUiConfigurationLoader {
         }
     }
 
+    // No error handling mechanisms because this is only for testing purposes
     @JvmOverloads
     @JvmStatic
-    //No error handling mechanisms because this is only for testing purposes
     fun fetchRemoteConfiguration(url: String? = null): String = runBlocking {
         ktorClient.get(url ?: defaultUrl).bodyAsText()
     }
@@ -51,5 +51,4 @@ object UnifiedUiConfigurationLoader {
     @JvmStatic
     fun fetchLocalConfiguration(context: Context, @RawRes resId: Int): String =
         context.rawRes(resId)
-
 }

@@ -3,6 +3,7 @@ package com.glia.widgets.call;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.text.format.DateUtils;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -54,9 +55,9 @@ import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.CommonExtensionsKt;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
-import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 
@@ -74,22 +75,15 @@ public class CallController implements
         OnSurveyListener,
         VisitorMediaUpdatesListener {
 
-    private CallViewCallback viewCallback;
-    private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
-    private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
-    private TimeCounter.RawTimerStatusListener inactivityTimerStatusListener;
-    private TimeCounter.RawTimerStatusListener connectingTimerStatusListener;
-    private MessagesNotSeenHandler.MessagesNotSeenHandlerListener messagesNotSeenHandlerListener;
+    private final static int MAX_IDLE_TIME = 3200;
+    private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
+    private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final TimeCounter inactivityTimeCounter;
     private final TimeCounter connectingTimerCounter;
     private final MinimizeHandler minimizeHandler;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
-    private final static int MAX_IDLE_TIME = 3200;
-    private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
-    private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
-
     private final CallNotificationUseCase callNotificationUseCase;
     private final GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
@@ -115,15 +109,18 @@ public class CallController implements
     private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
     private final IsCallVisualizerUseCase isCallVisualizerUseCase;
     private final IsOngoingEngagementUseCase isOngoingEngagementUseCase;
-
-    private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
-
     private final String TAG = "CallController";
+    private final CompositeDisposable disposable = new CompositeDisposable();
+    private CallViewCallback viewCallback;
+    private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
+    private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
+    private TimeCounter.RawTimerStatusListener inactivityTimerStatusListener;
+    private TimeCounter.RawTimerStatusListener connectingTimerStatusListener;
     private volatile CallState callState;
+    private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
+    private MessagesNotSeenHandler.MessagesNotSeenHandlerListener messagesNotSeenHandlerListener;
     private boolean isVisitorEndEngagement = false;
     private boolean shouldHandleEndedEngagement = false;
-
-    private final CompositeDisposable disposable = new CompositeDisposable();
 
     public CallController(
             MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
@@ -241,7 +238,7 @@ public class CallController implements
 
     public void initCall(String companyName,
                          String queueId,
-                         String  visitorContextAssetId,
+                         String visitorContextAssetId,
                          Engagement.MediaType mediaType) {
         Logger.d(TAG, "initCall");
         if (surveyUseCase.hasResult()) {
@@ -309,7 +306,7 @@ public class CallController implements
     public void onPause() {
         surveyUseCase.unregisterListener(this);
         removeVisitorMediaStateListenerUseCase.execute(this);
-        if(mediaUpgradeOfferRepositoryCallback != null) {
+        if (mediaUpgradeOfferRepositoryCallback != null) {
             removeMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
         }
     }
@@ -708,7 +705,7 @@ public class CallController implements
 
     private void onOperatorMediaStateVideo(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: video");
-        String formattedTime = Utils.toMmSs(0L);
+        String formattedTime = DateUtils.formatElapsedTime(0);
         if (callState.isCallOngoingAndOperatorConnected()) {
             formattedTime = callState.callStatus.getTime();
         }
@@ -722,7 +719,7 @@ public class CallController implements
 
     private void onOperatorMediaStateAudio(OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: audio");
-        String formattedTime = Utils.toMmSs(0L);
+        String formattedTime = DateUtils.formatElapsedTime(0);
         if (callState.isCallOngoingAndOperatorConnected())
             formattedTime = callState.callStatus.getTime();
 
@@ -762,7 +759,7 @@ public class CallController implements
     private void subscribeToOmnibrowseEvents() {
         Glia.omnibrowse.on(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagement -> {
             omnibrowseEngagement.getMedia().on(Media.Events.OPERATOR_STATE_UPDATE, this::onNewOperatorMediaState);
-            omnibrowseEngagement.on(Engagement.Events.STATE_UPDATE,  engagementState -> {
+            omnibrowseEngagement.on(Engagement.Events.STATE_UPDATE, engagementState -> {
                 switch (engagementState.getVisitorStatus()) {
                     case ENGAGED:
                         onEngagementOngoing(engagementState.getOperator());
@@ -811,13 +808,13 @@ public class CallController implements
 
     private void onOperatorConnected(Operator operator) {
         String name = operator.getName();
-        String imageUrl = Utils.getOperatorImageUrl(operator);
+        String imageUrl = CommonExtensionsKt.getImageUrl(operator);
         operatorConnected(name, imageUrl);
     }
 
     private void onOperatorChanged(Operator operator) {
         String name = operator.getName();
-        String imageUrl = Utils.getOperatorImageUrl(operator);
+        String imageUrl = CommonExtensionsKt.getImageUrl(operator);
         operatorChanged(name, imageUrl);
     }
 

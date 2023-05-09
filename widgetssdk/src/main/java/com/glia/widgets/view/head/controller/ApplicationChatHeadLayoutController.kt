@@ -19,7 +19,7 @@ import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadLayoutContract
 import io.reactivex.disposables.CompositeDisposable
@@ -151,7 +151,7 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun operatorDataLoaded(operator: Operator) {
-        operatorProfileImgUrl = Utils.getOperatorImageUrl(operator)
+        operatorProfileImgUrl = operator.imageUrl
         updateChatHeadView()
     }
 

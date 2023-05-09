@@ -7,7 +7,11 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.history.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class VisitorMessageViewHolder(

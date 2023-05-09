@@ -66,23 +66,31 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleTextWatcher
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.addColorFilter
+import com.glia.widgets.helper.asActivity
+import com.glia.widgets.helper.changeStatusBarColor
+import com.glia.widgets.helper.createTempPhotoFile
 import com.glia.widgets.helper.fileName
 import com.glia.widgets.helper.fileProviderAuthority
 import com.glia.widgets.helper.fixCapturedPhotoRotation
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getContentUriCompat
+import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.getFullHybridTheme
+import com.glia.widgets.helper.hideKeyboard
+import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isDownloaded
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.mapUriToFileAttachment
+import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.extensions.addColorFilter
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
-import com.glia.widgets.view.unifiedui.extensions.getColorStateListCompat
-import com.glia.widgets.view.unifiedui.extensions.getFontCompat
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
@@ -204,7 +212,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
      */
     fun setUiTheme(uiTheme: UiTheme?) {
         if (uiTheme == null) return
-        theme = Utils.getFullHybridTheme(uiTheme, theme)
+        theme = theme.getFullHybridTheme(uiTheme)
         theme.brandPrimaryColor?.let(::getColorCompat)?.also { statusBarColor = it }
         setupViewAppearance()
         if (isVisible) {
@@ -231,8 +239,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         screenSharingMode: ScreenSharing.Mode? = null,
         chatType: ChatType = ChatType.LIVE_CHAT
     ) {
-        Dependencies.getSdkConfigurationManager()?.isUseOverlay = useOverlays
-        Dependencies.getSdkConfigurationManager()?.screenSharingMode = screenSharingMode
+        Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
+        Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
         controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
         serviceChatHeadController?.init()
     }
@@ -610,12 +618,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun hideChat() {
         visibility = INVISIBLE
-        val activity = Utils.getActivity(this.context)
-        if (defaultStatusBarColor != null && activity != null) {
-            activity.window.statusBarColor = defaultStatusBarColor!!
+        if (defaultStatusBarColor != null) {
+            changeStatusBarColor(defaultStatusBarColor!!)
             defaultStatusBarColor = null
         }
-        Utils.hideSoftKeyboard(this.context, windowToken)
+        insetsController?.hideKeyboard()
     }
 
     private fun showToolbar(title: String?) {
@@ -626,7 +633,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun destroyController() {
-        controller?.onDestroy(Utils.getActivity(this.context) is ChatActivity)
+        controller?.onDestroy(context.asActivity() is ChatActivity)
         controller = null
     }
 
@@ -638,7 +645,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
+        theme = theme.getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
         theme.brandPrimaryColor?.let(::getColorCompat)?.also { statusBarColor = it }
     }
 
@@ -724,11 +731,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun handleStatusBarColor() {
-        val activity = Utils.getActivity(this.context)
-        if (activity != null && defaultStatusBarColor == null) {
+        val activity = context.requireActivity()
+        if (defaultStatusBarColor == null) {
             defaultStatusBarColor = activity.window.statusBarColor
             if (controller != null && controller!!.isChatVisible) {
-                activity.window.statusBarColor = statusBarColor
+                changeStatusBarColor(statusBarColor)
             }
         }
     }
@@ -756,7 +763,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 val intent = Intent()
                 intent.type = INTENT_TYPE_IMAGES
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
-                Utils.getActivity(context)?.startActivityForResult(
+                context.asActivity()?.startActivityForResult(
                     Intent.createChooser(
                         intent,
                         resources.getString(R.string.glia_chat_select_picture_title)
@@ -771,7 +778,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 ) {
                     dispatchImageCapture()
                 } else {
-                    Utils.getActivity(context)?.requestPermissions(
+                    context.asActivity()?.requestPermissions(
                         arrayOf(Manifest.permission.CAMERA),
                         CAMERA_PERMISSION_REQUEST
                     )
@@ -780,7 +787,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 val intent = Intent()
                 intent.type = INTENT_TYPE_ALL
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
-                Utils.getActivity(context)?.startActivityForResult(
+                context.asActivity()?.startActivityForResult(
                     Intent.createChooser(
                         intent,
                         resources.getString(R.string.glia_chat_select_file_title)
@@ -795,7 +802,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         var photoFile: File? = null
         try {
-            photoFile = Utils.createTempPhotoFile(context)
+            photoFile = createTempPhotoFile(context)
         } catch (exception: IOException) {
             Logger.e(TAG, "Create photo file failed: " + exception.message)
         }
@@ -807,7 +814,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             )
             if (controller?.photoCaptureFileUri != null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, controller!!.photoCaptureFileUri)
-                Utils.getActivity(context)?.startActivityForResult(
+                context.asActivity()?.startActivityForResult(
                     intent,
                     CAPTURE_IMAGE_ACTION_REQUEST
                 )
@@ -985,10 +992,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun handleDocumentOrVideoActionResult(intent: Intent?) {
-        intent?.data?.also {
-            controller?.onAttachmentReceived(
-                Utils.mapUriToFileAttachment(context.contentResolver, it)
-            )
+        intent?.data?.let {
+            mapUriToFileAttachment(context.contentResolver, it)
+        }?.also {
+            controller?.onAttachmentReceived(it)
         }
     }
 
@@ -996,7 +1003,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         controller?.apply {
             photoCaptureFileUri?.also {
                 fixCapturedPhotoRotation(it, context)
-                onAttachmentReceived(Utils.mapUriToFileAttachment(context.contentResolver, it))
+                onAttachmentReceived(mapUriToFileAttachment(context.contentResolver, it) ?: return)
             }
         }
     }
@@ -1009,7 +1016,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         ) {
             onFileDownload(file)
         } else {
-            Utils.getActivity(context)?.requestPermissions(
+            context.asActivity()?.requestPermissions(
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE

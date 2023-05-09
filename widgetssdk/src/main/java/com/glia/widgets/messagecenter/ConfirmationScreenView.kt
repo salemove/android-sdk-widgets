@@ -14,12 +14,12 @@ import androidx.transition.TransitionManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.MessageCenterConfirmationViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
 import com.google.android.material.transition.MaterialFadeThrough
 

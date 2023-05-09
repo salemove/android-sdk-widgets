@@ -3,11 +3,11 @@ package com.glia.widgets.di;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.Lifecycle;
 
 import com.glia.widgets.GliaWidgetsConfig;
+import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -16,7 +16,6 @@ import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
-import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
@@ -92,11 +91,7 @@ public class Dependencies {
         return useCaseFactory;
     }
 
-    public static INotificationManager getNotificationManager() {
-        return notificationManager;
-    }
-
-    @Nullable
+    @NonNull
     public static GliaSdkConfigurationManager getSdkConfigurationManager() {
         return sdkConfigurationManager;
     }
@@ -142,12 +137,7 @@ public class Dependencies {
     }
 
     @VisibleForTesting
-    public static void setNotificationManager(INotificationManager notificationManager) {
-        Dependencies.notificationManager = notificationManager;
-    }
-
-    @VisibleForTesting
-    public static void setSdkConfigurationManager(GliaSdkConfigurationManager sdkConfigurationManager) {
+    public static void setSdkConfigurationManager(@NonNull GliaSdkConfigurationManager sdkConfigurationManager) {
         Dependencies.sdkConfigurationManager = sdkConfigurationManager;
     }
 

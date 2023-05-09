@@ -8,7 +8,7 @@ import com.glia.widgets.view.unifiedui.config.chat.ChatRemoteConfig
 import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsConfirmationScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.secureconversations.SecureConversationsWelcomeScreenRemoteConfig
 import com.glia.widgets.view.unifiedui.config.survey.SurveyRemoteConfig
-import com.glia.widgets.view.unifiedui.extensions.deepMerge
+import com.glia.widgets.view.unifiedui.deepMerge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultTheme
 import com.google.gson.annotations.SerializedName

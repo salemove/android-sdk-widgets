@@ -12,14 +12,20 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.core.dialog.Dialog.*
+import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
+import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
+import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
+import com.glia.widgets.core.dialog.Dialog.MODE_NONE
+import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
+import com.glia.widgets.core.dialog.Dialog.MODE_START_SCREEN_SHARING
+import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
+import com.glia.widgets.core.dialog.Dialog.Mode
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 
 internal class ActivityWatcherForCallVisualizerController(
     private val callVisualizerController: CallVisualizerController,
@@ -161,8 +167,7 @@ internal class ActivityWatcherForCallVisualizerController(
         } else {
             watcher.openSupportActivity(ScreenSharing)
         }
-        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-        screenSharingController.onScreenSharingAcceptedAndPermissionAsked(contextWithStyle)
+        screenSharingController.onScreenSharingAcceptedAndPermissionAsked(activity)
     }
 
     private fun acquireMediaProjectionToken(activity: Activity) {
@@ -234,7 +239,7 @@ internal class ActivityWatcherForCallVisualizerController(
     @VisibleForTesting
     internal fun onMediaUpgradeAccept(error: GliaException?) {
         error?.let {
-            Logger.e(TAG, error.message, error)
+            Logger.e(TAG, it.debugMessage, error)
         } ?: run {
             if (mediaUpgradeOffer?.video != null && mediaUpgradeOffer?.video != MediaDirection.NONE) {
                 onPositiveDialogButtonClicked()
@@ -248,7 +253,7 @@ internal class ActivityWatcherForCallVisualizerController(
     @VisibleForTesting
     internal fun onMediaUpgradeDecline(error: GliaException?) {
         error?.let {
-            Logger.e(TAG, error.message, error)
+            Logger.e(TAG, it.debugMessage, error)
         } ?: run {
             currentDialogMode = MODE_NONE
             mediaUpgradeOffer = null

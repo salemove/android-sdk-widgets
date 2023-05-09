@@ -32,8 +32,9 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.getFullHybridTheme
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.Dialogs
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 import java.lang.ref.WeakReference
 
 internal class ActivityWatcherForCallVisualizer(
@@ -175,12 +176,13 @@ internal class ActivityWatcherForCallVisualizer(
 
     override fun openCallActivity() {
         resumedActivity.get()?.let {
-            val contextWithStyle = it.wrapWithMaterialThemeOverlay()
-            val intent = CallActivity.getIntent(contextWithStyle,
+            val intent = CallActivity.getIntent(
+                it,
                 getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
                     .setIsUpgradeToCall(true)
-                    .build())
-            contextWithStyle.startActivity(intent)
+                    .build()
+            )
+            it.startActivity(intent)
             if (it is EndScreenSharingActivity) {
                 it.finish()
             }
@@ -188,7 +190,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     private fun getConfigurationBuilder(): Configuration.Builder {
-        val configuration = Dependencies.getSdkConfigurationManager()?.createWidgetsConfiguration()
+        val configuration = Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
         return Configuration.Builder().setWidgetsConfiguration(configuration)
     }
 
@@ -365,8 +367,8 @@ internal class ActivityWatcherForCallVisualizer(
 
     private fun getRuntimeTheme(activity: Activity) : UiTheme {
         val themeFromIntent: UiTheme? = activity.intent?.getParcelableExtra(GliaWidgets.UI_THEME)
-        val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager()?.uiTheme
-        return Utils.getFullHybridTheme(themeFromIntent, themeFromGlobalSetting)
+        val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager().uiTheme
+        return themeFromGlobalSetting.getFullHybridTheme(themeFromIntent)
     }
 
     override fun openSupportActivity(permissionType: PermissionType) {

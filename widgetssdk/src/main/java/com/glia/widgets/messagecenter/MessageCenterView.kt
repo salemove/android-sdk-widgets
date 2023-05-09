@@ -24,15 +24,17 @@ import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.asActivity
+import com.glia.widgets.helper.changeStatusBarColor
+import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.isKeyboardVisible
+import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.rootWindowInsetsCompat
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.extensions.deepMerge
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.view.unifiedui.deepMerge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
@@ -74,7 +76,7 @@ class MessageCenterView(
     private var defaultStatusBarColor: Int? = null
     private var statusBarColor: Int by Delegates.notNull()
 
-    private val window: Window? by lazy { Utils.getActivity(this.context)?.window }
+    private val window: Window? by lazy { context.asActivity()?.window }
 
     private val dialogCallback: DialogController.Callback = DialogController.Callback {
         onDialogState(it)
@@ -126,7 +128,7 @@ class MessageCenterView(
             statusBarColor = it
         }
 
-        window?.statusBarColor = statusBarColor
+        changeStatusBarColor(statusBarColor)
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
@@ -172,7 +174,7 @@ class MessageCenterView(
     }
 
     private fun showUnAuthenticatedDialog() {
-        window?.statusBarColor = Color.TRANSPARENT
+        changeStatusBarColor(Color.TRANSPARENT)
         alertDialog = Dialogs.showAlertDialog(
             context,
             theme,
@@ -239,7 +241,7 @@ class MessageCenterView(
     }
 
     override fun hideSoftKeyboard() {
-        Utils.hideSoftKeyboard(context, windowToken)
+        insetsController?.hideKeyboard()
     }
 
     override fun setController(controller: MessageCenterContract.Controller?) {
@@ -290,10 +292,10 @@ class MessageCenterView(
     fun onPause() {
         detachDialogController()
     }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-
-        window?.statusBarColor = defaultStatusBarColor ?: return
+        changeStatusBarColor(defaultStatusBarColor ?: return)
     }
 
     private fun attachDialogController() {

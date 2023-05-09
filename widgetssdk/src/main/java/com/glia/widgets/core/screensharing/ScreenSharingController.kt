@@ -11,7 +11,7 @@ import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChan
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.asActivity
 import java.util.function.Consumer
 
 internal class ScreenSharingController(
@@ -90,7 +90,7 @@ internal class ScreenSharingController(
         dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAccepted(
-            Utils.getActivity(context),
+            context?.asActivity(),
             gliaSdkConfigurationManager.screenSharingMode
         )
         hasPendingScreenSharingRequest = false
@@ -101,7 +101,7 @@ internal class ScreenSharingController(
         dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAcceptedAndPermissionAsked(
-            Utils.getActivity(context),
+            context?.asActivity(),
             gliaSdkConfigurationManager.screenSharingMode
         )
         hasPendingScreenSharingRequest = false

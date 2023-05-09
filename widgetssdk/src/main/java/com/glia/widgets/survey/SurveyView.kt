@@ -19,20 +19,22 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.SurveyViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.getFullHybridTheme
+import com.glia.widgets.helper.hideKeyboard
+import com.glia.widgets.helper.insetsController
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
 import com.glia.widgets.view.configuration.ButtonConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
 class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -195,7 +197,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
 
     fun setTheme(uiTheme: UiTheme?) {
         if (uiTheme == null) return
-        this.uiTheme = Utils.getFullHybridTheme(uiTheme, this.uiTheme)
+        this.uiTheme = this.uiTheme.getFullHybridTheme(uiTheme)
         this.uiTheme.surveyStyle?.also { surveyAdapter?.setStyle(it) }
     }
 
@@ -233,7 +235,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun hideSoftKeyboard() {
-        Utils.hideSoftKeyboard(context, windowToken)
+        insetsController?.hideKeyboard()
     }
 
     override fun onNetworkTimeout() {

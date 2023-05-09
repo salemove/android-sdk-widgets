@@ -177,7 +177,7 @@ class CallState {
                 .copyFrom(this)
                 .setCallStatus(
                         new CallStatus.EngagementOngoingOperatorIsConnecting(
-                                callStatus.getOperatorName(),
+                                callStatus.getFormattedOperatorName(),
                                 "0",
                                 callStatus.getOperatorProfileImageUrl(),
                                 callStatus.getVisitorMediaState()
@@ -201,7 +201,7 @@ class CallState {
                 .copyFrom(this)
                 .setCallStatus(
                         new CallStatus.EngagementOngoingVideoCallStarted(
-                                callStatus.getOperatorName(),
+                                callStatus.getFormattedOperatorName(),
                                 formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
@@ -224,7 +224,7 @@ class CallState {
                 .copyFrom(this)
                 .setCallStatus(
                         new CallStatus.EngagementOngoingAudioCallStarted(
-                                callStatus.getOperatorName(),
+                                callStatus.getFormattedOperatorName(),
                                 formattedTime,
                                 callStatus.getOperatorProfileImageUrl(),
                                 operatorMediaState,
@@ -240,7 +240,7 @@ class CallState {
                     .copyFrom(this)
                     .setCallStatus(
                             new CallStatus.EngagementOngoingAudioCallStarted(
-                                    callStatus.getOperatorName(),
+                                    callStatus.getFormattedOperatorName(),
                                     formattedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
@@ -254,7 +254,7 @@ class CallState {
                     .copyFrom(this)
                     .setCallStatus(
                             new CallStatus.EngagementOngoingVideoCallStarted(
-                                    callStatus.getOperatorName(),
+                                    callStatus.getFormattedOperatorName(),
                                     formattedTimeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getOperatorMediaState(),
@@ -285,7 +285,7 @@ class CallState {
                     .copyFrom(this)
                     .setCallStatus(
                             new CallStatus.EngagementOngoingOperatorIsConnecting(
-                                    callStatus.getOperatorName(),
+                                    callStatus.getFormattedOperatorName(),
                                     timeValue,
                                     callStatus.getOperatorProfileImageUrl(),
                                     callStatus.getVisitorMediaState()

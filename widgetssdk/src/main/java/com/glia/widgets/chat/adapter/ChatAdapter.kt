@@ -18,8 +18,8 @@ import com.glia.widgets.databinding.*
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
+import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
 
 internal class ChatAdapter(
     private val uiTheme: UiTheme,

@@ -3,13 +3,15 @@ package com.glia.widgets.survey;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.helper.Utils;
+import com.glia.widgets.helper.InsetsKt;
 
 public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFinishListener {
     private SurveyView surveyView;
@@ -48,7 +50,8 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
     }
 
     private void hideSoftKeyboard() {
-        Utils.hideSoftKeyboard(this, getWindow().getDecorView().getWindowToken());
+        WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), findViewById(R.id.survey_view));
+        InsetsKt.hideKeyboard(insetsController);
     }
 
     private void prepareSurveyView() {

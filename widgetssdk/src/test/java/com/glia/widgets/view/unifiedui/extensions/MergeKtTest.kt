@@ -1,5 +1,6 @@
 package com.glia.widgets.view.unifiedui.extensions
 
+import com.glia.widgets.view.unifiedui.deepMerge
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test

@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
-import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer
 import com.glia.widgets.callvisualizer.CallVisualizerCallback
 import com.glia.widgets.callvisualizer.CallVisualizerRepository
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
@@ -16,7 +15,6 @@ import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
 
 internal class CallVisualizerController(
     private val callVisualizerRepository: CallVisualizerRepository,
@@ -40,14 +38,18 @@ internal class CallVisualizerController(
         onCallVisualizerEndUseCase.execute(this) // engagementEnded callback
     }
 
-    override fun onOneWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String) {
-        val formattedOperatorName = Utils.formatOperatorName(operatorName)
-        dialogController.showUpgradeVideoDialog1Way(mediaUpgradeOffer, formattedOperatorName)
+    override fun onOneWayMediaUpgradeRequest(
+        mediaUpgradeOffer: MediaUpgradeOffer,
+        operatorNameFormatted: String
+    ) {
+        dialogController.showUpgradeVideoDialog1Way(mediaUpgradeOffer, operatorNameFormatted)
     }
 
-    override fun onTwoWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String) {
-        val formattedOperatorName = Utils.formatOperatorName(operatorName)
-        dialogController.showUpgradeVideoDialog2Way(mediaUpgradeOffer, formattedOperatorName)
+    override fun onTwoWayMediaUpgradeRequest(
+        mediaUpgradeOffer: MediaUpgradeOffer,
+        operatorNameFormatted: String
+    ) {
+        dialogController.showUpgradeVideoDialog2Way(mediaUpgradeOffer, operatorNameFormatted)
     }
 
     override fun onSurveyLoaded(survey: Survey?) {

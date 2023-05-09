@@ -5,7 +5,11 @@ import android.util.AttributeSet
 import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatEditText
 import com.glia.widgets.R
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.helper.getAttr
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getDimenRes
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme

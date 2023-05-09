@@ -18,7 +18,13 @@ import com.glia.widgets.chat.model.history.ResponseCardItem
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.load
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardTheme
 import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates

@@ -1,16 +1,13 @@
 package com.glia.widgets.core.configuration;
 
-import android.app.Activity;
 import android.content.Intent;
-
-import androidx.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.chat.ChatType;
-import com.glia.widgets.view.unifiedui.config.RemoteConfiguration;
+import com.glia.widgets.di.Dependencies;
 
 public class GliaSdkConfiguration {
 
@@ -22,9 +19,7 @@ public class GliaSdkConfiguration {
     private final String companyName;
     private final String queueId;
     private final String contextAssetId;
-    @Deprecated
     private final String contextUrl;
-    private final RemoteConfiguration remoteConfiguration;
     private final UiTheme runTimeTheme;
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
@@ -47,10 +42,6 @@ public class GliaSdkConfiguration {
         return this.contextAssetId;
     }
 
-    public RemoteConfiguration getRemoteConfiguration() {
-        return remoteConfiguration;
-    }
-
     public UiTheme getRunTimeTheme() {
         return this.runTimeTheme != null ? this.runTimeTheme : Dependencies.getSdkConfigurationManager().getUiTheme();
     }
@@ -71,9 +62,7 @@ public class GliaSdkConfiguration {
         private String companyName;
         private String queueId;
         private String contextAssetId;
-        @Deprecated
         private String contextUrl;
-        private RemoteConfiguration remoteConfiguration;
         private UiTheme runTimeTheme;
         private boolean useOverlay;
         private ScreenSharing.Mode screenSharingMode;
@@ -117,9 +106,8 @@ public class GliaSdkConfiguration {
 
         public Builder intent(Intent intent) {
             String tempCompanyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
-            this.companyName = tempCompanyName != null ? tempCompanyName : Dependencies.getSdkConfigurationManager().getCompanyName();
+            this.companyName = !TextUtils.isEmpty(tempCompanyName) ? tempCompanyName : Dependencies.getSdkConfigurationManager().getCompanyName();
             this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
-            this.remoteConfiguration = intent.getParcelableExtra(GliaWidgets.REMOTE_CONFIGURATION);
             UiTheme tempTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
             this.runTimeTheme = tempTheme != null ? tempTheme : Dependencies.getSdkConfigurationManager().getUiTheme();
             this.contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID);
@@ -144,7 +132,6 @@ public class GliaSdkConfiguration {
         this.queueId = builder.queueId;
         this.contextAssetId = builder.contextAssetId;
         this.contextUrl = builder.contextUrl;
-        this.remoteConfiguration = builder.remoteConfiguration;
         this.runTimeTheme = builder.runTimeTheme;
         this.useOverlay = builder.useOverlay;
         this.screenSharingMode = builder.screenSharingMode;

@@ -3,7 +3,11 @@ package com.glia.widgets.view
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -20,12 +24,15 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.applyButtonTheme
+import com.glia.widgets.helper.applyImageColorTheme
+import com.glia.widgets.helper.applyTextTheme
+import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
 import com.glia.widgets.view.button.BaseConfigurableButton
 import com.glia.widgets.view.button.GliaPositiveButton
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -42,7 +49,7 @@ object Dialogs {
     }
 
     private fun isUseVerticalAlignment(theme: UiTheme) =
-        alertTheme?.isVerticalAxis ?: Utils.getGliaAlertDialogButtonUseVerticalAlignment(theme)
+        alertTheme?.isVerticalAxis ?: theme.isAlertDialogButtonUseVerticalAlignment()
 
     private fun getOptionsAlertDialogLayout(
         theme: UiTheme, isButtonsColorsReversed: Boolean
@@ -79,7 +86,7 @@ object Dialogs {
         context: Context,
         theme: UiTheme,
         view: VisitorCodeView,
-        cancelable: Boolean
+        cancelable: Boolean = true
     ): AlertDialog {
         return MaterialAlertDialogBuilder(context)
             .setView(view)
@@ -336,7 +343,6 @@ object Dialogs {
             context = context,
             view = view,
             theme = theme,
-            cancelable = true
         ).apply {
             findViewById<TextView>(R.id.title_view)?.apply {
                 applyTextTheme(baseDarkColor, fontFamily)

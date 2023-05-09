@@ -1,6 +1,6 @@
 package com.glia.widgets.messagecenter
 
-import com.glia.widgets.view.unifiedui.extensions.unsafeMerge
+import com.glia.widgets.view.unifiedui.unsafeMerge
 import kotlin.properties.Delegates
 
 /**

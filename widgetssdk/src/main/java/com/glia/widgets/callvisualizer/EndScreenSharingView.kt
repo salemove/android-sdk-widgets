@@ -12,23 +12,27 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.changeStatusBarColor
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
-import com.glia.widgets.view.unifiedui.extensions.getFontCompat
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
+import com.glia.widgets.helper.applyButtonTheme
+import com.glia.widgets.helper.applyTextTheme
+import com.glia.widgets.helper.asActivity
+import com.glia.widgets.helper.changeStatusBarColor
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.getFullHybridTheme
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
-class EndScreenSharingView (
+class EndScreenSharingView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,
-    defStyleRes: Int)
-    : ConstraintLayout(
+    defStyleRes: Int
+) : ConstraintLayout(
     MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
@@ -60,9 +64,9 @@ class EndScreenSharingView (
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
-            defaultStatusBarColor = Utils.getActivity(context)?.window?.statusBarColor
+            defaultStatusBarColor = context.asActivity()?.window?.statusBarColor
             var theme = Utils.getThemeFromTypedArray(this, context)
-            theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
+            theme = theme.getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
             applyRuntimeTheme(theme)
         }
     }

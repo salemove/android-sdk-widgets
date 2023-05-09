@@ -1,19 +1,10 @@
 package com.glia.widgets.helper;
 
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Environment;
-import android.os.IBinder;
-import android.provider.OpenableColumns;
 import android.util.TypedValue;
-import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
@@ -22,29 +13,15 @@ import androidx.annotation.StyleableRes;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.androidsdk.Engagement;
-import com.glia.androidsdk.Operator;
-import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
-import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.view.unifiedui.extensions.MergeKt;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class Utils {
-    @Nullable
-    public static String getOperatorImageUrl(Operator operator) {
-        return operator.getPicture() != null ? operator.getPicture().getURL().orElse(null) : null;
-    }
 
     public static Engagement.MediaType toMediaType(@NonNull String mediaType) {
         switch (mediaType) {
@@ -54,32 +31,6 @@ public class Utils {
                 return Engagement.MediaType.AUDIO;
             default:
                 throw new InvalidParameterException("Invalid Media Type");
-        }
-    }
-
-    public static float pxFromDp(final Context context, final float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
-    }
-
-    public static String toMmSs(int seconds) {
-        return String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
-    }
-
-    public static String toMmSs(long milliseconds) {
-        return toMmSs(Long.valueOf(TimeUnit.MILLISECONDS.toSeconds(milliseconds)).intValue());
-    }
-
-    public static float pxToSp(Context context, float pixels) {
-        return pixels / context.getResources().getDisplayMetrics().scaledDensity;
-    }
-
-    public static String formatOperatorName(String operatorName) {
-        if (operatorName == null) return "";
-        int i = operatorName.indexOf(' ');
-        if (i != -1) {
-            return operatorName.substring(0, i);
-        } else {
-            return operatorName;
         }
     }
 
@@ -466,13 +417,6 @@ public class Utils {
         return defaultThemeBuilder.build();
     }
 
-    public static Boolean getGliaAlertDialogButtonUseVerticalAlignment(UiTheme theme) {
-        if (theme == null) return false;
-        return theme.getGliaAlertDialogButtonUseVerticalAlignment() != null ?
-                theme.getGliaAlertDialogButtonUseVerticalAlignment() :
-                false;
-    }
-
     private static Boolean getTypedArrayBooleanValue(TypedArray typedArray, int index) {
         return typedArray.hasValue(index) && typedArray.getBoolean(index, false);
     }
@@ -523,61 +467,5 @@ public class Utils {
         }
 
         return null;
-    }
-
-    @Nullable
-    public static Activity getActivity(Context context) {
-        while (context instanceof ContextWrapper) {
-            if (context instanceof Activity) {
-                return (Activity) context;
-            }
-            context = ((ContextWrapper) context).getBaseContext();
-        }
-        return null;
-    }
-
-    public static void hideSoftKeyboard(Context context, IBinder windowToken) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(windowToken, 0);
-    }
-
-    @NotNull
-    public static UiTheme getFullHybridTheme(@Nullable UiTheme newTheme, @Nullable UiTheme oldTheme) {
-        UiTheme mergedTheme = MergeKt.deepMerge(oldTheme, newTheme);
-        return mergedTheme != null ? mergedTheme : new UiTheme.UiThemeBuilder().build();
-    }
-
-    public static File createTempPhotoFile(Context context) throws IOException {
-        File directoryStorage = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        directoryStorage.deleteOnExit();
-        return File.createTempFile(generatePhotoFileName(), ".jpg", directoryStorage);
-    }
-
-    private static String generatePhotoFileName() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss_", Locale.getDefault());
-        Date date = new Date(System.currentTimeMillis());
-        return "IMG_" + formatter.format(date);
-    }
-
-    public static FileAttachment mapUriToFileAttachment(ContentResolver contentResolver, Uri uri) {
-        Cursor returnCursor = contentResolver.query(uri, null, null, null, null);
-        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-        returnCursor.moveToFirst();
-        String displayName = returnCursor.getString(nameIndex);
-        String mimeType = contentResolver.getType(uri);
-        long size = returnCursor.getLong(sizeIndex);
-        returnCursor.close();
-        return new FileAttachment(uri, displayName, size, mimeType);
-    }
-
-    public static String toString(AttachmentFile attachmentFile) {
-        return "{" +
-                "id=" + attachmentFile.getId() +
-                ", size=" + attachmentFile.getSize() +
-                ", contentType=" + attachmentFile.getContentType() +
-                ", isDeleted=" + attachmentFile.isDeleted() +
-                ", name=" + attachmentFile.getName() +
-                " }";
     }
 }

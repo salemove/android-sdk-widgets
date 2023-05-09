@@ -13,7 +13,7 @@ import androidx.core.util.Pair;
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
-import com.glia.widgets.helper.Utils;
+import com.glia.widgets.helper.ContextExtensionsKt;
 import com.glia.widgets.view.ViewHelpers;
 
 public class FloatingVisitorVideoContainer extends ConstraintLayout
@@ -43,7 +43,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     public void show(VisitorMediaState state) {
         if (!floatingVisitorVideoView.hasVideo()) {
             floatingVisitorVideoView.showVisitorVideo(
-                    state.getVideo().createVideoView(Utils.getActivity(getContext()))
+                    state.getVideo().createVideoView(ContextExtensionsKt.asActivity(getContext()))
             );
         }
         setVisibility(VISIBLE);

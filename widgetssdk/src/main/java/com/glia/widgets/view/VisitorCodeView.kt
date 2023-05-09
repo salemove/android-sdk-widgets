@@ -21,16 +21,21 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.applyButtonTheme
+import com.glia.widgets.helper.applyImageColorTheme
+import com.glia.widgets.helper.applyProgressColorTheme
+import com.glia.widgets.helper.applyTextTheme
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.getFullHybridTheme
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.separateStringWithSymbol
 import com.glia.widgets.view.button.GliaPositiveButton
-import com.glia.widgets.view.unifiedui.extensions.applyButtonTheme
-import com.glia.widgets.view.unifiedui.extensions.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.extensions.applyProgressColorTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
-import com.glia.widgets.view.unifiedui.extensions.getFontCompat
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.glia.widgets.view.unifiedui.extensions.separateStringWithSymbol
+import com.glia.widgets.view.unifiedui.applyButtonTheme
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyProgressColorTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
@@ -122,10 +127,8 @@ class VisitorCodeView internal constructor(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         val typedArrayTheme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        val runtimeGlobalTheme = Dependencies.getSdkConfigurationManager()?.uiTheme
-        theme = runtimeGlobalTheme?.let {
-            Utils.getFullHybridTheme(it, typedArrayTheme)
-        } ?: typedArrayTheme
+        val runtimeGlobalTheme = Dependencies.getSdkConfigurationManager().uiTheme
+        theme = typedArrayTheme.getFullHybridTheme(runtimeGlobalTheme)
         applyRuntimeThemeConfig(theme)
     }
 

@@ -3,7 +3,7 @@
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
 import androidx.annotation.ColorInt
-import com.glia.widgets.view.unifiedui.extensions.composeIfAtLeastOneNotNull
+import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.*
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme

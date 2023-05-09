@@ -21,6 +21,8 @@ import androidx.core.content.FileProvider;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.helper.CommonExtensionsKt;
+import com.glia.widgets.helper.ContextExtensionsKt;
 import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.header.AppBarView;
@@ -72,7 +74,7 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
 
     private void initCallbacks() {
         appBar.setOnBackClickedListener(() -> {
-            Activity activity = Utils.getActivity(getContext());
+            Activity activity = ContextExtensionsKt.asActivity(getContext());
             if (activity != null) activity.finish();
         });
     }
@@ -103,7 +105,7 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
                     if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         filePreviewController.onDownloadPressed();
                     } else {
-                        Activity activity = Utils.getActivity(getContext());
+                        Activity activity = ContextExtensionsKt.asActivity(getContext());
                         if (activity == null) return;
 
                         activity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_PERMISSION_REQUEST);
@@ -121,7 +123,8 @@ public class FilePreviewView extends ConstraintLayout implements FilePreviewCont
     }
 
     public UiTheme setTheme(UiTheme uiTheme) {
-        if (uiTheme != null) this.theme = Utils.getFullHybridTheme(uiTheme, this.theme);
+        if (uiTheme != null)
+            this.theme = CommonExtensionsKt.getFullHybridTheme(this.theme, uiTheme);
         setupViewAppearance();
         return this.theme;
     }

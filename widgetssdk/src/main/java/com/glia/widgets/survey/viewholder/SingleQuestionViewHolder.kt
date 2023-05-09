@@ -18,9 +18,9 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
-import java.util.*
+import java.util.Optional
 
 class SingleQuestionViewHolder(
     private val binding: SurveySingleQuestionItemBinding,

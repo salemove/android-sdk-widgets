@@ -25,9 +25,15 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.addColorFilter
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.load
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay

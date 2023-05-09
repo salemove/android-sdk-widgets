@@ -1,6 +1,7 @@
 package com.glia.widgets.view.textview;
 
-import static com.glia.widgets.helper.Utils.pxToSp;
+
+import static com.glia.widgets.helper.ContextExtensionsKt.pxToSp;
 
 import android.content.Context;
 import android.util.AttributeSet;

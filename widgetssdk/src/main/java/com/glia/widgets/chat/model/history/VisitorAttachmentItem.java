@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
@@ -16,7 +15,7 @@ public class VisitorAttachmentItem extends LinkedChatItem {
     public final boolean showDelivered;
 
     private VisitorAttachmentItem(String chatItemId, int viewType, AttachmentFile attachmentFile,
-                                 boolean isFileExists, boolean isDownloading, boolean showDelivered, long timestamp) {
+                                  boolean isFileExists, boolean isDownloading, boolean showDelivered, long timestamp) {
         super(chatItemId, viewType, chatItemId, timestamp);
         this.attachmentFile = attachmentFile;
         this.isFileExists = isFileExists;
@@ -89,7 +88,7 @@ public class VisitorAttachmentItem extends LinkedChatItem {
     @Override
     public String toString() {
         return "VisitorAttachmentItem{" +
-                "attachmentFile=" + Utils.toString(attachmentFile) +
+                "attachmentFile=" + attachmentFile +
                 ", chatItemId=" + getId() +
                 ", isFileExists=" + isFileExists +
                 ", isDownloading=" + isDownloading +

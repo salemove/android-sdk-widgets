@@ -21,9 +21,10 @@ import com.glia.widgets.databinding.MessageCenterActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.createTempPhotoFile
 import com.glia.widgets.helper.fileProviderAuthority
 import com.glia.widgets.helper.fixCapturedPhotoRotation
+import com.glia.widgets.helper.mapUriToFileAttachment
 import java.io.IOException
 
 class MessageCenterActivity : AppCompatActivity(),
@@ -40,7 +41,9 @@ class MessageCenterActivity : AppCompatActivity(),
 
     private val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
         uri?.also {
-            controller.onAttachmentReceived(Utils.mapUriToFileAttachment(contentResolver, it))
+            controller.onAttachmentReceived(
+                mapUriToFileAttachment(contentResolver, it) ?: return@also
+            )
         }
     }
 
@@ -48,7 +51,9 @@ class MessageCenterActivity : AppCompatActivity(),
         // Handle the returned Uri
         controller.photoCaptureFileUri?.also {
             fixCapturedPhotoRotation(it, this)
-            controller.onAttachmentReceived(Utils.mapUriToFileAttachment(contentResolver, it))
+            controller.onAttachmentReceived(
+                mapUriToFileAttachment(contentResolver, it) ?: return@also
+            )
         }
     }
 
@@ -107,7 +112,7 @@ class MessageCenterActivity : AppCompatActivity(),
         }
 
         try {
-            val photoFile = Utils.createTempPhotoFile(this)
+            val photoFile = createTempPhotoFile(this)
             val uri = FileProvider.getUriForFile(
                 this,
                 fileProviderAuthority,

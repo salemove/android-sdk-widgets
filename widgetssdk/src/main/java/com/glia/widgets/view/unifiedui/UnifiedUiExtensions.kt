@@ -1,44 +1,20 @@
-package com.glia.widgets.view.unifiedui.extensions
+package com.glia.widgets.view.unifiedui
 
-import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.LinearGradient
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Shader
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
-import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.annotation.AnyRes
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.FontRes
-import androidx.annotation.StyleRes
-import androidx.annotation.StyleableRes
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.view.children
-import androidx.core.widget.TextViewCompat
-import com.airbnb.lottie.LottieAnimationView
-import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.model.KeyPath
 import com.glia.widgets.R
-import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.applyShadow
+import com.glia.widgets.helper.colorForState
 import com.glia.widgets.view.button.GliaSurveyOptionButton
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
@@ -46,73 +22,11 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 
-internal fun View.getColorCompat(@ColorRes resId: Int) = ContextCompat.getColor(context, resId)
-internal fun View.getColorStateListCompat(@ColorRes resId: Int) =
-    ContextCompat.getColorStateList(context, resId)
-
-internal fun View.getDrawableCompat(@DrawableRes resId: Int) =
-    ContextCompat.getDrawable(context, resId)
-
-internal fun View.getFontCompat(@FontRes resId: Int) = ResourcesCompat.getFont(context, resId)
-internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTint(this, color)
-
-@AnyRes
-internal fun View.getTypedArrayResId(
-    typedArray: TypedArray, @StyleableRes index: Int, @AttrRes fallbackAttr: Int
-) = Utils.getTypedArrayIntegerValue(typedArray, context, index, fallbackAttr)
-
-@AnyRes
-internal fun View.getAttr(@AttrRes attr: Int, @AnyRes fallBackResId: Int): Int = TypedValue().takeIf {
-    context.theme.resolveAttribute(attr, it, true)
-}?.resourceId ?: fallBackResId
-
-internal fun LottieAnimationView.addColorFilter(
-    @ColorInt color: Int,
-    keyPath: KeyPath = KeyPath("**"),
-    mode: PorterDuff.Mode = PorterDuff.Mode.SRC_ATOP
-) = addValueCallback(keyPath, LottieProperty.COLOR_FILTER) {
-    PorterDuffColorFilter(color, mode)
-}
-
-internal fun ImageView.load(
-    url: String?,
-    onSuccess: (() -> Unit)? = null,
-    onError: ((ex: Exception) -> Unit)? = null
-) {
-
-    val callback = if (onSuccess == null && onError == null)
-        null
-    else
-        object : Callback {
-            override fun onSuccess() {
-                onSuccess?.invoke()
-            }
-
-            override fun onError(e: Exception) {
-                onError?.invoke(e)
-            }
-        }
-
-    Picasso.get().load(url).into(this, callback)
-}
-
-internal val View.layoutInflater: LayoutInflater get() = LayoutInflater.from(this.context)
-
-internal fun TextView.setCompoundDrawableTintListCompat(tint: ColorStateList?) {
-    TextViewCompat.setCompoundDrawableTintList(this, tint)
-}
-
-//Unified Ui
-//--------------------------------------------------------------------------------------------------
 internal fun View.applyColorTheme(color: ColorTheme?) {
     background = createBackgroundFromTheme(color ?: return)
     backgroundTintList = null
@@ -159,15 +73,6 @@ internal fun View.applyLayerTheme(layer: LayerTheme?) {
     background = drawable
 }
 
-internal fun MaterialToolbar.applyToolbarTheme(@ColorInt backgroundColor: Int?, @ColorInt navigationIconColor: Int?) {
-    backgroundColor?.let {
-        backgroundTintList = ColorStateList.valueOf(it)
-    }
-    navigationIconColor?.let {
-        navigationIcon?.setTint(navigationIconColor)
-    }
-}
-
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
     layer?.fill?.primaryColor?.also {
         /*
@@ -180,13 +85,6 @@ internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {
     layer?.stroke?.also(::setStrokeColor)
     layer?.borderWidthInt?.also(::setStrokeWidth)
     layer?.cornerRadius?.also(::setRadius)
-}
-
-internal fun View.applyShadow(@ColorInt color: Int?) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && color != null) {
-        outlineSpotShadowColor = color
-        outlineAmbientShadowColor = color
-    }
 }
 
 internal fun TextView.applyTextColorTheme(color: ColorTheme?) {
@@ -223,14 +121,6 @@ internal fun TextView.applyTextTheme(
     }
 }
 
-internal fun TextView.applyTextTheme(
-    @ColorInt textColor: Int?,
-    textFont: Typeface?
-) {
-    textColor?.also(::setTextColor)
-    textFont?.also(::setTypeface)
-}
-
 internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     buttonTheme?.background?.also { bg ->
         bg.fill?.also { backgroundTintList = it.primaryColorStateList }
@@ -251,27 +141,8 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
     }
 }
 
-internal fun MaterialButton.applyButtonTheme(
-    @ColorInt backgroundColor: Int?,
-    @ColorInt textColor: Int?,
-    textFont: Typeface?
-) {
-    backgroundColor?.also { backgroundTintList = ColorStateList.valueOf(it) }
-    textColor?.also {
-        setTextColor(it)
-        iconTint = ColorStateList.valueOf(it)
-    }
-    textFont?.also(::setTypeface)
-}
-
 internal fun ImageView.applyButtonTheme(buttonTheme: ButtonTheme?) {
     applyImageColorTheme(buttonTheme?.iconColor)
-}
-
-internal fun View.changeStatusBarColor(color: Int?) {
-    color?.run {
-        Utils.getActivity(context)?.window?.statusBarColor = this
-    }
 }
 
 internal fun CircularProgressIndicator.applyIndicatorColorTheme(colorTheme: ColorTheme?) {
@@ -282,26 +153,8 @@ internal fun ProgressBar.applyProgressColorTheme(colorTheme: ColorTheme?) {
     colorTheme?.primaryColorStateList?.also(::setIndeterminateTintList)
 }
 
-internal fun ProgressBar.applyProgressColorTheme(@ColorInt progressColor: Int?) {
-    progressColor?.also {
-        indeterminateTintList = ColorStateList.valueOf(it)
-    }
-}
-
 internal fun ImageView.applyImageColorTheme(colorTheme: ColorTheme?) {
     colorTheme?.primaryColorStateList?.also(::setImageTintList)
-}
-
-internal fun ImageView.applyImageColorTheme(@ColorInt imageColor: Int?) {
-    imageColor?.let {
-        imageTintList = ColorStateList.valueOf(it)
-    }
-}
-
-internal fun MenuItem.applyIconColorTheme(@ColorInt iconColor: Int?) {
-    iconColor?.let {
-        icon?.setTintCompat(it)
-    }
 }
 
 internal fun FloatingActionButton.applyBarButtonStatesTheme(barButtonStatesTheme: BarButtonStatesTheme?) {
@@ -384,10 +237,12 @@ internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTh
             textTheme = theme?.highlightedText
             layerTheme = theme?.highlightedLayer
         }
+
         isSelected -> {
             textTheme = theme?.selectedText
             layerTheme = theme?.selectedLayer
         }
+
         else -> {
             textTheme = theme?.normalText
             layerTheme = theme?.normalLayer
@@ -401,17 +256,3 @@ internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTh
     )
 }
 
-internal fun Context.wrapWithMaterialThemeOverlay(
-    attrs: AttributeSet? = null,
-    @AttrRes defStyleAttr: Int = R.attr.gliaChatStyle,
-    @StyleRes defStyleRes: Int = R.style.Application_Glia_Chat
-) : Context {
-    return MaterialThemeOverlay.wrap(
-        this,
-        attrs,
-        defStyleAttr,
-        defStyleRes
-    )
-}
-
-internal fun ViewGroup.hasChildOfType(clazz: Class<*>) = children.any{ clazz.isInstance(it) }

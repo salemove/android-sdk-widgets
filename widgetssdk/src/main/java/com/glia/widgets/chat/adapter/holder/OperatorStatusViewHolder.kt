@@ -9,10 +9,10 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.history.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.view.OperatorStatusView
-import com.glia.widgets.view.unifiedui.extensions.applyTextTheme
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
-import com.glia.widgets.view.unifiedui.extensions.getFontCompat
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStateTheme
 import com.glia.widgets.view.unifiedui.theme.chat.EngagementStatesTheme
 

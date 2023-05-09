@@ -22,8 +22,8 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.helper.CommonExtensionsKt;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.helper.Utils;
 import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
@@ -239,7 +239,7 @@ public class ServiceChatHeadController
     }
 
     private void operatorDataLoaded(Operator operator) {
-        operatorProfileImgUrl = Utils.getOperatorImageUrl(operator);
+        operatorProfileImgUrl = CommonExtensionsKt.getImageUrl(operator);
         updateChatHeadView();
     }
 

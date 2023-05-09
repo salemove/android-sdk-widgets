@@ -1,14 +1,13 @@
 package com.glia.widgets.call;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
-import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
 public interface CallStatus {
-
-    String getOperatorName();
 
     String getFormattedOperatorName();
 
@@ -36,11 +35,6 @@ public interface CallStatus {
 
         public EngagementNotOngoing(VisitorMediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
-        }
-
-        @Override
-        public String getOperatorName() {
-            return null;
         }
 
         @Override
@@ -86,6 +80,7 @@ public interface CallStatus {
             return Objects.hash(visitorMediaState);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "EngagementNotOngoing{" +
@@ -95,31 +90,26 @@ public interface CallStatus {
     }
 
     class EngagementOngoingOperatorIsConnecting implements CallStatus {
-        private final String operatorName;
+        private final String formattedOperatorName;
         private final String time;
         private final String operatorProfileImgUrl;
         private VisitorMediaState visitorMediaState;
 
         public EngagementOngoingOperatorIsConnecting(
-                String operatorName,
+                String formattedOperatorName,
                 String time,
                 String operatorProfileImgUrl,
                 VisitorMediaState visitorMediaState
         ) {
-            this.operatorName = operatorName;
+            this.formattedOperatorName = formattedOperatorName;
             this.time = time;
             this.operatorProfileImgUrl = operatorProfileImgUrl;
             this.visitorMediaState = visitorMediaState;
         }
 
         @Override
-        public String getOperatorName() {
-            return operatorName;
-        }
-
-        @Override
         public String getFormattedOperatorName() {
-            return Utils.formatOperatorName(operatorName);
+            return formattedOperatorName;
         }
 
         @Override
@@ -152,7 +142,7 @@ public interface CallStatus {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             EngagementOngoingOperatorIsConnecting that = (EngagementOngoingOperatorIsConnecting) o;
-            return Objects.equals(operatorName, that.operatorName) &&
+            return Objects.equals(formattedOperatorName, that.formattedOperatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                     Objects.equals(visitorMediaState, that.visitorMediaState);
@@ -160,13 +150,14 @@ public interface CallStatus {
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorProfileImgUrl, visitorMediaState);
+            return Objects.hash(formattedOperatorName, time, operatorProfileImgUrl, visitorMediaState);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "EngagementOngoingOperatorIsConnecting{" +
-                    "operatorName='" + operatorName + '\'' +
+                    "operatorName='" + formattedOperatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                     ", visitorMediaState=" + visitorMediaState +
@@ -175,20 +166,20 @@ public interface CallStatus {
     }
 
     class EngagementOngoingAudioCallStarted implements CallStatus {
-        private final String operatorName;
+        private final String formattedOperatorName;
         private final String time;
         private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
         private VisitorMediaState visitorMediaState;
 
         public EngagementOngoingAudioCallStarted(
-                String operatorName,
+                String formattedOperatorName,
                 String time,
                 String operatorProfileImgUrl,
                 OperatorMediaState operatorMediaState,
                 VisitorMediaState visitorMediaState
         ) {
-            this.operatorName = operatorName;
+            this.formattedOperatorName = formattedOperatorName;
             this.time = time;
             this.operatorProfileImgUrl = operatorProfileImgUrl;
             this.operatorMediaState = operatorMediaState;
@@ -196,13 +187,8 @@ public interface CallStatus {
         }
 
         @Override
-        public String getOperatorName() {
-            return operatorName;
-        }
-
-        @Override
         public String getFormattedOperatorName() {
-            return Utils.formatOperatorName(operatorName);
+            return formattedOperatorName;
         }
 
         @Override
@@ -235,7 +221,7 @@ public interface CallStatus {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             EngagementOngoingAudioCallStarted that = (EngagementOngoingAudioCallStarted) o;
-            return Objects.equals(operatorName, that.operatorName) &&
+            return Objects.equals(formattedOperatorName, that.formattedOperatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                     Objects.equals(operatorMediaState, that.operatorMediaState) &&
@@ -244,13 +230,14 @@ public interface CallStatus {
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorProfileImgUrl, operatorMediaState, visitorMediaState);
+            return Objects.hash(formattedOperatorName, time, operatorProfileImgUrl, operatorMediaState, visitorMediaState);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "EngagementOngoingAudioCallStarted{" +
-                    "operatorName='" + operatorName + '\'' +
+                    "operatorName='" + formattedOperatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                     ", operatorMediaState=" + operatorMediaState +
@@ -260,20 +247,20 @@ public interface CallStatus {
     }
 
     class EngagementOngoingVideoCallStarted implements CallStatus {
-        private final String operatorName;
+        private final String formattedOperatorName;
         private final String time;
         private final String operatorProfileImgUrl;
         private final OperatorMediaState operatorMediaState;
         private VisitorMediaState visitorMediaState;
 
         public EngagementOngoingVideoCallStarted(
-                String operatorName,
+                String formattedOperatorName,
                 String time,
                 String operatorProfileImgUrl,
                 OperatorMediaState operatorMediaState,
                 VisitorMediaState visitorMediaState
         ) {
-            this.operatorName = operatorName;
+            this.formattedOperatorName = formattedOperatorName;
             this.time = time;
             this.operatorProfileImgUrl = operatorProfileImgUrl;
             this.operatorMediaState = operatorMediaState;
@@ -281,13 +268,8 @@ public interface CallStatus {
         }
 
         @Override
-        public String getOperatorName() {
-            return operatorName;
-        }
-
-        @Override
         public String getFormattedOperatorName() {
-            return Utils.formatOperatorName(operatorName);
+            return formattedOperatorName;
         }
 
         @Override
@@ -320,7 +302,7 @@ public interface CallStatus {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             EngagementOngoingVideoCallStarted that = (EngagementOngoingVideoCallStarted) o;
-            return Objects.equals(operatorName, that.operatorName) &&
+            return Objects.equals(formattedOperatorName, that.formattedOperatorName) &&
                     Objects.equals(time, that.time) &&
                     Objects.equals(operatorProfileImgUrl, that.operatorProfileImgUrl) &&
                     Objects.equals(operatorMediaState, that.operatorMediaState) &&
@@ -329,13 +311,14 @@ public interface CallStatus {
 
         @Override
         public int hashCode() {
-            return Objects.hash(operatorName, time, operatorProfileImgUrl, operatorMediaState, visitorMediaState);
+            return Objects.hash(formattedOperatorName, time, operatorProfileImgUrl, operatorMediaState, visitorMediaState);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "EngagementOngoingVideoCallStarted{" +
-                    "operatorName='" + operatorName + '\'' +
+                    "operatorName='" + formattedOperatorName + '\'' +
                     ", time='" + time + '\'' +
                     ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
                     ", operatorMediaState=" + operatorMediaState +
@@ -354,11 +337,6 @@ public interface CallStatus {
         ) {
             setVisitorMediaState(visitorMediaState);
             this.time = time;
-        }
-
-        @Override
-        public String getOperatorName() {
-            return null;
         }
 
         @Override
@@ -405,6 +383,7 @@ public interface CallStatus {
             return Objects.hash(time, visitorMediaState);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return "EngagementOngoingTransferring{" +

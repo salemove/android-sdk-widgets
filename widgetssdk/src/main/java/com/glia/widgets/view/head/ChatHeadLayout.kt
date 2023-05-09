@@ -12,9 +12,9 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.ViewHelpers
-import com.glia.widgets.view.unifiedui.extensions.layoutInflater
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
@@ -24,7 +24,7 @@ class ChatHeadLayout @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.gliaChatStyle,
     defStyleRes: Int = R.style.Application_Glia_Chat
 ) : FrameLayout(
-    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
+    context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
     attrs,
     defStyleAttr,
     defStyleRes

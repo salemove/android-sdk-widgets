@@ -2,6 +2,7 @@
 
 package com.glia.widgets.helper
 
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,10 +12,16 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.widgets.core.fileupload.model.FileAttachment
 import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 internal fun String?.toFileExtensionOrEmpty() = this?.let { File(it) }?.extension.orEmpty()
 
@@ -108,4 +115,27 @@ internal fun getContentUriCompat(fileName: String, context: Context): Uri =
         ).let {
             FileProvider.getUriForFile(context, context.fileProviderAuthority, it)
         }
+    }
+
+@Throws(IOException::class)
+fun createTempPhotoFile(context: Context): File {
+    val directoryStorage = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    directoryStorage?.deleteOnExit()
+    return File.createTempFile(generatePhotoFileName(), ".jpg", directoryStorage)
+}
+
+private fun generatePhotoFileName(): String =
+    SimpleDateFormat("yyyyMMdd_HHmmss_", Locale.getDefault()).run {
+        "IMG_${format(Date())}"
+    }
+
+fun mapUriToFileAttachment(contentResolver: ContentResolver, uri: Uri): FileAttachment? =
+    contentResolver.query(uri, null, null, null, null)?.use {
+        val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+        it.moveToFirst()
+        val displayName = it.getString(nameIndex)
+        val mimeType = contentResolver.getType(uri)
+        val size = it.getLong(sizeIndex)
+        FileAttachment(uri, displayName, size, mimeType)
     }

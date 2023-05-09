@@ -8,10 +8,10 @@ import java.util.TimerTask;
 public class TimeCounter {
 
     private final static String TAG = "TimeCounter";
-    private TimerTask timerTask;
-    private Timer timer;
     private final List<FormattedTimerStatusListener> formattedListeners = new ArrayList<>();
     private final List<RawTimerStatusListener> rawListeners = new ArrayList<>();
+    private TimerTask timerTask;
+    private Timer timer;
 
     public void startNew(int timerDelayMs, int timerIntervalMs) {
         Logger.d(TAG, "startNew! timerDelay: " + Integer.valueOf(timerDelayMs).toString() +
@@ -79,7 +79,7 @@ public class TimeCounter {
                 }
 
                 if (!formattedListeners.isEmpty()) {
-                    String time = Utils.toMmSs(Long.valueOf(value));
+                    String time = CommonExtensionsKt.formatElapsedTime(value);
                     Logger.d(TAG, "Formatted timer: " + time);
                     for (FormattedTimerStatusListener listener : formattedListeners) {
                         listener.onNewFormattedTimerValue(time);

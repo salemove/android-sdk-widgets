@@ -48,13 +48,23 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.changeStatusBarColor
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getColorStateListCompat
+import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.helper.getFullHybridTheme
+import com.glia.widgets.helper.hideKeyboard
+import com.glia.widgets.helper.insetsController
+import com.glia.widgets.helper.requireActivity
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.OperatorStatusView
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
 import com.glia.widgets.view.head.BadgeTextView
 import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.header.AppBarView
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.view.unifiedui.applyBarButtonStatesTheme
+import com.glia.widgets.view.unifiedui.applyColorTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -76,7 +86,7 @@ internal class CallView(
     }
 
     private val audioManager: AudioManager by lazy { context.getSystemService()!! }
-    private val screenSharingViewCallback = object: ScreenSharingController.ViewCallback {
+    private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
         override fun onScreenSharingRequestError(ex: GliaException?) {
             ex?.run { showToast(this.debugMessage) }
         }
@@ -158,7 +168,7 @@ internal class CallView(
             onBackClickedListener?.onBackClicked()
         }
         appBar.setOnEndChatClickedListener { callController?.leaveChatClicked() }
-        appBar.setOnEndCallButtonClickedListener { screenSharingController?.onForceStopScreenSharing()}
+        appBar.setOnEndCallButtonClickedListener { screenSharingController?.onForceStopScreenSharing() }
         appBar.setOnXClickedListener { callController?.leaveChatQueueClicked() }
         chatButton.setOnClickListener { callController?.chatButtonClicked() }
         speakerButton.setOnClickListener { callController?.onSpeakerButtonPressed() }
@@ -175,8 +185,8 @@ internal class CallView(
         screenSharingMode: ScreenSharing.Mode?,
         mediaType: Engagement.MediaType?
     ) {
-        Dependencies.getSdkConfigurationManager()?.isUseOverlay = useOverlays
-        Dependencies.getSdkConfigurationManager()?.screenSharingMode = screenSharingMode
+        Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
+        Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
         callController?.initCall(companyName, queueId, visitorContextAssetId, mediaType)
         serviceChatHeadController?.init()
     }
@@ -236,7 +246,7 @@ internal class CallView(
                 Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
-                Dialog.MODE_VISITOR_CODE -> { Logger.e(TAG, "DialogController callback in CallView with MODE_VISITOR_CODE") } // Should never happen inside CallView
+                else -> Logger.e(TAG, "DialogController callback in CallView with ${it.mode}")
             }
         }
         dialogController = Dependencies.getControllerFactory().dialogController
@@ -562,11 +572,11 @@ internal class CallView(
 
     private fun setDefaultTheme(typedArray: TypedArray) {
         theme = Utils.getThemeFromTypedArray(typedArray, this.context)
-        theme = Utils.getFullHybridTheme(Dependencies.getSdkConfigurationManager()?.uiTheme, theme)
+            .getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
     }
 
     fun setUiTheme(uiTheme: UiTheme?) {
-        theme = Utils.getFullHybridTheme(uiTheme ?: return, theme)
+        theme = theme.getFullHybridTheme(uiTheme ?: return)
         setupViewAppearance()
         if (isVisible) {
             handleStatusBarColor()
@@ -604,21 +614,25 @@ internal class CallView(
 
     private fun hideUIOnCallEnd() {
         visibility = INVISIBLE
-        val activity = Utils.getActivity(this.context)
         hideOperatorVideo()
         hideVisitorVideo()
-        if (defaultStatusBarColor != null && activity != null) {
-            activity.window.statusBarColor = defaultStatusBarColor!!
-            defaultStatusBarColor = null
-        }
-        Utils.hideSoftKeyboard(this.context, windowToken)
+        insetsController?.hideKeyboard()
     }
 
     private fun handleStatusBarColor() {
-        val activity = Utils.getActivity(this.context)
-        if (activity != null && defaultStatusBarColor == null) {
+        val activity = context.requireActivity()
+        if (defaultStatusBarColor == null) {
             defaultStatusBarColor = activity.window.statusBarColor
-            activity.window.statusBarColor = getColorCompat(R.color.glia_transparent_black_bg)
+            changeStatusBarColor(getColorCompat(R.color.glia_transparent_black_bg))
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        defaultStatusBarColor?.also {
+            changeStatusBarColor(it)
+            defaultStatusBarColor = null
         }
     }
 
@@ -627,7 +641,10 @@ internal class CallView(
             context = this.context,
             theme = theme,
             title = resources.getString(R.string.glia_dialog_end_engagement_title),
-            message = resources.getString(R.string.glia_dialog_end_engagement_message, operatorName),
+            message = resources.getString(
+                R.string.glia_dialog_end_engagement_message,
+                operatorName
+            ),
             positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
             negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
             positiveButtonClickListener = {
@@ -772,7 +789,7 @@ internal class CallView(
         releaseOperatorVideoStream()
         operatorMediaState?.video?.also {
             Logger.d(TAG, "Starting video operator")
-            operatorVideoView = it.createVideoView(Utils.getActivity(context))
+            operatorVideoView = it.createVideoView(context.requireActivity())
 
             operatorVideoContainer.apply {
                 removeAllViews()
@@ -851,6 +868,7 @@ internal class CallView(
                     description?.also(onHoldTextView::applyThemeOrDefault)
                 }
             }
+
             callState.isCallOngoingAndOperatorIsConnecting -> {
                 //connecting connectingView, operatorNameView, callTimerView
                 callTheme?.connect?.connecting?.apply {
@@ -858,18 +876,21 @@ internal class CallView(
                     description?.also(connectingView::applyThemeOrDefault)
                 }
             }
+
             callState.isCallOngoingAndOperatorConnected -> {
                 //connected operatorNameView, callTimerView
                 callTheme?.connect?.connected?.apply {
                     title?.also(operatorNameView::applyThemeOrDefault)
                 }
             }
+
             callState.isTransferring -> {
                 //transferring operatorNameView, callTimerView
                 callTheme?.connect?.connected?.apply {
                     title?.also(operatorNameView::applyThemeOrDefault)
                 }
             }
+
             else -> {
                 //queue companyNameView, msrView
                 // this is the same as [callState.isCallNotOngoing] or queue state
@@ -1016,6 +1037,7 @@ internal class CallView(
             it.isEnabled = isEnabled
         }
     }
+
     override fun navigateToChat() {
         onNavigateToChatListener?.call()
     }
@@ -1037,6 +1059,10 @@ internal class CallView(
         mediaType: Engagement.MediaType,
         missingPermissionsCallBack: CallActivity.MissingPermissionsCallBack
     ) {
-        callController?.checkForPermissions(applicationContext, mediaType, missingPermissionsCallBack)
+        callController?.checkForPermissions(
+            applicationContext,
+            mediaType,
+            missingPermissionsCallBack
+        )
     }
 }

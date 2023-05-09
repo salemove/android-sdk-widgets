@@ -5,25 +5,26 @@ import com.glia.widgets.BuildConfig
 
 object Logger {
     @JvmStatic
-    fun d(tag: String?, message: String?) {
+    fun d(tag: String, message: String?) {
         if (BuildConfig.DEBUG) {
-            // For some reason lint doesn't like when `message` is null
-            Log.d(tag, message ?: "")
+            //No need to log an empty message
+            Log.d(tag, message ?: return)
         }
     }
 
     @JvmStatic
-    fun e(tag: String?, message: String?) {
+    fun e(tag: String, message: String?) {
         if (BuildConfig.DEBUG) {
-            // For some reason lint doesn't like when `message` is null
-            Log.e(tag, message ?: "")
+            // //No need to log an empty message
+            Log.e(tag, message ?: return)
         }
     }
 
     @JvmStatic
-    fun e(tag: String?, message: String?, tr: Throwable?) {
+    fun e(tag: String, message: String?, tr: Throwable?) {
         if (BuildConfig.DEBUG) {
             // No problem with lint in here
+            if (message.isNullOrBlank() && tr == null) return
             Log.e(tag, message, tr)
         }
     }
@@ -38,8 +39,8 @@ object Logger {
 internal val Any.TAG: String
     get() {
         return if (javaClass.isAnonymousClass) {
-            return javaClass.name
+            javaClass.name
         } else {
-            return javaClass.simpleName // returns "" if the underlying class is anonymo
+            javaClass.simpleName // returns "" if the underlying class is anonymous
         }
     }

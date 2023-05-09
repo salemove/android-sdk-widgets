@@ -10,7 +10,15 @@ import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ProgressButtonBinding
-import com.glia.widgets.view.unifiedui.extensions.*
+import com.glia.widgets.helper.applyShadow
+import com.glia.widgets.helper.getAttr
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.helper.getDimenRes
+import com.glia.widgets.helper.getDrawableCompat
+import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.view.unifiedui.applyIndicatorColorTheme
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme

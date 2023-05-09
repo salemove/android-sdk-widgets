@@ -11,6 +11,7 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.formattedName
 import java.util.function.Consumer
 
 class CallVisualizerRepository(private val gliaCore: GliaCore) {
@@ -30,7 +31,7 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
     }
 
     fun addVisitorContext(visitorContext: String) {
-        this.visitorContext = visitorContext;
+        this.visitorContext = visitorContext
     }
 
     private fun showDialogOnMediaUpgradeRequest() {
@@ -63,11 +64,11 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
             Logger.d(
                 TAG, "upgradeOfferConsumer, offer: $offer"
             )
-            val operatorName = engagement.state.operator.name
+            val operatorNameFormatted = engagement.state.operator.formattedName
             if (offer.video == MediaDirection.TWO_WAY) {
-                callback.onTwoWayMediaUpgradeRequest(offer, operatorName)
+                callback.onTwoWayMediaUpgradeRequest(offer, operatorNameFormatted)
             } else if (offer.video == MediaDirection.ONE_WAY) {
-                callback.onOneWayMediaUpgradeRequest(offer, operatorName)
+                callback.onOneWayMediaUpgradeRequest(offer, operatorNameFormatted)
             }
         }
     }

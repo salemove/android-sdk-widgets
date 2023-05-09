@@ -21,10 +21,9 @@ import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.hasChildOfType
 import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
-import com.glia.widgets.view.unifiedui.extensions.hasChildOfType
-import com.glia.widgets.view.unifiedui.extensions.wrapWithMaterialThemeOverlay
 import java.lang.ref.WeakReference
 
 internal class ActivityWatcherForChatHead(
@@ -153,17 +152,18 @@ internal class ActivityWatcherForChatHead(
 
     override fun openCallActivity() {
         resumedActivity.get()?.let {
-            val contextWithStyle = it.wrapWithMaterialThemeOverlay()
-            val intent = CallActivity.getIntent(contextWithStyle,
+            val intent = CallActivity.getIntent(
+                it,
                 getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
                     .setIsUpgradeToCall(true)
-                    .build())
-            contextWithStyle.startActivity(intent)
+                    .build()
+            )
+            it.startActivity(intent)
         }
     }
 
     private fun getConfigurationBuilder(): Configuration.Builder {
-        val configuration = Dependencies.getSdkConfigurationManager()?.createWidgetsConfiguration()
+        val configuration = Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
         return Configuration.Builder().setWidgetsConfiguration(configuration)
     }
 

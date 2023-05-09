@@ -7,10 +7,10 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
 import com.glia.widgets.R
-import com.glia.widgets.view.unifiedui.extensions.applyLayerTheme
-import com.glia.widgets.view.unifiedui.extensions.applyTextColorTheme
-import com.glia.widgets.view.unifiedui.extensions.getAttr
-import com.glia.widgets.view.unifiedui.extensions.getColorCompat
+import com.glia.widgets.helper.getAttr
+import com.glia.widgets.helper.getColorCompat
+import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextColorTheme
 import com.glia.widgets.view.unifiedui.theme.base.BadgeTheme
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView

@@ -192,7 +192,7 @@ public class RepositoryFactory {
 
     public SecureFileAttachmentRepository getSecureFileAttachmentRepository() {
         if (secureFileAttachmentRepository == null) {
-            secureFileAttachmentRepository = new SecureFileAttachmentRepository(gliaCore.getSecureConversations());
+            secureFileAttachmentRepository = new SecureFileAttachmentRepository(gliaCore);
         }
         return secureFileAttachmentRepository;
     }

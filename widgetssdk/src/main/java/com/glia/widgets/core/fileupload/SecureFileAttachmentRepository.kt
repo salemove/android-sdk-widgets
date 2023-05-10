@@ -2,14 +2,20 @@ package com.glia.widgets.core.fileupload
 
 import android.net.Uri
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.androidsdk.secureconversations.SecureConversations
+import com.glia.widgets.di.GliaCore
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
-class SecureFileAttachmentRepository(private val secureConversations: SecureConversations) {
+class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
+    private val secureConversations: SecureConversations by lazy {
+        gliaCore.secureConversations
+    }
+
     private val _observable = BehaviorSubject.createDefault(emptyList<FileAttachment>())
 
     val observable: Observable<List<FileAttachment>> = _observable
@@ -35,17 +41,27 @@ class SecureFileAttachmentRepository(private val secureConversations: SecureConv
     }
 
     fun uploadFile(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
-        secureConversations.uploadFile(file.uri) { engagementFile: EngagementFile?, e: GliaException? ->
-            if (engagementFile != null) {
-                if (!engagementFile.isSecurityScanRequired) {
-                    onUploadFileSuccess(file.uri, engagementFile, listener)
-                } else {
-                    onUploadFileSecurityScanRequired(file.uri, engagementFile, listener)
-                }
-            } else if (e != null) {
-                setFileAttachmentStatus(file.uri, getAttachmentStatus(e))
-                listener.onError(e)
+        val engagement = gliaCore.currentEngagement.orElse(null)
+        if (engagement != null) {
+            engagement.uploadFile(file.uri, handleFileUpload(file, listener))
+        } else {
+            secureConversations.uploadFile(file.uri, handleFileUpload(file, listener))
+        }
+    }
+
+    private fun handleFileUpload(
+        file: FileAttachment,
+        listener: AddFileToAttachmentAndUploadUseCase.Listener
+    ) = RequestCallback<EngagementFile> { engagementFile: EngagementFile?, e: GliaException? ->
+        if (engagementFile != null) {
+            if (!engagementFile.isSecurityScanRequired) {
+                onUploadFileSuccess(file.uri, engagementFile, listener)
+            } else {
+                onUploadFileSecurityScanRequired(file.uri, engagementFile, listener)
             }
+        } else if (e != null) {
+            setFileAttachmentStatus(file.uri, getAttachmentStatus(e))
+            listener.onError(e)
         }
     }
 

@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.Space
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
-import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -73,6 +72,8 @@ class MessageView(
         AttachmentPopup(addAttachmentButton, unifiedTheme?.pickMediaTheme)
     }
 
+    val messageTitleTop: Int get() = messageTitle.top
+
     private var checkMessageButtonClickListener: OnClickListener? = null
     private var attachmentButtonClickListener: OnClickListener? = null
     private var sendMessageButtonClickListener: OnClickListener? = null
@@ -85,7 +86,7 @@ class MessageView(
         isFillViewport = true
         isNestedScrollingEnabled = false
         overScrollMode = OVER_SCROLL_NEVER
-        setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
+        setBackgroundColor(getColorCompat(R.color.glia_chat_background_color))
         setupViewAppearance()
         initCallbacks()
         readTypedArray(attrs, defStyleAttr, defStyleRes)

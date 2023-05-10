@@ -120,6 +120,11 @@ public class DialogController {
         dialogManager.remove(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
     }
 
+    public void dismissMessageCenterUnavailableDialog() {
+        Logger.d(TAG, "Dismiss Message Center Unavailable Dialog");
+        dialogManager.remove(new DialogState(Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE));
+    }
+
     public void showStartScreenSharingDialog() {
         Logger.d(TAG, "Show Start Screen Sharing Dialog");
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_START_SCREEN_SHARING));

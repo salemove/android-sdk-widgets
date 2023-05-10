@@ -327,6 +327,7 @@ internal class ChatController(
 
     fun onDestroy(retain: Boolean) {
         Logger.d(TAG, "onDestroy, retain:$retain")
+        dialogController.dismissMessageCenterUnavailableDialog()
         destroyView()
 
         // viewCallback is accessed from multiple threads

@@ -37,6 +37,7 @@ import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.notification.openNotificationChannelScreen
@@ -136,6 +137,7 @@ internal class CallView(
 
     private var operatorVideoView: VideoView? = null
     private var alertDialog: AlertDialog? = null
+    private var currentDialogState: DialogState? = null
 
     @JvmOverloads
     constructor(
@@ -218,6 +220,10 @@ internal class CallView(
     private fun setupControllers() {
         callController = Dependencies.getControllerFactory().getCallController(this)
         dialogCallback = DialogController.Callback {
+            if (it.mode == currentDialogState?.mode) {
+                return@Callback
+            }
+            currentDialogState = it
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
                 Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
@@ -751,6 +757,7 @@ internal class CallView(
     }
 
     private fun dismissAlertDialog() {
+        currentDialogState = null
         alertDialog?.apply {
             dismiss()
             alertDialog = null

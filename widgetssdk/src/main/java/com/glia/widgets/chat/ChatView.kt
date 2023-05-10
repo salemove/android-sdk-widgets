@@ -53,6 +53,7 @@ import com.glia.widgets.chat.model.history.VisitorAttachmentItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -106,6 +107,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     private var alertDialog: AlertDialog? = null
+    private var currentDialogState: DialogState? = null
     private var callback: ChatViewCallback? = null
     private var controller: ChatController? = null
     private var dialogCallback: DialogController.Callback? = null
@@ -446,6 +448,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun setupDialogCallback() {
         dialogCallback = DialogController.Callback {
+            if (it.mode == currentDialogState?.mode) {
+                return@Callback
+            }
+            currentDialogState = it
             when (it.mode) {
                 Dialog.MODE_NONE -> dismissAlertDialog()
                 Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> post { showChatUnavailableView() }
@@ -963,6 +969,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun dismissAlertDialog() {
+        currentDialogState = null
         alertDialog?.dismiss()
         alertDialog = null
     }

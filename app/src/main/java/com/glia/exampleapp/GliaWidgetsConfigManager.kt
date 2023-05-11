@@ -26,6 +26,8 @@ object GliaWidgetsConfigManager {
     private const val REGION_KEY = "environment"
     private const val REGION_BETA = "beta"
     private const val REGION_ACCEPTANCE = "acceptance"
+    private const val BASE_DOMAIN = "base_domain"
+    private const val DEFAULT_BASE_DOMAIN = "at.samo.io"
     @JvmStatic
     fun obtainConfigFromDeepLink(data: Uri, applicationContext: Context): GliaWidgetsConfig {
         saveQueueIdToPrefs(data, applicationContext)
@@ -39,12 +41,14 @@ object GliaWidgetsConfigManager {
             throw RuntimeException("deep link must start with \"glia://widgets/secret\"")
         }
         val region = data.getQueryParameter(REGION_KEY) ?: REGION_ACCEPTANCE
+        val baseDomain = data.getQueryParameter(BASE_DOMAIN) ?: DEFAULT_BASE_DOMAIN
 
         // By this point all settings from deep link where saved to the shared prefs overriding the
         // defaults combining both together
         return createDefaultConfig(
             context = applicationContext,
-            region = region
+            region = region,
+            baseDomain = baseDomain
         )
     }
 
@@ -91,6 +95,7 @@ object GliaWidgetsConfigManager {
         uiJsonRemoteConfig: String? = null,
         runtimeConfig: UiTheme? = null,
         region: String = REGION_BETA,
+        baseDomain: String = DEFAULT_BASE_DOMAIN,
         preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     ): GliaWidgetsConfig {
         val apiKeyId = preferences.getString(
@@ -121,6 +126,7 @@ object GliaWidgetsConfigManager {
             .setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret!!))
             .setSiteId(siteId)
             .setRegion(region)
+            .setBaseDomain(baseDomain)
             .setCompanyName(companyName)
             .setUseOverlay(useOverlay)
             .setScreenSharingMode(screenSharingMode)

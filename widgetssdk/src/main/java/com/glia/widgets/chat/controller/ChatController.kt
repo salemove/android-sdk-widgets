@@ -403,10 +403,13 @@ internal class ChatController(
     private fun onUnengagementMessage(messageInternal: ChatMessageInternal) {
         emitChatItems {
             val message = messageInternal.chatMessage
-            if (message.senderType == Chat.Participant.VISITOR && message.attachment != null
-                && !isNewMessage(chatState.chatItems, message)
-            ) {
 
+            // Unengagement messages are needed to display visitor's attachments (1)
+            // and to display system messages (2).
+            // Other messages will get when the engagement will start with loading chat history
+            // and subscribing to the new messages.
+            if (message.senderType == Chat.Participant.VISITOR && message.attachment != null
+                && !isNewMessage(chatState.chatItems, message)) { // (1)
                 val items: MutableList<ChatItem> = chatState.chatItems.toMutableList()
                 val currentMessage =
                     items.first { (it as? LinkedChatItem)?.messageId == message.id }
@@ -414,7 +417,7 @@ internal class ChatController(
                 items.removeAll { (it as? VisitorAttachmentItem)?.messageId == message.id }
                 addVisitorAttachmentItemsToChatItems(items, message, currentMessageIndex + 1)
                 return@emitChatItems chatState.changeItems(items)
-            } else {
+            } else if (message.senderType == Chat.Participant.SYSTEM) { // (2)
                 onMessage(messageInternal)
             }
             return@emitChatItems null
@@ -1461,10 +1464,17 @@ internal class ChatController(
         viewCallback?.smoothScrollToBottom()
     }
 
-    private fun loadChatHistory() {
+    private fun loadChatHistory(subscribeToNewMessages: Boolean = false) {
         unengagementMessagesDisposable?.dispose()
         val historyDisposable = loadHistoryUseCase()
-            .subscribe({ historyLoaded(it) }, { error(it) })
+            .subscribe(
+                {
+                    historyLoaded(it)
+                    if (subscribeToNewMessages) {
+                        subscribeToMessages()
+                    }
+                }, ::error
+            )
         disposable.add(historyDisposable)
     }
 
@@ -1579,7 +1589,10 @@ internal class ChatController(
 
     override fun newEngagementLoaded(engagement: OmnicoreEngagement) {
         Logger.d(TAG, "newEngagementLoaded")
-        subscribeToMessages()
+
+        // Loading chat history to get new messages in correct order.
+        loadChatHistory(subscribeToNewMessages = true)
+
         onOperatorTypingUseCase.execute { onOperatorTyping(it) }
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener)
         mediaUpgradeOfferRepository.startListening()
@@ -1588,9 +1601,6 @@ internal class ChatController(
             Logger.d(TAG, "unsentMessage sent!")
         }
         emitViewState { chatState.engagementStarted() }
-        // Loading chat history again on engagement start in case it was an-authenticated visitor that restored ongoing engagement
-        // Currently there is no direct way to know if Visitor is authenticated.
-        loadChatHistory()
     }
 
     override fun engagementEnded() {

@@ -19,15 +19,20 @@ import java.io.File
 internal fun String?.toFileExtensionOrEmpty() = this?.let { File(it) }?.extension.orEmpty()
 
 internal val AttachmentFile.fileName: String
-    get() = id + name.toFileExtensionOrEmpty()
+    get() = toFileName(id, name)
 
 internal val AttachmentFile.isDownloaded: Boolean
     get() = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).run {
         File(path, fileName)
     }.exists()
 
-internal fun toFileName(fileId: String?, name: String?): String =
-    fileId + name.toFileExtensionOrEmpty()
+internal fun toFileName(fileId: String?, name: String?): String {
+    val fileExtension = name.toFileExtensionOrEmpty()
+    if (fileExtension.isEmpty()) {
+        return fileId.toString()
+    }
+    return "$fileId.$fileExtension"
+}
 
 internal val Context.fileProviderAuthority: String
     get() = "$packageName.com.glia.widgets.fileprovider"
@@ -88,6 +93,7 @@ internal fun getContentUriCompat(fileName: String, context: Context): Uri =
             selectionArgs,
             sortOrder
         )
+            ?.takeIf { it.count > 0 }
             ?.use {
                 val idColumn = it.getColumnIndexOrThrow(MediaStore.Downloads._ID)
                 it.moveToFirst()

@@ -302,6 +302,7 @@ public class CallController implements
 
             onEngagementUseCase.unregisterListener(this);
             onEngagementEndUseCase.unregisterListener(this);
+            shouldHandleEndedEngagement = false;
         }
     }
 

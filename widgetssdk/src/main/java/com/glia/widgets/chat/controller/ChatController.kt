@@ -346,6 +346,7 @@ internal class ChatController(
             onMessageUseCase.unregisterListener()
             onOperatorTypingUseCase.unregisterListener()
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
+            shouldHandleEndedEngagement = false
         }
     }
 

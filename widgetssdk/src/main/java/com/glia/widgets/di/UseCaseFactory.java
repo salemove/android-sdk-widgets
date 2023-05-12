@@ -55,6 +55,7 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
+import com.glia.widgets.core.engagement.domain.ResetSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
@@ -691,8 +692,7 @@ public class UseCaseFactory {
     public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
         return new SetEngagementConfigUseCase(
                 repositoryFactory.getEngagementConfigRepository(),
-                surveyStateManager,
-                repositoryFactory.getGliaSurveyRepository()
+                createResetSurveyUseCase()
         );
     }
 
@@ -766,5 +766,10 @@ public class UseCaseFactory {
     @NonNull
     DecodeSampledBitmapFromInputStreamUseCase createDecodeSampledBitmapFromInputStreamUseCase() {
         return new DecodeSampledBitmapFromInputStreamUseCase();
+    }
+
+    @NonNull
+    public ResetSurveyUseCase createResetSurveyUseCase() {
+        return new ResetSurveyUseCase(surveyStateManager, repositoryFactory.getGliaSurveyRepository());
     }
 }

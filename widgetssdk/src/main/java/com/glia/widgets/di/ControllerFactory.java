@@ -33,6 +33,9 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 
 public class ControllerFactory {
 
+    private static final String TAG = "ControllerFactory";
+    private static ServiceChatHeadController serviceChatHeadController;
+    private static ApplicationChatHeadLayoutController applicationChatHeadController;
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
@@ -40,20 +43,15 @@ public class ControllerFactory {
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
     private final GliaSdkConfigurationManager sdkConfigurationManager;
-
-    private static final String TAG = "ControllerFactory";
-
+    private final FilePreviewController filePreviewController;
+    private final ChatHeadPosition chatHeadPosition;
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
-    private final FilePreviewController filePreviewController;
-    private final ChatHeadPosition chatHeadPosition;
     private SurveyController surveyController;
     private CallVisualizerController callVisualizerController;
     private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
-    private static ServiceChatHeadController serviceChatHeadController;
-    private static ApplicationChatHeadLayoutController applicationChatHeadController;
 
     public ControllerFactory(
             RepositoryFactory repositoryFactory,

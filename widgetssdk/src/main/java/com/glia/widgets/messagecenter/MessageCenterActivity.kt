@@ -47,22 +47,25 @@ class MessageCenterActivity : AppCompatActivity(),
         }
     }
 
-    private val getImage = registerForActivityResult(TakePicture()) {
-        // Handle the returned Uri
-        controller.photoCaptureFileUri?.also {
-            fixCapturedPhotoRotation(it, this)
-            controller.onAttachmentReceived(
-                mapUriToFileAttachment(contentResolver, it) ?: return@also
-            )
+    private val getImage = registerForActivityResult(TakePicture()) { captured ->
+        if (captured) {
+            // Handle the returned Uri
+            controller.photoCaptureFileUri?.also {
+                fixCapturedPhotoRotation(it, this)
+                controller.onAttachmentReceived(
+                    mapUriToFileAttachment(contentResolver, it) ?: return@also
+                )
+            }
         }
     }
 
-    private val getPermission = registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
-        // Handle the returned Uri
-        if (isGranted) {
-            takePhoto()
+    private val getPermission =
+        registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
+            // Handle the returned Uri
+            if (isGranted) {
+                takePhoto()
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

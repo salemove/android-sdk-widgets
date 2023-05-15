@@ -64,11 +64,11 @@ class MessageCenterView(
 
     private var controller: MessageCenterContract.Controller? = null
 
-    private var binding: MessageCenterViewBinding by Delegates.notNull()
+    private var binding: MessageCenterViewBinding? = null
 
-    private val appBar: AppBarView get() = binding.appBarView
-    private val messageView: MessageView get() = binding.messageView
-    private val confirmationView: ConfirmationScreenView get() = binding.confirmationView
+    private val appBar: AppBarView? get() = binding?.appBarView
+    private val messageView: MessageView? get() = binding?.messageView
+    private val confirmationView: ConfirmationScreenView? get() = binding?.confirmationView
 
     private var alertDialog: AlertDialog? = null
 
@@ -101,7 +101,7 @@ class MessageCenterView(
     private fun onKeyboardAnimation(insets: Insets) {
         if (rootWindowInsetsCompat?.isKeyboardVisible == false) return
 
-        messageView.apply {
+        messageView?.apply {
             smoothScrollTo(0, insets.bottom.coerceAtMost(messageTitleTop))
         }
     }
@@ -117,12 +117,12 @@ class MessageCenterView(
 
         controller?.ensureMessageCenterAvailability()
         setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
-        appBar.hideBackButton()
+        appBar?.hideBackButton()
         initCallbacks()
     }
 
     private fun setupAppBarUnifiedTheme(headerTheme: HeaderTheme?) {
-        appBar.applyHeaderTheme(headerTheme)
+        appBar?.applyHeaderTheme(headerTheme)
 
         headerTheme?.background?.fill?.primaryColor?.also {
             statusBarColor = it
@@ -143,28 +143,30 @@ class MessageCenterView(
     }
 
     private fun initCallbacks() {
-        messageView.setOnCheckMessageButtonClickListener {
-            clearAndDismissDialogs()
-            controller?.onCheckMessagesClicked()
+        messageView?.apply {
+            setOnCheckMessageButtonClickListener {
+                clearAndDismissDialogs()
+                controller?.onCheckMessagesClicked()
+            }
+            setOnSendMessageButtonClickListener {
+                controller?.onSendMessageClicked()
+            }
+            setOnAttachmentButtonClickListener {
+                controller?.onAddAttachmentButtonClicked()
+            }
+            setOnMessageTextChangedListener {
+                controller?.onMessageChanged(it)
+            }
+            setOnRemoveAttachmentListener {
+                controller?.onRemoveAttachment(it)
+            }
         }
-        messageView.setOnSendMessageButtonClickListener {
-            controller?.onSendMessageClicked()
-        }
-        messageView.setOnAttachmentButtonClickListener {
-            controller?.onAddAttachmentButtonClicked()
-        }
-        messageView.setOnMessageTextChangedListener {
-            controller?.onMessageChanged(it)
-        }
-        messageView.setOnRemoveAttachmentListener {
-            controller?.onRemoveAttachment(it)
-        }
-        appBar.setOnXClickedListener {
+        appBar?.setOnXClickedListener {
             clearAndDismissDialogs()
             controller?.onCloseButtonClicked()
         }
 
-        confirmationView.setOnCheckMessagesButtonClickListener {
+        confirmationView?.setOnCheckMessagesButtonClickListener {
             controller?.onCheckMessagesClicked()
         }
     }
@@ -187,7 +189,7 @@ class MessageCenterView(
     }
 
     override fun showAttachmentPopup() {
-        messageView.showAttachmentPopup(
+        messageView?.showAttachmentPopup(
             { controller?.onGalleryClicked() },
             { controller?.onTakePhotoClicked() },
             { controller?.onBrowseClicked() }
@@ -222,7 +224,7 @@ class MessageCenterView(
     }
 
     override fun showConfirmationScreen() {
-        confirmationView.fadeThrough(messageView)
+        confirmationView?.fadeThrough(messageView!!)
 
         showConfirmationAppBar()
     }
@@ -258,11 +260,11 @@ class MessageCenterView(
     }
 
     override fun onStateUpdated(state: State) {
-        post { messageView.onStateUpdated(state) }
+        post { messageView?.onStateUpdated(state) }
     }
 
     override fun emitUploadAttachments(attachments: List<FileAttachment>) {
-        messageView.emitUploadAttachments(attachments)
+        messageView?.emitUploadAttachments(attachments)
     }
 
     override fun selectAttachmentFile(type: String) {
@@ -328,8 +330,13 @@ class MessageCenterView(
     internal class SavedState(val state: Parcelable?, val isConfirmationScreen: Boolean) :
         BaseSavedState(state)
 
-    override fun onSaveInstanceState(): Parcelable {
-        return SavedState(super.onSaveInstanceState(), confirmationView.isVisible)
+    override fun onSaveInstanceState(): Parcelable? {
+        val superState = super.onSaveInstanceState()
+        return if (binding == null) {
+            superState
+        } else {
+            SavedState(superState, confirmationView!!.isVisible)
+        }
     }
 
     override fun onRestoreInstanceState(state: Parcelable) {

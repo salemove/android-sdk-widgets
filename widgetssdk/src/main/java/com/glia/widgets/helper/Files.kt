@@ -45,40 +45,40 @@ internal val Context.fileProviderAuthority: String
     get() = "$packageName.com.glia.widgets.fileprovider"
 
 internal fun fixCapturedPhotoRotation(uri: Uri, context: Context) {
-        with(context.contentResolver) {
-            val matrix: Matrix = openInputStream(uri)?.use {
-                val orientation = ExifInterface(it).getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL
-                )
-                val rotation = when (orientation) {
-                    ExifInterface.ORIENTATION_ROTATE_90 -> 90f
-                    ExifInterface.ORIENTATION_ROTATE_180 -> 180f
-                    ExifInterface.ORIENTATION_ROTATE_270 -> 270f
-                    else -> 0f
-                }
-
-                Matrix().apply { postRotate(rotation) }
-            } ?: Matrix()
-
-            val bitmap: Bitmap = openInputStream(uri)?.use {
-                val rawBitmap = BitmapFactory.decodeStream(it)
-
-                Bitmap.createBitmap(
-                    rawBitmap,
-                    0,
-                    0,
-                    rawBitmap.width,
-                    rawBitmap.height,
-                    matrix,
-                    true
-                )
-            } ?: return@with
-
-            openOutputStream(uri)?.use {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+    with(context.contentResolver) {
+        val matrix: Matrix = openInputStream(uri)?.use {
+            val orientation = ExifInterface(it).getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )
+            val rotation = when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+                else -> 0f
             }
+
+            Matrix().apply { postRotate(rotation) }
+        } ?: Matrix()
+
+        val bitmap: Bitmap = openInputStream(uri)?.use {
+            val rawBitmap: Bitmap = BitmapFactory.decodeStream(it) ?: return@with
+
+            Bitmap.createBitmap(
+                rawBitmap,
+                0,
+                0,
+                rawBitmap.width,
+                rawBitmap.height,
+                matrix,
+                true
+            )
+        } ?: return@with
+
+        openOutputStream(uri)?.use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
         }
+    }
 }
 
 internal fun getContentUriCompat(fileName: String, context: Context): Uri =
@@ -99,14 +99,14 @@ internal fun getContentUriCompat(fileName: String, context: Context): Uri =
             selection,
             selectionArgs,
             sortOrder
-        )
-            ?.takeIf { it.count > 0 }
-            ?.use {
-                val idColumn = it.getColumnIndexOrThrow(MediaStore.Downloads._ID)
-                it.moveToFirst()
-                val id = it.getLong(idColumn)
-                ContentUris.withAppendedId(downloadsContentUri, id)
-            } ?: Uri.EMPTY
+        )?.use {
+            if (it.count == 0) return@use Uri.EMPTY
+
+            val idColumn = it.getColumnIndexOrThrow(MediaStore.Downloads._ID)
+            it.moveToFirst()
+            val id = it.getLong(idColumn)
+            ContentUris.withAppendedId(downloadsContentUri, id)
+        } ?: Uri.EMPTY
 
     } else {
         File(
@@ -131,6 +131,8 @@ private fun generatePhotoFileName(): String =
 
 fun mapUriToFileAttachment(contentResolver: ContentResolver, uri: Uri): FileAttachment? =
     contentResolver.query(uri, null, null, null, null)?.use {
+        if (it.count == 0) return@use null
+
         val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
         it.moveToFirst()

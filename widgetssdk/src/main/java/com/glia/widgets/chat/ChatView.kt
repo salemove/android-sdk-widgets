@@ -120,7 +120,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var controller: ChatController? = null
     private var dialogCallback: DialogController.Callback? = null
     private var dialogController: DialogController? = null
-    private val screenSharingViewCallback = object: ScreenSharingController.ViewCallback {
+    private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
         override fun onScreenSharingRequestError(ex: GliaException?) {
             ex?.run { showToast(this.debugMessage) }
         }
@@ -172,7 +172,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 val holder = binding.chatRecyclerView.findViewHolderForAdapterPosition(lastIndex)
                 if (holder is WebViewViewHolder) {
                     // WebView needs time for calculating the height.
-                    // So to scroll to the bottom we need to do it with delay.
+                    // So to scroll to the bottom, we need to do it with delay.
                     postDelayed(
                         { binding.chatRecyclerView.scrollToPosition(lastIndex) },
                         WEB_VIEW_INITIALIZATION_DELAY.toLong()
@@ -473,7 +473,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                 Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post { showAllowScreenSharingNotificationsAndStartSharingDialog() }
-                Dialog.MODE_VISITOR_CODE -> { Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")} // Should never happen inside ChatView
+                Dialog.MODE_VISITOR_CODE -> {
+                    Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
+                } // Should never happen inside ChatView
                 else -> Logger.d(TAG, "Dialog mode ${it.mode} not handled.")
             }
         }
@@ -987,6 +989,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             OPEN_DOCUMENT_ACTION_REQUEST, CAPTURE_VIDEO_ACTION_REQUEST -> handleDocumentOrVideoActionResult(
                 intent
             )
+
             CAPTURE_IMAGE_ACTION_REQUEST -> handleCaptureImageActionResult()
         }
     }
@@ -1089,11 +1092,14 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     override fun onFileOpenClick(file: AttachmentFile) {
         val contentUri = getContentUriCompat(file.fileName, context)
-        val openIntent = Intent(Intent.ACTION_VIEW)
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            .setDataAndType(contentUri, file.contentType)
-        openIntent.clipData = ClipData.newRawUri("", contentUri)
-        context.startActivity(openIntent)
+
+        with(Intent(Intent.ACTION_VIEW)) {
+            clipData = ClipData.newRawUri("", contentUri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            setDataAndType(contentUri, file.contentType)
+            resolveActivity(context.packageManager)?.also { context.startActivity(this) }
+        } ?: showToast(message = context.getString(R.string.glia_view_file_error_message))
+
     }
 
     override fun onImageItemClick(item: AttachmentFile) {

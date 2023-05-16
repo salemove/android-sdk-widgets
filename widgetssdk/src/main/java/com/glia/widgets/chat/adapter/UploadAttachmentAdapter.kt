@@ -246,16 +246,19 @@ class ViewHolder(
                 progressValue = 0,
                 inDeterminate = true
             )
+
             status == Status.SECURITY_SCAN -> updateProgress(
                 indicatorColor = normalColor,
                 progressValue = 50,
                 inDeterminate = true
             )
+
             status == Status.READY_TO_SEND -> updateProgress(
                 indicatorColor = normalColor,
                 progressValue = 100,
                 inDeterminate = false
             )
+
             status.isError ->
                 updateProgress(
                     indicatorColor = errorColor,
@@ -271,9 +274,9 @@ class ViewHolder(
         inDeterminate: Boolean = true
     ) {
         progressIndicator.apply {
+            isIndeterminate = inDeterminate
             setIndicatorColor(indicatorColor)
             progress = progressValue
-            isIndeterminate = inDeterminate
         }
     }
 
@@ -284,6 +287,7 @@ class ViewHolder(
             status.isError -> context.getString(
                 R.string.glia_chat_attachment_upload_failed_upload
             )
+
             status == Status.UPLOADING -> context.getString(R.string.glia_chat_attachment_upload_uploading)
             else -> context.getString(R.string.glia_chat_attachment_upload_uploading)
         }

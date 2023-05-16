@@ -35,6 +35,7 @@
     <string name="glia_chat_new_messages">New Messages</string>
 
     <string name="glia_messaging_title">Messaging</string>
+    <string name="glia_view_file_error_message">Can\'t open file</string>
 
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>

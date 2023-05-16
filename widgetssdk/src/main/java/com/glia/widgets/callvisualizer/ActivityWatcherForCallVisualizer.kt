@@ -43,6 +43,10 @@ internal class ActivityWatcherForCallVisualizer(
 ) : BaseActivityWatcher(), ActivityWatcherForCallVisualizerContract.Watcher {
 
     init {
+        topActivityObserver.subscribe(
+            {activity -> resumedActivity = WeakReference(activity)},
+            {error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error)}
+        )
         controller.setWatcher(this)
     }
 
@@ -58,6 +62,7 @@ internal class ActivityWatcherForCallVisualizer(
     var resumedActivity: WeakReference<Activity?> = WeakReference(null)
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        super.onActivityCreated(activity, savedInstanceState)
         if (controller.isCallOrChatActive(activity)) {
             // Call and Chat screens process screen sharing requests on their own
             controller.removeMediaProjectionLaunchers(activity::class.simpleName)
@@ -70,18 +75,14 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun onActivityResumed(activity: Activity) {
-        resumedActivity = WeakReference(activity)
+        super.onActivityResumed(activity)
         controller.onActivityResumed(activity)
     }
 
     override fun onActivityPaused(activity: Activity) {
+        super.onActivityPaused(activity)
         controller.onActivityPaused()
-        resumedActivity.clear()
     }
-
-    override fun onActivityStarted(activity: Activity) {}
-    override fun onActivityStopped(activity: Activity) {}
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
     override fun checkInitialCameraPermission() {
         resumedActivity.get()?.run {

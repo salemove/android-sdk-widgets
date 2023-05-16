@@ -31,6 +31,10 @@ internal class ActivityWatcherForChatHead(
 ) : BaseActivityWatcher(), ActivityWatcherForChatHeadContract.Watcher {
 
     init {
+        topActivityObserver.subscribe(
+            {activity -> resumedActivity = WeakReference(activity)},
+            {error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error)}
+        )
         controller.setWatcher(this)
     }
 
@@ -45,17 +49,17 @@ internal class ActivityWatcherForChatHead(
     private var chatHeadViewPosition: Pair<Int, Int>? = null
 
     override fun onActivityResumed(activity: Activity) {
-        resumedActivity = WeakReference(activity)
+        super.onActivityResumed(activity)
         controller.onActivityResumed()
         if (isSameOrientation(activity)) restoreBubblePosition()
 
     }
 
     override fun onActivityPaused(activity: Activity) {
+        super.onActivityPaused(activity)
         screenOrientation = activity.resources.configuration.orientation
         controller.onActivityPaused()
         removeChatHeadLayoutIfPresent()
-        resumedActivity.clear()
     }
 
     private fun createChatHeadLayout(activity: Activity) {

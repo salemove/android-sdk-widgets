@@ -100,6 +100,7 @@ import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
+import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase;
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase;
@@ -761,6 +762,11 @@ public class UseCaseFactory {
     @NonNull
     public AddNewMessagesDividerUseCase createAddNewMessagesDividerUseCase() {
         return new AddNewMessagesDividerUseCase(createFindNewMessagesDividerIndexUseCase());
+    }
+
+    @NonNull
+    public IsFileReadyForPreviewUseCase createIsFileReadyForPreviewUseCase() {
+        return new IsFileReadyForPreviewUseCase(repositoryFactory.getGliaFileRepository());
     }
 
     @NonNull

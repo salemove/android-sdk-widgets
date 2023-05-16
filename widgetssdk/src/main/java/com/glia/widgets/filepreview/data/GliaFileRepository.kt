@@ -7,6 +7,7 @@ import io.reactivex.Maybe
 import java.io.InputStream
 
 interface GliaFileRepository {
+    fun isReadyForPreview(attachmentFile: AttachmentFile): Boolean
     fun loadImageFromCache(fileName: String): Maybe<Bitmap>
     fun putImageToCache(fileName: String, bitmap: Bitmap)
     fun loadImageFromDownloads(fileName: String): Maybe<Bitmap>

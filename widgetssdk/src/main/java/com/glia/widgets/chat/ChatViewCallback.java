@@ -37,4 +37,8 @@ public interface ChatViewCallback {
     void fileDownloadSuccess(AttachmentFile attachmentFile);
 
     void clearMessageInput();
+
+    void navigateToPreview(AttachmentFile attachmentFile);
+
+    void fileIsNotReadyForPreview();
 }

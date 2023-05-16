@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 
+import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.Logger;
 
@@ -38,56 +39,17 @@ public class DownloadsFolderDataSource {
         this.context = appContext;
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private Maybe<Bitmap> getImageFromDownloadsFolderAPI29(String imageName) {
-        return Maybe.create(emitter -> {
-            Uri downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL);
-            String[] projection = new String[]{
-                    MediaStore.Downloads._ID,
-                    MediaStore.Downloads.DISPLAY_NAME,
-                    MediaStore.Downloads.SIZE
-            };
-            String selection = MediaStore.Downloads.DISPLAY_NAME +
-                    " == ?";
-            String[] selectionArgs = new String[]{imageName};
-            String sortOrder = MediaStore.Downloads.DISPLAY_NAME + " ASC";
-            try (Cursor cursor = context.getContentResolver().query(
-                    downloadsContentUri,
-                    projection,
-                    selection,
-                    selectionArgs,
-                    sortOrder
-            )) {
-                int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID);
-                cursor.moveToFirst();
-                long id = cursor.getLong(idColumn);
-                cursor.close();
-
-                Uri contentUri = ContentUris.withAppendedId(downloadsContentUri, id);
-                Bitmap bitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(contentUri));
-                if (bitmap != null) {
-                    emitter.onSuccess(bitmap);
-                } else {
-                    emitter.onError(new FileNotFoundException());
-                }
-            } catch (FileNotFoundException e) {
-                emitter.onError(e);
-            }
-        });
+    public boolean isDownloaded(AttachmentFile attachmentFile) {
+        return FileHelper.isDownloaded(attachmentFile, context);
     }
 
-    private Maybe<Bitmap> getImageFromDownloadsFolderOld(String imageName) {
+    public Maybe<Bitmap> getImageFromDownloadsFolder(@Nullable String imageName) {
+        if (imageName == null) return Maybe.error(new NullPointerException("Image name cannot be null"));
+
         return Maybe.create(emitter -> {
-            File imageFile = new File(
-                    Environment
-                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                            .toString(),
-                    imageName
-            );
-            Uri uri = FileProvider.getUriForFile(
-                    context,
-                    FileHelper.getFileProviderAuthority(context),
-                    imageFile
+            Uri uri = FileHelper.getContentUriCompat(
+                    imageName,
+                    context
             );
             Bitmap bitmap = BitmapFactory.decodeStream(
                     context.getContentResolver().openInputStream(uri)
@@ -98,16 +60,6 @@ public class DownloadsFolderDataSource {
                 emitter.onSuccess(bitmap);
             }
         });
-    }
-
-    public Maybe<Bitmap> getImageFromDownloadsFolder(@Nullable String imageName) {
-        if (imageName == null) return Maybe.error(new NullPointerException("Image name cannot be null"));
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return getImageFromDownloadsFolderAPI29(imageName);
-        } else {
-            return getImageFromDownloadsFolderOld(imageName);
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

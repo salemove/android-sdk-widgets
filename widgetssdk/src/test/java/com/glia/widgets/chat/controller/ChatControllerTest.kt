@@ -52,6 +52,7 @@ import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCas
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
+import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
@@ -121,6 +122,7 @@ class ChatControllerTest {
     private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
     private lateinit var preEngagementMessageUseCase: PreEngagementMessageUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
+    private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
 
     private lateinit var chatController: ChatController
 
@@ -177,6 +179,7 @@ class ChatControllerTest {
         isCallVisualizerUseCase = mock()
         preEngagementMessageUseCase = mock()
         addNewMessagesDividerUseCase = mock()
+        isFileReadyForPreviewUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -229,7 +232,8 @@ class ChatControllerTest {
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
             isCallVisualizerUseCase = isCallVisualizerUseCase,
             preEngagementMessageUseCase = preEngagementMessageUseCase,
-            addNewMessagesDividerUseCase = addNewMessagesDividerUseCase
+            addNewMessagesDividerUseCase = addNewMessagesDividerUseCase,
+            isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase
         )
     }
 

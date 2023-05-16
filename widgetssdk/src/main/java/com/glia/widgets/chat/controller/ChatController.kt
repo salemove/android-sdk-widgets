@@ -101,6 +101,7 @@ import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
+import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.TimeCounter
@@ -167,7 +168,8 @@ internal class ChatController(
     private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
     private val preEngagementMessageUseCase: PreEngagementMessageUseCase,
-    private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
+    private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
+    private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
@@ -357,6 +359,14 @@ internal class ChatController(
         messagesNotSeenHandler.onChatWentBackground()
         surveyUseCase.unregisterListener(this)
         mediaUpgradeOfferRepositoryCallback?.let { removeMediaUpgradeCallbackUseCase(it) }
+    }
+
+    fun onImageItemClick(item: AttachmentFile) {
+        if (isFileReadyForPreviewUseCase(item)) {
+            viewCallback?.navigateToPreview(item)
+        } else {
+            viewCallback?.fileIsNotReadyForPreview()
+        }
     }
 
     fun onMessageTextChanged(message: String) {

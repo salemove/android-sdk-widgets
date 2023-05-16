@@ -25,6 +25,10 @@ internal class GliaFileRepositoryImpl(
         gliaCore.secureConversations
     }
 
+    override fun isReadyForPreview(attachmentFile: AttachmentFile): Boolean =
+        downloadsFolderDataSource.isDownloaded(attachmentFile) ||
+        bitmapCache.getBitmapById(attachmentFile.fileName) != null
+
     override fun loadImageFromCache(fileName: String): Maybe<Bitmap> = Maybe.create { emitter ->
         bitmapCache.getBitmapById(fileName)?.let {
             emitter.onSuccess(it)

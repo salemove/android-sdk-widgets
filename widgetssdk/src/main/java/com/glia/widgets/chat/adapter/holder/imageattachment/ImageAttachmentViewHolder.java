@@ -48,6 +48,8 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(AttachmentFile attachmentFile) {
+        imageView.setImageResource(android.R.color.transparent); // clear the previous view state
+
         String imageName = FileHelper.getFileName(attachmentFile);
         disposable = getImageFileFromCacheUseCase.execute(imageName)
                 .doOnError(error -> Logger.e(TAG, "failed loading from cache: " + imageName + " reason: " + error.getMessage()))

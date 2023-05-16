@@ -133,7 +133,8 @@ public class ControllerFactory {
                     useCaseFactory.createSetPendingSurveyUsed(),
                     useCaseFactory.createIsCallVisualizerUseCase(),
                     useCaseFactory.createPreEngagementMessageUseCase(),
-                    useCaseFactory.createAddNewMessagesDividerUseCase()
+                    useCaseFactory.createAddNewMessagesDividerUseCase(),
+                    useCaseFactory.createIsFileReadyForPreviewUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

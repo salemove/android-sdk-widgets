@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import com.glia.androidsdk.chat.AttachmentFile
@@ -27,11 +28,16 @@ internal fun String?.toFileExtensionOrEmpty() = this?.let { File(it) }?.extensio
 
 internal val AttachmentFile.fileName: String
     get() = toFileName(id, name)
-
-internal val AttachmentFile.isDownloaded: Boolean
-    get() = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).run {
-        File(path, fileName)
-    }.exists()
+internal fun AttachmentFile.isDownloaded(context: Context): Boolean =
+    isDownloaded(context, this)
+internal fun isDownloaded(context: Context, attachmentFile: AttachmentFile): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        getContentUriApi29(attachmentFile.fileName, context) != null
+    } else {
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).run {
+            File(toString(), attachmentFile.fileName)
+        }.exists()
+    }
 
 internal fun toFileName(fileId: String?, name: String?): String {
     val fileExtension = name.toFileExtensionOrEmpty()
@@ -81,40 +87,49 @@ internal fun fixCapturedPhotoRotation(uri: Uri, context: Context) {
     }
 }
 
-internal fun getContentUriCompat(fileName: String, context: Context): Uri =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL)
-        val projection = arrayOf(
-            MediaStore.Downloads._ID,
-            MediaStore.Downloads.DISPLAY_NAME,
-            MediaStore.Downloads.SIZE
-        )
-        val selection = MediaStore.Downloads.DISPLAY_NAME + " == ?"
-        val selectionArgs = arrayOf(fileName)
-        val sortOrder = MediaStore.Downloads.DISPLAY_NAME + " ASC"
+@RequiresApi(Build.VERSION_CODES.Q)
+private fun getContentUriApi29(fileName: String, context: Context): Uri? {
+    val downloadsContentUri = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL)
+    val projection = arrayOf(
+        MediaStore.Downloads._ID,
+        MediaStore.Downloads.DISPLAY_NAME,
+        MediaStore.Downloads.SIZE
+    )
+    val selection = MediaStore.Downloads.DISPLAY_NAME + " == ?"
+    val selectionArgs = arrayOf(fileName)
+    val sortOrder = MediaStore.Downloads.DISPLAY_NAME + " ASC"
 
-        context.contentResolver.query(
-            downloadsContentUri,
-            projection,
-            selection,
-            selectionArgs,
-            sortOrder
-        )?.use {
-            if (it.count == 0) return@use Uri.EMPTY
-
+    return context.contentResolver.query(
+        downloadsContentUri,
+        projection,
+        selection,
+        selectionArgs,
+        sortOrder
+    )
+        ?.use {
+            if (it.count == 0) {
+                return@use null
+            }
             val idColumn = it.getColumnIndexOrThrow(MediaStore.Downloads._ID)
             it.moveToFirst()
             val id = it.getLong(idColumn)
             ContentUris.withAppendedId(downloadsContentUri, id)
-        } ?: Uri.EMPTY
-
-    } else {
-        File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-            fileName
-        ).let {
-            FileProvider.getUriForFile(context, context.fileProviderAuthority, it)
         }
+}
+
+private fun getContentUri(fileName: String, context: Context): Uri =
+    File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+        fileName
+    ).let {
+        FileProvider.getUriForFile(context, context.fileProviderAuthority, it)
+    }
+
+internal fun getContentUriCompat(fileName: String, context: Context): Uri =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        getContentUriApi29(fileName, context) ?: Uri.EMPTY
+    } else {
+        getContentUri(fileName, context)
     }
 
 @Throws(IOException::class)

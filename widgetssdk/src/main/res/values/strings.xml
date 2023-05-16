@@ -36,6 +36,7 @@
 
     <string name="glia_messaging_title">Messaging</string>
     <string name="glia_view_file_error_message">Can\'t open file</string>
+    <string name="glia_view_file_not_ready_for_preview">The image is not ready for preview. Please try again later.</string>
 
     <!--    top app bar-->
     <string name="glia_top_app_bar_close">Close</string>

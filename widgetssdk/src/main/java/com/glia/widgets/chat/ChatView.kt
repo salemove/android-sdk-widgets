@@ -445,6 +445,21 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     }
                 }
             }
+
+            override fun navigateToPreview(attachmentFile: AttachmentFile) {
+                context.startActivity(
+                    FilePreviewActivity.intent(
+                        context,
+                        attachmentFile.id,
+                        attachmentFile.name,
+                        theme
+                    )
+                )
+            }
+
+            override fun fileIsNotReadyForPreview() {
+                showToast(context.getString(R.string.glia_view_file_not_ready_for_preview))
+            }
         }
     }
 
@@ -493,7 +508,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             item.showChatHead,
             item.attachmentFile,
             item.operatorProfileImgUrl,
-            item.attachmentFile.isDownloaded,
+            item.attachmentFile.isDownloaded(context),
             item.isDownloading,
             item.operatorId,
             item.messageId,
@@ -502,7 +517,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
         is VisitorAttachmentItem -> VisitorAttachmentItem.editDownloadedStatus(
             item,
-            item.attachmentFile.isDownloaded
+            item.attachmentFile.isDownloaded(context)
         )
 
         else -> item
@@ -1103,7 +1118,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     override fun onImageItemClick(item: AttachmentFile) {
-        context.startActivity(FilePreviewActivity.intent(this.context, item.id, item.name, theme))
+        controller?.onImageItemClick(item)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {

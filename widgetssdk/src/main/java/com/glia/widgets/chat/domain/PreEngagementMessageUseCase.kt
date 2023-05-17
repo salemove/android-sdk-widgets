@@ -9,7 +9,7 @@ import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import io.reactivex.Observable
 import java.util.function.Consumer
 
-internal class UnengagementMessageUseCase(
+internal class PreEngagementMessageUseCase(
     private val messageRepository: GliaChatRepository,
     private val engagementRepository: GliaEngagementRepository,
     private val onEngagementUseCase: GliaOnEngagementUseCase,

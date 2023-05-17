@@ -132,7 +132,7 @@ public class ControllerFactory {
                     useCaseFactory.createHasPendingSurveyUseCase(),
                     useCaseFactory.createSetPendingSurveyUsed(),
                     useCaseFactory.createIsCallVisualizerUseCase(),
-                    useCaseFactory.createUnengagementMessageUseCase(),
+                    useCaseFactory.createPreEngagementMessageUseCase(),
                     useCaseFactory.createAddNewMessagesDividerUseCase()
             );
         } else {

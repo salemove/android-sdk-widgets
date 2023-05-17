@@ -208,6 +208,7 @@ public class GliaWidgets {
     public static void clearVisitorSession() {
         Logger.d(TAG, "clearVisitorSession");
         Dependencies.getControllerFactory().destroyControllers();
+        Dependencies.getUseCaseFactory().resetState();
         Dependencies.glia().clearVisitorSession();
     }
 

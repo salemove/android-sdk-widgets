@@ -216,7 +216,7 @@ public class ControllerFactory {
         }
     }
 
-    private void destroyChatController() {
+    public void destroyChatController() {
         Logger.d(TAG, "destroyChatController");
         if (retainedChatController != null) {
             retainedChatController.onDestroy(false);

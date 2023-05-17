@@ -63,7 +63,7 @@ internal class CallVisualizerController(
         surveyUseCase.registerListener(this)
     }
 
-    override fun engagementEnded() {
+    override fun callVisualizerEngagementEnded() {
         // Beware, this function is called before onSurveyLoaded()
         // No need to do anything currently
     }

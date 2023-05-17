@@ -17,7 +17,7 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
-import com.glia.widgets.chat.domain.UnengagementMessageUseCase
+import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
@@ -119,7 +119,7 @@ class ChatControllerTest {
     private lateinit var hasPendingSurveyUseCase: HasPendingSurveyUseCase
     private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
     private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
-    private lateinit var unengagementMessageUseCase: UnengagementMessageUseCase
+    private lateinit var preEngagementMessageUseCase: PreEngagementMessageUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
 
     private lateinit var chatController: ChatController
@@ -175,7 +175,7 @@ class ChatControllerTest {
         hasPendingSurveyUseCase = mock()
         setPendingSurveyUsedUseCase = mock()
         isCallVisualizerUseCase = mock()
-        unengagementMessageUseCase = mock()
+        preEngagementMessageUseCase = mock()
         addNewMessagesDividerUseCase = mock()
 
         chatController = ChatController(
@@ -228,7 +228,7 @@ class ChatControllerTest {
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
             isCallVisualizerUseCase = isCallVisualizerUseCase,
-            unengagementMessageUseCase = unengagementMessageUseCase,
+            preEngagementMessageUseCase = preEngagementMessageUseCase,
             addNewMessagesDividerUseCase = addNewMessagesDividerUseCase
         )
     }

@@ -42,7 +42,7 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
-import com.glia.widgets.chat.domain.UnengagementMessageUseCase
+import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
@@ -166,7 +166,7 @@ internal class ChatController(
     private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
     private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
-    private val unengagementMessageUseCase: UnengagementMessageUseCase,
+    private val preEngagementMessageUseCase: PreEngagementMessageUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
@@ -392,15 +392,15 @@ internal class ChatController(
                 .subscribe())
     }
 
-    private fun subscribeToUnengagementMessages() {
-        val subscribe = unengagementMessageUseCase.execute()
-            .doOnNext { onUnengagementMessage(it) }
+    private fun subscribeToPreEngagementMessage() {
+        val subscribe = preEngagementMessageUseCase.execute()
+            .doOnNext { onPreEngagementMessage(it) }
             .subscribe()
         disposable.add(subscribe)
         unengagementMessagesDisposable = subscribe
     }
 
-    private fun onUnengagementMessage(messageInternal: ChatMessageInternal) {
+    private fun onPreEngagementMessage(messageInternal: ChatMessageInternal) {
         emitChatItems {
             val message = messageInternal.chatMessage
             if (message.senderType == Chat.Participant.VISITOR && message.attachment != null
@@ -1487,7 +1487,7 @@ internal class ChatController(
         }
 
         initGliaEngagementObserving()
-        subscribeToUnengagementMessages()
+        subscribeToPreEngagementMessage()
     }
 
     private fun submitHistoryItems(

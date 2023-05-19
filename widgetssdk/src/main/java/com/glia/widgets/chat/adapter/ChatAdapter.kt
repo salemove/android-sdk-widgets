@@ -1,5 +1,6 @@
 package com.glia.widgets.chat.adapter
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -175,7 +176,7 @@ internal class ChatAdapter(
                     val viewHolder = holder as VisitorImageAttachmentViewHolder
                     viewHolder.bind(chatItem.attachmentFile, chatItem.showDelivered)
                     viewHolder.itemView.setOnClickListener {
-                        onImageItemClickListener.onImageItemClick(chatItem.attachmentFile)
+                        onImageItemClickListener.onImageItemClick(chatItem.attachmentFile, it)
                     }
                 }
             }
@@ -214,7 +215,7 @@ internal class ChatAdapter(
     }
 
     interface OnImageItemClickListener {
-        fun onImageItemClick(item: AttachmentFile)
+        fun onImageItemClick(item: AttachmentFile, view: View)
     }
 
     fun interface OnCustomCardResponse {

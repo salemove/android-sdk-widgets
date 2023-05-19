@@ -56,6 +56,7 @@ import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.requireActivity
+import com.glia.widgets.helper.showToast
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.OperatorStatusView
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
@@ -826,7 +827,7 @@ internal class CallView(
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        context.showToast(message, Toast.LENGTH_SHORT)
     }
 
     fun interface OnBackClickedListener {

@@ -1,5 +1,6 @@
 package com.glia.widgets.view.head
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
@@ -26,14 +27,15 @@ import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import java.lang.ref.WeakReference
 
+@SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
     val controller: ActivityWatcherForChatHeadContract.Controller
 ) : BaseActivityWatcher(), ActivityWatcherForChatHeadContract.Watcher {
 
     init {
         topActivityObserver.subscribe(
-            {activity -> resumedActivity = WeakReference(activity)},
-            {error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error)}
+            { activity -> resumedActivity = WeakReference(activity) },
+            { error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error) }
         )
         controller.setWatcher(this)
     }

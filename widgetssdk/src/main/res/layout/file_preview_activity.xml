@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".filepreview.ui.FilePreviewActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/glia_black_color"
+        app:navigationContentDescription="@string/glia_top_app_bar_navigate_up_content_description"
+        app:navigationIcon="?attr/gliaIconAppBarBack"
+        app:titleCentered="true"
+        app:titleTextColor="@color/glia_white_color" />
 
     <com.glia.widgets.filepreview.ui.FilePreviewView
         android:id="@+id/file_preview_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent"
+        tools:srcCompat="@android:drawable/ic_btn_speak_now" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

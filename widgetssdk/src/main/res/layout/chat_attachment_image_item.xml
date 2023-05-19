@@ -8,6 +8,7 @@
     android:adjustViewBounds="true"
     android:cropToPadding="true"
     android:scaleType="centerCrop"
+    android:transitionName="@string/glia_file_preview_transition_name"
     app:shapeAppearanceOverlay="@style/ShapeAppearance.CircularBorder"
     tools:background="@color/design_default_color_error"
     tools:ignore="ContentDescription"

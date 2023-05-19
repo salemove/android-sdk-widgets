@@ -1,0 +1,15 @@
+package com.glia.widgets.filepreview.domain.usecase
+
+import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.widgets.filepreview.data.GliaFileRepository
+import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
+import com.glia.widgets.filepreview.domain.exception.RemoteFileIsDeletedException
+import io.reactivex.Completable
+
+class DownloadFileUseCase(private val fileRepository: GliaFileRepository) {
+    operator fun invoke(file: AttachmentFile): Completable = when {
+        file.name.isEmpty() -> Completable.error(FileNameMissingException())
+        file.isDeleted -> Completable.error(RemoteFileIsDeletedException())
+        else -> fileRepository.downloadFileFromNetwork(file)
+    }
+}

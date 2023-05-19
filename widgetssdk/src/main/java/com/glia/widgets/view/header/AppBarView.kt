@@ -187,33 +187,6 @@ class AppBarView @JvmOverloads constructor(
         leaveQueueIcon.isVisible = false
     }
 
-    private var saveItem: MenuItem? = null
-    private var shareItem: MenuItem? = null
-
-    fun setMenuImagePreview() {
-        binding.toolbar.inflateMenu(R.menu.menu_file_preview)
-        val menu = binding.toolbar.menu
-        saveItem = menu.findItem(R.id.save_item)
-        shareItem = menu.findItem(R.id.share_item)
-    }
-
-    fun setImagePreviewButtonListener(listener: OnImagePreviewMenuListener) {
-        binding.toolbar.setOnMenuItemClickListener { item: MenuItem ->
-            val itemId = item.itemId
-            if (itemId == R.id.share_item) {
-                listener.onShareClicked()
-            } else if (itemId == R.id.save_item) {
-                listener.onDownloadClicked()
-            }
-            true
-        }
-    }
-
-    fun setImagePreviewButtonsVisible(saveItem: Boolean, shareItem: Boolean) {
-        this.saveItem!!.isVisible = saveItem
-        this.shareItem!!.isVisible = shareItem
-    }
-
     internal fun applyHeaderTheme(headerTheme: HeaderTheme?) {
         headerTheme?.apply {
             binding.toolbar.applyColorTheme(background?.fill)
@@ -231,11 +204,6 @@ class AppBarView @JvmOverloads constructor(
         }
 
         toolbarTitleText?.also { it.applyTextTheme(textTheme) }
-    }
-
-    interface OnImagePreviewMenuListener {
-        fun onShareClicked()
-        fun onDownloadClicked()
     }
 
     fun interface OnBackClicked {

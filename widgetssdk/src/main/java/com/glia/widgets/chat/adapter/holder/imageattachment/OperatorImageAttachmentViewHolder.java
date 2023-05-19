@@ -38,7 +38,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
 
     public void bind(OperatorAttachmentItem item, ChatAdapter.OnImageItemClickListener onImageItemClickListener) {
         super.bind(item.attachmentFile);
-        itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.attachmentFile));
+        itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.attachmentFile, v));
         updateOperatorStatus(item);
 
         setAccessibilityLabels();
@@ -49,7 +49,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
                 R.string.glia_chat_operator_image_content_description));
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
-            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+            public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
                 String actionLabel = host.getResources().getString(R.string.glia_chat_attachment_open_button_label);

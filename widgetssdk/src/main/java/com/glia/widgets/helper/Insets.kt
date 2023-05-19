@@ -2,6 +2,7 @@ package com.glia.widgets.helper
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
@@ -11,6 +12,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
+
+internal val Window.insetsControllerCompat: WindowInsetsControllerCompat
+    get() = WindowCompat.getInsetsController(this, decorView)
 
 internal val View.insetsController: WindowInsetsControllerCompat?
     get() = context.asActivity()?.let {
@@ -91,7 +95,7 @@ internal class SimpleWindowInsetsAndAnimationHandler(
         if (!keyboardAnimationInProgress) {
             insets.getInsets(WindowInsetsCompat.Type.systemBars()).apply {
                 v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    updateMargins(top = top, bottom = bottom)
+                    updateMargins(left, top, right, bottom)
                 }
             }
         }

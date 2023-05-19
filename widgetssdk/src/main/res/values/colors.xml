@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="glia_black_color">#000000</color>
+    <color name="glia_white_color">#FFFFFF</color>
 
     <color name="glia_brand_primary_color">#0F6BFF</color>
     <color name="glia_base_dark_color">#2C0735</color>

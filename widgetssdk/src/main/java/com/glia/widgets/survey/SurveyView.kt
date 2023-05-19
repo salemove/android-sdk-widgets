@@ -10,7 +10,6 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
@@ -23,6 +22,7 @@ import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.showToast
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.survey.SurveyAdapter.SurveyAdapterListener
 import com.glia.widgets.view.configuration.ButtonConfiguration
@@ -239,7 +239,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onNetworkTimeout() {
-        Toast.makeText(context, R.string.glia_survey_network_unavailable, Toast.LENGTH_LONG).show()
+        context.showToast(R.string.glia_survey_network_unavailable)
     }
 
     override fun finish() {

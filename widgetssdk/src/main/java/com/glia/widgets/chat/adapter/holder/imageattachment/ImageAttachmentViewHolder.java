@@ -51,10 +51,10 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
         imageView.setImageResource(android.R.color.transparent); // clear the previous view state
 
         String imageName = FileHelper.getFileName(attachmentFile);
-        disposable = getImageFileFromCacheUseCase.execute(imageName)
+        disposable = getImageFileFromCacheUseCase.invoke(imageName)
                 .doOnError(error -> Logger.e(TAG, "failed loading from cache: " + imageName + " reason: " + error.getMessage()))
                 .doOnSuccess(_b -> Logger.d(TAG, "loaded from cache: " + imageName))
-                .onErrorResumeNext(getImageFileFromDownloadsUseCase.execute(imageName))
+                .onErrorResumeNext(getImageFileFromDownloadsUseCase.invoke(imageName))
                 .doOnError(error -> Logger.e(TAG, imageName + " failed loading from downloads: " + error.getMessage()))
                 .doOnSuccess(_b -> Logger.d(TAG, "loaded from downloads: " + imageName))
                 .onErrorResumeNext(getImageFileFromNetworkUseCase.invoke(attachmentFile))

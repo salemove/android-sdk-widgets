@@ -27,7 +27,9 @@
         <activity
             android:name=".filepreview.ui.FilePreviewActivity"
             android:launchMode="singleTop"
-            android:theme="@style/Application.Glia.Chat.Activity" />
+            android:noHistory="true"
+            android:parentActivityName=".chat.ChatActivity"
+            android:theme="@style/Application.Glia.FilePreview.Activity" />
         <activity
             android:name=".call.CallActivity"
             android:launchMode="singleTask"

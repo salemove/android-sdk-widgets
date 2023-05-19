@@ -3,6 +3,7 @@ package com.glia.widgets.base
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.lang.ref.WeakReference
 
@@ -36,7 +37,7 @@ internal open class BaseActivityWatcher : Application.ActivityLifecycleCallbacks
         }
     }
     private val resumedActivitySubject: PublishSubject<List<Activity>> = PublishSubject.create()
-    val topActivityObserver = resumedActivitySubject
+    val topActivityObserver: Observable<Activity> = resumedActivitySubject
         .filter { list -> list.isNotEmpty() }
         .map { list -> list.last() }
 

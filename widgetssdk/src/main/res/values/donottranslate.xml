@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="glia_outlined_options_icon_content_description">Outlined options icon description</string>
+    <string name="glia_file_preview_transition_name">image_preview_transition</string>
 </resources>

@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import android.text.format.DateUtils
+import android.view.View
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
@@ -41,8 +42,8 @@ import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
-import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
+import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
@@ -361,9 +362,9 @@ internal class ChatController(
         mediaUpgradeOfferRepositoryCallback?.let { removeMediaUpgradeCallbackUseCase(it) }
     }
 
-    fun onImageItemClick(item: AttachmentFile) {
+    fun onImageItemClick(item: AttachmentFile, view: View) {
         if (isFileReadyForPreviewUseCase(item)) {
-            viewCallback?.navigateToPreview(item)
+            viewCallback?.navigateToPreview(item, view)
         } else {
             viewCallback?.fileIsNotReadyForPreview()
         }
@@ -750,26 +751,32 @@ internal class ChatController(
         mediaUpgradeOfferRepositoryCallback = object : MediaUpgradeOfferRepositoryCallback {
             override fun newOffer(offer: MediaUpgradeOffer) {
                 if (isChatViewPaused) return
-                if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
-                    // audio call
-                    Logger.d(TAG, "audioUpgradeRequested")
-                    if (chatState.isOperatorOnline) dialogController.showUpgradeAudioDialog(
-                        offer,
-                        chatState.formattedOperatorName
-                    )
-                } else if (offer.video == MediaDirection.TWO_WAY) {
-                    // video call
-                    Logger.d(TAG, "2 way videoUpgradeRequested")
-                    if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog2Way(
-                        offer,
-                        chatState.formattedOperatorName
-                    )
-                } else if (offer.video == MediaDirection.ONE_WAY) {
-                    Logger.d(TAG, "1 way videoUpgradeRequested")
-                    if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog1Way(
-                        offer,
-                        chatState.formattedOperatorName
-                    )
+                when {
+                    offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY -> {
+                        // audio call
+                        Logger.d(TAG, "audioUpgradeRequested")
+                        if (chatState.isOperatorOnline) dialogController.showUpgradeAudioDialog(
+                            offer,
+                            chatState.formattedOperatorName
+                        )
+                    }
+
+                    offer.video == MediaDirection.TWO_WAY -> {
+                        // video call
+                        Logger.d(TAG, "2 way videoUpgradeRequested")
+                        if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog2Way(
+                            offer,
+                            chatState.formattedOperatorName
+                        )
+                    }
+
+                    offer.video == MediaDirection.ONE_WAY -> {
+                        Logger.d(TAG, "1 way videoUpgradeRequested")
+                        if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog1Way(
+                            offer,
+                            chatState.formattedOperatorName
+                        )
+                    }
                 }
             }
 
@@ -1050,20 +1057,26 @@ internal class ChatController(
             val currentChatItem = currentChatItems[i]
             if (currentChatItem is VisitorMessageItem) {
                 val itemId = currentChatItem.id
-                if (itemId == VisitorMessageItem.HISTORY_ID) {
-                    // we reached the history items no point in going searching further
-                    break
-                } else if (!foundDelivered && itemId == messageId) {
-                    foundDelivered = true
-                    currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
-                        currentChatItem,
-                        true
-                    )
-                } else if (currentChatItem.isShowDelivered) {
-                    currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
-                        currentChatItem,
-                        false
-                    )
+                when {
+                    itemId == VisitorMessageItem.HISTORY_ID -> {
+                        // we reached the history items no point in going searching further
+                        break
+                    }
+
+                    !foundDelivered && itemId == messageId -> {
+                        foundDelivered = true
+                        currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
+                            currentChatItem,
+                            true
+                        )
+                    }
+
+                    currentChatItem.isShowDelivered -> {
+                        currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
+                            currentChatItem,
+                            false
+                        )
+                    }
                 }
             } else if (currentChatItem is VisitorAttachmentItem) {
                 if (!foundDelivered && currentChatItem.id == messageId) {
@@ -1612,17 +1625,23 @@ internal class ChatController(
     override fun onSurveyLoaded(survey: Survey?) {
         Logger.d(TAG, "newSurveyLoaded")
         setPendingSurveyUsedUseCase.invoke()
-        if (viewCallback != null && survey != null) {
-            // Show survey
-            viewCallback!!.navigateToSurvey(survey)
-            Dependencies.getControllerFactory().destroyControllers()
-        } else if (shouldHandleEndedEngagement && !isVisitorEndEngagement) {
-            // Show "Engagement ended" pop-up
-            shouldHandleEndedEngagement = false
-            dialogController.showEngagementEndedDialog()
-        } else if (shouldHandleEndedEngagement) {
-            // Close chat screen
-            Dependencies.getControllerFactory().destroyControllers()
+        when {
+            viewCallback != null && survey != null -> {
+                // Show survey
+                viewCallback!!.navigateToSurvey(survey)
+                Dependencies.getControllerFactory().destroyControllers()
+            }
+
+            shouldHandleEndedEngagement && !isVisitorEndEngagement -> {
+                // Show "Engagement ended" pop-up
+                shouldHandleEndedEngagement = false
+                dialogController.showEngagementEndedDialog()
+            }
+
+            shouldHandleEndedEngagement -> {
+                // Close chat screen
+                Dependencies.getControllerFactory().destroyControllers()
+            }
         }
     }
 
@@ -1721,8 +1740,7 @@ internal class ChatController(
 
     fun onFileDownloadClicked(attachmentFile: AttachmentFile) {
         disposable.add(
-            downloadFileUseCase
-                .execute(attachmentFile)
+            downloadFileUseCase(attachmentFile)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ fileDownloadSuccess(attachmentFile) }) {

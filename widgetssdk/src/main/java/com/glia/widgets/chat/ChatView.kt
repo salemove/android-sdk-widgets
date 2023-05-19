@@ -16,10 +16,12 @@ import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.withStyledAttributes
@@ -446,14 +448,19 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 }
             }
 
-            override fun navigateToPreview(attachmentFile: AttachmentFile) {
+            override fun navigateToPreview(
+                attachmentFile: AttachmentFile,
+                view: View
+            ) {
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    context.requireActivity(),
+                    view,
+                    context.getString(R.string.glia_file_preview_transition_name)
+                )
+
                 context.startActivity(
-                    FilePreviewActivity.intent(
-                        context,
-                        attachmentFile.id,
-                        attachmentFile.name,
-                        theme
-                    )
+                    FilePreviewActivity.intent(context, attachmentFile),
+                    options.toBundle()
                 )
             }
 
@@ -1115,8 +1122,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     }
 
-    override fun onImageItemClick(item: AttachmentFile) {
-        controller?.onImageItemClick(item)
+    override fun onImageItemClick(item: AttachmentFile, view: View) {
+        controller?.onImageItemClick(item, view)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {

@@ -1,5 +1,7 @@
 package com.glia.widgets.chat;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.chat.AttachmentFile;
@@ -38,7 +40,7 @@ public interface ChatViewCallback {
 
     void clearMessageInput();
 
-    void navigateToPreview(AttachmentFile attachmentFile);
+    void navigateToPreview(AttachmentFile attachmentFile, View view);
 
     void fileIsNotReadyForPreview();
 }

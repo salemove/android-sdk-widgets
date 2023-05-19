@@ -86,6 +86,15 @@
 
     </style>
 
+    <style name="Application.Glia.FilePreview.Activity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowBackground">@color/glia_black_color</item>
+        <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
+        <item name="colorPrimary">@color/glia_black_color</item>
+        <item name="android:colorPrimary">@color/glia_black_color</item>
+    </style>
+
     <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

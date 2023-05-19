@@ -778,4 +778,8 @@ public class UseCaseFactory {
     public ResetSurveyUseCase createResetSurveyUseCase() {
         return new ResetSurveyUseCase(surveyStateManager, repositoryFactory.getGliaSurveyRepository());
     }
+
+    public void resetState() {
+        createResetSurveyUseCase().invoke();
+    }
 }

@@ -41,4 +41,8 @@ internal class ToggleChatHeadServiceUseCase(
     override fun isDisplayBasedOnPermission(): Boolean {
         return permissionManager.hasOverlayPermission()
     }
+
+    fun onDestroy() {
+        chatHeadManager.stopChatHeadService()
+    }
 }

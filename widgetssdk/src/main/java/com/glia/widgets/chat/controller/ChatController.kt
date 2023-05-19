@@ -339,7 +339,7 @@ internal class ChatController(
         synchronized(this) { viewCallback = null }
         backClickedListener = null
         if (!retain) {
-            disposable.dispose()
+            disposable.clear()
             mediaUpgradeOfferRepository.stopAll()
             mediaUpgradeOfferRepositoryCallback = null
             timerStatusListener = null
@@ -554,7 +554,8 @@ internal class ChatController(
             viewCallback?.backToCall()
         } else {
             backClickedListener?.onBackClicked()
-            Dependencies.getControllerFactory().destroyControllers()
+            Dependencies.getControllerFactory().destroyChatController()
+            Dependencies.getControllerFactory().destroyCallController()
         }
         updateFromCallScreenUseCase.updateFromCallScreen(false)
     }
@@ -1612,12 +1613,15 @@ internal class ChatController(
         Logger.d(TAG, "newSurveyLoaded")
         setPendingSurveyUsedUseCase.invoke()
         if (viewCallback != null && survey != null) {
+            // Show survey
             viewCallback!!.navigateToSurvey(survey)
             Dependencies.getControllerFactory().destroyControllers()
         } else if (shouldHandleEndedEngagement && !isVisitorEndEngagement) {
+            // Show "Engagement ended" pop-up
             shouldHandleEndedEngagement = false
             dialogController.showEngagementEndedDialog()
-        } else {
+        } else if (shouldHandleEndedEngagement) {
+            // Close chat screen
             Dependencies.getControllerFactory().destroyControllers()
         }
     }

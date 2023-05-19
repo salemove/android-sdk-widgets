@@ -32,7 +32,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class ServiceChatHeadController
-        implements ChatHeadContract.Controller, VisitorMediaUpdatesListener {
+        implements ChatHeadContract.Controller, VisitorMediaUpdatesListener,
+        GliaOnEngagementEndUseCase.Listener, GliaOnCallVisualizerEndUseCase.Listener {
     private static final String TAG = ServiceChatHeadController.class.getSimpleName();
 
     private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
@@ -104,8 +105,10 @@ public class ServiceChatHeadController
 
     @Override
     public void onDestroy() {
-        toggleChatHeadServiceUseCase.invoke(null);
+        toggleChatHeadServiceUseCase.onDestroy();
         removeVisitorMediaStateListenerUseCase.execute(this);
+        gliaOnEngagementEndUseCase.unregisterListener(this);
+        gliaOnCallVisualizerEndUseCase.unregisterListener(this);
     }
 
     @Override
@@ -192,16 +195,18 @@ public class ServiceChatHeadController
         this.buildTimeTheme = theme;
     }
 
-    private void omnicoreEngagementEnded() {
+    @Override
+    public void engagementEnded() {
         setPendingSurveyUseCase.invoke(); // Survey is supported by omnicore engagement only
-        omnibrowseEngagementEnded();
+        callVisualizerEngagementEnded();
     }
 
-    private void omnibrowseEngagementEnded() {
+    @Override
+    public void callVisualizerEngagementEnded() {
         state = State.ENDED;
         operatorProfileImgUrl = null;
         unreadMessagesCount = 0;
-        engagementDisposables.dispose();
+        engagementDisposables.clear();
         updateChatHeadView();
     }
 
@@ -214,7 +219,7 @@ public class ServiceChatHeadController
                         throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
                 );
         engagementDisposables.add(operatorDisposable);
-        gliaOnEngagementEndUseCase.execute(this::omnicoreEngagementEnded);
+        gliaOnEngagementEndUseCase.execute(this);
         toggleChatHeadServiceUseCase.invoke(resumedViewName);
         updateChatHeadView();
     }
@@ -229,7 +234,7 @@ public class ServiceChatHeadController
                 );
         engagementDisposables.add(operatorDisposable);
         // To recieve callback to engagementEnded() after Call Visualizer engagement ends
-        gliaOnCallVisualizerEndUseCase.execute(this::omnibrowseEngagementEnded);
+        gliaOnCallVisualizerEndUseCase.execute(this);
         updateChatHeadView();
     }
 

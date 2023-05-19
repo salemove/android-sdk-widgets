@@ -73,8 +73,6 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     override fun onDestroy() {
-        if (isDisplayApplicationChatHeadUseCase(resumedViewName)) return
-
         chatHeadLayout?.hide()
         gliaOnEngagementUseCase.unregisterListener(this)
         gliaOnCallVisualizerUseCase.unregisterListener(this)
@@ -141,8 +139,12 @@ internal class ApplicationChatHeadLayoutController(
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0
-        engagementDisposables.dispose()
+        engagementDisposables.clear()
         updateChatHeadView()
+    }
+
+    override fun callVisualizerEngagementEnded() {
+        engagementEnded()
     }
 
     private fun onUnreadMessageCountChange(count: Int) {

@@ -51,7 +51,9 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     var alertDialog: AlertDialog? = null
-    var dialogCallback: DialogController.Callback? = null
+    val dialogCallback: DialogController.Callback = DialogController.Callback {
+        controller.onDialogControllerCallback(it)
+    }
     var cameraPermissionLauncher: ActivityResultLauncher<String>? = null
     var overlayPermissionLauncher: ActivityResultLauncher<String>? = null
 
@@ -344,9 +346,6 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun setupDialogCallback() {
-        dialogCallback = DialogController.Callback {
-            controller.onDialogControllerCallback(it)
-        }
         dialogController.addCallback(dialogCallback)
     }
 

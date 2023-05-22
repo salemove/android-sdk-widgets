@@ -480,9 +480,11 @@ public class MainFragment extends Fragment {
     // For testing the integrated Visitor Code solution
     private void showVisitorCodeInADedicatedView() {
         VisitorCodeView visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(getContext());
-        CardView cv = containerView.findViewById(R.id.container);
-        cv.addView(visitorCodeView);
-        cv.setVisibility(View.VISIBLE);
+        if (visitorCodeView != null) {
+            CardView cv = containerView.findViewById(R.id.container);
+            cv.addView(visitorCodeView);
+            cv.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showToast(String message) {

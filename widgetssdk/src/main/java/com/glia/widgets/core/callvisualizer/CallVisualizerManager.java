@@ -44,16 +44,22 @@ public class CallVisualizerManager implements CallVisualizer {
 
     @Override
     public VisitorCodeView createVisitorCodeView(Context context) {
-        checkForProperInit();
-        startListeningForEngagements();
-        return buildVisitorCodeUseCase.invoke(context, false);
+        if (!engagementRepository.isCallVisualizerEngagement()) {
+            checkForProperInit();
+            startListeningForEngagements();
+            return buildVisitorCodeUseCase.invoke(context, false);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public void showVisitorCodeDialog(Context context) {
-        checkForProperInit();
-        startListeningForEngagements();
-        Dependencies.getControllerFactory().getDialogController().showVisitorCodeDialog();
+        if (!engagementRepository.isCallVisualizerEngagement()) {
+            checkForProperInit();
+            startListeningForEngagements();
+            Dependencies.getControllerFactory().getDialogController().showVisitorCodeDialog();
+        }
     }
 
     @Override

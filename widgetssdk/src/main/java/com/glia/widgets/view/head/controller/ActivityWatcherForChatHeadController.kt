@@ -69,25 +69,25 @@ internal class ActivityWatcherForChatHeadController(
         return applicationChatHeadController.shouldShow(gliaOrRootView)
     }
 
+    private fun showBubble() {
+        if (Glia.isInitialized()) {
+            serviceChatHeadController.init()
+        }
+        val gliaOrRootView = watcher.fetchGliaOrRootView()
+        val viewName: String =
+            if (gliaOrRootView != null) gliaOrRootView::class.java.simpleName else ""
+        serviceChatHeadController.onResume(gliaOrRootView)
+        applicationChatHeadController.onResume(viewName)
+        if (applicationChatHeadController.shouldShow(viewName)) {
+            watcher.addChatHeadLayoutIfAbsent()
+            applicationChatHeadController.updateChatHeadView()
+        }
+    }
+
     private fun setupScreenSharingViewCallback() {
         screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
             override fun onScreenSharingRequestSuccess() {
                 showBubble()
-            }
-
-            private fun showBubble() {
-                if (Glia.isInitialized()) {
-                    serviceChatHeadController.init()
-                }
-                val gliaOrRootView = watcher.fetchGliaOrRootView()
-                val viewName: String =
-                    if (gliaOrRootView != null) gliaOrRootView::class.java.simpleName else ""
-                serviceChatHeadController.onResume(gliaOrRootView)
-                applicationChatHeadController.onResume(viewName)
-                if (applicationChatHeadController.shouldShow(viewName)) {
-                    watcher.addChatHeadLayoutIfAbsent()
-                    applicationChatHeadController.updateChatHeadView()
-                }
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.glia.widgets.callvisualizer
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import androidx.activity.ComponentActivity
@@ -46,7 +45,8 @@ internal class ActivityWatcherForCallVisualizerController(
     }
 
     internal var screenSharingViewCallback: ScreenSharingController.ViewCallback? = null
-    internal val startMediaProjectionLaunchers = mutableMapOf<String, ActivityResultLauncher<Intent>?>()
+    internal val startMediaProjectionLaunchers =
+        mutableMapOf<String, ActivityResultLauncher<Intent>?>()
 
     override fun onActivityResumed(activity: Activity) {
         Logger.d(TAG, "onActivityResumed(root)")
@@ -56,7 +56,8 @@ internal class ActivityWatcherForCallVisualizerController(
             when (activity.intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)) {
                 is ScreenSharing -> acquireMediaProjectionToken(activity)
                 is Camera -> watcher.requestCameraPermission()
-                else -> { /* Shouldn't happen. No need to do anything. */}
+                else -> { /* Shouldn't happen. No need to do anything. */
+                }
             }
         }
     }
@@ -122,6 +123,7 @@ internal class ActivityWatcherForCallVisualizerController(
                 watcher.dismissOverlayDialog()
                 watcher.openOverlayPermissionView()
             }
+
             else -> Logger.d(TAG, "Not relevant")
         }
         currentDialogMode = MODE_NONE
@@ -134,14 +136,17 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING,
             MODE_START_SCREEN_SHARING -> screenSharingController.onScreenSharingDeclined()
+
             MODE_OVERLAY_PERMISSION -> {
                 watcher.dismissOverlayDialog()
             }
+
             MODE_MEDIA_UPGRADE -> {
                 mediaUpgradeOffer?.decline { error ->
                     onMediaUpgradeDecline(error)
                 }
             }
+
             MODE_VISITOR_CODE,
             MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
         }
@@ -184,8 +189,8 @@ internal class ActivityWatcherForCallVisualizerController(
     @VisibleForTesting
     internal fun setupScreenSharingViewCallback() {
         screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-            override fun onScreenSharingRequestError(ex: GliaException?) {
-                ex?.run { watcher.showToast(ex.debugMessage) }
+            override fun onScreenSharingRequestError(ex: GliaException) {
+                watcher.showToast(ex.debugMessage)
             }
 
             override fun onScreenSharingStarted() {
@@ -205,22 +210,16 @@ internal class ActivityWatcherForCallVisualizerController(
                 watcher.openSupportActivity(Camera)
             }
         } else {
-            mediaUpgradeOffer?.accept { error ->
-                onMediaUpgradeAccept(error)
-            }
+            mediaUpgradeOffer?.accept { onMediaUpgradeAccept(it) }
         }
     }
 
     override fun onRequestedCameraPermissionResult(isGranted: Boolean) {
         watcher.destroySupportActivityIfExists()
         if (isGranted) {
-            mediaUpgradeOffer?.accept { error ->
-                onMediaUpgradeAccept(error)
-            }
+            mediaUpgradeOffer?.accept { onMediaUpgradeAccept(it) }
         } else {
-            mediaUpgradeOffer?.decline { error ->
-                onMediaUpgradeDecline(error)
-            }
+            mediaUpgradeOffer?.decline { onMediaUpgradeDecline(it) }
         }
     }
 
@@ -228,9 +227,9 @@ internal class ActivityWatcherForCallVisualizerController(
         screenSharingController.onScreenSharingDeclined()
     }
 
-    override fun onMediaProjectionPermissionResult(isGranted: Boolean, context: Context) {
+    override fun onMediaProjectionPermissionResult(isGranted: Boolean, activity: Activity) {
         if (isGranted) {
-            screenSharingController.onScreenSharingAccepted(context)
+            screenSharingController.onScreenSharingAccepted(activity)
         } else {
             screenSharingController.onScreenSharingDeclined()
         }
@@ -244,7 +243,11 @@ internal class ActivityWatcherForCallVisualizerController(
             if (mediaUpgradeOffer?.video != null && mediaUpgradeOffer?.video != MediaDirection.NONE) {
                 onPositiveDialogButtonClicked()
             } else {
-                Logger.e(TAG, "Audio upgrade offer in call visualizer", Exception("Audio upgrade offer in call visualizer"))
+                Logger.e(
+                    TAG,
+                    "Audio upgrade offer in call visualizer",
+                    Exception("Audio upgrade offer in call visualizer")
+                )
                 return
             }
         }

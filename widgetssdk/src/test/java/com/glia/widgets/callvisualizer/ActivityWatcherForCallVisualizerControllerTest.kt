@@ -12,7 +12,13 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
-import com.glia.widgets.core.dialog.Dialog.*
+import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
+import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
+import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
+import com.glia.widgets.core.dialog.Dialog.MODE_NONE
+import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
+import com.glia.widgets.core.dialog.Dialog.MODE_START_SCREEN_SHARING
+import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.screensharing.ScreenSharingController
@@ -21,7 +27,17 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.notNull
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 import java.util.function.Consumer
 
 internal class ActivityWatcherForCallVisualizerControllerTest {
@@ -323,13 +339,13 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onMediaProjectionPermissionResult accepts screen sharing when isGranted`() {
-        controller.onMediaProjectionPermissionResult(isGranted = true, context = activity)
+        controller.onMediaProjectionPermissionResult(isGranted = true, activity = activity)
         verify(screenSharingController).onScreenSharingAccepted(activity)
     }
 
     @Test
     fun `onMediaProjectionPermissionResult declines screen sharing when isGranted = false`() {
-        controller.onMediaProjectionPermissionResult(isGranted = false, context = activity)
+        controller.onMediaProjectionPermissionResult(isGranted = false, activity = activity)
         verify(screenSharingController).onScreenSharingDeclined()
     }
 

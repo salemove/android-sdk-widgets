@@ -1,6 +1,6 @@
 package com.glia.widgets.core.screensharing
 
-import android.content.Context
+import android.app.Activity
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
@@ -11,7 +11,6 @@ import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChan
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.asActivity
 import java.util.function.Consumer
 
 internal class ScreenSharingController(
@@ -46,11 +45,12 @@ internal class ScreenSharingController(
 
     override fun onScreenSharingStarted() {
         Logger.d(TAG, "screen sharing started")
-        viewCallbacks.forEach(Consumer { obj: ViewCallback -> obj.onScreenSharingStarted() })
+        viewCallbacks.forEach { it.onScreenSharingStarted() }
     }
 
     override fun onScreenSharingEnded() {
         Logger.d(TAG, "screen sharing ended")
+        viewCallbacks.forEach { it.onScreenSharingEnded() }
     }
 
     override fun onScreenSharingRequestError(exception: GliaException) {
@@ -66,13 +66,13 @@ internal class ScreenSharingController(
         viewCallbacks.forEach(Consumer { obj: ViewCallback -> obj.onScreenSharingRequestSuccess() })
     }
 
-    fun onResume(context: Context?) {
+    fun onResume(activity: Activity) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
             if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
-                onScreenSharingAccepted(context)
+                onScreenSharingAccepted(activity)
             }
         }
     }
@@ -85,23 +85,23 @@ internal class ScreenSharingController(
     val isSharingScreen: Boolean
         get() = repository.isSharingScreen
 
-    fun onScreenSharingAccepted(context: Context?) {
+    fun onScreenSharingAccepted(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAccepted")
         dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAccepted(
-            context?.asActivity(),
+            activity,
             gliaSdkConfigurationManager.screenSharingMode
         )
         hasPendingScreenSharingRequest = false
     }
 
-    fun onScreenSharingAcceptedAndPermissionAsked(context: Context?) {
+    fun onScreenSharingAcceptedAndPermissionAsked(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAcceptedAndPermissionAsked")
         dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAcceptedAndPermissionAsked(
-            context?.asActivity(),
+            activity,
             gliaSdkConfigurationManager.screenSharingMode
         )
         hasPendingScreenSharingRequest = false
@@ -129,21 +129,33 @@ internal class ScreenSharingController(
     }
 
     private fun showScreenSharingEnabledNotification() {
-        showScreenSharingNotificationUseCase.invoke()
+        showScreenSharingNotificationUseCase()
     }
 
     override fun hideScreenSharingEnabledNotification() {
-        removeScreenSharingNotificationUseCase.invoke()
+        removeScreenSharingNotificationUseCase()
     }
 
     interface ViewCallback {
-        fun onScreenSharingRequestError(ex: GliaException?) {}
-        fun onScreenSharingRequestSuccess() {}
-        fun onScreenSharingStarted() {}
+        fun onScreenSharingRequestError(ex: GliaException) {
+            /* The function is an intentionally-blank to make it optional for implementation */
+        }
+
+        fun onScreenSharingRequestSuccess() {
+            /* The function is an intentionally-blank to make it optional for implementation */
+        }
+
+        fun onScreenSharingStarted() {
+            /* The function is an intentionally-blank to make it optional for implementation */
+        }
+
+        fun onScreenSharingEnded() {
+            /* The function is an intentionally-blank to make it optional for implementation */
+        }
     }
 
     override fun onForceStopScreenSharing() {
         repository.forceEndScreenSharing()
-        removeScreenSharingNotificationUseCase.invoke()
+        removeScreenSharingNotificationUseCase()
     }
 }

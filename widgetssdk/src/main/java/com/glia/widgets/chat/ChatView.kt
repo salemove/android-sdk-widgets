@@ -121,8 +121,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var dialogCallback: DialogController.Callback? = null
     private var dialogController: DialogController? = null
     private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-        override fun onScreenSharingRequestError(ex: GliaException?) {
-            ex?.run { showToast(this.debugMessage) }
+        override fun onScreenSharingRequestError(ex: GliaException) {
+            showToast(ex.debugMessage)
         }
 
         override fun onScreenSharingRequestSuccess() {
@@ -315,7 +315,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     fun onResume() {
         controller?.onResume()
         screenSharingController?.setViewCallback(screenSharingViewCallback)
-        screenSharingController?.onResume(this.context)
+        screenSharingController?.onResume(context.requireActivity())
         dialogController?.addCallback(dialogCallback)
     }
 
@@ -623,7 +623,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
                 R.string.glia_dialog_screen_sharing_offer_accept,
                 R.string.glia_dialog_screen_sharing_offer_decline,
-                { screenSharingController?.onScreenSharingAccepted(context) }
+                { screenSharingController?.onScreenSharingAccepted(context.requireActivity()) }
             ) { screenSharingController?.onScreenSharingDeclined() }
         }
     }
@@ -1086,21 +1086,19 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     isDownloading
                 )
             }
-        } else if (currentChatItem is OperatorAttachmentItem) {
-            if (currentChatItem.attachmentFile.id == attachmentFile.id) {
-                return OperatorAttachmentItem(
-                    currentChatItem.id,
-                    currentChatItem.viewType,
-                    currentChatItem.showChatHead,
-                    currentChatItem.attachmentFile,
-                    currentChatItem.operatorProfileImgUrl,
-                    isFileExists,
-                    isDownloading,
-                    currentChatItem.operatorId,
-                    currentChatItem.messageId,
-                    currentChatItem.timestamp
-                )
-            }
+        } else if (currentChatItem is OperatorAttachmentItem && currentChatItem.attachmentFile.id == attachmentFile.id) {
+            return OperatorAttachmentItem(
+                currentChatItem.id,
+                currentChatItem.viewType,
+                currentChatItem.showChatHead,
+                currentChatItem.attachmentFile,
+                currentChatItem.operatorProfileImgUrl,
+                isFileExists,
+                isDownloading,
+                currentChatItem.operatorId,
+                currentChatItem.messageId,
+                currentChatItem.timestamp
+            )
         }
         return currentChatItem
     }
@@ -1139,7 +1137,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         Toast.makeText(context, message, duration).show()
     }
 
-    interface OnBackClickedListener {
+    fun interface OnBackClickedListener {
         /**
          * Callback which is used to notify the enclosing activity or fragment when the user
          * clicks on the view's top app bar's up button.
@@ -1147,7 +1145,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         fun onBackClicked()
     }
 
-    interface OnEndListener {
+    fun interface OnEndListener {
         /**
          * Callback which is fired when the chat is ended. End can happen due to the user clicking
          * on the end engagement button or the leave queue button.
@@ -1155,11 +1153,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         fun onEnd()
     }
 
-    interface OnMinimizeListener {
+    fun interface OnMinimizeListener {
         fun onMinimize()
     }
 
-    interface OnNavigateToCallListener {
+    fun interface OnNavigateToCallListener {
         /**
          * Callback which is fired when the user has accepted a media upgrade offer and should be
          * navigated to a view where they can visually see data about their media upgrade.
@@ -1170,15 +1168,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         fun call(theme: UiTheme?, mediaType: String?)
     }
 
-    interface OnBackToCallListener {
+    fun interface OnBackToCallListener {
         fun onBackToCall()
     }
 
-    interface OnNavigateToSurveyListener {
+    fun interface OnNavigateToSurveyListener {
         fun onSurvey(theme: UiTheme?, survey: Survey)
     }
 
-    interface OnTitleUpdatedListener {
+    fun interface OnTitleUpdatedListener {
         fun onTitleUpdated(title: String?)
     }
 

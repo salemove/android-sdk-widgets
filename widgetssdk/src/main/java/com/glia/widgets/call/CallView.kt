@@ -87,12 +87,16 @@ internal class CallView(
 
     private val audioManager: AudioManager by lazy { context.getSystemService()!! }
     private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-        override fun onScreenSharingRequestError(ex: GliaException?) {
-            ex?.run { showToast(this.debugMessage) }
+        override fun onScreenSharingRequestError(ex: GliaException) {
+            showToast(ex.debugMessage)
         }
 
         override fun onScreenSharingRequestSuccess() {
             post { appBar.showEndScreenSharingButton() }
+        }
+
+        override fun onScreenSharingEnded() {
+            post { appBar.hideEndScreenSharingButton() }
         }
     }
 
@@ -206,7 +210,7 @@ internal class CallView(
         callController?.onResume()
         operatorVideoView?.resumeRendering()
         screenSharingController?.setViewCallback(screenSharingViewCallback)
-        screenSharingController?.onResume(this.context)
+        screenSharingController?.onResume(context.requireActivity())
         serviceChatHeadController?.onResume(this)
         dialogController?.addCallback(dialogCallback)
     }
@@ -427,7 +431,7 @@ internal class CallView(
                 resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
                 R.string.glia_dialog_screen_sharing_offer_accept,
                 R.string.glia_dialog_screen_sharing_offer_decline,
-                { screenSharingController!!.onScreenSharingAccepted(context) }
+                { screenSharingController!!.onScreenSharingAccepted(context.requireActivity()) }
             ) { screenSharingController!!.onScreenSharingDeclined() }
     }
 
@@ -879,16 +883,12 @@ internal class CallView(
 
             callState.isCallOngoingAndOperatorConnected -> {
                 //connected operatorNameView, callTimerView
-                callTheme?.connect?.connected?.apply {
-                    title?.also(operatorNameView::applyThemeOrDefault)
-                }
+                invalidateOperatorNameViewTheme()
             }
 
             callState.isTransferring -> {
                 //transferring operatorNameView, callTimerView
-                callTheme?.connect?.connected?.apply {
-                    title?.also(operatorNameView::applyThemeOrDefault)
-                }
+                invalidateOperatorNameViewTheme()
             }
 
             else -> {
@@ -901,6 +901,12 @@ internal class CallView(
                     connectingView.restoreDefaultTheme()
                 }
             }
+        }
+    }
+
+    private fun invalidateOperatorNameViewTheme() {
+        callTheme?.connect?.connected?.apply {
+            title?.also(operatorNameView::applyThemeOrDefault)
         }
     }
 

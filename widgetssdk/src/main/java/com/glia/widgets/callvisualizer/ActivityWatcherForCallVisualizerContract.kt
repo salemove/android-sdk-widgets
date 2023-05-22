@@ -1,7 +1,6 @@
 package com.glia.widgets.callvisualizer
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -23,7 +22,7 @@ class ActivityWatcherForCallVisualizerContract {
         fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer)
         fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean = true)
         fun onRequestedCameraPermissionResult(isGranted: Boolean)
-        fun onMediaProjectionPermissionResult(isGranted: Boolean, context: Context)
+        fun onMediaProjectionPermissionResult(isGranted: Boolean, activity: Activity)
         fun onMediaProjectionRejected()
     }
 

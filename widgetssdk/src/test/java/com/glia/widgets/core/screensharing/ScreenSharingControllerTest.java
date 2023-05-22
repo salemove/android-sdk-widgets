@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
+import android.app.Activity;
 
 import com.glia.androidsdk.GliaException;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -95,7 +95,7 @@ public class ScreenSharingControllerTest {
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
                 .thenReturn(true);
 
-        subjectUnderTest.onResume(mock(Context.class));
+        subjectUnderTest.onResume(mock(Activity.class));
 
         verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).invoke();
@@ -108,14 +108,14 @@ public class ScreenSharingControllerTest {
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
                 .thenReturn(false);
 
-        subjectUnderTest.onResume(mock(Context.class));
+        subjectUnderTest.onResume(mock(Activity.class));
 
         verify(dialogController).showEnableScreenSharingNotificationsAndStartSharingDialog();
     }
 
     @Test
     public void onScreenSharingAccepted_hidesDialogShowsNotificationAcceptsScreenSharing() {
-        subjectUnderTest.onScreenSharingAccepted(mock(Context.class));
+        subjectUnderTest.onScreenSharingAccepted(mock(Activity.class));
 
         verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).invoke();

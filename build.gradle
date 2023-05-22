@@ -25,7 +25,7 @@ allprojects {
             dirs '../libs'
         }
         //TODO Needed to use not public new Core SDK release, remove before release
-        maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1186' }
+        maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1187' }
     }
 }
 

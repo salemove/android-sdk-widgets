@@ -42,7 +42,7 @@ class SecureConversationsRepository(private val secureConversations: SecureConve
         }
     }
 
-    fun markMessagesRead(callback: RequestCallback<Void>?) {
+    fun markMessagesRead(callback: RequestCallback<Void>) {
         secureConversations.markMessagesRead(callback)
     }
 

@@ -904,7 +904,7 @@ internal class ChatController(
                     Logger.e(TAG, "cancelQueueTicketUseCase error: ${it.message}")
                 }
         )
-        endEngagementUseCase.execute()
+        endEngagementUseCase()
         mediaUpgradeOfferRepository.stopAll()
         emitViewState { chatState.stop() }
     }

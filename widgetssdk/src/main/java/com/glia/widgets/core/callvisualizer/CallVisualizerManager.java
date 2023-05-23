@@ -12,6 +12,7 @@ import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.VisitorCodeView;
 
 public class CallVisualizerManager implements CallVisualizer {
@@ -49,6 +50,7 @@ public class CallVisualizerManager implements CallVisualizer {
             startListeningForEngagements();
             return buildVisitorCodeUseCase.invoke(context, false);
         } else {
+            Logger.e(TAG, "Trying to show visitor code view during ongoing CallVisualizer engagement");
             return null;
         }
     }
@@ -59,6 +61,8 @@ public class CallVisualizerManager implements CallVisualizer {
             checkForProperInit();
             startListeningForEngagements();
             Dependencies.getControllerFactory().getDialogController().showVisitorCodeDialog();
+        } else {
+            Logger.e(TAG, "Trying to show visitor code view during ongoing CallVisualizer engagement");
         }
     }
 

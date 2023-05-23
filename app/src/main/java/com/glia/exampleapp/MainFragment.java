@@ -41,6 +41,7 @@ import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.messagecenter.MessageCenterActivity;
 import com.glia.widgets.view.VisitorCodeView;
 

@@ -256,23 +256,25 @@ internal class ActivityWatcherForCallVisualizer(
         Logger.d(TAG, "Show screen sharing and notifications dialog")
         val theme = UiTheme.UiThemeBuilder().build()
         val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-        alertDialog = Dialogs.showOptionsDialog(
-            context = contextWithStyle,
-            theme = theme,
-            title = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-            message = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-            positiveButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-            negativeButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
-            positiveButtonClickListener = {
-                controller.onPositiveDialogButtonClicked()
-            },
-            negativeButtonClickListener = {
-                controller.onNegativeDialogButtonClicked()
-            },
-            cancelListener = {
-                controller.onNegativeDialogButtonClicked()
-            }
-        )
+        activity.runOnUiThread {
+            alertDialog = Dialogs.showOptionsDialog(
+                context = contextWithStyle,
+                theme = theme,
+                title = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
+                message = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
+                positiveButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
+                negativeButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                positiveButtonClickListener = {
+                    controller.onPositiveDialogButtonClicked()
+                },
+                negativeButtonClickListener = {
+                    controller.onNegativeDialogButtonClicked()
+                },
+                cancelListener = {
+                    controller.onNegativeDialogButtonClicked()
+                }
+            )
+        }
     }
 
     override fun showOverlayPermissionsDialog() {

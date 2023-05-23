@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.glia.androidsdk.GliaException;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.widgets.callvisualizer.CallVisualizerRepository;
@@ -43,6 +44,7 @@ public class CallVisualizerManager implements CallVisualizer {
         }
     }
 
+    @Nullable
     @Override
     public VisitorCodeView createVisitorCodeView(Context context) {
         if (!engagementRepository.isCallVisualizerEngagement()) {

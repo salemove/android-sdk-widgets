@@ -2,6 +2,8 @@ package com.glia.widgets.core.callvisualizer.domain;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import com.glia.widgets.view.VisitorCodeView;
 
 /**
@@ -22,6 +24,7 @@ public interface CallVisualizer {
      * expired. During that time, the code can be used to initiate an engagement. Once the operator
      * has used the visitor code to initiate an engagement, the code will expire immediately.
      */
+    @Nullable
     VisitorCodeView createVisitorCodeView(Context context);
 
     /**

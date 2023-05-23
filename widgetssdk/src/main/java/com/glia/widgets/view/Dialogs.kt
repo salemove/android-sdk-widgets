@@ -333,21 +333,24 @@ object Dialogs {
     fun showVisitorCodeDialog(
         context: Context,
         theme: UiTheme
-    ): AlertDialog {
+    ): AlertDialog? {
         val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
         val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
-        val view = GliaWidgets.getCallVisualizer().createVisitorCodeView(context).apply {
+        return GliaWidgets.getCallVisualizer()
+            .createVisitorCodeView(context)
+            ?.apply {
             setClosable(true)
-        }
-        return showDialogBasedOnView(
-            context = context,
-            view = view,
-            theme = theme,
-        ).apply {
-            findViewById<TextView>(R.id.title_view)?.apply {
-                applyTextTheme(baseDarkColor, fontFamily)
+            }?.run {
+                showDialogBasedOnView(
+                    context = context,
+                    view = this,
+                    theme = theme,
+                ).apply {
+                    findViewById<TextView>(R.id.title_view)?.apply {
+                        applyTextTheme(baseDarkColor, fontFamily)
+                    }
+                }
             }
-        }
     }
 
     fun showScreenSharingDialog(

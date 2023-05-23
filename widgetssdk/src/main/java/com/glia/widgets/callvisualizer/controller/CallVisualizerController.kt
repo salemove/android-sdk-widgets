@@ -27,6 +27,8 @@ internal class CallVisualizerController(
     GliaOnCallVisualizerUseCase.Listener,
     GliaOnCallVisualizerEndUseCase.Listener, OnSurveyListener {
 
+    private var engagementEndedCallback: (() -> Unit)? = null
+
     fun init() {
         Logger.d(TAG, "CallVisualizerController initialized")
         callVisualizerRepository.init(this)
@@ -64,7 +66,16 @@ internal class CallVisualizerController(
     }
 
     override fun callVisualizerEngagementEnded() {
+        engagementEndedCallback?.invoke()
         // Beware, this function is called before onSurveyLoaded()
         // No need to do anything currently
+    }
+
+    fun setOnEngagementEndedCallback(callback: () -> Unit) {
+        this.engagementEndedCallback = callback
+    }
+
+    fun removeOnEngagementEndedCallback() {
+        this.engagementEndedCallback = null
     }
 }

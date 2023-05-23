@@ -10,10 +10,6 @@ import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.di.Dependencies;
 
 public class GliaSdkConfiguration {
-
-    private static final boolean DEFAULT_USE_OVERLAY = true;
-    public static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE =
-            ScreenSharing.Mode.UNBOUNDED;
     private static final ChatType DEFAULT_CHAT_TYPE = ChatType.LIVE_CHAT;
 
     private final String companyName;
@@ -111,11 +107,11 @@ public class GliaSdkConfiguration {
             UiTheme tempTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
             this.runTimeTheme = tempTheme != null ? tempTheme : Dependencies.getSdkConfigurationManager().getUiTheme();
             this.contextAssetId = intent.getStringExtra(GliaWidgets.CONTEXT_ASSET_ID);
-            this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, DEFAULT_USE_OVERLAY);
+            this.useOverlay = intent.getBooleanExtra(GliaWidgets.USE_OVERLAY, Dependencies.getSdkConfigurationManager().isUseOverlay());
             ScreenSharing.Mode tempMode = intent.hasExtra(GliaWidgets.SCREEN_SHARING_MODE)
                     ? (ScreenSharing.Mode) intent.getSerializableExtra(GliaWidgets.SCREEN_SHARING_MODE)
                     : Dependencies.getSdkConfigurationManager().getScreenSharingMode();
-            this.screenSharingMode = tempMode != null ? tempMode : DEFAULT_SCREEN_SHARING_MODE;
+            this.screenSharingMode = tempMode != null ? tempMode : Dependencies.getSdkConfigurationManager().getScreenSharingMode();
             this.chatType = intent.hasExtra(GliaWidgets.CHAT_TYPE)
                     ? intent.getParcelableExtra(GliaWidgets.CHAT_TYPE)
                     : DEFAULT_CHAT_TYPE;

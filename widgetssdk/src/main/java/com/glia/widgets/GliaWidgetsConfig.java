@@ -15,6 +15,10 @@ import kotlin.Deprecated;
  * @see GliaWidgetsConfig.Builder
  */
 public class GliaWidgetsConfig {
+
+    public static final boolean DEFAULT_USE_OVERLAY = true;
+    public static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE = ScreenSharing.Mode.UNBOUNDED;
+
     private final String appToken;
     private final String siteId;
     private final SiteApiKey siteApiKey;
@@ -65,8 +69,8 @@ public class GliaWidgetsConfig {
         this.requestCode = builder.requestCode;
         this.uiJsonRemoteConfig = builder.uiJsonRemoteConfig;
         this.companyName = builder.companyName;
-        this.screenSharingMode = builder.screenSharingMode != null ? builder.screenSharingMode : ScreenSharing.Mode.UNBOUNDED;
-        this.useOverlay = builder.useOverlay;
+        this.screenSharingMode = builder.screenSharingMode != null ? builder.screenSharingMode : DEFAULT_SCREEN_SHARING_MODE;
+        this.useOverlay = builder.useOverlay != null ? builder.useOverlay : DEFAULT_USE_OVERLAY;
         this.uiTheme = builder.uiTheme;
     }
 
@@ -176,7 +180,7 @@ public class GliaWidgetsConfig {
         String uiJsonRemoteConfig;
         String companyName;
         ScreenSharing.Mode screenSharingMode;
-        boolean useOverlay;
+        Boolean useOverlay;
         UiTheme uiTheme;
 
         public Builder() {
@@ -267,7 +271,7 @@ public class GliaWidgetsConfig {
          * @param useOverlay - Is it allowed to overlay the application
          * @return Builder instance
          */
-        public Builder setUseOverlay(@Nullable boolean useOverlay) {
+        public Builder setUseOverlay(boolean useOverlay) {
             this.useOverlay = useOverlay;
             return this;
         }

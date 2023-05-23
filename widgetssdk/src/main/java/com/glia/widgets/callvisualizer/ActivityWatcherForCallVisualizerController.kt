@@ -52,6 +52,7 @@ internal class ActivityWatcherForCallVisualizerController(
         Logger.d(TAG, "onActivityResumed(root)")
         addDialogCallback(activity)
         addScreenSharingCallback(activity)
+        callVisualizerController.setOnEngagementEndedCallback(::addEngagementEndedCallback)
         if (activity is CallVisualizerSupportActivity) {
             when (activity.intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)) {
                 is ScreenSharing -> acquireMediaProjectionToken(activity)
@@ -61,10 +62,16 @@ internal class ActivityWatcherForCallVisualizerController(
         }
     }
 
+    private fun addEngagementEndedCallback() {
+            watcher.removeDialogFromStack()
+            currentDialogMode = MODE_NONE
+    }
+
     override fun onActivityPaused() {
         Logger.d(TAG, "onActivityPaused()")
         watcher.dismissAlertDialog()
         watcher.removeDialogCallback()
+        callVisualizerController.removeOnEngagementEndedCallback()
         removeScreenSharingCallback()
     }
 

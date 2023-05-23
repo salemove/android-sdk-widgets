@@ -53,6 +53,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
         controller.onActivityResumed(activity)
+        verify(callVisualizerController).setOnEngagementEndedCallback(any())
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
     }
 
@@ -87,6 +88,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onActivityPaused()
         verify(watcher).dismissAlertDialog()
         verify(watcher).removeDialogCallback()
+        verify(callVisualizerController).removeOnEngagementEndedCallback()
         verify(screenSharingController).removeViewCallback(anyOrNull())
     }
 
@@ -354,6 +356,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(screenSharingController).onResume(activity)
+        verify(callVisualizerController).setOnEngagementEndedCallback(any())
         verify(watcher).setupDialogCallback()
         verify(watcher).requestCameraPermission()
         cleanup()

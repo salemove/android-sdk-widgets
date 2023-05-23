@@ -41,8 +41,8 @@ import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
-import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
+import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
@@ -750,26 +750,32 @@ internal class ChatController(
         mediaUpgradeOfferRepositoryCallback = object : MediaUpgradeOfferRepositoryCallback {
             override fun newOffer(offer: MediaUpgradeOffer) {
                 if (isChatViewPaused) return
-                if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
-                    // audio call
-                    Logger.d(TAG, "audioUpgradeRequested")
-                    if (chatState.isOperatorOnline) dialogController.showUpgradeAudioDialog(
-                        offer,
-                        chatState.formattedOperatorName
-                    )
-                } else if (offer.video == MediaDirection.TWO_WAY) {
-                    // video call
-                    Logger.d(TAG, "2 way videoUpgradeRequested")
-                    if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog2Way(
-                        offer,
-                        chatState.formattedOperatorName
-                    )
-                } else if (offer.video == MediaDirection.ONE_WAY) {
-                    Logger.d(TAG, "1 way videoUpgradeRequested")
-                    if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog1Way(
-                        offer,
-                        chatState.formattedOperatorName
-                    )
+                when {
+                    offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY -> {
+                        // audio call
+                        Logger.d(TAG, "audioUpgradeRequested")
+                        if (chatState.isOperatorOnline) dialogController.showUpgradeAudioDialog(
+                            offer,
+                            chatState.formattedOperatorName
+                        )
+                    }
+
+                    offer.video == MediaDirection.TWO_WAY -> {
+                        // video call
+                        Logger.d(TAG, "2 way videoUpgradeRequested")
+                        if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog2Way(
+                            offer,
+                            chatState.formattedOperatorName
+                        )
+                    }
+
+                    offer.video == MediaDirection.ONE_WAY -> {
+                        Logger.d(TAG, "1 way videoUpgradeRequested")
+                        if (chatState.isOperatorOnline) dialogController.showUpgradeVideoDialog1Way(
+                            offer,
+                            chatState.formattedOperatorName
+                        )
+                    }
                 }
             }
 
@@ -897,7 +903,7 @@ internal class ChatController(
                     Logger.e(TAG, "cancelQueueTicketUseCase error: ${it.message}")
                 }
         )
-        endEngagementUseCase.execute()
+        endEngagementUseCase()
         mediaUpgradeOfferRepository.stopAll()
         emitViewState { chatState.stop() }
     }
@@ -1050,20 +1056,26 @@ internal class ChatController(
             val currentChatItem = currentChatItems[i]
             if (currentChatItem is VisitorMessageItem) {
                 val itemId = currentChatItem.id
-                if (itemId == VisitorMessageItem.HISTORY_ID) {
-                    // we reached the history items no point in going searching further
-                    break
-                } else if (!foundDelivered && itemId == messageId) {
-                    foundDelivered = true
-                    currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
-                        currentChatItem,
-                        true
-                    )
-                } else if (currentChatItem.isShowDelivered) {
-                    currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
-                        currentChatItem,
-                        false
-                    )
+                when {
+                    itemId == VisitorMessageItem.HISTORY_ID -> {
+                        // we reached the history items no point in going searching further
+                        break
+                    }
+
+                    !foundDelivered && itemId == messageId -> {
+                        foundDelivered = true
+                        currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
+                            currentChatItem,
+                            true
+                        )
+                    }
+
+                    currentChatItem.isShowDelivered -> {
+                        currentChatItems[i] = VisitorMessageItem.editDeliveredStatus(
+                            currentChatItem,
+                            false
+                        )
+                    }
                 }
             } else if (currentChatItem is VisitorAttachmentItem) {
                 if (!foundDelivered && currentChatItem.id == messageId) {
@@ -1612,17 +1624,23 @@ internal class ChatController(
     override fun onSurveyLoaded(survey: Survey?) {
         Logger.d(TAG, "newSurveyLoaded")
         setPendingSurveyUsedUseCase.invoke()
-        if (viewCallback != null && survey != null) {
-            // Show survey
-            viewCallback!!.navigateToSurvey(survey)
-            Dependencies.getControllerFactory().destroyControllers()
-        } else if (shouldHandleEndedEngagement && !isVisitorEndEngagement) {
-            // Show "Engagement ended" pop-up
-            shouldHandleEndedEngagement = false
-            dialogController.showEngagementEndedDialog()
-        } else if (shouldHandleEndedEngagement) {
-            // Close chat screen
-            Dependencies.getControllerFactory().destroyControllers()
+        when {
+            viewCallback != null && survey != null -> {
+                // Show survey
+                viewCallback!!.navigateToSurvey(survey)
+                Dependencies.getControllerFactory().destroyControllers()
+            }
+
+            shouldHandleEndedEngagement && !isVisitorEndEngagement -> {
+                // Show "Engagement ended" pop-up
+                shouldHandleEndedEngagement = false
+                dialogController.showEngagementEndedDialog()
+            }
+
+            shouldHandleEndedEngagement -> {
+                // Close chat screen
+                Dependencies.getControllerFactory().destroyControllers()
+            }
         }
     }
 

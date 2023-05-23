@@ -75,9 +75,9 @@ public class CallController implements
         OnSurveyListener,
         VisitorMediaUpdatesListener {
 
-    private final static int MAX_IDLE_TIME = 3200;
-    private final static int INACTIVITY_TIMER_TICKER_VALUE = 400;
-    private final static int INACTIVITY_TIMER_DELAY_VALUE = 0;
+    private static final int MAX_IDLE_TIME = 3200;
+    private static final int INACTIVITY_TIMER_TICKER_VALUE = 400;
+    private static final int INACTIVITY_TIMER_DELAY_VALUE = 0;
     private final MediaUpgradeOfferRepository mediaUpgradeOfferRepository;
     private final TimeCounter callTimer;
     private final TimeCounter inactivityTimeCounter;
@@ -698,7 +698,7 @@ public class CallController implements
                                 throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
                         )
         );
-        endEngagementUseCase.execute();
+        endEngagementUseCase.invoke();
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(callState.stop());
     }

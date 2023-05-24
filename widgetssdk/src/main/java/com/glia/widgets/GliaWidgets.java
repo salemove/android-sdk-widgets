@@ -137,7 +137,8 @@ public class GliaWidgets {
      * @param gliaWidgetsConfig Glia configuration
      */
     public synchronized static void init(GliaWidgetsConfig gliaWidgetsConfig) {
-        Dependencies.glia().init(createGliaConfig(gliaWidgetsConfig));
+        GliaConfig gliaConfig = createGliaConfig(gliaWidgetsConfig);
+        Dependencies.glia().init(gliaConfig);
         Dependencies.init(gliaWidgetsConfig);
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
@@ -149,6 +150,7 @@ public class GliaWidgets {
         return builder
                 .setSiteId(gliaWidgetsConfig.getSiteId())
                 .setRegion(gliaWidgetsConfig.getRegion())
+                .setBaseDomain(gliaWidgetsConfig.getBaseDomain())
                 .setContext(gliaWidgetsConfig.getContext())
                 .build();
     }

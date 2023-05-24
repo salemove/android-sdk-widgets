@@ -20,6 +20,7 @@ public class GliaWidgetsConfig {
     private final SiteApiKey siteApiKey;
     private final Context context;
     private final String region;
+    private final String baseDomain;
     private final int requestCode;
     private final String uiJsonRemoteConfig;
     private final String companyName;
@@ -62,6 +63,7 @@ public class GliaWidgetsConfig {
         this.siteId = builder.siteId;
         this.context = builder.context;
         this.region = builder.region;
+        this.baseDomain = builder.baseDomain;
         this.requestCode = builder.requestCode;
         this.uiJsonRemoteConfig = builder.uiJsonRemoteConfig;
         this.companyName = builder.companyName;
@@ -84,6 +86,10 @@ public class GliaWidgetsConfig {
 
     public String getRegion() {
         return region;
+    }
+
+    public String getBaseDomain() {
+        return baseDomain;
     }
 
     public SiteApiKey getSiteApiKey() {
@@ -172,6 +178,7 @@ public class GliaWidgetsConfig {
         SiteApiKey siteApiKey;
         Context context;
         String region;
+        String baseDomain;
         int requestCode;
         String uiJsonRemoteConfig;
         String companyName;
@@ -230,6 +237,16 @@ public class GliaWidgetsConfig {
             return this;
         }
 
+        /**
+         * @hidden
+         * @param baseDomain Base domain to be used.
+         * @return Builder instance
+         */
+        public Builder setBaseDomain(String baseDomain) {
+            this.baseDomain = baseDomain;
+            return this;
+        }
+
         public Builder setSiteApiKey(SiteApiKey siteApiKey) {
             this.siteApiKey = siteApiKey;
             return this;
@@ -267,7 +284,7 @@ public class GliaWidgetsConfig {
          * @param useOverlay - Is it allowed to overlay the application
          * @return Builder instance
          */
-        public Builder setUseOverlay(@Nullable boolean useOverlay) {
+        public Builder setUseOverlay(boolean useOverlay) {
             this.useOverlay = useOverlay;
             return this;
         }

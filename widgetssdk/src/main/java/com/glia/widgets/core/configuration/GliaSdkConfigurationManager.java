@@ -1,7 +1,5 @@
 package com.glia.widgets.core.configuration;
 
-import static com.glia.widgets.core.configuration.GliaSdkConfiguration.DEFAULT_SCREEN_SHARING_MODE;
-
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.UiTheme;
 
@@ -40,11 +38,7 @@ public class GliaSdkConfigurationManager {
     }
 
     public ScreenSharing.Mode getScreenSharingMode() {
-        if (screenSharingMode == null) {
-            return DEFAULT_SCREEN_SHARING_MODE;
-        } else {
-            return screenSharingMode;
-        }
+        return screenSharingMode;
     }
 
     public void setScreenSharingMode(ScreenSharing.Mode screenSharingMode) {

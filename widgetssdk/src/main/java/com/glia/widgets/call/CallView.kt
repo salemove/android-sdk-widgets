@@ -86,7 +86,9 @@ internal class CallView(
         Dependencies.getGliaThemeManager().theme?.callTheme
     }
 
-    private val audioManager: AudioManager by lazy { context.getSystemService()!! }
+    //should be used only with `applicationContext` otherwise `audioManager` won’t
+    // work properly for more than one call
+    private val audioManager: AudioManager by lazy { context.applicationContext.getSystemService()!! }
     private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
         override fun onScreenSharingRequestError(ex: GliaException) {
             showToast(ex.debugMessage)

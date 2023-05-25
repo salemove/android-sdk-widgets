@@ -188,8 +188,11 @@ public class MainFragment extends Fragment {
     }
 
     private void listenForCallVisualizerEngagements() {
+        // If Visitor Code is displayed as embedded view then it should be hidden on engagement start
         GliaWidgets.getCallVisualizer().onEngagementStart(() -> {
-            showToast("Call Visualiser engagement established");
+            FragmentActivity activity = getActivity();
+            if (activity == null) return;
+            activity.runOnUiThread(this::removeVisitorCodeFromDedicatedView);
         });
     }
 
@@ -481,8 +484,15 @@ public class MainFragment extends Fragment {
     private void showVisitorCodeInADedicatedView() {
         VisitorCodeView visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(getContext());
         CardView cv = containerView.findViewById(R.id.container);
+        cv.removeAllViews();
         cv.addView(visitorCodeView);
         cv.setVisibility(View.VISIBLE);
+    }
+
+    private void removeVisitorCodeFromDedicatedView() {
+        CardView cv = containerView.findViewById(R.id.container);
+        cv.removeAllViews();
+        cv.setVisibility(View.GONE);
     }
 
     private void showToast(String message) {

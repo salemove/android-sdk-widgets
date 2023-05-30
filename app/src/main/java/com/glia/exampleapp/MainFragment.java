@@ -113,9 +113,7 @@ public class MainFragment extends Fragment {
         }
 
         if (push.getType() == GliaPushMessage.PushType.QUEUED_MESSAGE) {
-            authenticate(() -> {
-                navigateToChat(ChatType.SECURE_MESSAGING);
-            });
+            authenticate(() -> navigateToChat(ChatType.SECURE_MESSAGING));
         } else {
             navigateToChat(ChatType.LIVE_CHAT);
         }
@@ -358,23 +356,25 @@ public class MainFragment extends Fragment {
         if (getContext() == null) return;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        final EditText tokenInput = prepareTokenInputViewEditText(builder);
-        tokenInput.setText(getAuthToken());
+        final EditText jwtInput = prepareJwtInputViewEditText(builder);
+        final EditText externalTokenInput = prepareExternalTokenInputViewEditText(builder);
+        jwtInput.setText(getAuthToken());
         builder.setPositiveButton(
                 getString(R.string.authentication_dialog_authenticate_button),
-                (dialog, which) -> authenticate(tokenInput, callback));
+                (dialog, which) -> authenticate(jwtInput, externalTokenInput, callback));
         builder.setNeutralButton(
                 getString(R.string.authentication_dialog_clear_button),
                 null);
         builder.setNegativeButton(
                 R.string.authentication_dialog_cancel_button,
                 (dialog, which) -> dialog.cancel());
-        builder.setView(prepareDialogLayout(tokenInput));
+        builder.setView(prepareDialogLayout(jwtInput, externalTokenInput));
         AlertDialog alertDialog = builder.create();
         alertDialog.setOnShowListener(dialogInterface -> {
             Button button = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
             button.setOnClickListener(v -> {
-                tokenInput.setText("");
+                jwtInput.setText("");
+                externalTokenInput.setText("");
                 clearAuthToken();
             });
         });
@@ -382,7 +382,7 @@ public class MainFragment extends Fragment {
     }
 
     @NonNull
-    private LinearLayout prepareDialogLayout(EditText tokenInput) {
+    private LinearLayout prepareDialogLayout(EditText jwtInput, EditText externalTokenInput) {
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -390,17 +390,33 @@ public class MainFragment extends Fragment {
         int marginInDp = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
         layoutParams.setMargins(marginInDp, 0, marginInDp, 0);
-        tokenInput.setLayoutParams(layoutParams);
-        tokenInput.setGravity(android.view.Gravity.TOP | Gravity.START);
+        jwtInput.setLayoutParams(layoutParams);
+        jwtInput.setGravity(android.view.Gravity.TOP | Gravity.START);
+        externalTokenInput.setLayoutParams(layoutParams);
+        externalTokenInput.setGravity(android.view.Gravity.TOP | Gravity.START);
 
-        container.addView(tokenInput, layoutParams);
+        container.addView(jwtInput, layoutParams);
+        container.addView(externalTokenInput, layoutParams);
         return container;
     }
 
     @NonNull
-    private EditText prepareTokenInputViewEditText(AlertDialog.Builder builder) {
+    private EditText prepareJwtInputViewEditText(AlertDialog.Builder builder) {
         final EditText input = new EditText(getContext());
-        input.setHint(R.string.authentication_dialog_token_input_hint);
+        input.setHint(R.string.authentication_dialog_jwt_input_hint);
+        input.setSingleLine();
+        input.setMaxLines(10);
+        input.setHorizontallyScrolling(false);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setTitle(R.string.authentication_dialog_title);
+        builder.setView(input);
+        return input;
+    }
+
+    @NonNull
+    private EditText prepareExternalTokenInputViewEditText(AlertDialog.Builder builder) {
+        final EditText input = new EditText(getContext());
+        input.setHint(R.string.authentication_dialog_external_token_input_hint);
         input.setSingleLine();
         input.setMaxLines(10);
         input.setHorizontallyScrolling(false);
@@ -435,11 +451,15 @@ public class MainFragment extends Fragment {
         setupAuthButtonsVisibility();
     }
 
-    private void authenticate(EditText input, @Nullable OnAuthCallback callback) {
+    private void authenticate(EditText jwtInput,
+                              EditText externalTokenInput,
+                              @Nullable OnAuthCallback callback) {
         if (getActivity() == null || containerView == null) return;
 
-        String jwt = input.getText().toString();
-        authentication.authenticate((response, exception) -> {
+        String jwt = jwtInput.getText().toString();
+        String externalAccessToken = externalTokenInput.getText().toString();
+        if (externalAccessToken.isEmpty()) externalAccessToken = null;
+        authentication.authenticate(jwt, externalAccessToken, (response, exception) -> {
             if (exception == null && authentication.isAuthenticated()) {
                 setupAuthButtonsVisibility();
                 if (callback != null) {
@@ -448,7 +468,7 @@ public class MainFragment extends Fragment {
             } else {
                 showToast("Error: " + exception);
             }
-        }, jwt);
+        });
 
         saveAuthToken(jwt);
     }

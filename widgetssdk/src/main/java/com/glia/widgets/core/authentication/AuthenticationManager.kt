@@ -19,15 +19,20 @@ internal class AuthenticationManager(
         authentication.setBehavior(behavior)
     }
 
+    @Deprecated(
+        "Please use authenticate(String, String?, RequestCallback<Void>)",
+        ReplaceWith("authenticate(jwtToken, null, requestCallback)")
+    )
     override fun authenticate(requestCallback: RequestCallback<Void>, jwtToken: String) {
         cleanup()
-        authentication.authenticate(requestCallback, jwtToken)
+        authentication.authenticate(jwtToken, null, requestCallback)
     }
 
     override fun authenticate(jwtToken: String,
-                               externalAccessToken: String?,
-                               requestCallback: RequestCallback<Void>) {
-        // TODO: Covered by https://github.com/salemove/android-sdk-widgets/pull/620
+                              externalAccessToken: String?,
+                              requestCallback: RequestCallback<Void>) {
+        cleanup()
+        authentication.authenticate(jwtToken, externalAccessToken, requestCallback)
     }
 
     override fun deauthenticate(requestCallback: RequestCallback<Void>) {

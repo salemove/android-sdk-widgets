@@ -24,8 +24,6 @@ allprojects {
         flatDir {
             dirs '../libs'
         }
-        //TODO Needed to use not public new Core SDK release, remove before release
-        maven { url 'https://s01.oss.sonatype.org/content/repositories/comglia-1187' }
     }
 }
 

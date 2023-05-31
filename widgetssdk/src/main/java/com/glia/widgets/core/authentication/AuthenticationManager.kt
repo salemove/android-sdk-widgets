@@ -24,6 +24,12 @@ internal class AuthenticationManager(
         authentication.authenticate(requestCallback, jwtToken)
     }
 
+    override fun authenticate(jwtToken: String,
+                               externalAccessToken: String?,
+                               requestCallback: RequestCallback<Void>) {
+        // TODO: Covered by https://github.com/salemove/android-sdk-widgets/pull/620
+    }
+
     override fun deauthenticate(requestCallback: RequestCallback<Void>) {
         cleanup()
         authentication.deauthenticate(requestCallback)

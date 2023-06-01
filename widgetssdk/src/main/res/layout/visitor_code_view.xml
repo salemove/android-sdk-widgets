@@ -20,9 +20,11 @@
             android:id="@+id/success_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:clipChildren="false"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/glia_large_x_large"
+            android:paddingEnd="@dimen/glia_large_x_large"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/success_title_view"

@@ -86,10 +86,13 @@ object Dialogs {
         context: Context,
         theme: UiTheme,
         view: VisitorCodeView,
+        horizontalInset: Int = 0,
         cancelable: Boolean = true
     ): AlertDialog {
         return MaterialAlertDialogBuilder(context)
             .setView(view)
+            .setBackgroundInsetStart(horizontalInset)
+            .setBackgroundInsetEnd(horizontalInset)
             .setCancelable(cancelable)
             .show()
             .also { setDialogBackground(it, theme.gliaChatBackgroundColor) }

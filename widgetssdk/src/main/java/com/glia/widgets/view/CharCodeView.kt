@@ -80,16 +80,20 @@ class CharCodeView @JvmOverloads constructor(
 
     private fun createCharSlotView(character: Char, runtimeTheme: UiTheme?, remoteTheme: VisitorCodeTheme?): TextView {
 
-        val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode) // TODO: confirm this
+        val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode)
         charView.isFocusable = false
         charView.text = character.toString()
-        charView.gravity = TEXT_ALIGNMENT_CENTER
+        charView.textAlignment = TEXT_ALIGNMENT_CENTER
         charView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
         applyRuntimeTheme(runtimeTheme, charView)
         applyRemoteTheme(remoteTheme, charView)
 
-        val charViewLayout = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        val charViewLayout = LayoutParams(
+            WIDTH_NOT_SPECIFIED,
+            LayoutParams.WRAP_CONTENT,
+            USE_ALL_AVAILABLE_WIDTH
+        )
         charViewLayout.setMargins(
             charViewProps.horizonMargin,
             charViewProps.verticalMargin,
@@ -98,11 +102,7 @@ class CharCodeView @JvmOverloads constructor(
         )
         charView.layoutParams = charViewLayout
 
-        charView.setPadding(
-            charViewProps.horizonPadding,
-            charViewProps.verticalPadding,
-            charViewProps.horizonPadding,
-            charViewProps.verticalPadding
+        charView.setPadding(0, charViewProps.verticalPadding, 0, charViewProps.verticalPadding
         )
 
         return charView
@@ -143,6 +143,11 @@ class CharCodeView @JvmOverloads constructor(
 
         charView.applyLayerTheme(theme.numberSlotBackground)
         charView.applyTextTheme(theme.numberSlotText, withAlignment = false)
+    }
+
+    companion object {
+        private const val WIDTH_NOT_SPECIFIED = 0
+        private const val USE_ALL_AVAILABLE_WIDTH = 1f
     }
 
 }

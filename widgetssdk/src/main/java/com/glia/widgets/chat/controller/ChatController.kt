@@ -1638,9 +1638,10 @@ internal class ChatController(
                 dialogController.showEngagementEndedDialog()
             }
 
-            shouldHandleEndedEngagement -> {
+            else -> {
                 // Close chat screen
                 Dependencies.getControllerFactory().destroyControllers()
+                destroyView()
             }
         }
     }

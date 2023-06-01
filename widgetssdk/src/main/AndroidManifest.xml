@@ -53,6 +53,11 @@
             android:launchMode="singleTask"
             android:noHistory="true"
             android:theme="@style/Application.Glia.Translucent.Activity" />
+        <activity
+            android:name=".callvisualizer.mvpendscreensharing.MvpEndScreenSharingActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:theme="@style/Application.Glia.Call.Activity" />
 
         <service
             android:name=".core.chathead.ChatHeadService"

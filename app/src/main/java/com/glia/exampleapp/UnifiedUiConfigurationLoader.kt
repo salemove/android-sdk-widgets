@@ -11,9 +11,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.MessageLengthLimitingLogger
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 
 private fun Context.rawRes(@RawRes resId: Int): String = resources.openRawResource(resId).use {
@@ -46,10 +44,8 @@ object UnifiedUiConfigurationLoader {
     @JvmOverloads
     @JvmStatic
     //No error handling mechanisms because this is only for testing purposes
-    fun fetchRemoteConfiguration(url: String? = null): String = runBlocking(Dispatchers.Main) {
-        withContext(Dispatchers.IO) {
-            ktorClient.get(url ?: defaultUrl).bodyAsText()
-        }
+    fun fetchRemoteConfiguration(url: String? = null): String = runBlocking {
+        ktorClient.get(url ?: defaultUrl).bodyAsText()
     }
 
     @JvmStatic

@@ -75,6 +75,7 @@ class MergeKtTest {
         assertEquals(result.address?.zip, left.address?.zip)
         assertEquals(result.map!!["1"], "2")
     }
+
     @Test
     fun `deepMerge deep merges data class properties`() {
         val left = User(

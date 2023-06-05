@@ -9,6 +9,8 @@ internal class GetImageFileFromDownloadsUseCase(private val gliaFileRepository: 
     operator fun invoke(fileName: String?): Maybe<Bitmap> {
         return if (fileName.isNullOrEmpty()) {
             Maybe.error(FileNameMissingException())
-        } else gliaFileRepository.loadImageFromDownloads(fileName)
+        } else {
+            gliaFileRepository.loadImageFromDownloads(fileName)
+        }
     }
 }

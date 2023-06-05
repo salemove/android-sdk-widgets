@@ -15,13 +15,20 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 
 internal class ActivityWatcherForChatHeadTest {
 
     private val watcher = Mockito.mock(ActivityWatcherForChatHeadContract.Watcher::class.java)
     private val serviceChatHeadController = Mockito.mock(ServiceChatHeadController::class.java)
-    private val applicationChatHeadController = Mockito.mock(ApplicationChatHeadLayoutController::class.java)
+    private val applicationChatHeadController =
+        Mockito.mock(ApplicationChatHeadLayoutController::class.java)
     private val screenSharingController = Mockito.mock(ScreenSharingController::class.java)
     private val onEngagementUseCase = Mockito.mock(GliaOnEngagementUseCase::class.java)
     private val isFromCallScreenUseCase = Mockito.mock(IsFromCallScreenUseCase::class.java)

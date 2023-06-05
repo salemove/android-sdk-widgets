@@ -27,7 +27,7 @@ internal data class OptionButtonRemoteConfig(
     val highlightedLayerRemoteConfig: LayerRemoteConfig?,
 
     @SerializedName("font")
-    val fontRemoteConfig: FontRemoteConfig?,
+    val fontRemoteConfig: FontRemoteConfig?
 ) {
     fun toOptionButtonTheme(): OptionButtonTheme = OptionButtonTheme(
         normalText = normalTextRemoteConfig?.toTextTheme(),

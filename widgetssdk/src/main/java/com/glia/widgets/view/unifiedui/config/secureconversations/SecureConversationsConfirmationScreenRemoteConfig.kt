@@ -1,6 +1,5 @@
 package com.glia.widgets.view.unifiedui.config.secureconversations
 
-
 import com.glia.widgets.view.unifiedui.config.base.ButtonRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig

@@ -44,8 +44,8 @@ internal class ActivityWatcherForCallVisualizer(
 
     init {
         topActivityObserver.subscribe(
-            {activity -> resumedActivity = WeakReference(activity)},
-            {error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error)}
+            { activity -> resumedActivity = WeakReference(activity) },
+            { error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error) }
         )
         controller.setWatcher(this)
     }
@@ -120,7 +120,7 @@ internal class ActivityWatcherForCallVisualizer(
     private fun registerForCameraPermissionResult(activity: Activity) {
         (activity as? ComponentActivity?)?.let { componentActivity ->
             cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
-                isGranted: Boolean ->
+                    isGranted: Boolean ->
                 controller.onRequestedCameraPermissionResult(isGranted)
             }
         }
@@ -145,8 +145,9 @@ internal class ActivityWatcherForCallVisualizer(
         val componentActivity = activity as? ComponentActivity?
         if (componentActivity == null) {
             Logger.d(
-                TAG, "Activity does not support ActivityResultRegistry APIs, " +
-                        "legacy onActivityResult() should be used to acquire a media projection token"
+                TAG,
+                "Activity does not support ActivityResultRegistry APIs, " +
+                    "legacy onActivityResult() should be used to acquire a media projection token"
             )
             controller.removeMediaProjectionLaunchers(activity::class.java.simpleName)
             return
@@ -367,7 +368,7 @@ internal class ActivityWatcherForCallVisualizer(
         alertDialog = Dialogs.showVisitorCodeDialog(contextWithStyle, theme)
     }
 
-    private fun getRuntimeTheme(activity: Activity) : UiTheme {
+    private fun getRuntimeTheme(activity: Activity): UiTheme {
         val themeFromIntent: UiTheme? = activity.intent?.getParcelableExtra(GliaWidgets.UI_THEME)
         val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager().uiTheme
         return themeFromGlobalSetting.getFullHybridTheme(themeFromIntent)

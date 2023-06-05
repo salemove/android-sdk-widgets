@@ -14,7 +14,7 @@ class VisitorCodeController(
     private val dialogController: DialogController,
     private val visitorCodeRepository: VisitorCodeRepository,
     private val engagementRepository: GliaEngagementRepository
-    ) : VisitorCodeContract.Controller {
+) : VisitorCodeContract.Controller {
 
     private var disposable: Disposable? = null
     private val onEngagementStartConsumer: (Engagement) -> Unit = {
@@ -53,7 +53,7 @@ class VisitorCodeController(
             )
     }
 
-    private fun failGuardDuration(visitorCode: VisitorCode) : Long {
+    private fun failGuardDuration(visitorCode: VisitorCode): Long {
         return visitorCode.duration.run {
             if (this <= 0) {
                 defaultRefreshDurationMilliseconds

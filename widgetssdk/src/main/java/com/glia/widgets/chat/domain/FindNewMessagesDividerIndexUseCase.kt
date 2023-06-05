@@ -19,7 +19,6 @@ internal class FindNewMessagesDividerIndexUseCase {
         val iterator = messages.run { listIterator(size) }
 
         while (iterator.hasPrevious() && remainingUnreadMessagesCount > 0) {
-
             val message = iterator.previous()
 
             if (message is ServerChatItem) {
@@ -31,5 +30,4 @@ internal class FindNewMessagesDividerIndexUseCase {
 
         return dividerIndex
     }
-
 }

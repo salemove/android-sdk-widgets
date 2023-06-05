@@ -27,8 +27,10 @@ import com.glia.widgets.helper.fixCapturedPhotoRotation
 import com.glia.widgets.helper.mapUriToFileAttachment
 import java.io.IOException
 
-class MessageCenterActivity : AppCompatActivity(),
-    MessageCenterView.OnFinishListener, MessageCenterView.OnNavigateToMessagingListener,
+class MessageCenterActivity :
+    AppCompatActivity(),
+    MessageCenterView.OnFinishListener,
+    MessageCenterView.OnNavigateToMessagingListener,
     MessageCenterView.OnAttachFileListener {
 
     private lateinit var binding: MessageCenterActivityBinding

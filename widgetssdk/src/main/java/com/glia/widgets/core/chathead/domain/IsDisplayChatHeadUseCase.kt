@@ -24,14 +24,14 @@ internal abstract class IsDisplayChatHeadUseCase(
 
     abstract fun isDisplayBasedOnPermission(): Boolean
 
-    open operator fun invoke(viewName: String?) : Boolean {
+    open operator fun invoke(viewName: String?): Boolean {
         return (isBubbleEnabled() && isDisplayBasedOnPermission() && isShowForEngagement(viewName))
     }
 
     private fun isShowForEngagement(viewName: String?) =
         isShowForMediaEngagement(viewName) ||
-                isShowForChatEngagement(viewName) ||
-                isCallVisualizerScreenSharing(viewName)
+            isShowForChatEngagement(viewName) ||
+            isCallVisualizerScreenSharing(viewName)
 
     private fun isBubbleEnabled(): Boolean {
         return configurationManager.isUseOverlay
@@ -39,7 +39,7 @@ internal abstract class IsDisplayChatHeadUseCase(
 
     private fun isCallVisualizerScreenSharing(viewName: String?): Boolean {
         return engagementRepository.isCallVisualizerEngagement &&
-                screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
+            screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
     }
 
     private fun isShowForMediaEngagement(viewName: String?): Boolean {
@@ -52,9 +52,9 @@ internal abstract class IsDisplayChatHeadUseCase(
 
     private fun isNotInListOfGliaViewsExceptChat(viewName: String?): Boolean {
         return viewName != CallView::class.java.simpleName &&
-                viewName != FilePreviewView::class.java.simpleName &&
-                viewName != EndScreenSharingView::class.java.simpleName &&
-                viewName != MessageCenterView::class.java.simpleName
+            viewName != FilePreviewView::class.java.simpleName &&
+            viewName != EndScreenSharingView::class.java.simpleName &&
+            viewName != MessageCenterView::class.java.simpleName
     }
 
     private fun isNotInListOfGliaViews(viewName: String?): Boolean {

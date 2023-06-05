@@ -49,7 +49,7 @@ internal class MessageCenterController(
     private val disposables = CompositeDisposable()
 
     @Volatile
-    private var state = State()
+    private var state = MessageCenterState()
 
     override var photoCaptureFileUri: Uri? = null
 
@@ -74,15 +74,21 @@ internal class MessageCenterController(
         view?.setupViewAppearance()
         view?.emitUploadAttachments(getFileAttachmentsUseCase())
 
-        disposables.add(addFileAttachmentsObserverUseCase().subscribe {
-            view?.emitUploadAttachments(it)
-        })
-        disposables.add(showMessageLimitErrorUseCase().subscribe {
-            setState(state.copy(showMessageLimitError = it))
-        })
-        disposables.add(sendMessageButtonStateUseCase().subscribe {
-            setState(state.copy(sendMessageButtonState = it))
-        })
+        disposables.add(
+            addFileAttachmentsObserverUseCase().subscribe {
+                view?.emitUploadAttachments(it)
+            }
+        )
+        disposables.add(
+            showMessageLimitErrorUseCase().subscribe {
+                setState(state.copy(showMessageLimitError = it))
+            }
+        )
+        disposables.add(
+            sendMessageButtonStateUseCase().subscribe {
+                setState(state.copy(sendMessageButtonState = it))
+            }
+        )
 
         updateAllowFileSendState()
     }
@@ -174,22 +180,24 @@ internal class MessageCenterController(
     }
 
     override fun ensureMessageCenterAvailability() {
-        isMessageCenterAvailableUseCase(RequestCallback { isAvailable, exception ->
-            val showSendMessageGroup = when {
-                exception != null -> {
-                    dialogController.showUnexpectedErrorDialog()
-                    false
-                }
+        isMessageCenterAvailableUseCase(
+            RequestCallback { isAvailable, exception ->
+                val showSendMessageGroup = when {
+                    exception != null -> {
+                        dialogController.showUnexpectedErrorDialog()
+                        false
+                    }
 
-                !isAvailable -> {
-                    dialogController.showMessageCenterUnavailableDialog()
-                    false
-                }
+                    !isAvailable -> {
+                        dialogController.showMessageCenterUnavailableDialog()
+                        false
+                    }
 
-                else -> true
+                    else -> true
+                }
+                setState(state.copy(showSendMessageGroup = showSendMessageGroup))
             }
-            setState(state.copy(showSendMessageGroup = showSendMessageGroup))
-        })
+        )
     }
 
     override fun onAttachmentReceived(file: FileAttachment) {
@@ -215,7 +223,8 @@ internal class MessageCenterController(
                 override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
                     Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
                 }
-            })
+            }
+        )
     }
 
     override fun onRemoveAttachment(file: FileAttachment) {
@@ -228,7 +237,7 @@ internal class MessageCenterController(
     }
 
     @Synchronized
-    private fun setState(state: State) {
+    private fun setState(state: MessageCenterState) {
         this.state = state
         this.view?.onStateUpdated(state)
     }

@@ -7,11 +7,12 @@ import kotlin.math.roundToInt
 internal data class LayerTheme(
     val fill: ColorTheme? = null,
     @ColorInt
-    val stroke: Int? = null, // Currently it is not possible to draw gradient stroke(change to ThemeColor in case of migrating to Jetpack Compose)
+    val stroke: Int? = null,
+    // Currently it is not possible to draw gradient stroke(change to ThemeColor in case of migrating to Jetpack Compose)
     @Px
     val borderWidth: Float? = null, // width in pixels
     @Px
-    val cornerRadius: Float? = null //radius in pixels
+    val cornerRadius: Float? = null // radius in pixels
 ) {
 
     @get:Px

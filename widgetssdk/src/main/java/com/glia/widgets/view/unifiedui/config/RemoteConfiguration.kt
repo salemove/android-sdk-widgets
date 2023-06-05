@@ -52,7 +52,8 @@ internal data class RemoteConfiguration(
             surveyTheme = surveyRemoteConfig?.toSurveyTheme(),
             callVisualizerTheme = callVisualizerRemoteConfig?.toCallVisualizerTheme(),
             secureConversationsWelcomeScreenTheme = secureConversationsWelcomeScreenRemoteConfig?.toSecureConversationsWelcomeScreenTheme(),
-            secureConversationsConfirmationScreenTheme = secureConversationsConfirmationScreenRemoteConfig?.toSecureConversationsConfirmationScreenTheme()
+            secureConversationsConfirmationScreenTheme = secureConversationsConfirmationScreenRemoteConfig
+                ?.toSecureConversationsConfirmationScreenTheme()
         )
 
         return defaultTheme deepMerge unifiedTheme

@@ -12,9 +12,12 @@ import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.reset
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.Mockito.verifyNoMoreInteractions
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.function.Consumer
 
@@ -23,7 +26,8 @@ internal class VisitorCodeControllerTest {
     private val dialogController = mock(DialogController::class.java)
     private val visitorCodeRepository = mock(VisitorCodeRepository::class.java)
     private val engagementRepository = mock(GliaEngagementRepository::class.java)
-    private val controller = VisitorCodeController(dialogController, visitorCodeRepository, engagementRepository)
+    private val controller =
+        VisitorCodeController(dialogController, visitorCodeRepository, engagementRepository)
     private val view = mock(VisitorCodeContract.View::class.java)
     private val refreshTime = 1000L
 

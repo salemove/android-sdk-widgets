@@ -47,5 +47,4 @@ class AddNewMessagesDividerUseCaseTest {
         assertTrue(added)
         assertTrue(items.contains(NewMessagesItem))
     }
-
 }

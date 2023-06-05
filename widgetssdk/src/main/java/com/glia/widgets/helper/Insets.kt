@@ -37,7 +37,6 @@ internal val WindowInsetsCompat.isKeyboardVisible: Boolean
 internal val WindowInsetsCompat.keyboardHeight: Int
     get() = getInsets(WindowInsetsCompat.Type.ime()).bottom
 
-
 internal typealias WindowInsetsAnimationCallback = (insets: Insets) -> Unit
 
 /**
@@ -102,5 +101,4 @@ internal class SimpleWindowInsetsAndAnimationHandler(
 
         return WindowInsetsCompat.CONSUMED
     }
-
 }

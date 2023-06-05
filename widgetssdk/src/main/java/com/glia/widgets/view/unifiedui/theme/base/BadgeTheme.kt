@@ -4,5 +4,5 @@ internal data class BadgeTheme(
     val textColor: ColorTheme? = null,
     val background: LayerTheme? = null,
     val textSize: Float? = null, // Size in SP
-    val textStyle: Int? = null, // Typeface.NORMAL
+    val textStyle: Int? = null // Typeface.NORMAL
 )

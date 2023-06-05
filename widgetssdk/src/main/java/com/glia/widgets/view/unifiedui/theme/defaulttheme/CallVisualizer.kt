@@ -17,7 +17,6 @@ internal fun CallVisualizerTheme(pallet: ColorPallet): CallVisualizerTheme =
         visitorCodeTheme = VisitorCodeTheme(pallet)
     )
 
-
 /**
  * Default theme for EndScreenSharing screen
  */
@@ -28,7 +27,6 @@ internal fun EndScreenSharingTheme(pallet: ColorPallet): EndScreenSharingTheme =
         label = BaseDarkColorTextTheme(pallet),
         background = LayerTheme(fill = pallet.backgroundColorTheme)
     )
-
 
 /**
  * Default theme for Visitor Code dialog

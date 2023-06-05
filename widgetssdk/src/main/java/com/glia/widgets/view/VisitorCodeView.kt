@@ -42,7 +42,8 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay
 /**
  * A view for displaying the visitor code to the visitor.
  *
- * This view should not be instantiated directly - neither programmatically nor inside your XML layouts.
+ * This view should not be instantiated directly -
+ *  neither programmatically nor inside your XML layouts.
  * Use [CallVisualizer.createVisitorCodeView] to create an instance of this view.
  */
 class VisitorCodeView internal constructor(
@@ -51,7 +52,7 @@ class VisitorCodeView internal constructor(
     private lateinit var controller: VisitorCodeContract.Controller
     private var theme: UiTheme? = null
 
-    private var timer : CountDownTimer? = null
+    private var timer: CountDownTimer? = null
 
     private var successContainer: View
     private var failureContainer: View
@@ -163,7 +164,10 @@ class VisitorCodeView internal constructor(
     override fun showVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
-            successTitle.contentDescription = context.getString(R.string.glia_visitor_code_content_description, visitorCode.code.separateStringWithSymbol("-"))
+            successTitle.contentDescription = context.getString(
+                R.string.glia_visitor_code_content_description,
+                visitorCode.code.separateStringWithSymbol("-")
+            )
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
             charCodeView.setText(visitorCode.code)
         }

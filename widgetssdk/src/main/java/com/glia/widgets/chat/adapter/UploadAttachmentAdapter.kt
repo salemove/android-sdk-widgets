@@ -89,10 +89,11 @@ class ViewHolder(
 
     private val theme: FileUploadBarTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.run {
-            if (isMessageCenter)
+            if (isMessageCenter) {
                 secureConversationsWelcomeScreenTheme?.attachmentListTheme
-            else
+            } else {
                 chatTheme?.input?.fileUploadBar
+            }
         }
     }
 
@@ -125,9 +126,10 @@ class ViewHolder(
     }
 
     private fun updateExtensionType(
-        attachment: FileAttachment, mimeType: String, displayName: String
+        attachment: FileAttachment,
+        mimeType: String,
+        displayName: String
     ) {
-
         if (attachment.attachmentStatus.isError) {
             extensionContainerView.setCardBackgroundColor(
                 itemView.getColorStateListCompat(R.color.glia_system_agent_bubble_color)
@@ -172,10 +174,13 @@ class ViewHolder(
     }
 
     private fun updateContentDescription(
-        displayName: String, size: String?, attachment: FileAttachment
+        displayName: String,
+        size: String?,
+        attachment: FileAttachment
     ) {
         removeItemButton.contentDescription = context.getString(
-            R.string.glia_chat_attachment_remove_item_content_description, displayName
+            R.string.glia_chat_attachment_remove_item_content_description,
+            displayName
         )
         itemView.contentDescription = context.getString(
             R.string.glia_chat_attachment_item_content_description,
@@ -234,7 +239,6 @@ class ViewHolder(
     }
 
     private fun setProgressIndicatorState(status: Status) {
-
         val normalColor = theme?.progress?.primaryColor
             ?: itemView.getColorCompat(R.color.glia_brand_primary_color)
         val errorColor = theme?.errorProgress?.primaryColor

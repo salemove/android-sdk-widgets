@@ -57,15 +57,14 @@ internal class ActivityWatcherForCallVisualizerController(
             when (activity.intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)) {
                 is ScreenSharing -> acquireMediaProjectionToken(activity)
                 is Camera -> watcher.requestCameraPermission()
-                else -> { /* Shouldn't happen. No need to do anything. */
-                }
+                else -> { /* Shouldn't happen. No need to do anything. */ }
             }
         }
     }
 
     private fun addEngagementEndedCallback() {
-            watcher.removeDialogFromStack()
-            currentDialogMode = MODE_NONE
+        watcher.removeDialogFromStack()
+        currentDialogMode = MODE_NONE
     }
 
     override fun onActivityPaused() {
@@ -130,7 +129,6 @@ internal class ActivityWatcherForCallVisualizerController(
                 watcher.dismissOverlayDialog()
                 watcher.openOverlayPermissionView()
             }
-
             else -> Logger.d(TAG, "Not relevant")
         }
         currentDialogMode = MODE_NONE
@@ -143,17 +141,14 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING,
             MODE_START_SCREEN_SHARING -> screenSharingController.onScreenSharingDeclined()
-
             MODE_OVERLAY_PERMISSION -> {
                 watcher.dismissOverlayDialog()
             }
-
             MODE_MEDIA_UPGRADE -> {
                 mediaUpgradeOffer?.decline { error ->
                     onMediaUpgradeDecline(error)
                 }
             }
-
             MODE_VISITOR_CODE,
             MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
         }

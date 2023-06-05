@@ -7,7 +7,8 @@ import androidx.core.graphics.ColorUtils
 import kotlin.math.roundToInt
 
 internal data class ColorTheme(
-    val isGradient: Boolean = false, val values: List<Int>
+    val isGradient: Boolean = false,
+    val values: List<Int>
 ) {
     constructor(@ColorInt color: Int) : this(values = listOf(color))
 
@@ -31,5 +32,4 @@ internal data class ColorTheme(
 
         return copy(values = newColors)
     }
-
 }

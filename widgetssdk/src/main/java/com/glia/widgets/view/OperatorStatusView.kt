@@ -24,7 +24,10 @@ import com.squareup.picasso.Picasso
 import kotlin.properties.Delegates
 
 class OperatorStatusView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+    defStyleRes: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val binding by lazy {
@@ -75,7 +78,6 @@ class OperatorStatusView @JvmOverloads constructor(
             )
 
             updateProfilePictureViewSize(operatorImageSize)
-
         }
 
         setOnHoldVisibility()
@@ -197,7 +199,10 @@ class OperatorStatusView @JvmOverloads constructor(
 
     private fun setPlaceholderViewContentPadding(contentPadding: Int) {
         placeholderView.setPaddingRelative(
-            contentPadding, contentPadding, contentPadding, contentPadding
+            contentPadding,
+            contentPadding,
+            contentPadding,
+            contentPadding
         )
     }
 

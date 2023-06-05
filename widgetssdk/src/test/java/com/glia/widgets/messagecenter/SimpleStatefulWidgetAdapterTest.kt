@@ -4,7 +4,12 @@ import android.graphics.Color
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import kotlin.properties.Delegates
 
 class SimpleStatefulWidgetAdapterTest {
@@ -36,9 +41,9 @@ class SimpleStatefulWidgetAdapterTest {
         callback = mock()
         adapter = SimpleStatefulWidgetAdapter(defaultState, callback)
 
-        //Set default Theme
+        // Set default Theme
         adapter.updateStatefulTheme(defaultTheme)
-        resetMocks()// reset and clear all mocks after setting the default theme
+        resetMocks() // reset and clear all mocks after setting the default theme
     }
 
     @After

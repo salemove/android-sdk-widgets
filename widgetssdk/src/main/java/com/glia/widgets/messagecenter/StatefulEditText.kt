@@ -134,5 +134,4 @@ class StatefulEditText @JvmOverloads constructor(context: Context, attrs: Attrib
 
         statefulWidgetAdapter.updateState(state)
     }
-
 }

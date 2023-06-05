@@ -25,7 +25,8 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class OperatorMessageViewHolder(
-    private val binding: ChatOperatorMessageLayoutBinding, private val uiTheme: UiTheme
+    private val binding: ChatOperatorMessageLayoutBinding,
+    private val uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
@@ -33,7 +34,9 @@ internal class OperatorMessageViewHolder(
 
     private val messageContentView: TextView by lazy {
         ChatReceiveMessageContentBinding.inflate(
-            itemView.layoutInflater, binding.contentLayout, false
+            itemView.layoutInflater,
+            binding.contentLayout,
+            false
         ).root.apply {
             uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
                 backgroundTintList = it
@@ -45,7 +48,7 @@ internal class OperatorMessageViewHolder(
 
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
-            //Unified Ui
+            // Unified Ui
             applyLayerTheme(operatorTheme?.background)
             applyTextTheme(operatorTheme?.text)
         }

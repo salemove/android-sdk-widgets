@@ -518,14 +518,14 @@ data class UiTheme(
          */
         @ColorRes
         var newMessageDividerColor: Int? = null
-        private set
+            private set
 
         /**
          * The color of "new messages" divider text in the chat
          */
         @ColorRes
         var newMessageDividerTextColor: Int? = null
-        private set
+            private set
 
         /**
          * Color for bot action button background color
@@ -728,14 +728,14 @@ data class UiTheme(
          */
         @DrawableRes
         var iconEndScreenShare: Int? = null
-        private set
+            private set
 
         /**
          * The icon tint resId when visitor is sharing the screen
          */
         @DrawableRes
         var endScreenShareTintColor: Int? = null
-        private set
+            private set
 
         /**
          * Connecting Operator Status Layout Heading Text Color
@@ -1086,5 +1086,4 @@ data class UiTheme(
             return UiTheme(this)
         }
     }
-
 }

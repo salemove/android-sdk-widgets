@@ -33,7 +33,9 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.appbar.AppBarLayout
 
 class AppBarView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.gliaChatStyle
 ) : AppBarLayout(context, attrs, defStyleAttr) {
     private val binding: AppBarBinding by lazy { AppBarBinding.inflate(layoutInflater, this) }
 
@@ -54,23 +56,31 @@ class AppBarView @JvmOverloads constructor(
     private fun setDefaults(attrs: AttributeSet?) {
         context.withStyledAttributes(attrs, R.styleable.AppBarView) {
             iconAppBarBackRes = getTypedArrayResId(
-                this, R.styleable.AppBarView_backIcon, R.attr.gliaIconAppBarBack
+                this,
+                R.styleable.AppBarView_backIcon,
+                R.attr.gliaIconAppBarBack
             ).also {
                 binding.toolbar.setNavigationIcon(it)
             }
 
             val titleColorRes = getTypedArrayResId(
-                this, R.styleable.AppBarView_lightTint, R.attr.gliaChatHeaderTitleTintColor
+                this,
+                R.styleable.AppBarView_lightTint,
+                R.attr.gliaChatHeaderTitleTintColor
             )
             binding.title.setTextColor(getColorCompat(titleColorRes))
 
             val homeButtonTintColor = getTypedArrayResId(
-                this, R.styleable.AppBarView_lightTint, R.attr.gliaChatHeaderHomeButtonTintColor
+                this,
+                R.styleable.AppBarView_lightTint,
+                R.attr.gliaChatHeaderHomeButtonTintColor
             )
             binding.toolbar.navigationIcon?.setTint(getColorCompat(homeButtonTintColor))
 
             val backgroundTintList = getTypedArrayResId(
-                this, R.styleable.AppBarView_android_backgroundTint, R.attr.gliaBrandPrimaryColor
+                this,
+                R.styleable.AppBarView_android_backgroundTint,
+                R.attr.gliaBrandPrimaryColor
             )
             binding.toolbar.backgroundTintList = getColorStateListCompat(backgroundTintList)
 
@@ -82,7 +92,8 @@ class AppBarView @JvmOverloads constructor(
             Utils.getFont(this, context)?.also { binding.title.typeface = it }
 
             val leaveIconTint = getTypedArrayResId(
-                this, R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
+                this,
+                R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
                 R.attr.gliaChatHeaderExitQueueButtonTintColor
             )
             leaveQueueIcon.icon?.setTint(getColorCompat(leaveIconTint))

@@ -8,7 +8,7 @@ internal data class ShadowRemoteConfig(
     val colorLayerRemoteConfig: ColorLayerRemoteConfig?,
 
     @SerializedName("offset")
-    val elevation: SizeDpRemoteConfig? //using offset param as an elevation, can’t use opacity and radius
+    val elevation: SizeDpRemoteConfig? // using offset param as an elevation, can’t use opacity and radius
 
 ) {
 

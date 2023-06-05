@@ -78,7 +78,8 @@ class IsMessagingAvailableUseCaseTest {
         )
         val queues = arrayOf(audioQueue, queueWithoutMessagingIdFromUseCase, videoQueue)
         val isMessageCenterAvailable: Boolean = isMessagingAvailableUseCase.containsMessagingQueue(
-            arrayOf(messagingQueueId), queues
+            arrayOf(messagingQueueId),
+            queues
         )
         assertFalse(isMessageCenterAvailable)
     }
@@ -138,5 +139,4 @@ class IsMessagingAvailableUseCaseTest {
             mediaTypesWithMessaging,
             false
         )
-
 }

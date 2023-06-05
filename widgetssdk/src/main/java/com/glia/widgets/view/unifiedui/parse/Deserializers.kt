@@ -26,7 +26,8 @@ import android.graphics.Color as SystemColor
 private const val TAG = "UnifiedUi:Deserializers"
 
 internal fun <T> tryOrNull(
-    onError: ((Exception) -> Unit)? = { Logger.e(TAG, "Skipping", it) }, block: () -> T?
+    onError: ((Exception) -> Unit)? = { Logger.e(TAG, "Skipping", it) },
+    block: () -> T?
 ): T? = try {
     block()
 } catch (ex: Exception) {
@@ -41,7 +42,9 @@ internal fun <T> tryOrNull(
 internal class AlignmentDeserializer : JsonDeserializer<AlignmentTypeRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): AlignmentTypeRemoteConfig? = tryOrNull {
         AlignmentTypeRemoteConfig.values().firstOrNull { it.type == json.asString }
     }
@@ -53,13 +56,14 @@ internal class AlignmentDeserializer : JsonDeserializer<AlignmentTypeRemoteConfi
 internal class ColorDeserializer : JsonDeserializer<ColorRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): ColorRemoteConfig? = tryOrNull(onError = {
         Logger.e(TAG, "ColorDeserializer", IllegalArgumentException("${it.message}: -> $json"))
     }) {
         ColorRemoteConfig(SystemColor.parseColor(json.asString))
     }
-
 }
 
 /**
@@ -86,7 +90,9 @@ internal class ColorLayerDeserializer : JsonDeserializer<ColorLayerRemoteConfig?
     private val colorDeserializer = ColorDeserializer()
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): ColorLayerRemoteConfig? = tryOrNull {
         val root = json.asJsonObject
 
@@ -103,7 +109,9 @@ internal class ColorLayerDeserializer : JsonDeserializer<ColorLayerRemoteConfig?
     }
 
     private fun parseColors(
-        valuesArray: JsonArray?, typeOfT: Type, context: JsonDeserializationContext
+        valuesArray: JsonArray?,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): List<ColorRemoteConfig>? = valuesArray?.mapNotNull {
         colorDeserializer.deserialize(it, typeOfT, context)
     }?.takeIf {
@@ -122,12 +130,14 @@ internal class ColorLayerDeserializer : JsonDeserializer<ColorLayerRemoteConfig?
 
 /**
  * Deserializes textStyle property from remote config
- * returns null if property differs from [REGULAR],[BOLD],[ITALIC],[BOLD_ITALIC]
+ * returns null if property differs from [REGULAR], [BOLD], [ITALIC], [BOLD_ITALIC]
  */
 internal class TextStyleDeserializer : JsonDeserializer<TextStyleRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): TextStyleRemoteConfig? = tryOrNull {
         val typeface = when (json.asString) {
             BOLD -> Typeface.BOLD
@@ -152,7 +162,9 @@ internal class DpDeserializer(private val resourceProvider: ResourceProvider) :
     JsonDeserializer<SizeDpRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): SizeDpRemoteConfig? = tryOrNull {
         val sizePx = json.asFloat.takeIf { it >= 0 }?.run(resourceProvider::convertDpToPixel)
             ?: return@tryOrNull null
@@ -164,7 +176,9 @@ internal class DpDeserializer(private val resourceProvider: ResourceProvider) :
 internal class SpDeserializer : JsonDeserializer<SizeSpRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): SizeSpRemoteConfig? = tryOrNull {
         val sizeSp = json.asFloat.takeIf { it >= 0 } ?: return@tryOrNull null
 
@@ -180,7 +194,9 @@ internal class AttachmentSourceTypeDeserializer :
     JsonDeserializer<AttachmentSourceTypeRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): AttachmentSourceTypeRemoteConfig? = tryOrNull {
         AttachmentSourceTypeRemoteConfig.values().firstOrNull { it.value == json.asString }
     }
@@ -193,7 +209,9 @@ internal class AttachmentSourceTypeDeserializer :
 internal class AxisDeserializer : JsonDeserializer<AxisRemoteConfig?> {
 
     override fun deserialize(
-        json: JsonElement, typeOfT: Type, context: JsonDeserializationContext
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
     ): AxisRemoteConfig? = tryOrNull {
         AxisRemoteConfig.values().firstOrNull { it.value == json.asString }
     }

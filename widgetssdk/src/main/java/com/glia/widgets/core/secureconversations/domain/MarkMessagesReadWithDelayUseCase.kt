@@ -29,5 +29,4 @@ internal class MarkMessagesReadWithDelayUseCase(private val repository: SecureCo
             }
         }
     }
-
 }

@@ -18,7 +18,7 @@ internal data class UpgradeRemoteConfig(
     val iconColor: ColorLayerRemoteConfig?,
 
     @SerializedName("background")
-    val background: LayerRemoteConfig?,
+    val background: LayerRemoteConfig?
 ) {
     fun toUpgradeTheme(): MediaUpgradeTheme = MediaUpgradeTheme(
         text = textRemoteConfig?.toTextTheme(),

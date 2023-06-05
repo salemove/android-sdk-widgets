@@ -41,5 +41,4 @@ internal class PreEngagementMessageUseCase(
             .doOnError { obj: Throwable -> obj.printStackTrace() }
             .share()
     }
-
 }

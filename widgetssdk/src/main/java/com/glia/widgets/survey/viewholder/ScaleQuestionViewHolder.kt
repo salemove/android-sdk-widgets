@@ -43,7 +43,8 @@ class ScaleQuestionViewHolder(
     }
 
     override fun onBind(
-        questionItem: QuestionItem, listener: SurveyAdapter.SurveyAdapterListener?
+        questionItem: QuestionItem,
+        listener: SurveyAdapter.SurveyAdapterListener?
     ) {
         super.onBind(questionItem, listener)
         applyAnswer(questionItem.answer)

@@ -43,7 +43,9 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
         attrs,
         defStyleAttr,
         defStyleRes
-    ), SurveyContract.View, SurveyAdapterListener {
+    ),
+    SurveyContract.View,
+    SurveyAdapterListener {
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var onFinishListener: OnFinishListener? = null
     private var controller: SurveyContract.Controller? = null
@@ -151,7 +153,14 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     private fun setupCardView(cornerRadius: Float, colors: IntArray) {
         val background = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, null)
         background.cornerRadii = listOf(
-            cornerRadius, cornerRadius, cornerRadius, cornerRadius, 0f, 0f, 0f, 0f
+            cornerRadius,
+            cornerRadius,
+            cornerRadius,
+            cornerRadius,
+            0f,
+            0f,
+            0f,
+            0f
         ).toFloatArray()
         cardView.background = background
     }
@@ -174,7 +183,8 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        @SuppressLint("CustomViewStyleable") val typedArray = this.context.obtainStyledAttributes(
+        @SuppressLint("CustomViewStyleable")
+        val typedArray = this.context.obtainStyledAttributes(
             attrs,
             R.styleable.GliaView,
             defStyleAttr,
@@ -185,7 +195,8 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun setDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        @SuppressLint("CustomViewStyleable") val typedArray = this.context.obtainStyledAttributes(
+        @SuppressLint("CustomViewStyleable")
+        val typedArray = this.context.obtainStyledAttributes(
             attrs,
             R.styleable.GliaView,
             defStyleAttr,

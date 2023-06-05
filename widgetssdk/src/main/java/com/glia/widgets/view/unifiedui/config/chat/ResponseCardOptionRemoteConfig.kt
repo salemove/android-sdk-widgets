@@ -16,6 +16,6 @@ internal value class ResponseCardOptionRemoteConfig(
 //    val disabled: ButtonRemoteConfig?,
 ) {
     fun toResponseCardOptionTheme(): ResponseCardOptionTheme = ResponseCardOptionTheme(
-        normal = normal?.toButtonTheme(),
+        normal = normal?.toButtonTheme()
     )
 }

@@ -17,7 +17,6 @@ internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTi
 internal fun ColorStateList?.colorForState(state: IntArray): Int? =
     this?.getColorForState(state, defaultColor)
 
-
 // Common
 internal fun String.separateStringWithSymbol(symbol: String): String =
     asSequence().joinToString(symbol)

@@ -9,7 +9,8 @@ internal class PutImageFileToDownloadsUseCase(private val gliaFileRepository: Gl
     operator fun invoke(fileName: String?, bitmap: Bitmap): Completable {
         return if (fileName.isNullOrEmpty()) {
             Completable.error(FileNameMissingException())
-        } else gliaFileRepository
-            .putImageToDownloads(fileName, bitmap)
+        } else {
+            gliaFileRepository.putImageToDownloads(fileName, bitmap)
+        }
     }
 }

@@ -6,7 +6,12 @@ import android.graphics.Color
 import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
-import com.glia.widgets.view.unifiedui.theme.survey.*
+import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyBooleanQuestionTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyInputQuestionTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyScaleQuestionTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
+import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
 
 /**
  * Default theme for Survey screen

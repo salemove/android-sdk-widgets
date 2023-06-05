@@ -32,7 +32,6 @@ class ChatHeadService : Service() {
 
     private val chatHeadMargin: Int get() = resources.getDimensionPixelSize(R.dimen.glia_chat_head_content_padding)
 
-
     private val layoutFlag: Int
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -111,11 +110,13 @@ class ChatHeadService : Service() {
                     windowManager.updateViewLayout(chatHeadView, layoutParams)
                     controller.onChatHeadPositionChanged(layoutParams.x, layoutParams.y)
                 }
-            ) { controller.onChatHeadClicked() })
+            ) { controller.onChatHeadClicked() }
+        )
     }
 
     private fun initChatHeadPosition(
-        params: WindowManager.LayoutParams, chatHeadPosition: Pair<Int, Int>
+        params: WindowManager.LayoutParams,
+        chatHeadPosition: Pair<Int, Int>
     ) {
         val display = displaySize
         params.x = chatHeadPosition.first ?: getDefaultXPosition(display.width)
@@ -124,7 +125,7 @@ class ChatHeadService : Service() {
 
     private fun getDefaultXPosition(screenWidth: Int): Int = screenWidth - chatHeadSize - chatHeadMargin
 
-    //🤔 Need to think why it is strictly the 4/5 of screen height
+    // 🤔Need to think why it is strictly the 4/5 of screen height
     private fun getDefaultYPosition(screenHeight: Int): Int = screenHeight / 10 * 8
 
     companion object {

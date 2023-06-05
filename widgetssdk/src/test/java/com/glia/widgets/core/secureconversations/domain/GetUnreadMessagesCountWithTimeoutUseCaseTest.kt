@@ -77,5 +77,4 @@ class GetUnreadMessagesCountWithTimeoutUseCaseTest {
 
         useCase().test().assertComplete().assertValue(10)
     }
-
 }

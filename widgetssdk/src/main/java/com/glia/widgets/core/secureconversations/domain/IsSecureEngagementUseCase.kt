@@ -6,13 +6,14 @@ import com.glia.widgets.core.engagement.GliaEngagementRepository
 import com.glia.widgets.core.queue.GliaQueueRepository
 import com.glia.widgets.core.queue.model.GliaQueueingState
 
-class IsSecureEngagementUseCase(private val engagementConfigRepository: GliaEngagementConfigRepository,
-                                private val engagementRepository: GliaEngagementRepository,
-                                private val queueRepository: GliaQueueRepository
+class IsSecureEngagementUseCase(
+    private val engagementConfigRepository: GliaEngagementConfigRepository,
+    private val engagementRepository: GliaEngagementRepository,
+    private val queueRepository: GliaQueueRepository
 ) {
     operator fun invoke(): Boolean {
-        return engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING
-                && !engagementRepository.hasOngoingEngagement()
-                && queueRepository.queueingState is GliaQueueingState.None
+        return engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING &&
+            !engagementRepository.hasOngoingEngagement() &&
+            queueRepository.queueingState is GliaQueueingState.None
     }
 }

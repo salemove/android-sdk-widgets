@@ -17,7 +17,8 @@ import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 import kotlin.math.roundToInt
 
 internal class SystemMessageViewHolder(
-    binding: ChatReceiveMessageContentBinding, uiTheme: UiTheme
+    binding: ChatReceiveMessageContentBinding,
+    uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val content: TextView by lazy { binding.root }
 
@@ -52,7 +53,7 @@ internal class SystemMessageViewHolder(
 
             uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
 
-            //Unified Ui
+            // Unified Ui
             applyLayerTheme(operatorTheme?.background)
             applyTextTheme(operatorTheme?.text)
         }
@@ -62,7 +63,8 @@ internal class SystemMessageViewHolder(
         content.apply {
             text = message
             resources.getString(
-                R.string.glia_chat_operator_message_content_description, message
+                R.string.glia_chat_operator_message_content_description,
+                message
             )
         }
     }

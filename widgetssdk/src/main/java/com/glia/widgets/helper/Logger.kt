@@ -7,7 +7,7 @@ object Logger {
     @JvmStatic
     fun d(tag: String, message: String?) {
         if (BuildConfig.DEBUG) {
-            //No need to log an empty message
+            // No need to log an empty message
             Log.d(tag, message ?: return)
         }
     }
@@ -29,7 +29,6 @@ object Logger {
         }
     }
 }
-
 
 /**
  * This extension allows us to use TAG in any Kotlin class

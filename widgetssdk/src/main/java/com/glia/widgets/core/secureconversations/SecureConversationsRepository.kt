@@ -58,10 +58,11 @@ class SecureConversationsRepository(private val secureConversations: SecureConve
         ex: GliaException?,
         listener: GliaSendMessageUseCase.Listener
     ) {
-        if (ex != null)
+        if (ex != null) {
             listener.error(ex)
-        else
+        } else {
             listener.messageSent(visitorMessage)
+        }
     }
 
     fun getUnreadMessagesCount(callback: RequestCallback<Int>) =

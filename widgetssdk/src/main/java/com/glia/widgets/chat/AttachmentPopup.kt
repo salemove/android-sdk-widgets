@@ -93,5 +93,4 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
         binding.rootLayout.background = background
         return binding
     }
-
 }

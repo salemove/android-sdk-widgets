@@ -53,5 +53,4 @@ class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: Att
     private fun applyActivatedTheme() {
         barButtonStatesTheme?.activated?.title?.also(::applyTextTheme) ?: restoreDefaultTheme()
     }
-
 }

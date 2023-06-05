@@ -33,7 +33,7 @@ interface MessageCenterContract {
 
     interface View : BaseView<Controller> {
         fun setupViewAppearance()
-        fun onStateUpdated(state: State)
+        fun onStateUpdated(state: MessageCenterState)
         fun emitUploadAttachments(attachments: List<FileAttachment>)
         fun selectAttachmentFile(type: String)
         fun takePhoto()

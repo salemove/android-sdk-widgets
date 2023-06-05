@@ -15,6 +15,7 @@ buildscript {
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("org.jetbrains.kotlin.android") version "$kotlin_version" apply false
+    id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
 }
 
 allprojects {
@@ -24,6 +25,20 @@ allprojects {
         flatDir {
             dirs '../libs'
         }
+    }
+}
+
+subprojects {
+    apply plugin: 'org.jlleitschuh.gradle.ktlint'
+
+    repositories {
+        mavenCentral()
+    }
+
+    ktlint {
+        outputToConsole.set(true)
+        debug.set(true)
+        android.set(true)
     }
 }
 

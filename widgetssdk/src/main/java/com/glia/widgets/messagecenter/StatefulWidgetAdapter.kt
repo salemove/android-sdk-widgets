@@ -57,7 +57,6 @@ internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
         return false
     }
 
-
     private fun onStatefulThemeChanged(newThemes: Map<out S, T?>) {
         callback.onNewTheme(newThemes[state] ?: return)
     }
@@ -66,7 +65,6 @@ internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
         callback.onNewState(newState)
         callback.onNewTheme(statefulTheme[newState] ?: return)
     }
-
 
     override fun updateStatefulTheme(newStatefulTheme: Map<out S, T?>) {
         statefulTheme = when {
@@ -85,5 +83,4 @@ internal class SimpleStatefulWidgetAdapter<S : Enum<S>, T>(
 
     private fun composeThemeForState(state: S, newStatefulTheme: Map<out S, T?>): Pair<S, T?> =
         state to statefulTheme[state].unsafeMerge(newStatefulTheme[state])
-
 }

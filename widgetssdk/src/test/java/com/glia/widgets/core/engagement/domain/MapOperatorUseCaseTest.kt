@@ -4,14 +4,11 @@ import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.OperatorMessage
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.model.TestOperator
 import io.reactivex.Single
 import junit.framework.TestCase.assertEquals
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

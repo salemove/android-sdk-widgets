@@ -17,7 +17,6 @@ internal class MapOperatorUseCase(private val getOperatorUseCase: GetOperatorUse
             else -> Single.just(chatMessage).map { ChatMessageInternal(it) }
         }
 
-
     private fun mapOperator(operatorMessage: OperatorMessage): Single<ChatMessageInternal> {
         return getOperatorUseCase.execute(operatorMessage.operatorId!!)
             .map { map(operatorMessage, it.orElse(null)) }

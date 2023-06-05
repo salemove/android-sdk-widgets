@@ -158,7 +158,8 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     override fun shareImageFile(fileName: String) {
         val file = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .toString(), fileName
+                .toString(),
+            fileName
         )
         val contentUri = FileProvider.getUriForFile(this, this.fileProviderAuthority, file)
         val shareIntent = Intent(Intent.ACTION_SEND)

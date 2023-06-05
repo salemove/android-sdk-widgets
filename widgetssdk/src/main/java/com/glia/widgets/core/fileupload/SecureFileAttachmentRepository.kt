@@ -4,9 +4,9 @@ import android.net.Uri
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.engagement.EngagementFile
+import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.di.GliaCore
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
@@ -32,10 +32,12 @@ class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     fun getAttachedFilesCount(): Int {
         return getFileAttachments().size
     }
+
     fun isFileAttached(uri: Uri): Boolean {
         return getFileAttachments()
             .any { it.uri == uri }
     }
+
     fun attachFile(file: FileAttachment) {
         _observable.onNext(getFileAttachments() + file)
     }
@@ -174,5 +176,4 @@ class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
             else -> FileAttachment.Status.ERROR_UNKNOWN
         }
     }
-
 }

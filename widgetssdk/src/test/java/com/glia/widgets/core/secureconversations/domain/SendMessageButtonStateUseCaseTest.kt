@@ -5,7 +5,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
-import com.glia.widgets.messagecenter.State
+import com.glia.widgets.messagecenter.MessageCenterState
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.TestScheduler
 import io.reactivex.subjects.BehaviorSubject
@@ -67,7 +67,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.DISABLE, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.DISABLE, testObservable.values()[0])
     }
 
     @Test
@@ -86,7 +86,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.DISABLE, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.DISABLE, testObservable.values()[0])
     }
 
     @Test
@@ -105,7 +105,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.DISABLE, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.DISABLE, testObservable.values()[0])
     }
 
     @Test
@@ -120,7 +120,7 @@ class SendMessageButtonStateUseCaseTest {
             },
             mock<FileAttachment>().also {
                 whenever(it.isReadyToSend) doReturn true
-            },
+            }
         )
         val isSending = false
         val isLimitError = false
@@ -130,7 +130,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.DISABLE, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.DISABLE, testObservable.values()[0])
     }
 
     @Test
@@ -149,7 +149,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.DISABLE, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.DISABLE, testObservable.values()[0])
     }
 
     @Test
@@ -168,7 +168,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.NORMAL, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.NORMAL, testObservable.values()[0])
     }
 
     @Test
@@ -193,7 +193,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.NORMAL, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.NORMAL, testObservable.values()[0])
     }
 
     @Test
@@ -212,7 +212,7 @@ class SendMessageButtonStateUseCaseTest {
         testScheduler.advanceTimeBy(1, TimeUnit.SECONDS)
 
         assertEquals(1, testObservable.values().size)
-        assertEquals(State.ButtonState.PROGRESS, testObservable.values()[0])
+        assertEquals(MessageCenterState.ButtonState.PROGRESS, testObservable.values()[0])
     }
 
     private fun setInitialValues(

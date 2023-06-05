@@ -64,7 +64,8 @@ internal fun View.applyLayerTheme(layer: LayerTheme?) {
 
     layer.stroke?.also {
         drawable.setStroke(
-            layer.borderWidthInt ?: context.resources.getDimensionPixelSize(R.dimen.glia_px), it
+            layer.borderWidthInt ?: context.resources.getDimensionPixelSize(R.dimen.glia_px),
+            it
         )
     }
 
@@ -103,19 +104,20 @@ internal fun TextView.applyTextColorTheme(color: ColorTheme?) {
     } else {
         setTextColor(color.primaryColor)
     }
-
 }
 
 internal fun TextView.applyTextTheme(
-    textTheme: TextTheme?, withBackground: Boolean = false, withAlignment: Boolean = true
+    textTheme: TextTheme?,
+    withBackground: Boolean = false,
+    withAlignment: Boolean = true
 ) {
     textTheme?.textColor.also(::applyTextColorTheme)
     textTheme?.textSize?.also { setTextSize(TypedValue.COMPLEX_UNIT_SP, it) }
     textTheme?.textStyle?.also { typeface = Typeface.create(typeface, it) }
 
-    if (withAlignment)
+    if (withAlignment) {
         textTheme?.textAlignment?.let { textAlignment = it }
-
+    }
     if (withBackground) {
         textTheme?.backgroundColor.also(::applyColorTheme)
     }
@@ -135,7 +137,7 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
         applyTextTheme(it)
     }
 
-    //If no `iconColor` provided use text color
+    // If no `iconColor` provided use text color
     buttonTheme?.let { it.iconColor ?: it.text?.textColor }?.primaryColorStateList?.also {
         iconTint = it
     }
@@ -251,8 +253,10 @@ internal fun GliaSurveyOptionButton.applyOptionButtonTheme(theme: OptionButtonTh
     applyButtonTheme(
         ButtonTheme(
             textTheme?.copy(textSize = theme?.fontSize, textStyle = theme?.fontStyle),
-            layerTheme, null, null, null
+            layerTheme,
+            null,
+            null,
+            null
         )
     )
 }
-

@@ -10,7 +10,8 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
 internal class IsMessagingAvailableUseCase(
-    private val queueRepository: GliaQueueRepository, private val schedulers: Schedulers
+    private val queueRepository: GliaQueueRepository,
+    private val schedulers: Schedulers
 ) {
     private val queueIdsSubject: BehaviorSubject<Array<String>> = BehaviorSubject.create()
 
@@ -36,5 +37,4 @@ internal class IsMessagingAvailableUseCase(
         .filterNot { it.state.status == QueueState.Status.CLOSED }
         .filterNot { it.state.status == QueueState.Status.UNKNOWN }
         .any { it.supportsMessaging() }
-
 }

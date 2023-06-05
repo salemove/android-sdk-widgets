@@ -61,6 +61,5 @@ private fun CallButtonBarButtonTheme(pallet: ColorPallet) = pallet.run {
                 title = BaseLightColorTextTheme(this)
             )
         )
-
     }
 }

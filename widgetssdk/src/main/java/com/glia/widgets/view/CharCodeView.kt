@@ -37,7 +37,6 @@ class CharCodeView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, R.style.Application_Glia_Chat), attrs, defStyleAttr) {
 
-
     private val charViewProps: ViewDefaultProperties
     private var runtimeTheme: UiTheme? = null
     private val remoteTheme: VisitorCodeTheme? by lazy {
@@ -53,7 +52,7 @@ class CharCodeView @JvmOverloads constructor(
             horizonPadding = context.getDimenResPx(R.dimen.glia_large),
             verticalPadding = context.getDimenResPx(R.dimen.glia_small),
             horizonMargin = context.getDimenResPx(R.dimen.glia_small),
-            verticalMargin = 0,
+            verticalMargin = 0
         )
 
         if (isInEditMode) {
@@ -79,8 +78,7 @@ class CharCodeView @JvmOverloads constructor(
     }
 
     private fun createCharSlotView(character: Char, runtimeTheme: UiTheme?, remoteTheme: VisitorCodeTheme?): TextView {
-
-        val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode)
+        val charView = TextView(context, null, R.attr.visitorCodeStyle, R.style.Application_Glia_VisitorCode) // TODO: confirm this
         charView.isFocusable = false
         charView.text = character.toString()
         charView.textAlignment = TEXT_ALIGNMENT_CENTER
@@ -102,7 +100,11 @@ class CharCodeView @JvmOverloads constructor(
         )
         charView.layoutParams = charViewLayout
 
-        charView.setPadding(0, charViewProps.verticalPadding, 0, charViewProps.verticalPadding
+        charView.setPadding(
+            0,
+            charViewProps.verticalPadding,
+            0,
+            charViewProps.verticalPadding
         )
 
         return charView
@@ -149,5 +151,4 @@ class CharCodeView @JvmOverloads constructor(
         private const val WIDTH_NOT_SPECIFIED = 0
         private const val USE_ALL_AVAILABLE_WIDTH = 1f
     }
-
 }

@@ -3,7 +3,12 @@ package com.glia.widgets.view.unifiedui.parse
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.config.RemoteConfiguration
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig
-import com.glia.widgets.view.unifiedui.config.base.*
+import com.glia.widgets.view.unifiedui.config.base.AlignmentTypeRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorLayerRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.ColorRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.SizeDpRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.SizeSpRemoteConfig
+import com.glia.widgets.view.unifiedui.config.base.TextStyleRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceTypeRemoteConfig
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -17,14 +22,16 @@ internal class RemoteConfigurationParser {
             .registerTypeAdapter(ColorRemoteConfig::class.java, ColorDeserializer())
             .registerTypeAdapter(ColorLayerRemoteConfig::class.java, ColorLayerDeserializer())
             .registerTypeAdapter(
-                SizeDpRemoteConfig::class.java, DpDeserializer(Dependencies.getResourceProvider())
+                SizeDpRemoteConfig::class.java,
+                DpDeserializer(Dependencies.getResourceProvider())
             )
             .registerTypeAdapter(SizeSpRemoteConfig::class.java, SpDeserializer())
             .registerTypeAdapter(TextStyleRemoteConfig::class.java, TextStyleDeserializer())
             .registerTypeAdapter(AlignmentTypeRemoteConfig::class.java, AlignmentDeserializer())
             .registerTypeAdapter(AxisRemoteConfig::class.java, AxisDeserializer())
             .registerTypeAdapter(
-                AttachmentSourceTypeRemoteConfig::class.java, AttachmentSourceTypeDeserializer()
+                AttachmentSourceTypeRemoteConfig::class.java,
+                AttachmentSourceTypeDeserializer()
             )
             .create()
     }

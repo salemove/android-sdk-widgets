@@ -53,7 +53,8 @@ class MessageCenterView(
     attrs,
     defStyleAttr,
     defStyleRes
-), MessageCenterContract.View {
+),
+    MessageCenterContract.View {
 
     private var theme: UiTheme by Delegates.notNull()
     private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.getGliaThemeManager().theme }
@@ -108,11 +109,13 @@ class MessageCenterView(
 
     @JvmOverloads
     constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     override fun setupViewAppearance() {
-        //This is done to avoid view appearance when a visitor is not authenticated.
+        // This is done to avoid view appearance when a visitor is not authenticated.
         binding = MessageCenterViewBinding.inflate(layoutInflater, this)
 
         controller?.ensureMessageCenterAvailability()
@@ -259,7 +262,7 @@ class MessageCenterView(
         this.onNavigateToMessagingListener?.navigateToMessaging()
     }
 
-    override fun onStateUpdated(state: State) {
+    override fun onStateUpdated(state: MessageCenterState) {
         post { messageView?.onStateUpdated(state) }
     }
 

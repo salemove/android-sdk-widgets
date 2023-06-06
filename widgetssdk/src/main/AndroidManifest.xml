@@ -54,7 +54,7 @@
             android:noHistory="true"
             android:theme="@style/Application.Glia.Translucent.Activity" />
         <activity
-            android:name=".callvisualizer.mvpendscreensharing.MvpEndScreenSharingActivity"
+            android:name=".callvisualizer.mvpsample.MvpSampleActivity"
             android:launchMode="singleTask"
             android:noHistory="true"
             android:theme="@style/Application.Glia.Call.Activity" />

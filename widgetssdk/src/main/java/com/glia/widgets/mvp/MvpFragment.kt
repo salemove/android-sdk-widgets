@@ -2,6 +2,7 @@ package com.glia.widgets.mvp
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.glia.widgets.mvp.contracts.MvpControllerContract
 import com.glia.widgets.mvp.contracts.MvpViewContract
@@ -68,6 +69,10 @@ abstract class MvpFragment<PRESENTER, STATE> : Fragment(), MvpViewContract
     }
 
     override fun onDestroyView() {
+        view?.let {
+            val parentViewGroup = it.parent as ViewGroup?
+            parentViewGroup?.removeAllViews()
+        }
         super.onDestroyView()
         if (SubscribeLifecycleState.VIEW_CREATED == getSubscribeLifecycleState()) {
             controller.unsubscribe()

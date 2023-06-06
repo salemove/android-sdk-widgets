@@ -37,6 +37,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
+import com.glia.widgets.callvisualizer.mvpsample.MvpSampleActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
@@ -96,6 +97,9 @@ public class MainFragment extends Fragment {
                 }
             }
         );
+        view.findViewById(R.id.sample).setOnClickListener(v -> {
+            startActivity(MvpSampleActivity.Companion.getIntent(requireContext()));
+        });
         handleOpensFromPushNotification();
     }
 
@@ -517,7 +521,6 @@ public class MainFragment extends Fragment {
 
     private void showToast(String message) {
         if (getActivity() == null) return;
-
         getActivity().runOnUiThread(() -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
     }
 

@@ -31,6 +31,7 @@ import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCas
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
+import com.glia.widgets.core.callvisualizer.domain.SampleUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.chathead.SurveyStateManager;
@@ -115,6 +116,8 @@ public class UseCaseFactory {
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
     private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
 
+    private static SampleUseCase sampleUseCase;
+
     private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
     private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final RepositoryFactory repositoryFactory;
@@ -195,6 +198,14 @@ public class UseCaseFactory {
             visitorCodeViewBuilderUseCase = new VisitorCodeViewBuilderUseCase();
         }
         return visitorCodeViewBuilderUseCase;
+    }
+
+    @NonNull
+    public SampleUseCase getSampleUseCase() {
+        if (sampleUseCase == null) {
+            sampleUseCase = new SampleUseCase();
+        }
+        return sampleUseCase;
     }
 
     @NonNull

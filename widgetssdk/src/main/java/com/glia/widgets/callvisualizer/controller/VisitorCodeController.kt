@@ -6,6 +6,7 @@ import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.engagement.GliaEngagementRepository
+import com.glia.widgets.helper.rx.observableSchedulers
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -40,8 +41,7 @@ class VisitorCodeController(
     override fun onLoadVisitorCode() {
         view.startLoading()
         disposable = visitorCodeRepository.getVisitorCode()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .compose(observableSchedulers())
             .subscribe(
                 { visitorCode ->
                     view.showVisitorCode(visitorCode)

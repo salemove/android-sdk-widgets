@@ -109,6 +109,7 @@ import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
+import com.glia.widgets.helper.rx.completableSchedulers
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -1752,8 +1753,7 @@ internal class ChatController(
     fun onFileDownloadClicked(attachmentFile: AttachmentFile) {
         disposable.add(
             downloadFileUseCase(attachmentFile)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(completableSchedulers())
                 .subscribe({ fileDownloadSuccess(attachmentFile) }) {
                     fileDownloadError(attachmentFile, it)
                 }

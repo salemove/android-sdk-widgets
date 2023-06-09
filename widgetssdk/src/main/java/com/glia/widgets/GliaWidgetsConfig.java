@@ -7,8 +7,6 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.SiteApiKey;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 
-import kotlin.Deprecated;
-
 /**
  * Configurations used to initialize Glia SDK
  *
@@ -19,7 +17,6 @@ public class GliaWidgetsConfig {
     public static final boolean DEFAULT_USE_OVERLAY = true;
     public static final ScreenSharing.Mode DEFAULT_SCREEN_SHARING_MODE = ScreenSharing.Mode.UNBOUNDED;
 
-    private final String appToken;
     private final String siteId;
     private final SiteApiKey siteApiKey;
     private final Context context;
@@ -32,37 +29,7 @@ public class GliaWidgetsConfig {
     private final boolean useOverlay;
     private final UiTheme uiTheme;
 
-    /**
-     * @deprecated Deprecated since SDK version 1.6.5. Please use {@link GliaWidgetsConfig#GliaWidgetsConfig(String, String, Context, String, int)} instead.
-     */
-    @Deprecated(message = "Please use Builder instead")
-    public GliaWidgetsConfig(String appToken, String apiToken, String siteId, Context context, String region, int requestCode) {
-        this(appToken, siteId, context, region, requestCode);
-    }
-
-    /**
-     * @deprecated Deprecated since SDK version 1.6.18. Please use {@link GliaWidgetsConfig.Builder#setSiteApiKey(SiteApiKey)} instead.
-     */
-    @Deprecated(message = "Please use Builder instead")
-    public GliaWidgetsConfig(
-            String appToken,
-            String siteId,
-            Context context,
-            String region,
-            int requestCode
-    ) {
-        this(
-                new Builder()
-                        .setAppToken(appToken)
-                        .setSiteId(siteId)
-                        .setContext(context)
-                        .setRegion(region)
-                        .setRequestCode(requestCode)
-        );
-    }
-
     private GliaWidgetsConfig(Builder builder) {
-        this.appToken = builder.appToken;
         this.siteApiKey = builder.siteApiKey;
         this.siteId = builder.siteId;
         this.context = builder.context;
@@ -78,10 +45,6 @@ public class GliaWidgetsConfig {
 
     public String getSiteId() {
         return siteId;
-    }
-
-    public String getAppToken() {
-        return appToken;
     }
 
     public Context getContext() {
@@ -119,15 +82,6 @@ public class GliaWidgetsConfig {
 
     public UiTheme getUiTheme() {
         return uiTheme;
-    }
-
-    /**
-     * @deprecated API token is no longer needed for SDK to function correctly.
-     * Deprecated since SDK version 1.6.5
-     */
-    @Deprecated(message = "No longer needed since SDK version 1.6.5")
-    public String getApiToken() {
-        return null;
     }
 
     public int getRequestCode() {
@@ -177,7 +131,6 @@ public class GliaWidgetsConfig {
      * </p>
      */
     public static class Builder {
-        String appToken;
         String siteId;
         SiteApiKey siteApiKey;
         Context context;
@@ -192,25 +145,6 @@ public class GliaWidgetsConfig {
 
         public Builder() {
             requestCode = 45554442;
-        }
-
-        /**
-         * @param appToken - your APP token
-         * @return Builder instance
-         * @deprecated use site api key instead
-         */
-        public Builder setAppToken(String appToken) {
-            this.appToken = appToken;
-            return this;
-        }
-
-        /**
-         * @deprecated API token is no longer needed for SDK to function correctly.
-         * Deprecated since SDK version 1.6.5
-         */
-        @Deprecated(message = "No longer needed since SDK version 1.6.5")
-        public Builder setApiToken(String apiToken) {
-            return this;
         }
 
         /**

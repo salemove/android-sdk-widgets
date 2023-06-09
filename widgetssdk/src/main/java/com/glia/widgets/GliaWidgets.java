@@ -161,8 +161,6 @@ public class GliaWidgets {
     ) {
         if (widgetsConfig.getSiteApiKey() != null) {
             builder.setSiteApiKey(widgetsConfig.getSiteApiKey());
-        } else if (widgetsConfig.getAppToken() != null) {
-            builder.setAppToken(widgetsConfig.getAppToken());
         } else {
             throw new RuntimeException("Site key or app token is missing");
         }

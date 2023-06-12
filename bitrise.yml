@@ -97,7 +97,7 @@ workflows:
           inputs:
             - custom_id: $BROWSERSTACK_APP_ID
           title: Upload APP to BrowserStack
-      - deploy-to-bitrise-io@1:
+      - deploy-to-bitrise-io@2.2:
           inputs:
             - notify_email_list: $BUILD_EMAILS
       - cache-push@2: { }
@@ -149,7 +149,7 @@ workflows:
             - module: $EXAMPLE_APP_MODULE
             - variant: $INTEGRATOR_VARIANT
           title: Unit Test for APP
-      - deploy-to-bitrise-io@1:
+      - deploy-to-bitrise-io@2.2:
           inputs:
             - notify_email_list: $BUILD_EMAILS
       - cache-push@2: { }
@@ -198,7 +198,7 @@ workflows:
           inputs:
             - custom_id: $BROWSERSTACK_APP_ID
           title: Upload APP to BrowserStack
-      - deploy-to-bitrise-io@1:
+      - deploy-to-bitrise-io@2.2:
           inputs:
             - notify_email_list: $BUILD_EMAILS
       - slack@3:

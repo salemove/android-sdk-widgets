@@ -66,7 +66,7 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
             return message.getMetadata()
                     .optBoolean(NativeViewViewHolder.SHOW_BUTTON_KEY, false);
         }
-        return super.shouldShowCard(message, viewType);
+        return super.isInteractable(message, viewType);
     }
 
     @Override

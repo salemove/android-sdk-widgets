@@ -27,7 +27,7 @@ internal class GliaOnCallVisualizerEndUseCase(
         override fun run() {
             surveyRepository.onEngagementEnded(engagement)
             listener?.callVisualizerEngagementEnded()
-            operatorMediaRepository.stopListening(engagement)
+            operatorMediaRepository.onEngagementEnded(engagement)
             removeScreenSharingNotificationUseCase()
             callNotificationUseCase.removeAllNotifications()
             gliaVisitorMediaRepository.onEngagementEnded(engagement)

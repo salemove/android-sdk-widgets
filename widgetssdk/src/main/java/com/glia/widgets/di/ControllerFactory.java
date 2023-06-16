@@ -160,6 +160,7 @@ public class ControllerFactory {
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveOperatorMediaStateListenerUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
                     useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
@@ -178,7 +179,8 @@ public class ControllerFactory {
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                     useCaseFactory.createIsCallVisualizerUseCase(),
                     useCaseFactory.createIsOngoingEngagementUseCase(),
-                    useCaseFactory.createSetPendingSurveyUsed());
+                    useCaseFactory.createSetPendingSurveyUsed(),
+                    useCaseFactory.createTurnSpeakerphoneUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);

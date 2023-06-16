@@ -70,6 +70,7 @@ dependencies {
     // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 //    api "com.glia:android-sdk:0.26.6-SNAPSHOT" // Used when testing local Core SDK snapshot releases
 
+    implementation "com.twilio:audioswitch:$audioswitch"
     implementation "com.airbnb.android:lottie:$lottieVersion"
     implementation "com.google.code.gson:gson:$gson"
     implementation "androidx.core:core-ktx:$coreKtxVersion"

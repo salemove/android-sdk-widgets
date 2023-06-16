@@ -279,7 +279,18 @@ workflows:
             set -x
 
             git fetch --tags
-    - generate-changelog@0: {}
+    - script@1:
+        title: Generate changelog
+        inputs:
+          - content: |-
+              #!/usr/bin/env bash
+              # fail if any commands fails
+              set -e
+              # debug log
+              set -x
+              
+              # run the local bash script
+              bash ./scripts/generate-changelog.sh
     - github-release@0:
         inputs:
         - username: $GITHUB_USERNAME

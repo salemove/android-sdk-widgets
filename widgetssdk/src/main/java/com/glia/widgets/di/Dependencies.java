@@ -8,6 +8,8 @@ import androidx.lifecycle.Lifecycle;
 
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
+import com.glia.widgets.core.audio.AudioControlManager;
+import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -45,6 +47,8 @@ public class Dependencies {
                 gliaCore,
                 downloadsFolderDataSource
         );
+
+        AudioControlManager audioControlManager = new AudioControlManager(application);
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
                 new PermissionManager(application),
@@ -52,8 +56,13 @@ public class Dependencies {
                 notificationManager,
                 sdkConfigurationManager,
                 new ChatHeadManager(application),
+                audioControlManager,
                 new GliaWidgetsSchedulers(),
                 gliaCore
+        );
+        initAudioControlManager(
+                audioControlManager,
+                useCaseFactory.createOnAudioStartedUseCase()
         );
 
         controllerFactory = new ControllerFactory(
@@ -157,5 +166,12 @@ public class Dependencies {
                 chatBubbleController.onDestroy();
             }
         });
+    }
+
+    private static void initAudioControlManager(
+            AudioControlManager audioControlManager,
+            OnAudioStartedUseCase onAudioStartedUseCase
+    ) {
+        audioControlManager.init(onAudioStartedUseCase);
     }
 }

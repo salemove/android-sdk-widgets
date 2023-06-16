@@ -27,6 +27,9 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.core.audio.AudioControlManager;
+import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
+import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
@@ -71,6 +74,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.operator.domain.RemoveOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
@@ -124,6 +128,7 @@ public class UseCaseFactory {
     private static final SurveyStateManager surveyStateManager = new SurveyStateManager();
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
+    private final AudioControlManager audioControlManager;
     private final Schedulers schedulers;
     private final GliaCore gliaCore;
 
@@ -133,6 +138,7 @@ public class UseCaseFactory {
                           INotificationManager notificationManager,
                           GliaSdkConfigurationManager gliaSdkConfigurationManager,
                           ChatHeadManager chatHeadManager,
+                          AudioControlManager audioControlManager,
                           Schedulers schedulers,
                           GliaCore gliaCore) {
         this.repositoryFactory = repositoryFactory;
@@ -141,6 +147,7 @@ public class UseCaseFactory {
         this.notificationManager = notificationManager;
         this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
         this.chatHeadManager = chatHeadManager;
+        this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
         this.gliaCore = gliaCore;
     }
@@ -358,6 +365,13 @@ public class UseCaseFactory {
     @NonNull
     public AddOperatorMediaStateListenerUseCase createAddOperatorMediaStateListenerUseCase() {
         return new AddOperatorMediaStateListenerUseCase(
+                repositoryFactory.getGliaOperatorMediaRepository()
+        );
+    }
+
+    @NonNull
+    public RemoveOperatorMediaStateListenerUseCase createRemoveOperatorMediaStateListenerUseCase() {
+        return new RemoveOperatorMediaStateListenerUseCase(
                 repositoryFactory.getGliaOperatorMediaRepository()
         );
     }
@@ -777,6 +791,21 @@ public class UseCaseFactory {
     @NonNull
     public ResetSurveyUseCase createResetSurveyUseCase() {
         return new ResetSurveyUseCase(surveyStateManager, repositoryFactory.getGliaSurveyRepository());
+    }
+
+    @NonNull
+    public OnAudioStartedUseCase createOnAudioStartedUseCase() {
+        return new OnAudioStartedUseCase(
+                repositoryFactory.getGliaOperatorMediaRepository(),
+                repositoryFactory.getGliaVisitorMediaRepository()
+        );
+    }
+
+    @NonNull
+    public TurnSpeakerphoneUseCase createTurnSpeakerphoneUseCase() {
+        return new TurnSpeakerphoneUseCase(
+                audioControlManager
+        );
     }
 
     public void resetState() {

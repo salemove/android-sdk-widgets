@@ -24,6 +24,7 @@ import com.glia.widgets.Constants;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.dialog.DialogController;
@@ -44,6 +45,7 @@ import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCal
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.operator.domain.RemoveOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
@@ -89,6 +91,7 @@ public class CallController implements
     private final GliaCancelQueueTicketUseCase cancelQueueTicketUseCase;
     private final GliaOnEngagementUseCase onEngagementUseCase;
     private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
+    private final RemoveOperatorMediaStateListenerUseCase removeOperatorMediaStateListenerUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
     private final GliaEndEngagementUseCase endEngagementUseCase;
     private final ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase;
@@ -109,6 +112,7 @@ public class CallController implements
     private final QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase;
     private final IsCallVisualizerUseCase isCallVisualizerUseCase;
     private final IsOngoingEngagementUseCase isOngoingEngagementUseCase;
+    private final TurnSpeakerphoneUseCase turnSpeakerphoneUseCase;
     private final String TAG = "CallController";
     private final CompositeDisposable disposable = new CompositeDisposable();
     private CallViewCallback viewCallback;
@@ -136,6 +140,7 @@ public class CallController implements
             GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
             GliaOnEngagementUseCase onEngagementUseCase,
             AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
+            RemoveOperatorMediaStateListenerUseCase removeOperatorMediaStateListenerUseCase,
             GliaOnEngagementEndUseCase onEngagementEndUseCase,
             GliaEndEngagementUseCase endEngagementUseCase,
             ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
@@ -154,7 +159,8 @@ public class CallController implements
             QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
             IsCallVisualizerUseCase isCallVisualizerUseCase,
             IsOngoingEngagementUseCase isOngoingEngagementUseCase,
-            SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase) {
+            SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase,
+            TurnSpeakerphoneUseCase turnSpeakerphoneUseCase) {
         Logger.d(TAG, "constructor");
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
@@ -181,6 +187,7 @@ public class CallController implements
         this.cancelQueueTicketUseCase = cancelQueueTicketUseCase;
         this.onEngagementUseCase = onEngagementUseCase;
         this.addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase;
+        this.removeOperatorMediaStateListenerUseCase = removeOperatorMediaStateListenerUseCase;
         this.onEngagementEndUseCase = onEngagementEndUseCase;
         this.endEngagementUseCase = endEngagementUseCase;
         this.shouldShowMediaEngagementViewUseCase = shouldShowMediaEngagementViewUseCase;
@@ -200,6 +207,7 @@ public class CallController implements
         this.isCallVisualizerUseCase = isCallVisualizerUseCase;
         this.isOngoingEngagementUseCase = isOngoingEngagementUseCase;
         this.setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase;
+        this.turnSpeakerphoneUseCase = turnSpeakerphoneUseCase;
 
         if (isCallVisualizerUseCase.invoke()) {
             shouldShowMediaEngagementView(true);
@@ -300,6 +308,7 @@ public class CallController implements
             onEngagementUseCase.unregisterListener(this);
             onEngagementEndUseCase.unregisterListener(this);
             shouldHandleEndedEngagement = false;
+            removeOperatorMediaStateListenerUseCase.invoke(operatorMediaStateListener);
         }
     }
 
@@ -458,9 +467,12 @@ public class CallController implements
         dialogController.dismissCurrentDialog();
     }
 
-    public void onNewOperatorMediaState(OperatorMediaState operatorMediaState) {
-        Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState.toString() +
+    public void onNewOperatorMediaState(@Nullable OperatorMediaState operatorMediaState) {
+        Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState +
                 ", timertaskrunning: " + callTimer.isRunning());
+        if (operatorMediaState == null) {
+            return;
+        }
         if (operatorMediaState.getVideo() != null) {
             if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
                 dialogController.showEnableCallNotificationChannelDialog();
@@ -500,6 +512,7 @@ public class CallController implements
         boolean newValue = !callState.isSpeakerOn;
         Logger.d(TAG, "onSpeakerButtonPressed, new value: " + newValue);
         emitViewState(callState.speakerValueChanged(newValue));
+        turnSpeakerphoneUseCase.invoke(newValue);
     }
 
     public void queueForEngagementStarted() {

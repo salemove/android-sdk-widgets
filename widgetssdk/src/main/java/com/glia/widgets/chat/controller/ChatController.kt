@@ -1655,9 +1655,9 @@ internal class ChatController(
         }
     }
 
-    private fun onNewOperatorMediaState(operatorMediaState: OperatorMediaState) {
+    private fun onNewOperatorMediaState(operatorMediaState: OperatorMediaState?) {
         Logger.d(TAG, "newOperatorMediaState: $operatorMediaState")
-        if (chatState.isAudioCallStarted && operatorMediaState.video != null) {
+        if (chatState.isAudioCallStarted && operatorMediaState?.video != null) {
             upgradeMediaItem()
         } else if (!chatState.isMediaUpgradeStarted) {
             addMediaUpgradeItemToChatItems(operatorMediaState)
@@ -1669,12 +1669,12 @@ internal class ChatController(
         callNotificationUseCase(operatorMedia = operatorMediaState)
     }
 
-    private fun addMediaUpgradeItemToChatItems(operatorMediaState: OperatorMediaState) {
+    private fun addMediaUpgradeItemToChatItems(operatorMediaState: OperatorMediaState?) {
         var type: MediaUpgradeStartedTimerItem.Type? = null
-        if (operatorMediaState.video == null && operatorMediaState.audio != null) {
+        if (operatorMediaState?.video == null && operatorMediaState?.audio != null) {
             Logger.d(TAG, "starting audio timer")
             type = MediaUpgradeStartedTimerItem.Type.AUDIO
-        } else if (operatorMediaState.video != null) {
+        } else if (operatorMediaState?.video != null) {
             Logger.d(TAG, "starting video timer")
             type = MediaUpgradeStartedTimerItem.Type.VIDEO
         }

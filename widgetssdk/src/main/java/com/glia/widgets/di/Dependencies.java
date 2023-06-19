@@ -1,9 +1,12 @@
 package com.glia.widgets.di;
 
 import android.app.Application;
+import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
 import com.glia.widgets.GliaWidgetsConfig;
@@ -16,6 +19,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
+import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
@@ -25,6 +29,8 @@ import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
+
+import kotlin.jvm.functions.Function2;
 
 public class Dependencies {
 
@@ -48,10 +54,16 @@ public class Dependencies {
                 downloadsFolderDataSource
         );
 
+        PermissionManager permissionManager = new PermissionManager(
+                application,
+                ContextCompat::checkSelfPermission,
+                repositoryFactory.getPermissionsRequestRepository(),
+                Build.VERSION.SDK_INT
+        );
         AudioControlManager audioControlManager = new AudioControlManager(application);
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
-                new PermissionManager(application),
+                permissionManager,
                 new PermissionDialogManager(application),
                 notificationManager,
                 sdkConfigurationManager,
@@ -87,6 +99,12 @@ public class Dependencies {
                         getControllerFactory().getActivityWatcherForChatHeadController()
                 );
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead);
+
+        ActivityWatcherForPermissionsRequest activityWatcherForPermissionsRequest =
+                new ActivityWatcherForPermissionsRequest(
+                        getControllerFactory().getPermissionsController()
+                );
+        application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest);
 
         resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(

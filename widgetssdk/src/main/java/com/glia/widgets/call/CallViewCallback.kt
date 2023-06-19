@@ -8,4 +8,5 @@ internal interface CallViewCallback {
     fun navigateToSurvey(survey: Survey)
     fun destroyView()
     fun minimizeView()
+    fun showMissingPermissionsDialog()
 }

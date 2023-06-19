@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
@@ -67,6 +68,7 @@ import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
@@ -805,6 +807,22 @@ public class UseCaseFactory {
     public TurnSpeakerphoneUseCase createTurnSpeakerphoneUseCase() {
         return new TurnSpeakerphoneUseCase(
                 audioControlManager
+        );
+    }
+
+    @NonNull
+    public AcceptMediaUpgradeOfferUseCase createAcceptMediaUpgradeOfferUseCase() {
+        return new AcceptMediaUpgradeOfferUseCase(
+                repositoryFactory.getMediaUpgradeOfferRepository(),
+                permissionManager
+        );
+    }
+
+    @NonNull
+    public HandleCallPermissionsUseCase createHandleCallPermissionsUseCase() {
+        return new HandleCallPermissionsUseCase(
+                createIsCallVisualizerUseCase(),
+                permissionManager
         );
     }
 

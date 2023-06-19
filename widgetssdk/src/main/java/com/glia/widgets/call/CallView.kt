@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.TypedArray
-import android.media.AudioManager
 import android.net.Uri
 import android.provider.Settings
 import android.util.AttributeSet
@@ -18,7 +17,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.getSystemService
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -193,12 +191,19 @@ internal class CallView(
         visitorContextAssetId: String?,
         useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode?,
+        isUpgradeToCall: Boolean,
         mediaType: Engagement.MediaType?
     ) {
-        Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
-        Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
-        callController?.initCall(companyName, queueId, visitorContextAssetId, mediaType)
-        serviceChatHeadController?.init()
+        callController?.startCall(
+            companyName,
+            queueId,
+            visitorContextAssetId,
+            mediaType,
+            useOverlays,
+            screenSharingMode,
+            isUpgradeToCall,
+            serviceChatHeadController
+        )
     }
 
     fun onDestroy() {
@@ -755,7 +760,7 @@ internal class CallView(
         }
     }
 
-    fun showMissingPermissionsDialog() {
+    override fun showMissingPermissionsDialog() {
         showAlertDialog(
             R.string.glia_dialog_permission_error_title,
             R.string.glia_dialog_permission_error_message
@@ -1076,17 +1081,5 @@ internal class CallView(
 
     override fun minimizeView() {
         onMinimizeListener?.onMinimize()
-    }
-
-    fun checkForPermissions(
-        applicationContext: Context,
-        mediaType: Engagement.MediaType,
-        missingPermissionsCallBack: CallActivity.MissingPermissionsCallBack
-    ) {
-        callController?.checkForPermissions(
-            applicationContext,
-            mediaType,
-            missingPermissionsCallBack
-        )
     }
 }

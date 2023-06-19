@@ -24,6 +24,7 @@ import com.glia.widgets.filepreview.data.GliaFileRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepositoryImpl;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.filepreview.data.source.local.InAppBitmapCache;
+import com.glia.widgets.permissions.PermissionsRequestRepository;
 
 public class RepositoryFactory {
 
@@ -46,6 +47,7 @@ public class RepositoryFactory {
     private static SendMessageRepository sendMessageRepository;
     private CallVisualizerRepository callVisualizerRepository;
     private static VisitorCodeRepository visitorCodeRepository;
+    private static PermissionsRequestRepository permissionsRequestRepository;
 
     private final GliaCore gliaCore;
     private final DownloadsFolderDataSource downloadsFolderDataSource;
@@ -209,5 +211,12 @@ public class RepositoryFactory {
             sendMessageRepository = new SendMessageRepository();
         }
         return sendMessageRepository;
+    }
+
+    public PermissionsRequestRepository getPermissionsRequestRepository() {
+        if (permissionsRequestRepository == null) {
+            permissionsRequestRepository = new PermissionsRequestRepository();
+        }
+        return permissionsRequestRepository;
     }
 }

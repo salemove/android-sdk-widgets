@@ -41,6 +41,7 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCa
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
+import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -123,6 +124,7 @@ class ChatControllerTest {
     private lateinit var preEngagementMessageUseCase: PreEngagementMessageUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
+    private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
 
     private lateinit var chatController: ChatController
 
@@ -180,6 +182,7 @@ class ChatControllerTest {
         preEngagementMessageUseCase = mock()
         addNewMessagesDividerUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
+        acceptMediaUpgradeOfferUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -233,7 +236,8 @@ class ChatControllerTest {
             isCallVisualizerUseCase = isCallVisualizerUseCase,
             preEngagementMessageUseCase = preEngagementMessageUseCase,
             addNewMessagesDividerUseCase = addNewMessagesDividerUseCase,
-            isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase
+            isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
+            acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase
         )
     }
 

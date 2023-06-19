@@ -87,6 +87,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository.Submitter
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback
+import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -170,7 +171,8 @@ internal class ChatController(
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
     private val preEngagementMessageUseCase: PreEngagementMessageUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
-    private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
+    private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
+    private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
@@ -717,14 +719,14 @@ internal class ChatController(
         emitViewState { chatState }
     }
 
-    fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer?) {
+    fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer) {
         Logger.d(TAG, "upgradeToAudioClicked")
         messagesNotSeenHandler.chatUpgradeOfferAccepted()
-        mediaUpgradeOfferRepository.acceptOffer(offer, Submitter.CHAT)
+        acceptMediaUpgradeOfferUseCase(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()
     }
 
-    fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer?) {
+    fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer) {
         Logger.d(TAG, "closeUpgradeDialogClicked")
         mediaUpgradeOfferRepository.declineOffer(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()

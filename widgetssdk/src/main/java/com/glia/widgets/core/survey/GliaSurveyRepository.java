@@ -17,7 +17,9 @@ public class GliaSurveyRepository implements RequestCallback<Survey> {
 
     private final GliaCore gliaCore;
     private final List<OnSurveyListener> listeners = new ArrayList<>();
-    private boolean isFetching = false;
+
+    @Nullable
+    private String engagementId = null;
 
     @Nullable
     private ResultStorage result;
@@ -26,11 +28,12 @@ public class GliaSurveyRepository implements RequestCallback<Survey> {
         this.gliaCore = gliaCore;
     }
 
-    public void onEngagementEnded(Engagement engagement) {
-        if (isFetching) { // Prevent multiple surveys fetching.
+    public synchronized void onEngagementEnded(Engagement engagement) {
+        String engagementId = engagement.getState().getId();
+        if (engagementId.equals(this.engagementId)) { // Prevent multiple surveys fetching.
             return;
         }
-        isFetching = true;
+        this.engagementId = engagementId;
         engagement.getSurvey(this);
     }
 
@@ -43,7 +46,6 @@ public class GliaSurveyRepository implements RequestCallback<Survey> {
         for (OnSurveyListener listener : listenersCopy) {
             listener.onSurveyLoaded(survey);
         }
-        isFetching = false;
     }
 
     public void registerListener(OnSurveyListener listener) {

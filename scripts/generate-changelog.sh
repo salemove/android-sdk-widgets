@@ -45,4 +45,4 @@ generate_changelog
 envman add --key BITRISE_CHANGELOG --valuefile $CHANGELOG_FILE_NAME
 
 printf "\n"
-echo "$BITRISE_CHANGELOG"
+envman run bash -c 'echo "$BITRISE_CHANGELOG"'

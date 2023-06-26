@@ -8,8 +8,9 @@ generate_changelog() {
   local latest_tag="${tags_array[0]}"
   local previous_tag="${tags_array[1]}"
   echo "latest_tag=$latest_tag"
+  echo "previous_tag=$previous_tag"
 
-  local commits=$(git log "$latest_tag"..HEAD --no-merges --pretty=format:"%H")
+  local commits=$(git log "$previous_tag".."$latest_tag" --no-merges --pretty=format:"%H")
   local commits_as_array=($commits)
   local commits_count=${#commits_as_array[@]}
   echo "Number of commits from previous_tag: $commits_count"

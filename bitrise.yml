@@ -279,7 +279,7 @@ workflows:
               set -x
               
               # run the local bash script
-              bash ./scripts/generate-changelog.sh
+              bash ./test/generate-changelog.sh
     - github-release@0:
         inputs:
         - username: $GITHUB_USERNAME

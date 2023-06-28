@@ -61,15 +61,6 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
     }
 
     @Override
-    public boolean isInteractable(ChatMessage message, int viewType) {
-        if (viewType == NATIVE_VIEW_TYPE) {
-            return message.getMetadata()
-                    .optBoolean(NativeViewViewHolder.SHOW_BUTTON_KEY, false);
-        }
-        return super.isInteractable(message, viewType);
-    }
-
-    @Override
     public boolean shouldShowCard(ChatMessage message, int viewType) {
         if (viewType == NATIVE_VIEW_TYPE) {
             return message.getMetadata()

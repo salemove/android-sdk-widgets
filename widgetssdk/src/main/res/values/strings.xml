@@ -8,7 +8,6 @@
     <string name="glia_chat_delivered">Delivered</string>
     <string name="glia_chat_upgraded_to_audio_call">Upgraded to audio call</string>
     <string name="glia_chat_upgraded_to_video_call">Upgraded to video call</string>
-    <string name="glia_chat_single_choice_card_hint">Tap on the answer above</string>
     <string name="glia_chat_not_started_hint">Send a message to start chatting</string>
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>
     <string name="glia_chat_file_download_failed_msg">Could not download the file. Please try again.</string>

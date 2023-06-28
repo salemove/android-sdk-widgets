@@ -120,7 +120,6 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateFromCallScreenUseCase(),
                     useCaseFactory.createCustomCardAdapterTypeUseCase(),
                     useCaseFactory.createCustomCardTypeUseCase(),
-                    useCaseFactory.createCustomCardInteractableUseCase(),
                     useCaseFactory.createCustomCardShouldShowUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                     useCaseFactory.createIsQueueingEngagementUseCase(),

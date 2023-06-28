@@ -544,7 +544,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun updateChatEditText(chatState: ChatState) {
         when (chatState.chatInputMode) {
-            ChatInputMode.SINGLE_CHOICE_CARD -> binding.chatEditText.setHint(R.string.glia_chat_single_choice_card_hint)
             ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.setHint(R.string.glia_chat_not_started_hint)
             else -> binding.chatEditText.setHint(R.string.glia_chat_enter_message)
         }

@@ -10,7 +10,6 @@ import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
-import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.DecodeSampledBitmapFromInputStreamUseCase;
@@ -609,11 +608,6 @@ public class UseCaseFactory {
     @NonNull
     public CustomCardAdapterTypeUseCase createCustomCardAdapterTypeUseCase() {
         return new CustomCardAdapterTypeUseCase(GliaWidgets.getCustomCardAdapter());
-    }
-
-    @NonNull
-    public CustomCardInteractableUseCase createCustomCardInteractableUseCase() {
-        return new CustomCardInteractableUseCase(GliaWidgets.getCustomCardAdapter());
     }
 
     @NonNull

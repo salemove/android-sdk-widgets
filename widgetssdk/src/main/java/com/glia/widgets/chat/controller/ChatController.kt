@@ -30,7 +30,6 @@ import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase
-import com.glia.widgets.chat.domain.CustomCardInteractableUseCase
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
@@ -155,7 +154,6 @@ internal class ChatController(
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val customCardAdapterTypeUseCase: CustomCardAdapterTypeUseCase,
     private val customCardTypeUseCase: CustomCardTypeUseCase,
-    private val customCardInteractableUseCase: CustomCardInteractableUseCase,
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
     private val isQueueingEngagementUseCase: IsQueueingEngagementUseCase,
@@ -985,31 +983,6 @@ internal class ChatController(
         appendMessagesNotSeen()
     }
 
-    private fun changeChatInputMode(currentChatItems: List<ChatItem>, message: ChatMessage) {
-        val newInputMode = getChatInputMode(currentChatItems, message)
-        if (chatState.chatInputMode != newInputMode) {
-            emitViewState { chatState.chatInputModeChanged(newInputMode) }
-        }
-    }
-
-    private fun getChatInputMode(
-        currentChatItems: List<ChatItem>,
-        message: ChatMessage
-    ): ChatInputMode {
-        val customCardChatInputMode =
-            customCardInteractableUseCase.execute(currentChatItems, message)
-        if (customCardChatInputMode != null) {
-            return customCardChatInputMode
-        }
-        if (message.attachment is SingleChoiceAttachment) {
-            val attachment = message.attachment as SingleChoiceAttachment
-            if (attachment.options != null) {
-                return ChatInputMode.SINGLE_CHOICE_CARD
-            }
-        }
-        return ChatInputMode.ENABLED
-    }
-
     private fun addVisitorAttachmentItemsToChatItems(
         currentChatItems: MutableList<ChatItem>,
         chatMessage: ChatMessage,
@@ -1125,10 +1098,6 @@ internal class ChatController(
         appendOperatorOrCustomCardItem(currentChatItems, chatMessageInternal, isLastItem)
         appendOperatorAttachmentItems(currentChatItems, chatMessageInternal)
         setLastOperatorItemChatHeadVisibility(currentChatItems, true)
-
-        if (isLastItem) {
-            changeChatInputMode(currentChatItems, chatMessageInternal.chatMessage)
-        }
     }
 
     private fun isOperatorChanged(

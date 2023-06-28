@@ -101,7 +101,11 @@ public abstract class CustomCardAdapter {
      * @return a boolean indicating if the input field should be locked
      *         until a visitor selects an option from the card.
      *         The default implementation returns {@code true}.
+     *
+     * @deprecated The result does not affect the behavior of the input field.
+     *             The chat input field will always be active.
      */
+    @Deprecated
     public boolean isInteractable(ChatMessage message, int viewType) {
         return true;
     }

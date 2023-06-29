@@ -111,7 +111,7 @@
             android:id="@+id/chat_edit_text"
             style="@style/Application.Glia.Chat.Edittext"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
@@ -120,6 +120,8 @@
             android:paddingStart="@dimen/glia_large"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textColorHint="?attr/gliaBaseNormalColor"
+            android:maxLines="4"
+            android:maxLength="10000"
             tools:ignore="RtlSymmetry"
             tools:textColor="@color/glia_black_color" />
 

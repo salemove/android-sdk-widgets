@@ -3,6 +3,11 @@ max_line_length = 150
 indent_style = space
 indent_size = 2
 
+[*.java]
+insert_final_newline = true
+indent_size = 4
+trim_trailing_whitespace = true
+
 [{*.kt,*.kts}]
 insert_final_newline = true
 indent_size = 4
@@ -13,3 +18,6 @@ ktlint_experimental = false
 
 [*.md]
 trim_trailing_whitespace = false
+
+[*.xml]
+indent_size = 4

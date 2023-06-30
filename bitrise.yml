@@ -101,59 +101,7 @@ workflows:
         inputs:
         - notify_email_list: $BUILD_EMAILS
     - cache-push@2: {}
-  develop:
-    steps:
-    - activate-ssh-key@4:
-        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
-    - git-clone@4: {}
-    - script@1:
-        inputs:
-        - content: |-
-            sudo update-alternatives --set javac /usr/lib/jvm/java-11-openjdk-amd64/bin/javac
-            sudo update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
-            export JAVA_HOME='/usr/lib/jvm/java-11-openjdk-amd64'
-            envman add --key JAVA_HOME --value '/usr/lib/jvm/java-11-openjdk-amd64'
-    - cache-pull@2: {}
-    - set-java-version@1.1:
-        is_always_run: true
-        inputs:
-        - set_java_version: "17"
-    - install-missing-android-tools@2:
-        inputs:
-        - gradlew_path: $PROJECT_LOCATION/gradlew
-    - android-build@0:
-        inputs:
-        - variant: $INTEGRATOR_VARIANT
-        - module: $EXAMPLE_APP_MODULE
-    - android-lint@0:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
-        title: Run Lint for SDK
-    - android-unit-test@1:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
-        title: Unit Test for SDK
-    - android-lint@0:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
-        title: Run Lint for APP
-    - android-unit-test@1:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
-        title: Unit Test for APP
-    - deploy-to-bitrise-io@2.2:
-        inputs:
-        - notify_email_list: $BUILD_EMAILS
-    - cache-push@2: {}
-  master:
+  development:
     steps:
     - activate-ssh-key@4:
         run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
@@ -427,9 +375,7 @@ app:
       is_expand: false
     GIT_AUTHOR_EMAIL: bitrise@glia.com
 trigger_map:
-- push_branch: master
-  workflow: master
-- push_branch: develop
-  workflow: develop
+- push_branch: development
+  workflow: development
 - pull_request_target_branch: '*'
   workflow: pull_request

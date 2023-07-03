@@ -2,113 +2,124 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
-    defaultConfig {
-        applicationId "com.glia.exampleapp"
-        minSdkVersion 24
-        targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
+  compileSdkVersion 33
+  buildToolsVersion "30.0.3"
+  defaultConfig {
+    applicationId "com.glia.exampleapp"
+    minSdkVersion 24
+    targetSdkVersion 33
+    versionCode 1
+    versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+  kotlinOptions {
+    jvmTarget = "11"
+  }
+  signingConfigs {
+    debug {
+      storeFile file('debug.keystore')
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-        }
-    }
+  }
+  buildFeatures {
+    viewBinding true
+  }
 
-    File propsFile = project.rootProject.file('local.properties')
-    if (propsFile.exists()) {
-        Properties p = new Properties()
-        new FileInputStream(propsFile).withCloseable { is -> p.load(is) }
-        p.each { name, value -> ext[name] = value }
-    }
+  File propsFile = project.rootProject.file('local.properties')
+  if (propsFile.exists()) {
+    Properties p = new Properties()
+    new FileInputStream(propsFile).withCloseable { is -> p.load(is) }
+    p.each { name, value -> ext[name] = value }
+  }
 
-    initEnvProperty('GLIA_API_KEY_SECRET')
-    initEnvProperty('GLIA_API_KEY_ID')
-    initEnvProperty('GLIA_SITE_ID')
-    initEnvProperty('GLIA_QUEUE_ID')
-    initEnvProperty('GLIA_JWT', "")
-    initEnvProperty('FIREBASE_PROJECT_ID')
-    initEnvProperty('FIREBASE_API_KEY')
-    initEnvProperty('FIREBASE_APP_ID')
-    initEnvProperty('FIREBASE_APP_ID_DEBUG')
+  initEnvProperty('GLIA_API_KEY_SECRET')
+  initEnvProperty('GLIA_API_KEY_ID')
+  initEnvProperty('GLIA_SITE_ID')
+  initEnvProperty('GLIA_QUEUE_ID')
+  initEnvProperty('GLIA_JWT', "")
+  initEnvProperty('FIREBASE_PROJECT_ID')
+  initEnvProperty('FIREBASE_API_KEY')
+  initEnvProperty('FIREBASE_APP_ID')
+  initEnvProperty('FIREBASE_APP_ID_DEBUG')
 
-    buildTypes {
-        all {
-            resValue("string", "site_id", GLIA_SITE_ID)
-            resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
-            resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
-            resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
-            resValue("string", "glia_jwt", GLIA_JWT)
-            resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
-            resValue("string", "firebase_api_key", FIREBASE_API_KEY)
-        }
-        debug {
-            signingConfig signingConfigs.debug
-            applicationIdSuffix '.debug'
-            resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG ?: "")
-        }
-        release {
-            initWith debug
-            applicationIdSuffix ''
-            resValue("string", "firebase_app_id", FIREBASE_APP_ID ?: "")
-        }
+  buildTypes {
+    all {
+      resValue("string", "site_id", GLIA_SITE_ID)
+      resValue("string", "glia_api_key_id", GLIA_API_KEY_ID)
+      resValue("string", "glia_api_key_secret", GLIA_API_KEY_SECRET)
+      resValue("string", "glia_queue_id", GLIA_QUEUE_ID)
+      resValue("string", "glia_jwt", GLIA_JWT)
+      resValue("string", "firebase_proj_id", FIREBASE_PROJECT_ID)
+      resValue("string", "firebase_api_key", FIREBASE_API_KEY)
     }
-    lint {
-        disable 'WrongLayoutName',
-                'LayoutFileNameMatchesClass',
-                'MatchingViewId',
-                'RawDimen',
-                'WrongAnnotationOrder',
-                'ColorCasing',
-                'WrongViewIdFormat',
-                'HardcodedText'
+    debug {
+      signingConfig signingConfigs.debug
+      applicationIdSuffix '.debug'
+      resValue("string", "firebase_app_id", FIREBASE_APP_ID_DEBUG ?: "")
     }
-    namespace 'com.glia.exampleapp'
+    release {
+      initWith debug
+      applicationIdSuffix ''
+      resValue("string", "firebase_app_id", FIREBASE_APP_ID ?: "")
+    }
+  }
+  lint {
+    disable 'WrongLayoutName',
+      'LayoutFileNameMatchesClass',
+      'MatchingViewId',
+      'RawDimen',
+      'WrongAnnotationOrder',
+      'ColorCasing',
+      'WrongViewIdFormat',
+      'HardcodedText'
+  }
+  namespace 'com.glia.exampleapp'
 }
 
 def initEnvProperty(String propertyName, String defaultValue = "UNDEFINED") {
-    if (!project.hasProperty(propertyName)) {
-        ext[propertyName] = System.getenv(propertyName) as String ?: defaultValue
-    }
+  if (!project.hasProperty(propertyName)) {
+    ext[propertyName] = System.getenv(propertyName) as String ?: defaultValue
+  }
 }
 
 dependencies {
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.navigation:navigation-fragment:$navVersion"
-    implementation "androidx.navigation:navigation-ui:$navVersion"
-    implementation "androidx.preference:preference:$preferenceVersion"
-    implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
-    implementation "com.google.firebase:firebase-messaging"
-    implementation project(path: ':widgetssdk')
-    implementation "androidx.core:core-ktx:$coreKtxVersion"
+  implementation "androidx.appcompat:appcompat:$appCompatVersion"
+  implementation "com.google.android.material:material:$materialVersion"
+  implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+  implementation "androidx.navigation:navigation-fragment:$navVersion"
+  implementation "androidx.navigation:navigation-ui:$navVersion"
+  implementation "androidx.preference:preference:$preferenceVersion"
+  implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
+  implementation "com.google.firebase:firebase-messaging"
+  implementation project(path: ':widgetssdk')
+  implementation "androidx.core:core-ktx:$coreKtxVersion"
 
-    implementation "io.ktor:ktor-client-android:2.2.4"
-    implementation "io.ktor:ktor-client-logging:2.2.4"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+  implementation "io.ktor:ktor-client-android:2.2.4"
+  implementation "io.ktor:ktor-client-logging:2.2.4"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2"
+
+  implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
+  implementation "androidx.lifecycle:lifecycle-common-java8:2.6.1"
+  implementation "androidx.activity:activity-ktx:1.7.2"
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2"
+  testImplementation "io.mockk:mockk-android:1.13.5"
+  testImplementation "io.mockk:mockk-agent:1.13.5"
+  testImplementation "io.kotest:kotest-assertions-core-jvm:5.6.2"
 
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
-    testImplementation "junit:junit:$junitVersion"
-    androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+  debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+  testImplementation "junit:junit:$junitVersion"
+  androidTestImplementation "androidx.test.ext:junit:$testLibraryVersion"
+  androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }

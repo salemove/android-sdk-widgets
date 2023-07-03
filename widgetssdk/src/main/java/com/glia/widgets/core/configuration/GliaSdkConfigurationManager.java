@@ -29,6 +29,7 @@ public class GliaSdkConfigurationManager {
         this.companyName = companyName;
     }
 
+    @Nullable
     public UiTheme getUiTheme() {
         return uiTheme;
     }

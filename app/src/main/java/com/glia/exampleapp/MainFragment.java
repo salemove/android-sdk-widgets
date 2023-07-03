@@ -33,6 +33,7 @@ import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.fcm.GliaPushMessage;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.visitor.Authentication;
+import com.glia.exampleapp.mvi.ui.elements.PostActivity;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
@@ -85,9 +86,9 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.authenticationButton).setOnClickListener(v ->
                 showAuthenticationDialog(null));
         view.findViewById(R.id.deauthenticationButton).setOnClickListener(v ->
-                deauthenticate());
+            deauthenticate());
         view.findViewById(R.id.clear_session_button).setOnClickListener(v ->
-                clearSession());
+            clearSession());
         view.findViewById(R.id.visitor_code_button).setOnClickListener(v -> {
                 if (((SwitchCompat) view.findViewById(R.id.visitor_code_switch)).isChecked()) {
                     showVisitorCodeInADedicatedView();
@@ -96,6 +97,8 @@ public class MainFragment extends Fragment {
                 }
             }
         );
+        view.findViewById(R.id.btn_launch_mvi_flow).setOnClickListener(v ->
+            startActivity(new Intent(requireActivity(), PostActivity.class)));
         handleOpensFromPushNotification();
     }
 

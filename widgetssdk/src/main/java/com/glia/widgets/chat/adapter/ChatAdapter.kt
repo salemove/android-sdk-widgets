@@ -208,7 +208,7 @@ internal class ChatAdapter(
             }
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is CustomCardItem -> {
-                (holder as CustomCardViewHolder).bind(chatItem.message) { text: String?, value: String? ->
+                (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->
                     onCustomCardResponse.onCustomCardResponse(chatItem.getId(), text, value)
                 }
             }
@@ -245,7 +245,7 @@ internal class ChatAdapter(
     }
 
     fun interface OnCustomCardResponse {
-        fun onCustomCardResponse(messageId: String, text: String?, value: String?)
+        fun onCustomCardResponse(messageId: String, text: String, value: String)
     }
 
     companion object {

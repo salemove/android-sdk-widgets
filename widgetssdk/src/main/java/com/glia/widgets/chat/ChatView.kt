@@ -166,7 +166,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
         }
     private val onCustomCardResponse =
-        OnCustomCardResponse { messageId: String, text: String?, value: String? ->
+        OnCustomCardResponse { messageId: String, text: String, value: String ->
             controller?.sendCustomCardResponse(messageId, text, value)
         }
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {

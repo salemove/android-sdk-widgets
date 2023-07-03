@@ -99,18 +99,9 @@ public class GliaChatRepository {
         );
     }
 
-    public void sendResponse(String cardMessageId, String text, String value, Listener listener) {
+    public void sendResponse(SingleChoiceAttachment attachment, RequestCallback<VisitorMessage> callback) {
         gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendResponse(cardMessageId, text, value, (result, ex) -> {
-                    if (listener != null) {
-                        if (ex != null) {
-                            listener.error(ex);
-                        } else {
-                            listener.messageSent(result.getVisitorResponseMessage());
-                            listener.onCardMessageUpdated(result.getCardMessage());
-                        }
-                    }
-                })
+                engagement.getChat().sendMessage(attachment, callback)
         );
     }
 

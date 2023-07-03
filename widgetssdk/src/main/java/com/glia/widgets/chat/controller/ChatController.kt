@@ -11,7 +11,6 @@ import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.MessageAttachment
-import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.chat.VisitorMessage
@@ -189,7 +188,7 @@ internal class ChatController(
                 onMessageSent(message)
             }
 
-            override fun onCardMessageUpdated(message: OperatorMessage) {
+            override fun onCardMessageUpdated(message: ChatMessage) {
                 updateCustomCard(message)
             }
 
@@ -1384,13 +1383,14 @@ internal class ChatController(
         }
     }
 
-    fun sendCustomCardResponse(messageId: String, text: String?, value: String?) {
-        sendMessageUseCase.execute(messageId, text, value, sendMessageCallback)
+    fun sendCustomCardResponse(messageId: String, text: String, value: String) {
         emitChatItems {
             chatState.chatItems
                 .firstOrNull { messageId == it.id }
                 ?.let { it as CustomCardItem }
                 ?.also {
+                    sendMessageUseCase.execute(it.message, text, value, sendMessageCallback)
+
                     val customCardType = customCardTypeUseCase.execute(it.viewType) ?: return@also
                     val currentMessage = it.message
                     val showCustomCard = customCardShouldShowUseCase.execute(
@@ -1398,28 +1398,22 @@ internal class ChatController(
                         customCardType,
                         false
                     )
-                    val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                    var indexForResponseMessage = chatItems.indexOf(it)
-                    if (showCustomCard) {
-                        // The index for the response message should be next to the card
-                        // when the card is shown after the response.
-                        indexForResponseMessage += 1
-                    } else {
-                        // If the card should be hidden after the response, we remove it from the
-                        // item list. The response message will be shown instead of the card.
+                    if (!showCustomCard) {
+                        val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+
+                        // If the card should be hidden after the response, we remove it from the item list.
                         chatItems.remove(it)
+                        return@emitChatItems chatState.changeItems(chatItems)
                     }
-                    chatItems.add(
-                        indexForResponseMessage,
-                        VisitorMessageItem.asUnsentCardResponse(text)
-                    )
-                    return@emitChatItems chatState.changeItems(chatItems)
+                    return@emitChatItems null
+                } ?: run {
+                    sendMessageUseCase.execute(null, text, value, sendMessageCallback)
                 }
             return@emitChatItems null
         }
     }
 
-    private fun updateCustomCard(message: OperatorMessage) {
+    private fun updateCustomCard(message: ChatMessage) {
         chatState.chatItems
             .firstOrNull { message.id == it.id }
             ?.let { it as CustomCardItem }

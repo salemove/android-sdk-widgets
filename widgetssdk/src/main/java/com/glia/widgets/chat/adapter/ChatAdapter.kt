@@ -20,8 +20,12 @@ import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachment
 import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
+import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.CustomCardItem
+import com.glia.widgets.chat.model.history.GvaGalleryCards
+import com.glia.widgets.chat.model.history.GvaPersistentButtons
+import com.glia.widgets.chat.model.history.GvaResponseText
 import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.history.OperatorAttachmentItem
 import com.glia.widgets.chat.model.history.OperatorMessageItem
@@ -66,11 +70,13 @@ internal class ChatAdapter(
                     uiTheme
                 )
             }
+
             VISITOR_FILE_VIEW_TYPE -> {
                 val view =
                     inflater.inflate(R.layout.chat_attachment_visitor_file_layout, parent, false)
                 VisitorFileAttachmentViewHolder(view, uiTheme)
             }
+
             VISITOR_IMAGE_VIEW_TYPE -> {
                 VisitorImageAttachmentViewHolder(
                     inflater.inflate(R.layout.chat_attachment_visitor_image_layout, parent, false),
@@ -80,12 +86,14 @@ internal class ChatAdapter(
                     getImageFileFromNetworkUseCase
                 )
             }
+
             VISITOR_MESSAGE_TYPE -> {
                 VisitorMessageViewHolder(
                     ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false),
                     uiTheme
                 )
             }
+
             OPERATOR_IMAGE_VIEW_TYPE -> {
                 OperatorImageAttachmentViewHolder(
                     inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false),
@@ -95,6 +103,7 @@ internal class ChatAdapter(
                     getImageFileFromNetworkUseCase
                 )
             }
+
             OPERATOR_FILE_VIEW_TYPE -> {
                 OperatorFileAttachmentViewHolder(
                     inflater.inflate(
@@ -105,18 +114,21 @@ internal class ChatAdapter(
                     uiTheme
                 )
             }
+
             OPERATOR_MESSAGE_VIEW_TYPE -> {
                 OperatorMessageViewHolder(
                     ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false),
                     uiTheme
                 )
             }
+
             MEDIA_UPGRADE_ITEM_TYPE -> {
                 MediaUpgradeStartedViewHolder(
                     ChatMediaUpgradeLayoutBinding.inflate(inflater, parent, false),
                     uiTheme
                 )
             }
+
             NEW_MESSAGES_DIVIDER_TYPE -> {
                 NewMessagesDividerViewHolder(
                     ChatNewMessagesDividerLayoutBinding.inflate(
@@ -127,6 +139,7 @@ internal class ChatAdapter(
                     uiTheme
                 )
             }
+
             SYSTEM_MESSAGE_TYPE -> SystemMessageViewHolder(
                 ChatReceiveMessageContentBinding.inflate(
                     inflater,
@@ -135,6 +148,56 @@ internal class ChatAdapter(
                 ),
                 uiTheme
             )
+
+//            TODO should be implemented later - MOB 2364
+            GVA_RESPONSE_TEXT_TYPE -> {
+                SystemMessageViewHolder(
+                    ChatReceiveMessageContentBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    uiTheme
+                )
+            }
+
+//            TODO should be changed to appropriate ViewHolder later - MOB 2371
+            GVA_PERSISTENT_BUTTONS_TYPE -> {
+                SystemMessageViewHolder(
+                    ChatReceiveMessageContentBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    uiTheme
+                )
+            }
+
+//            TODO should be changed to appropriate ViewHolder later - MOB 2396
+            GVA_QUICK_REPLIES_TYPE -> {
+                SystemMessageViewHolder(
+                    ChatReceiveMessageContentBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    uiTheme
+                )
+            }
+
+//            TODO should be changed to appropriate ViewHolder later - MOB 2404
+            GVA_GALLERY_CARDS_TYPE -> {
+                SystemMessageViewHolder(
+                    ChatReceiveMessageContentBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    uiTheme
+                )
+            }
+
+
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {
@@ -176,9 +239,11 @@ internal class ChatAdapter(
                 chatItem,
                 onOptionClickedListener
             )
+
             is MediaUpgradeStartedTimerItem -> (holder as MediaUpgradeStartedViewHolder).bind(
                 chatItem
             )
+
             is OperatorAttachmentItem -> {
                 if (chatItem.getViewType() == OPERATOR_FILE_VIEW_TYPE) {
                     (holder as OperatorFileAttachmentViewHolder).bind(
@@ -192,6 +257,7 @@ internal class ChatAdapter(
                     )
                 }
             }
+
             is VisitorAttachmentItem -> {
                 if (chatItem.getViewType() == VISITOR_FILE_VIEW_TYPE) {
                     (holder as VisitorFileAttachmentViewHolder).bind(
@@ -206,7 +272,15 @@ internal class ChatAdapter(
                     }
                 }
             }
+
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
+
+            is GvaResponseText -> (holder as SystemMessageViewHolder).bind(Gva.Type.PLAIN_TEXT.name)
+
+            is GvaPersistentButtons -> (holder as SystemMessageViewHolder).bind(Gva.Type.PERSISTENT_BUTTONS.name)
+
+            is GvaGalleryCards -> (holder as SystemMessageViewHolder).bind(Gva.Type.GALLERY_CARDS.name)
+
             is CustomCardItem -> {
                 (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->
                     onCustomCardResponse.onCustomCardResponse(chatItem.getId(), text, value)
@@ -240,7 +314,7 @@ internal class ChatAdapter(
         fun onFileDownloadClick(file: AttachmentFile)
     }
 
-    interface OnImageItemClickListener {
+    fun interface OnImageItemClickListener {
         fun onImageItemClick(item: AttachmentFile, view: View)
     }
 
@@ -259,7 +333,15 @@ internal class ChatAdapter(
         const val VISITOR_IMAGE_VIEW_TYPE = 7
         const val NEW_MESSAGES_DIVIDER_TYPE = 8
         const val SYSTEM_MESSAGE_TYPE = 9
-        const val CUSTOM_CARD_TYPE = 10 // Should be the last type with the highest value
+
+        //GVA Types
+        const val GVA_RESPONSE_TEXT_TYPE = 10
+        const val GVA_PERSISTENT_BUTTONS_TYPE = 11
+        const val GVA_QUICK_REPLIES_TYPE = 12
+        const val GVA_GALLERY_CARDS_TYPE = 13
+
+        //Custom Card
+        const val CUSTOM_CARD_TYPE = 14 // Should be the last type with the highest value
     }
 
     @IntDef(
@@ -273,7 +355,11 @@ internal class ChatAdapter(
         VISITOR_IMAGE_VIEW_TYPE,
         NEW_MESSAGES_DIVIDER_TYPE,
         SYSTEM_MESSAGE_TYPE,
-        CUSTOM_CARD_TYPE
+        CUSTOM_CARD_TYPE,
+        GVA_RESPONSE_TEXT_TYPE,
+        GVA_PERSISTENT_BUTTONS_TYPE,
+        GVA_QUICK_REPLIES_TYPE,
+        GVA_GALLERY_CARDS_TYPE
     )
     @Retention(AnnotationRetention.SOURCE)
     annotation class Type

@@ -34,7 +34,7 @@ class MapOperatorUseCaseTest {
         mapOperatorUseCase(chatMessage)
             .test()
             .assertComplete()
-            .assertNever { it.operator.isPresent }
+            .assertNever { it.operator != null }
     }
 
     @Test
@@ -44,9 +44,9 @@ class MapOperatorUseCaseTest {
         whenever(chatMessage.operatorId) doReturn operator.id
         whenever(getOperatorUseCase.execute(operator.id)) doReturn (Single.just(Optional.of(operator)))
         mapOperatorUseCase(chatMessage)
-            .doOnSuccess { assertEquals(it.operatorId.get(), operator.id) }
+            .doOnSuccess { assertEquals(it.operatorId, operator.id) }
             .test()
             .assertComplete()
-            .assertNever { !it.operator.isPresent }
+            .assertNever { it.operator == null }
     }
 }

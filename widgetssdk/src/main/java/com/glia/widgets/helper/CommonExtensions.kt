@@ -2,6 +2,8 @@ package com.glia.widgets.helper
 
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.text.Html
+import android.text.Spanned
 import android.text.format.DateUtils
 import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
@@ -37,3 +39,8 @@ internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean =
 
 internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme =
     deepMerge(newTheme) ?: UiTheme.UiThemeBuilder().build()
+
+/**
+ * Returns styled text from the provided HTML string.
+ */
+internal fun String.fromHtml(flags: Int = Html.FROM_HTML_MODE_COMPACT): Spanned = Html.fromHtml(this, flags)

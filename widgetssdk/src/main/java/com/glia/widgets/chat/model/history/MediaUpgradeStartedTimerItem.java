@@ -1,11 +1,13 @@
 package com.glia.widgets.chat.model.history;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.chat.adapter.ChatAdapter;
 
 import java.util.Objects;
 
 public class MediaUpgradeStartedTimerItem extends ChatItem {
-    public final static String ID = "media_upgrade_item";
+    public static final String ID = "media_upgrade_item";
     public final MediaUpgradeStartedTimerItem.Type type;
     public final String time;
 
@@ -15,16 +17,13 @@ public class MediaUpgradeStartedTimerItem extends ChatItem {
         this.time = time;
     }
 
-    public enum Type {
-        AUDIO, VIDEO
-    }
-
+    @NonNull
     @Override
     public String toString() {
         return "MediaUpgradeStartedTimerItem{" +
-                "type=" + type +
-                ", time='" + time + '\'' +
-                '}';
+            "type=" + type +
+            ", time='" + time + '\'' +
+            '}';
     }
 
     @Override
@@ -34,11 +33,15 @@ public class MediaUpgradeStartedTimerItem extends ChatItem {
         if (!super.equals(o)) return false;
         MediaUpgradeStartedTimerItem that = (MediaUpgradeStartedTimerItem) o;
         return type == that.type &&
-                Objects.equals(time, that.time);
+            Objects.equals(time, that.time);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), type, time);
+    }
+
+    public enum Type {
+        AUDIO, VIDEO
     }
 }

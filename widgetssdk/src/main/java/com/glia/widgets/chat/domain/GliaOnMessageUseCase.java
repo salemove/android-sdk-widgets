@@ -11,8 +11,8 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 public class GliaOnMessageUseCase implements
-        GliaOnEngagementUseCase.Listener,
-        GliaChatRepository.MessageListener {
+    GliaOnEngagementUseCase.Listener,
+    GliaChatRepository.MessageListener {
 
     private final GliaOnEngagementUseCase onEngagementUseCase;
     private final GliaChatRepository messageRepository;
@@ -20,9 +20,9 @@ public class GliaOnMessageUseCase implements
     private final PublishSubject<ChatMessage> publishSubject;
 
     public GliaOnMessageUseCase(
-            GliaChatRepository messageRepository,
-            GliaOnEngagementUseCase gliaOnEngagementUseCase,
-            MapOperatorUseCase mapOperatorUseCase) {
+        GliaChatRepository messageRepository,
+        GliaOnEngagementUseCase gliaOnEngagementUseCase,
+        MapOperatorUseCase mapOperatorUseCase) {
         this.onEngagementUseCase = gliaOnEngagementUseCase;
         this.messageRepository = messageRepository;
         this.mapOperatorUseCase = mapOperatorUseCase;
@@ -32,9 +32,9 @@ public class GliaOnMessageUseCase implements
     public Observable<ChatMessageInternal> execute() {
         this.onEngagementUseCase.execute(this);
         return publishSubject
-                .flatMapSingle(mapOperatorUseCase::invoke)
-                .doOnError(Throwable::printStackTrace)
-                .share();
+            .flatMapSingle(chatMessage -> mapOperatorUseCase.invoke(chatMessage, false, true))
+            .doOnError(Throwable::printStackTrace)
+            .share();
     }
 
     public void unregisterListener() {

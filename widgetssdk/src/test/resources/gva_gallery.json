@@ -1,0 +1,47 @@
+{
+  "content": "\"\"",
+  "type": "chat",
+  "metadata": {
+    "type": "galleryCards",
+    "galleryCards": [
+      {
+        "title": "Example Card",
+        "subtitle": "Subtitle text",
+        "imageUrl": "http://d2e39xiit5tjik.cloudfront.net/finnapp/galleries/InvestmentAccounts.jpg",
+        "options": [
+          {
+            "text": "Postback Button",
+            "value": "{\"utterance\":\"Postback Button\",\"payload\":{\"routingData\":{},\"destinationUtterance\":\"Cancel\",\"messageType\":\"buttonTap\"}}"
+          },
+          {
+            "text": "Open Url - Modal",
+            "url": "https://www.glia.com",
+            "urlTarget": "modal"
+          },
+          {
+            "text": "Open Url - Same Tab",
+            "url": "https://www.glia.com",
+            "urlTarget": "self"
+          },
+          {
+            "text": "Open Url - New Tab",
+            "url": "https://www.glia.com",
+            "urlTarget": "blank"
+          },
+          {
+            "text": "Call Phone Number",
+            "url": "tel:555-555-5555",
+            "urlTarget": "self"
+          },
+          {
+            "text": "Broadcast Event",
+            "value": "{\"utterance\":\"Broadcast Event\",\"payload\":{\"userId\":\"dummy-user-id\",\"messageType\":\"buttonTap\",\"broadcastEventName\":\"dummy-event\"}}"
+          }
+        ]
+      }
+    ],
+    "glia": {
+      "message_group_id": "8d1de3fc-4e2f-423a-8ba2-8fa76770c4f3"
+    }
+  }
+}

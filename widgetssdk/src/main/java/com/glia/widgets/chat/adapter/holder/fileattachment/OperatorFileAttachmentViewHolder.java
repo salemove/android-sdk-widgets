@@ -24,7 +24,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     }
 
     public void bind(OperatorAttachmentItem item, ChatAdapter.OnFileItemClickListener listener) {
-        super.setData(item.isFileExists, item.isDownloading, item.attachmentFile, listener);
+        super.setData(item.isFileExists(), item.isDownloading(), item.getAttachmentFile(), listener);
         updateOperatorStatusView(item);
     }
 
@@ -34,29 +34,29 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     }
 
     private void updateOperatorStatusView(OperatorAttachmentItem item) {
-        operatorStatusView.setVisibility(item.showChatHead ? View.VISIBLE : View.GONE);
-        if (item.operatorProfileImgUrl != null) {
-            operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
+        operatorStatusView.setVisibility(item.getShowChatHead() ? View.VISIBLE : View.GONE);
+        if (item.getOperatorProfileImgUrl() != null) {
+            operatorStatusView.showProfileImage(item.getOperatorProfileImgUrl());
         } else {
             operatorStatusView.showPlaceholder();
         }
 
-        String name = item.attachmentFile.getName();
-        String byteSize = Formatter.formatFileSize(itemView.getContext(), item.attachmentFile.getSize());
+        String name = item.getAttachmentFile().getName();
+        String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
         itemView.setContentDescription(itemView.getResources().getString(R.string.glia_chat_operator_file_content_description, name, byteSize));
 
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
-            public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
+            public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
-                String actionLabel = host.getResources().getString(item.isFileExists
-                        ? R.string.glia_chat_attachment_open_button_label
-                        : R.string.glia_chat_attachment_download_button_label);
+                String actionLabel = host.getResources().getString(item.isFileExists()
+                    ? R.string.glia_chat_attachment_open_button_label
+                    : R.string.glia_chat_attachment_download_button_label);
 
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
-                        = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                        AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
+                    = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
                 info.addAction(actionClick);
             }
         });

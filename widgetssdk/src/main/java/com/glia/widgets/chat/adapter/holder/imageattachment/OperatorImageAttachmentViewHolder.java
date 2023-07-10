@@ -37,8 +37,8 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
     }
 
     public void bind(OperatorAttachmentItem item, ChatAdapter.OnImageItemClickListener onImageItemClickListener) {
-        super.bind(item.attachmentFile);
-        itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.attachmentFile, v));
+        super.bind(item.getAttachmentFile());
+        itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.getAttachmentFile(), v));
         updateOperatorStatus(item);
 
         setAccessibilityLabels();
@@ -63,9 +63,9 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
     }
 
     private void updateOperatorStatus(OperatorAttachmentItem item) {
-        operatorStatusView.setVisibility(item.showChatHead ? View.VISIBLE : View.GONE);
-        if (item.operatorProfileImgUrl != null) {
-            operatorStatusView.showProfileImage(item.operatorProfileImgUrl);
+        operatorStatusView.setVisibility(item.getShowChatHead() ? View.VISIBLE : View.GONE);
+        if (item.getOperatorProfileImgUrl() != null) {
+            operatorStatusView.showProfileImage(item.getOperatorProfileImgUrl());
         } else {
             operatorStatusView.showPlaceholder();
         }

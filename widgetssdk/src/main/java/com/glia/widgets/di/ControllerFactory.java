@@ -133,7 +133,6 @@ public class ControllerFactory {
                 useCaseFactory.createHasPendingSurveyUseCase(),
                 useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createIsCallVisualizerUseCase(),
-                useCaseFactory.createPreEngagementMessageUseCase(),
                 useCaseFactory.createAddNewMessagesDividerUseCase(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createAcceptMediaUpgradeOfferUseCase(),

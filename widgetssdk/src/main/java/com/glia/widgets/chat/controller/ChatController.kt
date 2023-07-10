@@ -40,7 +40,6 @@ import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
-import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
@@ -175,7 +174,6 @@ internal class ChatController(
     private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
     private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
-    private val preEngagementMessageUseCase: PreEngagementMessageUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
@@ -188,7 +186,6 @@ internal class ChatController(
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
     private var timerStatusListener: FormattedTimerStatusListener? = null
     private var engagementStateEventDisposable: Disposable? = null
-    private var unengagementMessagesDisposable: Disposable? = null
 
     private val disposable = CompositeDisposable()
     private val operatorMediaStateListener =
@@ -355,7 +352,6 @@ internal class ChatController(
             minimizeHandler.clear()
             getEngagementUseCase.unregisterListener(this)
             engagementEndUseCase.unregisterListener(this)
-            onMessageUseCase.unregisterListener()
             onOperatorTypingUseCase.unregisterListener()
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
             shouldHandleEndedEngagement = false
@@ -406,18 +402,10 @@ internal class ChatController(
 
     private fun subscribeToMessages() {
         disposable.add(
-            onMessageUseCase.execute()
-                .doOnNext { onMessage(it) }
+            onMessageUseCase()
+                .doOnNext { onPreEngagementMessage(it) }
                 .subscribe()
         )
-    }
-
-    private fun subscribeToPreEngagementMessage() {
-        val subscribe = preEngagementMessageUseCase.execute()
-            .doOnNext { onPreEngagementMessage(it) }
-            .subscribe()
-        disposable.add(subscribe)
-        unengagementMessagesDisposable = subscribe
     }
 
     private fun onPreEngagementMessage(messageInternal: ChatMessageInternal) {
@@ -1432,7 +1420,6 @@ internal class ChatController(
     }
 
     private fun loadChatHistory() {
-        unengagementMessagesDisposable?.dispose()
         val historyDisposable = loadHistoryUseCase()
             .subscribe({ historyLoaded(it) }, { error(it) })
         disposable.add(historyDisposable)
@@ -1457,7 +1444,7 @@ internal class ChatController(
         }
 
         initGliaEngagementObserving()
-        subscribeToPreEngagementMessage()
+        subscribeToMessages()
     }
 
     private fun submitHistoryItems(

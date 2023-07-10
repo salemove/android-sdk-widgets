@@ -26,7 +26,7 @@ import kotlin.reflect.full.primaryConstructor
  *     val c = a deepMerge b
  */
 internal inline infix fun <reified T : Any?> T.deepMerge(other: T): T {
-    if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes")
+    if (!T::class.isData) throw UnsupportedOperationException("Merge supports only data classes, ${T::class.simpleName} is not a data class")
     return unsafeMerge(other)
 }
 

@@ -18,6 +18,8 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.chat.domain.gva.IsGvaUseCase
+import com.glia.widgets.chat.domain.gva.MapGvaUseCase
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
@@ -123,6 +125,8 @@ class ChatControllerTest {
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
+    private lateinit var isGvaUseCase: IsGvaUseCase
+    private lateinit var mapGvaUseCase: MapGvaUseCase
 
     private lateinit var chatController: ChatController
 
@@ -180,6 +184,8 @@ class ChatControllerTest {
         addNewMessagesDividerUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
         acceptMediaUpgradeOfferUseCase = mock()
+        isGvaUseCase = mock()
+        mapGvaUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -233,7 +239,9 @@ class ChatControllerTest {
             preEngagementMessageUseCase = preEngagementMessageUseCase,
             addNewMessagesDividerUseCase = addNewMessagesDividerUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
-            acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase
+            acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
+            isGvaUseCase = isGvaUseCase,
+            mapGvaUseCase = mapGvaUseCase
         )
     }
 

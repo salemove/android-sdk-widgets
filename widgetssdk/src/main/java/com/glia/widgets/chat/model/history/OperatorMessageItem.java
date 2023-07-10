@@ -7,21 +7,29 @@ import com.glia.widgets.chat.adapter.ChatAdapter;
 import java.util.Objects;
 
 public class OperatorMessageItem extends OperatorChatItem {
-    public final String operatorName;
-    public final String content;
+    private final String operatorName;
+    private final String content;
 
     public OperatorMessageItem(
-            String id,
-            String operatorName,
-            String operatorProfileImgUrl,
-            boolean showChatHead,
-            String content,
-            String operatorId,
-            long timestamp
+        String id,
+        String operatorName,
+        String operatorProfileImgUrl,
+        boolean showChatHead,
+        String content,
+        String operatorId,
+        long timestamp
     ) {
         super(id, ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE, showChatHead, operatorProfileImgUrl, operatorId, id, timestamp);
         this.operatorName = operatorName;
         this.content = content;
+    }
+
+    public String getOperatorName() {
+        return operatorName;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     @Override
@@ -31,7 +39,7 @@ public class OperatorMessageItem extends OperatorChatItem {
         if (!super.equals(o)) return false;
         OperatorMessageItem that = (OperatorMessageItem) o;
         return Objects.equals(operatorName, that.operatorName)
-                && Objects.equals(content, that.content);
+            && Objects.equals(content, that.content);
     }
 
     @Override
@@ -43,11 +51,11 @@ public class OperatorMessageItem extends OperatorChatItem {
     @Override
     public String toString() {
         return "OperatorMessageItem{" +
-                "showChatHead=" + showChatHead +
-                ", operatorProfileImgUrl='" + operatorProfileImgUrl + '\'' +
-                ", operatorId='" + operatorId + '\'' +
-                ", operatorName='" + operatorName + '\'' +
-                ", content='" + content + '\'' +
-                "} " + super.toString();
+            "showChatHead=" + getShowChatHead() +
+            ", operatorProfileImgUrl='" + getOperatorProfileImgUrl() + '\'' +
+            ", operatorId='" + getOperatorId() + '\'' +
+            ", operatorName='" + operatorName + '\'' +
+            ", content='" + content + '\'' +
+            "} " + super.toString();
     }
 }

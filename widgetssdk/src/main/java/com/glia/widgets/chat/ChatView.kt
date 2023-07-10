@@ -388,8 +388,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     updateShowSendButton(chatState)
                     updateChatEditText(chatState)
                     updateAppBar(chatState)
-                    binding.newMessagesIndicatorLayout.isVisible =
-                        chatState.showMessagesUnseenIndicator()
+                    binding.newMessagesIndicatorLayout.isVisible = chatState.showMessagesUnseenIndicator
                     updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl)
                     isInBottom = chatState.isChatInBottom
                     binding.chatRecyclerView.setInBottom(isInBottom)
@@ -402,6 +401,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
                     binding.operatorTypingAnimationView.isVisible = chatState.isOperatorTyping
                     updateAttachmentButton(chatState)
+                    updateQuickRepliesState(chatState)
                 }
             }
 
@@ -481,6 +481,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
     }
 
+    private fun updateQuickRepliesState(chatState: ChatState) {
+        val quickReplies = chatState.gvaQuickReplies
+        binding.gvaQuickRepliesLayout.isVisible = quickReplies.isNotEmpty()
+        binding.gvaQuickRepliesLayout.text = quickReplies.map { it.text }.toString()
+    }
+
     private fun updateNewMessageOperatorStatusView(operatorProfileImgUrl: String?) {
         binding.newMessagesIndicatorImage.apply {
             operatorProfileImgUrl?.also(::showProfileImage) ?: showPlaceholder()
@@ -508,6 +514,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
                     showAllowScreenSharingNotificationsAndStartSharingDialog()
                 }
+
                 Dialog.MODE_VISITOR_CODE -> {
                     Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
                 } // Should never happen inside ChatView

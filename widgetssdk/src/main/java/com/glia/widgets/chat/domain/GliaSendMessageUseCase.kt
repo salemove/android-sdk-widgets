@@ -27,8 +27,11 @@ class GliaSendMessageUseCase(
         fun onCardMessageUpdated(message: ChatMessage)
         fun onMessageValidated()
         fun errorOperatorNotOnline(message: String)
-        fun errorMessageInvalid()
         fun error(ex: GliaException)
+
+        fun errorMessageInvalid() {
+            // Currently, no need for this method, but have to keep it because it describes case in else branch
+        }
     }
 
     private val isSecureEngagement: Boolean

@@ -1,0 +1,41 @@
+{
+  "content": "Example Text with PBs",
+  "type": "chat",
+  "metadata": {
+    "type": "persistentButtons",
+    "content": "Example Text with PBs",
+    "options": [
+      {
+        "text": "Postback Button",
+        "value": "{\"utterance\":\"Postback Button\",\"payload\":{\"routingData\":{},\"destinationUtterance\":\"Cancel\",\"messageType\":\"buttonTap\"}}"
+      },
+      {
+        "text": "Open Url - Modal",
+        "url": "https://www.glia.com",
+        "urlTarget": "modal"
+      },
+      {
+        "text": "Open Url - Same Tab",
+        "url": "https://www.glia.com",
+        "urlTarget": "self"
+      },
+      {
+        "text": "Open Url - New Tab",
+        "url": "https://www.glia.com",
+        "urlTarget": "blank"
+      },
+      {
+        "text": "Call Phone Number",
+        "url": "tel:555-555-5555",
+        "urlTarget": "self"
+      },
+      {
+        "text": "Broadcast Event",
+        "value": "{\"utterance\":\"Broadcast Event\",\"payload\":{\"userId\":\"dummy-user-id\",\"messageType\":\"buttonTap\",\"broadcastEventName\":\"dummy-event\"}}"
+      }
+    ],
+    "glia": {
+      "message_group_id": "a565a0f5-81f2-4ebf-a79a-a0d484bde96f"
+    }
+  }
+}

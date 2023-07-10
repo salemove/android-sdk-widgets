@@ -15,7 +15,6 @@ import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
-import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
@@ -124,7 +123,6 @@ class ChatControllerTest {
     private lateinit var hasPendingSurveyUseCase: HasPendingSurveyUseCase
     private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
     private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
-    private lateinit var preEngagementMessageUseCase: PreEngagementMessageUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
@@ -184,7 +182,6 @@ class ChatControllerTest {
         hasPendingSurveyUseCase = mock()
         setPendingSurveyUsedUseCase = mock()
         isCallVisualizerUseCase = mock()
-        preEngagementMessageUseCase = mock()
         addNewMessagesDividerUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
         acceptMediaUpgradeOfferUseCase = mock()
@@ -241,7 +238,6 @@ class ChatControllerTest {
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
             isCallVisualizerUseCase = isCallVisualizerUseCase,
-            preEngagementMessageUseCase = preEngagementMessageUseCase,
             addNewMessagesDividerUseCase = addNewMessagesDividerUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,

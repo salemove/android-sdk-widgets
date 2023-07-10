@@ -24,7 +24,6 @@ import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
-import com.glia.widgets.chat.domain.PreEngagementMessageUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase;
@@ -335,21 +334,11 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public PreEngagementMessageUseCase createPreEngagementMessageUseCase() {
-        return new PreEngagementMessageUseCase(
-            repositoryFactory.getGliaMessageRepository(),
-            repositoryFactory.getGliaEngagementRepository(),
-            createOnEngagementUseCase(),
-            getMapOperatorUseCase()
-        );
-    }
-
-    @NonNull
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
         return new GliaOnMessageUseCase(
-            repositoryFactory.getGliaMessageRepository(),
-            createOnEngagementUseCase(),
-            getMapOperatorUseCase());
+                repositoryFactory.getGliaMessageRepository(),
+                getMapOperatorUseCase()
+        );
     }
 
     @NonNull

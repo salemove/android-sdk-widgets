@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.visitor.Authentication;
@@ -67,6 +69,9 @@ import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
+import com.glia.widgets.core.locales.CacheLocaleUseCase;
+import com.glia.widgets.core.locales.CachedFileNamesUseCase;
+import com.glia.widgets.core.locales.ReadCachedLocaleUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
@@ -110,6 +115,7 @@ import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCas
 import com.glia.widgets.helper.rx.Schedulers;
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase;
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
+import com.google.gson.Gson;
 
 public class UseCaseFactory {
     private static CallNotificationUseCase callNotificationUseCase;
@@ -119,7 +125,6 @@ public class UseCaseFactory {
     private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
     private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
-
     private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
     private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final RepositoryFactory repositoryFactory;
@@ -818,6 +823,21 @@ public class UseCaseFactory {
                 createIsCallVisualizerUseCase(),
                 permissionManager
         );
+    }
+
+    @NonNull
+    public CachedFileNamesUseCase getCachedFileNamesUseCase(Context context) {
+      return new CachedFileNamesUseCase(context.getSharedPreferences("SharedPrefs", Context.MODE_PRIVATE), new Gson());
+    }
+
+    @NonNull
+    public CacheLocaleUseCase getCacheLocaleUseCase(Context context) {
+      return new CacheLocaleUseCase(getCachedFileNamesUseCase(context));
+    }
+
+    @NonNull
+    public ReadCachedLocaleUseCase getReadCachedLocaleUseCase() {
+      return new ReadCachedLocaleUseCase();
     }
 
     public void resetState() {

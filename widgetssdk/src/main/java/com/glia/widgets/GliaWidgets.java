@@ -1,6 +1,7 @@
 package com.glia.widgets;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,9 @@ import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
+import com.glia.widgets.core.locales.CacheLocaleUseCase;
+import com.glia.widgets.core.locales.NewLocale;
+import com.glia.widgets.core.locales.ReadCachedLocaleUseCase;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
 import com.glia.widgets.core.visitor.VisitorInfoUpdate;
@@ -21,10 +25,14 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.function.Consumer;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * This class is a starting point for integration with Glia Widgets SDK
@@ -142,9 +150,42 @@ public class GliaWidgets {
         Dependencies.init(gliaWidgetsConfig);
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
+        //testCache(gliaWidgetsConfig.getContext());
     }
 
-    private static GliaConfig createGliaConfig(GliaWidgetsConfig gliaWidgetsConfig) {
+  private static void testCache(Context context) {
+    HashMap<String, String> map = new HashMap<>();
+    map.put("aa", "AaA");
+    map.put("bb", "BbC");
+    NewLocale locale = new NewLocale(map);
+    CompositeDisposable disposable = new CompositeDisposable();
+    disposable.add(Dependencies.getUseCaseFactory().getCacheLocaleUseCase(context)
+      .execute(context, locale, "es_MX")
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread()).subscribe(
+        () -> {
+          Logger.d(TAG, "Cache saved");
+          disposable.add(Dependencies.getUseCaseFactory().getReadCachedLocaleUseCase()
+            .execute(context, "es_MX")
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(
+              newLocale -> {
+                Logger.d(TAG, "Cache loaded " + newLocale.toString());
+              },
+              throwable -> {
+                Logger.d(TAG, "Failed to load cache " + throwable.getMessage());
+              }
+            )
+          );
+        },
+        throwable -> {
+          Logger.d(TAG, "Failed to save cache " + throwable.getMessage());
+        }
+      )
+    );
+  }
+
+  private static GliaConfig createGliaConfig(GliaWidgetsConfig gliaWidgetsConfig) {
         GliaConfig.Builder builder = new GliaConfig.Builder();
         setAuthorization(gliaWidgetsConfig, builder);
         return builder

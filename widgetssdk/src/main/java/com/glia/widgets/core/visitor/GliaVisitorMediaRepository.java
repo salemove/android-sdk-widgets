@@ -37,6 +37,7 @@ public class GliaVisitorMediaRepository {
         engagement.getMedia().off(Media.Events.VISITOR_STATE_UPDATE, this::onNewVisitorMediaState);
         currentMediaState = null;
         isOnHold = false;
+        notifyVisitorMediaStateChanged(null);
     }
 
     public void addVisitorMediaStateListener(VisitorMediaUpdatesListener listener) {

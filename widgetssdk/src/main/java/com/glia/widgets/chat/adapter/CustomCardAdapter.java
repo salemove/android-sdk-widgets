@@ -98,10 +98,14 @@ public abstract class CustomCardAdapter {
      * @param message a chat message with metadata.
      * @param viewType the view type of the new view.
      *                 The type is provided by {@link #getItemViewType(ChatMessage)}.
-     * @return a boolean indicating if the custom card view should be shown when
-     *         the card is interactable and an option is selected.
+     * @return a boolean indicating if the input field should be locked
+     *         until a visitor selects an option from the card.
      *         The default implementation returns {@code true}.
+     *
+     * @deprecated The result does not affect the behavior of the input field.
+     *             The chat input field will always be active.
      */
+    @Deprecated
     public boolean isInteractable(ChatMessage message, int viewType) {
         return true;
     }

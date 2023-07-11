@@ -2,7 +2,6 @@ package com.glia.widgets.call;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 
@@ -10,8 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.util.Pair;
 
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
@@ -22,16 +19,7 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.PublishSubject;
-
 public class CallActivity extends AppCompatActivity {
-    private static final int MEDIA_PERMISSION_REQUEST_CODE = 2001;
-
     private static final String TAG = CallActivity.class.getSimpleName();
 
     private Configuration configuration;
@@ -46,8 +34,6 @@ public class CallActivity extends AppCompatActivity {
         navigateToSurvey(survey);
         finish();
     };
-    private final PublishSubject<Pair<Integer, Integer[]>> permissionSubject = PublishSubject.create();
-    private Disposable permissionSubjectDisposable;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,7 +62,7 @@ public class CallActivity extends AppCompatActivity {
         callView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
 
         if (savedInstanceState == null) {
-            startCallWithPermissions();
+            startCall();
         }
 
         setTitle(getTitleText());
@@ -107,9 +93,6 @@ public class CallActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (permissionSubjectDisposable != null) {
-            permissionSubjectDisposable.dispose();
-        }
         onBackClickedListener = null;
         onNavigateToChatListener = null;
         callView.onDestroy();
@@ -132,58 +115,9 @@ public class CallActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Integer[] convertedGrantResults = IntStream.of(grantResults).boxed().toArray(Integer[]::new);
-        permissionSubject.onNext(new Pair<>(requestCode, convertedGrantResults));
     }
 
-    private void startCallWithPermissions() {
-        if (!configuration.getIsUpgradeToCall()) { // In upgrading to call, permissions handle on the Core SDK side.
-            callView.checkForPermissions(
-                    getApplicationContext(),
-                    configuration.getMediaType(),
-                    this::handleMissingPermissions);
-        } else {
-            onCallPermissionsAvailable();
-        }
-    }
-
-    private void handleMissingPermissions(List<String> missingPermissions) {
-        if (missingPermissions.size() > 0) {
-            permissionSubjectDisposable = permissionSubject
-                    .filter(this::isPermissionDataMediaRequestCode)
-                    .firstOrError()
-                    .map(permissionData -> permissionData.second)
-                    .map(permissionResultCodeArray -> Arrays
-                            .stream(permissionResultCodeArray)
-                            .allMatch(code -> code == PackageManager.PERMISSION_GRANTED))
-                    .subscribe(
-                            (isPermissionRequestSuccessful) -> {
-                                if (isPermissionRequestSuccessful) {
-                                    onCallPermissionsAvailable();
-                                } else {
-                                    callView.showMissingPermissionsDialog();
-                                }
-                            },
-                            error -> callView.showMissingPermissionsDialog()
-                    );
-            requestPermissions(
-                    missingPermissions.toArray(new String[0]),
-                    MEDIA_PERMISSION_REQUEST_CODE
-            );
-        } else {
-            onCallPermissionsAvailable();
-        }
-    }
-
-    public interface MissingPermissionsCallBack {
-        void onMissingPermissionsGathered(List<String> missingPermissions);
-    }
-
-    private boolean isPermissionDataMediaRequestCode(Pair<Integer, Integer[]> permissionData) {
-        return permissionData != null && permissionData.first != null && permissionData.first == MEDIA_PERMISSION_REQUEST_CODE;
-    }
-
-    private void onCallPermissionsAvailable() {
+    private void startCall() {
         GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
         callView.startCall(
                 sdkConfiguration.getCompanyName(),
@@ -191,6 +125,7 @@ public class CallActivity extends AppCompatActivity {
                 sdkConfiguration.getContextAssetId(),
                 sdkConfiguration.getUseOverlay(),
                 sdkConfiguration.getScreenSharingMode(),
+                configuration.getIsUpgradeToCall(),
                 configuration.getMediaType()
         );
     }

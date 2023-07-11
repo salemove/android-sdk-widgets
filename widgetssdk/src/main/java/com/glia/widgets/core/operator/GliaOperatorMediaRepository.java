@@ -1,5 +1,7 @@
 package com.glia.widgets.core.operator;
 
+import androidx.annotation.Nullable;
+
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
@@ -10,12 +12,7 @@ import java.util.function.Consumer;
 public class GliaOperatorMediaRepository {
     private final ArrayList<OperatorMediaStateListener> eventListeners = new ArrayList<>();
 
-    private final Consumer<OperatorMediaState> operatorMediaStateConsumer = operatorMediaState -> {
-        this.currentMediaState = operatorMediaState;
-        for (OperatorMediaStateListener listener : eventListeners) {
-            listener.onNewState(operatorMediaState);
-        }
-    };
+    private final Consumer<OperatorMediaState> operatorMediaStateConsumer = this::notifyOperatorMediaStateChanged;
 
     private OperatorMediaState currentMediaState = null;
 
@@ -24,14 +21,18 @@ public class GliaOperatorMediaRepository {
         if (currentMediaState != null) listener.onNewState(currentMediaState);
     }
 
+    public void removeMediaStateListener(OperatorMediaStateListener listener) {
+        eventListeners.remove(listener);
+    }
+
     public void onEngagementStarted(Engagement engagement) {
         engagement.getMedia()
                 .on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
-    public void stopListening(Engagement engagement) {
+    public void onEngagementEnded(Engagement engagement) {
         currentMediaState = null;
-        eventListeners.clear();
+        notifyOperatorMediaStateChanged(null);
         engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
@@ -47,7 +48,14 @@ public class GliaOperatorMediaRepository {
         return currentMediaState != null && currentMediaState.getVideo() != null;
     }
 
+    private void notifyOperatorMediaStateChanged(OperatorMediaState state) {
+        this.currentMediaState = state;
+        for (OperatorMediaStateListener listener : eventListeners) {
+            listener.onNewState(state);
+        }
+    }
+
     public interface OperatorMediaStateListener {
-        void onNewState(OperatorMediaState state);
+        void onNewState(@Nullable OperatorMediaState state);
     }
 }

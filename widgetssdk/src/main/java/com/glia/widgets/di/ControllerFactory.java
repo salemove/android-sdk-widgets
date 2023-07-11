@@ -19,6 +19,8 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
+import com.glia.widgets.permissions.PermissionsRequestContract;
+import com.glia.widgets.permissions.controller.PermissionsRequestController;
 import com.glia.widgets.survey.SurveyContract;
 import com.glia.widgets.survey.SurveyController;
 import com.glia.widgets.view.MessagesNotSeenHandler;
@@ -118,7 +120,6 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateFromCallScreenUseCase(),
                     useCaseFactory.createCustomCardAdapterTypeUseCase(),
                     useCaseFactory.createCustomCardTypeUseCase(),
-                    useCaseFactory.createCustomCardInteractableUseCase(),
                     useCaseFactory.createCustomCardShouldShowUseCase(),
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                     useCaseFactory.createIsQueueingEngagementUseCase(),
@@ -134,7 +135,8 @@ public class ControllerFactory {
                     useCaseFactory.createIsCallVisualizerUseCase(),
                     useCaseFactory.createPreEngagementMessageUseCase(),
                     useCaseFactory.createAddNewMessagesDividerUseCase(),
-                    useCaseFactory.createIsFileReadyForPreviewUseCase()
+                    useCaseFactory.createIsFileReadyForPreviewUseCase(),
+                    useCaseFactory.createAcceptMediaUpgradeOfferUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -147,6 +149,7 @@ public class ControllerFactory {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
+                    sdkConfigurationManager,
                     repositoryFactory.getMediaUpgradeOfferRepository(),
                     sharedTimer,
                     callViewCallback,
@@ -160,6 +163,7 @@ public class ControllerFactory {
                     useCaseFactory.createCancelQueueTicketUseCase(),
                     useCaseFactory.createOnEngagementUseCase(),
                     useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
+                    useCaseFactory.createRemoveOperatorMediaStateListenerUseCase(),
                     useCaseFactory.createOnEngagementEndUseCase(),
                     useCaseFactory.createEndEngagementUseCase(),
                     useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
@@ -178,7 +182,9 @@ public class ControllerFactory {
                     useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                     useCaseFactory.createIsCallVisualizerUseCase(),
                     useCaseFactory.createIsOngoingEngagementUseCase(),
-                    useCaseFactory.createSetPendingSurveyUsed());
+                    useCaseFactory.createSetPendingSurveyUsed(),
+                    useCaseFactory.createTurnSpeakerphoneUseCase(),
+                    useCaseFactory.createHandleCallPermissionsUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);
@@ -370,5 +376,11 @@ public class ControllerFactory {
                     useCaseFactory.createUpdateFromCallScreenUseCase());
         }
         return activityWatcherForChatHeadController;
+    }
+
+    public PermissionsRequestContract.Controller getPermissionsController() {
+        return new PermissionsRequestController(
+                repositoryFactory.getPermissionsRequestRepository()
+        );
     }
 }

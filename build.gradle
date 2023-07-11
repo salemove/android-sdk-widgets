@@ -64,6 +64,7 @@ ext {
     picassoVersion = '2.8'
     lottieVersion = '5.2.0'
     firebaseVersion = '31.0.2'
+    audioswitch = '1.1.8'
 
     leakCanaryVersion = '2.6'
     espressoVersion = '3.5.1'

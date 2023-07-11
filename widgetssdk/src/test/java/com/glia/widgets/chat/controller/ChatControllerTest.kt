@@ -4,7 +4,6 @@ import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase
-import com.glia.widgets.chat.domain.CustomCardInteractableUseCase
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
@@ -41,6 +40,7 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCa
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
+import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -106,7 +106,6 @@ class ChatControllerTest {
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
     private lateinit var customCardAdapterTypeUseCase: CustomCardAdapterTypeUseCase
     private lateinit var customCardTypeUseCase: CustomCardTypeUseCase
-    private lateinit var customCardInteractableUseCase: CustomCardInteractableUseCase
     private lateinit var customCardShouldShowUseCase: CustomCardShouldShowUseCase
     private lateinit var ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase
     private lateinit var addMediaUpgradeOfferCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase
@@ -123,6 +122,7 @@ class ChatControllerTest {
     private lateinit var preEngagementMessageUseCase: PreEngagementMessageUseCase
     private lateinit var addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
+    private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
 
     private lateinit var chatController: ChatController
 
@@ -163,7 +163,6 @@ class ChatControllerTest {
         updateFromCallScreenUseCase = mock()
         customCardAdapterTypeUseCase = mock()
         customCardTypeUseCase = mock()
-        customCardInteractableUseCase = mock()
         customCardShouldShowUseCase = mock()
         ticketStateChangeToUnstaffedUseCase = mock()
         addMediaUpgradeOfferCallbackUseCase = mock()
@@ -180,6 +179,7 @@ class ChatControllerTest {
         preEngagementMessageUseCase = mock()
         addNewMessagesDividerUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
+        acceptMediaUpgradeOfferUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -217,7 +217,6 @@ class ChatControllerTest {
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             customCardAdapterTypeUseCase = customCardAdapterTypeUseCase,
             customCardTypeUseCase = customCardTypeUseCase,
-            customCardInteractableUseCase = customCardInteractableUseCase,
             customCardShouldShowUseCase = customCardShouldShowUseCase,
             ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase,
             isOngoingEngagementUseCase = isOngoingEngagementUseCase,
@@ -233,7 +232,8 @@ class ChatControllerTest {
             isCallVisualizerUseCase = isCallVisualizerUseCase,
             preEngagementMessageUseCase = preEngagementMessageUseCase,
             addNewMessagesDividerUseCase = addNewMessagesDividerUseCase,
-            isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase
+            isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
+            acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase
         )
     }
 

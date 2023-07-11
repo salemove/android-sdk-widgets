@@ -1,19 +1,25 @@
 package com.glia.widgets.di;
 
 import android.app.Application;
+import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
+import com.glia.widgets.core.audio.AudioControlManager;
+import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
+import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
@@ -23,6 +29,8 @@ import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
+
+import kotlin.jvm.functions.Function2;
 
 public class Dependencies {
 
@@ -45,15 +53,28 @@ public class Dependencies {
                 gliaCore,
                 downloadsFolderDataSource
         );
+
+        PermissionManager permissionManager = new PermissionManager(
+                application,
+                ContextCompat::checkSelfPermission,
+                repositoryFactory.getPermissionsRequestRepository(),
+                Build.VERSION.SDK_INT
+        );
+        AudioControlManager audioControlManager = new AudioControlManager(application);
         useCaseFactory = new UseCaseFactory(
                 repositoryFactory,
-                new PermissionManager(application),
+                permissionManager,
                 new PermissionDialogManager(application),
                 notificationManager,
                 sdkConfigurationManager,
                 new ChatHeadManager(application),
+                audioControlManager,
                 new GliaWidgetsSchedulers(),
                 gliaCore
+        );
+        initAudioControlManager(
+                audioControlManager,
+                useCaseFactory.createOnAudioStartedUseCase()
         );
 
         controllerFactory = new ControllerFactory(
@@ -78,6 +99,12 @@ public class Dependencies {
                         getControllerFactory().getActivityWatcherForChatHeadController()
                 );
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead);
+
+        ActivityWatcherForPermissionsRequest activityWatcherForPermissionsRequest =
+                new ActivityWatcherForPermissionsRequest(
+                        getControllerFactory().getPermissionsController()
+                );
+        application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest);
 
         resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(
@@ -157,5 +184,12 @@ public class Dependencies {
                 chatBubbleController.onDestroy();
             }
         });
+    }
+
+    private static void initAudioControlManager(
+            AudioControlManager audioControlManager,
+            OnAudioStartedUseCase onAudioStartedUseCase
+    ) {
+        audioControlManager.init(onAudioStartedUseCase);
     }
 }

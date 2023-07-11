@@ -164,9 +164,16 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 super.onScrolled(recyclerView, dx, dy)
                 controller?.onRecyclerviewPositionChanged(!recyclerView.canScrollVertically(1))
             }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                // hide the keyboard on chat scroll
+                insetsController?.hideKeyboard()
+            }
         }
     private val onCustomCardResponse =
-        OnCustomCardResponse { messageId: String, text: String?, value: String? ->
+        OnCustomCardResponse { messageId: String, text: String, value: String ->
             controller?.sendCustomCardResponse(messageId, text, value)
         }
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
@@ -544,7 +551,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun updateChatEditText(chatState: ChatState) {
         when (chatState.chatInputMode) {
-            ChatInputMode.SINGLE_CHOICE_CARD -> binding.chatEditText.setHint(R.string.glia_chat_single_choice_card_hint)
             ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.setHint(R.string.glia_chat_not_started_hint)
             else -> binding.chatEditText.setHint(R.string.glia_chat_enter_message)
         }

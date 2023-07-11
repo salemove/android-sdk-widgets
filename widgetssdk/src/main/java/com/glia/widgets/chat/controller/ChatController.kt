@@ -11,7 +11,6 @@ import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.MessageAttachment
-import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.chat.VisitorMessage
@@ -30,7 +29,6 @@ import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase
-import com.glia.widgets.chat.domain.CustomCardInteractableUseCase
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
@@ -87,6 +85,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository.Submitter
 import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback
+import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -154,7 +153,6 @@ internal class ChatController(
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val customCardAdapterTypeUseCase: CustomCardAdapterTypeUseCase,
     private val customCardTypeUseCase: CustomCardTypeUseCase,
-    private val customCardInteractableUseCase: CustomCardInteractableUseCase,
     private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
     private val isQueueingEngagementUseCase: IsQueueingEngagementUseCase,
@@ -170,7 +168,8 @@ internal class ChatController(
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
     private val preEngagementMessageUseCase: PreEngagementMessageUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
-    private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
+    private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
+    private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
@@ -189,7 +188,7 @@ internal class ChatController(
                 onMessageSent(message)
             }
 
-            override fun onCardMessageUpdated(message: OperatorMessage) {
+            override fun onCardMessageUpdated(message: ChatMessage) {
                 updateCustomCard(message)
             }
 
@@ -717,14 +716,14 @@ internal class ChatController(
         emitViewState { chatState }
     }
 
-    fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer?) {
+    fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer) {
         Logger.d(TAG, "upgradeToAudioClicked")
         messagesNotSeenHandler.chatUpgradeOfferAccepted()
-        mediaUpgradeOfferRepository.acceptOffer(offer, Submitter.CHAT)
+        acceptMediaUpgradeOfferUseCase(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()
     }
 
-    fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer?) {
+    fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer) {
         Logger.d(TAG, "closeUpgradeDialogClicked")
         mediaUpgradeOfferRepository.declineOffer(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()
@@ -983,31 +982,6 @@ internal class ChatController(
         appendMessagesNotSeen()
     }
 
-    private fun changeChatInputMode(currentChatItems: List<ChatItem>, message: ChatMessage) {
-        val newInputMode = getChatInputMode(currentChatItems, message)
-        if (chatState.chatInputMode != newInputMode) {
-            emitViewState { chatState.chatInputModeChanged(newInputMode) }
-        }
-    }
-
-    private fun getChatInputMode(
-        currentChatItems: List<ChatItem>,
-        message: ChatMessage
-    ): ChatInputMode {
-        val customCardChatInputMode =
-            customCardInteractableUseCase.execute(currentChatItems, message)
-        if (customCardChatInputMode != null) {
-            return customCardChatInputMode
-        }
-        if (message.attachment is SingleChoiceAttachment) {
-            val attachment = message.attachment as SingleChoiceAttachment
-            if (attachment.options != null) {
-                return ChatInputMode.SINGLE_CHOICE_CARD
-            }
-        }
-        return ChatInputMode.ENABLED
-    }
-
     private fun addVisitorAttachmentItemsToChatItems(
         currentChatItems: MutableList<ChatItem>,
         chatMessage: ChatMessage,
@@ -1123,10 +1097,6 @@ internal class ChatController(
         appendOperatorOrCustomCardItem(currentChatItems, chatMessageInternal, isLastItem)
         appendOperatorAttachmentItems(currentChatItems, chatMessageInternal)
         setLastOperatorItemChatHeadVisibility(currentChatItems, true)
-
-        if (isLastItem) {
-            changeChatInputMode(currentChatItems, chatMessageInternal.chatMessage)
-        }
     }
 
     private fun isOperatorChanged(
@@ -1413,13 +1383,14 @@ internal class ChatController(
         }
     }
 
-    fun sendCustomCardResponse(messageId: String, text: String?, value: String?) {
-        sendMessageUseCase.execute(messageId, text, value, sendMessageCallback)
+    fun sendCustomCardResponse(messageId: String, text: String, value: String) {
         emitChatItems {
             chatState.chatItems
                 .firstOrNull { messageId == it.id }
                 ?.let { it as CustomCardItem }
                 ?.also {
+                    sendMessageUseCase.execute(it.message, text, value, sendMessageCallback)
+
                     val customCardType = customCardTypeUseCase.execute(it.viewType) ?: return@also
                     val currentMessage = it.message
                     val showCustomCard = customCardShouldShowUseCase.execute(
@@ -1427,28 +1398,22 @@ internal class ChatController(
                         customCardType,
                         false
                     )
-                    val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
-                    var indexForResponseMessage = chatItems.indexOf(it)
-                    if (showCustomCard) {
-                        // The index for the response message should be next to the card
-                        // when the card is shown after the response.
-                        indexForResponseMessage += 1
-                    } else {
-                        // If the card should be hidden after the response, we remove it from the
-                        // item list. The response message will be shown instead of the card.
+                    if (!showCustomCard) {
+                        val chatItems: MutableList<ChatItem> = chatState.chatItems.toMutableList()
+
+                        // If the card should be hidden after the response, we remove it from the item list.
                         chatItems.remove(it)
+                        return@emitChatItems chatState.changeItems(chatItems)
                     }
-                    chatItems.add(
-                        indexForResponseMessage,
-                        VisitorMessageItem.asUnsentCardResponse(text)
-                    )
-                    return@emitChatItems chatState.changeItems(chatItems)
+                    return@emitChatItems null
+                } ?: run {
+                    sendMessageUseCase.execute(null, text, value, sendMessageCallback)
                 }
             return@emitChatItems null
         }
     }
 
-    private fun updateCustomCard(message: OperatorMessage) {
+    private fun updateCustomCard(message: ChatMessage) {
         chatState.chatItems
             .firstOrNull { message.id == it.id }
             ?.let { it as CustomCardItem }
@@ -1655,9 +1620,9 @@ internal class ChatController(
         }
     }
 
-    private fun onNewOperatorMediaState(operatorMediaState: OperatorMediaState) {
+    private fun onNewOperatorMediaState(operatorMediaState: OperatorMediaState?) {
         Logger.d(TAG, "newOperatorMediaState: $operatorMediaState")
-        if (chatState.isAudioCallStarted && operatorMediaState.video != null) {
+        if (chatState.isAudioCallStarted && operatorMediaState?.video != null) {
             upgradeMediaItem()
         } else if (!chatState.isMediaUpgradeStarted) {
             addMediaUpgradeItemToChatItems(operatorMediaState)
@@ -1669,12 +1634,12 @@ internal class ChatController(
         callNotificationUseCase(operatorMedia = operatorMediaState)
     }
 
-    private fun addMediaUpgradeItemToChatItems(operatorMediaState: OperatorMediaState) {
+    private fun addMediaUpgradeItemToChatItems(operatorMediaState: OperatorMediaState?) {
         var type: MediaUpgradeStartedTimerItem.Type? = null
-        if (operatorMediaState.video == null && operatorMediaState.audio != null) {
+        if (operatorMediaState?.video == null && operatorMediaState?.audio != null) {
             Logger.d(TAG, "starting audio timer")
             type = MediaUpgradeStartedTimerItem.Type.AUDIO
-        } else if (operatorMediaState.video != null) {
+        } else if (operatorMediaState?.video != null) {
             Logger.d(TAG, "starting video timer")
             type = MediaUpgradeStartedTimerItem.Type.VIDEO
         }

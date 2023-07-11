@@ -4,12 +4,12 @@ import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
+import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
-import com.glia.widgets.chat.domain.CustomCardInteractableUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
 import com.glia.widgets.chat.domain.DecodeSampledBitmapFromInputStreamUseCase;
@@ -27,6 +27,9 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.core.audio.AudioControlManager;
+import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
+import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase;
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
@@ -64,6 +67,7 @@ import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase;
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase;
+import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase;
 import com.glia.widgets.core.notification.device.INotificationManager;
@@ -71,6 +75,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase;
+import com.glia.widgets.core.operator.domain.RemoveOperatorMediaStateListenerUseCase;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
@@ -124,6 +129,7 @@ public class UseCaseFactory {
     private static final SurveyStateManager surveyStateManager = new SurveyStateManager();
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
+    private final AudioControlManager audioControlManager;
     private final Schedulers schedulers;
     private final GliaCore gliaCore;
 
@@ -133,6 +139,7 @@ public class UseCaseFactory {
                           INotificationManager notificationManager,
                           GliaSdkConfigurationManager gliaSdkConfigurationManager,
                           ChatHeadManager chatHeadManager,
+                          AudioControlManager audioControlManager,
                           Schedulers schedulers,
                           GliaCore gliaCore) {
         this.repositoryFactory = repositoryFactory;
@@ -141,6 +148,7 @@ public class UseCaseFactory {
         this.notificationManager = notificationManager;
         this.gliaSdkConfigurationManager = gliaSdkConfigurationManager;
         this.chatHeadManager = chatHeadManager;
+        this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
         this.gliaCore = gliaCore;
     }
@@ -358,6 +366,13 @@ public class UseCaseFactory {
     @NonNull
     public AddOperatorMediaStateListenerUseCase createAddOperatorMediaStateListenerUseCase() {
         return new AddOperatorMediaStateListenerUseCase(
+                repositoryFactory.getGliaOperatorMediaRepository()
+        );
+    }
+
+    @NonNull
+    public RemoveOperatorMediaStateListenerUseCase createRemoveOperatorMediaStateListenerUseCase() {
+        return new RemoveOperatorMediaStateListenerUseCase(
                 repositoryFactory.getGliaOperatorMediaRepository()
         );
     }
@@ -596,11 +611,6 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public CustomCardInteractableUseCase createCustomCardInteractableUseCase() {
-        return new CustomCardInteractableUseCase(GliaWidgets.getCustomCardAdapter());
-    }
-
-    @NonNull
     public CustomCardShouldShowUseCase createCustomCardShouldShowUseCase() {
         return new CustomCardShouldShowUseCase(GliaWidgets.getCustomCardAdapter());
     }
@@ -777,6 +787,37 @@ public class UseCaseFactory {
     @NonNull
     public ResetSurveyUseCase createResetSurveyUseCase() {
         return new ResetSurveyUseCase(surveyStateManager, repositoryFactory.getGliaSurveyRepository());
+    }
+
+    @NonNull
+    public OnAudioStartedUseCase createOnAudioStartedUseCase() {
+        return new OnAudioStartedUseCase(
+                repositoryFactory.getGliaOperatorMediaRepository(),
+                repositoryFactory.getGliaVisitorMediaRepository()
+        );
+    }
+
+    @NonNull
+    public TurnSpeakerphoneUseCase createTurnSpeakerphoneUseCase() {
+        return new TurnSpeakerphoneUseCase(
+                audioControlManager
+        );
+    }
+
+    @NonNull
+    public AcceptMediaUpgradeOfferUseCase createAcceptMediaUpgradeOfferUseCase() {
+        return new AcceptMediaUpgradeOfferUseCase(
+                repositoryFactory.getMediaUpgradeOfferRepository(),
+                permissionManager
+        );
+    }
+
+    @NonNull
+    public HandleCallPermissionsUseCase createHandleCallPermissionsUseCase() {
+        return new HandleCallPermissionsUseCase(
+                createIsCallVisualizerUseCase(),
+                permissionManager
+        );
     }
 
     public void resetState() {

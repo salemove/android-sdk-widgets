@@ -23,18 +23,25 @@ import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
 import com.glia.widgets.chat.adapter.holder.WebViewViewHolder;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ExampleCustomCardAdapter extends CustomCardAdapter {
-    private static final int WEB_VIEW_TYPE = 1;
-    private static final int NATIVE_VIEW_TYPE = 2;
+    private static final Integer WEB_VIEW_TYPE = 1;
+    private static final Integer NATIVE_VIEW_TYPE = 2;
+    private static final Integer SDK_DEFAULT_TYPE = null;
+
 
     @Override
     @Nullable
     public Integer getItemViewType(ChatMessage message) {
         if (WebViewViewHolder.isWebViewType(message)) {
             return WEB_VIEW_TYPE;
+        } else if (NativeViewViewHolder.isNativeViewType(message)) {
+            return NATIVE_VIEW_TYPE;
+        } else {
+            // Use default Widgets SDK message rendering as fallback
+            return SDK_DEFAULT_TYPE;
         }
-        return NATIVE_VIEW_TYPE;
     }
 
     @Override
@@ -51,15 +58,6 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
             View view = inflater.inflate(R.layout.native_view_item, parent, false);
             return new NativeViewViewHolder(view, uiTheme);
         }
-    }
-
-    @Override
-    public boolean isInteractable(ChatMessage message, int viewType) {
-        if (viewType == NATIVE_VIEW_TYPE) {
-            return message.getMetadata()
-                    .optBoolean(NativeViewViewHolder.SHOW_BUTTON_KEY, false);
-        }
-        return super.shouldShowCard(message, viewType);
     }
 
     @Override
@@ -90,6 +88,16 @@ public class ExampleCustomCardAdapter extends CustomCardAdapter {
             this.messageTextView = itemView.findViewById(R.id.message);
             this.metadataTextView = itemView.findViewById(R.id.metadata);
             this.okButton = itemView.findViewById(R.id.ok_button);
+        }
+
+        public static boolean isNativeViewType(ChatMessage message) {
+            JSONObject metadata = message == null ? null : message.getMetadata();
+            if (metadata == null || metadata.length() == 0) {
+                return false;
+            } else {
+                return metadata.has(NativeViewViewHolder.SHOW_BUTTON_KEY)
+                  || metadata.has(NativeViewViewHolder.SHOULD_SHOW_VIEW_KEY);
+            }
         }
 
         @Override

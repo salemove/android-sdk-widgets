@@ -18,6 +18,7 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
 import com.glia.widgets.chat.model.history.ChatItem
@@ -127,6 +128,7 @@ class ChatControllerTest {
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var isGvaUseCase: IsGvaUseCase
     private lateinit var mapGvaUseCase: MapGvaUseCase
+    private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
 
     private lateinit var chatController: ChatController
 
@@ -186,6 +188,7 @@ class ChatControllerTest {
         acceptMediaUpgradeOfferUseCase = mock()
         isGvaUseCase = mock()
         mapGvaUseCase = mock()
+        determineGvaButtonTypeUseCase = mock()
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
@@ -241,7 +244,8 @@ class ChatControllerTest {
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
             isGvaUseCase = isGvaUseCase,
-            mapGvaUseCase = mapGvaUseCase
+            mapGvaUseCase = mapGvaUseCase,
+            determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase
         )
     }
 

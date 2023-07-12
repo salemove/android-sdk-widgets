@@ -210,6 +210,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         )
     }
 
+    private val onGvaButtonsClickListener = ChatAdapter.OnGvaButtonsClickListener {
+        controller?.onGvaButtonClicked(it)
+    }
+
     init {
         initConfigurations()
         bindViews()
@@ -709,6 +713,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             this,
             this,
             onCustomCardResponse,
+            onGvaButtonsClickListener,
             GliaWidgets.getCustomCardAdapter(),
             Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
             Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),

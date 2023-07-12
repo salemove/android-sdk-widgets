@@ -21,6 +21,7 @@ import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewH
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.Gva
+import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.CustomCardItem
 import com.glia.widgets.chat.model.history.GvaGalleryCards
@@ -51,6 +52,7 @@ internal class ChatAdapter(
     private val onFileItemClickListener: OnFileItemClickListener,
     private val onImageItemClickListener: OnImageItemClickListener,
     private val onCustomCardResponse: OnCustomCardResponse,
+    private val onGvaButtonsClickListener: OnGvaButtonsClickListener,
     private val customCardAdapter: CustomCardAdapter?,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
@@ -163,18 +165,6 @@ internal class ChatAdapter(
 
 //            TODO should be changed to appropriate ViewHolder later - MOB 2371
             GVA_PERSISTENT_BUTTONS_TYPE -> {
-                SystemMessageViewHolder(
-                    ChatReceiveMessageContentBinding.inflate(
-                        inflater,
-                        parent,
-                        false
-                    ),
-                    uiTheme
-                )
-            }
-
-//            TODO should be changed to appropriate ViewHolder later - MOB 2396
-            GVA_QUICK_REPLIES_TYPE -> {
                 SystemMessageViewHolder(
                     ChatReceiveMessageContentBinding.inflate(
                         inflater,
@@ -322,6 +312,10 @@ internal class ChatAdapter(
         fun onCustomCardResponse(messageId: String, text: String, value: String)
     }
 
+    fun interface OnGvaButtonsClickListener {
+        fun onGvaButtonClicked(gvaButton: GvaButton)
+    }
+
     companion object {
         const val OPERATOR_STATUS_VIEW_TYPE = 0
         const val VISITOR_MESSAGE_TYPE = 1
@@ -337,11 +331,10 @@ internal class ChatAdapter(
         //GVA Types
         const val GVA_RESPONSE_TEXT_TYPE = 10
         const val GVA_PERSISTENT_BUTTONS_TYPE = 11
-        const val GVA_QUICK_REPLIES_TYPE = 12
-        const val GVA_GALLERY_CARDS_TYPE = 13
+        const val GVA_GALLERY_CARDS_TYPE = 12
 
         //Custom Card
-        const val CUSTOM_CARD_TYPE = 14 // Should be the last type with the highest value
+        const val CUSTOM_CARD_TYPE = 13 // Should be the last type with the highest value
     }
 
     @IntDef(
@@ -358,7 +351,6 @@ internal class ChatAdapter(
         CUSTOM_CARD_TYPE,
         GVA_RESPONSE_TEXT_TYPE,
         GVA_PERSISTENT_BUTTONS_TYPE,
-        GVA_QUICK_REPLIES_TYPE,
         GVA_GALLERY_CARDS_TYPE
     )
     @Retention(AnnotationRetention.SOURCE)

@@ -138,7 +138,8 @@ public class ControllerFactory {
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createAcceptMediaUpgradeOfferUseCase(),
                 useCaseFactory.createIsGvaUseCase(),
-                useCaseFactory.createMapGvaUseCase()
+                useCaseFactory.createMapGvaUseCase(),
+                useCaseFactory.createDetermineGvaButtonTypeUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

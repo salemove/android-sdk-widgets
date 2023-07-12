@@ -9,6 +9,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
+import com.glia.widgets.chat.adapter.holder.GvaResponseTextViewHolder
 import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder
 import com.glia.widgets.chat.adapter.holder.NewMessagesDividerViewHolder
 import com.glia.widgets.chat.adapter.holder.OperatorMessageViewHolder
@@ -151,13 +152,14 @@ internal class ChatAdapter(
                 uiTheme
             )
 
-//            TODO should be implemented later - MOB 2364
             GVA_RESPONSE_TEXT_TYPE -> {
-                SystemMessageViewHolder(
+                val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
+                GvaResponseTextViewHolder(
+                    operatorMessageBinding,
                     ChatReceiveMessageContentBinding.inflate(
                         inflater,
-                        parent,
-                        false
+                        operatorMessageBinding.contentLayout,
+                        true
                     ),
                     uiTheme
                 )
@@ -265,7 +267,7 @@ internal class ChatAdapter(
 
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
 
-            is GvaResponseText -> (holder as SystemMessageViewHolder).bind(Gva.Type.PLAIN_TEXT.name)
+            is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
 
             is GvaPersistentButtons -> (holder as SystemMessageViewHolder).bind(Gva.Type.PERSISTENT_BUTTONS.name)
 

@@ -19,11 +19,13 @@ workflows:
               envman add --key VERSION_INCREMENT_TYPE --value "$GITHUB_VERSION_INCREMENT_TYPE"
             fi
     - gradle-runner@2:
+        title: Increment project version
         inputs:
         - gradle_file: $PROJECT_LOCATION/build.gradle
         - gradlew_path: $PROJECT_LOCATION/gradlew
         - gradle_task: saveWidgetsVersion --type=$VERSION_INCREMENT_TYPE
     - script@1:
+        title: Create PR
         inputs:
         - content: |-
             #!/usr/bin/env bash
@@ -39,7 +41,9 @@ workflows:
             MESSAGE="Increment project version to ${NEW_VERSION}"
 
             git checkout -b $BRANCH_NAME
-            git add -A
+            # git add -u stages modifications and deletions, without new files
+            # added it to prevent CHANGELOG.md from being included in the PR
+            git add -u
             git commit -m "$MESSAGE"
             git push origin "$BRANCH_NAME":"$BRANCH_NAME"
 
@@ -48,7 +52,7 @@ workflows:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}" | jq --raw-output '.number')
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
 
             curl \
               -X POST \
@@ -94,9 +98,9 @@ workflows:
         - variant: $INTEGRATOR_VARIANT
         - module: $EXAMPLE_APP_MODULE
     - browserstack-upload@0:
+        title: Upload APP to BrowserStack
         inputs:
         - custom_id: $BROWSERSTACK_APP_ID
-        title: Upload APP to BrowserStack
     - deploy-to-bitrise-io@2.2:
         inputs:
         - notify_email_list: $BUILD_EMAILS
@@ -119,33 +123,33 @@ workflows:
         - variant: $INTEGRATOR_VARIANT
         - module: $EXAMPLE_APP_MODULE
     - android-lint@0:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
         title: Run Lint for SDK
-    - android-unit-test@1:
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $WIDGET_SDK_MODULE
         - variant: $SDK_VARIANT
-        title: Unit Test for SDK
-    - android-lint@0:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
-        title: Run Lint for APP
     - android-unit-test@1:
+        title: Unit Test for SDK
+        inputs:
+        - project_location: $PROJECT_LOCATION
+        - module: $WIDGET_SDK_MODULE
+        - variant: $SDK_VARIANT
+    - android-lint@0:
+        title: Run Lint for APP
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
         - variant: $INTEGRATOR_VARIANT
+    - android-unit-test@1:
         title: Unit Test for APP
+        inputs:
+        - project_location: $PROJECT_LOCATION
+        - module: $EXAMPLE_APP_MODULE
+        - variant: $INTEGRATOR_VARIANT
     - browserstack-upload@0:
+        title: Upload APP to BrowserStack
         inputs:
         - custom_id: $BROWSERSTACK_APP_ID
-        title: Upload APP to BrowserStack
     - deploy-to-bitrise-io@2.2:
         inputs:
         - notify_email_list: $BUILD_EMAILS
@@ -258,34 +262,34 @@ workflows:
         - variant: $INTEGRATOR_VARIANT
         - module: $EXAMPLE_APP_MODULE
     - android-lint@0:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
         title: Run Lint for SDK
-    - android-unit-test@1:
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $WIDGET_SDK_MODULE
         - variant: $SDK_VARIANT
-        title: Unit Test for SDK
-    - android-lint@0:
-        inputs:
-        - project_location: $PROJECT_LOCATION
-        - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
-        title: Run Lint for APP
     - android-unit-test@1:
+        title: Unit Test for SDK
+        inputs:
+        - project_location: $PROJECT_LOCATION
+        - module: $WIDGET_SDK_MODULE
+        - variant: $SDK_VARIANT
+    - android-lint@0:
+        title: Run Lint for APP
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
         - variant: $INTEGRATOR_VARIANT
+    - android-unit-test@1:
         title: Unit Test for APP
+        inputs:
+        - project_location: $PROJECT_LOCATION
+        - module: $EXAMPLE_APP_MODULE
+        - variant: $INTEGRATOR_VARIANT
     - gradle-runner@2:
+        title: Assemble SDK for instrumentation tests
         inputs:
         - gradlew_path: ./gradlew
         - gradle_task: :$WIDGET_SDK_MODULE:assembleDebugAndroidTest
-        title: Assemble SDK for instrumentation tests
     - virtual-device-testing-for-android@1:
         title: UI Test for APP
         inputs:
@@ -305,11 +309,13 @@ workflows:
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
     - gradle-runner@2:
+        title: Upgrade Core SDK version
         inputs:
         - gradlew_path: $PROJECT_LOCATION/gradlew
         - gradle_file: $PROJECT_LOCATION/build.gradle
         - gradle_task: saveCoreSdkVersion --coreSdkVersion=$NEW_VERSION
     - script@1:
+        title: Create PR
         inputs:
         - content: |-
             #!/usr/bin/env bash
@@ -333,7 +339,7 @@ workflows:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"master\"}" | jq --raw-output '.number')
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
 
             curl \
               -X POST \

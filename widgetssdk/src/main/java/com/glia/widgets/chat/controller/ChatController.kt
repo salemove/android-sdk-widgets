@@ -43,10 +43,12 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatState
+import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.CustomCardItem
@@ -178,7 +180,8 @@ internal class ChatController(
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val isGvaUseCase: IsGvaUseCase,
-    private val mapGvaUseCase: MapGvaUseCase
+    private val mapGvaUseCase: MapGvaUseCase,
+    private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
@@ -1713,5 +1716,15 @@ internal class ChatController(
 
     fun isCallVisualizerOngoing(): Boolean {
         return isCallVisualizerUseCase()
+    }
+
+    fun onGvaButtonClicked(button: GvaButton) {
+        when (determineGvaButtonTypeUseCase(button)) {
+            Gva.ButtonType.BroadcastEvent -> TODO("will be implemented in next tasks")
+            is Gva.ButtonType.Email -> TODO("will be implemented in next tasks")
+            is Gva.ButtonType.Phone -> TODO("will be implemented in next tasks")
+            is Gva.ButtonType.PostBack -> TODO("will be implemented in next tasks")
+            is Gva.ButtonType.Url -> TODO("will be implemented in next tasks")
+        }
     }
 }

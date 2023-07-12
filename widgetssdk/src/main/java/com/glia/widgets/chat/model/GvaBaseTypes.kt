@@ -1,6 +1,8 @@
 package com.glia.widgets.chat.model
 
+import android.net.Uri
 import androidx.annotation.StringDef
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.google.gson.annotations.SerializedName
 
 internal object Gva {
@@ -32,6 +34,14 @@ internal object Gva {
             const val BLANK = "blank"
         }
     }
+
+    sealed interface ButtonType {
+        object BroadcastEvent : ButtonType
+        data class PostBack(val singleChoiceAttachment: SingleChoiceAttachment) : ButtonType
+        data class Phone(val uri: Uri) : ButtonType
+        data class Email(val uri: Uri) : ButtonType
+        data class Url(val uri: Uri) : ButtonType
+    }
 }
 
 internal data class GvaButton(
@@ -49,13 +59,7 @@ internal data class GvaButton(
     @SerializedName("transferPhoneNumber")
     val transferPhoneNumber: String? = null
 ) {
-    val isPostBack: Boolean
-        get() = url.isNullOrBlank()
-
-    val isBroadCastEvent: Boolean
-        get() = !destinationPbBroadcastEvent.isNullOrBlank()
-
-//    fun toResponse(): SingleChoiceAttachment = SingleChoiceAttachment.from(text, value) TODO should be available with core sdk's next release.
+    fun toResponse(): SingleChoiceAttachment = SingleChoiceAttachment.from(text, value)
 }
 
 internal data class GvaGalleryCard(

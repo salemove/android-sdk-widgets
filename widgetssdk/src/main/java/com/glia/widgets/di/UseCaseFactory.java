@@ -27,6 +27,8 @@ import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
 import com.glia.widgets.chat.domain.PreEngagementMessageUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
+import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase;
+import com.glia.widgets.chat.domain.gva.DetermineGvaUrlTypeUseCase;
 import com.glia.widgets.chat.domain.gva.GetGvaTypeUseCase;
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase;
 import com.glia.widgets.chat.domain.gva.MapGvaGvaGalleryCardsUseCase;
@@ -890,6 +892,16 @@ public class UseCaseFactory {
             createMapGvaGvaQuickRepliesUseCase(),
             createMapGvaGvaGalleryCardsUseCase()
         );
+    }
+
+    @NonNull
+    public DetermineGvaUrlTypeUseCase createDetermineGvaUrlTypeUseCase() {
+        return new DetermineGvaUrlTypeUseCase();
+    }
+
+    @NonNull
+    public DetermineGvaButtonTypeUseCase createDetermineGvaButtonTypeUseCase() {
+        return new DetermineGvaButtonTypeUseCase(createDetermineGvaUrlTypeUseCase());
     }
 
     public void resetState() {

@@ -21,6 +21,8 @@ import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
+import com.glia.widgets.chat.model.Gva
+import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.history.ChatItem
 import com.glia.widgets.chat.model.history.LinkedChatItem
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
@@ -416,4 +418,15 @@ class ChatControllerTest {
         chatController.emitChatTranscriptItems(mutableListOf(), 10)
         verify(markMessagesReadWithDelayUseCase, never()).invoke()
     }
+
+    @Test
+    fun `onGvaButtonClicked triggers viewCallback showBroadcastNotSupportedToast when gva type is BroadcastEvent`() {
+        val gvaButton: GvaButton = mock()
+        whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.BroadcastEvent
+
+        chatController.onGvaButtonClicked(gvaButton)
+
+        verify(chatViewCallback).showBroadcastNotSupportedToast()
+    }
+
 }

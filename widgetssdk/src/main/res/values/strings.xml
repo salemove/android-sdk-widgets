@@ -258,4 +258,7 @@
     <string name="glia_visitor_code_error_title">Could not load the visitor code. Please try refreshing.</string>
     <string name="glia_visitor_code_refresh_button">Refresh</string>
 
+    <!--    GVA -->
+    <string name="gva_not_supported">This action is not currently supported on mobile.</string>
+
 </resources>

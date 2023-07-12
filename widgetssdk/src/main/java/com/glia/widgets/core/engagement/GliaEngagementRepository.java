@@ -31,6 +31,10 @@ public class GliaEngagementRepository {
     }
 
     public void unregisterEngagementEndListener(Runnable engagementEnded) {
+        // Engagement#off(Event, Callback) does not support `null` callback
+        if (engagementEnded == null) {
+            return;
+        }
         gliaCore.getCurrentEngagement().ifPresent(
                 engagement -> engagement.off(Engagement.Events.END, engagementEnded));
     }

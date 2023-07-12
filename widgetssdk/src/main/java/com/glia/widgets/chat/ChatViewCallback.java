@@ -43,4 +43,6 @@ public interface ChatViewCallback {
     void navigateToPreview(AttachmentFile attachmentFile, View view);
 
     void fileIsNotReadyForPreview();
+
+    void showBroadcastNotSupportedToast();
 }

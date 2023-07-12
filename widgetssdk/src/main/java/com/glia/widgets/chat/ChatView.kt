@@ -482,6 +482,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             override fun fileIsNotReadyForPreview() {
                 showToast(context.getString(R.string.glia_view_file_not_ready_for_preview))
             }
+
+            override fun showBroadcastNotSupportedToast() {
+                showToast(context.getString(R.string.gva_not_supported))
+            }
         }
     }
 

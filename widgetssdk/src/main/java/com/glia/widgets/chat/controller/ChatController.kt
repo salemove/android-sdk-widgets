@@ -1720,7 +1720,7 @@ internal class ChatController(
 
     fun onGvaButtonClicked(button: GvaButton) {
         when (determineGvaButtonTypeUseCase(button)) {
-            Gva.ButtonType.BroadcastEvent -> TODO("will be implemented in next tasks")
+            Gva.ButtonType.BroadcastEvent -> viewCallback?.showBroadcastNotSupportedToast()
             is Gva.ButtonType.Email -> TODO("will be implemented in next tasks")
             is Gva.ButtonType.Phone -> TODO("will be implemented in next tasks")
             is Gva.ButtonType.PostBack -> TODO("will be implemented in next tasks")

@@ -1376,6 +1376,10 @@ internal class ChatController(
         }
     }
 
+    private fun sendGvaResponse(singleChoiceAttachment: SingleChoiceAttachment) {
+        sendMessageUseCase.execute(singleChoiceAttachment, sendMessageCallback)
+    }
+
     private fun updateCustomCard(message: ChatMessage) {
         chatState.chatItems
             .firstOrNull { message.id == it.id }
@@ -1710,7 +1714,7 @@ internal class ChatController(
             Gva.ButtonType.BroadcastEvent -> viewCallback?.showBroadcastNotSupportedToast()
             is Gva.ButtonType.Email -> viewCallback?.requestOpenEmailClient(buttonType.uri)
             is Gva.ButtonType.Phone -> viewCallback?.requestOpenDialer(buttonType.uri)
-            is Gva.ButtonType.PostBack -> TODO("will be implemented in next tasks")
+            is Gva.ButtonType.PostBack -> sendGvaResponse(buttonType.singleChoiceAttachment)
             is Gva.ButtonType.Url -> viewCallback?.requestOpenUri(buttonType.uri)
         }
     }

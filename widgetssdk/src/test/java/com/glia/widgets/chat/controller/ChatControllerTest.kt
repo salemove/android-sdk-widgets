@@ -2,6 +2,7 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase
@@ -457,6 +458,20 @@ class ChatControllerTest {
         chatController.onGvaButtonClicked(gvaButton)
 
         verify(chatViewCallback).requestOpenEmailClient(uri)
+    }
+
+    @Test
+    fun `onGvaButtonClicked triggers sendMessageUseCase when gva type is PostBack`() {
+        val gvaButton = GvaButton(text = "text", value = "value")
+        val singleChoiceAttachment = gvaButton.toResponse()
+        whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.PostBack(singleChoiceAttachment)
+
+        chatController.onGvaButtonClicked(gvaButton)
+
+        assertEquals(gvaButton.text, singleChoiceAttachment.selectedOptionText)
+        assertEquals(gvaButton.value, singleChoiceAttachment.selectedOption)
+
+        verify(sendMessageUseCase).execute(any<SingleChoiceAttachment>(), any())
     }
 
 }

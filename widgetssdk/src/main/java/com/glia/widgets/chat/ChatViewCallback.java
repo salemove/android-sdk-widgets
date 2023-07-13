@@ -11,6 +11,8 @@ import com.glia.widgets.chat.model.ChatState;
 import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public interface ChatViewCallback {
@@ -48,4 +50,8 @@ public interface ChatViewCallback {
     void showBroadcastNotSupportedToast();
 
     void requestOpenUri(@NonNull Uri uri);
+
+    void requestOpenDialer(@NotNull Uri uri);
+
+    void requestOpenEmailClient(@NotNull Uri uri);
 }

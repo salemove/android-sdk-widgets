@@ -59,7 +59,7 @@ internal data class GvaButton(
     @SerializedName("transferPhoneNumber")
     val transferPhoneNumber: String? = null
 ) {
-    fun toResponse(): SingleChoiceAttachment = SingleChoiceAttachment.from(text, value)
+    fun toResponse(): SingleChoiceAttachment = SingleChoiceAttachment.from(value, text)
 }
 
 internal data class GvaGalleryCard(

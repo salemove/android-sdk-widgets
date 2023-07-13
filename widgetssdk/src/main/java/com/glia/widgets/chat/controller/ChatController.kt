@@ -1382,8 +1382,8 @@ internal class ChatController(
                     }
                     return@emitChatItems null
                 } ?: run {
-                    sendMessageUseCase.execute(null, text, value, sendMessageCallback)
-                }
+                sendMessageUseCase.execute(null, text, value, sendMessageCallback)
+            }
             return@emitChatItems null
         }
     }
@@ -1719,12 +1719,12 @@ internal class ChatController(
     }
 
     fun onGvaButtonClicked(button: GvaButton) {
-        when (determineGvaButtonTypeUseCase(button)) {
+        when (val buttonType: Gva.ButtonType = determineGvaButtonTypeUseCase(button)) {
             Gva.ButtonType.BroadcastEvent -> viewCallback?.showBroadcastNotSupportedToast()
             is Gva.ButtonType.Email -> TODO("will be implemented in next tasks")
             is Gva.ButtonType.Phone -> TODO("will be implemented in next tasks")
             is Gva.ButtonType.PostBack -> TODO("will be implemented in next tasks")
-            is Gva.ButtonType.Url -> TODO("will be implemented in next tasks")
+            is Gva.ButtonType.Url -> viewCallback?.requestOpenUri(buttonType.uri)
         }
     }
 }

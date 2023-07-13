@@ -1,5 +1,6 @@
 package com.glia.widgets.chat.controller
 
+import android.net.Uri
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase
@@ -427,6 +428,17 @@ class ChatControllerTest {
         chatController.onGvaButtonClicked(gvaButton)
 
         verify(chatViewCallback).showBroadcastNotSupportedToast()
+    }
+
+    @Test
+    fun `onGvaButtonClicked triggers viewCallback requestOpenUri when gva type is Url`() {
+        val gvaButton: GvaButton = mock()
+        val uri: Uri = mock()
+        whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Url(uri)
+
+        chatController.onGvaButtonClicked(gvaButton)
+
+        verify(chatViewCallback).requestOpenUri(uri)
     }
 
 }

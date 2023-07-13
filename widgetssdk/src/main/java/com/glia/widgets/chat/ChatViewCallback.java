@@ -1,5 +1,6 @@
 package com.glia.widgets.chat;
 
+import android.net.Uri;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -45,4 +46,6 @@ public interface ChatViewCallback {
     void fileIsNotReadyForPreview();
 
     void showBroadcastNotSupportedToast();
+
+    void requestOpenUri(@NonNull Uri uri);
 }

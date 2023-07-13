@@ -486,6 +486,16 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             override fun showBroadcastNotSupportedToast() {
                 showToast(context.getString(R.string.gva_not_supported))
             }
+
+            override fun requestOpenUri(uri: Uri) {
+                this@ChatView.requestOpenUri(uri)
+            }
+        }
+    }
+
+    private fun requestOpenUri(uri: Uri) {
+        Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE).also {
+            context.startActivity(it)
         }
     }
 

@@ -11,6 +11,15 @@
             <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="*" />
         </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="mailto" />
+        </intent>
     </queries>
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />

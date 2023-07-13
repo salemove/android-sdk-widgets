@@ -490,6 +490,36 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             override fun requestOpenUri(uri: Uri) {
                 this@ChatView.requestOpenUri(uri)
             }
+
+            override fun requestOpenDialer(uri: Uri) {
+                this@ChatView.requestOpenDialer(uri)
+            }
+
+            override fun requestOpenEmailClient(uri: Uri) {
+                this@ChatView.requestOpenEmailClient(uri)
+            }
+        }
+    }
+
+    private fun requestOpenEmailClient(uri: Uri) {
+        val intent = Intent(Intent.ACTION_SENDTO)
+            .setData(Uri.parse("mailto:")) //This step makes sure that only email apps handle this.
+            .putExtra(Intent.EXTRA_EMAIL, arrayOf(uri.schemeSpecificPart))
+
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+        }
+    }
+
+    private fun requestOpenDialer(uri: Uri) {
+        val intent = Intent(Intent.ACTION_DIAL).setData(uri)
+
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
         }
     }
 

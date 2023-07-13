@@ -437,4 +437,26 @@ class ChatControllerTest {
         verify(chatViewCallback).requestOpenUri(uri)
     }
 
+    @Test
+    fun `onGvaButtonClicked triggers viewCallback requestOpenDialer when gva type is Phone`() {
+        val gvaButton: GvaButton = mock()
+        val uri: Uri = mock()
+        whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Phone(uri)
+
+        chatController.onGvaButtonClicked(gvaButton)
+
+        verify(chatViewCallback).requestOpenDialer(uri)
+    }
+
+    @Test
+    fun `onGvaButtonClicked triggers viewCallback requestOpenEmailClient when gva type is Email`() {
+        val gvaButton: GvaButton = mock()
+        val uri: Uri = mock()
+        whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Email(uri)
+
+        chatController.onGvaButtonClicked(gvaButton)
+
+        verify(chatViewCallback).requestOpenEmailClient(uri)
+    }
+
 }

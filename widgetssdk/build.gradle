@@ -61,10 +61,6 @@ dependencies {
   implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
   implementation "io.reactivex.rxjava2:rxjava:$rxJava"
 
-  // removed because becomes slow on Android 11. They say it is fixed, but I still have the issue.
-  // https://square.github.io/leakcanary/changelog/
-  // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
-
   api "com.glia:android-sdk:$gliaSdkVersion"
   // Glia sdk aar
   // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')

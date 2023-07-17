@@ -23,6 +23,18 @@
         app:layout_constraintTop_toBottomOf="@+id/app_bar_view"
         tools:listitem="@layout/chat_visitor_message_layout" />
 
+    <com.glia.widgets.chat.GvaChipGroup
+        android:id="@+id/gva_quick_replies_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="16dp"
+        app:chipSpacingHorizontal="12dp"
+        app:chipSpacingVertical="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />
+
+
     <RelativeLayout
         android:id="@+id/new_messages_indicator_layout"
         android:layout_width="wrap_content"
@@ -64,17 +76,6 @@
             android:layout_alignEnd="@id/new_messages_indicator_card" />
 
     </RelativeLayout>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/gva_quick_replies_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/design_default_color_error"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view"
-        tools:text="[Check Balanck], [Register Card]" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/operator_typing_animation_view"

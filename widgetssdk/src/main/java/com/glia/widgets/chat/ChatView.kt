@@ -530,9 +530,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun updateQuickRepliesState(chatState: ChatState) {
-        val quickReplies = chatState.gvaQuickReplies
-        binding.gvaQuickRepliesLayout.isVisible = quickReplies.isNotEmpty()
-        binding.gvaQuickRepliesLayout.text = quickReplies.map { it.text }.toString()
+        binding.gvaQuickRepliesLayout.setButtons(chatState.gvaQuickReplies)
     }
 
     private fun updateNewMessageOperatorStatusView(operatorProfileImgUrl: String?) {
@@ -818,6 +816,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.operatorTypingAnimationView.addColorFilter(color = it)
         }
 
+        binding.gvaQuickRepliesLayout.updateTheme(theme)
+
         applyTheme(Dependencies.getGliaThemeManager().theme)
     }
 
@@ -846,6 +846,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
         binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
+        binding.gvaQuickRepliesLayout.onItemClickedListener = GvaChipGroup.OnItemClickedListener { controller?.onGvaButtonClicked(it) }
     }
 
     private fun setupAddAttachmentButton() {

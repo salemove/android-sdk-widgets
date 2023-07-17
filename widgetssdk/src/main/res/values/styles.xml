@@ -75,6 +75,25 @@
         <item name="operatorPlaceholderIconTintList">?attr/baseLightColor</item>
     </style>
 
+    <style name="Application.Glia.Chat.GvaChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="shapeAppearanceOverlay">@style/Application.Glia.Chat.GvaChipShapeAppearance</item>
+        <item name="android:textColor">?attr/gvaQuickReplyTextColor</item>
+        <item name="chipStrokeColor">?attr/gvaQuickReplyStrokeColor</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:checkable">false</item>
+        <item name="chipBackgroundColor">?attr/gvaQuickReplyBackgroundColor</item>
+        <item name="chipSurfaceColor">@android:color/transparent</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Application.Glia.Chat.GvaChipShapeAppearance" parent="">
+        <item name="cornerSize">10dp</item>
+    </style>
+
     <style name="Application.Glia.VisitorCode" parent="TextAppearance.MaterialComponents.Headline4">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>

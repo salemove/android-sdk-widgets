@@ -429,13 +429,14 @@ internal class ChatController(
     }
 
     private fun onMessage(messageInternal: ChatMessageInternal) {
-        addQuickReplyButtons(emptyList())
 
         emitChatItems {
             val message = messageInternal.chatMessage
             if (!isNewMessage(chatState.chatItems, message)) {
                 return@emitChatItems null
             }
+            addQuickReplyButtons(emptyList())
+
             val isUnsentMessage =
                 chatState.unsentMessages.isNotEmpty() && chatState.unsentMessages[0].message == message.content
             Logger.d(

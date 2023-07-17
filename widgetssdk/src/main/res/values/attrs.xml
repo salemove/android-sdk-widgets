@@ -84,9 +84,9 @@
         <!-- The icon resID used when visitor is sharing the screen -->
         <attr name="endScreenShareTintColor" format="reference" />
         <!--The color of "new messages" divider in the chat-->
-        <attr name="newMessagesDividerColor" format="reference"/>
+        <attr name="newMessagesDividerColor" format="reference" />
         <!--The color of "new messages" divider text in the chat-->
-        <attr name="newMessagesDividerTextColor" format="reference"/>
+        <attr name="newMessagesDividerTextColor" format="reference" />
 
         <attr name="chatHeaderTitleTintColor" format="reference" />
         <attr name="chatHeaderHomeButtonTintColor" format="reference" />
@@ -174,9 +174,9 @@
     <!-- Visitor message text color -->
     <attr name="gliaVisitorMessageTextColor" format="reference" />
     <!--The color of "new messages" divider in the chat-->
-    <attr name="gliaNewMessagesDividerColor" format="reference"/>
+    <attr name="gliaNewMessagesDividerColor" format="reference" />
     <!--The color of "new messages" divider text in the chat-->
-    <attr name="gliaNewMessagesDividerTextColor" format="reference"/>
+    <attr name="gliaNewMessagesDividerTextColor" format="reference" />
     <!-- Operator message background color -->
     <attr name="gliaOperatorMessageBackgroundColor" format="reference" />
     <!-- Operator message text color -->
@@ -207,6 +207,12 @@
     <attr name="buttonSurveyOptionButtonStyle" format="reference" />
     <attr name="choiceCardContentTextStyle" format="reference" />
     <attr name="chatHeadStyle" format="reference" />
+
+    <!--    Gva-->
+    <attr name="gvaQuickReplyButtonStyle" format="reference" />
+    <attr name="gvaQuickReplyBackgroundColor" format="color" />
+    <attr name="gvaQuickReplyStrokeColor" format="color" />
+    <attr name="gvaQuickReplyTextColor" format="color" />
 
     <declare-styleable name="OutlinedOptionView">
         <attr name="icon" format="reference" />

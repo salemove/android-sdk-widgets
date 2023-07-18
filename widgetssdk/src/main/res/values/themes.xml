@@ -153,6 +153,7 @@
         <item name="gliaBotActionButtonSelectedTextColor">?attr/gliaBaseShadeColor</item>
 
         <!--        GVA-->
+        <item name="gvaOptionButtonStyle">@style/Application.Glia.Chat.Button.Gva</item>
         <item name="gvaQuickReplyButtonStyle">@style/Application.Glia.Chat.GvaChip</item>
         <item name="gvaQuickReplyBackgroundColor">@android:color/transparent</item>
         <item name="gvaQuickReplyStrokeColor">?attr/gliaBrandPrimaryColor</item>

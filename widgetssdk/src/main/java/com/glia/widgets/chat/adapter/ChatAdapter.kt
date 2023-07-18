@@ -9,6 +9,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
+import com.glia.widgets.chat.adapter.holder.GvaPersistentButtonsViewHolder
 import com.glia.widgets.chat.adapter.holder.GvaResponseTextViewHolder
 import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder
 import com.glia.widgets.chat.adapter.holder.NewMessagesDividerViewHolder
@@ -35,6 +36,7 @@ import com.glia.widgets.chat.model.history.OperatorStatusItem
 import com.glia.widgets.chat.model.history.SystemChatItem
 import com.glia.widgets.chat.model.history.VisitorAttachmentItem
 import com.glia.widgets.chat.model.history.VisitorMessageItem
+import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
@@ -165,13 +167,14 @@ internal class ChatAdapter(
                 )
             }
 
-//            TODO should be changed to appropriate ViewHolder later - MOB 2371
             GVA_PERSISTENT_BUTTONS_TYPE -> {
-                SystemMessageViewHolder(
-                    ChatReceiveMessageContentBinding.inflate(
+                val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
+                GvaPersistentButtonsViewHolder(
+                    operatorMessageBinding,
+                    ChatGvaPersistentButtonsContentBinding.inflate(
                         inflater,
-                        parent,
-                        false
+                        operatorMessageBinding.contentLayout,
+                        true
                     ),
                     uiTheme
                 )
@@ -269,7 +272,7 @@ internal class ChatAdapter(
 
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
 
-            is GvaPersistentButtons -> (holder as SystemMessageViewHolder).bind(Gva.Type.PERSISTENT_BUTTONS.name)
+            is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem, onGvaButtonsClickListener)
 
             is GvaGalleryCards -> (holder as SystemMessageViewHolder).bind(Gva.Type.GALLERY_CARDS.name)
 

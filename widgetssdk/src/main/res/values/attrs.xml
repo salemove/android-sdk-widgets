@@ -209,6 +209,7 @@
     <attr name="chatHeadStyle" format="reference" />
 
     <!--    Gva-->
+    <attr name="gvaOptionButtonStyle" format="reference" />
     <attr name="gvaQuickReplyButtonStyle" format="reference" />
     <attr name="gvaQuickReplyBackgroundColor" format="color" />
     <attr name="gvaQuickReplyStrokeColor" format="color" />

@@ -66,6 +66,16 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+    <style name="Application.Glia.Chat.Button.Gva" parent="Widget.MaterialComponents.Button">
+        <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
+        </item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
     <style name="Application.Glia.Chat.ChatHead">
         <item name="badgeBackgroundTintList">?attr/gliaBrandPrimaryColor</item>
         <item name="badgeTextColor">?attr/baseLightColor</item>

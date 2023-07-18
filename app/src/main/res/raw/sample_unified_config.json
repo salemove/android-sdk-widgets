@@ -2990,6 +2990,26 @@
           "#FFFF00"
         ]
       }
+    },
+    "gva": {
+      "quickReplyButton": {
+        "text": {
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          }
+        },
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          }
+        }
+      }
     }
   },
   "surveyScreen": {

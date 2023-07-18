@@ -51,4 +51,10 @@ object UnifiedUiConfigurationLoader {
     @JvmStatic
     fun fetchLocalConfiguration(context: Context, @RawRes resId: Int): String =
         context.rawRes(resId)
+
+    @JvmStatic
+    fun fetchLocalGlobalColors(context: Context): String = fetchLocalConfiguration(context, R.raw.global_colors_unified_config)
+
+    @JvmStatic
+    fun fetchLocalConfigSample(context: Context): String = fetchLocalConfiguration(context, R.raw.sample_unified_config)
 }

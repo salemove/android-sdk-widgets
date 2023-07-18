@@ -81,9 +81,7 @@
         <item name="android:textColor">?attr/gvaQuickReplyTextColor</item>
         <item name="chipStrokeColor">?attr/gvaQuickReplyStrokeColor</item>
         <item name="chipStrokeWidth">1dp</item>
-        <item name="ensureMinTouchTargetSize">false</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
+        <item name="ensureMinTouchTargetSize">true</item>
         <item name="android:checkable">false</item>
         <item name="chipBackgroundColor">?attr/gvaQuickReplyBackgroundColor</item>
         <item name="chipSurfaceColor">@android:color/transparent</item>

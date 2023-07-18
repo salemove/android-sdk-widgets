@@ -29,6 +29,22 @@ internal fun NegativeDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
     DefaultButtonTheme(text = baseLightColorTheme, background = systemNegativeColorTheme)
 }
 
+/**
+ * Default theme for Outlined Button
+ */
+internal fun OutlinedButtonTheme(
+    text: ColorTheme?,
+    stroke: ColorTheme?
+): ButtonTheme? = composeIfAtLeastOneNotNull(text, stroke) {
+    ButtonTheme(
+        text = TextTheme(textColor = text),
+        background = LayerTheme(stroke = stroke?.primaryColor),
+        iconColor = null,
+        elevation = null,
+        shadowColor = null
+    )
+}
+
 private fun DefaultButtonTheme(
     text: ColorTheme? = null,
     background: ColorTheme? = null,

@@ -27,9 +27,7 @@
         android:id="@+id/gva_quick_replies_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingVertical="16dp"
-        app:chipSpacingHorizontal="12dp"
-        app:chipSpacingVertical="12dp"
+        android:paddingVertical="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_recycler_view" />

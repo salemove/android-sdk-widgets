@@ -34,7 +34,8 @@ internal fun ChatTheme(pallet: ColorPallet): ChatTheme =
         unreadIndicator = ChatUnreadIndicatorTheme(pallet),
         typingIndicator = pallet.primaryColorTheme,
         newMessagesDividerColorTheme = pallet.primaryColorTheme,
-        newMessagesDividerTextTheme = TextTheme(textColor = pallet.primaryColorTheme)
+        newMessagesDividerTextTheme = TextTheme(textColor = pallet.primaryColorTheme),
+        gva = GvaTheme(pallet)
     )
 
 /**

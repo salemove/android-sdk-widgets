@@ -8,7 +8,7 @@ internal data class LayerTheme(
     val fill: ColorTheme? = null,
     @ColorInt
     val stroke: Int? = null,
-    // Currently it is not possible to draw gradient stroke(change to ThemeColor in case of migrating to Jetpack Compose)
+    // Currently, it is impossible to draw a gradient stroke(change to ThemeColor in case of migrating to Jetpack Compose)
     @Px
     val borderWidth: Float? = null, // width in pixels
     @Px

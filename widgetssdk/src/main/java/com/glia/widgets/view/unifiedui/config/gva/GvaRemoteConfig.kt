@@ -6,9 +6,13 @@ import com.google.gson.annotations.SerializedName
 
 internal data class GvaRemoteConfig(
     @SerializedName("quickReplyButton")
-    val quickReplyRemoteConfig: ButtonRemoteConfig?
+    val quickReplyRemoteConfig: ButtonRemoteConfig?,
+
+    @SerializedName("persistentButton")
+    val persistentButtonRemoteConfig: GvaPersistentButtonRemoteConfig?
 ) {
     fun toGvaTheme(): GvaTheme = GvaTheme(
-        quickReplyTheme = quickReplyRemoteConfig?.toButtonTheme()
+        quickReplyTheme = quickReplyRemoteConfig?.toButtonTheme(),
+        persistentButtonTheme = persistentButtonRemoteConfig?.toGvaPersistentButtonTheme()
     )
 }

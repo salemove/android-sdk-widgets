@@ -10,6 +10,7 @@ import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.history.GvaPersistentButtons
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.fromHtml
 import com.glia.widgets.helper.getColorCompat
@@ -18,6 +19,7 @@ import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.gva.GvaPersistentButtonTheme
 import com.google.android.material.button.MaterialButton
 
 internal class GvaPersistentButtonsViewHolder(
@@ -25,6 +27,10 @@ internal class GvaPersistentButtonsViewHolder(
     private val contentBinding: ChatGvaPersistentButtonsContentBinding,
     private val uiTheme: UiTheme
 ) : OperatorBaseViewHolder(operatorMessageBinding, uiTheme) {
+
+    private val persistentButtonTheme: GvaPersistentButtonTheme? by lazy {
+        Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.persistentButtonTheme
+    }
 
     init {
         contentBinding.root.apply {
@@ -35,7 +41,7 @@ internal class GvaPersistentButtonsViewHolder(
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
             // Unified Ui
-            applyLayerTheme(operatorTheme?.background)
+            applyLayerTheme(persistentButtonTheme?.background ?: operatorTheme?.background)
         }
         contentBinding.message.apply {
             uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
@@ -46,7 +52,7 @@ internal class GvaPersistentButtonsViewHolder(
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
             // Unified Ui
-            applyTextTheme(operatorTheme?.text)
+            applyTextTheme(persistentButtonTheme?.title ?: operatorTheme?.text)
         }
     }
 
@@ -98,8 +104,7 @@ internal class GvaPersistentButtonsViewHolder(
 
             uiTheme.fontRes?.let(container::getFontCompat)?.also(it::setTypeface)
 
-            // TODO: should be changed to persistent theme later - MOB 2373
-            //gvaButtonTheme?.also(it::applyButtonTheme)
+            persistentButtonTheme?.button?.also(it::applyButtonTheme)
         }
     }
 }

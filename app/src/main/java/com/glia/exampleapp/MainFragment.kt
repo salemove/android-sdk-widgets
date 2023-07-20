@@ -234,7 +234,7 @@ class MainFragment : Fragment() {
         return Utils.getScreenSharingModeFromPrefs(sharedPreferences, resources)
     }
 
-    private fun getRuntimeThemeFromPrefs(sharedPreferences: SharedPreferences): UiTheme {
+    private fun getRuntimeThemeFromPrefs(sharedPreferences: SharedPreferences): UiTheme? {
         return Utils.getRunTimeThemeByPrefs(sharedPreferences, resources)
     }
 

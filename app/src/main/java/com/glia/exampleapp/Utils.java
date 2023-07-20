@@ -67,6 +67,7 @@ class Utils {
         return String.format("#%08X", resources.getColor(intColor, null));
     }
 
+    @Nullable
     public static UiTheme getRunTimeThemeByPrefs(SharedPreferences sharedPreferences, Resources resources) {
         boolean isRunTimeThemeEnabled = sharedPreferences.getBoolean(resources.getString(R.string.pref_runtime_theme), false);
         if (!isRunTimeThemeEnabled) {
@@ -102,8 +103,8 @@ class Utils {
         Boolean whiteLabel = sharedPreferences.getBoolean(resources.getString(R.string.pref_white_label), false);
 
         Boolean gliaAlertDialogButtonUseVerticalAlignment = sharedPreferences.getBoolean(
-                resources.getString(R.string.pref_use_alert_dialog_button_vertical_alignment),
-                false
+            resources.getString(R.string.pref_use_alert_dialog_button_vertical_alignment),
+            false
         );
 
         UiTheme.UiThemeBuilder builder = new UiTheme.UiThemeBuilder();
@@ -141,10 +142,10 @@ class Utils {
         builder.setNeutralButtonConfiguration(null);
 
         builder.setChatHeadConfiguration(
-                getChatHeadConfiguration(
-                        brandPrimaryColor,
-                        baseLightColor
-                )
+            getChatHeadConfiguration(
+                brandPrimaryColor,
+                baseLightColor
+            )
         );
 
         builder.setSendMessageButtonTintColor(chatSendMessageButtonTintColor);

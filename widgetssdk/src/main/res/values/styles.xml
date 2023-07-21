@@ -28,6 +28,11 @@
         <item name="cornerSize">@dimen/glia_x_large</item>
     </style>
 
+    <style name="Application.Glia.Chat.ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/glia_medium</item>
+    </style>
+
     <style name="Application.Glia.Chat.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/glia_small</item>
@@ -72,7 +77,7 @@
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
         <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
-        <item name="android:padding">16dp</item>
+        <item name="android:padding">13dp</item>
         <item name="android:stateListAnimator">@null</item>
     </style>
 

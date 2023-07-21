@@ -9,6 +9,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder
+import com.glia.widgets.chat.adapter.holder.GvaGalleryViewHolder
 import com.glia.widgets.chat.adapter.holder.GvaPersistentButtonsViewHolder
 import com.glia.widgets.chat.adapter.holder.GvaResponseTextViewHolder
 import com.glia.widgets.chat.adapter.holder.MediaUpgradeStartedViewHolder
@@ -24,7 +25,6 @@ import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachm
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.CustomCardChatItem
-import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaGalleryCards
 import com.glia.widgets.chat.model.GvaPersistentButtons
@@ -36,6 +36,7 @@ import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SystemChatItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.databinding.ChatGvaGalleryLayoutBinding
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
@@ -180,14 +181,16 @@ internal class ChatAdapter(
                 )
             }
 
-//            TODO should be changed to appropriate ViewHolder later - MOB 2404
             GVA_GALLERY_CARDS_TYPE -> {
-                SystemMessageViewHolder(
-                    ChatReceiveMessageContentBinding.inflate(
+                val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
+                GvaGalleryViewHolder(
+                    operatorMessageBinding,
+                    ChatGvaGalleryLayoutBinding.inflate(
                         inflater,
-                        parent,
-                        false
+                        operatorMessageBinding.contentLayout,
+                        true
                     ),
+                    onGvaButtonsClickListener,
                     uiTheme
                 )
             }
@@ -248,7 +251,7 @@ internal class ChatAdapter(
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
             is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem, onGvaButtonsClickListener)
-            is GvaGalleryCards -> (holder as SystemMessageViewHolder).bind(Gva.Type.GALLERY_CARDS.name)
+            is GvaGalleryCards -> (holder as GvaGalleryViewHolder).bind(chatItem)
             is CustomCardChatItem -> {
                 (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->
                     onCustomCardResponse.onCustomCardResponse(chatItem.id, text, value)

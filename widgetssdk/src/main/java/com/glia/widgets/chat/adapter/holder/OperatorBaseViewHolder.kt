@@ -23,7 +23,8 @@ internal open class OperatorBaseViewHolder(
     }
 
     fun updateOperatorStatusView(item: OperatorChatItem) {
-        operatorMessageBinding.chatHeadView.isVisible = item.showChatHead
+//        operatorMessageBinding.chatHeadView.isVisible = item.showChatHead
+        operatorMessageBinding.chatHeadView.isVisible = true
         if (item.operatorProfileImgUrl != null) {
             operatorMessageBinding.chatHeadView.showProfileImage(item.operatorProfileImgUrl)
         } else {

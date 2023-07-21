@@ -379,9 +379,9 @@ class MainFragment : Fragment() {
         GliaWidgets.init(
             createDefaultConfig(
                 context = requireActivity().applicationContext,
-                /*uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalGlobalColors(requireContext()),*/
-                /*runtimeConfig = createSampleRuntimeConfig(),*/
-                /*region = "us"*/
+//                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalConfigSample(requireContext()),
+//                runtimeConfig = createSampleRuntimeConfig(),
+                region = "us"
             )
         )
         prepareAuthentication()

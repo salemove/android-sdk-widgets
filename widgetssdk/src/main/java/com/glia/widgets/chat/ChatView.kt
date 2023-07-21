@@ -47,11 +47,10 @@ import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
 import com.glia.widgets.chat.adapter.holder.WebViewViewHolder
 import com.glia.widgets.chat.controller.ChatController
+import com.glia.widgets.chat.model.AttachmentItem
 import com.glia.widgets.chat.model.ChatInputMode
+import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.OperatorAttachmentItem
-import com.glia.widgets.chat.model.history.VisitorAttachmentItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
@@ -82,7 +81,6 @@ import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
-import com.glia.widgets.helper.isDownloaded
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.mapUriToFileAttachment
 import com.glia.widgets.helper.requireActivity
@@ -575,24 +573,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun updateIsFileDownloaded(item: ChatItem): ChatItem = when (item) {
-        is OperatorAttachmentItem -> OperatorAttachmentItem(
-            item.id,
-            item.viewType,
-            item.showChatHead,
-            item.attachmentFile,
-            item.operatorProfileImgUrl,
-            item.attachmentFile.isDownloaded(context),
-            item.isDownloading,
-            item.operatorId,
-            item.messageId,
-            item.timestamp
-        )
-
-        is VisitorAttachmentItem -> VisitorAttachmentItem.editDownloadedStatus(
-            item,
-            item.attachmentFile.isDownloaded(context)
-        )
-
+        is AttachmentItem -> item.run { updateWith(isDownloaded(context), isDownloading) }
         else -> item
     }
 
@@ -1158,30 +1139,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         currentChatItem: ChatItem,
         isDownloading: Boolean,
         isFileExists: Boolean
-    ): ChatItem {
-        if (currentChatItem is VisitorAttachmentItem) {
-            if (currentChatItem.attachmentFile.id == attachmentFile.id) {
-                return VisitorAttachmentItem.editFileStatuses(
-                    currentChatItem,
-                    isFileExists,
-                    isDownloading
-                )
-            }
-        } else if (currentChatItem is OperatorAttachmentItem && currentChatItem.attachmentFile.id == attachmentFile.id) {
-            return OperatorAttachmentItem(
-                currentChatItem.id,
-                currentChatItem.viewType,
-                currentChatItem.showChatHead,
-                currentChatItem.attachmentFile,
-                currentChatItem.operatorProfileImgUrl,
-                isFileExists,
-                isDownloading,
-                currentChatItem.operatorId,
-                currentChatItem.messageId,
-                currentChatItem.timestamp
-            )
-        }
-        return currentChatItem
+    ): ChatItem = when {
+        currentChatItem is AttachmentItem && currentChatItem.attachmentId == attachmentFile.id ->
+            currentChatItem.updateWith(isFileExists, isDownloading)
+
+        else -> currentChatItem
     }
 
     override fun onFileOpenClick(file: AttachmentFile) {

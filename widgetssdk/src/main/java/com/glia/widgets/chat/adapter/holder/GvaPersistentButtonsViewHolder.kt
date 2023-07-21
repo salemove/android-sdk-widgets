@@ -7,7 +7,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
-import com.glia.widgets.chat.model.history.GvaPersistentButtons
+import com.glia.widgets.chat.model.GvaPersistentButtons
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
@@ -16,7 +16,6 @@ import com.glia.widgets.helper.fromHtml
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
-import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.gva.GvaPersistentButtonTheme

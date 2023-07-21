@@ -22,10 +22,9 @@ import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase
+import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.LinkedChatItem
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
@@ -252,9 +251,9 @@ class ChatControllerTest {
     @Test
     fun removeDuplicates_returnsNull_whenNewMessagesIsNull() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id2") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id3") }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id2") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id3") }
         )
 
         assertNull(chatController.removeDuplicates(oldHistory, null))
@@ -277,9 +276,9 @@ class ChatControllerTest {
     @Test
     fun removeDuplicates_returnsAllMessages_whenAllNewMessagesAreNotContainInHistory() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id2") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id3") }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id2") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id3") }
         )
         val newMessages = listOf<ChatMessage>(
             mock<ChatMessage>().also { whenever(it.id).thenReturn("Id4") },
@@ -297,9 +296,9 @@ class ChatControllerTest {
     @Test
     fun removeDuplicates_returnsOnlyNewMessages_whenSomeNewMessagesAreContainInHistory() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id2") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id3") }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id2") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id3") }
         )
         val newMessages = listOf<ChatMessage>(
             mock<ChatMessage>().also { whenever(it.id).thenReturn("Id3") },
@@ -317,9 +316,9 @@ class ChatControllerTest {
     @Test
     fun removeDuplicates_removesAllMessages_whenAllNewMessagesAreContainInHistory() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id2") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("Id3") }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id2") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("Id3") }
         )
         val newMessages = listOf<ChatMessage>(
             mock<ChatMessage>().also { whenever(it.id).thenReturn("Id1") },
@@ -350,9 +349,9 @@ class ChatControllerTest {
     @Test
     fun isNewMessage_returnsTrue_whenOldMessagesDoesNotContainNewOne() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId2") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId3") }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId2") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId3") }
         )
         val newMessage = mock<ChatMessage>()
         whenever(newMessage.id).thenReturn("newId")
@@ -363,9 +362,9 @@ class ChatControllerTest {
     @Test
     fun isNewMessage_returnsFalse_whenOldMessagesContainsNewOne() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId2") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId3") }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId2") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId3") }
         )
         val newMessage = mock<ChatMessage>()
         whenever(newMessage.id).thenReturn("oldId2")
@@ -376,27 +375,14 @@ class ChatControllerTest {
     @Test
     fun isNewMessage_filterNullId_whenOldMessageDoesNotHaveId() {
         val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId1") },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn(null) },
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn(null) }
+            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId1") },
+            mock<ChatItem>().also { whenever(it.id).thenReturn(null) },
+            mock<ChatItem>().also { whenever(it.id).thenReturn(null) }
         )
         val newMessage = mock<ChatMessage>()
         whenever(newMessage.id).thenReturn("oldId1")
 
         assertFalse(chatController.isNewMessage(oldHistory, newMessage))
-    }
-
-    @Test
-    fun isNewMessage_filterLinkedChatItem_whenOldMessageHasIncorrectType() {
-        val oldHistory = listOf<ChatItem>(
-            mock<LinkedChatItem>().also { whenever(it.messageId).thenReturn("oldId1") },
-            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId2") },
-            mock<ChatItem>().also { whenever(it.id).thenReturn("oldId3") }
-        )
-        val newMessage = mock<ChatMessage>()
-        whenever(newMessage.id).thenReturn("oldId2")
-
-        assertTrue(chatController.isNewMessage(oldHistory, newMessage))
     }
 
     @Test

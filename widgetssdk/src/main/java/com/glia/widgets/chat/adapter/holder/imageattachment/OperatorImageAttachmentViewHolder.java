@@ -10,7 +10,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
+import com.glia.widgets.chat.model.OperatorAttachmentItem;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
@@ -36,7 +36,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
         operatorStatusView.setShowRippleAnimation(false);
     }
 
-    public void bind(OperatorAttachmentItem item, ChatAdapter.OnImageItemClickListener onImageItemClickListener) {
+    public void bind(OperatorAttachmentItem.Image item, ChatAdapter.OnImageItemClickListener onImageItemClickListener) {
         super.bind(item.getAttachmentFile());
         itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.getAttachmentFile(), v));
         updateOperatorStatus(item);

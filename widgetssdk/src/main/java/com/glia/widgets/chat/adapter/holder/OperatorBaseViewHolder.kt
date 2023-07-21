@@ -4,7 +4,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.OperatorChatItem
+import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme

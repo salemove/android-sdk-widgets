@@ -44,14 +44,14 @@ class MapGvaPersistentButtonsUseCaseTest {
 
             val galleryCard = useCase(chatMessageInternal, chatState)
 
-            assertEquals(galleryCard.messageId, messageId)
+            assertEquals(galleryCard.id, messageId)
             assertEquals(galleryCard.content, content)
             assertEquals(galleryCard.options, emptyList<GvaButton>())
             assertEquals(galleryCard.showChatHead, false)
             assertEquals(galleryCard.operatorId, operatorId)
-            assertEquals(galleryCard.messageId, messageId)
+            assertEquals(galleryCard.id, messageId)
             assertEquals(galleryCard.timestamp, messageTimeStamp)
-            assertEquals(galleryCard.operatorProfileImageUrl, operatorImageUrl)
+            assertEquals(galleryCard.operatorProfileImgUrl, operatorImageUrl)
             assertEquals(galleryCard.operatorName, operatorName)
         }
     }
@@ -67,7 +67,7 @@ class MapGvaPersistentButtonsUseCaseTest {
 
             val galleryCard = useCase(chatMessageInternal, chatState)
 
-            assertEquals(galleryCard.operatorProfileImageUrl, operatorImageUrl)
+            assertEquals(galleryCard.operatorProfileImgUrl, operatorImageUrl)
             assertEquals(galleryCard.operatorName, operatorName)
         }
     }

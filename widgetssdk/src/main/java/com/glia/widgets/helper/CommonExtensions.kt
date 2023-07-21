@@ -9,6 +9,7 @@ import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
+import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
 import com.glia.widgets.view.unifiedui.deepMerge
@@ -44,3 +45,6 @@ internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme =
  * Returns styled text from the provided HTML string.
  */
 internal fun String.fromHtml(flags: Int = Html.FROM_HTML_MODE_COMPACT): Spanned = Html.fromHtml(this, flags)
+
+internal val AttachmentFile.isImage: Boolean
+    get() = contentType.startsWith("image")

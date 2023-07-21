@@ -1,9 +1,10 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.ServerChatItem
+import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.ServerChatItem
 
 internal const val NOT_PROVIDED = -1
+
 internal class FindNewMessagesDividerIndexUseCase {
 
     /**

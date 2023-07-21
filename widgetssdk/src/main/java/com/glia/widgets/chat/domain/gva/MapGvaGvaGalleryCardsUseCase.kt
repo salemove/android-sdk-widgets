@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain.gva
 
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.chat.model.history.GvaGalleryCards
+import com.glia.widgets.chat.model.GvaGalleryCards
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import java.util.UUID
 
@@ -17,8 +17,8 @@ internal class MapGvaGvaGalleryCardsUseCase(
             galleryCards = parseGvaGalleryCardsUseCase(metadata),
             showChatHead = false,
             operatorId = chatMessage.operatorId ?: UUID.randomUUID().toString(),
-            timeStamp = message.timestamp,
-            operatorProfileImageUrl = chatMessage.operatorImageUrl ?: chatState.operatorProfileImgUrl,
+            timestamp = message.timestamp,
+            operatorProfileImgUrl = chatMessage.operatorImageUrl ?: chatState.operatorProfileImgUrl,
             operatorName = chatMessage.operatorName ?: chatState.formattedOperatorName
         )
     }

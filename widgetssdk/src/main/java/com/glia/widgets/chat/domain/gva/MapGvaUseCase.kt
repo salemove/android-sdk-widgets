@@ -2,7 +2,7 @@ package com.glia.widgets.chat.domain.gva
 
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.Gva
-import com.glia.widgets.chat.model.history.GvaChatItem
+import com.glia.widgets.chat.model.GvaChatItem
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 
 internal class MapGvaUseCase(

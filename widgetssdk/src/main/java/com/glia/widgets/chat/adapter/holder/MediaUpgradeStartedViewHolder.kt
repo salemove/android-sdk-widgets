@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
+import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
@@ -65,21 +65,26 @@ internal class MediaUpgradeStartedViewHolder(
     }
 
     fun bind(chatItem: MediaUpgradeStartedTimerItem) {
-        if (chatItem.type == MediaUpgradeStartedTimerItem.Type.AUDIO) {
-            upgradeAudioIcon?.also(binding.iconView::setImageResource)
-            binding.iconView.contentDescription =
-                itemView.resources.getString(R.string.glia_chat_audio_icon_content_description)
-            binding.titleView.text =
-                itemView.resources.getString(R.string.glia_chat_upgraded_to_audio_call)
-            setMediaUpgradeTheme(chatTheme?.audioUpgrade)
-        } else {
-            upgradeVideoIcon?.also(binding.iconView::setImageResource)
-            binding.iconView.contentDescription =
-                itemView.resources.getString(R.string.glia_chat_video_icon_content_description)
-            binding.titleView.text =
-                itemView.resources.getString(R.string.glia_chat_upgraded_to_video_call)
-            setMediaUpgradeTheme(chatTheme?.videoUpgrade)
+        when (chatItem) {
+            is MediaUpgradeStartedTimerItem.Audio -> {
+                upgradeAudioIcon?.also(binding.iconView::setImageResource)
+                binding.iconView.contentDescription =
+                    itemView.resources.getString(R.string.glia_chat_audio_icon_content_description)
+                binding.titleView.text =
+                    itemView.resources.getString(R.string.glia_chat_upgraded_to_audio_call)
+                setMediaUpgradeTheme(chatTheme?.audioUpgrade)
+            }
+
+            is MediaUpgradeStartedTimerItem.Video -> {
+                upgradeVideoIcon?.also(binding.iconView::setImageResource)
+                binding.iconView.contentDescription =
+                    itemView.resources.getString(R.string.glia_chat_video_icon_content_description)
+                binding.titleView.text =
+                    itemView.resources.getString(R.string.glia_chat_upgraded_to_video_call)
+                setMediaUpgradeTheme(chatTheme?.videoUpgrade)
+            }
         }
+
         binding.timerView.text = chatItem.time
     }
 }

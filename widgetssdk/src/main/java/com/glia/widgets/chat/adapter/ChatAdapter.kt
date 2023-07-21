@@ -22,20 +22,20 @@ import com.glia.widgets.chat.adapter.holder.fileattachment.VisitorFileAttachment
 import com.glia.widgets.chat.adapter.holder.imageattachment.ImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.OperatorImageAttachmentViewHolder
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
+import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.CustomCardItem
-import com.glia.widgets.chat.model.history.GvaGalleryCards
-import com.glia.widgets.chat.model.history.GvaPersistentButtons
-import com.glia.widgets.chat.model.history.GvaResponseText
-import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
-import com.glia.widgets.chat.model.history.OperatorAttachmentItem
-import com.glia.widgets.chat.model.history.OperatorMessageItem
-import com.glia.widgets.chat.model.history.OperatorStatusItem
-import com.glia.widgets.chat.model.history.SystemChatItem
-import com.glia.widgets.chat.model.history.VisitorAttachmentItem
-import com.glia.widgets.chat.model.history.VisitorMessageItem
+import com.glia.widgets.chat.model.GvaGalleryCards
+import com.glia.widgets.chat.model.GvaPersistentButtons
+import com.glia.widgets.chat.model.GvaResponseText
+import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
+import com.glia.widgets.chat.model.OperatorAttachmentItem
+import com.glia.widgets.chat.model.OperatorMessageItem
+import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.SystemChatItem
+import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
@@ -61,7 +61,7 @@ internal class ChatAdapter(
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val differ = AsyncListDiffer(this, ChatAdapterDillCallback())
+    private val differ = AsyncListDiffer(this, ChatAdapterDiffCallback())
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -210,75 +210,48 @@ internal class ChatAdapter(
         }
     }
 
-    override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
-        position: Int,
-        payloads: MutableList<Any>
-    ) {
-        if (differ.currentList[position] is MediaUpgradeStartedTimerItem) {
-            val time = (payloads.firstOrNull() as? String)
-
-            if (time != null) {
-                (holder as? MediaUpgradeStartedViewHolder)?.updateTime(time)
-                return
-            }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
+        val isHandled: Boolean = when (val item: ChatItem = differ.currentList[position]) {
+            is MediaUpgradeStartedTimerItem -> updateMediaUpgradeTimer(payloads, holder as MediaUpgradeStartedViewHolder)
+            else -> false
         }
-        super.onBindViewHolder(holder, position, payloads)
+
+        if (!isHandled) {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
+
+    private fun updateMediaUpgradeTimer(payloads: MutableList<Any>, viewHolder: MediaUpgradeStartedViewHolder): Boolean = payloads.run {
+        firstOrNull() as? String
+    }?.let {
+        viewHolder.updateTime(it)
+        true
+    } ?: false
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val chatItem = differ.currentList[position]) {
             is OperatorStatusItem -> (holder as OperatorStatusViewHolder).bind(chatItem)
             is VisitorMessageItem -> (holder as VisitorMessageViewHolder).bind(chatItem)
-            is OperatorMessageItem -> (holder as OperatorMessageViewHolder).bind(
-                chatItem,
-                onOptionClickedListener
-            )
-
-            is MediaUpgradeStartedTimerItem -> (holder as MediaUpgradeStartedViewHolder).bind(
-                chatItem
-            )
-
-            is OperatorAttachmentItem -> {
-                if (chatItem.getViewType() == OPERATOR_FILE_VIEW_TYPE) {
-                    (holder as OperatorFileAttachmentViewHolder).bind(
-                        chatItem,
-                        onFileItemClickListener
-                    )
-                } else {
-                    (holder as OperatorImageAttachmentViewHolder).bind(
-                        chatItem,
-                        onImageItemClickListener
-                    )
-                }
-            }
-
-            is VisitorAttachmentItem -> {
-                if (chatItem.getViewType() == VISITOR_FILE_VIEW_TYPE) {
-                    (holder as VisitorFileAttachmentViewHolder).bind(
-                        chatItem,
-                        onFileItemClickListener
-                    )
-                } else {
-                    val viewHolder = holder as VisitorImageAttachmentViewHolder
-                    viewHolder.bind(chatItem.attachmentFile, chatItem.showDelivered)
-                    viewHolder.itemView.setOnClickListener {
-                        onImageItemClickListener.onImageItemClick(chatItem.attachmentFile, it)
-                    }
+            is OperatorMessageItem -> (holder as OperatorMessageViewHolder).bind(chatItem, onOptionClickedListener)
+            is MediaUpgradeStartedTimerItem -> (holder as MediaUpgradeStartedViewHolder).bind(chatItem)
+            is OperatorAttachmentItem.Image -> (holder as OperatorImageAttachmentViewHolder).bind(chatItem, onImageItemClickListener)
+            is OperatorAttachmentItem.File -> (holder as OperatorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener)
+            is VisitorAttachmentItem.File -> (holder as VisitorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener)
+            is VisitorAttachmentItem.Image -> {
+                val viewHolder = holder as VisitorImageAttachmentViewHolder
+                viewHolder.bind(chatItem.attachmentFile, chatItem.showDelivered)
+                viewHolder.itemView.setOnClickListener {
+                    onImageItemClickListener.onImageItemClick(chatItem.attachmentFile, it)
                 }
             }
 
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
-
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
-
             is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem, onGvaButtonsClickListener)
-
             is GvaGalleryCards -> (holder as SystemMessageViewHolder).bind(Gva.Type.GALLERY_CARDS.name)
-
-            is CustomCardItem -> {
+            is CustomCardChatItem -> {
                 (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->
-                    onCustomCardResponse.onCustomCardResponse(chatItem.getId(), text, value)
+                    onCustomCardResponse.onCustomCardResponse(chatItem.id, text, value)
                 }
             }
         }

@@ -1,9 +1,8 @@
 package com.glia.widgets.chat.adapter.holder
 
 import android.view.View
-import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.GvaResponseText
+import com.glia.widgets.chat.model.GvaResponseText
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.helper.fromHtml

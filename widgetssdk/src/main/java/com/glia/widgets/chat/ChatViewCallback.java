@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.androidsdk.engagement.Survey;
+import com.glia.widgets.chat.model.ChatItem;
 import com.glia.widgets.chat.model.ChatState;
-import com.glia.widgets.chat.model.history.ChatItem;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
 
 import org.jetbrains.annotations.NotNull;

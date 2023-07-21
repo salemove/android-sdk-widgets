@@ -11,7 +11,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.chat.model.history.OperatorAttachmentItem;
+import com.glia.widgets.chat.model.OperatorAttachmentItem;
 import com.glia.widgets.view.OperatorStatusView;
 
 public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
@@ -23,7 +23,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         setupOperatorStatusView(uiTheme);
     }
 
-    public void bind(OperatorAttachmentItem item, ChatAdapter.OnFileItemClickListener listener) {
+    public void bind(OperatorAttachmentItem.File item, ChatAdapter.OnFileItemClickListener listener) {
         super.setData(item.isFileExists(), item.isDownloading(), item.getAttachmentFile(), listener);
         updateOperatorStatusView(item);
     }
@@ -33,7 +33,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         operatorStatusView.setShowRippleAnimation(false);
     }
 
-    private void updateOperatorStatusView(OperatorAttachmentItem item) {
+    private void updateOperatorStatusView(OperatorAttachmentItem.File item) {
         operatorStatusView.setVisibility(item.getShowChatHead() ? View.VISIBLE : View.GONE);
         if (item.getOperatorProfileImgUrl() != null) {
             operatorStatusView.showProfileImage(item.getOperatorProfileImgUrl());

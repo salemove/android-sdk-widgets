@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.ServerChatItem
+import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.ServerChatItem
 import com.glia.widgets.core.secureconversations.domain.NO_UNREAD_MESSAGES
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -12,12 +12,12 @@ import kotlin.properties.Delegates
 class FindNewMessagesDividerIndexUseCaseTest {
     private val useCase: FindNewMessagesDividerIndexUseCase = FindNewMessagesDividerIndexUseCase()
 
-    private var operatorChatItem: ChatItem by Delegates.notNull()
+    private var operatorChatItem: ServerChatItem by Delegates.notNull()
     private var notOperatorChatItem: ChatItem by Delegates.notNull()
 
     @Before
     fun setUp() {
-        operatorChatItem = mock(extraInterfaces = arrayOf(ServerChatItem::class))
+        operatorChatItem = mock()
         notOperatorChatItem = mock()
     }
 

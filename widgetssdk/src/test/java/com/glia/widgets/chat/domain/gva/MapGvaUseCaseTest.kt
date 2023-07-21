@@ -3,10 +3,10 @@ package com.glia.widgets.chat.domain.gva
 import com.glia.widgets.chat.MockChatMessageInternal
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.Gva
-import com.glia.widgets.chat.model.history.GvaGalleryCards
-import com.glia.widgets.chat.model.history.GvaPersistentButtons
-import com.glia.widgets.chat.model.history.GvaQuickReplies
-import com.glia.widgets.chat.model.history.GvaResponseText
+import com.glia.widgets.chat.model.GvaGalleryCards
+import com.glia.widgets.chat.model.GvaPersistentButtons
+import com.glia.widgets.chat.model.GvaQuickReplies
+import com.glia.widgets.chat.model.GvaResponseText
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before

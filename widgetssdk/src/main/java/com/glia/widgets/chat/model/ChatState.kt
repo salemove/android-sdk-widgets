@@ -1,10 +1,5 @@
 package com.glia.widgets.chat.model
 
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.MediaUpgradeStartedTimerItem
-import com.glia.widgets.chat.model.history.OperatorStatusItem
-import com.glia.widgets.chat.model.history.VisitorMessageItem
-
 internal data class ChatState(
     val integratorChatStarted: Boolean = false,
     val isVisible: Boolean = false,
@@ -21,7 +16,7 @@ internal data class ChatState(
     val lastTypedText: String = "",
     val engagementRequested: Boolean = false,
     val pendingNavigationType: String? = null,
-    val unsentMessages: List<VisitorMessageItem> = emptyList(),
+    val unsentMessages: List<VisitorMessageItem.Unsent> = emptyList(),
     val operatorStatusItem: OperatorStatusItem? = null,
     val showSendButton: Boolean = false,
     val isAttachmentButtonEnabled: Boolean = false,
@@ -37,7 +32,7 @@ internal data class ChatState(
     val isMediaUpgradeStarted: Boolean get() = mediaUpgradeStartedTimerItem != null
 
     val isAudioCallStarted: Boolean
-        get() = isMediaUpgradeStarted && mediaUpgradeStartedTimerItem?.type == MediaUpgradeStartedTimerItem.Type.AUDIO
+        get() = isMediaUpgradeStarted && mediaUpgradeStartedTimerItem is MediaUpgradeStartedTimerItem.Audio
 
     val showMessagesUnseenIndicator: Boolean get() = !isChatInBottom && messagesNotSeen > 0
 
@@ -82,7 +77,7 @@ internal data class ChatState(
         formattedOperatorName = null,
         operatorProfileImgUrl = null,
         engagementRequested = false,
-        operatorStatusItem = OperatorStatusItem.TransferringStatusItem(),
+        operatorStatusItem = OperatorStatusItem.Transferring,
         chatInputMode = ChatInputMode.DISABLED,
         showSendButton = false,
         isAttachmentButtonNeeded = false
@@ -127,7 +122,7 @@ internal data class ChatState(
 
     fun setPendingNavigationType(pendingNavigationType: String?): ChatState = copy(pendingNavigationType = pendingNavigationType)
 
-    fun changeUnsentMessages(unsentMessages: List<VisitorMessageItem>): ChatState = copy(unsentMessages = unsentMessages)
+    fun changeUnsentMessages(unsentMessages: List<VisitorMessageItem.Unsent>): ChatState = copy(unsentMessages = unsentMessages)
 
     fun setShowSendButton(isShow: Boolean): ChatState = copy(showSendButton = isShow)
 

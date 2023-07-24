@@ -16,6 +16,7 @@ import com.glia.widgets.helper.fromHtml
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
+import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.gva.GvaPersistentButtonTheme

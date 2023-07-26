@@ -26,7 +26,7 @@ internal class GvaPersistentButtonsViewHolder(
     operatorMessageBinding: ChatOperatorMessageLayoutBinding,
     private val contentBinding: ChatGvaPersistentButtonsContentBinding,
     private val uiTheme: UiTheme
-) : OperatorBaseViewHolder(operatorMessageBinding, uiTheme) {
+) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme) {
 
     private val persistentButtonTheme: GvaPersistentButtonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.persistentButtonTheme

@@ -57,6 +57,7 @@ internal class ChatAdapter(
     private val onImageItemClickListener: OnImageItemClickListener,
     private val onCustomCardResponse: OnCustomCardResponse,
     private val onGvaButtonsClickListener: OnGvaButtonsClickListener,
+    private val chatItemHeightManager: ChatItemHeightManager,
     private val customCardAdapter: CustomCardAdapter?,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
@@ -182,13 +183,11 @@ internal class ChatAdapter(
             }
 
             GVA_GALLERY_CARDS_TYPE -> {
-                val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
                 GvaGalleryViewHolder(
-                    operatorMessageBinding,
                     ChatGvaGalleryLayoutBinding.inflate(
                         inflater,
-                        operatorMessageBinding.contentLayout,
-                        true
+                        parent,
+                        false
                     ),
                     onGvaButtonsClickListener,
                     uiTheme
@@ -251,7 +250,7 @@ internal class ChatAdapter(
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
             is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem, onGvaButtonsClickListener)
-            is GvaGalleryCards -> (holder as GvaGalleryViewHolder).bind(chatItem)
+            is GvaGalleryCards -> (holder as GvaGalleryViewHolder).bind(chatItem, chatItemHeightManager.getMeasuredHeight(chatItem))
             is CustomCardChatItem -> {
                 (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->
                     onCustomCardResponse.onCustomCardResponse(chatItem.id, text, value)
@@ -274,6 +273,7 @@ internal class ChatAdapter(
     }
 
     fun submitList(items: List<ChatItem>?) {
+        chatItemHeightManager.measureHeight(items)
         differ.submitList(items)
     }
 

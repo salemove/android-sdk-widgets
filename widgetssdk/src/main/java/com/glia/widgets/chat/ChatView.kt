@@ -44,6 +44,7 @@ import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.ChatAdapter.OnCustomCardResponse
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
+import com.glia.widgets.chat.adapter.ChatItemHeightManager
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
 import com.glia.widgets.chat.adapter.holder.WebViewViewHolder
 import com.glia.widgets.chat.controller.ChatController
@@ -737,6 +738,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             this,
             onCustomCardResponse,
             onGvaButtonsClickListener,
+            ChatItemHeightManager(theme, layoutInflater, resources),
             GliaWidgets.getCustomCardAdapter(),
             Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
             Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),

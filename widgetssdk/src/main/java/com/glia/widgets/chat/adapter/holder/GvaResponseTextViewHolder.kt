@@ -16,7 +16,7 @@ internal class GvaResponseTextViewHolder(
     operatorMessageBinding: ChatOperatorMessageLayoutBinding,
     private val messageContentBinding: ChatReceiveMessageContentBinding,
     private val uiTheme: UiTheme
-) : OperatorBaseViewHolder(operatorMessageBinding, uiTheme)  {
+) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme)  {
 
     init {
         setupMessageContentView()

@@ -2,4 +2,16 @@
 <resources>
     <string name="glia_outlined_options_icon_content_description">Outlined options icon description</string>
     <string name="glia_file_preview_transition_name">image_preview_transition</string>
+
+    <!-- Survey -->
+    <string name="glia_survey_open_text_item_title" translatable="false">Additional thoughts?</string>
+    <string name="glia_survey_scale_item_title" translatable="false">How would you rate this interaction? (1 - Bad, 5 - Good)</string>
+    <string name="glia_survey_scale_item_1" translatable="false">1</string>
+    <string name="glia_survey_scale_item_2" translatable="false">2</string>
+    <string name="glia_survey_scale_item_3" translatable="false">3</string>
+    <string name="glia_survey_scale_item_4" translatable="false">4</string>
+    <string name="glia_survey_scale_item_5" translatable="false">5</string>
+    <string name="glia_survey_single_choice_item_title" translatable="false">If you hadn\'t chatted with us today, what would you have done?</string>
+    <string name="glia_survey_require_label" translatable="false"><![CDATA[%1$s\u00A0<font color=#%2$s>*</font>]]></string>
+
 </resources>

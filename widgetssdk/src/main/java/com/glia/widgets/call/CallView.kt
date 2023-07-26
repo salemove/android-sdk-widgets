@@ -660,8 +660,7 @@ internal class CallView(
             theme = theme,
             title = resources.getString(R.string.glia_dialog_end_engagement_title),
             message = resources.getString(
-                R.string.glia_dialog_end_engagement_message,
-                operatorName
+                R.string.glia_dialog_end_engagement_message
             ),
             positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
             negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
@@ -1038,7 +1037,7 @@ internal class CallView(
                     resources.getString(R.string.glia_call_chat_zero_content_description)
                 } else {
                     resources.getQuantityString(
-                        R.plurals.glia_call_chat_content_description,
+                        R.plurals.chat_message_unread_accessibility_label,
                         callState.messagesNotSeen,
                         callState.messagesNotSeen
                     )

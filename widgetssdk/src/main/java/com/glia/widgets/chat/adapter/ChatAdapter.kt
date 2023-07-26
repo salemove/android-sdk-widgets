@@ -182,13 +182,11 @@ internal class ChatAdapter(
             }
 
             GVA_GALLERY_CARDS_TYPE -> {
-                val operatorMessageBinding = ChatOperatorMessageLayoutBinding.inflate(inflater, parent, false)
                 GvaGalleryViewHolder(
-                    operatorMessageBinding,
                     ChatGvaGalleryLayoutBinding.inflate(
                         inflater,
-                        operatorMessageBinding.contentLayout,
-                        true
+                        parent,
+                        false
                     ),
                     onGvaButtonsClickListener,
                     uiTheme

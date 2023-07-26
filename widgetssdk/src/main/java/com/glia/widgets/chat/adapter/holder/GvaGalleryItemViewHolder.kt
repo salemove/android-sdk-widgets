@@ -39,7 +39,7 @@ internal class GvaGalleryItemViewHolder(
     }
 
     init {
-        binding.root.apply {
+        binding.item.apply {
             uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
                 backgroundTintList = it
             }
@@ -61,18 +61,20 @@ internal class GvaGalleryItemViewHolder(
             binding.subtitle.isVisible = false
         }
 
-        card.imageUrl?.let {
-            binding.image.load(it)
-            binding.image.isVisible = true
-        } ?: run {
-            binding.image.isVisible = false
-        }
-
         if (card.options.isEmpty().not()) {
             setupButtons(card.options, binding.container)
             binding.container.isVisible = true
         } else {
             binding.container.isVisible = false
+        }
+    }
+
+    fun bindImage(card: GvaGalleryCard) {
+        card.imageUrl?.let {
+            binding.image.load(it)
+            binding.image.isVisible = true
+        } ?: run {
+            binding.image.isVisible = false
         }
     }
 

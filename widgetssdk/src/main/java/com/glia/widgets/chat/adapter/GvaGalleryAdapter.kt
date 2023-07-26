@@ -16,6 +16,7 @@ internal class GvaGalleryAdapter(
 
     fun setGalleryCards(galleryCards: List<GvaGalleryCard>) {
         this.galleryCards = galleryCards
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = galleryCards?.count() ?: 0
@@ -27,6 +28,9 @@ internal class GvaGalleryAdapter(
     )
 
     override fun onBindViewHolder(holder: GvaGalleryItemViewHolder, position: Int) {
-        galleryCards?.get(position)?.let { holder.bind(it) }
+        galleryCards?.get(position)?.let {
+            holder.bind(it)
+            holder.bindImage(it)
+        }
     }
 }

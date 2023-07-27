@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
@@ -16,7 +15,6 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.fromHtml
 import com.glia.widgets.helper.getColorStateListCompat
-import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
@@ -28,7 +26,7 @@ internal class GvaGalleryItemViewHolder(
     private val binding: ChatGvaGalleryItemBinding,
     private val buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
     private val uiTheme: UiTheme
-) : ViewHolder(binding.root) {
+) {
 
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
@@ -38,8 +36,10 @@ internal class GvaGalleryItemViewHolder(
         Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.persistentButtonTheme
     }
 
+    val itemView = binding.root
+
     init {
-        binding.item.apply {
+        binding.root.apply {
             uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
                 backgroundTintList = it
             }
@@ -51,7 +51,12 @@ internal class GvaGalleryItemViewHolder(
         }
     }
 
-    fun bind(card: GvaGalleryCard) {
+    fun setupData(card: GvaGalleryCard) {
+        setupViews(card)
+        setupImage(card)
+    }
+
+    private fun setupViews(card: GvaGalleryCard) {
         binding.title.text = card.title.fromHtml()
 
         card.subtitle?.let {
@@ -69,7 +74,7 @@ internal class GvaGalleryItemViewHolder(
         }
     }
 
-    fun bindImage(card: GvaGalleryCard) {
+    private fun setupImage(card: GvaGalleryCard) {
         card.imageUrl?.let {
             binding.image.load(it)
             binding.image.isVisible = true
@@ -110,7 +115,7 @@ internal class GvaGalleryItemViewHolder(
             it.text = text
             it.setOnClickListener(onClickListener)
 
-            uiTheme.fontRes?.let(container::getFontCompat)?.also(it::setTypeface)
+//            uiTheme.fontRes?.let(container::getFontCompat)?.also(it::setTypeface)
 
             persistentButtonTheme?.button?.also(it::applyButtonTheme)
         }

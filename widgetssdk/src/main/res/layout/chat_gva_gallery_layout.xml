@@ -13,8 +13,7 @@
         android:orientation="vertical"
         app:layout_constraintGuide_begin="@dimen/glia_chat_operator_margin_start" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/card_recycler_view"
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"
@@ -24,7 +23,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="RtlSymmetry" />
+        tools:ignore="RtlSymmetry">
+
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="bottom"/>
+
+    </HorizontalScrollView>
 
     <com.glia.widgets.view.OperatorStatusView
         android:id="@+id/chat_head_view"

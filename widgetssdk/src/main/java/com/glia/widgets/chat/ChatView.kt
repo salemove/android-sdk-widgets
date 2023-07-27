@@ -731,6 +731,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun setupViewAppearance() {
         adapter = ChatAdapter(
+            layoutInflater,
             theme,
             onOptionClickedListener,
             this,

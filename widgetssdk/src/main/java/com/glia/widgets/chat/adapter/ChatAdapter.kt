@@ -1,5 +1,6 @@
 package com.glia.widgets.chat.adapter
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
@@ -51,6 +52,7 @@ import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(
+    private val inflater: LayoutInflater,
     private val uiTheme: UiTheme,
     private val onOptionClickedListener: OnOptionClickedListener,
     private val onFileItemClickListener: OnFileItemClickListener,
@@ -63,12 +65,13 @@ internal class ChatAdapter(
     private val getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val differ = AsyncListDiffer(this, ChatAdapterDiffCallback())
+    private val gvaGalleryAdapter = GvaGalleryAdapter(inflater, onGvaButtonsClickListener, uiTheme)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         @Type viewType: Int
     ): RecyclerView.ViewHolder {
-        val inflater = parent.layoutInflater
+//        val inflater = parent.layoutInflater
         return when (viewType) {
             OPERATOR_STATUS_VIEW_TYPE -> {
                 OperatorStatusViewHolder(
@@ -189,6 +192,7 @@ internal class ChatAdapter(
                         false
                     ),
                     onGvaButtonsClickListener,
+                    gvaGalleryAdapter,
                     uiTheme
                 )
             }

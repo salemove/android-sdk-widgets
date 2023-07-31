@@ -9,10 +9,14 @@ internal data class GvaRemoteConfig(
     val quickReplyRemoteConfig: ButtonRemoteConfig?,
 
     @SerializedName("persistentButton")
-    val persistentButtonRemoteConfig: GvaPersistentButtonRemoteConfig?
+    val persistentButtonRemoteConfig: GvaPersistentButtonRemoteConfig?,
+
+    @SerializedName("galleryCard")
+    val galleryCardRemoteConfig: GvaGalleryCardRemoteConfig?
 ) {
     fun toGvaTheme(): GvaTheme = GvaTheme(
         quickReplyTheme = quickReplyRemoteConfig?.toButtonTheme(),
-        persistentButtonTheme = persistentButtonRemoteConfig?.toGvaPersistentButtonTheme()
+        persistentButtonTheme = persistentButtonRemoteConfig?.toGvaPersistentButtonTheme(),
+        galleryCardTheme = galleryCardRemoteConfig?.toGvaGalleryCardTheme()
     )
 }

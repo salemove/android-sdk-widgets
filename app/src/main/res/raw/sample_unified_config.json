@@ -3100,6 +3100,132 @@
             ]
           }
         }
+      },
+      "galleryCard": {
+        "title": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#F3F3F3"
+            ]
+          },
+          "font": {
+            "size": 18,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#04728c"
+            ]
+          }
+        },
+        "subtitle": {
+          "alignment": "center",
+          "background": {
+            "type": "fill",
+            "value": [
+              "#F3F3F3"
+            ]
+          },
+          "font": {
+            "size": 16,
+            "style": "regular"
+          },
+          "foreground": {
+            "type": "fill",
+            "value": [
+              "#000000"
+            ]
+          }
+        },
+        "image": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#F3F3F3"
+            ]
+          },
+          "cornerRadius": 18
+        },
+        "button": {
+          "background": {
+            "border": {
+              "type": "fill",
+              "value": [
+                "#FFFFFF"
+              ]
+            },
+            "borderWidth": 2,
+            "color": {
+              "type": "fill",
+              "value": [
+                "#3e95a6"
+              ]
+            },
+            "cornerRadius": 8
+          },
+          "shadow": {
+            "color": {
+              "type": "fill",
+              "value": [
+                "#FFFFFF"
+              ]
+            },
+            "offset": 0,
+            "opacity": 1,
+            "radius": 0
+          },
+          "text": {
+            "alignment": "center",
+            "background": {
+              "type": "fill",
+              "value": [
+                "#f0d12b"
+              ]
+            },
+            "font": {
+              "size": 16,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "fill",
+              "value": [
+                "#FFFFFF"
+              ]
+            }
+          },
+          "tintColor": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          }
+        },
+        "background": {
+          "border": {
+            "type": "fill",
+            "value": [
+              "#FFFFFF"
+            ]
+          },
+          "borderWidth": 2,
+          "color": {
+            "type": "fill",
+            "value": [
+              "#1AFFD000"
+            ]
+          },
+          "cornerRadius": 24
+        }
       }
     }
   },

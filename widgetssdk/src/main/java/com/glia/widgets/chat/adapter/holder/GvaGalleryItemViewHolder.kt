@@ -16,19 +16,22 @@ import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.fromHtml
+import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
+import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
-import com.glia.widgets.view.unifiedui.theme.gva.GvaPersistentButtonTheme
+import com.glia.widgets.view.unifiedui.theme.gva.GvaGalleryCardTheme
 import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates
 
 internal class GvaGalleryItemViewHolder(
     private val binding: ChatGvaGalleryItemBinding,
-    private val buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
+    buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
     private val uiTheme: UiTheme
 ) : ViewHolder(binding.root) {
 
@@ -38,12 +41,12 @@ internal class GvaGalleryItemViewHolder(
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
     }
 
-    private val persistentButtonTheme: GvaPersistentButtonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.persistentButtonTheme
+    private val galleryCardTheme: GvaGalleryCardTheme? by lazy {
+        Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.galleryCardTheme
     }
 
     init {
-        adapter = ButtonsAdapter(buttonsClickListener, uiTheme, persistentButtonTheme)
+        adapter = ButtonsAdapter(buttonsClickListener, uiTheme, galleryCardTheme?.button)
         binding.buttonsRecyclerView.adapter = adapter
         binding.item.apply {
             uiTheme.operatorMessageBackgroundColor?.let(::getColorStateListCompat)?.also {
@@ -53,8 +56,31 @@ internal class GvaGalleryItemViewHolder(
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
             // Unified Ui
-            applyLayerTheme(operatorTheme?.background)
+            applyLayerTheme(galleryCardTheme?.background ?: operatorTheme?.background)
         }
+        binding.title.apply {
+            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
+            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setLinkTextColor)
+
+            uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
+
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+
+            // Unified Ui
+            applyTextTheme(galleryCardTheme?.title ?: operatorTheme?.text)
+        }
+        binding.subtitle.apply {
+            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setTextColor)
+            uiTheme.operatorMessageTextColor?.let(::getColorCompat)?.also(::setLinkTextColor)
+
+            uiTheme.fontRes?.let(::getFontCompat)?.also(::setTypeface)
+
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+
+            // Unified Ui
+            applyTextTheme(galleryCardTheme?.subtitle ?: operatorTheme?.text)
+        }
+        galleryCardTheme?.image?.also(binding.image::applyLayerTheme)
     }
 
     fun bind(card: GvaGalleryCard) {
@@ -83,7 +109,7 @@ internal class GvaGalleryItemViewHolder(
     private class ButtonsAdapter(
         private val buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
         private val uiTheme: UiTheme,
-        private val persistentButtonTheme: GvaPersistentButtonTheme?
+        private val buttonTheme: ButtonTheme?
     ) : RecyclerView.Adapter<ButtonsAdapter.ButtonViewHolder>() {
 
         private var options: List<GvaButton>? = null
@@ -110,7 +136,7 @@ internal class GvaGalleryItemViewHolder(
 
                 uiTheme.fontRes?.let(parent::getFontCompat)?.also(it::setTypeface)
 
-                persistentButtonTheme?.button?.also(it::applyButtonTheme)
+                buttonTheme?.also(it::applyButtonTheme)
             }
             button.layoutParams = LinearLayoutCompat.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT)
             return ButtonViewHolder(button)

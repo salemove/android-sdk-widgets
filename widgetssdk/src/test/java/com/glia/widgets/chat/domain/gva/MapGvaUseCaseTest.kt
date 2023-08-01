@@ -1,14 +1,13 @@
 package com.glia.widgets.chat.domain.gva
 
 import com.glia.widgets.chat.MockChatMessageInternal
-import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaGalleryCards
 import com.glia.widgets.chat.model.GvaPersistentButtons
 import com.glia.widgets.chat.model.GvaQuickReplies
 import com.glia.widgets.chat.model.GvaResponseText
+import junit.framework.TestCase.assertTrue
 import org.junit.After
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -21,10 +20,8 @@ class MapGvaUseCaseTest {
     private lateinit var getGvaTypeUseCase: GetGvaTypeUseCase
     private lateinit var mapGvaResponseTextUseCase: MapGvaResponseTextUseCase
     private lateinit var mapGvaPersistentButtonsUseCase: MapGvaPersistentButtonsUseCase
-    private lateinit var mapGvaGvaQuickRepliesUseCase: MapGvaGvaQuickRepliesUseCase
+    private lateinit var mapGvaQuickRepliesUseCase: MapGvaQuickRepliesUseCase
     private lateinit var mapGvaGvaGalleryCardsUseCase: MapGvaGvaGalleryCardsUseCase
-
-    private lateinit var chatState: ChatState
 
     private lateinit var useCase: MapGvaUseCase
 
@@ -33,16 +30,14 @@ class MapGvaUseCaseTest {
         getGvaTypeUseCase = mock()
         mapGvaResponseTextUseCase = mock()
         mapGvaPersistentButtonsUseCase = mock()
-        mapGvaGvaQuickRepliesUseCase = mock()
+        mapGvaQuickRepliesUseCase = mock()
         mapGvaGvaGalleryCardsUseCase = mock()
-
-        chatState = mock()
 
         useCase = MapGvaUseCase(
             getGvaTypeUseCase,
             mapGvaResponseTextUseCase,
             mapGvaPersistentButtonsUseCase,
-            mapGvaGvaQuickRepliesUseCase,
+            mapGvaQuickRepliesUseCase,
             mapGvaGvaGalleryCardsUseCase
         )
 
@@ -61,7 +56,7 @@ class MapGvaUseCaseTest {
         whenever(mapGvaResponseTextUseCase(any(), any())) doReturn mock()
 
         mockChatMessageInternal.apply {
-            val gva = useCase(chatMessageInternal, chatState)
+            val gva = useCase(chatMessageInternal)
             assertTrue(gva is GvaResponseText)
         }
     }
@@ -72,7 +67,7 @@ class MapGvaUseCaseTest {
         whenever(mapGvaPersistentButtonsUseCase(any(), any())) doReturn mock()
 
         mockChatMessageInternal.apply {
-            val gva = useCase(chatMessageInternal, chatState)
+            val gva = useCase(chatMessageInternal)
             assertTrue(gva is GvaPersistentButtons)
         }
     }
@@ -80,10 +75,10 @@ class MapGvaUseCaseTest {
     @Test
     fun `invoke returns GvaQuickReplies when GVA type is QUICK_REPLIES`() {
         whenever(getGvaTypeUseCase(any())) doReturn Gva.Type.QUICK_REPLIES
-        whenever(mapGvaGvaQuickRepliesUseCase(any(), any())) doReturn mock<GvaQuickReplies>()
+        whenever(mapGvaQuickRepliesUseCase(any(), any())) doReturn mock()
 
         mockChatMessageInternal.apply {
-            val gva = useCase(chatMessageInternal, chatState)
+            val gva = useCase(chatMessageInternal)
             assertTrue(gva is GvaQuickReplies)
         }
     }
@@ -94,7 +89,7 @@ class MapGvaUseCaseTest {
         whenever(mapGvaGvaGalleryCardsUseCase(any(), any())) doReturn mock()
 
         mockChatMessageInternal.apply {
-            val gva = useCase(chatMessageInternal, chatState)
+            val gva = useCase(chatMessageInternal)
             assertTrue(gva is GvaGalleryCards)
         }
     }
@@ -103,6 +98,6 @@ class MapGvaUseCaseTest {
     fun `invoke throws exception when ChatMessage is not GVA message`() {
         whenever(getGvaTypeUseCase(any())) doReturn null
 
-        mockChatMessageInternal.apply { useCase(chatMessageInternal, chatState) }
+        mockChatMessageInternal.apply { useCase(chatMessageInternal) }
     }
 }

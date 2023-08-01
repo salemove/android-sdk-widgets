@@ -1,7 +1,6 @@
 package com.glia.widgets.di;
 
 import android.app.Application;
-import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -19,40 +18,35 @@ import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
-import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
+import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
-import kotlin.jvm.functions.Function2;
-
 public class Dependencies {
 
     private final static String TAG = "Dependencies";
-
+    private static final UnifiedThemeManager UNIFIED_THEME_MANAGER = new UnifiedThemeManager();
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static CallVisualizerManager callVisualizerManager;
     private static GliaSdkConfigurationManager sdkConfigurationManager =
             new GliaSdkConfigurationManager();
     private static UseCaseFactory useCaseFactory;
+    private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
-    private static final UnifiedThemeManager UNIFIED_THEME_MANAGER = new UnifiedThemeManager();
 
     public static void onAppCreate(Application application) {
         notificationManager = new NotificationManager(application);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
-        RepositoryFactory repositoryFactory = new RepositoryFactory(
-                gliaCore,
-                downloadsFolderDataSource
-        );
+        RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
 
         PermissionManager permissionManager = new PermissionManager(
                 application,
@@ -72,20 +66,12 @@ public class Dependencies {
                 new GliaWidgetsSchedulers(),
                 gliaCore
         );
-        initAudioControlManager(
-                audioControlManager,
-                useCaseFactory.createOnAudioStartedUseCase()
-        );
+        initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase());
 
-        controllerFactory = new ControllerFactory(
-                repositoryFactory,
-                useCaseFactory,
-                sdkConfigurationManager
-        );
-        initApplicationLifecycleObserver(
-                new ApplicationLifecycleManager(),
-                controllerFactory.getChatHeadController()
-        );
+        managerFactory = new ManagerFactory(useCaseFactory);
+
+        controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory, sdkConfigurationManager, managerFactory);
+        initApplicationLifecycleObserver(new ApplicationLifecycleManager(), controllerFactory.getChatHeadController());
 
         ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer =
                 new ActivityWatcherForCallVisualizer(
@@ -96,8 +82,7 @@ public class Dependencies {
 
         ActivityWatcherForChatHead activityWatcherForChatHead =
                 new ActivityWatcherForChatHead(
-                        getControllerFactory().getActivityWatcherForChatHeadController()
-                );
+                        getControllerFactory().getActivityWatcherForChatHeadController());
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead);
 
         ActivityWatcherForPermissionsRequest activityWatcherForPermissionsRequest =
@@ -123,6 +108,11 @@ public class Dependencies {
         return sdkConfigurationManager;
     }
 
+    @VisibleForTesting
+    public static void setSdkConfigurationManager(@NonNull GliaSdkConfigurationManager sdkConfigurationManager) {
+        Dependencies.sdkConfigurationManager = sdkConfigurationManager;
+    }
+
     @NonNull
     public static UnifiedThemeManager getGliaThemeManager() {
         return UNIFIED_THEME_MANAGER;
@@ -141,6 +131,11 @@ public class Dependencies {
         return controllerFactory;
     }
 
+    @VisibleForTesting
+    public static void setControllerFactory(ControllerFactory controllerFactory) {
+        Dependencies.controllerFactory = controllerFactory;
+    }
+
     public static GliaCore glia() {
         return gliaCore;
     }
@@ -156,16 +151,6 @@ public class Dependencies {
 
     public static ResourceProvider getResourceProvider() {
         return resourceProvider;
-    }
-
-    @VisibleForTesting
-    public static void setControllerFactory(ControllerFactory controllerFactory) {
-        Dependencies.controllerFactory = controllerFactory;
-    }
-
-    @VisibleForTesting
-    public static void setSdkConfigurationManager(@NonNull GliaSdkConfigurationManager sdkConfigurationManager) {
-        Dependencies.sdkConfigurationManager = sdkConfigurationManager;
     }
 
     @VisibleForTesting

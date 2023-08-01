@@ -1,6 +1,7 @@
 package com.glia.widgets.chat
 
 import com.glia.androidsdk.chat.ChatMessage
+import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import org.json.JSONObject
 import org.mockito.Mockito
@@ -14,6 +15,7 @@ internal class MockChatMessageInternal {
     val messageTimeStamp = 123L
     val operatorImageUrl = "operator_url"
     val operatorName = "operator_name"
+    val content = "content"
 
     private val chatMessage: ChatMessage = mock()
     val chatMessageInternal: ChatMessageInternal = mock()
@@ -26,6 +28,7 @@ internal class MockChatMessageInternal {
         whenever(chatMessage.id) doReturn messageId
         whenever(chatMessage.timestamp) doReturn messageTimeStamp
         whenever(chatMessage.metadata) doReturn metadata
+        whenever(chatMessage.content) doReturn content
     }
 
     fun mockOperatorProperties() {
@@ -34,11 +37,7 @@ internal class MockChatMessageInternal {
         whenever(chatMessageInternal.operatorName) doReturn operatorName
     }
 
-    fun mockOperatorPropertiesWithNull() {
-        whenever(chatMessageInternal.operatorId) doReturn null
-        whenever(chatMessageInternal.operatorImageUrl) doReturn null
-        whenever(chatMessageInternal.operatorName) doReturn null
-    }
+    fun metadataWithContent(content: String = this.content): JSONObject = JSONObject().put(Gva.Keys.CONTENT, content)
 
     fun reset() {
         Mockito.reset(chatMessage, chatMessageInternal)

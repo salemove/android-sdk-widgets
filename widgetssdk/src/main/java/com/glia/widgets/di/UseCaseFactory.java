@@ -9,6 +9,17 @@ import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
+import com.glia.widgets.chat.domain.AppendGvaMessageItemUseCase;
+import com.glia.widgets.chat.domain.AppendHistoryChatMessageUseCase;
+import com.glia.widgets.chat.domain.AppendHistoryCustomCardItemUseCase;
+import com.glia.widgets.chat.domain.AppendHistoryOperatorChatItemUseCase;
+import com.glia.widgets.chat.domain.AppendHistoryResponseCardOrTextItemUseCase;
+import com.glia.widgets.chat.domain.AppendHistoryVisitorChatItemUseCase;
+import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase;
+import com.glia.widgets.chat.domain.AppendNewOperatorMessageUseCase;
+import com.glia.widgets.chat.domain.AppendNewResponseCardOrTextItemUseCase;
+import com.glia.widgets.chat.domain.AppendNewVisitorMessageUseCase;
+import com.glia.widgets.chat.domain.AppendSystemMessageItemUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
@@ -19,11 +30,16 @@ import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase;
+import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase;
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase;
-import com.glia.widgets.chat.domain.IsEnableChatEditTextUseCase;
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.IsSecureConversationsChatAvailableUseCase;
 import com.glia.widgets.chat.domain.IsShowSendButtonUseCase;
+import com.glia.widgets.chat.domain.MapOperatorAttachmentUseCase;
+import com.glia.widgets.chat.domain.MapOperatorPlainTextUseCase;
+import com.glia.widgets.chat.domain.MapResponseCardUseCase;
+import com.glia.widgets.chat.domain.MapVisitorAttachmentUseCase;
+import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase;
 import com.glia.widgets.chat.domain.SiteInfoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase;
@@ -31,8 +47,8 @@ import com.glia.widgets.chat.domain.gva.DetermineGvaUrlTypeUseCase;
 import com.glia.widgets.chat.domain.gva.GetGvaTypeUseCase;
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase;
 import com.glia.widgets.chat.domain.gva.MapGvaGvaGalleryCardsUseCase;
-import com.glia.widgets.chat.domain.gva.MapGvaGvaQuickRepliesUseCase;
 import com.glia.widgets.chat.domain.gva.MapGvaPersistentButtonsUseCase;
+import com.glia.widgets.chat.domain.gva.MapGvaQuickRepliesUseCase;
 import com.glia.widgets.chat.domain.gva.MapGvaResponseTextUseCase;
 import com.glia.widgets.chat.domain.gva.MapGvaUseCase;
 import com.glia.widgets.chat.domain.gva.ParseGvaButtonsUseCase;
@@ -164,6 +180,30 @@ public class UseCaseFactory {
         this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
         this.gliaCore = gliaCore;
+    }
+
+    @NonNull
+    private AppendHistoryResponseCardOrTextItemUseCase createAppendHistoryResponseCardOrTextItemUseCase() {
+        return new AppendHistoryResponseCardOrTextItemUseCase(
+            createMapOperatorAttachmentUseCase(),
+            createMapOperatorPlainTextUseCase(),
+            createMapResponseCardUseCase()
+        );
+    }
+
+    @NonNull
+    public MapResponseCardUseCase createMapResponseCardUseCase() {
+        return new MapResponseCardUseCase();
+    }
+
+    @NonNull
+    public MapOperatorAttachmentUseCase createMapOperatorAttachmentUseCase() {
+        return new MapOperatorAttachmentUseCase();
+    }
+
+    @NonNull
+    public MapOperatorPlainTextUseCase createMapOperatorPlainTextUseCase() {
+        return new MapOperatorPlainTextUseCase();
     }
 
     @NonNull
@@ -299,7 +339,8 @@ public class UseCaseFactory {
             repositoryFactory.getGliaOperatorMediaRepository(),
             repositoryFactory.getGliaQueueRepository(),
             repositoryFactory.getGliaVisitorMediaRepository(),
-            repositoryFactory.getGliaEngagementStateRepository()
+            repositoryFactory.getGliaEngagementStateRepository(),
+            repositoryFactory.getOperatorRepository()
         );
     }
 
@@ -336,8 +377,8 @@ public class UseCaseFactory {
     @NonNull
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
         return new GliaOnMessageUseCase(
-                repositoryFactory.getGliaMessageRepository(),
-                getMapOperatorUseCase()
+            repositoryFactory.getGliaMessageRepository(),
+            getMapOperatorUseCase()
         );
     }
 
@@ -488,11 +529,6 @@ public class UseCaseFactory {
     @NonNull
     public DownloadFileUseCase createDownloadFileUseCase() {
         return new DownloadFileUseCase(repositoryFactory.getGliaFileRepository());
-    }
-
-    @NonNull
-    public IsEnableChatEditTextUseCase createIsEnableChatEditTextUseCase() {
-        return new IsEnableChatEditTextUseCase();
     }
 
     @NonNull
@@ -863,8 +899,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public MapGvaGvaQuickRepliesUseCase createMapGvaGvaQuickRepliesUseCase() {
-        return new MapGvaGvaQuickRepliesUseCase(createParseGvaButtonsUseCase(), createMapGvaResponseTextUseCase());
+    public MapGvaQuickRepliesUseCase createMapGvaGvaQuickRepliesUseCase() {
+        return new MapGvaQuickRepliesUseCase(createParseGvaButtonsUseCase());
     }
 
     @NonNull
@@ -891,6 +927,106 @@ public class UseCaseFactory {
     @NonNull
     public DetermineGvaButtonTypeUseCase createDetermineGvaButtonTypeUseCase() {
         return new DetermineGvaButtonTypeUseCase(createDetermineGvaUrlTypeUseCase());
+    }
+
+    @NonNull
+    public HandleCustomCardClickUseCase createHandleCustomCardClickUseCase() {
+        return new HandleCustomCardClickUseCase(
+            createCustomCardTypeUseCase(),
+            createCustomCardShouldShowUseCase()
+        );
+    }
+
+    @NonNull
+    public AppendHistoryChatMessageUseCase createAppendHistoryChatMessageUseCase() {
+        return new AppendHistoryChatMessageUseCase(
+            createAppendHistoryVisitorChatItemUseCase(),
+            createAppendHistoryOperatorChatItemUseCase(),
+            createAppendSystemMessageItemUseCase()
+        );
+    }
+
+    @NonNull
+    public AppendSystemMessageItemUseCase createAppendSystemMessageItemUseCase() {
+        return new AppendSystemMessageItemUseCase();
+    }
+
+    @NonNull
+    public AppendHistoryVisitorChatItemUseCase createAppendHistoryVisitorChatItemUseCase() {
+        return new AppendHistoryVisitorChatItemUseCase(createMapVisitorAttachmentUseCase());
+    }
+
+    @NonNull
+    public MapVisitorAttachmentUseCase createMapVisitorAttachmentUseCase() {
+        return new MapVisitorAttachmentUseCase();
+    }
+
+    @NonNull
+    public AppendHistoryOperatorChatItemUseCase createAppendHistoryOperatorChatItemUseCase() {
+        return new AppendHistoryOperatorChatItemUseCase(
+            createIsGvaUseCase(),
+            createCustomCardAdapterTypeUseCase(),
+            createAppendHistoryGvaMessageItemUseCase(),
+            createAppendHistoryCustomCardItemUseCase(),
+            createAppendHistoryResponseCardOrTextItemUseCase()
+        );
+    }
+
+    @NonNull
+    public AppendHistoryCustomCardItemUseCase createAppendHistoryCustomCardItemUseCase() {
+        return new AppendHistoryCustomCardItemUseCase(
+            createCustomCardTypeUseCase(),
+            createCustomCardShouldShowUseCase()
+        );
+    }
+
+    @NonNull
+    public AppendGvaMessageItemUseCase createAppendHistoryGvaMessageItemUseCase() {
+        return new AppendGvaMessageItemUseCase(createMapGvaUseCase());
+    }
+
+    @NonNull
+    public AppendNewVisitorMessageUseCase createAppendNewVisitorMessageUseCase() {
+        return new AppendNewVisitorMessageUseCase(createMapVisitorAttachmentUseCase());
+    }
+
+    @NonNull
+    public AppendNewOperatorMessageUseCase createAppendNewOperatorMessageUseCase() {
+        return new AppendNewOperatorMessageUseCase(
+            createIsGvaUseCase(),
+            createCustomCardAdapterTypeUseCase(),
+            createAppendGvaMessageItemUseCase(),
+            createAppendHistoryCustomCardItemUseCase(),
+            createAppendNewResponseCardOrTextItemUseCase()
+        );
+    }
+
+    @NonNull
+    private AppendNewResponseCardOrTextItemUseCase createAppendNewResponseCardOrTextItemUseCase() {
+        return new AppendNewResponseCardOrTextItemUseCase(
+            createMapOperatorAttachmentUseCase(),
+            createMapOperatorPlainTextUseCase(),
+            createMapResponseCardUseCase()
+        );
+    }
+
+    @NonNull
+    public AppendGvaMessageItemUseCase createAppendGvaMessageItemUseCase() {
+        return new AppendGvaMessageItemUseCase(createMapGvaUseCase());
+    }
+
+    @NonNull
+    public AppendNewChatMessageUseCase createAppendNewChatMessageUseCase() {
+        return new AppendNewChatMessageUseCase(
+            createAppendNewOperatorMessageUseCase(),
+            createAppendNewVisitorMessageUseCase(),
+            createAppendSystemMessageItemUseCase()
+        );
+    }
+
+    @NonNull
+    public SendUnsentMessagesUseCase createSendUnsentMessagesUseCase() {
+        return new SendUnsentMessagesUseCase(repositoryFactory.getGliaMessageRepository());
     }
 
     public void resetState() {

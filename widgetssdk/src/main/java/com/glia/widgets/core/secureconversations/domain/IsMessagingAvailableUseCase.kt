@@ -5,7 +5,7 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.androidsdk.queuing.QueueState
 import com.glia.widgets.core.queue.GliaQueueRepository
 import com.glia.widgets.helper.rx.Schedulers
-import com.glia.widgets.helper.supportsMessaging
+import com.glia.widgets.helper.supportMessaging
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
@@ -36,5 +36,5 @@ internal class IsMessagingAvailableUseCase(
         .filter { queueIds.contains(it.id) }
         .filterNot { it.state.status == QueueState.Status.CLOSED }
         .filterNot { it.state.status == QueueState.Status.UNKNOWN }
-        .any { it.supportsMessaging() }
+        .any { it.supportMessaging() }
 }

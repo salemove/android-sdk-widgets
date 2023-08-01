@@ -47,12 +47,12 @@ import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.adapter.ChatItemHeightManager
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.chat.adapter.holder.WebViewViewHolder
 import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.AttachmentItem
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
+import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
@@ -173,17 +173,18 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
         }
     private val onCustomCardResponse =
-        OnCustomCardResponse { messageId: String, text: String, value: String ->
-            controller?.sendCustomCardResponse(messageId, text, value)
+        OnCustomCardResponse { customCard: CustomCardChatItem, text: String, value: String ->
+            controller?.sendCustomCardResponse(customCard, text, value)
         }
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             super.onItemRangeInserted(positionStart, itemCount)
+
             val totalItemCount = adapter.itemCount
             val lastIndex = totalItemCount - 1
-            if (isInBottom) {
-                val holder = binding.chatRecyclerView.findViewHolderForAdapterPosition(lastIndex)
-                if (holder is WebViewViewHolder) {
+            if (isInBottom && lastIndex != -1) {
+                val itemViewType = adapter.getItemViewType(lastIndex)
+                if (itemViewType == ChatAdapter.CUSTOM_CARD_TYPE) {
                     // WebView needs time for calculating the height.
                     // So to scroll to the bottom, we need to do it with delay.
                     postDelayed(
@@ -631,12 +632,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 },
                 cancelListener = {
                     it.dismiss()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 }
             )
@@ -654,16 +655,16 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                     this.context.openNotificationChannelScreen()
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                 },
                 cancelListener = {
                     it.dismiss()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                 }
             )
         }

@@ -21,6 +21,7 @@ import com.glia.widgets.view.configuration.survey.SurveyStyle
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
 import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
 
 class SingleQuestionViewHolder(
     private val binding: SurveySingleQuestionItemBinding,
@@ -50,7 +51,7 @@ class SingleQuestionViewHolder(
     private fun singleChoice(item: QuestionItem) {
         val selectedId = Optional.ofNullable(item.answer)
             .map { answer: Survey.Answer -> answer.getResponse<Any>() as String }
-            .orElse(null)
+            .getOrNull()
         val options = item.question.options ?: return
         radioGroup.removeAllViews()
         for (i in options.indices) {

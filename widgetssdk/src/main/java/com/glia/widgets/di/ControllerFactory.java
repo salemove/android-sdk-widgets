@@ -47,6 +47,7 @@ public class ControllerFactory {
     private final GliaSdkConfigurationManager sdkConfigurationManager;
     private final FilePreviewController filePreviewController;
     private final ChatHeadPosition chatHeadPosition;
+    private final ManagerFactory managerFactory;
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
@@ -58,7 +59,8 @@ public class ControllerFactory {
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
         UseCaseFactory useCaseFactory,
-        GliaSdkConfigurationManager sdkConfigurationManager
+        GliaSdkConfigurationManager sdkConfigurationManager,
+        ManagerFactory managerFactory
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
@@ -79,6 +81,7 @@ public class ControllerFactory {
         );
         this.chatHeadPosition = ChatHeadPosition.getInstance();
         this.sdkConfigurationManager = sdkConfigurationManager;
+        this.managerFactory = managerFactory;
     }
 
     public ChatController getChatController(ChatViewCallback chatViewCallback) {
@@ -92,11 +95,9 @@ public class ControllerFactory {
                 dialogController,
                 messagesNotSeenHandler,
                 useCaseFactory.createCallNotificationUseCase(),
-                useCaseFactory.createGliaLoadHistoryUseCase(),
                 useCaseFactory.createQueueForChatEngagementUseCase(),
                 useCaseFactory.createOnEngagementUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createGliaOnMessageUseCase(),
                 useCaseFactory.createGliaOnOperatorTypingUseCase(),
                 useCaseFactory.createGliaSendMessagePreviewUseCase(),
                 useCaseFactory.createGliaSendMessageUseCase(),
@@ -112,15 +113,11 @@ public class ControllerFactory {
                 useCaseFactory.createIsShowSendButtonUseCase(),
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createDownloadFileUseCase(),
-                useCaseFactory.createIsEnableChatEditTextUseCase(),
                 useCaseFactory.createSiteInfoUseCase(),
                 useCaseFactory.getGliaSurveyUseCase(),
                 useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.createCustomCardAdapterTypeUseCase(),
-                useCaseFactory.createCustomCardTypeUseCase(),
-                useCaseFactory.createCustomCardShouldShowUseCase(),
                 useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                 useCaseFactory.createIsQueueingEngagementUseCase(),
                 useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
@@ -129,16 +126,14 @@ public class ControllerFactory {
                 useCaseFactory.createIsOngoingEngagementUseCase(),
                 useCaseFactory.createSetEngagementConfigUseCase(),
                 useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
-                useCaseFactory.createMarkMessagesReadUseCase(),
                 useCaseFactory.createHasPendingSurveyUseCase(),
                 useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createIsCallVisualizerUseCase(),
-                useCaseFactory.createAddNewMessagesDividerUseCase(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createAcceptMediaUpgradeOfferUseCase(),
-                useCaseFactory.createIsGvaUseCase(),
-                useCaseFactory.createMapGvaUseCase(),
-                useCaseFactory.createDetermineGvaButtonTypeUseCase()
+                useCaseFactory.createDetermineGvaButtonTypeUseCase(),
+                useCaseFactory.createIsAuthenticatedUseCase(),
+                managerFactory.getChatManager()
             );
         } else {
             Logger.d(TAG, "retained chat controller");

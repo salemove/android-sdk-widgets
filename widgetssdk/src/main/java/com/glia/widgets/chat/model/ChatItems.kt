@@ -1,6 +1,7 @@
 package com.glia.widgets.chat.model
 
 import android.content.Context
+import android.text.format.DateUtils
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.SingleChoiceOption
@@ -100,6 +101,16 @@ internal sealed class OperatorMessageItem : OperatorChatItem(ChatAdapter.OPERATO
         override val content: String?
     ) : OperatorMessageItem() {
         override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
+
+        fun asPlainText(): PlainText = PlainText(
+            id = id,
+            timestamp = timestamp,
+            showChatHead = showChatHead,
+            operatorProfileImgUrl = operatorProfileImgUrl,
+            operatorId = operatorId,
+            operatorName = operatorName,
+            content = content
+        )
     }
 
     data class ResponseCard(
@@ -120,7 +131,7 @@ internal sealed class OperatorMessageItem : OperatorChatItem(ChatAdapter.OPERATO
 
         override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
 
-        fun toPlainText() = PlainText(
+        fun asPlainText() = PlainText(
             id = id,
             timestamp = timestamp,
             showChatHead = showChatHead,
@@ -141,11 +152,11 @@ internal sealed class MediaUpgradeStartedTimerItem : ChatItem(ChatAdapter.MEDIA_
 
     abstract fun updateTime(time: String): MediaUpgradeStartedTimerItem
 
-    data class Audio(override val time: String) : MediaUpgradeStartedTimerItem() {
+    data class Audio(override val time: String = DateUtils.formatElapsedTime(0)) : MediaUpgradeStartedTimerItem() {
         override fun updateTime(time: String) = copy(time = time)
     }
 
-    data class Video(override val time: String) : MediaUpgradeStartedTimerItem() {
+    data class Video(override val time: String = DateUtils.formatElapsedTime(0)) : MediaUpgradeStartedTimerItem() {
         override fun updateTime(time: String) = copy(time = time)
     }
 }
@@ -183,9 +194,12 @@ internal sealed class OperatorStatusItem : ChatItem(ChatAdapter.OPERATOR_STATUS_
 
 // Visitor
 
-internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : ChatItem(viewType), AttachmentItem {
+internal abstract class VisitorChatItem(@ChatAdapter.Type viewType: Int) : ChatItem(viewType) {
     abstract val showDelivered: Boolean
-    abstract fun withDeliveredStatus(delivered: Boolean): VisitorAttachmentItem
+    abstract fun withDeliveredStatus(delivered: Boolean): VisitorChatItem
+}
+
+internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : VisitorChatItem(viewType), AttachmentItem {
 
     data class Image(
         override val id: String,
@@ -195,7 +209,7 @@ internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : C
         override val isDownloading: Boolean = false,
         override val showDelivered: Boolean = false
     ) : VisitorAttachmentItem(ChatAdapter.VISITOR_IMAGE_VIEW_TYPE) {
-        override fun withDeliveredStatus(delivered: Boolean): VisitorAttachmentItem = copy(showDelivered = delivered)
+        override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem = copy(showDelivered = delivered)
 
         override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
             copy(isFileExists = isFileExists, isDownloading = isDownloading)
@@ -209,18 +223,23 @@ internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : C
         override val isDownloading: Boolean = false,
         override val showDelivered: Boolean = false
     ) : VisitorAttachmentItem(ChatAdapter.VISITOR_FILE_VIEW_TYPE) {
-        override fun withDeliveredStatus(delivered: Boolean): VisitorAttachmentItem = copy(showDelivered = delivered)
+        override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem = copy(showDelivered = delivered)
 
         override fun updateWith(isFileExists: Boolean, isDownloading: Boolean): ChatItem =
             copy(isFileExists = isFileExists, isDownloading = isDownloading)
     }
 }
 
-internal sealed class VisitorMessageItem : ChatItem(ChatAdapter.VISITOR_MESSAGE_TYPE) {
-    val showDelivered: Boolean
+internal sealed class VisitorMessageItem : VisitorChatItem(ChatAdapter.VISITOR_MESSAGE_TYPE) {
+    override val showDelivered: Boolean
         get() = this is Delivered
 
     abstract val message: String
+
+    override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem {
+        check(!delivered) { "The method should be called only with false value, to hide delivered status" }
+        return New(id, timestamp, message)
+    }
 
     data class New(
         override val id: String,
@@ -235,8 +254,8 @@ internal sealed class VisitorMessageItem : ChatItem(ChatAdapter.VISITOR_MESSAGE_
     ) : VisitorMessageItem()
 
     data class Unsent(
-        override val id: String,
-        override val timestamp: Long,
+        override val id: String = "",
+        override val timestamp: Long = System.currentTimeMillis(),
         override val message: String
     ) : VisitorMessageItem()
 

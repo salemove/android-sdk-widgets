@@ -33,18 +33,8 @@ internal class GliaLoadHistoryUseCase(
 
     private fun loadHistoryAndMapOperator(): Single<MutableList<ChatMessageInternal>> = loadHistory()
         .flatMapPublisher { Flowable.fromArray(*it) }
-        .concatMapSingle { mapOperatorUseCase(chatMessage = it, isHistory = true) }
+        .concatMapSingle { mapOperatorUseCase(chatMessage = it) }
         .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
-        .map { markLastItem(it) }
-
-    private fun markLastItem(mutableList: MutableList<ChatMessageInternal>): MutableList<ChatMessageInternal> {
-        if (mutableList.isNotEmpty()) {
-            val lastItem = mutableList.removeLast()
-            mutableList.add(lastItem.copy(isLatest = true))
-        }
-
-        return mutableList
-    }
 
     private fun loadHistory() = Single.create { emitter ->
         loadHistory { messages, error ->

@@ -7,9 +7,8 @@ import static org.mockito.Mockito.mock;
 
 import androidx.core.util.Consumer;
 
-import com.glia.androidsdk.Operator;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
-import com.glia.widgets.core.model.TestOperator;
+import com.glia.widgets.core.engagement.data.LocalOperator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,13 +19,13 @@ import java.util.Optional;
 public class GetOperatorUseCaseTest {
     private GliaOperatorRepository gliaOperatorRepository;
     private GetOperatorUseCase getOperatorUseCase;
-    private Operator operator;
+    private LocalOperator operator;
 
     @Before
     public void setUp() throws Exception {
         gliaOperatorRepository = mock(GliaOperatorRepository.class);
         getOperatorUseCase = new GetOperatorUseCase(gliaOperatorRepository);
-        operator = TestOperator.DEFAULT;
+        operator = new LocalOperator("id", "name", "imageUrl");
     }
 
     @Test
@@ -47,9 +46,9 @@ public class GetOperatorUseCaseTest {
                 .assertResult(Optional.empty());
     }
 
-    private void stubGetOperatorResponse(Operator operator) {
+    private void stubGetOperatorResponse(LocalOperator operator) {
         doAnswer(invocation -> {
-            Consumer<Operator> callback = invocation.getArgument(1);
+            Consumer<LocalOperator> callback = invocation.getArgument(1);
             callback.accept(operator);
             return callback;
         }).when(gliaOperatorRepository).getOperatorById(anyString(), any());

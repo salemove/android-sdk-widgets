@@ -187,14 +187,11 @@ internal class ApplicationChatHeadLayoutController(
         state = State.ENGAGEMENT
         engagementDisposables.add(
             getOperatorFlowableUseCase.execute()
-                .subscribe(
-                    { operator: Operator -> operatorDataLoaded(operator) }
-                ) { throwable: Throwable ->
-                    Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.message)
-                }
+                .subscribe({ operatorDataLoaded(it) }) { Logger.e(TAG, "getOperatorFlowableUseCase error: " + it.message) }
         )
         updateChatHeadView()
     }
+
     override fun newEngagementLoaded(engagement: OmnibrowseEngagement) {
         onNewEngagementLoaded()
     }

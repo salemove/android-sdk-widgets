@@ -1,10 +1,9 @@
 package com.glia.widgets.core.engagement.domain
 
-import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.Chat
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.OperatorMessage
-import com.glia.widgets.core.model.TestOperator
+import com.glia.widgets.core.engagement.data.LocalOperator
 import io.reactivex.Single
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -17,14 +16,14 @@ import kotlin.properties.Delegates
 
 class MapOperatorUseCaseTest {
     private var mapOperatorUseCase: MapOperatorUseCase by Delegates.notNull()
-    var getOperatorUseCase: GetOperatorUseCase by Delegates.notNull()
-    var operator: Operator by Delegates.notNull()
+    private var getOperatorUseCase: GetOperatorUseCase by Delegates.notNull()
+    private var operator: LocalOperator by Delegates.notNull()
 
     @Before
     fun setUp() {
         getOperatorUseCase = mock()
         mapOperatorUseCase = MapOperatorUseCase(getOperatorUseCase)
-        operator = TestOperator.DEFAULT
+        operator = LocalOperator("id", "name", "imageUrl")
     }
 
     @Test

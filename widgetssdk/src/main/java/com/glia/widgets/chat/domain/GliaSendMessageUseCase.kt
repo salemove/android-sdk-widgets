@@ -1,9 +1,7 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.FilesAttachment
-import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
@@ -24,7 +22,6 @@ class GliaSendMessageUseCase(
 ) {
     interface Listener {
         fun messageSent(message: VisitorMessage?)
-        fun onCardMessageUpdated(message: ChatMessage)
         fun onMessageValidated()
         fun errorOperatorNotOnline(message: String)
         fun error(ex: GliaException)
@@ -91,36 +88,6 @@ class GliaSendMessageUseCase(
 
     fun execute(singleChoiceAttachment: SingleChoiceAttachment?, listener: Listener?) {
         chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
-    }
-
-    fun execute(chatMessage: ChatMessage?, text: String, value: String, listener: Listener?) {
-        val attachment = SingleChoiceAttachment.from(value, text)
-        chatRepository.sendResponse(attachment) { result: VisitorMessage?, ex: GliaException? ->
-            listener?.let {
-                if (ex != null) {
-                    listener.error(ex)
-                }
-                if (result != null) {
-                    listener.messageSent(result)
-
-                    chatMessage?.let {
-                        it as? OperatorMessage
-                    }?.let {
-                        listener.onCardMessageUpdated(
-                            ChatMessage(
-                                it.id,
-                                it.content,
-                                it.timestamp,
-                                ChatMessage.Sender(it.senderType, it.operatorHref, it.operatorId),
-                                it.deliveredAt,
-                                attachment,
-                                it.metadata
-                            )
-                        )
-                    }
-                }
-            }
-        }
     }
 
     private val isOperatorOnline: Boolean

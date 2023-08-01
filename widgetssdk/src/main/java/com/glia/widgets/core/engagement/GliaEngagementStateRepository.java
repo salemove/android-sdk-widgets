@@ -17,23 +17,21 @@ import io.reactivex.processors.BehaviorProcessor;
 public class GliaEngagementStateRepository {
     private final EngagementStateEventVisitor<Operator> visitor = new EngagementStateEventVisitor.OperatorVisitor();
     private final BehaviorProcessor<Optional<Operator>> operatorProcessor =
-            BehaviorProcessor.createDefault(Optional.empty());
+        BehaviorProcessor.createDefault(Optional.empty());
     private final Flowable<Operator> operatorFlowable =
-            operatorProcessor
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .onBackpressureLatest();
+        operatorProcessor
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .onBackpressureLatest();
 
     private final BehaviorProcessor<Optional<EngagementState>> engagementStateProcessor = BehaviorProcessor.createDefault(Optional.empty());
 
     private final BehaviorProcessor<EngagementStateEvent> engagementStateEventProcessor = BehaviorProcessor.createDefault(
-            new EngagementStateEvent.EngagementEndedEvent()
+        new EngagementStateEvent.EngagementEndedEvent()
     );
     private final Flowable<EngagementStateEvent> engagementStateEventFlowable = engagementStateEventProcessor.onBackpressureLatest();
-
-    private CompositeDisposable disposable = new CompositeDisposable();
-
     private final GliaOperatorRepository operatorRepository;
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     public GliaEngagementStateRepository(GliaOperatorRepository operatorRepository) {
         this.operatorRepository = operatorRepository;
@@ -42,14 +40,16 @@ public class GliaEngagementStateRepository {
     public void onEngagementStarted(Engagement engagement) {
         disposable = new CompositeDisposable();
         disposable.add(
-                engagementStateProcessor
-                        .onBackpressureLatest()
-                        .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
-                        .doOnNext(this::notifyEngagementStateEventUpdate)
-                        .doOnNext(this::updateOperatorOnEngagementStateChanged)
-                        .subscribe()
+            engagementStateProcessor
+                .onBackpressureLatest()
+                .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
+                .doOnNext(this::notifyEngagementStateEventUpdate)
+                .doOnNext(this::updateOperatorOnEngagementStateChanged)
+                .subscribe()
         );
-        engagement.on(Engagement.Events.STATE_UPDATE, this::notifyEngagementStateUpdate);
+        engagement.on(Engagement.Events.STATE_UPDATE, engagementState -> {
+            notifyEngagementStateUpdate(engagementState);
+        });
         engagement.on(Engagement.Events.END, () -> onEngagementEnded(engagement));
     }
 
@@ -75,7 +75,7 @@ public class GliaEngagementStateRepository {
 
     private void notifyOperatorUpdate(Operator operator) {
         if (operator != null) {
-            operatorRepository.addOrUpdateOperator(operator);
+            operatorRepository.emit(operator);
         }
         operatorProcessor.onNext(Optional.ofNullable(operator));
     }
@@ -91,13 +91,13 @@ public class GliaEngagementStateRepository {
     private @Nullable
     Operator getOperator() {
         return operatorProcessor
-                .getValue()
-                .orElse(null);
+            .getValue()
+            .orElse(null);
     }
 
     private EngagementStateEvent mapToEngagementStateChangeEvent(
-            EngagementState engagementState,
-            @Nullable Operator operator
+        EngagementState engagementState,
+        @Nullable Operator operator
     ) {
         if (engagementState == null) {
             return new EngagementStateEvent.EngagementEndedEvent();

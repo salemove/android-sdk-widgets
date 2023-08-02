@@ -380,8 +380,7 @@ class MainFragment : Fragment() {
             createDefaultConfig(
                 context = requireActivity().applicationContext,
                 /*uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalGlobalColors(requireContext()),*/
-                /*runtimeConfig = createSampleRuntimeConfig(),*/
-                /*region = "us"*/
+                /*runtimeConfig = createSampleRuntimeConfig()*/
             )
         )
         prepareAuthentication()

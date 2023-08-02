@@ -169,7 +169,7 @@ object Dialogs {
                 text = negativeButtonText
                 setOnClickListener(negativeButtonClickListener)
                 applyButtonTheme(
-                    backgroundColor = systemNegativeColor,
+                    backgroundColor = if (isButtonsColorsReversed) { brandPrimaryColor } else { systemNegativeColor },
                     textColor = baseLightColor,
                     textFont = fontFamily
                 )
@@ -179,7 +179,7 @@ object Dialogs {
                 text = positiveButtonText
                 setOnClickListener(positiveButtonClickListener)
                 applyButtonTheme(
-                    backgroundColor = brandPrimaryColor,
+                    backgroundColor = if (isButtonsColorsReversed) { systemNegativeColor } else { brandPrimaryColor },
                     textColor = baseLightColor,
                     textFont = fontFamily
                 )

@@ -1,8 +1,14 @@
 package com.glia.widgets.chat.adapter.holder
 
+import android.os.Bundle
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.GvaButtonsAdapter
@@ -37,6 +43,18 @@ internal class GvaGalleryItemViewHolder(
     }
 
     init {
+        ViewCompat.setAccessibilityDelegate(
+            binding.root,
+            object : AccessibilityDelegateCompat() {
+                override fun performAccessibilityAction(host: View, action: Int, args: Bundle?): Boolean {
+                    if (action == AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS) {
+                        // Sends an accessibility event of accessibility focus type.
+                        host.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
+                    }
+                    return super.performAccessibilityAction(host, action, args)
+                }
+            }
+        )
         adapter = GvaButtonsAdapter(buttonsClickListener, uiTheme, galleryCardTheme?.button)
         binding.buttonsRecyclerView.adapter = adapter
         binding.item.apply {
@@ -74,7 +92,19 @@ internal class GvaGalleryItemViewHolder(
         galleryCardTheme?.image?.also(binding.image::applyLayerTheme)
     }
 
-    fun bind(card: GvaGalleryCard) {
+    fun bindForMeasure(card: GvaGalleryCard) {
+        bindTexts(card)
+        bindButtons(card)
+    }
+
+    fun bind(card: GvaGalleryCard, position: Int, size: Int) {
+        bindTexts(card)
+        bindButtons(card)
+        bindImage(card)
+        updateContendDescription(card, position, size)
+    }
+
+    private fun bindTexts(card: GvaGalleryCard) {
         binding.title.text = card.title.fromHtml()
 
         card.subtitle?.let {
@@ -83,17 +113,32 @@ internal class GvaGalleryItemViewHolder(
         } ?: run {
             binding.subtitle.isVisible = false
         }
+    }
 
+    private fun bindButtons(card: GvaGalleryCard) {
         adapter.setOptions(card.options)
         binding.buttonsRecyclerView.isVisible = card.options.isEmpty().not()
     }
 
-    fun bindImage(card: GvaGalleryCard) {
+    private fun bindImage(card: GvaGalleryCard) {
         card.imageUrl?.let {
             binding.image.load(it)
             binding.image.isVisible = true
         } ?: run {
             binding.image.isVisible = false
         }
+    }
+
+    private fun updateContendDescription(card: GvaGalleryCard, position: Int, size: Int) {
+        val cardContentDescription = listOf(card.title, card.subtitle)
+            .filter { it?.isNotEmpty() ?: false }
+            .joinToString(separator = ". ")
+
+        itemView.contentDescription = itemView.resources.getString(
+            R.string.gva_gallery_card_message_content_description,
+            cardContentDescription,
+            position + 1,
+            size
+        )
     }
 }

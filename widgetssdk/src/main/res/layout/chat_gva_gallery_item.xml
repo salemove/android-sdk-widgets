@@ -38,7 +38,8 @@
             android:textAppearance="?attr/textAppearanceHeadline3"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textIsSelectable="true"
-            android:textColorLink="?attr/gliaBaseDarkColor"/>
+            android:textColorLink="?attr/gliaBaseDarkColor"
+            android:importantForAccessibility="no" />
 
         <TextView
             android:id="@+id/subtitle"
@@ -50,7 +51,8 @@
             android:textAppearance="?attr/textAppearanceBody1"
             android:textColor="?attr/gliaBaseDarkColor"
             android:textIsSelectable="true"
-            android:textColorLink="?attr/gliaBaseDarkColor" />
+            android:textColorLink="?attr/gliaBaseDarkColor"
+            android:importantForAccessibility="no" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/buttons_recycler_view"

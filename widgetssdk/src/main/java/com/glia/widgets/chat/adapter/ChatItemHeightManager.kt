@@ -46,7 +46,7 @@ internal class ChatItemHeightManager(
     }
 
     private fun measureHeight(gvaGalleryCard: GvaGalleryCard): Int {
-        gvaGalleryItemViewHolder.bind(gvaGalleryCard)
+        gvaGalleryItemViewHolder.bindForMeasure(gvaGalleryCard)
         gvaGalleryItemViewHolder.itemView.measure(
             View.MeasureSpec.makeMeasureSpec(gvaGalleryCardWidth, View.MeasureSpec.AT_MOST),
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)

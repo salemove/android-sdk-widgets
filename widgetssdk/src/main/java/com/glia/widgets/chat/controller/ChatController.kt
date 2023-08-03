@@ -675,6 +675,7 @@ internal class ChatController(
 
             EngagementStateEvent.Type.ENGAGEMENT_ENDED -> {
                 Logger.d(TAG, "Engagement Ended")
+                dialogController.dismissDialogs()
             }
         }
     }

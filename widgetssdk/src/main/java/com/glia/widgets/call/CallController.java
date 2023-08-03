@@ -231,6 +231,7 @@ public class CallController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEndedByOperator");
         stop();
+        dialogController.dismissDialogs();
     }
 
     @Override

@@ -260,5 +260,6 @@
 
     <!--    GVA -->
     <string name="gva_not_supported">This action is not currently supported on mobile.</string>
+    <string name="gva_gallery_card_message_content_description">%1$s \n Card: %2$d of %3$d.</string><!--does not synchronized yet-->
 
 </resources>

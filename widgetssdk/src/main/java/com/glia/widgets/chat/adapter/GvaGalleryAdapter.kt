@@ -28,9 +28,10 @@ internal class GvaGalleryAdapter(
     )
 
     override fun onBindViewHolder(holder: GvaGalleryItemViewHolder, position: Int) {
-        galleryCards?.get(position)?.let {
-            holder.bind(it)
-            holder.bindImage(it)
+        galleryCards?.apply {
+            getOrNull(position)?.let {
+                holder.bind(it, position, size)
+            }
         }
     }
 }

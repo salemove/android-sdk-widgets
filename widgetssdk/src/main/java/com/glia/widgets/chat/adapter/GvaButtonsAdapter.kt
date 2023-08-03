@@ -30,6 +30,7 @@ internal class GvaButtonsAdapter(
         private val buttonView: MaterialButton
     ) : RecyclerView.ViewHolder(buttonView) {
         fun bind(button: GvaButton, buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener) {
+            buttonView.contentDescription = button.text
             buttonView.text = button.text
             buttonView.setOnClickListener {
                 buttonsClickListener.onGvaButtonClicked(button)

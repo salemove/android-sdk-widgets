@@ -117,7 +117,7 @@ public class GliaWidgets {
     public static final String CHAT_TYPE = "chat_type";
 
     @Nullable
-    private static CustomCardAdapter customCardAdapter;
+    private static CustomCardAdapter customCardAdapter = new WebViewCardAdapter();
 
     /**
      * Should be called when the application is starting in {@link Application}.onCreate()
@@ -274,8 +274,12 @@ public class GliaWidgets {
 
     /**
      * Allows configuring custom response cards based on metadata.
+     * <p>
+     * Glia SDK uses {@link WebViewCardAdapter} by default.
+     * This method allows setting the custom implementation of {@link CustomCardAdapter}.
      *
-     * @param customCardAdapter an instance of {@link CustomCardAdapter}.
+     * @param customCardAdapter an instance of {@link CustomCardAdapter}
+     *                          or {@code null} for the default, not Custom Card, Glia message implementation.
      * @see CustomCardAdapter
      * @see WebViewCardAdapter
      */

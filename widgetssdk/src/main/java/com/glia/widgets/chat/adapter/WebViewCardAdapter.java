@@ -7,20 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
 import com.glia.widgets.chat.adapter.holder.WebViewViewHolder;
 
 /**
  * The implementation of {@link CustomCardAdapter} allows displaying all card messages in WebViews.
- * <p>
- * It provides a simple way to set up {@link GliaWidgets#setCustomCardAdapter(CustomCardAdapter)}.
- * <p>
- * <b>Usage example:</b>
- * <pre>{@code
- * GliaWidgets.setCustomCardAdapter(new WebViewCardAdapter());
- * }<pre/>
  * @see CustomCardAdapter
  * @see WebViewViewHolder
  */

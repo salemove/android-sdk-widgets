@@ -24,13 +24,13 @@ object GliaWidgetsConfigManager {
     private const val QUEUE_ID_KEY = "queue_id"
     private const val VISITOR_CONTEXT_ASSET_ID_KEY = "visitor_context_asset_id"
     private const val REGION_KEY = "environment"
-    private const val REGION_BETA = "beta"
     private const val REGION_ACCEPTANCE = "acceptance"
     private const val BASE_DOMAIN = "base_domain"
     private const val DEFAULT_BASE_DOMAIN = "at.samo.io"
 
     @JvmStatic
     fun obtainConfigFromDeepLink(data: Uri, applicationContext: Context): GliaWidgetsConfig {
+        saveRegionIfPresent(data, applicationContext)
         saveQueueIdToPrefs(data, applicationContext)
         saveVisitorContextAssetIdIfPresent(data, applicationContext)
         saveSiteIdToPrefs(data, applicationContext)
@@ -51,6 +51,15 @@ object GliaWidgetsConfigManager {
             region = region,
             baseDomain = baseDomain
         )
+    }
+
+    private fun saveRegionIfPresent(data: Uri, applicationContext: Context) {
+        val visitorContextAssetId = data.getQueryParameter(REGION_KEY) ?: return
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        sharedPreferences.edit().putString(
+            applicationContext.getString(R.string.pref_environment),
+            visitorContextAssetId
+        ).apply()
     }
 
     private fun saveVisitorContextAssetIdIfPresent(data: Uri, applicationContext: Context) {
@@ -95,10 +104,14 @@ object GliaWidgetsConfigManager {
         context: Context,
         uiJsonRemoteConfig: String? = null,
         runtimeConfig: UiTheme? = null,
-        region: String = REGION_BETA,
+        region: String? = null,
         baseDomain: String = DEFAULT_BASE_DOMAIN,
         preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     ): GliaWidgetsConfig {
+        val siteRegion = region ?: preferences.getString(
+            context.getString(R.string.pref_environment),
+            context.getString(R.string.environment)
+        )
         val apiKeyId = preferences.getString(
             context.getString(R.string.pref_api_key_id),
             context.getString(R.string.glia_api_key_id)
@@ -128,7 +141,7 @@ object GliaWidgetsConfigManager {
         return GliaWidgetsConfig.Builder()
             .setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret!!))
             .setSiteId(siteId)
-            .setRegion(region)
+            .setRegion(siteRegion)
             .setBaseDomain(baseDomain)
             .setCompanyName(companyName)
             .setUseOverlay(useOverlay)

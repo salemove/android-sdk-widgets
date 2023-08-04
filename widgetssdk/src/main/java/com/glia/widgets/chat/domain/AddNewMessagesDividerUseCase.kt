@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.NewMessagesItem
+import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.NewMessagesDividerItem
 
 internal class AddNewMessagesDividerUseCase(
     private val findNewMessagesDividerIndexUseCase: FindNewMessagesDividerIndexUseCase
@@ -10,7 +10,7 @@ internal class AddNewMessagesDividerUseCase(
         val index = findNewMessagesDividerIndexUseCase(messages, unreadMessagesCount)
 
         if (index != NOT_PROVIDED) {
-            messages.add(index, NewMessagesItem)
+            messages.add(index, NewMessagesDividerItem)
             return true
         }
 

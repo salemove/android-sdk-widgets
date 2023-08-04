@@ -27,7 +27,7 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
 
     public void init() {
         Logger.d(TAG, "init");
-        gliaOnMessageUseCase.execute().doOnNext(this::onMessage).subscribe();
+        gliaOnMessageUseCase.invoke().doOnNext(this::onMessage).subscribe();
         gliaOnEngagementEndUseCase.execute(this);
     }
 

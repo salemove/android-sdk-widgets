@@ -152,6 +152,13 @@
         <item name="gliaBotActionButtonSelectedBackgroundColor">?attr/gliaBrandPrimaryColor</item>
         <item name="gliaBotActionButtonSelectedTextColor">?attr/gliaBaseShadeColor</item>
 
+        <!--        GVA-->
+        <item name="gvaOptionButtonStyle">@style/Application.Glia.Chat.Button.Gva</item>
+        <item name="gvaQuickReplyButtonStyle">@style/Application.Glia.Chat.GvaChip</item>
+        <item name="gvaQuickReplyBackgroundColor">@android:color/transparent</item>
+        <item name="gvaQuickReplyStrokeColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gvaQuickReplyTextColor">?attr/gliaBrandPrimaryColor</item>
+
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
@@ -174,6 +181,8 @@
 
         <item name="gliaAlertDialogButtonUseVerticalAlignment">false</item>
         <item name="whiteLabel">false</item>
+
+        <item name="chipStyle">?attr/gvaQuickReplyButtonStyle</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

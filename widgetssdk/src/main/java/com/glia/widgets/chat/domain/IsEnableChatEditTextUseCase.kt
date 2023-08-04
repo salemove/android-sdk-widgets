@@ -1,13 +1,13 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.widgets.chat.adapter.ChatAdapter
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.ResponseCardItem
+import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.OperatorMessageItem
 
-class IsEnableChatEditTextUseCase {
+internal class IsEnableChatEditTextUseCase {
 
     // should enable only if there is no unselected choice-card last
     operator fun invoke(items: List<ChatItem>?): Boolean = items?.lastOrNull()?.let {
-        it.viewType != ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE || it !is ResponseCardItem
+        it.viewType != ChatAdapter.OPERATOR_MESSAGE_VIEW_TYPE || it !is OperatorMessageItem.ResponseCard
     } ?: true
 }

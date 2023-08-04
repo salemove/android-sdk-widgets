@@ -339,7 +339,17 @@ data class UiTheme(
     @get:Deprecated("Replaced by Unified Ui")
     val chatHeadConfiguration: ChatHeadConfiguration? = null,
     @get:Deprecated("Replaced by Unified Ui")
-    val surveyStyle: SurveyStyle? = null
+    val surveyStyle: SurveyStyle? = null,
+
+    //    GVA
+    @ColorRes
+    val gvaQuickReplyBackgroundColor: Int? = null,
+
+    @ColorRes
+    val gvaQuickReplyStrokeColor: Int? = null,
+
+    @ColorRes
+    val gvaQuickReplyTextColor: Int? = null
 
 ) : Parcelable {
 
@@ -404,7 +414,10 @@ data class UiTheme(
         gliaChatStartedHeadingTextColor = builder.chatStartedHeadingTextColor,
         gliaChoiceCardContentTextConfiguration = builder.choiceCardContentTextConfiguration,
         chatHeadConfiguration = builder.chatHeadConfiguration,
-        surveyStyle = builder.surveyStyle
+        surveyStyle = builder.surveyStyle,
+        gvaQuickReplyBackgroundColor = builder.gvaQuickReplyBackgroundColor,
+        gvaQuickReplyStrokeColor = builder.gvaQuickReplyStrokeColor,
+        gvaQuickReplyTextColor = builder.gvaQuickReplyTextColor
     )
 
     class UiThemeBuilder {
@@ -783,6 +796,19 @@ data class UiTheme(
         var surveyStyle: SurveyStyle? = SurveyStyle.Builder().build()
             private set
 
+        //    GVA
+        @ColorRes
+        var gvaQuickReplyBackgroundColor: Int? = null
+            private set
+
+        @ColorRes
+        var gvaQuickReplyStrokeColor: Int? = null
+            private set
+
+        @ColorRes
+        var gvaQuickReplyTextColor: Int? = null
+            private set
+
         fun setAppBarTitle(appBarTitle: String?) {
             this.appBarTitle = appBarTitle
         }
@@ -1023,6 +1049,19 @@ data class UiTheme(
             this.surveyStyle = surveyStyle
         }
 
+
+        fun setGvaQuickReplyBackgroundColor(@ColorRes gvaQuickReplyBackgroundColor: Int?) {
+            this.gvaQuickReplyBackgroundColor = gvaQuickReplyBackgroundColor
+        }
+
+        fun setGvaQuickReplyStrokeColor(@ColorRes gvaQuickReplyStrokeColor: Int?) {
+            this.gvaQuickReplyStrokeColor = gvaQuickReplyStrokeColor
+        }
+
+        fun setGvaQuickReplyTextColor(@ColorRes gvaQuickReplyTextColor: Int?) {
+            this.gvaQuickReplyTextColor = gvaQuickReplyTextColor
+        }
+
         fun setTheme(theme: UiTheme) {
             appBarTitle = theme.appBarTitle
             brandPrimaryColor = theme.brandPrimaryColor
@@ -1080,6 +1119,9 @@ data class UiTheme(
             choiceCardContentTextConfiguration = theme.gliaChoiceCardContentTextConfiguration
             chatHeadConfiguration = theme.chatHeadConfiguration
             surveyStyle = theme.surveyStyle
+            gvaQuickReplyBackgroundColor = theme.gvaQuickReplyBackgroundColor
+            gvaQuickReplyStrokeColor = theme.gvaQuickReplyStrokeColor
+            gvaQuickReplyTextColor = theme.gvaQuickReplyTextColor
         }
 
         fun build(): UiTheme {

@@ -3,99 +3,96 @@ apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
-    defaultPublishConfig "debug"
-    defaultConfig {
-        minSdkVersion 24
-        targetSdkVersion 31
-        versionCode widgetsVersionCode
-        versionName widgetsVersionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
+  compileSdkVersion 31
+  buildToolsVersion "30.0.3"
+  defaultPublishConfig "debug"
+  defaultConfig {
+    minSdkVersion 24
+    targetSdkVersion 31
+    versionCode widgetsVersionCode
+    versionName widgetsVersionName
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles "consumer-rules.pro"
+  }
 
-    buildTypes {
-        all {
-            buildConfigField("String", "GLIA_CORE_SDK_VERSION", "\"$gliaSdkVersion\"")
-            buildConfigField("String", "GLIA_WIDGETS_SDK_VERSION", "\"$defaultConfig.versionName\"")
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+  buildTypes {
+    all {
+      buildConfigField("String", "GLIA_CORE_SDK_VERSION", "\"$gliaSdkVersion\"")
+      buildConfigField("String", "GLIA_WIDGETS_SDK_VERSION", "\"$defaultConfig.versionName\"")
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    lint {
-        disable 'WrongLayoutName',
-                'LayoutFileNameMatchesClass',
-                'MatchingViewId',
-                'RawDimen',
-                'WrongAnnotationOrder',
-                'ColorCasing',
-                'WrongViewIdFormat',
-                'HardcodedText'
-    }
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+  kotlinOptions {
+    jvmTarget = "11"
+  }
+  lint {
+    disable 'WrongLayoutName',
+      'LayoutFileNameMatchesClass',
+      'MatchingViewId',
+      'RawDimen',
+      'WrongAnnotationOrder',
+      'ColorCasing',
+      'WrongViewIdFormat',
+      'HardcodedText'
+  }
 
-    buildFeatures {
-        viewBinding true
-        buildConfig true
-    }
-    namespace 'com.glia.widgets'
+  buildFeatures {
+    viewBinding true
+    buildConfig true
+  }
+  namespace 'com.glia.widgets'
 }
 
 dependencies {
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_process"
-    implementation "com.squareup.picasso:picasso:$picassoVersion"
+  implementation "androidx.appcompat:appcompat:$appCompatVersion"
+  implementation "com.google.android.material:material:$materialVersion"
+  implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+  implementation "androidx.lifecycle:lifecycle-process:$lifecycle_process"
+  implementation "com.squareup.picasso:picasso:$picassoVersion"
 
-    // Used for audio and video permissions by CallActivity
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
-    implementation "io.reactivex.rxjava2:rxjava:$rxJava"
+  // Used for audio and video permissions by CallActivity
+  implementation "io.reactivex.rxjava2:rxandroid:$rxAndroid"
+  implementation "io.reactivex.rxjava2:rxjava:$rxJava"
 
-    // removed because becomes slow on Android 11. They say it is fixed, but I still have the issue.
-    // https://square.github.io/leakcanary/changelog/
-    // debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
-
-    api "com.glia:android-sdk:$gliaSdkVersion"
-    // Glia sdk aar
-    // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
+  api "com.glia:android-sdk:$gliaSdkVersion"
+  // Glia sdk aar
+  // implementation(name: "glia-core-sdk-$gliaSdkVersion", ext: 'aar')
 //    api "com.glia:android-sdk:0.26.6-SNAPSHOT" // Used when testing local Core SDK snapshot releases
 
-    implementation "com.twilio:audioswitch:$audioswitch"
-    implementation "com.airbnb.android:lottie:$lottieVersion"
-    implementation "com.google.code.gson:gson:$gson"
-    implementation "androidx.core:core-ktx:$coreKtxVersion"
+  implementation "com.twilio:audioswitch:$audioswitch"
+  implementation "com.airbnb.android:lottie:$lottieVersion"
+  implementation "com.google.code.gson:gson:$gson"
+  implementation "androidx.core:core-ktx:$coreKtxVersion"
 
-    testImplementation "junit:junit:$junitVersion"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
-    androidTestImplementation "org.mockito:mockito-android:$mockitoAndroidTestVersion"
-    androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "androidx.test:rules:$testRulesVersion"
+  testImplementation "junit:junit:$junitVersion"
+  testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
+  testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+  testImplementation "org.robolectric:robolectric:$robolectricVersion"
+  androidTestImplementation "org.mockito:mockito-android:$mockitoAndroidTestVersion"
+  androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
+  androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+  androidTestImplementation "androidx.test:rules:$testRulesVersion"
 
-    // Test dependencies to Android native libraries
-    // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
-    testImplementation "org.json:json:20220924"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+  // Test dependencies to Android native libraries
+  // To prevent unit tests firing errors like 'Method length in org.json.JSONObject not mocked'
+  testImplementation "org.json:json:20220924"
+  implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 ext {
-    PUBLISH_GROUP_ID = 'com.glia'
-    PUBLISH_VERSION = android.defaultConfig.versionName
-    PUBLISH_ARTIFACT_ID = 'android-widgets'
-    PUBLISH_MODULE_DESCRIPTION = 'Glia Android Widgets SDK'
-    PUBLISH_ORGANISATION_NAME = 'Glia'
-    PUBLISH_ORGANISATION_URL = 'https://www.glia.com/'
+  PUBLISH_GROUP_ID = 'com.glia'
+  PUBLISH_VERSION = android.defaultConfig.versionName
+  PUBLISH_ARTIFACT_ID = 'android-widgets'
+  PUBLISH_MODULE_DESCRIPTION = 'Glia Android Widgets SDK'
+  PUBLISH_ORGANISATION_NAME = 'Glia'
+  PUBLISH_ORGANISATION_URL = 'https://www.glia.com/'
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

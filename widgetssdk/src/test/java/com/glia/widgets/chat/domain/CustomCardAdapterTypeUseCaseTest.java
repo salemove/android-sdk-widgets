@@ -32,7 +32,7 @@ public class CustomCardAdapterTypeUseCaseTest {
         CustomCardAdapterTypeUseCase useCase = new CustomCardAdapterTypeUseCase(null);
         ChatMessage message = mock(ChatMessage.class);
 
-        Integer result = useCase.execute(message);
+        Integer result = useCase.invoke(message);
 
         assertNull(result);
     }
@@ -41,7 +41,7 @@ public class CustomCardAdapterTypeUseCaseTest {
     public void execute_returnsNull_whenMetadataIsNull() {
         ChatMessage message = mock(ChatMessage.class);
 
-        Integer result = useCase.execute(message);
+        Integer result = useCase.invoke(message);
 
         assertNull(result);
     }
@@ -52,7 +52,7 @@ public class CustomCardAdapterTypeUseCaseTest {
         JSONObject metadata = new JSONObject();
         when(message.getMetadata()).thenReturn(metadata);
 
-        Integer result = useCase.execute(message);
+        Integer result = useCase.invoke(message);
 
         assertNull(result);
     }
@@ -64,7 +64,7 @@ public class CustomCardAdapterTypeUseCaseTest {
         when(message.getMetadata()).thenReturn(metadata);
         when(customCardAdapter.getChatAdapterViewType(message)).thenReturn(VIEW_TYPE);
 
-        Integer result = useCase.execute(message);
+        Integer result = useCase.invoke(message);
 
         assertEquals(VIEW_TYPE, result);
     }

@@ -1,7 +1,7 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.NewMessagesItem
+import com.glia.widgets.chat.model.ChatItem
+import com.glia.widgets.chat.model.NewMessagesDividerItem
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -27,7 +27,7 @@ class AddNewMessagesDividerUseCaseTest {
         val items: MutableList<ChatItem> = mutableListOf()
         val added = useCase(items, 10)
         assertFalse(added)
-        assertFalse(items.contains(NewMessagesItem))
+        assertFalse(items.contains(NewMessagesDividerItem))
     }
 
     @Test
@@ -36,7 +36,7 @@ class AddNewMessagesDividerUseCaseTest {
         val items: MutableList<ChatItem> = mutableListOf()
         val added = useCase(items, 10)
         assertTrue(added)
-        assertTrue(items.contains(NewMessagesItem))
+        assertTrue(items.contains(NewMessagesDividerItem))
     }
 
     @Test
@@ -45,6 +45,6 @@ class AddNewMessagesDividerUseCaseTest {
         val items: MutableList<ChatItem> = mutableListOf(mock(), mock())
         val added = useCase(items, 10)
         assertTrue(added)
-        assertTrue(items.contains(NewMessagesItem))
+        assertTrue(items.contains(NewMessagesDividerItem))
     }
 }

@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.OperatorStatusItem
+import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
@@ -72,16 +72,14 @@ internal class OperatorStatusViewHolder(
 
     fun bind(item: OperatorStatusItem) {
         chatStartingHeadingView.text = item.companyName
-        when (item.status) {
-            OperatorStatusItem.Status.IN_QUEUE -> applyInQueueState(item.companyName)
-            OperatorStatusItem.Status.OPERATOR_CONNECTED -> applyConnectedState(
-                item.operatorName,
-                item.profileImgUrl
-            )
-            OperatorStatusItem.Status.JOINED -> applyJoinedState(item.operatorName)
-            OperatorStatusItem.Status.TRANSFERRING -> applyTransferringState()
+        when (item) {
+            is OperatorStatusItem.Connected -> applyConnectedState(item.operatorName, item.profileImgUrl)
+            is OperatorStatusItem.InQueue -> applyInQueueState(item.companyName)
+            is OperatorStatusItem.Joined -> applyConnectedState(item.operatorName, item.profileImgUrl)
+            is OperatorStatusItem.Transferring -> applyTransferringState()
         }
-        statusPictureView.isVisible = isShowStatusPictureView(item.status)
+
+        statusPictureView.isVisible = isShowStatusPictureView(item)
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
     }
 
@@ -164,10 +162,10 @@ internal class OperatorStatusViewHolder(
         }
     }
 
-    private fun isShowStatusPictureView(status: OperatorStatusItem.Status) =
-        status != OperatorStatusItem.Status.JOINED
+    private fun isShowStatusPictureView(item: OperatorStatusItem): Boolean = item !is OperatorStatusItem.Joined
 
-    private fun isShowStatusViewRippleAnimation(item: OperatorStatusItem) = item.status.let {
-        it == OperatorStatusItem.Status.IN_QUEUE || it == OperatorStatusItem.Status.TRANSFERRING
+    private fun isShowStatusViewRippleAnimation(item: OperatorStatusItem): Boolean = when (item) {
+        is OperatorStatusItem.InQueue, is OperatorStatusItem.Transferring -> true
+        else -> false
     }
 }

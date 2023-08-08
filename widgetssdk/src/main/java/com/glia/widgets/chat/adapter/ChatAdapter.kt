@@ -178,6 +178,7 @@ internal class ChatAdapter(
                         operatorMessageBinding.contentLayout,
                         true
                     ),
+                    onGvaButtonsClickListener,
                     uiTheme
                 )
             }
@@ -249,7 +250,7 @@ internal class ChatAdapter(
 
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
-            is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem, onGvaButtonsClickListener)
+            is GvaPersistentButtons -> (holder as GvaPersistentButtonsViewHolder).bind(chatItem)
             is GvaGalleryCards -> (holder as GvaGalleryViewHolder).bind(chatItem, chatItemHeightManager.getMeasuredHeight(chatItem))
             is CustomCardChatItem -> {
                 (holder as CustomCardViewHolder).bind(chatItem.message) { text: String, value: String ->

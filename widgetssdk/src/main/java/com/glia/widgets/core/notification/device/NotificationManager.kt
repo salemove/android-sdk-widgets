@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.glia.widgets.R
 import com.glia.widgets.core.notification.NotificationFactory
+import com.glia.widgets.core.notification.NotificationRemovalService
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.core.screensharing.MediaProjectionService
 
@@ -60,6 +61,7 @@ internal class NotificationManager(private val applicationContext: Application) 
                 NotificationFactory.CALL_NOTIFICATION_ID,
                 NotificationFactory.createAudioCallNotification(applicationContext)
             )
+            startNotificationRemovalService()
         }
     }
 
@@ -69,11 +71,21 @@ internal class NotificationManager(private val applicationContext: Application) 
                 NotificationFactory.CALL_NOTIFICATION_ID,
                 NotificationFactory.createVideoCallNotification(applicationContext, isTwoWayVideo, hasAudio)
             )
+            startNotificationRemovalService()
         }
+    }
+
+    private fun startNotificationRemovalService() {
+        applicationContext.startService(
+            Intent(applicationContext, NotificationRemovalService::class.java)
+        )
     }
 
     override fun removeCallNotification() {
         notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID)
+        applicationContext.stopService(
+            Intent(applicationContext, NotificationRemovalService::class.java)
+        )
     }
 
     /**

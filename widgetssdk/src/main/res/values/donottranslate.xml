@@ -2,4 +2,13 @@
 <resources>
     <string name="glia_outlined_options_icon_content_description">Outlined options icon description</string>
     <string name="glia_file_preview_transition_name">image_preview_transition</string>
+
+    <!-- Survey -->
+    <string name="glia_survey_scale_item_1" translatable="false">1</string>
+    <string name="glia_survey_scale_item_2" translatable="false">2</string>
+    <string name="glia_survey_scale_item_3" translatable="false">3</string>
+    <string name="glia_survey_scale_item_4" translatable="false">4</string>
+    <string name="glia_survey_scale_item_5" translatable="false">5</string>
+    <string name="glia_survey_require_label" translatable="false"><![CDATA[%1$s\u00A0<font color=#%2$s>*</font>]]></string>
+
 </resources>

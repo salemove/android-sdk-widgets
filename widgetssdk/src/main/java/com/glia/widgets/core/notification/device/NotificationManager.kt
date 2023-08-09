@@ -7,12 +7,13 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.glia.widgets.R
+import com.glia.widgets.StringProvider
 import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.NotificationRemovalService
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.core.screensharing.MediaProjectionService
 
-internal class NotificationManager(private val applicationContext: Application) :
+internal class NotificationManager(private val applicationContext: Application, private val stringProvider: StringProvider) :
     INotificationManager {
     private val notificationManager: NotificationManager by lazy {
         applicationContext.getSystemService(NotificationManager::class.java)
@@ -35,7 +36,7 @@ internal class NotificationManager(private val applicationContext: Application) 
             val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID,
-                applicationContext.getString(R.string.glia_notification_call_channel_name),
+                stringProvider.getRemoteString(R.string.android_notification_audio_call_channel_name),
                 importance
             )
             notificationManager.createNotificationChannel(notificationChannel)
@@ -48,7 +49,7 @@ internal class NotificationManager(private val applicationContext: Application) 
             val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
-                applicationContext.getString(R.string.glia_notification_screen_sharing_channel_name),
+                stringProvider.getRemoteString(R.string.android_notification_screen_sharing_channel_name),
                 importance
             )
             notificationManager.createNotificationChannel(notificationChannel)

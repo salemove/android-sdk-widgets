@@ -85,7 +85,7 @@ public class CallActivityTest {
         Dependencies.setResourceProvider(resourceProvider);
 
         // set up StringProvider
-        StringProvider stringProvider = new TestStringProvider(appContext);
+        StringProvider stringProvider = new AndroidTestStringProvider(appContext);
         Dependencies.setStringProvider(stringProvider);
     }
 

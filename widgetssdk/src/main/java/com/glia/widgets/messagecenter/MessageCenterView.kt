@@ -123,6 +123,7 @@ class MessageCenterView(
         controller?.ensureMessageCenterAvailability()
         setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
         appBar?.hideBackButton()
+        appBar?.setTitle(stringProvider.getRemoteString(R.string.engagement_secure_messaging_title))
         initCallbacks()
     }
 

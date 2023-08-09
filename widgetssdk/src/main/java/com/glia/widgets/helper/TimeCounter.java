@@ -1,7 +1,5 @@
 package com.glia.widgets.helper;
 
-import static android.text.format.DateUtils.formatElapsedTime;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -81,7 +79,7 @@ public class TimeCounter {
                 }
 
                 if (!formattedListeners.isEmpty()) {
-                    String time = formatElapsedTime(value);
+                    String time = CommonExtensionsKt.formatElapsedTime(value);
                     Logger.d(TAG, "Formatted timer: " + time);
                     for (FormattedTimerStatusListener listener : formattedListeners) {
                         listener.onNewFormattedTimerValue(time);

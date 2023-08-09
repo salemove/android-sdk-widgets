@@ -15,3 +15,4 @@ class CallVisualizerSupportActivity : AppCompatActivity() {
 sealed class PermissionType : Parcelable
 object ScreenSharing : PermissionType()
 object Camera : PermissionType()
+object None : PermissionType()

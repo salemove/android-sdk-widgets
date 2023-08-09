@@ -73,7 +73,6 @@ internal class ActivityWatcherForCallVisualizer(
             registerForCameraPermissionResult(activity)
             registerForOverlayPermissionResult(activity)
         }
-        super.onActivityCreated(activity, savedInstanceState)
     }
 
     override fun onActivityResumed(activity: Activity) {
@@ -171,6 +170,7 @@ internal class ActivityWatcherForCallVisualizer(
                 // Visitor rejected system permission required for screen sharing
                 controller.onMediaProjectionRejected()
             }
+            controller.setIsWaitingMediaProjectionResult(false)
             destroySupportActivityIfExists(componentActivity)
         }
         activity::class.simpleName?.let {
@@ -208,6 +208,7 @@ internal class ActivityWatcherForCallVisualizer(
         Logger.d(TAG, "Dismiss alert dialog")
         alertDialog?.dismiss()
         alertDialog = null
+        destroySupportActivityIfExists()
     }
 
     override fun removeDialogFromStack() {
@@ -374,6 +375,11 @@ internal class ActivityWatcherForCallVisualizer(
         return themeFromGlobalSetting.getFullHybridTheme(themeFromIntent)
     }
 
+    override fun isSupportActivityOpen(): Boolean {
+        val activity = resumedActivity.get()
+        return (activity == null || activity is CallVisualizerSupportActivity)
+    }
+
     override fun openSupportActivity(permissionType: PermissionType) {
         resumedActivity.get()?.run {
             val intent = Intent(this, CallVisualizerSupportActivity::class.java)
@@ -383,12 +389,15 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun destroySupportActivityIfExists() {
-        resumedActivity.get()?.let { destroySupportActivityIfExists(it) }
+        resumedActivity.get()?.let {
+            if (!it.isFinishing && !controller.isWaitingMediaProjectionResult()) destroySupportActivityIfExists(it)
+        }
     }
 
     private fun destroySupportActivityIfExists(activity: Activity) {
         if (activity is CallVisualizerSupportActivity) {
             activity.finish()
+            activity.overridePendingTransition(0, 0)
         }
     }
 }

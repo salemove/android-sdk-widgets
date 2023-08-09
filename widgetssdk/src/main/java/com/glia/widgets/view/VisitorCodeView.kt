@@ -25,6 +25,7 @@ import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyImageColorTheme
 import com.glia.widgets.helper.applyProgressColorTheme
 import com.glia.widgets.helper.applyTextTheme
+import com.glia.widgets.helper.combineStringWith
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getFullHybridTheme
@@ -164,10 +165,8 @@ class VisitorCodeView internal constructor(
     override fun showVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
-            successTitle.contentDescription = context.getString(
-                R.string.glia_visitor_code_content_description,
-                visitorCode.code.separateStringWithSymbol("-")
-            )
+            successTitle.contentDescription = context.getString(R.string.glia_visitor_code_content_description)
+                .combineStringWith(visitorCode.code.separateStringWithSymbol("-"), " ")
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
             charCodeView.setText(visitorCode.code)
         }

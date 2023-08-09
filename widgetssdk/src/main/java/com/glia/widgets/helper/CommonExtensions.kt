@@ -31,6 +31,9 @@ internal fun String.separateStringWithSymbol(symbol: String): String = asSequenc
 internal fun Queue.supportMessaging() = state.medias.contains(Engagement.MediaType.MESSAGING)
 
 internal fun formatElapsedTime(elapsedMilliseconds: Long) = DateUtils.formatElapsedTime(elapsedMilliseconds / DateUtils.SECOND_IN_MILLIS)
+internal fun String.combineStringWith(string: String, separator: String) : String {
+    return this + separator + string
+}
 
 internal val Operator.formattedName: String get() = name.substringBefore(' ')
 

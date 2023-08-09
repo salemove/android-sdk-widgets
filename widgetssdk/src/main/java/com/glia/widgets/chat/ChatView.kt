@@ -927,8 +927,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             theme = theme,
             title = resources.getString(R.string.glia_dialog_end_engagement_title),
             message = resources.getString(
-                R.string.glia_dialog_end_engagement_message,
-                operatorName
+                R.string.glia_dialog_end_engagement_message
             ),
             positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
             negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),

@@ -26,6 +26,10 @@ internal fun String.separateStringWithSymbol(symbol: String): String =
 
 internal fun Queue.supportsMessaging() = state.medias.contains(Engagement.MediaType.MESSAGING)
 
+internal fun String.combineStringWith(string: String, separator: String) : String {
+    return this + separator + string
+}
+
 internal val Operator.imageUrl: String?
     get() = picture?.url?.orElse(null)
 

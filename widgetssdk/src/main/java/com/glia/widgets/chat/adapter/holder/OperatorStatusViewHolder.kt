@@ -107,7 +107,7 @@ internal class OperatorStatusViewHolder(
         chatStartedCaptionView.text =
             itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
         itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined_content_description,
+            R.string.glia_chat_operator_has_joined,
             operatorName
         )
 
@@ -119,7 +119,7 @@ internal class OperatorStatusViewHolder(
         chatStartedCaptionView.text =
             itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
         itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined_content_description,
+            R.string.glia_chat_operator_has_joined,
             operatorName
         )
 

@@ -300,7 +300,7 @@ internal class CallView(
         operatorStatusView.setShowOnHold(state.showOnHold())
         if (state.isTransferring) {
             operatorStatusView.showTransferring()
-            operatorNameView.setText(R.string.glia_chat_visitor_status_transferring)
+            operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring_message))
         } else {
             handleOperatorStatusViewOperatorImage(state)
         }
@@ -927,11 +927,12 @@ internal class CallView(
 
     override fun emitState(callState: CallState) {
         post {
-            connectingView.text = resources.getString(
-                R.string.glia_call_connecting_with,
+            connectingView.text = stringProvider.getRemoteString(
+                R.string.engagement_connect_with,
                 callState.callStatus.formattedOperatorName,
                 callState.callStatus.time
             )
+
             handleCallTimerView(callState)
 
             // No need to manage the remaining view's states if only time has changed

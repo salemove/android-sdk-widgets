@@ -475,7 +475,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                     context.requireActivity(),
                     view,
-                    context.getString(R.string.glia_file_preview_transition_name)
+                    context.getString(R.string.glia_file_preview_transition_name) // Not translatable
                 )
 
                 context.startActivity(
@@ -485,11 +485,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
 
             override fun fileIsNotReadyForPreview() {
-                showToast(context.getString(R.string.glia_view_file_not_ready_for_preview))
+                showToast(stringProvider.getRemoteString(R.string.android_file_not_ready_for_preview))
             }
 
             override fun showBroadcastNotSupportedToast() {
-                showToast(context.getString(R.string.gva_not_supported))
+                showToast(stringProvider.getRemoteString(R.string.gva_error_unsupported))
             }
 
             override fun requestOpenUri(uri: Uri) {
@@ -599,8 +599,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun updateChatEditText(chatState: ChatState) {
         when (chatState.chatInputMode) {
-            ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.setHint(R.string.glia_chat_not_started_hint)
-            else -> binding.chatEditText.setHint(R.string.glia_chat_enter_message)
+            ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.hint = stringProvider.getRemoteString(R.string.chat_message_start_engagement_placeholder)
+            else -> binding.chatEditText.hint = stringProvider.getRemoteString(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled
     }
@@ -619,11 +619,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.appBarView.hideEndScreenSharingButton()
         }
         if (chatState.isSecureMessaging) {
-            showToolbar(resources.getString(R.string.glia_messaging_title))
+            showToolbar(stringProvider.getRemoteString(R.string.message_center_header))
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
         } else {
-            showToolbar(theme.appBarTitle)
+            showToolbar(stringProvider.getRemoteString(R.string.message_center_header))
             binding.appBarView.showBackButton()
         }
     }
@@ -769,9 +769,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 binding.addAttachmentQueue.smoothScrollToPosition(uploadAttachmentAdapter.itemCount)
             }
         })
+        binding.addAttachmentButton.contentDescription = stringProvider.getRemoteString(R.string.chat_attach_files)
         binding.addAttachmentQueue.layoutManager = LinearLayoutManager(this.context)
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTheme(theme)
+        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.media_text_name))
 
         // icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
@@ -813,7 +815,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
 
         binding.gvaQuickRepliesLayout.updateTheme(theme)
-
+        binding.sendButton.contentDescription = stringProvider.getRemoteString(R.string.send_message_send)
         applyTheme(Dependencies.getGliaThemeManager().theme)
     }
 
@@ -862,7 +864,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 context.asActivity()?.startActivityForResult(
                     Intent.createChooser(
                         intent,
-                        resources.getString(R.string.glia_chat_select_picture_title)
+                        stringProvider.getRemoteString(R.string.android_file_select_picture_title)
                     ),
                     OPEN_DOCUMENT_ACTION_REQUEST
                 )
@@ -886,7 +888,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 context.asActivity()?.startActivityForResult(
                     Intent.createChooser(
                         intent,
-                        resources.getString(R.string.glia_chat_select_file_title)
+                        stringProvider.getRemoteString(R.string.android_file_select_file_title)
                     ),
                     OPEN_DOCUMENT_ACTION_REQUEST
                 )
@@ -1130,13 +1132,13 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     fun fileDownloadFailed(file: AttachmentFile) {
         submitUpdatedItems(file, isDownloading = false, isFileExists = false)
-        showToast(context.getString(R.string.glia_chat_file_download_failed_msg))
+        showToast(stringProvider.getRemoteString(R.string.android_chat_download_failed))
     }
 
     fun fileDownloadCompleted(file: AttachmentFile) {
         submitUpdatedItems(file, isDownloading = false, isFileExists = true)
         showToast(
-            context.getString(R.string.glia_chat_file_download_success_message),
+            stringProvider.getRemoteString(R.string.android_chat_download_complete),
             Toast.LENGTH_LONG
         )
     }
@@ -1174,7 +1176,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             setDataAndType(contentUri, file.contentType)
             resolveActivity(context.packageManager)?.also { context.startActivity(this) }
-        } ?: showToast(message = context.getString(R.string.glia_view_file_error_message))
+        } ?: showToast(message = stringProvider.getRemoteString(R.string.android_file_view_error))
     }
 
     override fun onImageItemClick(item: AttachmentFile, view: View) {

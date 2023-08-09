@@ -412,7 +412,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_company_name_hint);
+            String expected = appContext.getString(R.string.general_company_name);
             onView(withId(R.id.company_name_view)).check(matches(withHint(expected)));
         }
     }

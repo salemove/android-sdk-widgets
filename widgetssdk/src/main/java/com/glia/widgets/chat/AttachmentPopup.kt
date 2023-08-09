@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.PopupWindow
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentPopupBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.setTintCompat
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -19,6 +20,7 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
     private val margin by lazy { anchor.context.resources.getDimensionPixelSize(R.dimen.glia_chat_attachment_menu_margin) }
     private val binding: ChatAttachmentPopupBinding by lazy { bindLayout(anchor.context) }
     private val popupWindow: PopupWindow by lazy { createPopupMenu() }
+    private val stringProvider = Dependencies.getStringProvider()
 
     private fun createPopupMenu(): PopupWindow {
         val popupView = binding.root
@@ -39,14 +41,17 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
         onTakePhotoClicked: () -> Unit,
         onBrowseClicked: () -> Unit
     ) {
+        binding.photoLibraryTitle.text = stringProvider.getRemoteString(R.string.chat_attachement_photo_library)
         binding.photoLibraryItem.setOnClickListener {
             popupWindow.dismiss()
             onGalleryClicked()
         }
+        binding.photoOrVideoTitle.text = stringProvider.getRemoteString(R.string.chat_attachement_take_photo)
         binding.photoOrVideoItem.setOnClickListener {
             popupWindow.dismiss()
             onTakePhotoClicked()
         }
+        binding.browseTitle.text = stringProvider.getRemoteString(R.string.general_browse)
         binding.browseItem.setOnClickListener {
             popupWindow.dismiss()
             onBrowseClicked()

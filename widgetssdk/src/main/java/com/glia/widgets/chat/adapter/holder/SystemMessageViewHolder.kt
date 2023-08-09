@@ -21,7 +21,7 @@ internal class SystemMessageViewHolder(
     uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val content: TextView by lazy { binding.root }
-
+    private val stringProvider = Dependencies.getStringProvider()
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
     }
@@ -62,8 +62,8 @@ internal class SystemMessageViewHolder(
     fun bind(message: String) {
         content.apply {
             text = message
-            resources.getString(
-                R.string.glia_chat_operator_message_content_description,
+            stringProvider.getRemoteString(
+                R.string.android_chat_accessibility_message,
                 message
             )
         }

@@ -95,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
-        android:text="@string/glia_call_on_hold"
+        tools:text="@string/glia_call_on_hold"
         android:textAppearance="?attr/textAppearanceBody1"
         android:textColor="@color/glia_base_light_color"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"

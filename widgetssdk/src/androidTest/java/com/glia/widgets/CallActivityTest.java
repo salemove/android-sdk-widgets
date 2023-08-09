@@ -83,6 +83,10 @@ public class CallActivityTest {
         // set up ResourceProvider
         resourceProvider = new ResourceProvider(appContext);
         Dependencies.setResourceProvider(resourceProvider);
+
+        // set up StringProvider
+        StringProvider stringProvider = new AndroidTestStringProvider(appContext);
+        Dependencies.setStringProvider(stringProvider);
     }
 
     @Test
@@ -135,7 +139,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_minimize_content_description);
+            String expected = appContext.getString(R.string.engagement_minimize_video_button);
             onView(withId(R.id.minimize_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -155,7 +159,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_speaker_on_content_description);
+            String expected = appContext.getString(R.string.android_call_turn_speaker_off_button_accessibility);
             onView(withId(R.id.speaker_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -175,7 +179,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_speaker_off_content_description);
+            String expected = appContext.getString(R.string.android_call_turn_speaker_on_button_accessibility);
             onView(withId(R.id.speaker_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -235,7 +239,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_video_on_content_description);
+            String expected = appContext.getString(R.string.android_call_turn_video_off_button_accessibility);
             onView(withId(R.id.video_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -255,7 +259,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_video_off_content_description);
+            String expected = appContext.getString(R.string.android_call_turn_video_on_button_accessibility);
             onView(withId(R.id.video_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -295,7 +299,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getResources().getQuantityString(R.plurals.glia_call_chat_content_description, 15, 15);
+            String expected = appContext.getResources().getString(R.string.glia_call_chat_other_content_description, 15);
             onView(withId(R.id.chat_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -314,7 +318,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_connecting_with, "FormattedOperatorName", "");
+            String expected = appContext.getString(R.string.engagement_connection_screen_connect_with, "FormattedOperatorName", "");
             onView(withId(R.id.connecting_view)).check(matches(withContentDescription(expected)));
         }
     }
@@ -333,7 +337,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_visitor_video_content_description);
+            String expected = appContext.getString(R.string.call_visitor_video_accessibility_label);
             onView(withId(R.id.floating_visitor_video)).check(matches(withContentDescription(expected)));
         }
     }
@@ -352,7 +356,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_operator_video_content_description);
+            String expected = appContext.getString(R.string.call_operator_video_accessibility_label);
             onView(withId(R.id.operator_video_container)).check(matches(withContentDescription(expected)));
         }
     }
@@ -392,28 +396,9 @@ public class CallActivityTest {
 
             Thread.sleep(1000);
 
-            onView(withContentDescription(R.string.glia_top_app_bar_navigate_up_content_description)).perform(click());
+            onView(withContentDescription(R.string.android_app_bar_nav_up_accessibility)).perform(click());
 
             assertEquals(Lifecycle.State.DESTROYED, scenario.getState());
-        }
-    }
-
-    @Test
-    public void testCompanyNameHint() {
-        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
-
-        try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
-            CallStatus callStatus = mock(CallStatus.class);
-            when(callStatus.getFormattedOperatorName()).thenReturn("FormattedOperatorName");
-            CallStateHelper callState = new CallStateHelper.Builder()
-                    .setVisible(true)
-                    .setCallStatus(callStatus)
-                    .build();
-
-            callViewCallback.emitState(callState.makeCallState());
-
-            String expected = appContext.getString(R.string.glia_call_company_name_hint);
-            onView(withId(R.id.company_name_view)).check(matches(withHint(expected)));
         }
     }
 
@@ -450,7 +435,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_call_duration_hint);
+            String expected = appContext.getString(R.string.call_duration_accessibility_label);
             onView(withId(R.id.call_timer_view)).check(matches(withHint(expected)));
         }
     }

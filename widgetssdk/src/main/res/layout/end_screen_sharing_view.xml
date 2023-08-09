@@ -11,14 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:titleText="@string/call_visualizer_screen_sharing_title"
+        tools:titleText="@string/call_visualizer_screen_sharing_view_title"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/screen_sharing_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/call_visualizer_label"
+        tools:text="@string/call_visualizer_label"
         android:textAppearance="?attr/textAppearanceHeadline2"
         android:layout_marginBottom="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_pre_xx_large"
@@ -36,7 +36,7 @@
         android:paddingBottom="@dimen/glia_medium"
         android:layout_marginStart="@dimen/glia_pre_xx_large"
         android:layout_marginEnd="@dimen/glia_pre_xx_large"
-        android:text="@string/call_visualizer_button"
+        tools:text="@string/call_visualizer_button"
         app:icon="@drawable/ic_screensharing_off"
         app:iconTint="?attr/gliaBaseLightColor"
         app:iconGravity="textStart"

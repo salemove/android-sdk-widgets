@@ -23,7 +23,7 @@ public class Activity extends AppCompatActivity {
     private void initGliaWidgetsWithDeepLink() {
         Uri uri = getIntent().getData();
         if (!Glia.isInitialized() && uri != null) {
-            GliaWidgets.init(GliaWidgetsConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()));
+            GliaWidgets.init(ExampleAppConfigManager.obtainConfigFromDeepLink(uri, getApplicationContext()));
         }
     }
 

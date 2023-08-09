@@ -8,9 +8,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.OperatorAttachmentItem;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
@@ -18,6 +20,7 @@ import com.glia.widgets.view.OperatorStatusView;
 
 public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder {
     private final OperatorStatusView operatorStatusView;
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
 
     public OperatorImageAttachmentViewHolder(
             @NonNull View itemView,
@@ -45,14 +48,14 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
     }
 
     private void setAccessibilityLabels() {
-        itemView.setContentDescription(itemView.getResources().getString(
-                R.string.glia_chat_operator_image_content_description));
+        itemView.setContentDescription(stringProvider.getRemoteString(
+                R.string.android_chat_operator_image_attachment_accessibility));
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
             public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
-                String actionLabel = host.getResources().getString(R.string.glia_chat_attachment_open_button_label);
+                String actionLabel = stringProvider.getRemoteString(R.string.general_open);
 
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
                         = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(

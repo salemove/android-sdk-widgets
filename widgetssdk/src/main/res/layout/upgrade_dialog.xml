@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"
@@ -47,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_small"
-        android:text="@string/glia_dialog_upgrade_decline"
+        tools:text="@string/glia_dialog_upgrade_decline"
         app:layout_constraintEnd_toStartOf="@id/accept_button"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
@@ -58,22 +59,49 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/glia_small"
         android:layout_marginTop="@dimen/glia_large_x_large"
-        android:text="@string/glia_dialog_upgrade_accept"
+        tools:text="@string/glia_dialog_upgrade_accept"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toEndOf="@id/decline_button"
         app:layout_constraintTop_toBottomOf="@id/dialog_title_view" />
 
-    <ImageView
-        android:id="@+id/logo_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/logo_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_large_x_large"
-        android:contentDescription="@string/glia_chat_glia_logo_content_description"
-        android:src="@drawable/ic_powered_by_glia"
-        app:layout_constraintEnd_toEndOf="@id/end_guideline"
-        app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/accept_button"
-        app:tint="?attr/gliaBaseShadeColor" />
+        app:layout_constraintTop_toBottomOf="@+id/accept_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/powered_by_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Powered by"
+            style="@style/Application.Glia.Caption"
+            android:textColor="@color/glia_base_normal_color_50"
+            android:layout_marginEnd="@dimen/glia_medium"
+            android:importantForAccessibility="no"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toStartOf="@id/logo_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+            android:id="@+id/logo_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/glia_pre_x_large"
+            android:layout_marginBottom="@dimen/glia_pre_x_large"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_glia_logo"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/powered_by_text"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Space
         android:id="@+id/space"
@@ -83,7 +111,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo_view"
+        app:layout_constraintTop_toBottomOf="@id/logo_container"
         app:layout_constraintVertical_bias="0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

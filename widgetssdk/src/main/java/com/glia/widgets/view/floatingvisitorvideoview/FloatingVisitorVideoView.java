@@ -10,11 +10,14 @@ import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.comms.VideoView;
 import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
+import com.glia.widgets.di.Dependencies;
 import com.google.android.material.card.MaterialCardView;
 
 public class FloatingVisitorVideoView extends MaterialCardView {
     private VideoView videoView;
     private TextView onHoldOverlay;
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
 
     public FloatingVisitorVideoView(@NonNull Context context) {
         this(context, null);
@@ -71,6 +74,7 @@ public class FloatingVisitorVideoView extends MaterialCardView {
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_floating_view, this);
         onHoldOverlay = findViewById(R.id.on_hold_textview);
+        onHoldOverlay.setText(stringProvider.getRemoteString(R.string.general_you));
     }
 
     private void releaseVideoStream() {

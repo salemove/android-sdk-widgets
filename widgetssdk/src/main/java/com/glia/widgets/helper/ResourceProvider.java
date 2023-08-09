@@ -9,16 +9,19 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
+import java.util.List;
 
 interface IResourceProvider {
 
     String getString(@StringRes int id);
 
-    String getString(@StringRes int id, @Nullable Object... formatArgs);
+    String getString(@StringRes int id, @Nullable String... formatArgs);
 
     @ColorInt
     Integer getColor(@ColorRes int id);
@@ -32,10 +35,13 @@ interface IResourceProvider {
     float convertSpToPixel(float sp);
 
     int convertDpToIntPixel(float dp);
+
+    String getResourceKey(@StringRes int stringKey);
 }
 
 public class ResourceProvider implements IResourceProvider {
 
+    @VisibleForTesting
     private final WeakReference<Context> weakContext;
 
     public ResourceProvider(Context context) {
@@ -48,7 +54,7 @@ public class ResourceProvider implements IResourceProvider {
     }
 
     @Override
-    public String getString(int id, @Nullable Object... formatArgs) {
+    public String getString(int id, @Nullable String... formatArgs) {
         return (weakContext.get()).getResources().getString(id, formatArgs);
     }
 
@@ -76,6 +82,14 @@ public class ResourceProvider implements IResourceProvider {
     @Override
     public int convertDpToIntPixel(float dp) {
         return Math.round(convertDpToPixel(dp));
+    }
+
+    @Override
+    public String getResourceKey(int stringKey) {
+        /*
+            getResourceName wil contain package and resourceName separated by "/", discarding the first package part
+         */
+        return weakContext.get().getResources().getResourceName(stringKey).split("/")[1];
     }
 
     @Override

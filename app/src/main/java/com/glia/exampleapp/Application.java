@@ -51,7 +51,7 @@ public class Application extends android.app.Application {
                 if (activity.getClass() != com.glia.exampleapp.Activity.class) {
                     if (Glia.isInitialized()) return;
 
-                    GliaWidgets.init(GliaWidgetsConfigManager.createDefaultConfig(getApplicationContext()));
+                    GliaWidgets.init(ExampleAppConfigManager.createDefaultConfig(getApplicationContext()));
                 }
             }
 

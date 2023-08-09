@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.LayoutRes
+import androidx.annotation.NonNull
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -21,6 +22,9 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
+import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
@@ -34,11 +38,15 @@ import com.glia.widgets.view.button.BaseConfigurableButton
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
+import com.glia.widgets.view.unifiedui.applyTextColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 object Dialogs {
+
+    private val stringProvider: StringProvider = Dependencies.getStringProvider()
     private val alertTheme: AlertTheme?
         get() = Dependencies.getGliaThemeManager().theme?.alertTheme
 
@@ -197,10 +205,7 @@ object Dialogs {
                 )
                 applyAlertTheme(alertTheme)
             }
-            findViewById<ImageView>(R.id.logo_view).apply {
-                isVisible = theme.whiteLabel?.not() ?: true
-                applyImageColorTheme(baseShadeColor)
-            }
+            setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
         }
     }
 
@@ -218,16 +223,17 @@ object Dialogs {
 
         return showDialog(context, R.layout.alert_dialog, theme.baseLightColor) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
-                setText(title)
+                text = stringProvider.getRemoteString(title)
                 applyTextTheme(baseDarkColor, fontFamily)
                 applyTextTheme(alertTheme?.title)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
-                setText(message)
+                text = stringProvider.getRemoteString(message)
                 applyTextTheme(baseDarkColor, fontFamily)
                 applyTextTheme(alertTheme?.message)
             }
             findViewById<ImageButton>(R.id.close_dialog_button).apply {
+                contentDescription = stringProvider.getRemoteString(R.string.general_close_accessibility)
                 setOnClickListener(buttonClickListener)
                 applyImageColorTheme(baseNormalColor)
                 applyImageColorTheme(alertTheme?.closeButtonColor)
@@ -251,14 +257,17 @@ object Dialogs {
             theme.baseLightColor
         ) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
+                text = stringProvider.getRemoteString(R.string.engagement_ended_header)
                 applyTextTheme(baseDarkColor, fontFamily)
                 applyTextTheme(alertTheme?.title)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
+                text = stringProvider.getRemoteString(R.string.engagement_ended_message)
                 applyTextTheme(baseDarkColor, fontFamily)
                 applyTextTheme(alertTheme?.message)
             }
             findViewById<BaseConfigurableButton>(R.id.ok_button).apply {
+                text = stringProvider.getRemoteString(R.string.general_ok)
                 setOnClickListener(buttonClickListener)
                 applyButtonTheme(
                     backgroundColor = brandPrimaryColor,
@@ -295,6 +304,7 @@ object Dialogs {
             }
             findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
                 setOnClickListener(onCloseClickListener)
+                text = stringProvider.getRemoteString(R.string.general_decline)
                 applyButtonTheme(
                     backgroundColor = systemNegativeColor,
                     textColor = baseLightColor,
@@ -304,6 +314,7 @@ object Dialogs {
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
                 setOnClickListener(onAcceptOfferClickListener)
+                text = stringProvider.getRemoteString(R.string.general_accept)
                 applyButtonTheme(
                     backgroundColor = primaryBrandColor,
                     textColor = baseLightColor,
@@ -311,36 +322,22 @@ object Dialogs {
                 )
                 applyAlertTheme(alertTheme)
             }
-            findViewById<ImageView>(R.id.logo_view).apply {
-                isVisible = theme.whiteLabel?.not() ?: true
-                applyImageColorTheme(baseShadeColor)
-            }
+
+            setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
+
 
             when (mediaUpgrade.mediaUpgradeMode) {
                 MediaUpgrade.MODE_AUDIO -> {
-                    titleView.text = context.getString(
-                        R.string.glia_dialog_upgrade_audio_title,
-                        mediaUpgrade.operatorName
-                    )
+                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_audio_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
-                    titleIconView.contentDescription =
-                        context.getString(R.string.glia_chat_audio_icon_content_description)
                 }
                 MediaUpgrade.MODE_VIDEO_ONE_WAY -> {
-                    titleView.text = context.getString(
-                        R.string.glia_dialog_upgrade_video_1_way_title,
-                        mediaUpgrade.operatorName
-                    )
+                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_video_one_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                 }
                 MediaUpgrade.MODE_VIDEO_TWO_WAY -> {
-                    titleView.text = context.getString(
-                        R.string.glia_dialog_upgrade_video_2_way_title,
-                        mediaUpgrade.operatorName
-                    )
+                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_video_two_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
-                    titleIconView.contentDescription =
-                        context.getString(R.string.glia_chat_video_icon_content_description)
                 }
             }
         }
@@ -399,7 +396,7 @@ object Dialogs {
                 applyTextTheme(alertTheme?.message)
             }
             findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                setText(negativeButtonText)
+                text = stringProvider.getRemoteString(negativeButtonText)
                 setOnClickListener {
                     dismiss()
                     negativeButtonClickListener.onClick(it)
@@ -412,7 +409,7 @@ object Dialogs {
                 applyAlertTheme(alertTheme)
             }
             findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                setText(positiveButtonText)
+                text = stringProvider.getRemoteString(positiveButtonText)
                 setOnClickListener {
                     dismiss()
                     positiveButtonClickListener.onClick(it)
@@ -424,10 +421,8 @@ object Dialogs {
                 )
                 applyAlertTheme(alertTheme)
             }
-            findViewById<ImageView>(R.id.logo_view).apply {
-                isVisible = theme.whiteLabel?.not() ?: true
-                applyImageColorTheme(baseShadeColor)
-            }
+
+            setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
         }
     }
 
@@ -441,13 +436,13 @@ object Dialogs {
 
         return showDialog(context, R.layout.alert_dialog, theme.baseLightColor, false, onShow) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
-                setText(R.string.glia_dialog_message_center_unavailable_title)
+                text = stringProvider.getRemoteString(R.string.message_center_unavailable_title)
                 baseDarkColor?.also(::setTextColor)
                 fontFamily?.also(::setTypeface)
                 alertTheme?.title.also(::applyTextTheme)
             }
             findViewById<TextView>(R.id.dialog_message_view).apply {
-                setText(R.string.glia_dialog_message_center_unavailable_message)
+                text = stringProvider.getRemoteString(R.string.message_center_unavailable_message)
                 baseDarkColor?.also(::setTextColor)
                 fontFamily?.also(::setTypeface)
                 alertTheme?.message.also(::applyTextTheme)
@@ -468,5 +463,18 @@ object Dialogs {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         )
         clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+    }
+
+    private fun setupPoweredByGlia(dialog: Dialog, @NonNull notWhitelabel: Boolean, baseShadeColor: Int?){
+        dialog.findViewById<View>(R.id.logo_container)?.isVisible = notWhitelabel
+        if (notWhitelabel) {
+            dialog.findViewById<TextView>(R.id.powered_by_text)?.apply {
+                text = stringProvider.getRemoteString(R.string.general_powered)
+                baseShadeColor?.run {
+                    applyTextColorTheme(ColorTheme(false, listOf(this)))
+                }
+            }
+            dialog.findViewById<ImageView>(R.id.logo_view)?.applyImageColorTheme(baseShadeColor)
+        }
     }
 }

@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/save_item"
         android:icon="@drawable/ic_action_save"
         android:orderInCategory="1"
-        android:title="@string/glia_preview_activity_menu_save_button"
         android:visible="false"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        tools:title="@string/android_preview_menu_save" />
     <item
         android:id="@+id/share_item"
         android:icon="@drawable/ic_action_share"
         android:orderInCategory="2"
-        android:title="@string/glia_preview_activity_menu_share_button"
         android:visible="false"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:title="@string/android_preview_menu_share" />
 </menu>

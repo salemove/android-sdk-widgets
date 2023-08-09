@@ -1,7 +1,6 @@
 package com.glia.widgets.core.configuration;
 
 import android.content.Intent;
-import android.text.TextUtils;
 
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.GliaWidgets;
@@ -101,8 +100,7 @@ public class GliaSdkConfiguration {
         }
 
         public Builder intent(Intent intent) {
-            String tempCompanyName = intent.getStringExtra(GliaWidgets.COMPANY_NAME);
-            this.companyName = !TextUtils.isEmpty(tempCompanyName) ? tempCompanyName : Dependencies.getSdkConfigurationManager().getCompanyName();
+            this.companyName = Dependencies.getSdkConfigurationManager().getCompanyName();
             this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
             UiTheme tempTheme = intent.getParcelableExtra(GliaWidgets.UI_THEME);
             this.runTimeTheme = tempTheme != null ? tempTheme : Dependencies.getSdkConfigurationManager().getUiTheme();

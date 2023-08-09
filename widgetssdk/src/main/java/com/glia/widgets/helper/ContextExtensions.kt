@@ -44,10 +44,3 @@ internal fun Context.showToast(
 ) {
     Toast.makeText(this, message, duration).show()
 }
-
-internal fun Context.showToast(
-    @StringRes messageRes: Int,
-    @IntRange(from = 0, to = 1) duration: Int = Toast.LENGTH_LONG
-) {
-    Toast.makeText(this, messageRes, duration).show()
-}

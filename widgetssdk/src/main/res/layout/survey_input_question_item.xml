@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:paddingTop="@dimen/glia_large"
     android:paddingStart="@dimen/glia_large_x_large"
@@ -15,7 +16,7 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/glia_survey_open_text_item_title"
+        tools:text="Title"
         android:textAppearance="?attr/textAppearanceBody1" />
 
     <EditText
@@ -38,8 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"
         android:textColor="@color/glia_system_negative_color"
-        android:text="@string/glia_survey_required_error_message"
         android:drawablePadding="@dimen/glia_small"
-        app:drawableStartCompat="@drawable/ic_attention" />
+        app:drawableStartCompat="@drawable/ic_attention"
+        tools:text="@string/survey_action_validation_error" />
 
 </LinearLayout>

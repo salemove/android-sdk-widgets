@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_confirmation_screen_title_top_margin"
-        android:text="@string/message_center_confirmation_screen_title" />
+        tools:text="@string/message_center_confirmation_screen_title" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/subtitle"
@@ -37,7 +37,7 @@
         android:layout_marginHorizontal="42dp"
         android:layout_marginTop="@dimen/glia_confirmation_screen_message_top_margin"
         android:gravity="center"
-        android:text="@string/message_center_confirmation_screen_message"
+        tools:text="@string/message_center_confirmation_screen_message"
         android:textSize="16sp" />
 
     <Space
@@ -53,7 +53,7 @@
         android:layout_marginBottom="@dimen/glia_confirmation_screen_button_bottom_margin"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        android:text="@string/message_center_confirmation_screen_check_messages_btn"
+        tools:text="@string/message_center_confirmation_screen_check_messages_btn"
         android:textAllCaps="false" />
 
 </merge>

@@ -50,6 +50,7 @@ internal class ActivityWatcherForCallVisualizer(
         controller.setWatcher(this)
     }
 
+    private val stringProvider = Dependencies.getStringProvider()
     var alertDialog: AlertDialog? = null
     val dialogCallback: DialogController.Callback = DialogController.Callback {
         controller.onDialogControllerCallback(it)
@@ -238,10 +239,10 @@ internal class ActivityWatcherForCallVisualizer(
         alertDialog = Dialogs.showOptionsDialog(
             context = contextWithStyle,
             theme = UiTheme.UiThemeBuilder().build(),
-            title = activity.getString(R.string.glia_dialog_allow_notifications_title),
-            message = activity.getString(R.string.glia_dialog_allow_notifications_message),
-            positiveButtonText = activity.getString(R.string.glia_dialog_allow_notifications_yes),
-            negativeButtonText = activity.getString(R.string.glia_dialog_allow_notifications_no),
+            title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
+            message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 controller.onPositiveDialogButtonClicked()
             },
@@ -270,10 +271,10 @@ internal class ActivityWatcherForCallVisualizer(
             alertDialog = Dialogs.showOptionsDialog(
                 context = contextWithStyle,
                 theme = theme,
-                title = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-                message = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                positiveButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-                negativeButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
+                message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked()
                 },
@@ -297,10 +298,10 @@ internal class ActivityWatcherForCallVisualizer(
             alertDialog = Dialogs.showOptionsDialog(
                 activity.wrapWithMaterialThemeOverlay(),
                 UiTheme.UiThemeBuilder().build(),
-                activity.getString(R.string.glia_dialog_overlay_permissions_title),
-                activity.getString(R.string.glia_dialog_overlay_permissions_message),
-                activity.getString(R.string.glia_dialog_overlay_permissions_ok),
-                activity.getString(R.string.glia_dialog_overlay_permissions_no),
+                stringProvider.getRemoteString(R.string.android_overlay_permission_title),
+                stringProvider.getRemoteString(R.string.android_overlay_permission_message),
+                stringProvider.getRemoteString(R.string.general_ok),
+                stringProvider.getRemoteString(R.string.general_no),
                 {
                     controller.onPositiveDialogButtonClicked()
                 },
@@ -327,10 +328,10 @@ internal class ActivityWatcherForCallVisualizer(
             alertDialog = Dialogs.showScreenSharingDialog(
                 contextWithStyle,
                 theme,
-                activity.getString(R.string.glia_dialog_screen_sharing_offer_title),
-                activity.getString(R.string.glia_dialog_screen_sharing_offer_message),
-                R.string.glia_dialog_screen_sharing_offer_accept,
-                R.string.glia_dialog_screen_sharing_offer_decline,
+                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
+                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
+                R.string.general_accept,
+                R.string.general_decline,
                 {
                     controller.onPositiveDialogButtonClicked(activity)
                 }

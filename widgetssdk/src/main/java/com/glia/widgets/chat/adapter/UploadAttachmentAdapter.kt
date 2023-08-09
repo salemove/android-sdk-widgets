@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.fileupload.model.FileAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
@@ -50,7 +52,7 @@ class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachment>() {
 class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
     ListAdapter<FileAttachment, ViewHolder>(UploadAttachmentItemCallback()) {
     private var callback: ItemCallback? = null
-
+    private val stringProvider = Dependencies.getStringProvider()
     fun setItemCallback(callback: ItemCallback?) {
         this.callback = callback
     }
@@ -86,6 +88,7 @@ class ViewHolder(
     private val removeItemButton: ImageButton get() = binding.removeItemButton
 
     private val context: Context get() = itemView.context
+    private val stringProvider = Dependencies.getStringProvider()
 
     private val theme: FileUploadBarTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.run {
@@ -178,15 +181,15 @@ class ViewHolder(
         size: String?,
         attachment: FileAttachment
     ) {
-        removeItemButton.contentDescription = context.getString(
-            R.string.glia_chat_attachment_remove_item_content_description,
-            displayName
+        removeItemButton.contentDescription = stringProvider.getRemoteString(
+            R.string.chat_file_remove_upload_accessibility_label,
+            StringKeyPair(StringKey.NAME, displayName)
         )
-        itemView.contentDescription = context.getString(
-            R.string.glia_chat_attachment_item_content_description,
-            displayName,
-            size,
-            getStatusIndicatorText(attachment.attachmentStatus)
+        itemView.contentDescription = stringProvider.getRemoteString(
+            R.string.android_chat_file_accessibility,
+            StringKeyPair(StringKey.NAME, displayName),
+            StringKeyPair(StringKey.SIZE, size ?: stringProvider.getRemoteString(R.string.general_unknown)),
+            StringKeyPair(StringKey.STATUS, getStatusIndicatorText(attachment.attachmentStatus))
         )
     }
 
@@ -196,7 +199,7 @@ class ViewHolder(
         titleText.setTextColor(itemView.getColorCompat(textColorRes))
 
         titleText.text =
-            if (status.isError) context.getString(getTitleErrorStringRes(status)) else "$fileName • $byteSize"
+            if (status.isError) stringProvider.getRemoteString(getTitleErrorStringRes(status)) else "$fileName • $byteSize"
 
         statusText.text = getStatusIndicatorText(status)
 
@@ -226,16 +229,16 @@ class ViewHolder(
 
     @StringRes
     private fun getTitleErrorStringRes(status: Status): Int = when (status) {
-        Status.ERROR_NETWORK_TIMEOUT -> R.string.glia_chat_attachment_upload_error_network_time_out
-        Status.ERROR_INVALID_INPUT -> R.string.glia_chat_attachment_upload_error_invalid_input
-        Status.ERROR_PERMISSIONS_DENIED -> R.string.glia_chat_attachment_upload_error_read_access_permissions_denied
-        Status.ERROR_FORMAT_UNSUPPORTED -> R.string.glia_chat_attachment_upload_error_file_type_invalid
-        Status.ERROR_FILE_TOO_LARGE -> R.string.glia_chat_attachment_upload_error_file_size_over_limit
-        Status.ERROR_ENGAGEMENT_MISSING -> R.string.glia_chat_attachment_upload_error_engagement_missing
-        Status.ERROR_SECURITY_SCAN_FAILED -> R.string.glia_chat_attachment_upload_error_failed_to_check_safety
-        Status.ERROR_FILE_UPLOAD_FORBIDDEN -> R.string.glia_chat_attachment_upload_error_file_upload_forbidden
-        Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED -> R.string.glia_chat_attachment_upload_error_file_count_limit_reached
-        else -> R.string.glia_chat_attachment_upload_error_internal_error
+        Status.ERROR_NETWORK_TIMEOUT -> R.string.android_upload_error_network
+        Status.ERROR_INVALID_INPUT -> R.string.android_upload_error_invalid_input
+        Status.ERROR_PERMISSIONS_DENIED -> R.string.android_upload_error_permissions
+        Status.ERROR_FORMAT_UNSUPPORTED -> R.string.chat_attachement_unsupported_file
+        Status.ERROR_FILE_TOO_LARGE -> R.string.chat_file_size_limit_error
+        Status.ERROR_ENGAGEMENT_MISSING -> R.string.android_upload_error_engagement_missing
+        Status.ERROR_SECURITY_SCAN_FAILED -> R.string.chat_file_infected_file_error
+        Status.ERROR_FILE_UPLOAD_FORBIDDEN -> R.string.android_upload_error_forbidden
+        Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED -> R.string.android_upload_error_file_limit
+        else -> R.string.error_internal
     }
 
     private fun setProgressIndicatorState(status: Status) {
@@ -285,14 +288,13 @@ class ViewHolder(
     }
 
     private fun getStatusIndicatorText(status: Status): String =
-        when {
-            status == Status.SECURITY_SCAN -> context.getString(R.string.glia_chat_attachment_upload_checking_file)
-            status == Status.READY_TO_SEND -> context.getString(R.string.glia_chat_attachment_upload_ready_to_send)
-            status.isError -> context.getString(
-                R.string.glia_chat_attachment_upload_failed_upload
-            )
-
-            status == Status.UPLOADING -> context.getString(R.string.glia_chat_attachment_upload_uploading)
-            else -> context.getString(R.string.glia_chat_attachment_upload_uploading)
-        }
+        stringProvider.getRemoteString(
+            when {
+                status == Status.SECURITY_SCAN -> R.string.chat_file_upload_scanning
+                status == Status.READY_TO_SEND -> R.string.chat_file_upload_success
+                status.isError -> R.string.chat_file_upload_failed
+                status == Status.UPLOADING -> R.string.chat_file_upload_in_progress
+                else -> R.string.chat_file_upload_in_progress
+            }
+        )
 }

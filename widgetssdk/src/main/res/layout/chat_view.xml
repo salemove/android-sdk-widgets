@@ -123,7 +123,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/glia_chat_enter_message"
             android:importantForAutofill="no"
             android:maxLength="10000"
             android:maxLines="4"
@@ -141,7 +140,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/glia_chat_add_attachment_description"
             android:padding="@dimen/glia_large"
             android:src="@drawable/ic_add_attachment" />
 
@@ -151,7 +149,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/glia_chat_send_content_description"
             android:padding="@dimen/glia_large"
             android:src="?attr/gliaIconSendMessage"
             app:tint="?attr/gliaBrandPrimaryColor"

@@ -31,6 +31,7 @@ class InputQuestionViewHolder(
     private val inputTheme: SurveyInputQuestionTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.surveyTheme?.inputQuestion
     }
+    private val stringProvider = Dependencies.getStringProvider()
     private val comment: EditText get() = binding.etComment
 
     private val optionButtonTheme: OptionButtonTheme by lazy {
@@ -116,6 +117,7 @@ class InputQuestionViewHolder(
     }
 
     private fun setupInputBoxText(optionButtonStyle: OptionButtonConfiguration) {
+        comment.hint = stringProvider.getRemoteString(R.string.general_comment)
         comment.setTextColor(optionButtonStyle.normalText.textColor)
         if (optionButtonStyle.normalText.isBold) comment.typeface = Typeface.DEFAULT_BOLD
         comment.setHintTextColor(itemView.getColorCompat(R.color.glia_base_shade_color))

@@ -4,10 +4,10 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.glia.widgets.R
 import com.glia.widgets.core.notification.NotificationActionReceiver.Companion.getScreenSharingEndPressedActionIntent
+import com.glia.widgets.di.Dependencies
 
 internal object NotificationFactory {
     private const val SCREEN_SHARING_PENDING_INTENT_REQUEST_CODE = 1
@@ -15,6 +15,7 @@ internal object NotificationFactory {
     const val NOTIFICATION_CALL_CHANNEL_ID = "call_channel"
     const val SCREEN_SHARING_NOTIFICATION_ID = 1
     const val CALL_NOTIFICATION_ID = 2
+    private val stringProvider = Dependencies.getStringProvider()
 
     @JvmStatic
     fun createScreenSharingNotification(context: Context): Notification {
@@ -27,14 +28,14 @@ internal object NotificationFactory {
 
         return NotificationCompat.Builder(context, NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_screensharing)
-            .setContentTitle(context.getString(R.string.glia_notification_screen_sharing_title))
-            .setContentText(context.getString(R.string.glia_notification_screen_sharing_message))
+            .setContentTitle(stringProvider.getRemoteString(R.string.android_notification_screen_sharing_title))
+            .setContentText(stringProvider.getRemoteString(R.string.android_notification_screen_sharing_message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOngoing(true)
             .addAction(
                 R.drawable.ic_baseline_close,
-                context.getString(R.string.glia_notification_action_end_sharing),
+                stringProvider.getRemoteString(R.string.android_notification_end_screen_sharing_title),
                 pendingIntent
             ).build()
     }
@@ -43,8 +44,8 @@ internal object NotificationFactory {
         createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_mic,
-            title = R.string.glia_notification_audio_call_title,
-            message = R.string.glia_notification_audio_call_message
+            title = stringProvider.getRemoteString(R.string.android_notification_audio_call_title),
+            message = stringProvider.getRemoteString(R.string.android_notification_audio_call_message)
         )
 
     fun createVideoCallNotification(
@@ -62,14 +63,14 @@ internal object NotificationFactory {
     private fun createOneWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
         val message =
             if (hasAudio) {
-                R.string.glia_notification_one_way_video_call_message
+                stringProvider.getRemoteString(R.string.android_notification_one_way_video_message)
             } else {
-                R.string.glia_notification_one_way_video_call_message_no_audio
+                stringProvider.getRemoteString(R.string.android_notification_one_way_video_no_audio_message)
             }
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
-            title = R.string.glia_notification_one_way_video_call_title,
+            title = stringProvider.getRemoteString(R.string.android_notification_one_way_video_title),
             message = message
         )
     }
@@ -77,14 +78,14 @@ internal object NotificationFactory {
     private fun createTwoWayVideoNotification(context: Context, hasAudio: Boolean): Notification {
         val message =
             if (hasAudio) {
-                R.string.glia_notification_two_way_video_call_message
+                stringProvider.getRemoteString(R.string.android_notification_two_way_video_message)
             } else {
-                R.string.glia_notification_two_way_video_call_message_no_audio
+                stringProvider.getRemoteString(R.string.android_notification_two_way_video_no_audio_message)
             }
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
-            title = R.string.glia_notification_two_way_video_call_title,
+            title = stringProvider.getRemoteString(R.string.android_notification_two_way_video_title),
             message = message
         )
     }
@@ -92,13 +93,13 @@ internal object NotificationFactory {
     private fun createCallNotification(
         context: Context,
         @DrawableRes icon: Int,
-        @StringRes title: Int,
-        @StringRes message: Int
+        title: String,
+        message: String
     ): Notification {
         return NotificationCompat.Builder(context, NOTIFICATION_CALL_CHANNEL_ID)
             .setSmallIcon(icon)
-            .setContentTitle(context.getString(title))
-            .setContentText(context.getString(message))
+            .setContentTitle(title)
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setOngoing(true)

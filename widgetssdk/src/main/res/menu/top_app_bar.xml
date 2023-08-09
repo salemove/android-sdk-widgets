@@ -4,7 +4,7 @@
     <item
         android:id="@+id/leave_queue_button"
         android:icon="?attr/gliaIconLeaveQueue"
-        android:title="@string/glia_top_app_bar_close"
+        android:title="Close"
         app:iconTint="?attr/gliaBaseLightColor"
         app:showAsAction="always" />
 

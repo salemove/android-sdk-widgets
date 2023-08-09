@@ -4,6 +4,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.di.Dependencies
@@ -18,6 +20,7 @@ internal open class OperatorBaseViewHolder(
     unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val stringProvider = Dependencies.getStringProvider()
     val operatorTheme: MessageBalloonTheme? by lazy {
         unifiedTheme?.chatTheme?.operatorMessage
     }
@@ -42,17 +45,17 @@ internal open class OperatorBaseViewHolder(
             }
 
             operatorName.isNullOrEmpty().not() -> {
-                itemView.contentDescription = itemView.resources.getString(
-                    R.string.glia_chat_operator_name_message_content_description,
-                    operatorName,
-                    message
+                itemView.contentDescription = stringProvider.getRemoteString(
+                    R.string.android_chat_operator_name_accessibility_message,
+                    StringKeyPair(StringKey.OPERATOR_NAME, operatorName ?: ""),
+                    StringKeyPair(StringKey.MESSAGE, message ?: "")
                 )
             }
 
             else -> {
-                itemView.contentDescription = itemView.resources.getString(
-                    R.string.glia_chat_operator_message_content_description,
-                    message
+                itemView.contentDescription = stringProvider.getRemoteString(
+                    R.string.android_chat_operator_message_accessibility,
+                    StringKeyPair(StringKey.MESSAGE, message ?: "")
                 )
             }
         }

@@ -21,7 +21,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/glia_medium"
             android:accessibilityLiveRegion="polite"
-            android:contentDescription="@string/message_center_progress_bar_content_description"
             android:importantForAccessibility="yes"
             android:indeterminate="true"
             android:visibility="gone"
@@ -40,7 +39,7 @@
             android:importantForAccessibility="no"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:text="@string/message_center_send_message_btn"
+            tools:text="@string/message_center_send_message_btn"
             android:textAppearance="?attr/textAppearanceSubtitle2"
             android:textColor="?attr/gliaBaseLightColor"
             tools:textColor="@color/glia_disable_button_text" />

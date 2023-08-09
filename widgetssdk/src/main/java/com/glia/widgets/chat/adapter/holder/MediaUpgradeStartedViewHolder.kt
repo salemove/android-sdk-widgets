@@ -27,6 +27,8 @@ internal class MediaUpgradeStartedViewHolder(
     @DrawableRes
     private val upgradeVideoIcon: Int? = uiTheme.iconChatVideoUpgrade
 
+    private val stringProvider = Dependencies.getStringProvider()
+
     private val chatTheme: ChatTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme
     }
@@ -68,19 +70,13 @@ internal class MediaUpgradeStartedViewHolder(
         when (chatItem) {
             is MediaUpgradeStartedTimerItem.Audio -> {
                 upgradeAudioIcon?.also(binding.iconView::setImageResource)
-                binding.iconView.contentDescription =
-                    itemView.resources.getString(R.string.glia_chat_audio_icon_content_description)
-                binding.titleView.text =
-                    itemView.resources.getString(R.string.glia_chat_upgraded_to_audio_call)
+                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_media_upgrade_audio_system_message)
                 setMediaUpgradeTheme(chatTheme?.audioUpgrade)
             }
 
             is MediaUpgradeStartedTimerItem.Video -> {
                 upgradeVideoIcon?.also(binding.iconView::setImageResource)
-                binding.iconView.contentDescription =
-                    itemView.resources.getString(R.string.glia_chat_video_icon_content_description)
-                binding.titleView.text =
-                    itemView.resources.getString(R.string.glia_chat_upgraded_to_video_call)
+                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_media_upgrade_video_system_message)
                 setMediaUpgradeTheme(chatTheme?.videoUpgrade)
             }
         }

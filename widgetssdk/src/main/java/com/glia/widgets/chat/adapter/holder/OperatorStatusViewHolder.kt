@@ -5,6 +5,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
@@ -29,9 +31,15 @@ internal class OperatorStatusViewHolder(
     private val engagementStatesTheme: EngagementStatesTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.connect
     }
+    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         applyBaseConfig(uiTheme)
+        setBaseStrings()
+    }
+
+    private fun setBaseStrings() {
+        chatStartingCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connection_screen_message)
     }
 
     private fun applyBaseConfig(uiTheme: UiTheme) {
@@ -46,6 +54,7 @@ internal class OperatorStatusViewHolder(
             chatStartingCaptionView.typeface = it
             chatStartedNameView.setTypeface(it, Typeface.BOLD)
             chatStartedCaptionView.typeface = it
+            chatStartedCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connection_screen_message)
         }
         engagementStatesTheme?.operator.also(statusPictureView::applyOperatorTheme)
     }
@@ -86,9 +95,9 @@ internal class OperatorStatusViewHolder(
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_in_queue_message_content_description,
-            companyName ?: ""
+        itemView.contentDescription = stringProvider.getRemoteString(
+            R.string.android_chat_queue_message_accessibility_label,
+            StringKeyPair(StringKey.COMPANY_NAME, companyName ?: "")
         )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)
@@ -101,12 +110,10 @@ internal class OperatorStatusViewHolder(
         applyChatStartedViewsVisibility()
 
         chatStartedNameView.text = operatorName
-        chatStartedCaptionView.text =
-            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined_content_description,
-            operatorName
-        )
+        stringProvider.getRemoteString(R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)).apply {
+            chatStartedCaptionView.text = this
+            itemView.contentDescription = this
+        }
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
     }
@@ -116,10 +123,10 @@ internal class OperatorStatusViewHolder(
             ?: statusPictureView.showPlaceholder()
         chatStartedNameView.text = operatorName
         chatStartedCaptionView.text =
-            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined_content_description,
-            operatorName
+            stringProvider.getRemoteString(R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName))
+        itemView.contentDescription = stringProvider.getRemoteString(
+            R.string.chat_operator_joined_system_message,
+            StringKeyPair(StringKey.OPERATOR_NAME, operatorName)
         )
 
         applyChatStartingViewsVisibility(false)
@@ -134,8 +141,7 @@ internal class OperatorStatusViewHolder(
         chatStartedNameView.isVisible = true
         chatStartedCaptionView.isVisible = false
 
-        chatStartedNameView.text =
-            itemView.resources.getString(R.string.glia_chat_visitor_status_transferring)
+        chatStartedNameView.text = stringProvider.getRemoteString(R.string.engagement_queue_transferring)
 
         engagementStatesTheme?.transferring.also(::applyEngagementState)
     }

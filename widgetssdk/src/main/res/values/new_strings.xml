@@ -103,7 +103,6 @@
     <string name="android_chat_file_visitor_accessibility">@string/glia_chat_visitor_file_content_description</string>
     <string name="android_chat_file_visitor_delivered_accessibility">@string/glia_chat_visitor_file_delivered_content_description</string>
     <string name="android_bubble_accessibility">@string/glia_chat_head_view_content_description</string>
-
     <string name="android_upload_error_engagement_missing">@string/glia_chat_attachment_upload_error_engagement_missing</string>
     <string name="android_upload_error_file_limit">@string/glia_chat_attachment_upload_error_file_count_limit_reached</string>
     <string name="android_upload_error_forbidden">@string/glia_chat_attachment_upload_error_file_upload_forbidden</string>
@@ -133,14 +132,11 @@
     <string name="call_video_operator_accessibility_label">@string/glia_call_operator_video_content_description</string>
     <string name="call_video_visitor_accessibility_label">@string/glia_call_visitor_video_content_description</string>
     <string name="android_call_on_hold_accessibility">@string/glia_call_operator_status_on_hold_description</string>
-
-
     <string name="call_button_speaker">@string/glia_call_speaker_button_label</string>
     <string name="chat_operator_name_accessibility_label">@string/glia_call_operator_name_hint</string>
     <string name="chat_duration_accessibility_label">@string/glia_call_call_duration_hint</string>
     <string name="call_on_hold_bottom_text">@string/glia_call_continue_browsing_on_hold</string>
     <string name="engagement_queue_wait_message">@string/glia_call_continue_browsing</string>
-
     <string name="call_buttons_chat_badge_value_multiple_items_accessibility_label">@string/glia_call_chat_other_content_description</string>
     <string name="call_buttons_chat_badge_value_single_item_accessibility_label">@string/glia_call_chat_one_content_description</string>
 
@@ -188,8 +184,6 @@
     <string name="call_header_close_button_accessibility_hint">Activates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_operator_avatar_accessibility_hint">Displays operator avatar or placeholder.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_operator_name_accessibility_hint">Displays operator name.</string><!-- TODO ADA NEW IN ANDROID -->
-
-
     <string name="chat_input_send">@string/message_center_send_message_btn</string>
     <plurals name="chat_message_unread_accessibility_label"><item quantity="one">@string/glia_call_chat_one_content_description</item><item quantity="other">@string/glia_call_chat_other_content_description</item></plurals>
     <string name="chat_operator_avatar_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
@@ -198,7 +192,6 @@
     <string name="engagement_offer_upgrade">{operatorName} has offered you to upgrade</string> <!-- TODO NEW -->
     <string name="engagement_queue_reconnection_failed_try_again">@string/glia_dialog_unexpected_error_message</string>
     <string name="engagement_secure_messaging_title">@string/message_center_screen_title</string>
-
     <string name="error_unexpected_title">We\'re sorry, there has been an unexpected error.</string> <!-- TODO NEW -->
     <string name="general_back">Back</string> <!-- TODO NEW -->
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>

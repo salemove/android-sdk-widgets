@@ -183,8 +183,8 @@ class MessageCenterView(
         alertDialog = Dialogs.showAlertDialog(
             context,
             theme,
-            R.string.glia_dialog_message_center_unavailable_title,
-            R.string.glia_dialog_message_center_unauthorized_message
+            R.string.message_center_unavailable_title,
+            R.string.message_center_not_authenticated_message
         ) {
             controller?.dismissCurrentDialog()
             controller?.onCloseButtonClicked()
@@ -215,8 +215,8 @@ class MessageCenterView(
         alertDialog = Dialogs.showAlertDialog(
             this.context,
             theme,
-            R.string.glia_dialog_unexpected_error_title,
-            R.string.glia_dialog_unexpected_error_message
+            R.string.error_general,
+            R.string.engagement_queue_reconnection_failed_try_again
         ) {
             controller?.dismissCurrentDialog()
         }

@@ -133,7 +133,7 @@
             android:layout_marginTop="@dimen/glia_pre_x_large"
             android:layout_marginBottom="@dimen/glia_pre_x_large"
             android:importantForAccessibility="no"
-            android:src="@drawable/glia_logo"
+            android:src="@drawable/ic_glia_logo"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

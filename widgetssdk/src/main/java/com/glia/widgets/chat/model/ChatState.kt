@@ -88,7 +88,8 @@ internal data class ChatState(
         operatorProfileImgUrl: String?
     ): ChatState = copy(
         formattedOperatorName = formattedOperatorName,
-        operatorProfileImgUrl = operatorProfileImgUrl
+        operatorProfileImgUrl = operatorProfileImgUrl,
+        chatInputMode = ChatInputMode.ENABLED,
     )
 
     fun historyLoaded(chatItems: List<ChatItem>): ChatState = copy(

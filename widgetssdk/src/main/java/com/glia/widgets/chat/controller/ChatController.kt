@@ -4,6 +4,7 @@ import android.net.Uri
 import android.text.format.DateUtils
 import android.view.View
 import androidx.annotation.VisibleForTesting
+import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
@@ -675,7 +676,12 @@ internal class ChatController(
 
             EngagementStateEvent.Type.ENGAGEMENT_ENDED -> {
                 Logger.d(TAG, "Engagement Ended")
-                dialogController.dismissDialogs()
+                // TODO re-enable during MOB-2523
+                /*
+                if (!isOngoingEngagementUseCase.invoke()) {
+                    dialogController.dismissDialogs()
+                }
+                */
             }
         }
     }

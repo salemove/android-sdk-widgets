@@ -231,7 +231,12 @@ public class CallController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEndedByOperator");
         stop();
-        dialogController.dismissDialogs();
+        // TODO re-enable during MOB-2523
+        /*
+        if (!isOngoingEngagementUseCase.invoke()) {
+            dialogController.dismissDialogs()
+        }
+        */
     }
 
     @Override

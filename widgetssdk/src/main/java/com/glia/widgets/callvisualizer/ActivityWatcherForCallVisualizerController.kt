@@ -130,7 +130,11 @@ internal class ActivityWatcherForCallVisualizerController(
         when (currentDialogMode) {
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.openNotificationChannelScreen()
-            MODE_START_SCREEN_SHARING -> activity?.run { startScreenSharing(this) }
+            MODE_START_SCREEN_SHARING ->
+                activity?.run {
+                    setIsWaitingMediaProjectionResult(true)
+                    startScreenSharing(this)
+                }
             MODE_MEDIA_UPGRADE -> watcher.openCallActivity()
             MODE_ENABLE_NOTIFICATION_CHANNEL -> watcher.openNotificationChannelScreen()
             MODE_OVERLAY_PERMISSION -> {
@@ -141,6 +145,7 @@ internal class ActivityWatcherForCallVisualizerController(
         }
         watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
+        watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {

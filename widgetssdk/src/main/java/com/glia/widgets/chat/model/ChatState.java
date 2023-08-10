@@ -226,7 +226,7 @@ public class ChatState {
                 .copyFrom(this)
                 .setFormattedOperatorName(formattedOperatorName)
                 .setOperatorProfileImgUrl(operatorProfileImgUrl)
-//                .enableChatPanel() // Why is this here?
+                .enableChatPanel()
                 .createChatState();
     }
 

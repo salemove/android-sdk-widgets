@@ -17,6 +17,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -829,7 +830,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
         binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
-        binding.gvaQuickRepliesLayout.onItemClickedListener = GvaChipGroup.OnItemClickedListener { controller?.onGvaButtonClicked(it) }
+        binding.gvaQuickRepliesLayout.onItemClickedListener = GvaChipGroup.OnItemClickedListener {
+            controller?.onGvaButtonClicked(it)
+
+            // move the focus back to the chat list
+            binding.chatRecyclerView.adapter?.itemCount?.let { size ->
+                val viewHolder = binding.chatRecyclerView.findViewHolderForAdapterPosition(size - 1)
+                viewHolder?.itemView?.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+            }
+        }
     }
 
     private fun setupAddAttachmentButton() {

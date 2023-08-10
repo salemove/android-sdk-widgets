@@ -107,8 +107,8 @@ class GvaChipGroup @JvmOverloads constructor(
             applyUiTheme(uiTheme)
             text = gvaButton.text
             setOnClickListener {
-                this@GvaChipGroup.isVisible = false
                 onItemClickedListener?.onItemClicked(gvaButton)
+                this@GvaChipGroup.isVisible = false
             }
 
             addView(this)

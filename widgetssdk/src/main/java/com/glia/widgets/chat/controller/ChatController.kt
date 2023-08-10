@@ -676,7 +676,7 @@ internal class ChatController(
 
             EngagementStateEvent.Type.ENGAGEMENT_ENDED -> {
                 Logger.d(TAG, "Engagement Ended")
-                if (!Glia.getCurrentEngagement().isPresent) {
+                if (!Dependencies.getUseCaseFactory().createIsOngoingEngagementUseCase().invoke()) {
                     dialogController.dismissDialogs()
                 }
             }

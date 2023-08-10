@@ -231,7 +231,7 @@ public class CallController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEndedByOperator");
         stop();
-        if (!Glia.getCurrentEngagement().isPresent()) {
+        if (!Dependencies.getUseCaseFactory().createIsOngoingEngagementUseCase().invoke()) {
             dialogController.dismissDialogs();
         }
     }

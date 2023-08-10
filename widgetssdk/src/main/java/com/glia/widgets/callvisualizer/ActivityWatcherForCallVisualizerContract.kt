@@ -24,6 +24,8 @@ class ActivityWatcherForCallVisualizerContract {
         fun onRequestedCameraPermissionResult(isGranted: Boolean)
         fun onMediaProjectionPermissionResult(isGranted: Boolean, activity: Activity)
         fun onMediaProjectionRejected()
+        fun isWaitingMediaProjectionResult(): Boolean
+        fun setIsWaitingMediaProjectionResult(isWaiting: Boolean)
     }
 
     interface Watcher {
@@ -48,5 +50,6 @@ class ActivityWatcherForCallVisualizerContract {
         fun checkInitialCameraPermission()
         fun callOverlayDialog()
         fun dismissOverlayDialog()
+        fun isSupportActivityOpen(): Boolean
     }
 }

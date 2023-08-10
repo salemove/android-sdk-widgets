@@ -37,6 +37,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     @Mode
     private var currentDialogMode: Int = MODE_NONE
+    private var shouldWaitMediaProjectionResult: Boolean = false
 
     private lateinit var watcher: ActivityWatcherForCallVisualizerContract.Watcher
 
@@ -102,6 +103,14 @@ internal class ActivityWatcherForCallVisualizerController(
         if (state.mode != MODE_NONE) {
             currentDialogMode = state.mode
         }
+        if (state.mode != MODE_NONE && !watcher.isSupportActivityOpen()) {
+            // This function is executed twice
+            // First call opens CallVisualizerSupportActivity and exits the function.
+            // After that this function is called again when CallVisualizerSupportActivity is started.
+            // Second call shows dialog on top of CallVisualizerSupportActivity
+            watcher.openSupportActivity(None)
+            return
+        }
         when (state.mode) {
             MODE_NONE -> watcher.dismissAlertDialog()
             MODE_MEDIA_UPGRADE -> watcher.showUpgradeDialog(state as MediaUpgrade)
@@ -118,11 +127,14 @@ internal class ActivityWatcherForCallVisualizerController(
 
     override fun onPositiveDialogButtonClicked(activity: Activity?) {
         Logger.d(TAG, "onPositiveButtonDialogButtonClicked() - $currentDialogMode")
-        watcher.removeDialogFromStack()
         when (currentDialogMode) {
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.openNotificationChannelScreen()
-            MODE_START_SCREEN_SHARING -> activity?.run { startScreenSharing(this) }
+            MODE_START_SCREEN_SHARING ->
+                activity?.run {
+                    setIsWaitingMediaProjectionResult(true)
+                    startScreenSharing(this)
+                }
             MODE_MEDIA_UPGRADE -> watcher.openCallActivity()
             MODE_ENABLE_NOTIFICATION_CHANNEL -> watcher.openNotificationChannelScreen()
             MODE_OVERLAY_PERMISSION -> {
@@ -131,7 +143,9 @@ internal class ActivityWatcherForCallVisualizerController(
             }
             else -> Logger.d(TAG, "Not relevant")
         }
+        watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
+        watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {
@@ -273,5 +287,11 @@ internal class ActivityWatcherForCallVisualizerController(
         } else {
             mediaUpgradeOffer?.accept { error -> onMediaUpgradeAccept(error) }
         }
+    }
+
+    override fun isWaitingMediaProjectionResult() = shouldWaitMediaProjectionResult
+
+    override fun setIsWaitingMediaProjectionResult(isWaiting: Boolean) {
+        shouldWaitMediaProjectionResult = isWaiting
     }
 }

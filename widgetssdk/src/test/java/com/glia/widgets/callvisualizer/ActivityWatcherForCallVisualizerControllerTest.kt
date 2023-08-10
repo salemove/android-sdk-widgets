@@ -138,6 +138,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
         verify(watcher).openOverlayPermissionView()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -146,6 +147,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         resetMocks()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -158,6 +160,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onPositiveDialogButtonClicked notification channel dialog is shown when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(
             DialogState(
                 MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
@@ -167,10 +170,13 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onNegativeDialogButtonClicked decline is sent and dialog is dismissed when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(
             DialogState(
                 MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
@@ -178,92 +184,141 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         )
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onNegativeDialogButtonClicked()
+        verify(watcher).isSupportActivityOpen()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
     }
 
     @Test
     fun `onPositiveDialogButtonClicked call activity is called when MODE_MEDIA_UPGRADE`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         prepareMediaUpgradeApplicationState()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openCallActivity()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_MEDIA_UPGRADE`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         prepareMediaUpgradeApplicationState()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
     }
 
     @Test
     fun `onPositiveDialogButtonClicked overlay permissions are called when MODE_OVERLAY_PERMISSIONS`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
         verify(watcher).showOverlayPermissionsDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).dismissOverlayDialog()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openOverlayPermissionView()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_OVERLAY_PERMISSIONS`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
         verify(watcher).showOverlayPermissionsDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
+        verify(watcher).isSupportActivityOpen()
     }
 
     @Test
     fun `onPositiveDialogButtonClicked notification channel is shown when MODE_ENABLE_NOTIFICAIONTS_CHANNEL`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_NOTIFICATION_CHANNEL))
         verify(watcher).showAllowNotificationsDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_ENABLE_NOTIFICATIONS_CHANNEL`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_ENABLE_NOTIFICATION_CHANNEL))
         verify(watcher).showAllowNotificationsDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
+    }
+
+    @Test
+    fun `onPositiveDialogButtonClicked openSupportActivity called when isSupportActivityOpen false and MODE_VISITOR_CODE`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(false)
+        controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
+        verify(watcher, never()).showVisitorCodeDialog()
+        controller.onPositiveDialogButtonClicked()
+        verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).openSupportActivity(any())
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_VISITOR_CODE`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
         verify(watcher).showVisitorCodeDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_VISITOR_CODE`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
         verify(watcher).showVisitorCodeDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
     }
 
     @Test
+    fun `onPositiveDialogButtonClicked openSupportActivity called when isSupportActivityOpen false and MODE_SCREEN_SHARING`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(false)
+        controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
+        verify(watcher, never()).showScreenSharingDialog()
+        controller.onPositiveDialogButtonClicked()
+        verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
+        verify(watcher).openSupportActivity(any())
+    }
+    @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
         verify(watcher).showScreenSharingDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
+        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
         verify(watcher).showScreenSharingDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
+        verify(watcher).isSupportActivityOpen()
     }
 
     @Test

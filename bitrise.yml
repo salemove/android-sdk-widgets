@@ -162,7 +162,7 @@ workflows:
         - text: Android Build Succeeded!
         - webhook_url_on_error: $SLACK_ANDROID_WEBHOOK
         - channel_on_error: '#tm-mobile'
-        - text_on_error: '@mobile-caretaker Android Build Failed! (master-build)'
+        - text_on_error: '@mobile-caretaker Android Build Failed! (development-build)'
         - emoji_on_error: "\U0001F4A5"
         - color_on_error: '#d9482b'
         - from_username_on_error: Bitrise
@@ -328,20 +328,22 @@ workflows:
             # debug log
             set -x
 
-            BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+            NEW_BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+            BASE_BRANCH_NAME="development"
             MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
 
-            git checkout -b $BRANCH_NAME
+            git fetch origin $BASE_BRANCH_NAME
+            git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
             git add -A
             git commit -m "$MESSAGE"
-            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+            git push origin "$NEW_BRANCH_NAME":"$NEW_BRANCH_NAME"
 
             PULL_REQUEST_NUMBER=$(curl \
               -X POST \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${NEW_BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
 
             curl \
               -X POST \

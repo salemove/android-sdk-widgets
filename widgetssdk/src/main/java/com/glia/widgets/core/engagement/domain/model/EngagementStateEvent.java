@@ -9,6 +9,7 @@ public interface EngagementStateEvent {
         ENGAGEMENT_ONGOING,
         ENGAGEMENT_OPERATOR_CONNECTED,
         ENGAGEMENT_OPERATOR_CHANGED,
+        NO_ENGAGEMENT
     }
 
     Type getType();
@@ -94,9 +95,23 @@ public interface EngagementStateEvent {
     }
 
     class EngagementEndedEvent implements EngagementStateEvent {
+
         @Override
         public Type getType() {
             return Type.ENGAGEMENT_ENDED;
+        }
+
+        @Override
+        public <T> T accept(EngagementStateEventVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
+    }
+
+    class NoEngagementEvent implements EngagementStateEvent {
+
+        @Override
+        public Type getType() {
+            return Type.NO_ENGAGEMENT;
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.glia.widgets.core.engagement;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Operator;
@@ -27,11 +28,12 @@ public class GliaEngagementStateRepository {
     private final BehaviorProcessor<Optional<EngagementState>> engagementStateProcessor = BehaviorProcessor.createDefault(Optional.empty());
 
     private final BehaviorProcessor<EngagementStateEvent> engagementStateEventProcessor = BehaviorProcessor.createDefault(
-        new EngagementStateEvent.EngagementEndedEvent()
+        new EngagementStateEvent.NoEngagementEvent()
     );
     private final Flowable<EngagementStateEvent> engagementStateEventFlowable = engagementStateEventProcessor.onBackpressureLatest();
     private final GliaOperatorRepository operatorRepository;
     private CompositeDisposable disposable = new CompositeDisposable();
+    private boolean isOngoingEngagement = false;
 
     public GliaEngagementStateRepository(GliaOperatorRepository operatorRepository) {
         this.operatorRepository = operatorRepository;
@@ -95,16 +97,27 @@ public class GliaEngagementStateRepository {
             .orElse(null);
     }
 
+<<<<<<< HEAD
     private EngagementStateEvent mapToEngagementStateChangeEvent(
         EngagementState engagementState,
         @Nullable Operator operator
+=======
+    @VisibleForTesting
+    protected EngagementStateEvent mapToEngagementStateChangeEvent(
+            EngagementState engagementState,
+            @Nullable Operator operator
+>>>>>>> 87dfc69a (Added test coverage)
     ) {
-        if (engagementState == null) {
+        if (engagementState == null && isOngoingEngagement) {
+            isOngoingEngagement = false;
             return new EngagementStateEvent.EngagementEndedEvent();
+        } else if (engagementState == null) {
+            return new EngagementStateEvent.NoEngagementEvent();
         } else if (engagementState.getVisitorStatus() == EngagementState.VisitorStatus.TRANSFERRING) {
             return new EngagementStateEvent.EngagementTransferringEvent();
         } else {
             if (operator == null) {
+                isOngoingEngagement = true;
                 return new EngagementStateEvent.EngagementOperatorConnectedEvent(engagementState.getOperator());
             } else {
                 if (!engagementState.getOperator().getId().equals(operator.getId())) {
@@ -124,6 +137,7 @@ public class GliaEngagementStateRepository {
                 notifyOperatorUpdate(visitor.visit(engagementStateEvent));
                 break;
             case ENGAGEMENT_TRANSFERRING:
+            case NO_ENGAGEMENT:
             case ENGAGEMENT_ENDED:
                 notifyOperatorUpdate(null);
                 break;

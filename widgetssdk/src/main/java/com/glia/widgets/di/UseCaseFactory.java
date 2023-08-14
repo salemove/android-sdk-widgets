@@ -87,6 +87,7 @@ import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.ResetSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
+import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase;
@@ -1027,6 +1028,11 @@ public class UseCaseFactory {
     @NonNull
     public SendUnsentMessagesUseCase createSendUnsentMessagesUseCase() {
         return new SendUnsentMessagesUseCase(repositoryFactory.getGliaMessageRepository());
+    }
+
+    @NonNull
+    public UpdateOperatorDefaultImageUrlUseCase createUpdateOperatorDefaultImageUrlUseCase() {
+        return new UpdateOperatorDefaultImageUrlUseCase(repositoryFactory.getOperatorRepository(), createSiteInfoUseCase());
     }
 
     public void resetState() {

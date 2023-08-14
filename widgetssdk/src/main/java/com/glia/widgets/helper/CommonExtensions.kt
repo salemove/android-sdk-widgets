@@ -11,10 +11,12 @@ import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.MessageAttachment
+import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.engagement.data.LocalOperator
+import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.view.unifiedui.deepMerge
 import kotlin.jvm.optionals.getOrNull
 
@@ -34,8 +36,6 @@ internal val Operator.formattedName: String get() = name.substringBefore(' ')
 
 internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 
-internal fun Operator.toLocal(): LocalOperator = LocalOperator(id, name, imageUrl)
-
 internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment ?: false
 
 internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = deepMerge(newTheme) ?: UiTheme.UiThemeBuilder().build()
@@ -48,3 +48,6 @@ internal fun String.fromHtml(flags: Int = Html.FROM_HTML_MODE_COMPACT): Spanned 
 internal val AttachmentFile.isImage: Boolean get() = contentType.startsWith("image")
 
 internal fun MessageAttachment.asSingleChoice(): SingleChoiceAttachment? = this as? SingleChoiceAttachment
+
+internal fun OperatorMessage.toChatMessageInternal(): ChatMessageInternal =
+    ChatMessageInternal(this, LocalOperator(operatorId.orEmpty(), operatorName.orEmpty(), operatorImageUrl))

@@ -28,6 +28,7 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
+import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
@@ -104,6 +105,7 @@ class ChatControllerTest {
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
+    private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -156,6 +158,7 @@ class ChatControllerTest {
         acceptMediaUpgradeOfferUseCase = mock()
         determineGvaButtonTypeUseCase = mock()
         isAuthenticatedUseCase = mock()
+        updateOperatorDefaultImageUrlUseCase = mock()
         chatManager = mock()
 
         chatController = ChatController(
@@ -204,6 +207,7 @@ class ChatControllerTest {
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
+            updateOperatorDefaultImageUrlUseCase = updateOperatorDefaultImageUrlUseCase,
             chatManager = chatManager
         )
     }

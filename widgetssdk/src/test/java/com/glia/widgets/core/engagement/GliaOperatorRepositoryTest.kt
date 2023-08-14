@@ -7,7 +7,7 @@ import com.glia.androidsdk.Operator.Picture
 import com.glia.androidsdk.RequestCallback
 import com.glia.widgets.core.engagement.data.LocalOperator
 import com.glia.widgets.di.GliaCore
-import junit.framework.TestCase.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
@@ -46,40 +46,22 @@ class GliaOperatorRepositoryTest {
     }
 
     @Test
-    fun `updateIfExists returns the inserted operator if it doesn't exist in cache`() {
-        mockOperator()
-        val newLocalOperator = repository.updateIfExists(operator)
-        assertEquals(localOperator, newLocalOperator)
-    }
-
-    @Test
-    fun `updateIfExists returns the updated operator if it exists in cache without image url`() {
-        val imageUrl = "new_image_url"
-        mockOperator(imageUrl)
-        repository.putOperator(localOperator.copy(imageUrl = null))
-        val newLocalOperator = repository.updateIfExists(operator)
-
-        assertNotEquals(localOperator, newLocalOperator)
-        assertEquals(newLocalOperator.imageUrl, imageUrl)
-    }
-
-
-    @Test
-    fun `updateIfExists returns the old operator if it exists in cache with image url`() {
-        val imageUrl = "new_image_url"
-        mockOperator(imageUrl)
-        repository.putOperator(localOperator)
-        val newLocalOperator = repository.updateIfExists(operator)
-
-        assertEquals(localOperator, newLocalOperator)
-        assertEquals(newLocalOperator.imageUrl, localOperator.imageUrl)
+    fun `mapOperator return operator with operatorDefaultImageUrl when operator image is null`() {
+        mockOperator(null)
+        val operatorDefaultImageURL = "default_image"
+        repository.updateOperatorDefaultImageUrl(operatorDefaultImageURL)
+        val newOperator = repository.mapOperator(operator)
+        assertEquals(newOperator.imageUrl, operatorDefaultImageURL)
+        assertNotEquals(localOperator, newOperator)
+        assertEquals(localOperator.id, newOperator.id)
+        assertEquals(localOperator.name, newOperator.name)
     }
 
     @Test
     fun `emit updates operator and then puts it into cache`() {
         mockOperator()
         repository.emit(operator)
-        verify(repository).updateIfExists(operator)
+        verify(repository).mapOperator(operator)
         verify(repository).putOperator(any())
     }
 
@@ -110,15 +92,13 @@ class GliaOperatorRepositoryTest {
         stubGetOperatorResponse(null, GliaException("", GliaException.Cause.INVALID_INPUT))
         val callback: Consumer<LocalOperator?> = mock()
 
-        repository.getOperatorById(operator.id, callback);
+        repository.getOperatorById(operator.id, callback)
         verify(callback).accept(null)
     }
 
     private fun stubGetOperatorResponse(operator: Operator?, exception: GliaException?) {
         doAnswer { invocation: InvocationOnMock ->
-            val callback = invocation.getArgument<RequestCallback<Operator?>>(1)
-            callback.onResult(operator, exception)
-            callback
+            invocation.getArgument<RequestCallback<Operator?>>(1).apply { onResult(operator, exception) }
         }.whenever(core).getOperator(anyString(), any())
     }
 }

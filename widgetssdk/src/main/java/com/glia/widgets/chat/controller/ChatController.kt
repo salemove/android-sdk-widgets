@@ -51,6 +51,7 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
+import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor
 import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor.OperatorVisitor
@@ -140,6 +141,7 @@ internal class ChatController(
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
+    private val updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase,
     private val chatManager: ChatManager
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
@@ -207,6 +209,7 @@ internal class ChatController(
     ) {
         val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
         engagementConfigUseCase(chatType, queueIds)
+        updateOperatorDefaultImageUrlUseCase()
 
         if (!hasPendingSurveyUseCase.invoke()) {
             ensureSecureMessagingAvailable()

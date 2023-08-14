@@ -133,6 +133,7 @@ public class ControllerFactory {
                 useCaseFactory.createAcceptMediaUpgradeOfferUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase(),
+                useCaseFactory.createUpdateOperatorDefaultImageUrlUseCase(),
                 managerFactory.getChatManager()
             );
         } else {

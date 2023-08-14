@@ -219,12 +219,7 @@ internal class ChatController(
                 return
             }
 
-            var initChatState = chatState.initChat(companyName, queueId, visitorContextAssetId)
-            if (isSecureEngagement) {
-                initChatState = initChatState.setSecureMessagingState()
-            }
-            prepareChatComponents()
-            emitViewState { initChatState }
+            emitViewState { chatState.initChat(companyName, queueId, visitorContextAssetId) }
             initChatManager()
         }
     }
@@ -821,7 +816,13 @@ internal class ChatController(
             }
         }
 
-        emitViewState { chatState.historyLoaded() }
+        if (isSecureEngagement) {
+            emitViewState { chatState.setSecureMessagingState() }
+        } else {
+            emitViewState { chatState.historyLoaded() }
+        }
+
+        prepareChatComponents()
         initGliaEngagementObserving()
     }
 

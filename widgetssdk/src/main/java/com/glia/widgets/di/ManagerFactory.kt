@@ -13,7 +13,8 @@ internal class ManagerFactory(private val useCaseFactory: UseCaseFactory) {
                 appendHistoryChatMessageUseCase = createAppendHistoryChatMessageUseCase(),
                 appendNewChatMessageUseCase = createAppendNewChatMessageUseCase(),
                 sendUnsentMessagesUseCase = createSendUnsentMessagesUseCase(),
-                handleCustomCardClickUseCase = createHandleCustomCardClickUseCase()
+                handleCustomCardClickUseCase = createHandleCustomCardClickUseCase(),
+                isOngoingEngagementUseCase = createIsOngoingEngagementUseCase()
             )
         }
 }

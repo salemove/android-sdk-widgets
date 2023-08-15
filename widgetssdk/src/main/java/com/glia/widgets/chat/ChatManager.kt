@@ -21,6 +21,7 @@ import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -42,6 +43,7 @@ internal class ChatManager constructor(
     private val appendNewChatMessageUseCase: AppendNewChatMessageUseCase,
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
+    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.create(),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
@@ -101,13 +103,16 @@ internal class ChatManager constructor(
 
     @VisibleForTesting
     fun updateQuickReplies(state: State) {
-        val quickReplyItems = (state.chatItems.lastOrNull() as? GvaQuickReplies)?.run { options } ?: emptyList()
-
-        quickReplies.onNext(quickReplyItems)
+        state.takeIf { isOngoingEngagementUseCase() }
+            ?.run { chatItems.lastOrNull() as? GvaQuickReplies }
+            ?.run { options }
+            .orEmpty()
+            .also(quickReplies::onNext)
     }
 
     @VisibleForTesting
     fun subscribeToQuickReplies(onQuickReplyReceived: (List<GvaButton>) -> Unit): Disposable = quickReplies
+        .distinctUntilChanged()
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe { onQuickReplyReceived(it) }
 

@@ -19,6 +19,7 @@ import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -61,6 +62,7 @@ class ChatManagerTest {
     private lateinit var appendNewChatMessageUseCase: AppendNewChatMessageUseCase
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
+    private lateinit var isOngoingEngagementUseCase: IsOngoingEngagementUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
     private lateinit var compositeDisposable: CompositeDisposable
@@ -79,7 +81,8 @@ class ChatManagerTest {
         appendNewChatMessageUseCase = mock()
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
-        compositeDisposable = mock()
+        isOngoingEngagementUseCase = mock()
+        compositeDisposable = spy()
         stateProcessor = spy(BehaviorProcessor.create())
         quickReplies = BehaviorProcessor.create()
         action = PublishProcessor.create()
@@ -94,6 +97,7 @@ class ChatManagerTest {
                 appendNewChatMessageUseCase,
                 sendUnsentMessagesUseCase,
                 handleCustomCardClickUseCase,
+                isOngoingEngagementUseCase,
                 compositeDisposable,
                 stateProcessor,
                 quickReplies,
@@ -103,6 +107,7 @@ class ChatManagerTest {
 
         state = spy(ChatManager.State())
     }
+
     @Test
     fun `removeNewMessagesDivider removes NewMessagesDivider when it contains in chat items`() {
         state.chatItems.add(NewMessagesDividerItem)
@@ -515,8 +520,25 @@ class ChatManagerTest {
         }
         state.chatItems.add(quickReplies)
 
+        whenever(isOngoingEngagementUseCase()) doReturn true
+
         subjectUnderTest.updateQuickReplies(state)
         quickRepliesTest.assertValue(mockOptions)
+    }
+
+    @Test
+    fun `updateQuickReplies triggers quickReplies onNext with empty list when the is no ongoing engagement`() {
+        val quickRepliesTest = quickReplies.test()
+        val mockOptions: List<GvaButton> = listOf(mock())
+        val quickReplies: GvaQuickReplies = mock {
+            on { options } doReturn mockOptions
+        }
+        state.chatItems.add(quickReplies)
+
+        whenever(isOngoingEngagementUseCase()) doReturn false
+
+        subjectUnderTest.updateQuickReplies(state)
+        quickRepliesTest.assertValue(emptyList())
     }
 
     @Test

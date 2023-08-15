@@ -759,6 +759,7 @@ internal class ChatController(
     }
 
     private fun sendGvaResponse(singleChoiceAttachment: SingleChoiceAttachment) {
+        addQuickReplyButtons(emptyList())
         sendMessageUseCase.execute(singleChoiceAttachment, sendMessageCallback)
     }
 

@@ -158,6 +158,7 @@ internal class ChatController(
         object : GliaSendMessageUseCase.Listener {
             override fun messageSent(message: VisitorMessage?) {
                 Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
+                scrollChatToBottom()
             }
 
             override fun onMessageValidated() {
@@ -997,5 +998,10 @@ internal class ChatController(
             is Gva.ButtonType.PostBack -> sendGvaResponse(buttonType.singleChoiceAttachment)
             is Gva.ButtonType.Url -> viewCallback?.requestOpenUri(buttonType.uri)
         }
+    }
+
+    private fun scrollChatToBottom() {
+        emitViewState { chatState.copy(isChatInBottom = true) }
+        viewCallback?.smoothScrollToBottom()
     }
 }

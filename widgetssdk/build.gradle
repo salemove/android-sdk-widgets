@@ -1,11 +1,13 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'kotlin-parcelize'
+apply plugin: 'app.cash.paparazzi'
 
 android {
   compileSdkVersion 31
   buildToolsVersion "30.0.3"
   defaultPublishConfig "debug"
+  namespace 'com.glia.widgets'
   defaultConfig {
     minSdkVersion 24
     targetSdkVersion 31
@@ -47,7 +49,18 @@ android {
     viewBinding true
     buildConfig true
   }
-  namespace 'com.glia.widgets'
+
+  testOptions {
+    unitTests {
+      includeAndroidResources true
+    }
+  }
+
+  sourceSets {
+    test {
+      java.srcDirs += ['src/snapshotTest/java']
+    }
+  }
 }
 
 dependencies {

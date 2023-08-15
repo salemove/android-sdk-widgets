@@ -6,14 +6,17 @@ import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import io.reactivex.plugins.RxJavaPlugins
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.internal.stubbing.answers.AnswersWithDelay
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.mockito.stubbing.Answer
+import org.robolectric.RobolectricTestRunner
 import kotlin.properties.Delegates
 
+@RunWith(RobolectricTestRunner::class)
 class GetUnreadMessagesCountWithTimeoutUseCaseTest {
     private var repository: SecureConversationsRepository by Delegates.notNull()
     private var useCase: GetUnreadMessagesCountWithTimeoutUseCase by Delegates.notNull()

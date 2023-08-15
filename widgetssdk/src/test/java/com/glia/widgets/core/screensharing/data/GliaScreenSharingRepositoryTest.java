@@ -20,9 +20,12 @@ import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
 import com.glia.widgets.di.GliaCore;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.function.Consumer;
 
+@RunWith(RobolectricTestRunner.class)
 public class GliaScreenSharingRepositoryTest {
 
     @Test

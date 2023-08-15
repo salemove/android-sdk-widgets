@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
+import android.app.NotificationManager;
 import android.content.Context;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -22,8 +23,11 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.robolectric.RobolectricTestRunner;
 
+@RunWith(RobolectricTestRunner.class)
 public class GliaWidgetsTest {
     @ClassRule
     public static final TestRule rule = new InstantTaskExecutorRule();
@@ -43,6 +47,8 @@ public class GliaWidgetsTest {
     @Test
     public void onAppCreate_setApplicationToGliaCore_whenCalled() {
         Application application = mock(Application.class);
+        NotificationManager notificationManager = mock(NotificationManager.class);
+        when(application.getSystemService(NotificationManager.class)).thenReturn(notificationManager);
 
         GliaWidgets.onAppCreate(application);
 

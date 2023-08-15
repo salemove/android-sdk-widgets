@@ -97,16 +97,10 @@ public class GliaEngagementStateRepository {
             .orElse(null);
     }
 
-<<<<<<< HEAD
-    private EngagementStateEvent mapToEngagementStateChangeEvent(
-        EngagementState engagementState,
-        @Nullable Operator operator
-=======
     @VisibleForTesting
     protected EngagementStateEvent mapToEngagementStateChangeEvent(
             EngagementState engagementState,
             @Nullable Operator operator
->>>>>>> 87dfc69a (Added test coverage)
     ) {
         if (engagementState == null && isOngoingEngagement) {
             isOngoingEngagement = false;

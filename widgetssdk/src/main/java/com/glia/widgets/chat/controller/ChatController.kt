@@ -520,12 +520,12 @@ internal class ChatController(
 
             EngagementStateEvent.Type.ENGAGEMENT_ENDED -> {
                 Logger.d(TAG, "Engagement Ended")
-                // TODO re-enable during MOB-2523
-                /*
                 if (!isOngoingEngagementUseCase.invoke()) {
                     dialogController.dismissDialogs()
                 }
-                */
+            }
+            EngagementStateEvent.Type.NO_ENGAGEMENT -> {
+                Logger.d(TAG, "NoEngagement")
             }
         }
     }

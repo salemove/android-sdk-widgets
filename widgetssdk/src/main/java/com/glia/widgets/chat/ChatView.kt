@@ -439,10 +439,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
 
             override fun smoothScrollToBottom() {
+                if (adapter.itemCount < 1) return
                 post { binding.chatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1) }
             }
 
             override fun scrollToBottomImmediate() {
+                if (adapter.itemCount < 1) return
                 post { binding.chatRecyclerView.scrollToPosition(adapter.itemCount - 1) }
             }
 

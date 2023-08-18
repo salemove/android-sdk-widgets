@@ -863,7 +863,7 @@ public class UseCaseFactory {
     @NonNull
     private Gson getGvaGson() {
         if (gvaGson == null) {
-            gvaGson = new GsonBuilder().create();
+            gvaGson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         }
 
         return gvaGson;

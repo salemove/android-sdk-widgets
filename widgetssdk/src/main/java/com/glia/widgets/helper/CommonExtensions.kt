@@ -41,9 +41,9 @@ internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?
 internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = deepMerge(newTheme) ?: UiTheme.UiThemeBuilder().build()
 
 /**
- * Returns styled text from the provided HTML string.
+ * Returns styled text from the provided HTML string. Replaces \n to <br> tag.
  */
-internal fun String.fromHtml(flags: Int = Html.FROM_HTML_MODE_COMPACT): Spanned = Html.fromHtml(this, flags)
+internal fun String.fromHtml(flags: Int = Html.FROM_HTML_MODE_COMPACT): Spanned = Html.fromHtml(replace("\n", "<br>"), flags)
 
 internal val AttachmentFile.isImage: Boolean get() = contentType.startsWith("image")
 

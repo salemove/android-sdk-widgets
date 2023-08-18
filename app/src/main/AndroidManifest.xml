@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <application
-    android:name=".Application"
-    android:allowBackup="true"
-    android:icon="@mipmap/ic_launcher"
-    android:label="@string/app_name"
-    android:roundIcon="@mipmap/ic_launcher_round"
-    android:supportsRtl="true"
-    android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
+    <application
+        android:name=".Application"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
 
-    <activity android:name=".Activity" />
+        <activity
+            android:name=".Activity"
+            android:exported="true">
+            <nav-graph android:value="@navigation/nav_graph" />
+        </activity>
 
-    <activity-alias
-      android:name="LauncherActivity"
-      android:exported="true"
-      android:targetActivity=".Activity">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-      <intent-filter android:label="Deep Link Runner">
-        <action android:name="android.intent.action.VIEW" />
+        <activity-alias
+            android:name="LauncherActivity"
+            android:exported="true"
+            android:targetActivity=".Activity">
 
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:label="Deep Link Runner">
+                <action android:name="android.intent.action.VIEW" />
 
-        <data
-          android:host="widgets"
-          android:pathPrefix="/token"
-          android:scheme="glia" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-        <data
-          android:host="widgets"
-          android:pathPrefix="/secret"
-          android:scheme="glia" />
+                <data android:scheme="glia" />
+                <data android:host="widgets" />
+                <data android:pathPrefix="/token" />
+                <data android:pathPrefix="/secret" />
 
-      </intent-filter>
-    </activity-alias>
+            </intent-filter>
+        </activity-alias>
 
-    <service
-      android:name="com.glia.androidsdk.fcm.GliaFcmService"
-      android:exported="false">
-      <intent-filter>
-        <action android:name="com.google.firebase.MESSAGING_EVENT" />
-      </intent-filter>
-    </service>
+        <service
+            android:name="com.glia.androidsdk.fcm.GliaFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
-    <meta-data
-      android:name="com.google.firebase.messaging.default_notification_icon"
-      android:resource="@drawable/ic_notification" />
-  </application>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+    </application>
 </manifest>

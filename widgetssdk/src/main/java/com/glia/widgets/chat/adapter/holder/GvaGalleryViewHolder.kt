@@ -2,7 +2,7 @@ package com.glia.widgets.chat.adapter.holder
 
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.GvaGalleryAdapter
@@ -24,7 +24,7 @@ internal class GvaGalleryViewHolder(
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        PagerSnapHelper().attachToRecyclerView(contentBinding.cardRecyclerView)
+        LinearSnapHelper().attachToRecyclerView(contentBinding.cardRecyclerView)
     }
 
     fun bind(item: GvaGalleryCards, measuredHeight: Int?) {

@@ -22,11 +22,13 @@ import androidx.core.view.isVisible
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyImageColorTheme
 import com.glia.widgets.helper.applyTextTheme
+import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
 import com.glia.widgets.view.button.BaseConfigurableButton
 import com.glia.widgets.view.button.GliaPositiveButton
@@ -91,13 +93,23 @@ object Dialogs {
         horizontalInset: Int = 0,
         cancelable: Boolean = true
     ): AlertDialog {
-        return MaterialAlertDialogBuilder(context)
+        val dialog = MaterialAlertDialogBuilder(context)
             .setView(view)
             .setBackgroundInsetStart(horizontalInset)
             .setBackgroundInsetEnd(horizontalInset)
             .setCancelable(cancelable)
+            .setOnCancelListener {
+                Dependencies.getControllerFactory().dialogController.dismissVisitorCodeDialog()
+                context.asActivity()?.let {
+                    if (it is CallVisualizerSupportActivity) {
+                        it.overridePendingTransition(0, 0)
+                        it.finish()
+                    }
+                }
+            }
             .show()
             .also { setDialogBackground(it, theme.gliaChatBackgroundColor) }
+        return dialog
     }
 
     private fun showDialog(

@@ -116,7 +116,7 @@ public class DialogController {
     }
 
     public void dismissOverlayPermissionsDialog() {
-        Logger.d(TAG, "Dismiss Visitor Code Dialog");
+        Logger.d(TAG, "Dismiss Overlay Permissions Dialog");
         dialogManager.remove(new DialogState(Dialog.MODE_OVERLAY_PERMISSION));
     }
 

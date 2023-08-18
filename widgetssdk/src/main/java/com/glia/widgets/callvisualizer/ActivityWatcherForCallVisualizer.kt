@@ -96,13 +96,19 @@ internal class ActivityWatcherForCallVisualizer(
 
     override fun requestCameraPermission() {
         if (resumedActivity.get() is ComponentActivity) {
-            cameraPermissionLauncher?.run { this.launch(Manifest.permission.CAMERA) }
+            cameraPermissionLauncher?.run {
+                controller.setIsWaitingMediaProjectionResult(true)
+                this.launch(Manifest.permission.CAMERA)
+            }
         }
     }
 
     override fun requestOverlayPermission() {
         if (resumedActivity.get() is ComponentActivity) {
-            overlayPermissionLauncher?.run { this.launch(Settings.ACTION_MANAGE_OVERLAY_PERMISSION) }
+            overlayPermissionLauncher?.run {
+                controller.setIsWaitingMediaProjectionResult(true)
+                this.launch(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            }
         }
     }
 
@@ -120,6 +126,7 @@ internal class ActivityWatcherForCallVisualizer(
         (activity as? ComponentActivity?)?.let { componentActivity ->
             cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
                     isGranted: Boolean ->
+                controller.setIsWaitingMediaProjectionResult(false)
                 controller.onRequestedCameraPermissionResult(isGranted)
             }
         }
@@ -133,6 +140,7 @@ internal class ActivityWatcherForCallVisualizer(
         (activity as? ComponentActivity?)?.let { componentActivity ->
             overlayPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
                     isGranted: Boolean ->
+                controller.setIsWaitingMediaProjectionResult(false)
                 controller.onMediaProjectionPermissionResult(isGranted, componentActivity)
             }
         }
@@ -341,8 +349,8 @@ internal class ActivityWatcherForCallVisualizer(
             val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
 
             alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
-                dialogController.dismissCurrentDialog()
                 controller.onMediaUpgradeReceived(mediaUpgrade.mediaUpgradeOffer)
+                dialogController.dismissCurrentDialog()
             }) {
                 controller.onNegativeDialogButtonClicked()
             }

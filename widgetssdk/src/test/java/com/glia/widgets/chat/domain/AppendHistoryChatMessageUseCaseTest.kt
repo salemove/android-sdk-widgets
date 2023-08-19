@@ -10,6 +10,7 @@ import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -17,7 +18,9 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class AppendHistoryChatMessageUseCaseTest {
     private lateinit var appendHistoryVisitorChatItemUseCase: AppendHistoryVisitorChatItemUseCase
     private lateinit var appendHistoryOperatorChatItemUseCase: AppendHistoryOperatorChatItemUseCase

@@ -26,6 +26,9 @@ android {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
+    snapshot {
+      // Build type used for snapshot testing.
+    }
   }
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_11
@@ -55,11 +58,17 @@ android {
       includeAndroidResources true
     }
   }
-
   sourceSets {
-    test {
-      java.srcDirs += ['src/snapshotTest/java']
-    }
+    // Exclude the default test directory ("src/test/java") for all build types.
+    // It is necessary to exclude unit tests from snapshot tests.
+    test.java.srcDirs = []
+
+    // Add the default test directory for debug and release build types.
+    testDebug.java.srcDirs += ['src/test/java']
+    testRelease.java.srcDirs += ['src/test/java']
+
+    // Add resource directory for snapshot testing.
+    snapshot.res.srcDirs += ['src/testSnapshot/res']
   }
 }
 

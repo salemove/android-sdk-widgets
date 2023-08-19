@@ -77,7 +77,7 @@ ext {
   mockitoAndroidTestVersion = '4.3.1'
   archCoreVersion = '2.1.0'
   testRulesVersion = '1.5.0'
-  robolectricVersion = '4.10.3'
+  robolectricVersion = '4.9.2'
 
   //kotlin
   coreKtxVersion = '1.8.0'

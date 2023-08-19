@@ -7,15 +7,18 @@ import io.reactivex.schedulers.TestScheduler
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 import java.util.concurrent.TimeUnit
 import kotlin.properties.Delegates
 
+@RunWith(RobolectricTestRunner::class)
 class MarkMessagesReadWithDelayUseCaseTest {
     private var repository: SecureConversationsRepository by Delegates.notNull()
     private var useCase: MarkMessagesReadWithDelayUseCase by Delegates.notNull()

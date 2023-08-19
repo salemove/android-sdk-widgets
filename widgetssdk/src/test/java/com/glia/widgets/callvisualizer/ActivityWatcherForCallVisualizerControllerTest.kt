@@ -389,6 +389,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
+        verify(mediaUpgradeOffer).accept(notNull())
     }
 
     @Test

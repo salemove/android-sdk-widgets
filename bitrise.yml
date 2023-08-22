@@ -225,15 +225,15 @@ workflows:
     - script@1:
         title: Generate changelog
         inputs:
-          - content: |-
-              #!/usr/bin/env bash
-              # fail if any commands fails
-              set -e
-              # debug log
-              set -x
-              
-              # run the local bash script
-              bash ./scripts/generate-changelog.sh
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            # run the local bash script
+            bash ./scripts/generate-changelog.sh
     - github-release@0:
         inputs:
         - username: $GITHUB_USERNAME
@@ -274,7 +274,35 @@ workflows:
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - variant: debug
+    - gradle-unit-test@1:
+        title: Snapshot Test for SDK
+        inputs:
+        - unit_test_flags: ""
+        - unit_test_task: $WIDGET_SDK_MODULE:verifyPaparazziSnapshot
+        is_always_run: true
+    - script@1:
+        title: Export reports for Snapshot Test for SDK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+            
+            REPORTS_DIR=$BITRISE_SOURCE_DIR/widgetssdk/build/reports/tests/testSnapshotUnitTest
+            if [ -d "$REPORTS_DIR" ]; then
+              cd $REPORTS_DIR
+              zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshotTests.zip *
+            fi
+            
+            SNAPSHOT_DIR=$BITRISE_SOURCE_DIR/widgetssdk/build/paparazzi
+            if [ -d "$SNAPSHOT_DIR" ]; then
+              cd $SNAPSHOT_DIR
+              zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshots.zip *
+            fi
+        is_always_run: true
     - android-lint@0:
         title: Run Lint for APP
         inputs:
@@ -297,6 +325,7 @@ workflows:
         inputs:
         - test_type: instrumentation
         - use_verbose_log: true
+    - deploy-to-bitrise-io@2: {}
     - cache-push@2: {}
   upgrade_dependencies:
     steps:
@@ -357,6 +386,12 @@ app:
   - opts:
       is_expand: false
     PROJECT_LOCATION: .
+  - opts:
+      is_expand: false
+    GRADLE_BUILD_FILE_PATH: build.gradle
+  - opts:
+      is_expand: false
+    GRADLEW_PATH: "./gradlew"
   - opts:
       is_expand: false
     EXAMPLE_APP_MODULE: app

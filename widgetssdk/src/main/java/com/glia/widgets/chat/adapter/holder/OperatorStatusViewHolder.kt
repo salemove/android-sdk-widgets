@@ -78,10 +78,11 @@ internal class OperatorStatusViewHolder(
                 item.operatorName,
                 item.profileImgUrl
             )
-            OperatorStatusItem.Status.JOINED -> applyJoinedState(item.operatorName)
+
+            OperatorStatusItem.Status.JOINED -> applyJoinedState(item.operatorName, item.profileImgUrl)
             OperatorStatusItem.Status.TRANSFERRING -> applyTransferringState()
         }
-        statusPictureView.isVisible = isShowStatusPictureView(item.status)
+        statusPictureView.isVisible = true
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
     }
 
@@ -116,7 +117,9 @@ internal class OperatorStatusViewHolder(
         engagementStatesTheme?.connected.also(::applyEngagementState)
     }
 
-    private fun applyJoinedState(operatorName: String) {
+    private fun applyJoinedState(operatorName: String, profileImgUrl: String?) {
+        profileImgUrl?.let { statusPictureView.showProfileImage(it) }
+            ?: statusPictureView.showPlaceholder()
         chatStartedNameView.text = operatorName
         chatStartedCaptionView.text =
             itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
@@ -163,9 +166,6 @@ internal class OperatorStatusViewHolder(
             chatStartedNameView.applyTextTheme(it)
         }
     }
-
-    private fun isShowStatusPictureView(status: OperatorStatusItem.Status) =
-        status != OperatorStatusItem.Status.JOINED
 
     private fun isShowStatusViewRippleAnimation(item: OperatorStatusItem) = item.status.let {
         it == OperatorStatusItem.Status.IN_QUEUE || it == OperatorStatusItem.Status.TRANSFERRING

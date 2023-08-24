@@ -78,8 +78,7 @@ internal class OperatorStatusViewHolder(
             is OperatorStatusItem.Joined -> applyConnectedState(item.operatorName, item.profileImgUrl)
             is OperatorStatusItem.Transferring -> applyTransferringState()
         }
-
-        statusPictureView.isVisible = isShowStatusPictureView(item)
+        statusPictureView.isVisible = true
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
     }
 
@@ -87,18 +86,16 @@ internal class OperatorStatusViewHolder(
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
-        itemView.contentDescription =
-            itemView.resources.getString(
-                R.string.glia_chat_in_queue_message_content_description,
-                companyName ?: ""
-            )
+        itemView.contentDescription = itemView.resources.getString(
+            R.string.glia_chat_in_queue_message_content_description,
+            companyName ?: ""
+        )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)
     }
 
     private fun applyConnectedState(operatorName: String, profileImgUrl: String?) {
-        profileImgUrl?.let { statusPictureView.showProfileImage(it) }
-            ?: statusPictureView.showPlaceholder()
+        profileImgUrl?.let { statusPictureView.showProfileImage(it) } ?: statusPictureView.showPlaceholder()
 
         applyChatStartingViewsVisibility(false)
         applyChatStartedViewsVisibility()
@@ -112,21 +109,6 @@ internal class OperatorStatusViewHolder(
         )
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
-    }
-
-    private fun applyJoinedState(operatorName: String) {
-        chatStartedNameView.text = operatorName
-        chatStartedCaptionView.text =
-            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined_content_description,
-            operatorName
-        )
-
-        applyChatStartingViewsVisibility(false)
-        applyChatStartedViewsVisibility()
-
-        engagementStatesTheme?.connecting.also(::applyEngagementState)
     }
 
     private fun applyTransferringState() {
@@ -161,8 +143,6 @@ internal class OperatorStatusViewHolder(
             chatStartedNameView.applyTextTheme(it)
         }
     }
-
-    private fun isShowStatusPictureView(item: OperatorStatusItem): Boolean = item !is OperatorStatusItem.Joined
 
     private fun isShowStatusViewRippleAnimation(item: OperatorStatusItem): Boolean = when (item) {
         is OperatorStatusItem.InQueue, is OperatorStatusItem.Transferring -> true

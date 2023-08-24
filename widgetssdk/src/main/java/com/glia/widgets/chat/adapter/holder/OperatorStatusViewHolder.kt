@@ -111,6 +111,23 @@ internal class OperatorStatusViewHolder(
         engagementStatesTheme?.connected.also(::applyEngagementState)
     }
 
+    private fun applyJoinedState(operatorName: String, profileImgUrl: String?) {
+        profileImgUrl?.let { statusPictureView.showProfileImage(it) }
+            ?: statusPictureView.showPlaceholder()
+        chatStartedNameView.text = operatorName
+        chatStartedCaptionView.text =
+            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
+        itemView.contentDescription = itemView.resources.getString(
+            R.string.glia_chat_operator_has_joined_content_description,
+            operatorName
+        )
+
+        applyChatStartingViewsVisibility(false)
+        applyChatStartedViewsVisibility()
+
+        engagementStatesTheme?.connecting.also(::applyEngagementState)
+    }
+
     private fun applyTransferringState() {
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()

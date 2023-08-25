@@ -11,16 +11,19 @@ import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.chat.model.GvaGalleryCards
 import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 internal class ChatItemHeightManager(
     private val uiTheme: UiTheme,
     private val layoutInflater: LayoutInflater,
-    private val resources: Resources
+    private val resources: Resources,
+    private val unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
 ) {
     private val measuredHeightsMap = ArrayMap<ChatItem, Int>()
 
     private val gvaGalleryItemViewHolder: GvaGalleryItemViewHolder by lazy {
-        GvaGalleryItemViewHolder(ChatGvaGalleryItemBinding.inflate(layoutInflater), {}, uiTheme)
+        GvaGalleryItemViewHolder(ChatGvaGalleryItemBinding.inflate(layoutInflater), {}, uiTheme, unifiedTheme)
     }
 
     private val gvaGalleryCardWidth: Int by lazy {

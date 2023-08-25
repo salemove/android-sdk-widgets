@@ -9,13 +9,16 @@ import com.glia.widgets.chat.adapter.GvaGalleryAdapter
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.chat.model.GvaGalleryCards
 import com.glia.widgets.databinding.ChatGvaGalleryLayoutBinding
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 internal class GvaGalleryViewHolder(
     private val contentBinding: ChatGvaGalleryLayoutBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
-    uiTheme: UiTheme
-) : OperatorBaseViewHolder(contentBinding.root, contentBinding.chatHeadView, uiTheme) {
-    private val adapter = GvaGalleryAdapter(buttonsClickListener, uiTheme)
+    uiTheme: UiTheme,
+    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+) : OperatorBaseViewHolder(contentBinding.root, contentBinding.chatHeadView, uiTheme, unifiedTheme) {
+    private val adapter = GvaGalleryAdapter(buttonsClickListener, uiTheme, unifiedTheme)
 
     init {
         contentBinding.cardRecyclerView.adapter = adapter

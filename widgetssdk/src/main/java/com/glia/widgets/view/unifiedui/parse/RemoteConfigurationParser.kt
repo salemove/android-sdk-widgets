@@ -1,6 +1,7 @@
 package com.glia.widgets.view.unifiedui.parse
 
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.view.unifiedui.config.RemoteConfiguration
 import com.glia.widgets.view.unifiedui.config.alert.AxisRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.AlignmentTypeRemoteConfig
@@ -13,7 +14,9 @@ import com.glia.widgets.view.unifiedui.config.chat.AttachmentSourceTypeRemoteCon
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 
-internal class RemoteConfigurationParser {
+internal class RemoteConfigurationParser(
+    resourceProvider: ResourceProvider = Dependencies.getResourceProvider()
+) {
     /**
      * @return [Gson] instance with applied deserializers to parse remote config.
      */
@@ -23,7 +26,7 @@ internal class RemoteConfigurationParser {
             .registerTypeAdapter(ColorLayerRemoteConfig::class.java, ColorLayerDeserializer())
             .registerTypeAdapter(
                 SizeDpRemoteConfig::class.java,
-                DpDeserializer(Dependencies.getResourceProvider())
+                DpDeserializer(resourceProvider)
             )
             .registerTypeAdapter(SizeSpRemoteConfig::class.java, SpDeserializer())
             .registerTypeAdapter(TextStyleRemoteConfig::class.java, TextStyleDeserializer())

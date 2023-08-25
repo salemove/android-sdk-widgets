@@ -10,12 +10,12 @@ import java.util.List;
 
 public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listener {
 
+    private final static String TAG = "MessagesNotSeenHandler";
     private final GliaOnMessageUseCase gliaOnMessageUseCase;
     private final GliaOnEngagementEndUseCase gliaOnEngagementEndUseCase;
-    private final static String TAG = "MessagesNotSeenHandler";
+    private final List<MessagesNotSeenHandlerListener> listeners = new ArrayList<>();
     private int count = 0;
     private boolean isCounting = false;
-    private final List<MessagesNotSeenHandlerListener> listeners = new ArrayList<>();
 
     public MessagesNotSeenHandler(
             GliaOnMessageUseCase gliaOnMessageUseCase,
@@ -28,7 +28,6 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
     public void init() {
         Logger.d(TAG, "init");
         gliaOnMessageUseCase.execute().doOnNext(this::onMessage).subscribe();
-        gliaOnEngagementEndUseCase.execute(this);
     }
 
     public void chatOnBackClicked() {
@@ -59,13 +58,27 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
 
     public void addListener(MessagesNotSeenHandlerListener listener) {
         Logger.d(TAG, "addListener");
+        registerEngagementEndUseCaseListener();
         this.listeners.add(listener);
         listener.onNewCount(count);
+    }
+
+    private void registerEngagementEndUseCaseListener() {
+        if (listeners.isEmpty()) {
+            gliaOnEngagementEndUseCase.execute(this);
+        }
     }
 
     public void removeListener(MessagesNotSeenHandlerListener listener) {
         Logger.d(TAG, "removeListener");
         listeners.remove(listener);
+        unregisterEngagementEndUseCaseListener();
+    }
+
+    private void unregisterEngagementEndUseCaseListener() {
+        if (listeners.isEmpty()) {
+            gliaOnEngagementEndUseCase.unregisterListener(this);
+        }
     }
 
     private void emitCount(int newCount) {
@@ -85,6 +98,11 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
         if (isCounting && messageInternal.isNotVisitor()) {
             emitCount(count + 1);
         }
+    }
+
+    public void onDestroy() {
+        gliaOnEngagementEndUseCase.unregisterListener(this);
+        engagementEnded();
     }
 
     public interface MessagesNotSeenHandlerListener {

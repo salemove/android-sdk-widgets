@@ -212,6 +212,7 @@ public class ControllerFactory {
         destroyChatController();
         serviceChatHeadController.onDestroy();
         applicationChatHeadController.onDestroy();
+        messagesNotSeenHandler.onDestroy();
     }
 
     public void destroyCallController() {

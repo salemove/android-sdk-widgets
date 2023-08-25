@@ -205,12 +205,13 @@ public class GliaWidgets {
      */
     public static void endEngagement() {
         Logger.d(TAG, "endEngagement");
+        Dependencies.getControllerFactory().destroyControllers();
+
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
             if (e != null) {
                 Logger.e(TAG, "Ending engagement error: " + e);
             }
         }));
-        Dependencies.getControllerFactory().destroyControllers();
     }
 
     /**

@@ -1,0 +1,12 @@
+{
+  "globalColors": {
+    "primary": "#DE1256",
+    "secondary": "#341256",
+    "baseNormal": "#0FEDCB",
+    "baseLight": "#CDEF01",
+    "baseDark": "#7890AB",
+    "baseShade": "#654321",
+    "background": "#123456",
+    "systemNegative": "#A09876"
+  }
+}

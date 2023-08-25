@@ -8,16 +8,18 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.OperatorStatusView
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal open class OperatorBaseViewHolder(
     itemView: View,
     private val chatHeadView: OperatorStatusView,
-    private val uiTheme: UiTheme
+    private val uiTheme: UiTheme,
+    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
 ) : RecyclerView.ViewHolder(itemView) {
 
     val operatorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+        unifiedTheme?.chatTheme?.operatorMessage
     }
 
     init {

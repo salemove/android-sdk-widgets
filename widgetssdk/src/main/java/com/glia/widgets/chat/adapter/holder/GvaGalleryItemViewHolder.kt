@@ -14,7 +14,6 @@ import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.GvaButtonsAdapter
 import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.databinding.ChatGvaGalleryItemBinding
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.fromHtml
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
@@ -22,6 +21,7 @@ import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 import com.glia.widgets.view.unifiedui.theme.gva.GvaGalleryCardTheme
 import kotlin.properties.Delegates
@@ -29,17 +29,18 @@ import kotlin.properties.Delegates
 internal class GvaGalleryItemViewHolder(
     private val binding: ChatGvaGalleryItemBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
-    private val uiTheme: UiTheme
+    private val uiTheme: UiTheme,
+    private val unifiedTheme: UnifiedTheme?
 ) : ViewHolder(binding.root) {
 
     private var adapter: GvaButtonsAdapter by Delegates.notNull()
 
     private val operatorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+        unifiedTheme?.chatTheme?.operatorMessage
     }
 
     private val galleryCardTheme: GvaGalleryCardTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.galleryCardTheme
+        unifiedTheme?.chatTheme?.gva?.galleryCardTheme
     }
 
     init {

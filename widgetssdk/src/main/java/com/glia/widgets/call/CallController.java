@@ -328,7 +328,7 @@ public class CallController implements
         viewCallback = null;
 
         if (!retain) {
-            disposable.dispose();
+            disposable.clear();
             mediaUpgradeOfferRepository.stopAll();
             mediaUpgradeOfferRepositoryCallback = null;
             if (callTimerStatusListener != null) {
@@ -823,10 +823,7 @@ public class CallController implements
                         break;
                 }
             });
-            omnibrowseEngagement.on(Engagement.Events.END, engagementState -> {
-                Glia.omnibrowse.off(Omnibrowse.Events.ENGAGEMENT);
-                viewCallback.destroyView();
-            });
+            omnibrowseEngagement.on(Engagement.Events.END, engagementState -> viewCallback.destroyView());
         });
     }
 

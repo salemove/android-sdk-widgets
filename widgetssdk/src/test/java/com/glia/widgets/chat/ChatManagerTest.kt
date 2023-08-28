@@ -10,6 +10,7 @@ import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaButton
@@ -42,6 +43,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
@@ -63,6 +65,7 @@ class ChatManagerTest {
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
     private lateinit var isOngoingEngagementUseCase: IsOngoingEngagementUseCase
+    private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
     private lateinit var compositeDisposable: CompositeDisposable
@@ -82,6 +85,7 @@ class ChatManagerTest {
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
         isOngoingEngagementUseCase = mock()
+        isAuthenticatedUseCase = mock()
         compositeDisposable = spy()
         stateProcessor = spy(BehaviorProcessor.create())
         quickReplies = BehaviorProcessor.create()
@@ -98,6 +102,7 @@ class ChatManagerTest {
                 sendUnsentMessagesUseCase,
                 handleCustomCardClickUseCase,
                 isOngoingEngagementUseCase,
+                isAuthenticatedUseCase,
                 compositeDisposable,
                 stateProcessor,
                 quickReplies,
@@ -556,7 +561,7 @@ class ChatManagerTest {
     fun `loadHistory triggers mapChatHistory when history response receives`() {
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
         val testFlowable = subjectUnderTest.loadHistory { }.test()
-        verify(subjectUnderTest).mapChatHistory(any())
+        verify(subjectUnderTest).mapChatHistory(any(), isNull())
         assertTrue(testFlowable.valueCount() == 1)
     }
 
@@ -628,6 +633,21 @@ class ChatManagerTest {
 
             assertEquals(test.values().last().last(), chatItems.last())
         }
+    }
+
+    @Test
+    fun `reloadHistoryIfNeeded does nothing when authenticated`() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        subjectUnderTest.reloadHistoryIfNeeded()
+        verify(loadHistoryUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `reloadHistoryIfNeeded reloads history when not authenticated`() {
+        whenever(isAuthenticatedUseCase()) doReturn false
+        whenever(loadHistoryUseCase()) doReturn Single.just(mock())
+        subjectUnderTest.reloadHistoryIfNeeded()
+        verify(loadHistoryUseCase).invoke()
     }
 
     private inline fun <reified T : ChatMessage> mockChatMessage(): ChatMessageInternal {

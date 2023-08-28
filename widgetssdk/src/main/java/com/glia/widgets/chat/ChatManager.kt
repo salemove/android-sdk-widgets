@@ -10,6 +10,7 @@ import com.glia.widgets.chat.domain.AppendNewChatMessageUseCase
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
+import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.CustomCardChatItem
@@ -25,6 +26,8 @@ import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,6 +47,7 @@ internal class ChatManager constructor(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
+    private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.create(),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
@@ -128,11 +132,12 @@ internal class ChatManager constructor(
     }
 
     @VisibleForTesting
-    fun mapChatHistory(historyResponse: ChatHistoryResponse): State {
-        if (historyResponse.items.isEmpty()) return State()
+    fun mapChatHistory(historyResponse: ChatHistoryResponse, currentState: State? = null): State {
+        val state: State = currentState ?: State()
+
+        if (historyResponse.items.isEmpty()) return state
 
         val chatItems: MutableList<ChatItem> = mutableListOf()
-        val chatItemIds: MutableSet<String> = mutableSetOf()
 
         val rawItems = historyResponse.items
 
@@ -140,9 +145,10 @@ internal class ChatManager constructor(
         for (index in rawItems.indices.reversed()) {
 
             val rawMessage = rawItems[index]
-            chatItemIds.add(rawMessage.chatMessage.id)
 
-            appendHistoryChatMessageUseCase(chatItems, rawMessage, index == rawItems.lastIndex)
+            if (state.isNew(rawMessage)) {
+                appendHistoryChatMessageUseCase(chatItems, rawMessage, index == rawItems.lastIndex)
+            }
         }
 
         chatItems.reverse()
@@ -151,13 +157,10 @@ internal class ChatManager constructor(
             markMessagesReadWithDelay()
         }
 
-        val lastMessageWithVisibleOperatorImage = chatItems.lastOrNull() as? OperatorChatItem
+        state.lastMessageWithVisibleOperatorImage = chatItems.lastOrNull() as? OperatorChatItem
+        state.chatItems.addAll(chatItems)
 
-        return State(
-            chatItems = chatItems,
-            chatItemIds = chatItemIds,
-            lastMessageWithVisibleOperatorImage = lastMessageWithVisibleOperatorImage
-        )
+        return state
     }
 
     @VisibleForTesting
@@ -312,6 +315,15 @@ internal class ChatManager constructor(
     @VisibleForTesting
     fun removeNewMessagesDivider(messagesState: State) = messagesState.apply {
         chatItems.remove(NewMessagesDividerItem)
+    }
+
+    fun reloadHistoryIfNeeded() {
+        if (isAuthenticatedUseCase()) return
+
+        compositeDisposable.add(
+            loadHistoryUseCase().map { mapChatHistory(it, state.value) }
+                .subscribe({ state.onNext(it) }) { Logger.e(TAG, "Chat reload failed", it) }
+        )
     }
 
     internal data class State(

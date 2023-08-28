@@ -795,6 +795,7 @@ internal class ChatController(
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener)
         mediaUpgradeOfferRepository.startListening()
         emitViewState { chatState.engagementStarted() }
+        chatManager.reloadHistoryIfNeeded()
     }
 
     private fun initChatManager() {

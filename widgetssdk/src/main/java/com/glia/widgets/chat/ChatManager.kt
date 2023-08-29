@@ -21,7 +21,7 @@ import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
-import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
@@ -128,7 +128,7 @@ internal class ChatManager constructor(
 
     @VisibleForTesting
     fun checkUnsentMessages(state: State) {
-        sendUnsentMessagesUseCase(state.unsentItems.firstOrNull()?.message ?: return) {}
+        sendUnsentMessagesUseCase(state.unsentItems.firstOrNull() ?: return) {}
     }
 
     @VisibleForTesting
@@ -256,11 +256,11 @@ internal class ChatManager constructor(
     }
 
     @VisibleForTesting
-    fun addUnsentMessage(message: VisitorMessageItem.Unsent, state: State): State {
+    fun addUnsentMessage(message: Unsent, state: State): State {
         state.unsentItems += message
         return state.apply {
             val index = if (chatItems.lastOrNull() is OperatorStatusItem.InQueue) chatItems.lastIndex else chatItems.lastIndex + 1
-            chatItems.add(index, message)
+            chatItems.add(index, message.chatMessage)
         }
     }
 
@@ -329,7 +329,7 @@ internal class ChatManager constructor(
     internal data class State(
         val chatItems: MutableList<ChatItem> = mutableListOf(),
         val chatItemIds: MutableSet<String> = mutableSetOf(),
-        val unsentItems: MutableList<VisitorMessageItem.Unsent> = mutableListOf(),
+        val unsentItems: MutableList<Unsent> = mutableListOf(),
         var lastMessageWithVisibleOperatorImage: OperatorChatItem? = null,
         var operatorStatusItem: OperatorStatusItem? = null,
         var mediaUpgradeTimerItem: MediaUpgradeStartedTimerItem? = null,
@@ -354,7 +354,7 @@ internal class ChatManager constructor(
         data class OperatorConnected(val companyName: String, val operatorFormattedName: String, val operatorImageUrl: String?) : Action
         object Transferring : Action
         data class OperatorJoined(val companyName: String, val operatorFormattedName: String, val operatorImageUrl: String?) : Action
-        data class UnsentMessageReceived(val message: VisitorMessageItem.Unsent) : Action
+        data class UnsentMessageReceived(val message: Unsent) : Action
         data class ResponseCardClicked(val responseCard: OperatorMessageItem.ResponseCard) : Action
         data class OnMediaUpgradeStarted(val isVideo: Boolean) : Action
         data class OnMediaUpgradeTimerUpdated(val formattedValue: String) : Action

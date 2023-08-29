@@ -7,7 +7,7 @@ import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.messagecenter.MessageCenterState
 import io.reactivex.Observable
 
-class SendMessageButtonStateUseCase(
+internal class SendMessageButtonStateUseCase(
     private val sendMessageRepository: SendMessageRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
     private val secureConversationsRepository: SecureConversationsRepository,

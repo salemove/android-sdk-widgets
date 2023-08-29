@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
+import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.helper.isDownloaded
@@ -264,4 +265,11 @@ internal sealed class VisitorMessageItem : VisitorChatItem(ChatAdapter.VISITOR_M
         override val timestamp: Long,
         override val message: String
     ) : VisitorMessageItem()
+}
+
+internal sealed class Unsent(val content: String) {
+    val chatMessage: VisitorMessageItem.Unsent = VisitorMessageItem.Unsent(message = content)
+
+    data class Message(val message: String) : Unsent(message)
+    data class Attachment(val attachment: SingleChoiceAttachment) : Unsent(attachment.selectedOptionText)
 }

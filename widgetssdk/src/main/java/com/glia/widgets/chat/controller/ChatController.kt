@@ -38,7 +38,7 @@ import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
-import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
@@ -168,7 +168,7 @@ internal class ChatController(
                 }
             }
 
-            override fun errorOperatorNotOnline(message: String) {
+            override fun errorOperatorNotOnline(message: Unsent) {
                 onSendMessageOperatorOffline(message)
             }
 
@@ -347,22 +347,17 @@ internal class ChatController(
         error(exception)
     }
 
-    private fun onSendMessageOperatorOffline(message: String) {
+    private fun onSendMessageOperatorOffline(message: Unsent) {
         appendUnsentMessage(message)
         if (!chatState.engagementRequested) {
             queueForEngagement()
         }
     }
 
-    private fun appendUnsentMessage(message: String) {
+    private fun appendUnsentMessage(message: Unsent) {
         Logger.d(TAG, "appendUnsentMessage: $message")
-        chatManager.onChatAction(
-            ChatManager.Action.UnsentMessageReceived(
-                VisitorMessageItem.Unsent(
-                    message = message
-                )
-            )
-        )
+        chatManager.onChatAction(ChatManager.Action.UnsentMessageReceived(message))
+        scrollChatToBottom()
     }
 
     private fun onOperatorTyping(isOperatorTyping: Boolean) {

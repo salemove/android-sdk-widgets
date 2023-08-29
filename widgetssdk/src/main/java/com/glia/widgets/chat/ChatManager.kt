@@ -22,7 +22,6 @@ import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.Unsent
-import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -46,7 +45,6 @@ internal class ChatManager constructor(
     private val appendNewChatMessageUseCase: AppendNewChatMessageUseCase,
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
-    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.create(),
@@ -107,8 +105,7 @@ internal class ChatManager constructor(
 
     @VisibleForTesting
     fun updateQuickReplies(state: State) {
-        state.takeIf { isOngoingEngagementUseCase() }
-            ?.run { chatItems.lastOrNull() as? GvaQuickReplies }
+        state.run { chatItems.lastOrNull() as? GvaQuickReplies }
             ?.run { options }
             .orEmpty()
             .also(quickReplies::onNext)

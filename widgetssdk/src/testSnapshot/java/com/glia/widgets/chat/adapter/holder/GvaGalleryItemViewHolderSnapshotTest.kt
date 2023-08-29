@@ -334,7 +334,7 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
             binding.image.visibility = View.VISIBLE
         }
 
-        return  ViewData(binding, viewHolder)
+        return ViewData(binding, viewHolder)
     }
 
     private fun measureHeight(view: View) {

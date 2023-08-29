@@ -14,6 +14,7 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.gva.GvaPersistentButtonTheme
 import kotlin.properties.Delegates
 
@@ -21,13 +22,14 @@ internal class GvaPersistentButtonsViewHolder(
     operatorMessageBinding: ChatOperatorMessageLayoutBinding,
     private val contentBinding: ChatGvaPersistentButtonsContentBinding,
     buttonsClickListener: ChatAdapter.OnGvaButtonsClickListener,
-    private val uiTheme: UiTheme
-) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme) {
+    private val uiTheme: UiTheme,
+    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme, unifiedTheme) {
 
     private var adapter: GvaButtonsAdapter by Delegates.notNull()
 
     private val persistentButtonTheme: GvaPersistentButtonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.gva?.persistentButtonTheme
+        unifiedTheme?.chatTheme?.gva?.persistentButtonTheme
     }
 
     init {

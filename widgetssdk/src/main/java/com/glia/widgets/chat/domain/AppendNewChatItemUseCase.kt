@@ -138,19 +138,18 @@ internal class AppendNewVisitorMessageUseCase(
     fun addUnsentItem(state: ChatManager.State, message: VisitorMessage): Boolean {
         if (state.unsentItems.isEmpty()) return false
 
-        val unsentMessage =
-            state.unsentItems.firstOrNull { it.message == message.content } ?: return false
+        val unsentMessage = state.unsentItems.firstOrNull { it.content == message.content } ?: return false
         state.unsentItems.remove(unsentMessage)
 
-        val index = state.chatItems.indexOf(unsentMessage)
+        val index = state.chatItems.indexOf(unsentMessage.chatMessage)
         if (index != -1) {
             if (lastDeliveredItem != null) {
                 val lastDeliveredIndex = state.chatItems.indexOf(lastDeliveredItem!!)
                 state.chatItems[lastDeliveredIndex] = lastDeliveredItem!!.withDeliveredStatus(false)
             }
 
-            state.chatItems[index] = unsentMessage.run {
-                lastDeliveredItem = VisitorMessageItem.Delivered(message.id, timestamp, this.message)
+            state.chatItems[index] = message.run {
+                lastDeliveredItem = VisitorMessageItem.Delivered(id, timestamp, content)
                 lastDeliveredItem!!
             }
 

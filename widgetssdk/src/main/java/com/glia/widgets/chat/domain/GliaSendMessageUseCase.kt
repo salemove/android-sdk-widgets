@@ -5,6 +5,7 @@ import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
+import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
@@ -12,7 +13,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 
-class GliaSendMessageUseCase(
+internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val engagementStateRepository: GliaEngagementStateRepository,
@@ -23,7 +24,7 @@ class GliaSendMessageUseCase(
     interface Listener {
         fun messageSent(message: VisitorMessage?)
         fun onMessageValidated()
-        fun errorOperatorNotOnline(message: String)
+        fun errorOperatorNotOnline(message: Unsent)
         fun error(ex: GliaException)
 
         fun errorMessageInvalid() {
@@ -79,7 +80,7 @@ class GliaSendMessageUseCase(
                     sendMessage(message, listener)
                 }
             } else {
-                listener.errorOperatorNotOnline(message)
+                listener.errorOperatorNotOnline(Unsent.Message(message))
             }
         } else {
             listener.errorMessageInvalid()
@@ -87,12 +88,14 @@ class GliaSendMessageUseCase(
     }
 
     fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
-        if (isSecureEngagement) {
-            singleChoiceAttachment.apply {
+        when {
+            isSecureEngagement -> singleChoiceAttachment.apply {
                 secureConversationsRepository.send(selectedOptionText, engagementConfigRepository.queueIds, singleChoiceAttachment, listener)
             }
-        } else {
-            chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
+
+            isOperatorOnline -> chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
+
+            else -> listener.errorOperatorNotOnline(Unsent.Attachment(singleChoiceAttachment))
         }
     }
 

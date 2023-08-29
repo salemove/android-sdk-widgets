@@ -19,7 +19,7 @@ import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
-import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
@@ -194,7 +194,7 @@ class ChatManagerTest {
 
     @Test
     fun `addUnsentMessage adds Unsent message before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
-        val message: VisitorMessageItem.Unsent = VisitorMessageItem.Unsent(id = "id", message = "message")
+        val message: Unsent.Message = Unsent.Message(message = "message")
 
         val inQueue = OperatorStatusItem.InQueue("company_name")
 
@@ -206,14 +206,14 @@ class ChatManagerTest {
 
         assertTrue(newState.unsentItems.count() == 1)
         assertTrue(newState.chatItems.count() == 1)
-        assertEquals(newState.unsentItems.last(), newState.chatItems.last())
+        assertEquals(newState.unsentItems.last().chatMessage, newState.chatItems.last())
 
         newState.chatItems.add(inQueue)
 
         subjectUnderTest.addUnsentMessage(message, state).apply {
             assertTrue(unsentItems.count() == 2)
             assertTrue(chatItems.count() == 3)
-            assertEquals(unsentItems.last(), chatItems[1])
+            assertEquals(unsentItems.last().chatMessage, chatItems[1])
             assertEquals(chatItems.last(), inQueue)
         }
     }
@@ -482,7 +482,7 @@ class ChatManagerTest {
 
     @Test
     fun `checkUnsentMessages calls sendUnsentMessagesUseCase when unsent messages list is not empty`() {
-        val mockUnsentMessage: VisitorMessageItem.Unsent = mock {
+        val mockUnsentMessage: Unsent.Message = mock {
             on { message } doReturn "message"
         }
         state.unsentItems.add(mockUnsentMessage)

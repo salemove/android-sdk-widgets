@@ -4,6 +4,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.ChatManager
+import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
@@ -58,7 +59,7 @@ class AppendNewVisitorMessageUseCaseTest {
         val content = "content"
         whenever(visitorMessage.content) doReturn content
 
-        state.unsentItems.add(VisitorMessageItem.Unsent(message = content))
+        state.unsentItems.add(Unsent.Message(message = content))
         assertFalse(useCase.addUnsentItem(state, visitorMessage))
     }
 
@@ -74,9 +75,9 @@ class AppendNewVisitorMessageUseCaseTest {
         whenever(visitorMessage.id) doReturn "id"
         whenever(visitorMessage.timestamp) doReturn 1
 
-        val unsentMessage = VisitorMessageItem.Unsent(message = content)
+        val unsentMessage = Unsent.Message(message = content)
         state.unsentItems.add(unsentMessage)
-        state.chatItems.add(unsentMessage)
+        state.chatItems.add(unsentMessage.chatMessage)
 
         assertTrue(useCase.addUnsentItem(state, visitorMessage))
         assertTrue(state.unsentItems.isEmpty())

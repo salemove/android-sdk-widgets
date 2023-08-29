@@ -11,7 +11,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 
-class SecureConversationsRepository(private val secureConversations: SecureConversations) {
+internal class SecureConversationsRepository(private val secureConversations: SecureConversations) {
     private val _messageSendingObservable: Subject<Boolean> = BehaviorSubject.createDefault(false)
 
     val messageSendingObservable: Observable<Boolean> = _messageSendingObservable

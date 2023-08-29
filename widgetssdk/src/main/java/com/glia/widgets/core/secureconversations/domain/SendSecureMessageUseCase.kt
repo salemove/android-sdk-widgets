@@ -10,7 +10,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 
-class SendSecureMessageUseCase(
+internal class SendSecureMessageUseCase(
     private val queueId: String,
     private val sendMessageRepository: SendMessageRepository,
     private val secureConversationsRepository: SecureConversationsRepository,

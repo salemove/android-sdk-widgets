@@ -86,8 +86,14 @@ class GliaSendMessageUseCase(
         }
     }
 
-    fun execute(singleChoiceAttachment: SingleChoiceAttachment?, listener: Listener?) {
-        chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
+    fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
+        if (isSecureEngagement) {
+            singleChoiceAttachment.apply {
+                secureConversationsRepository.send(selectedOptionText, engagementConfigRepository.queueIds, singleChoiceAttachment, listener)
+            }
+        } else {
+            chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
+        }
     }
 
     private val isOperatorOnline: Boolean

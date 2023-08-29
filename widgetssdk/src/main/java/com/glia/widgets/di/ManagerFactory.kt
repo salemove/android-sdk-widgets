@@ -14,7 +14,6 @@ internal class ManagerFactory(private val useCaseFactory: UseCaseFactory) {
                 appendNewChatMessageUseCase = createAppendNewChatMessageUseCase(),
                 sendUnsentMessagesUseCase = createSendUnsentMessagesUseCase(),
                 handleCustomCardClickUseCase = createHandleCustomCardClickUseCase(),
-                isOngoingEngagementUseCase = createIsOngoingEngagementUseCase(),
                 isAuthenticatedUseCase = createIsAuthenticatedUseCase()
             )
         }

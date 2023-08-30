@@ -5,18 +5,21 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.GvaResponseText
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.fromHtml
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 
 internal class GvaResponseTextViewHolder(
     operatorMessageBinding: ChatOperatorMessageLayoutBinding,
     private val messageContentBinding: ChatReceiveMessageContentBinding,
-    private val uiTheme: UiTheme
-) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme)  {
+    private val uiTheme: UiTheme,
+    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
+) : OperatorBaseViewHolder(operatorMessageBinding.root, operatorMessageBinding.chatHeadView, uiTheme, unifiedTheme)  {
 
     init {
         setupMessageContentView()

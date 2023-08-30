@@ -2,19 +2,17 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.chat.model.GvaPersistentButtons
-import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
+import com.glia.widgets.chat.model.GvaResponseText
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
+import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.snapshotutils.SnapshotGva
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
+class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
 
-    private fun gvaPersistentButtons(showChatHead: Boolean = false) = GvaPersistentButtons(
+    private fun gvaResponseText(showChatHead: Boolean = false) = GvaResponseText(
         content = gvaLongSubtitle(),
-        options = mediumLengthTexts().map { GvaButton(it) },
         showChatHead = showChatHead
     )
 
@@ -24,7 +22,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withoutChatHead() {
         snapshot(
             setupView(
-                gvaPersistentButtons()
+                gvaResponseText()
             ).viewHolder.itemView
         )
     }
@@ -33,7 +31,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withoutChatHeadWithUiTheme() {
         snapshot(
             setupView(
-                gvaPersistentButtons(),
+                gvaResponseText(),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -43,7 +41,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withoutChatHeadWithGlobalColors() {
         snapshot(
             setupView(
-                gvaPersistentButtons(),
+                gvaResponseText(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -53,18 +51,8 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withoutChatHeadWithUnifiedTheme() {
         snapshot(
             setupView(
-                gvaPersistentButtons(),
+                gvaResponseText(),
                 unifiedTheme = unifiedTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withoutChatHeadUnifiedThemeWithoutGva() {
-        snapshot(
-            setupView(
-                gvaPersistentButtons(),
-                unifiedTheme = unifiedThemeWithoutGva()
             ).viewHolder.itemView
         )
     }
@@ -75,7 +63,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withChatHead() {
         snapshot(
             setupView(
-                gvaPersistentButtons(
+                gvaResponseText(
                     showChatHead = true
                 ),
             ).viewHolder.itemView
@@ -86,7 +74,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withChatHeadWithUiTheme() {
         snapshot(
             setupView(
-                gvaPersistentButtons(
+                gvaResponseText(
                     showChatHead = true
                 ),
                 uiTheme = uiTheme()
@@ -98,7 +86,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withChatHeadWithGlobalColors() {
         snapshot(
             setupView(
-                gvaPersistentButtons(
+                gvaResponseText(
                     showChatHead = true
                 ),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -110,22 +98,10 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
     fun withChatHeadWithUnifiedTheme() {
         snapshot(
             setupView(
-                gvaPersistentButtons(
+                gvaResponseText(
                     showChatHead = true
                 ),
                 unifiedTheme = unifiedTheme()
-            ).viewHolder.itemView
-        )
-    }
-
-    @Test
-    fun withChatHeadUnifiedThemeWithoutGva() {
-        snapshot(
-            setupView(
-                gvaPersistentButtons(
-                    showChatHead = true
-                ),
-                unifiedTheme = unifiedThemeWithoutGva()
             ).viewHolder.itemView
         )
     }
@@ -134,25 +110,24 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
 
     private data class ViewData(
         val chatOperatorMessageLayoutBinding: ChatOperatorMessageLayoutBinding,
-        val gvaPersistentButtonsContentBinding: ChatGvaPersistentButtonsContentBinding,
-        val viewHolder: GvaPersistentButtonsViewHolder
+        val gvaPersistentButtonsContentBinding: ChatReceiveMessageContentBinding,
+        val viewHolder: GvaResponseTextViewHolder
     )
 
     private fun setupView(
-        card: GvaPersistentButtons,
+        card: GvaResponseText,
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
-        val gvaPersistentButtonsContentBinding = ChatGvaPersistentButtonsContentBinding.inflate(
+        val gvaPersistentButtonsContentBinding = ChatReceiveMessageContentBinding.inflate(
             layoutInflater,
             chatOperatorMessageLayoutBinding.contentLayout,
             true
         )
-        val viewHolder = GvaPersistentButtonsViewHolder(
+        val viewHolder = GvaResponseTextViewHolder(
             chatOperatorMessageLayoutBinding,
             gvaPersistentButtonsContentBinding,
-            {},
             uiTheme,
             unifiedTheme
         )

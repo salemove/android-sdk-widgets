@@ -215,8 +215,11 @@ internal class ChatAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
-        val isHandled: Boolean = when (val item: ChatItem = differ.currentList[position]) {
-            is MediaUpgradeStartedTimerItem -> updateMediaUpgradeTimer(payloads, holder as MediaUpgradeStartedViewHolder)
+        val isHandled: Boolean = when (holder) {
+            is MediaUpgradeStartedViewHolder -> updateMediaUpgradeTimer(payloads, holder)
+            is VisitorMessageViewHolder -> updateDeliveredState(payloads, holder)
+            is VisitorFileAttachmentViewHolder -> updateDeliveredState(payloads, holder)
+            is VisitorImageAttachmentViewHolder -> updateDeliveredState(payloads, holder)
             else -> false
         }
 
@@ -224,6 +227,24 @@ internal class ChatAdapter(
             super.onBindViewHolder(holder, position, payloads)
         }
     }
+
+    private fun updateDeliveredState(payloads: MutableList<Any>, holder: VisitorMessageViewHolder): Boolean =
+        payloads.lastOrNull { it is Boolean }?.let {
+            holder.updateDelivered(it as Boolean)
+            true
+        } ?: false
+
+    private fun updateDeliveredState(payloads: MutableList<Any>, holder: VisitorFileAttachmentViewHolder): Boolean =
+        payloads.lastOrNull { it is Boolean }?.let {
+            holder.updateDelivered(it as Boolean)
+            true
+        } ?: false
+
+    private fun updateDeliveredState(payloads: MutableList<Any>, holder: VisitorImageAttachmentViewHolder): Boolean =
+        payloads.lastOrNull { it is Boolean }?.let {
+            holder.updateDelivered(it as Boolean)
+            true
+        } ?: false
 
     private fun updateMediaUpgradeTimer(payloads: MutableList<Any>, viewHolder: MediaUpgradeStartedViewHolder): Boolean = payloads.run {
         firstOrNull() as? String

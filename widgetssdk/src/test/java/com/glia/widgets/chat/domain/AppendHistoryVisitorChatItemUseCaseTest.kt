@@ -45,7 +45,7 @@ class AppendHistoryVisitorChatItemUseCaseTest {
         useCase(items, visitorMessage)
 
         assertTrue(items.count() == 1)
-        assertTrue(items.last() is VisitorMessageItem.History)
+        assertTrue(items.last() is VisitorMessageItem)
     }
 
     @Test
@@ -75,7 +75,7 @@ class AppendHistoryVisitorChatItemUseCaseTest {
 
         assertTrue(items.count() == 2)
         assertTrue(items.first() is VisitorAttachmentItem.File)
-        assertTrue(items[1] is VisitorMessageItem.History)
+        assertTrue(items[1] is VisitorMessageItem)
     }
 
     @Test
@@ -101,6 +101,6 @@ class AppendHistoryVisitorChatItemUseCaseTest {
         assertTrue(items.count() == 3)
         assertTrue(items.first() is VisitorAttachmentItem.File)
         assertTrue(items[1] is VisitorAttachmentItem.Image)
-        assertTrue(items[2] is VisitorMessageItem.History)
+        assertTrue(items[2] is VisitorMessageItem)
     }
 }

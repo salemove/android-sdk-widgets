@@ -297,6 +297,16 @@ class ChatManagerTest {
     }
 
     @Test
+    fun `mapMessageSent adds new Message`() {
+        val action: ChatManager.Action.MessageSent = mock {
+            on { message } doReturn mock()
+        }
+
+        subjectUnderTest.mapMessageSent(action.message, state)
+        verify(subjectUnderTest).mapNewMessage(any(), eq(state))
+    }
+
+    @Test
     fun `mapCustomCardClicked updates Custom Card`() {
         val action: ChatManager.Action.CustomCardClicked = mock {
             on { customCard } doReturn mock()
@@ -481,11 +491,16 @@ class ChatManagerTest {
         val mockUnsentMessage: Unsent.Message = mock {
             on { message } doReturn "message"
         }
+
+        whenever(sendUnsentMessagesUseCase(any(), any())).thenAnswer {
+            (it.getArgument(1) as ((VisitorMessage) -> Unit)).invoke(mock())
+        }
+
         state.unsentItems.add(mockUnsentMessage)
 
         subjectUnderTest.checkUnsentMessages(state)
-
         verify(sendUnsentMessagesUseCase).invoke(any(), any())
+        verify(subjectUnderTest).onChatAction(any())
     }
 
     @Test

@@ -98,7 +98,7 @@ internal class AppendHistoryVisitorChatItemUseCase(
             }
 
             if (content.isNotBlank()) {
-                chatItems += VisitorMessageItem.History(id, timestamp, content)
+                chatItems += VisitorMessageItem(content, id, timestamp)
             }
         }
 
@@ -131,7 +131,7 @@ internal class AppendHistoryCustomCardItemUseCase(
         message.attachment?.asSingleChoice()?.selectedOptionText?.takeIf {
             it.isNotBlank()
         }?.let {
-            VisitorMessageItem.History(message.id, message.timestamp, it)
+            VisitorMessageItem(it, message.id, message.timestamp)
         }?.also {
             chatItems.add(it)
         }

@@ -65,7 +65,7 @@ class AppendNewVisitorMessageUseCaseTest {
 
     @Test
     fun `addUnsentItem returns true when unsentItems and chatItems contain received message`() {
-        val lastDelivered: VisitorChatItem = VisitorMessageItem.Delivered("id", 1, "message")
+        val lastDelivered: VisitorChatItem = VisitorMessageItem("message", "id", 1, true)
 
         useCase.lastDeliveredItem = lastDelivered
         state.chatItems.add(lastDelivered)
@@ -81,8 +81,8 @@ class AppendNewVisitorMessageUseCaseTest {
 
         assertTrue(useCase.addUnsentItem(state, visitorMessage))
         assertTrue(state.unsentItems.isEmpty())
-        assertTrue(state.chatItems.last() is VisitorMessageItem.Delivered)
-        assertTrue(state.chatItems.first() is VisitorMessageItem.New)
+        assertTrue(state.chatItems.last() is VisitorMessageItem)
+        assertTrue(state.chatItems.first() is VisitorMessageItem)
     }
 
     @Test
@@ -106,7 +106,7 @@ class AppendNewVisitorMessageUseCaseTest {
         useCase(state, chatMessageInternal)
 
         assertTrue(state.chatItems.count() == 1)
-        assertTrue(state.chatItems.first() is VisitorMessageItem.Delivered)
+        assertTrue(state.chatItems.first() is VisitorMessageItem)
     }
 
     @Test
@@ -131,7 +131,7 @@ class AppendNewVisitorMessageUseCaseTest {
         useCase(state, chatMessageInternal)
 
         assertTrue(state.chatItems.count() == 2)
-        assertTrue(state.chatItems.first() is VisitorMessageItem.New)
+        assertTrue(state.chatItems.first() is VisitorMessageItem)
         assertTrue(state.chatItems.last() is VisitorAttachmentItem.File)
         assertTrue((state.chatItems.last() as VisitorChatItem).showDelivered)
         assertTrue(useCase.lastDeliveredItem is VisitorAttachmentItem.File)

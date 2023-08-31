@@ -20,11 +20,11 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
     private final TextView deliveredView;
 
     public VisitorImageAttachmentViewHolder(
-            @NonNull View itemView,
-            UiTheme uiTheme,
-            GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
-            GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
-            GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
+        @NonNull View itemView,
+        UiTheme uiTheme,
+        GetImageFileFromCacheUseCase getImageFileFromCacheUseCase,
+        GetImageFileFromDownloadsUseCase getImageFileFromDownloadsUseCase,
+        GetImageFileFromNetworkUseCase getImageFileFromNetworkUseCase
     ) {
         super(itemView, getImageFileFromCacheUseCase, getImageFileFromDownloadsUseCase, getImageFileFromNetworkUseCase);
         deliveredView = itemView.findViewById(R.id.delivered_view);
@@ -41,10 +41,10 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
     private void setAccessibilityLabels(boolean showDelivered) {
         if (showDelivered) {
             itemView.setContentDescription(itemView.getResources().getString(
-                    R.string.glia_chat_visitor_image_delivered_content_description));
+                R.string.glia_chat_visitor_image_delivered_content_description));
         } else {
             itemView.setContentDescription(itemView.getResources().getString(
-                    R.string.glia_chat_visitor_image_content_description));
+                R.string.glia_chat_visitor_image_content_description));
         }
     }
 
@@ -58,5 +58,9 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
             deliveredView.setTypeface(fontFamily);
         }
         deliveredView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
+    }
+
+    public void updateDelivered(boolean delivered) {
+        deliveredView.setVisibility(delivered ? View.VISIBLE : View.GONE);
     }
 }

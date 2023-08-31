@@ -125,7 +125,9 @@ internal class ChatManager constructor(
 
     @VisibleForTesting
     fun checkUnsentMessages(state: State) {
-        sendUnsentMessagesUseCase(state.unsentItems.firstOrNull() ?: return) {}
+        sendUnsentMessagesUseCase(state.unsentItems.firstOrNull() ?: return) {
+            onChatAction(Action.MessageSent(it))
+        }
     }
 
     @VisibleForTesting
@@ -187,9 +189,12 @@ internal class ChatManager constructor(
             is Action.OnMediaUpgradeTimerUpdated -> mapMediaUpgradeTimerUpdated(action.formattedValue, state)
             is Action.CustomCardClicked -> mapCustomCardClicked(action, state)
             Action.ChatRestored -> state
+            is Action.MessageSent -> mapMessageSent(action.message, state)
         }
     }
 
+    @VisibleForTesting
+    fun mapMessageSent(message: VisitorMessage, state: State): State = mapNewMessage(ChatMessageInternal(message), state)
 
     @VisibleForTesting
     fun mapCustomCardClicked(action: Action.CustomCardClicked, state: State): State = action.run {
@@ -359,5 +364,6 @@ internal class ChatManager constructor(
         object OnMediaUpgradeCanceled : Action
         data class CustomCardClicked(val customCard: CustomCardChatItem, val attachment: SingleChoiceAttachment) : Action
         object ChatRestored : Action
+        data class MessageSent(val message: VisitorMessage) : Action
     }
 }

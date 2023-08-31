@@ -149,7 +149,7 @@ internal class AppendNewVisitorMessageUseCase(
             }
 
             state.chatItems[index] = message.run {
-                lastDeliveredItem = VisitorMessageItem.Delivered(id, timestamp, content)
+                lastDeliveredItem = VisitorMessageItem(content, id, timestamp, true)
                 lastDeliveredItem!!
             }
 
@@ -168,11 +168,7 @@ internal class AppendNewVisitorMessageUseCase(
                 val hasFiles = !files.isNullOrEmpty()
 
                 if (content.isNotBlank()) {
-                    if (hasFiles) {
-                        state.chatItems += VisitorMessageItem.New(id, timestamp, content)
-                    } else {
-                        state.chatItems += VisitorMessageItem.Delivered(id, timestamp, content)
-                    }
+                    state.chatItems += VisitorMessageItem(content, id, timestamp, !hasFiles)
                 }
 
                 files?.forEachIndexed { index, attachmentFile ->

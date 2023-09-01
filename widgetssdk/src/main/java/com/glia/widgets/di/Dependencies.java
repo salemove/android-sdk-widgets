@@ -8,6 +8,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
+import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
@@ -54,6 +55,7 @@ public class Dependencies {
             // TODO IMPLEMENT NEW METHOD FROM CORE
             return fallback;
         };
+        notificationManager = new NotificationManager(application, stringProvider);
         notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);

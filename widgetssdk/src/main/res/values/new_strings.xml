@@ -15,6 +15,25 @@
     <string name="android_notification_one_way_video_no_audio_message">@string/glia_notification_one_way_video_call_message_no_audio</string>
     <string name="android_notification_one_way_video_call_title">@string/glia_notification_one_way_video_call_title</string>
 
+    <!-- Call Visualizer -->
+    <string name="call_visualizer_visitor_code_title">@string/glia_visitor_code_view_title</string>
+    <string name="visitor_code_failed">@string/glia_visitor_code_error_title</string>
+    <string name="call_visualizer_screen_sharing_view_title">@string/call_visualizer_screen_sharing_title</string>
+    <string name="call_visualizer_screen_sharing_message">@string/call_visualizer_label</string>
+    <string name="screen_sharing_visitor_screen_end">@string/call_visualizer_button</string>
+    <string name="android_visitor_code_loading">@string/glia_visitor_code_loading</string>
+    <string name="call_visualizer_visitor_code_title_accessibility_hint">@string/glia_visitor_code_content_description</string>
+    <string name="call_visualizer_visitor_code_refresh_accessibility_label">Refresh Button</string>
+
+    <!-- General -->
+    <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
+    <string name="general_accessibility_close">Close Button</string>
+    <string name="general_powered_by">@string/glia_chat_glia_logo_content_description</string>
+
+    <!-- iOS only -->
+    <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
+    <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates new visitor code</string>
+
     <!-- NEW REFERENCES -->
     <!-- NEW REFERENCES -->
     <string name="alert_action_settings">Settings</string><!-- TODO UNUSED IN ANDROID -->
@@ -75,8 +94,6 @@
     <string name="android_upload_error_network">@string/glia_chat_attachment_upload_error_network_time_out</string>
     <string name="android_upload_error_permissions">@string/glia_chat_attachment_upload_error_read_access_permissions_denied</string>
     <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
-    <string name="android_visitor_code_loading">@string/glia_visitor_code_loading</string>
-    <string name="android_visitor_code_refresh">@string/glia_visitor_code_refresh_button</string>
     <string name="call_bubble_accessibility_hint">Deactivates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_bubble_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
     <string name="call_button_mute">@string/glia_call_mute_button_mute</string>
@@ -94,17 +111,6 @@
     <string name="call_operator_name_accessibility_hint">Displays operator name.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_video_operator_accessibility_label">@string/glia_call_operator_video_content_description</string>
     <string name="call_video_visitor_accessibility_label">@string/glia_call_visitor_video_content_description</string>
-    <string name="call_visualizer_screen_sharing_message">@string/call_visualizer_label</string>
-    <string name="call_visualizer_screen_sharing_message_accessibility_hint">Message label</string><!-- Is it needed?-->
-    <string name="call_visualizer_screen_sharing_view_title">@string/call_visualizer_screen_sharing_title</string>
-    <string name="call_visualizer_visitor_code_action_close">@string/glia_top_app_bar_close</string><!-- Just use glia top app bar?-->
-    <string name="call_visualizer_visitor_code_action_refresh">@string/glia_visitor_code_refresh_button</string>
-    <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string><!-- TODO ADA NEW IN ANDROID, UNIFY WITH CLOSE?-->
-    <string name="call_visualizer_visitor_code_close_accessibility_label">Close Button</string><!-- TODO ADA NEW IN ANDROID, UNIFY WITH CLOSE?-->
-    <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates new visitor code</string><!-- TODO ADA NEW IN ANDROID-->
-    <string name="call_visualizer_visitor_code_refresh_accessibility_label">Refresh Button</string><!-- TODO ADA NEW IN ANDROID-->
-    <string name="call_visualizer_visitor_code_title">@string/glia_visitor_code_view_title</string>
-    <string name="call_visualizer_visitor_code_title_accessibility_hint">@string/glia_visitor_code_content_description</string>
     <string name="chat_duration_accessibility_label">@string/glia_call_call_duration_hint</string>
     <string name="chat_attach_files">@string/glia_chat_add_attachment_description</string>
     <string name="chat_attachement_photo_library">@string/glia_chat_attachment_upload_menu_gallery</string>
@@ -164,7 +170,6 @@
     <string name="general_no">@string/glia_dialog_no</string>
     <string name="general_ok">@string/glia_dialog_ok</string>
     <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
-    <string name="general_powered_by">@string/glia_chat_glia_logo_content_description</string> <!-- TODO remove Glia -->
     <string name="general_retry">Retry</string><!-- TODO NEW -->
     <string name="general_selected">Selected</string><!-- TODO NEW, maybe unify? -->
     <string name="general_submit">@string/glia_survey_submit_label</string>
@@ -194,7 +199,6 @@
     <string name="message_center_welcome_send_accessibility_hint">Navigates you to the chat transcript.</string><!-- TODO NEW-->
     <string name="message_center_welcome_title">@string/message_center_title</string>
     <string name="screen_sharing_visitor_screen_disclaimer_title">@string/glia_dialog_screen_sharing_offer_title</string>
-    <string name="screen_sharing_visitor_screen_end">@string/call_visualizer_button</string>
     <string name="screensharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
     <string name="send_message_send">@string/glia_chat_send_content_description</string>
     <string name="send_message_sending">@string/message_center_progress_bar_content_description</string>
@@ -207,7 +211,7 @@
     <string name="upgrade_audio_title">@string/glia_dialog_upgrade_audio_title</string>
     <string name="upgrade_video_one_way_title">@string/glia_dialog_upgrade_video_1_way_title</string>
     <string name="upgrade_video_two_way_title">@string/glia_dialog_upgrade_video_2_way_title</string>
-    <string name="visitor_code_failed">@string/glia_visitor_code_error_title</string>
+
 
     <!--    GVA -->
     <string name="gva_not_supported">This action is not currently supported on mobile.</string>

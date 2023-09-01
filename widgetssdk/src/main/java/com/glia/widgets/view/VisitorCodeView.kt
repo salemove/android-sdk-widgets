@@ -10,10 +10,12 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
+import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer
@@ -64,6 +66,9 @@ class VisitorCodeView internal constructor(
     private var refreshButton: GliaPositiveButton
     private var closeButton: AppCompatImageButton
     private var logoView: ImageView
+    private var logoText: TextView
+    private var logoContainer: View
+    private var stringProvider: StringProvider = Dependencies.getStringProvider()
 
     init {
         layoutInflater.inflate(R.layout.visitor_code_view, this, true)
@@ -77,6 +82,9 @@ class VisitorCodeView internal constructor(
         refreshButton.setOnClickListener { controller.onLoadVisitorCode() }
         closeButton = findViewById(R.id.close_button)
         closeButton.setOnClickListener { controller.onCloseButtonClicked() }
+        logoContainer = findViewById(R.id.logo_container)
+        logoText = findViewById(R.id.powered_by_text)
+        logoText.text = stringProvider.getRemoteString(R.string.general_powered_by)
         logoView = findViewById(R.id.logo_view)
         readTypedArray()
         applyRemoteThemeConfig(Dependencies.getGliaThemeManager().theme)
@@ -138,9 +146,9 @@ class VisitorCodeView internal constructor(
         runOnUi {
             showProgressBar(true)
             showSuccess()
-            successTitle.contentDescription = context.getString(R.string.glia_visitor_code_loading)
+            successTitle.contentDescription = stringProvider.getRemoteString(R.string.android_visitor_code_loading)
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
-            closeButton.contentDescription = context.getString(R.string.glia_chat_alert_dialog_close_content_description)
+            closeButton.contentDescription = stringProvider.getRemoteString(R.string.general_accessibility_close)
         }
     }
 
@@ -153,11 +161,15 @@ class VisitorCodeView internal constructor(
     }
 
     private fun showSuccess() {
+        successTitle.text = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_title)
         successContainer.visibility = VISIBLE
         failureContainer.visibility = GONE
     }
 
     private fun showFailure() {
+        failureTitle.text = stringProvider.getRemoteString(R.string.visitor_code_failed)
+        refreshButton.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_refresh_accessibility_label)
+        refreshButton.text = stringProvider.getRemoteString(R.string.general_refresh)
         failureContainer.visibility = VISIBLE
         successContainer.visibility = GONE
     }
@@ -165,7 +177,7 @@ class VisitorCodeView internal constructor(
     override fun showVisitorCode(visitorCode: VisitorCode) {
         runOnUi {
             showProgressBar(false)
-            successTitle.contentDescription = context.getString(R.string.glia_visitor_code_content_description)
+            successTitle.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_title_accessibility_hint)
                 .combineStringWith(visitorCode.code.separateStringWithSymbol("-"), " ")
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
             charCodeView.setText(visitorCode.code)
@@ -223,9 +235,9 @@ class VisitorCodeView internal constructor(
             textColor = baseLightColor,
             textFont = fontFamily
         )
-        logoView.apply {
+        logoContainer.apply {
             isVisible = theme.whiteLabel?.not() ?: true
-            applyImageColorTheme(baseShadeColor)
+            logoView.applyImageColorTheme(baseShadeColor)
         }
         progressBar.applyProgressColorTheme(brandPrimaryColor)
         closeButton.applyImageColorTheme(baseNormalColor)

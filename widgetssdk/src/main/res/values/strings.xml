@@ -16,7 +16,7 @@
     <string name="glia_survey_open_text_item_edit_hint">Comment</string>
     <string name="message_center_send_message_btn">Send</string>
     <string name="glia_dialog_decline">Decline</string>
-    <string name="glia_chat_glia_logo_content_description">Powered by Glia</string>
+        <string name="glia_chat_glia_logo_content_description">Powered by </string>
     <string name="glia_chat_title">Chat</string>
     <string name="glia_call_audio_app_bar_title">Audio Call</string>
     <string name="glia_call_video_button_label">Video</string> <!-- TODO unify with glia_call_app_bar_title -->
@@ -24,7 +24,7 @@
     <string name="glia_chat_add_attachment_description">Pick attachment</string>
     <string name="glia_chat_send_content_description">Send message</string>
     <string name="glia_chat_attachment_download_button_label">Download</string>
-    <string name="glia_visitor_code_error_title">Could not load the visitor code. Please try refreshing.</string>
+        <string name="glia_visitor_code_error_title">Could not load the visitor code. Please try refreshing.</string>
     <string name="message_center_progress_bar_content_description">Sending</string>
     <string name="glia_chat_delivered">Delivered</string>
     <string name="glia_chat_enter_message">Enter message</string>
@@ -43,7 +43,7 @@
     <string name="glia_dialog_leave_queue_message">You will lose your place in the queue.</string>
     <string name="glia_dialog_operators_unavailable_message">Operators are no longer available. Please try again later.</string>
     <string name="glia_call_minimize_button_label">Minimize</string>
-    <string name="call_visualizer_button">End Screen Sharing</string>
+        <string name="call_visualizer_button">End Screen Sharing</string>
     <string name="message_center_screen_title">Messaging</string>
     <string name="glia_dialog_end_engagement_title">End Engagement?</string>
     <string name="glia_chat_visitor_status_transferring">Transferring</string>
@@ -58,7 +58,7 @@
     <string name="glia_dialog_upgrade_audio_title">%1$s has offered you to upgrade to audio</string>
     <string name="glia_dialog_upgrade_video_1_way_title">%1$s has offered you to see their video</string>
     <string name="glia_dialog_upgrade_video_2_way_title">%1$s has offered you to upgrade to video</string>
-    <string name="glia_visitor_code_view_title">Your Visitor Code</string>
+        <string name="glia_visitor_code_view_title">Your Visitor Code</string>
     <string name="glia_call_company_name_hint">Company Name</string>
     <string name="glia_chat_operator_has_joined">%1$s has joined the conversation</string>
     <string name="glia_chat_not_started_hint">Send a message to start chatting.</string>
@@ -93,8 +93,8 @@
     <string name="message_center_message_edit_text_hint">Enter your message</string>
     <string name="glia_messaging_title">Messaging</string>
     <string name="message_center_confirmation_screen_message">Your message has been sent. We will get back to you within 48 hours.</string>
-    <string name="call_visualizer_screen_sharing_title">Screen Sharing</string>
-    <string name="call_visualizer_label">Your Screen is Being Shared</string>
+        <string name="call_visualizer_screen_sharing_title">Screen Sharing</string>
+        <string name="call_visualizer_label">Your Screen is Being Shared</string>
     <string name="glia_chat_file_download_success_message">The file has been downloaded.</string>
     <string name="glia_chat_file_download_failed_msg">Could not download the file. Please try again.</string>
     <string name="glia_chat_audio_icon_content_description">Audio icon</string>
@@ -155,9 +155,9 @@
     <string name="glia_preview_activity_image_content_description">Preview content</string>
     <string name="glia_survey_network_unavailable">The survey could not be submitted due to a network error. Please try again.</string>
     <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
-    <string name="glia_visitor_code_content_description">Your five-digit visitor code is</string>
-    <string name="glia_visitor_code_loading">Loading your visitor code</string>
-    <string name="glia_visitor_code_refresh_button">Refresh</string>
+        <string name="glia_visitor_code_content_description">Your five-digit visitor code is</string>
+        <string name="glia_visitor_code_loading">Loading your visitor code</string>
+        <string name="glia_visitor_code_refresh_button">Refresh</string>
     <string name="glia_call_minimize_content_description">@string/glia_call_minimize_button_label</string>
     <string name="glia_top_app_bar_end_screen_sharing_description">@string/call_visualizer_button</string>
     <string name="glia_call_chat_zero_content_description">@string/glia_chat_title</string>

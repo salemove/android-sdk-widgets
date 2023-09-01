@@ -45,6 +45,7 @@ class EndScreenSharingView(
     private var statusBarColor: Int by Delegates.notNull()
     private var screenSharingController: ScreenSharingController? = null
     private var defaultStatusBarColor: Int? = null
+    private var stringProvider = Dependencies.getStringProvider()
 
     private val binding: EndScreenSharingViewBinding by lazy {
         EndScreenSharingViewBinding.inflate(layoutInflater, this)
@@ -61,7 +62,14 @@ class EndScreenSharingView(
         initCallbacks()
         applyDefaultTheme(attrs, defStyleAttr, defStyleRes)
         applyRemoteTheme(Dependencies.getGliaThemeManager().theme)
+        setupViewTextResources()
         prepareView()
+    }
+
+    private fun setupViewTextResources() {
+        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_view_title))
+        binding.screenSharingLabel.text = stringProvider.getRemoteString(R.string.call_visualizer_label)
+        binding.endSharingButton.text = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end)
     }
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {

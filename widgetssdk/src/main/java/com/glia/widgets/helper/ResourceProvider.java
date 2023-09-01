@@ -9,6 +9,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -38,6 +39,7 @@ interface IResourceProvider {
 
 public class ResourceProvider implements IResourceProvider {
 
+    @VisibleForTesting
     private final WeakReference<Context> weakContext;
 
     public ResourceProvider(Context context) {

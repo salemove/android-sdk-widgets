@@ -512,6 +512,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         } else {
+            Logger.e(TAG, "No email client, uri - $uri")
             showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
         }
     }
@@ -522,13 +523,19 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         } else {
+            Logger.e(TAG, "No dialer uri - $uri")
             showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
         }
     }
 
     private fun requestOpenUri(uri: Uri) {
         Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE).also {
-            context.startActivity(it)
+            if (it.resolveActivity(context.packageManager) != null) {
+                context.startActivity(it)
+            } else {
+                Logger.e(TAG, "No app to open url - $uri")
+                showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+            }
         }
     }
 

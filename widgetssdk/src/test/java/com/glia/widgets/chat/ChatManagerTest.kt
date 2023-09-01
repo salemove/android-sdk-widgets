@@ -40,6 +40,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -624,6 +625,8 @@ class ChatManagerTest {
             val test = itemsFlowable.test()
 
             stateProcessor.onNext(ChatManager.State(chatItems = chatItems))
+
+            verify(this, atLeastOnce()).updateQuickReplies(any())
 
             assertEquals(test.values().last().last(), chatItems.last())
         }

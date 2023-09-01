@@ -59,7 +59,7 @@ internal class ChatManager constructor(
 
         subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
 
-        return state.map(State::immutableChatItems).onBackpressureLatest().share()
+        return state.doOnNext(::updateQuickReplies).map(State::immutableChatItems).onBackpressureLatest().share()
     }
 
     @VisibleForTesting
@@ -86,7 +86,6 @@ internal class ChatManager constructor(
     fun subscribeToState(onHistoryLoaded: (hasHistory: Boolean) -> Unit, onOperatorMessageReceived: (count: Int) -> Unit): Disposable = state.run {
         loadHistory(onHistoryLoaded)
             .concatWith(subscribeToMessages(onOperatorMessageReceived))
-            .doOnNext(::updateQuickReplies)
             .doOnError { it.printStackTrace() }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.computation())

@@ -32,6 +32,8 @@ interface IResourceProvider {
     float convertSpToPixel(float sp);
 
     int convertDpToIntPixel(float dp);
+
+    String getResourceKey(@StringRes int stringKey);
 }
 
 public class ResourceProvider implements IResourceProvider {
@@ -76,6 +78,14 @@ public class ResourceProvider implements IResourceProvider {
     @Override
     public int convertDpToIntPixel(float dp) {
         return Math.round(convertDpToPixel(dp));
+    }
+
+    @Override
+    public String getResourceKey(int stringKey) {
+        /*
+            getResourceName wil contain package and resourceName separated by "/", discarding the first package part
+         */
+        return weakContext.get().getResources().getResourceName(stringKey).split("/")[1];
     }
 
     @Override

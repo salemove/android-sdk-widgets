@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
 import com.glia.widgets.GliaWidgetsConfig;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
@@ -42,9 +43,18 @@ public class Dependencies {
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
+    private static StringProvider stringProvider;
 
     public static void onAppCreate(Application application) {
-        notificationManager = new NotificationManager(application);
+        resourceProvider = new ResourceProvider(application.getBaseContext());
+        stringProvider = stringKey -> {
+            // TODO IMPLEMENT NEW METHOD FROM CORE
+            String fallback = resourceProvider.getString(stringKey);
+            String key = resourceProvider.getResourceKey(stringKey);
+            // TODO IMPLEMENT NEW METHOD FROM CORE
+            return fallback;
+        };
+        notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
 
@@ -91,12 +101,15 @@ public class Dependencies {
                 );
         application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest);
 
-        resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(
                 useCaseFactory.getVisitorCodeViewBuilderUseCase(),
                 repositoryFactory.getCallVisualizerRepository(),
                 repositoryFactory.getGliaEngagementRepository()
         );
+    }
+
+    public static StringProvider getStringProvider() {
+        return stringProvider;
     }
 
     public static UseCaseFactory getUseCaseFactory() {

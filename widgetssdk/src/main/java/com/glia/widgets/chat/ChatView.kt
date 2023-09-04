@@ -20,6 +20,7 @@ import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityOptionsCompat
@@ -101,6 +102,7 @@ import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -1302,6 +1304,14 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             chatRecyclerView.updatePadding(bottom = dialogHeight)
             chatRecyclerView.scrollBy(0, dialogHeight)
             groupChatControls.isGone = true
+            operatorTypingAnimationView.isGone = true
         }
+    }
+
+    @VisibleForTesting
+    internal var executor: Executor? = null
+
+    override fun post(action: Runnable?): Boolean {
+        return executor?.execute(action)?.let { true } ?: super.post(action)
     }
 }

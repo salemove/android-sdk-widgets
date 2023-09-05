@@ -37,22 +37,24 @@ workflows:
             set -x
 
             NEW_VERSION=`./gradlew -q printCurrentVersionName`
-            BRANCH_NAME="project-version-increment/${NEW_VERSION}"
+            NEW_BRANCH_NAME="project-version-increment/${NEW_VERSION}"
+            BASE_BRANCH_NAME="development"
             MESSAGE="Increment project version to ${NEW_VERSION}"
 
-            git checkout -b $BRANCH_NAME
+            git fetch origin $BASE_BRANCH_NAME
+            git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
             # git add -u stages modifications and deletions, without new files
             # added it to prevent CHANGELOG.md from being included in the PR
             git add -u
             git commit -m "$MESSAGE"
-            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+            git push origin "$NEW_BRANCH_NAME":"$NEW_BRANCH_NAME"
 
             PULL_REQUEST_NUMBER=$(curl \
               -X POST \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${NEW_BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
 
             curl \
               -X POST \
@@ -160,7 +162,7 @@ workflows:
         - text: Android Build Succeeded!
         - webhook_url_on_error: $SLACK_ANDROID_WEBHOOK
         - channel_on_error: '#tm-mobile'
-        - text_on_error: '@mobile-caretaker Android Build Failed! (master-build)'
+        - text_on_error: '@mobile-caretaker Android Build Failed! (development-build)'
         - emoji_on_error: "\U0001F4A5"
         - color_on_error: '#d9482b'
         - from_username_on_error: Bitrise
@@ -223,15 +225,15 @@ workflows:
     - script@1:
         title: Generate changelog
         inputs:
-          - content: |-
-              #!/usr/bin/env bash
-              # fail if any commands fails
-              set -e
-              # debug log
-              set -x
-              
-              # run the local bash script
-              bash ./scripts/generate-changelog.sh
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+
+            # run the local bash script
+            bash ./scripts/generate-changelog.sh
     - github-release@0:
         inputs:
         - username: $GITHUB_USERNAME
@@ -272,7 +274,35 @@ workflows:
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $WIDGET_SDK_MODULE
-        - variant: $SDK_VARIANT
+        - variant: debug
+    - gradle-unit-test@1:
+        title: Snapshot Test for SDK
+        inputs:
+        - unit_test_flags: ""
+        - unit_test_task: $WIDGET_SDK_MODULE:verifyPaparazziSnapshot
+        is_always_run: true
+    - script@1:
+        title: Export reports for Snapshot Test for SDK
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # fail if any commands fails
+            set -e
+            # debug log
+            set -x
+            
+            REPORTS_DIR=$BITRISE_SOURCE_DIR/widgetssdk/build/reports/tests/testSnapshotUnitTest
+            if [ -d "$REPORTS_DIR" ]; then
+              cd $REPORTS_DIR
+              zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshotTests.zip *
+            fi
+            
+            SNAPSHOT_DIR=$BITRISE_SOURCE_DIR/widgetssdk/build/paparazzi
+            if [ -d "$SNAPSHOT_DIR" ]; then
+              cd $SNAPSHOT_DIR
+              zip -r $BITRISE_DEPLOY_DIR/widgetssdk-snapshots.zip *
+            fi
+        is_always_run: true
     - android-lint@0:
         title: Run Lint for APP
         inputs:
@@ -295,6 +325,7 @@ workflows:
         inputs:
         - test_type: instrumentation
         - use_verbose_log: true
+    - deploy-to-bitrise-io@2: {}
     - cache-push@2: {}
   upgrade_dependencies:
     steps:
@@ -326,20 +357,22 @@ workflows:
             # debug log
             set -x
 
-            BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+            NEW_BRANCH_NAME="core-sdk-version-increment/${NEW_VERSION}"
+            BASE_BRANCH_NAME="development"
             MESSAGE="Increment Core SDK version to ${NEW_VERSION}"
 
-            git checkout -b $BRANCH_NAME
+            git fetch origin $BASE_BRANCH_NAME
+            git checkout -b $NEW_BRANCH_NAME origin/$BASE_BRANCH_NAME
             git add -A
             git commit -m "$MESSAGE"
-            git push origin "$BRANCH_NAME":"$BRANCH_NAME"
+            git push origin "$NEW_BRANCH_NAME":"$NEW_BRANCH_NAME"
 
             PULL_REQUEST_NUMBER=$(curl \
               -X POST \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer $GITHUB_API_TOKEN" \
               https://api.github.com/repos/salemove/android-sdk-widgets/pulls \
-              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
+              -d "{\"title\":\"${MESSAGE}\",\"head\":\"${NEW_BRANCH_NAME}\",\"base\":\"development\"}" | jq --raw-output '.number')
 
             curl \
               -X POST \
@@ -353,6 +386,12 @@ app:
   - opts:
       is_expand: false
     PROJECT_LOCATION: .
+  - opts:
+      is_expand: false
+    GRADLE_BUILD_FILE_PATH: build.gradle
+  - opts:
+      is_expand: false
+    GRADLEW_PATH: "./gradlew"
   - opts:
       is_expand: false
     EXAMPLE_APP_MODULE: app

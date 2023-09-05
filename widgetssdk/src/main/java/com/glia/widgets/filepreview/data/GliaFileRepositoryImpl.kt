@@ -14,6 +14,7 @@ import com.glia.widgets.helper.fileName
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import java.io.InputStream
+import kotlin.jvm.optionals.getOrNull
 
 internal class GliaFileRepositoryImpl(
     private val bitmapCache: InAppBitmapCache,
@@ -67,7 +68,7 @@ internal class GliaFileRepositoryImpl(
         }
 
     private fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream>) {
-        val engagement = gliaCore.currentEngagement.orElse(null)
+        val engagement = gliaCore.currentEngagement.getOrNull()
         if (engagement == null && engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING) {
             secureConversations.fetchFile(attachmentFile.id, callback)
         } else {

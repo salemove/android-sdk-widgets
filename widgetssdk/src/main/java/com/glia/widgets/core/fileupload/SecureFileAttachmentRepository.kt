@@ -10,6 +10,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.di.GliaCore
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
+import kotlin.jvm.optionals.getOrNull
 
 class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     private val secureConversations: SecureConversations by lazy {
@@ -43,7 +44,7 @@ class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     }
 
     fun uploadFile(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
-        val engagement = gliaCore.currentEngagement.orElse(null)
+        val engagement = gliaCore.currentEngagement.getOrNull()
         if (engagement != null) {
             engagement.uploadFile(file.uri, handleFileUpload(file, listener))
         } else {

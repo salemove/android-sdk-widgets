@@ -231,6 +231,9 @@ public class CallController implements
     public void engagementEnded() {
         Logger.d(TAG, "engagementEndedByOperator");
         stop();
+        if (!isOngoingEngagementUseCase.invoke()) {
+            dialogController.dismissDialogs();
+        }
     }
 
     @Override

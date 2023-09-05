@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brandPrimaryColor">#9C27B0</color>
+    <color name="baseLightColor">#2196F3</color>
+    <color name="baseDarkColor">#F40336</color>
+    <color name="baseNormalColor">#FFC157</color>
+    <color name="baseShadeColor">#4C6F50</color>
+    <color name="systemAgentBubbleColor">#673A37</color>
+    <color name="systemNegativeColor">#FF6732</color>
+    <color name="visitorMessageBackgroundColor">#E91E63</color>
+    <color name="visitorMessageTextColor">#3F51B5</color>
+    <color name="operatorMessageBackgroundColor">#FF9800</color>
+    <color name="operatorMessageTextColor">#00BCD4</color>
+    <color name="newMessageDividerColor">#CDDC39</color>
+    <color name="newMessageDividerTextColor">#FFEB3B</color>
+    <color name="botActionButtonBackgroundColor">#8BC34A</color>
+    <color name="botActionButtonTextColor">#5F7B3B</color>
+    <color name="botActionButtonSelectedBackgroundColor">#03A9F4</color>
+    <color name="botActionButtonSelectedTextColor">#FFC107</color>
+    <color name="sendMessageButtonTintColor">#9C2700</color>
+    <color name="gliaChatBackgroundColor">#536DFE</color>
+    <color name="gliaChatHeaderTitleTintColor">#FFD740</color>
+    <color name="gliaChatHeaderHomeButtonTintColor">#8B534A</color>
+    <color name="gliaChatHeaderExitQueueButtonTintColor">#50BCD4</color>
+    <color name="visitorCodeTextColor">#673AB7</color>
+    <color name="visitorCodeBackgroundColor">#D9CEF3</color>
+    <color name="visitorCodeBorderColor">#4CAF50</color>
+    <color name="gliaChatStartingHeadingTextColor">#FF5722</color>
+    <color name="gliaChatStartingCaptionTextColor">#F44336</color>
+    <color name="gliaChatStartedHeadingTextColor">#CD6C89</color>
+    <color name="gliaChatStartedCaptionTextColor">#7FC107</color>
+    <color name="gvaQuickReplyBackgroundColor">#3C27B0</color>
+    <color name="gvaQuickReplyStrokeColor">#536D9E</color>
+    <color name="gvaQuickReplyTextColor">#FFFFFF</color>
+    <color name="endScreenShareTintColor">#6FD740</color>
+</resources>
+

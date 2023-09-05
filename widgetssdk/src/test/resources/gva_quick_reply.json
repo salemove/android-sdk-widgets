@@ -1,0 +1,14 @@
+{
+  "content": "Example Text with QRs",
+  "type": "chat",
+  "metadata": {
+    "type": "quickReplies",
+    "content": "Example Text with QRs",
+    "options": [
+      {
+        "text": "Postback QR Button",
+        "value": "{\"utterance\":\"Postback QR Button\",\"payload\":{\"routingData\":{},\"destinationUtterance\":\"What products do you offer?\",\"messageType\":\"quickReplyTap\"}}"
+      }
+    ]
+  }
+}

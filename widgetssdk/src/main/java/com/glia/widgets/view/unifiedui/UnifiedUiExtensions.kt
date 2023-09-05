@@ -25,7 +25,9 @@ import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.android.material.shape.CornerFamily
 
 internal fun View.applyColorTheme(color: ColorTheme?) {
     background = createBackgroundFromTheme(color ?: return)
@@ -72,6 +74,25 @@ internal fun View.applyLayerTheme(layer: LayerTheme?) {
     layer.cornerRadius?.also { drawable.cornerRadius = it }
 
     background = drawable
+}
+
+internal fun ShapeableImageView.applyLayerTheme(layer: LayerTheme?) {
+    layer?.fill?.also {
+        val drawable = (background as? GradientDrawable) ?: GradientDrawable()
+        if (it.isGradient) {
+            drawable.colors = it.valuesArray
+        } else {
+            drawable.setColor(it.primaryColor)
+        }
+        background = drawable
+    }
+
+    layer?.stroke?.also { strokeColor = ColorStateList.valueOf(it) }
+    layer?.borderWidth?.also(::setStrokeWidth)
+
+    layer?.cornerRadius?.also {
+        shapeAppearanceModel = shapeAppearanceModel.toBuilder().setAllCorners(CornerFamily.ROUNDED, it).build()
+    }
 }
 
 internal fun MaterialCardView.applyCardLayerTheme(layer: LayerTheme?) {

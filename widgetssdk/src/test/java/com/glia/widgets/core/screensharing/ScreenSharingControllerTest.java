@@ -18,7 +18,10 @@ import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
+@RunWith(RobolectricTestRunner.class)
 public class ScreenSharingControllerTest {
 
     private GliaScreenSharingRepository gliaScreenSharingRepository;

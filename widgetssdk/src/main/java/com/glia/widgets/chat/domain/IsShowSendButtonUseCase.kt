@@ -17,7 +17,7 @@ class IsShowSendButtonUseCase(
     }
 
     private fun hasText(message: String?): Boolean {
-        return message != null && message.isNotEmpty()
+        return !message.isNullOrEmpty()
     }
 
     private fun hadReadyToSendUnsentAttachments(): Boolean {

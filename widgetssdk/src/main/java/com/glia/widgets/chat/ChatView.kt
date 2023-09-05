@@ -17,6 +17,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -44,14 +45,14 @@ import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.ChatAdapter.OnCustomCardResponse
 import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
+import com.glia.widgets.chat.adapter.ChatItemHeightManager
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.chat.adapter.holder.WebViewViewHolder
 import com.glia.widgets.chat.controller.ChatController
+import com.glia.widgets.chat.model.AttachmentItem
 import com.glia.widgets.chat.model.ChatInputMode
+import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.chat.model.history.ChatItem
-import com.glia.widgets.chat.model.history.OperatorAttachmentItem
-import com.glia.widgets.chat.model.history.VisitorAttachmentItem
+import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
@@ -82,7 +83,6 @@ import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.hideKeyboard
 import com.glia.widgets.helper.insetsController
-import com.glia.widgets.helper.isDownloaded
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.mapUriToFileAttachment
 import com.glia.widgets.helper.requireActivity
@@ -173,17 +173,18 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
         }
     private val onCustomCardResponse =
-        OnCustomCardResponse { messageId: String, text: String, value: String ->
-            controller?.sendCustomCardResponse(messageId, text, value)
+        OnCustomCardResponse { customCard: CustomCardChatItem, text: String, value: String ->
+            controller?.sendCustomCardResponse(customCard, text, value)
         }
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             super.onItemRangeInserted(positionStart, itemCount)
+
             val totalItemCount = adapter.itemCount
             val lastIndex = totalItemCount - 1
-            if (isInBottom) {
-                val holder = binding.chatRecyclerView.findViewHolderForAdapterPosition(lastIndex)
-                if (holder is WebViewViewHolder) {
+            if (isInBottom && lastIndex != -1) {
+                val itemViewType = adapter.getItemViewType(lastIndex)
+                if (itemViewType == ChatAdapter.CUSTOM_CARD_TYPE) {
                     // WebView needs time for calculating the height.
                     // So to scroll to the bottom, we need to do it with delay.
                     postDelayed(
@@ -208,6 +209,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.chatMessageLayout,
             Dependencies.getGliaThemeManager().theme?.chatTheme?.attachmentsPopup
         )
+    }
+
+    private val onGvaButtonsClickListener = ChatAdapter.OnGvaButtonsClickListener {
+        controller?.onGvaButtonClicked(it)
     }
 
     init {
@@ -388,8 +393,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     updateShowSendButton(chatState)
                     updateChatEditText(chatState)
                     updateAppBar(chatState)
-                    binding.newMessagesIndicatorLayout.isVisible =
-                        chatState.showMessagesUnseenIndicator()
+                    binding.newMessagesIndicatorLayout.isVisible = chatState.showMessagesUnseenIndicator
                     updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl)
                     isInBottom = chatState.isChatInBottom
                     binding.chatRecyclerView.setInBottom(isInBottom)
@@ -402,6 +406,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
                     binding.operatorTypingAnimationView.isVisible = chatState.isOperatorTyping
                     updateAttachmentButton(chatState)
+                    updateQuickRepliesState(chatState)
                 }
             }
 
@@ -434,10 +439,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
 
             override fun smoothScrollToBottom() {
+                if (adapter.itemCount < 1) return
                 post { binding.chatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1) }
             }
 
             override fun scrollToBottomImmediate() {
+                if (adapter.itemCount < 1) return
                 post { binding.chatRecyclerView.scrollToPosition(adapter.itemCount - 1) }
             }
 
@@ -478,7 +485,62 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             override fun fileIsNotReadyForPreview() {
                 showToast(context.getString(R.string.glia_view_file_not_ready_for_preview))
             }
+
+            override fun showBroadcastNotSupportedToast() {
+                showToast(context.getString(R.string.gva_not_supported))
+            }
+
+            override fun requestOpenUri(uri: Uri) {
+                this@ChatView.requestOpenUri(uri)
+            }
+
+            override fun requestOpenDialer(uri: Uri) {
+                this@ChatView.requestOpenDialer(uri)
+            }
+
+            override fun requestOpenEmailClient(uri: Uri) {
+                this@ChatView.requestOpenEmailClient(uri)
+            }
         }
+    }
+
+    private fun requestOpenEmailClient(uri: Uri) {
+        val intent = Intent(Intent.ACTION_SENDTO)
+            .setData(Uri.parse("mailto:")) //This step makes sure that only email apps handle this.
+            .putExtra(Intent.EXTRA_EMAIL, arrayOf(uri.schemeSpecificPart))
+
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            Logger.e(TAG, "No email client, uri - $uri")
+            showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+        }
+    }
+
+    private fun requestOpenDialer(uri: Uri) {
+        val intent = Intent(Intent.ACTION_DIAL).setData(uri)
+
+        if (intent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(intent)
+        } else {
+            Logger.e(TAG, "No dialer uri - $uri")
+            showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+        }
+    }
+
+    private fun requestOpenUri(uri: Uri) {
+        Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE).also {
+            if (it.resolveActivity(context.packageManager) != null) {
+                context.startActivity(it)
+            } else {
+                Logger.e(TAG, "No app to open url - $uri")
+                showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+            }
+        }
+    }
+
+    private fun updateQuickRepliesState(chatState: ChatState) {
+        binding.gvaQuickRepliesLayout.setButtons(chatState.gvaQuickReplies)
     }
 
     private fun updateNewMessageOperatorStatusView(operatorProfileImgUrl: String?) {
@@ -508,6 +570,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
                     showAllowScreenSharingNotificationsAndStartSharingDialog()
                 }
+
                 Dialog.MODE_VISITOR_CODE -> {
                     Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
                 } // Should never happen inside ChatView
@@ -522,24 +585,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun updateIsFileDownloaded(item: ChatItem): ChatItem = when (item) {
-        is OperatorAttachmentItem -> OperatorAttachmentItem(
-            item.id,
-            item.viewType,
-            item.showChatHead,
-            item.attachmentFile,
-            item.operatorProfileImgUrl,
-            item.attachmentFile.isDownloaded(context),
-            item.isDownloading,
-            item.operatorId,
-            item.messageId,
-            item.timestamp
-        )
-
-        is VisitorAttachmentItem -> VisitorAttachmentItem.editDownloadedStatus(
-            item,
-            item.attachmentFile.isDownloaded(context)
-        )
-
+        is AttachmentItem -> item.run { updateWith(isDownloaded(context), isDownloading) }
         else -> item
     }
 
@@ -595,12 +641,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 },
                 cancelListener = {
                     it.dismiss()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 }
             )
@@ -618,16 +664,16 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                     this.context.openNotificationChannelScreen()
                 },
                 negativeButtonClickListener = {
                     dismissAlertDialog()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                 },
                 cancelListener = {
                     it.dismiss()
-                    controller?.notificationsDialogDismissed()
+                    controller?.notificationDialogDismissed()
                 }
             )
         }
@@ -702,6 +748,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             this,
             this,
             onCustomCardResponse,
+            onGvaButtonsClickListener,
+            ChatItemHeightManager(theme, layoutInflater, resources),
             GliaWidgets.getCustomCardAdapter(),
             Dependencies.getUseCaseFactory().createGetImageFileFromCacheUseCase(),
             Dependencies.getUseCaseFactory().createGetImageFileFromDownloadsUseCase(),
@@ -762,6 +810,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.operatorTypingAnimationView.addColorFilter(color = it)
         }
 
+        binding.gvaQuickRepliesLayout.updateTheme(theme)
+
         applyTheme(Dependencies.getGliaThemeManager().theme)
     }
 
@@ -790,6 +840,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
         binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
         binding.newMessagesIndicatorCard.setOnClickListener { controller?.newMessagesIndicatorClicked() }
+        binding.gvaQuickRepliesLayout.onItemClickedListener = GvaChipGroup.OnItemClickedListener {
+            controller?.onGvaButtonClicked(it)
+
+            // move the focus back to the chat list
+            binding.chatRecyclerView.adapter?.itemCount?.let { size ->
+                val viewHolder = binding.chatRecyclerView.findViewHolderForAdapterPosition(size - 1)
+                viewHolder?.itemView?.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED)
+            }
+        }
     }
 
     private fun setupAddAttachmentButton() {
@@ -1101,30 +1160,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         currentChatItem: ChatItem,
         isDownloading: Boolean,
         isFileExists: Boolean
-    ): ChatItem {
-        if (currentChatItem is VisitorAttachmentItem) {
-            if (currentChatItem.attachmentFile.id == attachmentFile.id) {
-                return VisitorAttachmentItem.editFileStatuses(
-                    currentChatItem,
-                    isFileExists,
-                    isDownloading
-                )
-            }
-        } else if (currentChatItem is OperatorAttachmentItem && currentChatItem.attachmentFile.id == attachmentFile.id) {
-            return OperatorAttachmentItem(
-                currentChatItem.id,
-                currentChatItem.viewType,
-                currentChatItem.showChatHead,
-                currentChatItem.attachmentFile,
-                currentChatItem.operatorProfileImgUrl,
-                isFileExists,
-                isDownloading,
-                currentChatItem.operatorId,
-                currentChatItem.messageId,
-                currentChatItem.timestamp
-            )
-        }
-        return currentChatItem
+    ): ChatItem = when {
+        currentChatItem is AttachmentItem && currentChatItem.attachmentId == attachmentFile.id ->
+            currentChatItem.updateWith(isFileExists, isDownloading)
+
+        else -> currentChatItem
     }
 
     override fun onFileOpenClick(file: AttachmentFile) {

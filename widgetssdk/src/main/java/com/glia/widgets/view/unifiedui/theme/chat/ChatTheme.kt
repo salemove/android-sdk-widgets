@@ -5,6 +5,7 @@ import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
+import com.glia.widgets.view.unifiedui.theme.gva.GvaTheme
 
 internal data class ChatTheme(
     val background: LayerTheme? = null,
@@ -21,5 +22,6 @@ internal data class ChatTheme(
     val unreadIndicator: UnreadIndicatorTheme? = null,
     val typingIndicator: ColorTheme? = null,
     val newMessagesDividerColorTheme: ColorTheme? = null,
-    val newMessagesDividerTextTheme: TextTheme? = null
+    val newMessagesDividerTextTheme: TextTheme? = null,
+    val gva: GvaTheme? = null
 )

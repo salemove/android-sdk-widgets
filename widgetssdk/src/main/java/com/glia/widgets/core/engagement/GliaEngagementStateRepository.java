@@ -1,6 +1,7 @@
 package com.glia.widgets.core.engagement;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.Operator;
@@ -17,23 +18,22 @@ import io.reactivex.processors.BehaviorProcessor;
 public class GliaEngagementStateRepository {
     private final EngagementStateEventVisitor<Operator> visitor = new EngagementStateEventVisitor.OperatorVisitor();
     private final BehaviorProcessor<Optional<Operator>> operatorProcessor =
-            BehaviorProcessor.createDefault(Optional.empty());
+        BehaviorProcessor.createDefault(Optional.empty());
     private final Flowable<Operator> operatorFlowable =
-            operatorProcessor
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .onBackpressureLatest();
+        operatorProcessor
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .onBackpressureLatest();
 
     private final BehaviorProcessor<Optional<EngagementState>> engagementStateProcessor = BehaviorProcessor.createDefault(Optional.empty());
 
     private final BehaviorProcessor<EngagementStateEvent> engagementStateEventProcessor = BehaviorProcessor.createDefault(
-            new EngagementStateEvent.EngagementEndedEvent()
+        new EngagementStateEvent.NoEngagementEvent()
     );
     private final Flowable<EngagementStateEvent> engagementStateEventFlowable = engagementStateEventProcessor.onBackpressureLatest();
-
-    private CompositeDisposable disposable = new CompositeDisposable();
-
     private final GliaOperatorRepository operatorRepository;
+    private CompositeDisposable disposable = new CompositeDisposable();
+    private boolean isOngoingEngagement = false;
 
     public GliaEngagementStateRepository(GliaOperatorRepository operatorRepository) {
         this.operatorRepository = operatorRepository;
@@ -42,14 +42,16 @@ public class GliaEngagementStateRepository {
     public void onEngagementStarted(Engagement engagement) {
         disposable = new CompositeDisposable();
         disposable.add(
-                engagementStateProcessor
-                        .onBackpressureLatest()
-                        .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
-                        .doOnNext(this::notifyEngagementStateEventUpdate)
-                        .doOnNext(this::updateOperatorOnEngagementStateChanged)
-                        .subscribe()
+            engagementStateProcessor
+                .onBackpressureLatest()
+                .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
+                .doOnNext(this::notifyEngagementStateEventUpdate)
+                .doOnNext(this::updateOperatorOnEngagementStateChanged)
+                .subscribe()
         );
-        engagement.on(Engagement.Events.STATE_UPDATE, this::notifyEngagementStateUpdate);
+        engagement.on(Engagement.Events.STATE_UPDATE, engagementState -> {
+            notifyEngagementStateUpdate(engagementState);
+        });
         engagement.on(Engagement.Events.END, () -> onEngagementEnded(engagement));
     }
 
@@ -75,7 +77,7 @@ public class GliaEngagementStateRepository {
 
     private void notifyOperatorUpdate(Operator operator) {
         if (operator != null) {
-            operatorRepository.addOrUpdateOperator(operator);
+            operatorRepository.emit(operator);
         }
         operatorProcessor.onNext(Optional.ofNullable(operator));
     }
@@ -91,20 +93,25 @@ public class GliaEngagementStateRepository {
     private @Nullable
     Operator getOperator() {
         return operatorProcessor
-                .getValue()
-                .orElse(null);
+            .getValue()
+            .orElse(null);
     }
 
-    private EngagementStateEvent mapToEngagementStateChangeEvent(
+    @VisibleForTesting
+    protected EngagementStateEvent mapToEngagementStateChangeEvent(
             EngagementState engagementState,
             @Nullable Operator operator
     ) {
-        if (engagementState == null) {
+        if (engagementState == null && isOngoingEngagement) {
+            isOngoingEngagement = false;
             return new EngagementStateEvent.EngagementEndedEvent();
+        } else if (engagementState == null) {
+            return new EngagementStateEvent.NoEngagementEvent();
         } else if (engagementState.getVisitorStatus() == EngagementState.VisitorStatus.TRANSFERRING) {
             return new EngagementStateEvent.EngagementTransferringEvent();
         } else {
             if (operator == null) {
+                isOngoingEngagement = true;
                 return new EngagementStateEvent.EngagementOperatorConnectedEvent(engagementState.getOperator());
             } else {
                 if (!engagementState.getOperator().getId().equals(operator.getId())) {
@@ -124,6 +131,7 @@ public class GliaEngagementStateRepository {
                 notifyOperatorUpdate(visitor.visit(engagementStateEvent));
                 break;
             case ENGAGEMENT_TRANSFERRING:
+            case NO_ENGAGEMENT:
             case ENGAGEMENT_ENDED:
                 notifyOperatorUpdate(null);
                 break;

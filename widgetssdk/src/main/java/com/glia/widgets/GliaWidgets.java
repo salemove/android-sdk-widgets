@@ -30,42 +30,35 @@ import io.reactivex.plugins.RxJavaPlugins;
  * This class is a starting point for integration with Glia Widgets SDK
  */
 public class GliaWidgets {
-    private final static String TAG = "GliaWidgets";
-
     public static final String REMOTE_CONFIGURATION = "remote_configuration";
-
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String UI_THEME = "ui_theme";
-
     /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String COMPANY_NAME = "company_name";
-
     /**
      * Use with {@link android.os.Bundle} to pass in the id of the queue you wish to enroll in
      * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String QUEUE_ID = "queue_id";
-
     /**
      * Use with {@link android.os.Bundle} to pass in a context url as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     *
      * @deprecated Use {@link com.glia.widgets.GliaWidgets#CONTEXT_ASSET_ID}
      */
     @Deprecated
     public static final String CONTEXT_URL = "context_url";
-
     /**
      * Use with {@link android.os.Bundle} to pass in a context asset ID as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String CONTEXT_ASSET_ID = "context_asset_id";
-
     /**
      * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
      * use the chat head bubble as an overlay as a navigation argument when
@@ -78,7 +71,6 @@ public class GliaWidgets {
      * When this value is not passed then by default this value is true.
      */
     public static final String USE_OVERLAY = "use_overlay";
-
     /**
      * Use with {@link android.os.Bundle} to pass an input parameter to the call activity to
      * tell it which type of engagement you would like to start. Can be one of:
@@ -86,36 +78,30 @@ public class GliaWidgets {
      * If no parameter is passed then will default to {@link MEDIA_TYPE_AUDIO}
      */
     public static final String MEDIA_TYPE = "media_type";
-
     /**
      * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
      * {@link com.glia.widgets.call.CallActivity} to start an audio call media engagement.
      */
     public static final String MEDIA_TYPE_AUDIO = "media_type_audio";
-
     /**
      * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
      * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
      */
     public static final String MEDIA_TYPE_VIDEO = "media_type_video";
-
     /**
      * Pass this parameter to call activity to tell it that upgrade to audio/video call is ongoing
      * If no parameter is passed then will default to false
      */
     public static final String IS_UPGRADE_TO_CALL = "upgrade_to_call";
-
     public static final String SURVEY = "survey";
-
     /**
      * Use with {@link android.os.Bundle} to pass in
      * {@link com.glia.androidsdk.screensharing.ScreenSharing.Mode} as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
-
     public static final String CHAT_TYPE = "chat_type";
-
+    private final static String TAG = "GliaWidgets";
     @Nullable
     private static CustomCardAdapter customCardAdapter = new WebViewCardAdapter();
 
@@ -148,16 +134,16 @@ public class GliaWidgets {
         GliaConfig.Builder builder = new GliaConfig.Builder();
         setAuthorization(gliaWidgetsConfig, builder);
         return builder
-                .setSiteId(gliaWidgetsConfig.getSiteId())
-                .setRegion(gliaWidgetsConfig.getRegion())
-                .setBaseDomain(gliaWidgetsConfig.getBaseDomain())
-                .setContext(gliaWidgetsConfig.getContext())
-                .build();
+            .setSiteId(gliaWidgetsConfig.getSiteId())
+            .setRegion(gliaWidgetsConfig.getRegion())
+            .setBaseDomain(gliaWidgetsConfig.getBaseDomain())
+            .setContext(gliaWidgetsConfig.getContext())
+            .build();
     }
 
     private static void setAuthorization(
-            GliaWidgetsConfig widgetsConfig,
-            GliaConfig.Builder builder
+        GliaWidgetsConfig widgetsConfig,
+        GliaConfig.Builder builder
     ) {
         if (widgetsConfig.getSiteApiKey() != null) {
             builder.setSiteApiKey(widgetsConfig.getSiteApiKey());
@@ -238,14 +224,14 @@ public class GliaWidgets {
     @Deprecated
     public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
         Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
-                .setName(visitorInfoUpdate.getName())
-                .setEmail(visitorInfoUpdate.getEmail())
-                .setPhone(visitorInfoUpdate.getPhone())
-                .setNote(visitorInfoUpdate.getNote())
-                .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
-                .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
-                .setNoteUpdateMethod(visitorInfoUpdate.getNoteUpdateMethod())
-                .build(), e -> {
+            .setName(visitorInfoUpdate.getName())
+            .setEmail(visitorInfoUpdate.getEmail())
+            .setPhone(visitorInfoUpdate.getPhone())
+            .setNote(visitorInfoUpdate.getNote())
+            .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
+            .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
+            .setNoteUpdateMethod(visitorInfoUpdate.getNoteUpdateMethod())
+            .build(), e -> {
             if (e != null) {
                 exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
             } else {
@@ -274,6 +260,14 @@ public class GliaWidgets {
     }
 
     /**
+     * @return current instance of {@link CustomCardAdapter}
+     */
+    @Nullable
+    public static CustomCardAdapter getCustomCardAdapter() {
+        return customCardAdapter;
+    }
+
+    /**
      * Allows configuring custom response cards based on metadata.
      * <p>
      * Glia SDK uses {@link WebViewCardAdapter} by default.
@@ -286,14 +280,6 @@ public class GliaWidgets {
      */
     public static void setCustomCardAdapter(@Nullable CustomCardAdapter customCardAdapter) {
         GliaWidgets.customCardAdapter = customCardAdapter;
-    }
-
-    /**
-     * @return current instance of {@link CustomCardAdapter}
-     */
-    @Nullable
-    public static CustomCardAdapter getCustomCardAdapter() {
-        return customCardAdapter;
     }
 
     /**
@@ -365,7 +351,7 @@ public class GliaWidgets {
 
     private static void throwUncaughtException(Throwable e) {
         Thread.UncaughtExceptionHandler handler =
-                Thread.currentThread().getUncaughtExceptionHandler();
+            Thread.currentThread().getUncaughtExceptionHandler();
         if (handler != null) {
             handler.uncaughtException(Thread.currentThread(), e);
         }

@@ -2,8 +2,8 @@ package com.glia.widgets.core.engagement.domain;
 
 import androidx.annotation.NonNull;
 
-import com.glia.androidsdk.Operator;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
+import com.glia.widgets.core.engagement.data.LocalOperator;
 
 import java.util.Optional;
 
@@ -16,11 +16,11 @@ public class GetOperatorUseCase {
         this.gliaOperatorRepository = gliaOperatorRepository;
     }
 
-    public Single<Optional<Operator>> execute(@NonNull String operatorId) {
+    public Single<Optional<LocalOperator>> execute(@NonNull String operatorId) {
         return Single.create(emitter ->
-                gliaOperatorRepository.getOperatorById(operatorId, operator ->
-                        emitter.onSuccess(Optional.ofNullable(operator))
-                )
+            gliaOperatorRepository.getOperatorById(operatorId, operator ->
+                emitter.onSuccess(Optional.ofNullable(operator))
+            )
         );
     }
 

@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.OperatorStatusItem
+import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
@@ -72,15 +72,11 @@ internal class OperatorStatusViewHolder(
 
     fun bind(item: OperatorStatusItem) {
         chatStartingHeadingView.text = item.companyName
-        when (item.status) {
-            OperatorStatusItem.Status.IN_QUEUE -> applyInQueueState(item.companyName)
-            OperatorStatusItem.Status.OPERATOR_CONNECTED -> applyConnectedState(
-                item.operatorName,
-                item.profileImgUrl
-            )
-
-            OperatorStatusItem.Status.JOINED -> applyJoinedState(item.operatorName, item.profileImgUrl)
-            OperatorStatusItem.Status.TRANSFERRING -> applyTransferringState()
+        when (item) {
+            is OperatorStatusItem.Connected -> applyConnectedState(item.operatorName, item.profileImgUrl)
+            is OperatorStatusItem.InQueue -> applyInQueueState(item.companyName)
+            is OperatorStatusItem.Joined -> applyConnectedState(item.operatorName, item.profileImgUrl)
+            is OperatorStatusItem.Transferring -> applyTransferringState()
         }
         statusPictureView.isVisible = true
         statusPictureView.setShowRippleAnimation(isShowStatusViewRippleAnimation(item))
@@ -90,18 +86,16 @@ internal class OperatorStatusViewHolder(
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
-        itemView.contentDescription =
-            itemView.resources.getString(
-                R.string.glia_chat_in_queue_message_content_description,
-                companyName ?: ""
-            )
+        itemView.contentDescription = itemView.resources.getString(
+            R.string.glia_chat_in_queue_message_content_description,
+            companyName ?: ""
+        )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)
     }
 
     private fun applyConnectedState(operatorName: String, profileImgUrl: String?) {
-        profileImgUrl?.let { statusPictureView.showProfileImage(it) }
-            ?: statusPictureView.showPlaceholder()
+        profileImgUrl?.let { statusPictureView.showProfileImage(it) } ?: statusPictureView.showPlaceholder()
 
         applyChatStartingViewsVisibility(false)
         applyChatStartedViewsVisibility()
@@ -115,23 +109,6 @@ internal class OperatorStatusViewHolder(
         )
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
-    }
-
-    private fun applyJoinedState(operatorName: String, profileImgUrl: String?) {
-        profileImgUrl?.let { statusPictureView.showProfileImage(it) }
-            ?: statusPictureView.showPlaceholder()
-        chatStartedNameView.text = operatorName
-        chatStartedCaptionView.text =
-            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined_content_description,
-            operatorName
-        )
-
-        applyChatStartingViewsVisibility(false)
-        applyChatStartedViewsVisibility()
-
-        engagementStatesTheme?.connecting.also(::applyEngagementState)
     }
 
     private fun applyTransferringState() {
@@ -167,7 +144,8 @@ internal class OperatorStatusViewHolder(
         }
     }
 
-    private fun isShowStatusViewRippleAnimation(item: OperatorStatusItem) = item.status.let {
-        it == OperatorStatusItem.Status.IN_QUEUE || it == OperatorStatusItem.Status.TRANSFERRING
+    private fun isShowStatusViewRippleAnimation(item: OperatorStatusItem): Boolean = when (item) {
+        is OperatorStatusItem.InQueue, is OperatorStatusItem.Transferring -> true
+        else -> false
     }
 }

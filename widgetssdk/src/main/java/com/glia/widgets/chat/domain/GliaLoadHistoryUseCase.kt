@@ -3,6 +3,7 @@ package com.glia.widgets.chat.domain
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
+import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.GetUnreadMessagesCountWithTimeoutUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
@@ -30,9 +31,9 @@ internal class GliaLoadHistoryUseCase(
         getUnreadMessagesCountUseCase()
     ) { messages, count -> ChatHistoryResponse(messages, count) }
 
-    private fun loadHistoryAndMapOperator() = loadHistory()
+    private fun loadHistoryAndMapOperator(): Single<MutableList<ChatMessageInternal>> = loadHistory()
         .flatMapPublisher { Flowable.fromArray(*it) }
-        .concatMapSingle { mapOperatorUseCase(it) }
+        .concatMapSingle { mapOperatorUseCase(chatMessage = it) }
         .toSortedList(Comparator.comparingLong { it.chatMessage.timestamp })
 
     private fun loadHistory() = Single.create { emitter ->

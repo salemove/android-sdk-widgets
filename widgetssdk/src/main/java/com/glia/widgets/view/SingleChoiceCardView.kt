@@ -14,7 +14,7 @@ import androidx.core.view.updatePadding
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.ResponseCardItem
+import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.SingleChoiceCardViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
@@ -64,22 +64,22 @@ class SingleChoiceCardView @JvmOverloads constructor(
         bgDrawable.setStroke(strokeSize, color)
     }
 
-    fun setData(
-        item: ResponseCardItem,
+    internal fun setData(
+        item: OperatorMessageItem.ResponseCard,
         theme: UiTheme
     ) {
         setupCardView(theme)
         setupImage(item.choiceCardImageUrl)
-        setupText(item.content, theme)
+        setupText(item.content.orEmpty(), theme)
         setupButtons(item, theme)
     }
 
-    fun setOnOptionClickedListener(onOptionClickedListener: OnOptionClickedListener?) {
+    internal fun setOnOptionClickedListener(onOptionClickedListener: OnOptionClickedListener?) {
         this.onOptionClickedListener = onOptionClickedListener
     }
 
-    fun interface OnOptionClickedListener {
-        fun onClicked(item: ResponseCardItem, selectedOption: SingleChoiceOption)
+    internal fun interface OnOptionClickedListener {
+        fun onClicked(item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption)
     }
 
     private fun setupCardView(theme: UiTheme) {
@@ -131,7 +131,7 @@ class SingleChoiceCardView @JvmOverloads constructor(
     }
 
     private fun setupButtons(
-        item: ResponseCardItem,
+        item: OperatorMessageItem.ResponseCard,
         theme: UiTheme
     ) {
         val horizontalMargin = resources.getDimensionPixelOffset(R.dimen.glia_large)

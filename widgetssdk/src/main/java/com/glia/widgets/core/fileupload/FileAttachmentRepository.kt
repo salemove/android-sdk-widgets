@@ -11,7 +11,9 @@ import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.di.GliaCore
-import java.util.*
+import java.util.Observable
+import java.util.Observer
+import kotlin.jvm.optionals.getOrNull
 
 class FileAttachmentRepository(
     private val gliaCore: GliaCore,
@@ -45,7 +47,7 @@ class FileAttachmentRepository(
     }
 
     fun uploadFile(file: FileAttachment, listener: AddFileToAttachmentAndUploadUseCase.Listener) {
-        val engagement = gliaCore.currentEngagement.orElse(null)
+        val engagement = gliaCore.currentEngagement.getOrNull()
         if (engagement != null) {
             engagement.uploadFile(file.uri, handleFileUpload(file, listener))
         } else if (engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING) {

@@ -26,6 +26,7 @@ import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -38,8 +39,10 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 import java.util.function.Consumer
 
+@RunWith(RobolectricTestRunner::class)
 internal class ActivityWatcherForCallVisualizerControllerTest {
 
     private val callVisualizerRepository = mock(CallVisualizerRepository::class.java)
@@ -386,6 +389,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
         controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
+        verify(mediaUpgradeOffer).accept(notNull())
     }
 
     @Test

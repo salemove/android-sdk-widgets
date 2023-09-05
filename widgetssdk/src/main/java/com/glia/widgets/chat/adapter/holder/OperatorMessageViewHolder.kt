@@ -9,8 +9,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.OperatorMessageItem
-import com.glia.widgets.chat.model.history.ResponseCardItem
+import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
@@ -69,16 +68,15 @@ internal class OperatorMessageViewHolder(
         onOptionClickedListener: OnOptionClickedListener
     ) {
         binding.contentLayout.removeAllViews()
-        if (item is ResponseCardItem) {
-            addSingleChoiceCardView(item, onOptionClickedListener)
-        } else {
-            addMessageTextView(item)
+        when (item) {
+            is OperatorMessageItem.PlainText -> addMessageTextView(item)
+            is OperatorMessageItem.ResponseCard -> addSingleChoiceCardView(item, onOptionClickedListener)
         }
         updateOperatorStatusView(item)
     }
 
     private fun addSingleChoiceCardView(
-        item: ResponseCardItem,
+        item: OperatorMessageItem.ResponseCard,
         onOptionClickedListener: OnOptionClickedListener
     ) {
         val singleChoiceCardView = SingleChoiceCardView(itemView.context)
@@ -101,7 +99,7 @@ internal class OperatorMessageViewHolder(
         itemView.contentDescription = item.content
     }
 
-    private fun addMessageTextView(item: OperatorMessageItem) {
+    private fun addMessageTextView(item: OperatorMessageItem.PlainText) {
         messageContentView.text = item.content
         binding.contentLayout.addView(messageContentView)
         if (!TextUtils.isEmpty(item.operatorName)) {

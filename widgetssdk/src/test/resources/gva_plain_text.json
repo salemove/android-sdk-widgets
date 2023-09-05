@@ -1,0 +1,11 @@
+{
+  "content": "Example text",
+  "type": "chat",
+  "metadata": {
+    "type": "plainText",
+    "content": "Example text",
+    "glia": {
+      "message_group_id": "d8a0880f-abb9-4797-ba0a-902cf3a5cd83"
+    }
+  }
+}

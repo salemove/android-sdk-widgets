@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ThemeOverlay.Glia.Chat.Material" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="gliaBrandPrimaryColor">@color/glia_brand_primary_color</item>
+        <item name="gliaBaseDarkColor">@color/glia_base_dark_color</item>
+        <item name="gliaBaseLightColor">@color/glia_base_light_color</item>
+        <item name="gliaBaseNormalColor">@color/glia_base_normal_color</item>
+        <item name="gliaBaseShadeColor">@color/glia_base_shade_color</item>
+        <item name="gliaSystemNegativeColor">@color/glia_system_negative_color</item>
+        <item name="gliaSystemAgentBubbleColor">@color/glia_system_agent_bubble_color</item>
+        <item name="gliaChatBackgroundColor">@color/glia_chat_background_color</item>
+        <item name="gliaEndScreenShareTintColor">@color/glia_base_light_color</item>
+        <item name="gliaIconAppBarBack">@drawable/ic_baseline_arrow_back</item>
+        <item name="gliaIconLeaveQueue">@drawable/ic_baseline_close</item>
+        <item name="gliaIconSendMessage">@drawable/ic_baseline_send</item>
+        <item name="gliaIconChatAudioUpgrade">@drawable/ic_baseline_mic</item>
+        <item name="gliaIconUpgradeAudioDialog">@drawable/ic_baseline_mic</item>
+        <item name="gliaIconCallAudioOn">@drawable/ic_baseline_mic</item>
+        <item name="gliaIconChatVideoUpgrade">@drawable/ic_baseline_videocam</item>
+        <item name="gliaIconUpgradeVideoDialog">@drawable/ic_baseline_videocam</item>
+        <item name="gliaIconCallVideoOn">@drawable/ic_baseline_videocam</item>
+        <item name="gliaIconCallAudioOff">@drawable/ic_baseline_mic_off</item>
+        <item name="gliaIconCallVideoOff">@drawable/ic_baseline_videocam_off</item>
+        <item name="gliaIconCallChat">@drawable/ic_chat_cloud</item>
+        <item name="gliaIconCallSpeakerOn">@drawable/ic_baseline_volume_up</item>
+        <item name="gliaIconCallSpeakerOff">@drawable/ic_baseline_volume_off</item>
+        <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
+        <item name="gliaIconPlaceholder">@drawable/ic_person</item>
+        <item name="gliaIconOnHold">@drawable/ic_pause_circle</item>
+        <item name="gliaIconEndScreenShare">@drawable/ic_screensharing_off</item>
+
+        <item name="gliaSendMessageButtonTintColor">?attr/gliaBrandPrimaryColor</item>
+
+        <item name="gliaChatHeaderTitleTintColor">?attr/gliaBaseLightColor</item>
+        <item name="gliaChatHeaderHomeButtonTintColor">?attr/gliaBaseLightColor</item>
+        <item name="gliaChatHeaderExitQueueButtonTintColor">?attr/gliaBaseLightColor</item>
+
+        <item name="gliaChatStartingHeadingTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaChatStartingCaptionTextColor">?attr/gliaBaseNormalColor</item>
+        <item name="gliaChatStartedHeadingTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaChatStartedCaptionTextColor">?attr/gliaBrandPrimaryColor</item>
+
+        <item name="gliaVisitorMessageBackgroundColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaVisitorMessageTextColor">?attr/gliaBaseLightColor</item>
+        <item name="gliaOperatorMessageBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
+        <item name="gliaOperatorMessageTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaNewMessagesDividerColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaNewMessagesDividerTextColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaBotActionButtonBackgroundColor">?attr/gliaSystemAgentBubbleColor</item>
+        <item name="gliaBotActionButtonTextColor">?attr/gliaBaseDarkColor</item>
+        <item name="gliaBotActionButtonSelectedBackgroundColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gliaBotActionButtonSelectedTextColor">?attr/gliaBaseShadeColor</item>
+
+        <!--        GVA-->
+        <item name="gvaOptionButtonStyle">@style/Application.Glia.Chat.Button.Gva</item>
+        <item name="gvaQuickReplyButtonStyle">@style/Application.Glia.Chat.GvaChip</item>
+        <item name="gvaQuickReplyBackgroundColor">@android:color/transparent</item>
+        <item name="gvaQuickReplyStrokeColor">?attr/gliaBrandPrimaryColor</item>
+        <item name="gvaQuickReplyTextColor">?attr/gliaBrandPrimaryColor</item>
+
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Glia.Chat.AlertDialog</item>
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="textAppearanceHeadline1">@style/Application.Glia.Header1</item>
+        <item name="textAppearanceHeadline2">@style/Application.Glia.Header2</item>
+        <item name="textAppearanceHeadline3">@style/Application.Glia.Header3</item>
+        <item name="textAppearanceCaption">@style/Application.Glia.Caption</item>
+        <item name="textAppearanceBody1">@style/Application.Glia.Body</item>
+        <item name="textAppearanceSubtitle2">@style/Application.Glia.Subtitle2</item>
+
+        <item name="gliaHeaderEndButtonStyle">@style/Application.Glia.Header.EndButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Application.Glia.Chat.Button.Positive
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/Application.Glia.Chat.Button.Negative
+        </item>
+        <item name="buttonBarNeutralButtonStyle">@style/Application.Glia.Chat.Button.Neutral</item>
+        <item name="buttonSurveyOptionButtonStyle">@style/Application.Glia.Chat.Button.SurveyOption
+        </item>
+
+        <item name="chatHeadStyle">@style/Application.Glia.Chat.ChatHead</item>
+
+        <item name="gliaAlertDialogButtonUseVerticalAlignment">false</item>
+        <item name="whiteLabel">false</item>
+
+        <item name="chipStyle">?attr/gvaQuickReplyButtonStyle</item>
+    </style>
+
+</resources>

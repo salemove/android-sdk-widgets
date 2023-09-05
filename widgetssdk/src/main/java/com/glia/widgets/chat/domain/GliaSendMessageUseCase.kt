@@ -1,12 +1,11 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.FilesAttachment
-import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
+import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
@@ -14,7 +13,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 
-class GliaSendMessageUseCase(
+internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val engagementStateRepository: GliaEngagementStateRepository,
@@ -24,11 +23,13 @@ class GliaSendMessageUseCase(
 ) {
     interface Listener {
         fun messageSent(message: VisitorMessage?)
-        fun onCardMessageUpdated(message: ChatMessage)
         fun onMessageValidated()
-        fun errorOperatorNotOnline(message: String)
-        fun errorMessageInvalid()
+        fun errorOperatorNotOnline(message: Unsent)
         fun error(ex: GliaException)
+
+        fun errorMessageInvalid() {
+            // Currently, no need for this method, but have to keep it because it describes case in else branch
+        }
     }
 
     private val isSecureEngagement: Boolean
@@ -79,44 +80,22 @@ class GliaSendMessageUseCase(
                     sendMessage(message, listener)
                 }
             } else {
-                listener.errorOperatorNotOnline(message)
+                listener.errorOperatorNotOnline(Unsent.Message(message))
             }
         } else {
             listener.errorMessageInvalid()
         }
     }
 
-    fun execute(singleChoiceAttachment: SingleChoiceAttachment?, listener: Listener?) {
-        chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
-    }
-
-    fun execute(chatMessage: ChatMessage?, text: String, value: String, listener: Listener?) {
-        val attachment = SingleChoiceAttachment.from(value, text)
-        chatRepository.sendResponse(attachment) { result: VisitorMessage?, ex: GliaException? ->
-            listener?.let {
-                if (ex != null) {
-                    listener.error(ex)
-                }
-                if (result != null) {
-                    listener.messageSent(result)
-
-                    chatMessage?.let {
-                        it as? OperatorMessage
-                    }?.let {
-                        listener.onCardMessageUpdated(
-                            ChatMessage(
-                                it.id,
-                                it.content,
-                                it.timestamp,
-                                ChatMessage.Sender(it.senderType, it.operatorHref, it.operatorId),
-                                it.deliveredAt,
-                                attachment,
-                                it.metadata
-                            )
-                        )
-                    }
-                }
+    fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
+        when {
+            isSecureEngagement -> singleChoiceAttachment.apply {
+                secureConversationsRepository.send(selectedOptionText, engagementConfigRepository.queueIds, singleChoiceAttachment, listener)
             }
+
+            isOperatorOnline -> chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
+
+            else -> listener.errorOperatorNotOnline(Unsent.Attachment(singleChoiceAttachment))
         }
     }
 

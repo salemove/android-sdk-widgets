@@ -4,7 +4,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.model.history.VisitorMessageItem
+import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.getColorCompat
@@ -46,9 +46,9 @@ internal class VisitorMessageViewHolder(
 
     fun bind(item: VisitorMessageItem) {
         binding.content.text = item.message
-        binding.deliveredView.isVisible = item.isShowDelivered
+        binding.deliveredView.isVisible = item.showDelivered
         val contentDescription = itemView.resources.getString(
-            if (item.isShowDelivered) {
+            if (item.showDelivered) {
                 R.string.glia_chat_visitor_message_delivered_content_description
             } else {
                 R.string.glia_chat_visitor_message_content_description
@@ -56,5 +56,9 @@ internal class VisitorMessageViewHolder(
             item.message
         )
         itemView.contentDescription = contentDescription
+    }
+
+    fun updateDelivered(delivered: Boolean) {
+        binding.deliveredView.isVisible = delivered
     }
 }

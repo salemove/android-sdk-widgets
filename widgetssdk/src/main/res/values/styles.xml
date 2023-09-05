@@ -28,6 +28,11 @@
         <item name="cornerSize">@dimen/glia_x_large</item>
     </style>
 
+    <style name="Application.Glia.Chat.ShapeAppearance.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/glia_medium</item>
+    </style>
+
     <style name="Application.Glia.Chat.ShapeAppearance.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/glia_small</item>
@@ -66,6 +71,16 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+    <style name="Application.Glia.Chat.Button.Gva" parent="Widget.MaterialComponents.Button">
+        <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
+        </item>
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textColor">?attr/gliaBaseDarkColor</item>
+        <item name="android:backgroundTint">?attr/gliaBaseLightColor</item>
+        <item name="android:padding">13dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
     <style name="Application.Glia.Chat.ChatHead">
         <item name="badgeBackgroundTintList">?attr/gliaBrandPrimaryColor</item>
         <item name="badgeTextColor">?attr/baseLightColor</item>
@@ -73,6 +88,23 @@
         <item name="operatorPlaceholderIcon">?attr/gliaIconPlaceholder</item>
         <item name="operatorPlaceholderBackgroundColor">?attr/gliaBrandPrimaryColor</item>
         <item name="operatorPlaceholderIconTintList">?attr/baseLightColor</item>
+    </style>
+
+    <style name="Application.Glia.Chat.GvaChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="shapeAppearanceOverlay">@style/Application.Glia.Chat.GvaChipShapeAppearance</item>
+        <item name="android:textColor">?attr/gvaQuickReplyTextColor</item>
+        <item name="chipStrokeColor">?attr/gvaQuickReplyStrokeColor</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="ensureMinTouchTargetSize">true</item>
+        <item name="android:checkable">false</item>
+        <item name="chipBackgroundColor">?attr/gvaQuickReplyBackgroundColor</item>
+        <item name="chipSurfaceColor">@android:color/transparent</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Application.Glia.Chat.GvaChipShapeAppearance" parent="">
+        <item name="cornerSize">10dp</item>
     </style>
 
     <style name="Application.Glia.VisitorCode" parent="TextAppearance.MaterialComponents.Headline4">

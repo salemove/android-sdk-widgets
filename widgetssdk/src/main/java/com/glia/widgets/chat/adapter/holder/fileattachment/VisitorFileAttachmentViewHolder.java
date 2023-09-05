@@ -16,7 +16,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
-import com.glia.widgets.chat.model.history.VisitorAttachmentItem;
+import com.glia.widgets.chat.model.VisitorAttachmentItem;
 
 public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     private final TextView deliveredView;
@@ -27,8 +27,8 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         setupDeliveredView(itemView.getContext(), uiTheme);
     }
 
-    public void bind(VisitorAttachmentItem item, ChatAdapter.OnFileItemClickListener listener) {
-        super.setData(item.isFileExists, item.isDownloading, item.attachmentFile, listener);
+    public void bind(VisitorAttachmentItem.File item, ChatAdapter.OnFileItemClickListener listener) {
+        super.setData(item.isFileExists(), item.isDownloading(), item.getAttachmentFile(), listener);
         updateDeliveredView(item);
     }
 
@@ -41,33 +41,37 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     }
 
     private void updateDeliveredView(VisitorAttachmentItem item) {
-        deliveredView.setVisibility(item.showDelivered ? View.VISIBLE : View.GONE);
+        deliveredView.setVisibility(item.getShowDelivered() ? View.VISIBLE : View.GONE);
 
         setAccessibilityLabels(item);
     }
 
     private void setAccessibilityLabels(VisitorAttachmentItem item) {
-        String name = item.attachmentFile.getName();
-        String byteSize = Formatter.formatFileSize(itemView.getContext(), item.attachmentFile.getSize());
-        itemView.setContentDescription(itemView.getResources().getString(item.showDelivered
-                        ? R.string.glia_chat_visitor_file_delivered_content_description
-                        : R.string.glia_chat_visitor_file_content_description,
-                name, byteSize));
+        String name = item.getAttachmentFile().getName();
+        String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
+        itemView.setContentDescription(itemView.getResources().getString(item.getShowDelivered()
+                ? R.string.glia_chat_visitor_file_delivered_content_description
+                : R.string.glia_chat_visitor_file_content_description,
+            name, byteSize));
 
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
             public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
-                String actionLabel = host.getResources().getString(item.isFileExists
-                        ? R.string.glia_chat_attachment_open_button_label
-                        : R.string.glia_chat_attachment_download_button_label);
+                String actionLabel = host.getResources().getString(item.isFileExists()
+                    ? R.string.glia_chat_attachment_open_button_label
+                    : R.string.glia_chat_attachment_download_button_label);
 
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
-                        = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
-                        AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
+                    = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                    AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel);
                 info.addAction(actionClick);
             }
         });
+    }
+
+    public void updateDelivered(boolean delivered) {
+        deliveredView.setVisibility(delivered ? View.VISIBLE : View.GONE);
     }
 }

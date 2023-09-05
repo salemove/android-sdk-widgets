@@ -57,9 +57,7 @@ public class GliaWidgetsTest {
         when(res.getResourceName(anyInt())).thenReturn("test/test2");
         NotificationManager notificationManager = mock(NotificationManager.class);
         when(application.getSystemService(NotificationManager.class)).thenReturn(notificationManager);
-
         GliaWidgets.onAppCreate(application);
-
         verify(gliaCore).onAppCreate(application);
     }
 

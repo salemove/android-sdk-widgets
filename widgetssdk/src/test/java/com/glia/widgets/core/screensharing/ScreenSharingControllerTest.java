@@ -2,6 +2,7 @@ package com.glia.widgets.core.screensharing;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -93,14 +94,13 @@ public class ScreenSharingControllerTest {
     }
 
     @Test
-    public void onResume_hidesDialogShowsNotificationAcceptsScreenSharing_whenNotificationChannelEnabled() {
+    public void onResume_acceptsScreenSharing_whenNotificationChannelEnabled() {
         subjectUnderTest.hasPendingScreenSharingRequest = true;
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
                 .thenReturn(true);
 
         subjectUnderTest.onResume(mock(Activity.class));
 
-        verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
@@ -117,19 +117,29 @@ public class ScreenSharingControllerTest {
     }
 
     @Test
-    public void onScreenSharingAccepted_hidesDialogShowsNotificationAcceptsScreenSharing() {
+    public void onResume_doNothing_whenEnableScreenSharingNotificationsAndStartSharingDialogShown() {
+        subjectUnderTest.hasPendingScreenSharingRequest = true;
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
+            .thenReturn(false);
+        when(dialogController.isEnableScreenSharingNotificationsAndStartSharingDialogShown()).thenReturn(true);
+
+        subjectUnderTest.onResume(mock(Activity.class));
+
+        verify(dialogController, never()).showEnableScreenSharingNotificationsAndStartSharingDialog();
+    }
+
+    @Test
+    public void onScreenSharingAccepted_acceptsScreenSharing() {
         subjectUnderTest.onScreenSharingAccepted(mock(Activity.class));
 
-        verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
 
     @Test
-    public void onScreenSharingDeclined_hidesDialogShowsNotificationAcceptsScreenSharing() {
+    public void onScreenSharingDeclined_declinesScreenSharing() {
         subjectUnderTest.onScreenSharingDeclined();
 
-        verify(dialogController).dismissCurrentDialog();
         verify(gliaScreenSharingRepository).onScreenSharingDeclined();
     }
 

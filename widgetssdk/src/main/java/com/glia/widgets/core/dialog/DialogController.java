@@ -164,6 +164,10 @@ public class DialogController {
         viewCallbacks.remove(callback);
     }
 
+    public boolean isEnableScreenSharingNotificationsAndStartSharingDialogShown() {
+        return Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING == dialogManager.getCurrentMode();
+    }
+
     private boolean isOverlayDialogShown() {
         return Dialog.MODE_OVERLAY_PERMISSION == dialogManager.getCurrentMode();
     }

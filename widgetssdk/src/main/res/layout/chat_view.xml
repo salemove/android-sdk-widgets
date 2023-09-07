@@ -163,6 +163,6 @@
         android:id="@+id/group_chat_controls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="operator_typing_animation_view, divider_view, add_attachment_queue, chat_message_layout" />
+        app:constraint_referenced_ids="divider_view, add_attachment_queue, chat_message_layout" />
 
 </merge>

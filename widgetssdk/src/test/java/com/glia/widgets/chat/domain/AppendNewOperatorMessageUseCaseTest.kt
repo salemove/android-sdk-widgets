@@ -102,7 +102,7 @@ class AppendNewOperatorMessageUseCaseTest {
         whenever(isGvaUseCase(any())) doReturn false
         doAnswer {
             state.chatItems.add(mock())
-            state.chatItems.add(mock<VisitorMessageItem.New>())
+            state.chatItems.add(mock<VisitorMessageItem>())
         }.whenever(appendNewResponseCardOrTextItemUseCase).invoke(any(), any())
 
         useCase(state, chatMessageInternal)

@@ -57,4 +57,8 @@ internal class VisitorMessageViewHolder(
         )
         itemView.contentDescription = contentDescription
     }
+
+    fun updateDelivered(delivered: Boolean) {
+        binding.deliveredView.isVisible = delivered
+    }
 }

@@ -149,6 +149,11 @@ public class Dependencies {
         Dependencies.controllerFactory = controllerFactory;
     }
 
+    @VisibleForTesting
+    public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
+        Dependencies.useCaseFactory = useCaseFactory;
+    }
+
     public static GliaCore glia() {
         return gliaCore;
     }

@@ -63,6 +63,6 @@ class AppendHistoryCustomCardItemUseCaseTest {
 
         assertTrue(items.isNotEmpty())
         assertTrue(items.first() is CustomCardChatItem)
-        assertTrue(items[1] is VisitorMessageItem.History)
+        assertTrue(items[1] is VisitorMessageItem)
     }
 }

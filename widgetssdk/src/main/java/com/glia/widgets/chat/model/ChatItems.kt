@@ -8,6 +8,7 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.helper.isDownloaded
+import java.util.UUID
 
 internal abstract class ChatItem(@ChatAdapter.Type val viewType: Int) {
     abstract val id: String
@@ -231,44 +232,21 @@ internal sealed class VisitorAttachmentItem(@ChatAdapter.Type viewType: Int) : V
     }
 }
 
-internal sealed class VisitorMessageItem : VisitorChatItem(ChatAdapter.VISITOR_MESSAGE_TYPE) {
-    override val showDelivered: Boolean
-        get() = this is Delivered
-
-    abstract val message: String
+internal data class VisitorMessageItem(
+    val message: String,
+    override val id: String = UUID.randomUUID().toString(),
+    override val timestamp: Long = System.currentTimeMillis(),
+    override val showDelivered: Boolean = false
+) : VisitorChatItem(ChatAdapter.VISITOR_MESSAGE_TYPE) {
 
     override fun withDeliveredStatus(delivered: Boolean): VisitorChatItem {
         check(!delivered) { "The method should be called only with false value, to hide delivered status" }
-        return New(id, timestamp, message)
+        return copy(showDelivered = delivered)
     }
-
-    data class New(
-        override val id: String,
-        override val timestamp: Long,
-        override val message: String
-    ) : VisitorMessageItem()
-
-    data class History(
-        override val id: String,
-        override val timestamp: Long,
-        override val message: String
-    ) : VisitorMessageItem()
-
-    data class Unsent(
-        override val id: String = "",
-        override val timestamp: Long = System.currentTimeMillis(),
-        override val message: String
-    ) : VisitorMessageItem()
-
-    data class Delivered(
-        override val id: String,
-        override val timestamp: Long,
-        override val message: String
-    ) : VisitorMessageItem()
 }
 
 internal sealed class Unsent(val content: String) {
-    val chatMessage: VisitorMessageItem.Unsent = VisitorMessageItem.Unsent(message = content)
+    val chatMessage: VisitorMessageItem = VisitorMessageItem(message = content)
 
     data class Message(val message: String) : Unsent(message)
     data class Attachment(val attachment: SingleChoiceAttachment) : Unsent(attachment.selectedOptionText)

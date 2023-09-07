@@ -70,4 +70,8 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
             }
         });
     }
+
+    public void updateDelivered(boolean delivered) {
+        deliveredView.setVisibility(delivered ? View.VISIBLE : View.GONE);
+    }
 }

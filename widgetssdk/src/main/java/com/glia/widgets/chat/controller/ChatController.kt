@@ -158,6 +158,7 @@ internal class ChatController(
         object : GliaSendMessageUseCase.Listener {
             override fun messageSent(message: VisitorMessage?) {
                 Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
+                message?.also { chatManager.onChatAction(ChatManager.Action.MessageSent(it)) }
                 scrollChatToBottom()
             }
 
@@ -519,6 +520,7 @@ internal class ChatController(
                     dialogController.dismissDialogs()
                 }
             }
+
             EngagementStateEvent.Type.NO_ENGAGEMENT -> {
                 Logger.d(TAG, "NoEngagement")
             }

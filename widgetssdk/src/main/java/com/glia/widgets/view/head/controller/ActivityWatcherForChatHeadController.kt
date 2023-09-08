@@ -1,6 +1,8 @@
 package com.glia.widgets.view.head.controller
 
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
+import com.glia.androidsdk.engagement.EngagementState
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
@@ -26,7 +28,15 @@ internal class ActivityWatcherForChatHeadController(
     internal var screenSharingViewCallback: ScreenSharingController.ViewCallback? = null
 
     override fun init() {
-        gliaOnEngagementUseCase.execute { watcher.addChatHeadLayoutIfAbsent() }
+        gliaOnEngagementUseCase.execute { engagement ->
+            showBubble()
+
+            engagement.on(
+                Engagement.Events.STATE_UPDATE
+            ) { engagementState: EngagementState? ->
+                showBubble()
+            }
+        }
     }
 
     override fun shouldShowBubble(gliaOrRootView: String?): Boolean {

@@ -22,6 +22,7 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.CommonExtensionsKt;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.MessagesNotSeenHandler;
@@ -177,7 +178,7 @@ public class ServiceChatHeadController
 
     public void init() {
         gliaOnEngagementUseCase.execute(this::newEngagementLoaded);
-        gliaOnCallVisualizerUseCase.invoke(this::newEngagementLoaded);
+        gliaOnCallVisualizerUseCase.invoke(this::newCallVisualizerEngagementLoaded);
         messagesNotSeenHandler.addListener(this::onUnreadMessageCountChange);
         addVisitorMediaStateListenerUseCase.execute(this);
     }
@@ -221,10 +222,11 @@ public class ServiceChatHeadController
         engagementDisposables.add(operatorDisposable);
         gliaOnEngagementEndUseCase.execute(this);
         toggleChatHeadServiceUseCase.invoke(resumedViewName);
+        if (sdkConfiguration == null) setSdkConfiguration(Dependencies.getSdkConfigurationManager().createWidgetsConfiguration());
         updateChatHeadView();
     }
 
-    private void newEngagementLoaded(OmnibrowseEngagement engagement) {
+    private void newCallVisualizerEngagementLoaded(OmnibrowseEngagement engagement) {
         state = State.ENGAGEMENT;
         if (operatorDisposable != null) operatorDisposable.dispose();
         operatorDisposable = getOperatorFlowableUseCase.execute()
@@ -235,6 +237,7 @@ public class ServiceChatHeadController
         engagementDisposables.add(operatorDisposable);
         // To recieve callback to engagementEnded() after Call Visualizer engagement ends
         gliaOnCallVisualizerEndUseCase.execute(this);
+        if (sdkConfiguration == null) setSdkConfiguration(Dependencies.getSdkConfigurationManager().createWidgetsConfiguration());
         updateChatHeadView();
     }
 

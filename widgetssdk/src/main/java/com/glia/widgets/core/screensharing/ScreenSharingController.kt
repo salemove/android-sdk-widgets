@@ -3,6 +3,7 @@ package com.glia.widgets.core.screensharing
 import android.app.Activity
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
+import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
@@ -66,7 +67,7 @@ internal class ScreenSharingController(
         viewCallbacks.forEach(Consumer { obj: ViewCallback -> obj.onScreenSharingRequestSuccess() })
     }
 
-    fun onResume(activity: Activity) {
+    fun onResume(activity: Activity, requestScreenSharingCallback: (() -> Unit)? = null) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
             if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
@@ -79,7 +80,11 @@ internal class ScreenSharingController(
                 }
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
-                onScreenSharingAccepted(activity)
+                if (requestScreenSharingCallback != null) {
+                    requestScreenSharingCallback()
+                } else {
+                    onScreenSharingAccepted(activity)
+                }
             }
         }
     }

@@ -169,7 +169,9 @@ internal class ActivityWatcherForCallVisualizerController(
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
-        screenSharingController.onResume(activity)
+        screenSharingController.onResume(activity) {
+            startScreenSharing(activity)
+        }
     }
 
     private fun removeScreenSharingCallback() {

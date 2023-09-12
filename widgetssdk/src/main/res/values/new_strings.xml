@@ -25,6 +25,13 @@
     <string name="call_visualizer_visitor_code_title_accessibility_hint">@string/glia_visitor_code_content_description</string>
     <string name="call_visualizer_visitor_code_refresh_accessibility_label">Refresh Button</string>
 
+    <!-- File preview -->
+    <string name="android_preview_title">@string/glia_preview_activity_toolbar_title</string>
+    <string name="android_preview_save_success_message">@string/glia_preview_activity_image_save_success_msg</string>
+    <string name="android_preview_save_error_message">@string/glia_preview_activity_image_save_fail_msg</string>
+    <string name="android_preview_failed_message">@string/glia_preview_activity_preview_failed_msg</string>
+    <string name="android_preview_accessibility_image">@string/glia_preview_activity_image_content_description</string>
+
     <!-- Dialogs -->
     <string name="android_notifications_allow_message">@string/glia_dialog_allow_notifications_message</string>
     <string name="android_notifications_allow_title">@string/glia_dialog_allow_notifications_title</string>
@@ -107,7 +114,6 @@
     <string name="chat_file_too_large_error">@string/glia_chat_attachment_upload_error_file_size_over_limit</string>
     <string name="chat_file_infected_error">@string/glia_chat_attachment_upload_error_failed_to_check_safety</string>
     <string name="error_internal">@string/glia_chat_attachment_upload_error_internal_error</string>
-    <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
 
     <!-- Call -->
     <string name="engagement_connect_with">@string/glia_call_connecting_with</string>
@@ -124,6 +130,7 @@
     <string name="general_close">@string/glia_top_app_bar_close</string>
     <string name="general_company_name">CompanyName OÜ</string>
     <string name="general_company_name_hint">@string/glia_call_company_name_hint</string>
+    <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
 
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
@@ -142,16 +149,11 @@
     <string name="android_call_queue_message">@string/glia_call_in_queue_message</string>
     <string name="android_chat_queue_accessibility_label">@string/glia_chat_in_queue_message_content_description</string>
     <string name="android_file_select_title">@string/glia_chat_select_file_title</string>
-    <string name="android_preview_accessibility_image">@string/glia_preview_activity_image_content_description</string>
     <string name="android_preview_error_fetch">@string/glia_preview_activity_img_fetch_fail_msg</string>
-    <string name="android_preview_failed_message">@string/glia_preview_activity_preview_failed_msg</string>
     <string name="android_preview_menu_save">@string/glia_preview_activity_menu_save_button</string>
     <string name="android_preview_menu_share">@string/glia_preview_activity_menu_share_button</string>
-    <string name="android_preview_save_error_message">@string/glia_preview_activity_image_save_fail_msg</string>
-    <string name="android_preview_save_success_message">@string/glia_preview_activity_image_save_success_msg</string>
     <string name="android_preview_share_error_message">@string/glia_preview_activity_image_share_fail_msg</string>
     <string name="android_preview_share_title">@string/glia_preview_activity_image_share_title</string>
-    <string name="android_preview_title">@string/glia_preview_activity_toolbar_title</string>
     <string name="android_survey_error_network">@string/glia_survey_network_unavailable</string>
     <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
     <string name="call_bubble_accessibility_hint">Deactivates minimize.</string><!-- TODO ADA NEW IN ANDROID -->

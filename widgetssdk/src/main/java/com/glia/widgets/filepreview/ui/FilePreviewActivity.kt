@@ -26,6 +26,8 @@ import com.glia.widgets.helper.showToast
 import java.io.File
 
 internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.View {
+    private val stringProvider = Dependencies.getStringProvider()
+
     private val binding: FilePreviewActivityBinding by lazy {
         FilePreviewActivityBinding.inflate(
             layoutInflater
@@ -52,12 +54,13 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setTitle(R.string.glia_preview_activity_toolbar_title)
+        setTitle(R.string.android_preview_title)
 
         applyInsets()
         onImageDataReceived(intent)
 
         setSupportActionBar(binding.toolbar)
+        binding.toolbar.contentDescription = stringProvider.getRemoteString(R.string.android_app_bar_nav_up_accessibility)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -169,15 +172,15 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun showOnImageSaveSuccess() {
-        showToast(R.string.glia_preview_activity_image_save_success_msg)
+        showToast(R.string.android_preview_save_success_message)
     }
 
     override fun showOnImageSaveFailed() {
-        showToast(R.string.glia_preview_activity_image_save_fail_msg)
+        showToast(R.string.android_preview_save_error_message)
     }
 
     override fun showOnImageLoadingFailed() {
-        showToast(R.string.glia_preview_activity_preview_failed_msg)
+        showToast(R.string.android_preview_failed_message)
     }
 
     override fun engagementEnded() {

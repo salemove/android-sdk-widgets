@@ -30,6 +30,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.notNull
@@ -113,6 +115,24 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         resetMocks()
         verify(watcher, never()).requestCameraPermission()
         verify(nonCallVisualizerSupportActivity, never()).getSystemService(any())
+    }
+
+    @Test
+    fun `onActivityResumed start screen sharing when ScreenSharingController calls requestScreenSharingCallback`() {
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(
+            isCallOrChatActiveUseCase
+        )
+        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        val nonCallVisualizerSupportActivity = mock(Activity::class.java)
+        controller.onActivityResumed(nonCallVisualizerSupportActivity)
+
+        val argumentCaptor = argumentCaptor<Function0<Unit>>()
+        verify(screenSharingController).onResume(eq(nonCallVisualizerSupportActivity), argumentCaptor.capture())
+        argumentCaptor.firstValue.invoke()
+
+        verify(screenSharingController).onScreenSharingAcceptedAndPermissionAsked(nonCallVisualizerSupportActivity)
+
+        resetMocks()
     }
 
     @Test
@@ -456,7 +476,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onActivityResumed(activity)
         verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
         verify(screenSharingController).setViewCallback(anyOrNull())
-        verify(screenSharingController).onResume(activity)
+        verify(screenSharingController).onResume(eq(activity), notNull())
         verify(callVisualizerController).setOnEngagementEndedCallback(any())
         verify(watcher).setupDialogCallback()
         verify(watcher).requestCameraPermission()

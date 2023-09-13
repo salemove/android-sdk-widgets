@@ -35,7 +35,6 @@
         android:layout_gravity="end"
         android:layout_marginTop="@dimen/glia_small"
         android:background="?attr/selectableItemBackground"
-        android:contentDescription="@string/glia_chat_alert_dialog_close_content_description"
         android:src="?attr/gliaIconLeaveQueue"
         app:tint="?attr/gliaBaseNormalColor"
         tools:src="@android:drawable/ic_menu_close_clear_cancel" />

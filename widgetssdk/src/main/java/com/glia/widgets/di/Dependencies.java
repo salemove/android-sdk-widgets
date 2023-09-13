@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle;
 import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.StringProvider;
+import com.glia.widgets.StringProviderImpl;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
@@ -48,14 +49,7 @@ public class Dependencies {
 
     public static void onAppCreate(Application application) {
         resourceProvider = new ResourceProvider(application.getBaseContext());
-        stringProvider = stringKey -> {
-            // TODO IMPLEMENT NEW METHOD FROM CORE
-            String fallback = resourceProvider.getString(stringKey);
-            String key = resourceProvider.getResourceKey(stringKey);
-            // TODO IMPLEMENT NEW METHOD FROM CORE
-            return fallback;
-        };
-        notificationManager = new NotificationManager(application, stringProvider);
+        stringProvider = new StringProviderImpl(resourceProvider);
         notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);

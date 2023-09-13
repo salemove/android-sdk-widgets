@@ -37,7 +37,6 @@ import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
-import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
@@ -155,6 +154,8 @@ internal class CallView(
     private var alertDialog: AlertDialog? = null
     private var currentDialogState: DialogState? = null
 
+    private val stringProvider = Dependencies.getStringProvider()
+
     @JvmOverloads
     constructor(
         context: Context,
@@ -254,7 +255,7 @@ internal class CallView(
                 Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
                 Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
                 Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
-                Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog((it as OperatorName).operatorName) }
+                Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog() }
                 Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
                 Dialog.MODE_NO_MORE_OPERATORS -> post { showNoMoreOperatorsAvailableDialog() }
                 Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
@@ -358,10 +359,10 @@ internal class CallView(
         alertDialog = Dialogs.showOptionsDialog(
             context = this.context,
             theme = theme,
-            title = resources.getString(R.string.glia_dialog_leave_queue_title),
-            message = resources.getString(R.string.glia_dialog_leave_queue_message),
-            positiveButtonText = resources.getString(R.string.glia_dialog_leave_queue_yes),
-            negativeButtonText = resources.getString(R.string.glia_dialog_leave_queue_no),
+            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
+            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
@@ -385,10 +386,10 @@ internal class CallView(
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-                message = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                positiveButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-                negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
+                message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     callController?.notificationsDialogDismissed()
                     this.context.openNotificationChannelScreen()
@@ -410,10 +411,10 @@ internal class CallView(
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = resources.getString(R.string.glia_dialog_allow_notifications_title),
-                message = resources.getString(R.string.glia_dialog_allow_notifications_message),
-                positiveButtonText = resources.getString(R.string.glia_dialog_allow_notifications_yes),
-                negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_notifications_allow_title),
+                message = stringProvider.getRemoteString(R.string.android_notifications_allow_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
@@ -437,10 +438,10 @@ internal class CallView(
                 Dialogs.showScreenSharingDialog(
                     this.context,
                     theme,
-                    resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
-                    resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
-                    R.string.glia_dialog_screen_sharing_offer_accept,
-                    R.string.glia_dialog_screen_sharing_offer_decline,
+                    stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
+                    stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
+                    R.string.general_accept,
+                    R.string.general_decline,
                     { screenSharingController!!.onScreenSharingAccepted(context.requireActivity()) }
                 ) { screenSharingController!!.onScreenSharingDeclined() }
         }
@@ -651,16 +652,14 @@ internal class CallView(
         }
     }
 
-    private fun showEndEngagementDialog(operatorName: String) {
+    private fun showEndEngagementDialog() {
         alertDialog = Dialogs.showOptionsDialog(
             context = this.context,
             theme = theme,
-            title = resources.getString(R.string.glia_dialog_end_engagement_title),
-            message = resources.getString(
-                R.string.glia_dialog_end_engagement_message
-            ),
-            positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
-            negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
+            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
+            message = stringProvider.getRemoteString(R.string.engagement_end_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
@@ -734,8 +733,8 @@ internal class CallView(
 
     private fun showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
-            R.string.glia_dialog_operators_unavailable_title,
-            R.string.glia_dialog_operators_unavailable_message
+            R.string.engagement_queue_closed_header,
+            R.string.engagement_queue_closed_message
         ) {
             dismissAlertDialog()
             callController?.noMoreOperatorsAvailableDismissed()
@@ -747,8 +746,8 @@ internal class CallView(
 
     private fun showUnexpectedErrorDialog() {
         showAlertDialog(
-            R.string.glia_dialog_unexpected_error_title,
-            R.string.glia_dialog_unexpected_error_message
+            R.string.error_general,
+            R.string.engagement_queue_reconnection_failed_try_again
         ) {
             dismissAlertDialog()
             callController?.unexpectedErrorDialogDismissed()
@@ -758,8 +757,8 @@ internal class CallView(
 
     override fun showMissingPermissionsDialog() {
         showAlertDialog(
-            R.string.glia_dialog_permission_error_title,
-            R.string.glia_dialog_permission_error_message
+            R.string.android_permissions_title,
+            R.string.android_permissions_message
         ) {
             dismissAlertDialog()
             callController?.unexpectedErrorDialogDismissed()
@@ -769,10 +768,10 @@ internal class CallView(
 
     private fun showOverlayPermissionsDialog() {
         showOptionsDialog(
-            resources.getString(R.string.glia_dialog_overlay_permissions_title),
-            resources.getString(R.string.glia_dialog_overlay_permissions_message),
-            resources.getString(R.string.glia_dialog_overlay_permissions_ok),
-            resources.getString(R.string.glia_dialog_overlay_permissions_no),
+            stringProvider.getRemoteString(R.string.android_overlay_title),
+            stringProvider.getRemoteString(R.string.android_overlay_message),
+            stringProvider.getRemoteString(R.string.general_ok),
+            stringProvider.getRemoteString(R.string.general_no),
             {
                 dismissAlertDialog()
                 callController?.overlayPermissionsDialogDismissed()

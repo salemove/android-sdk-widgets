@@ -59,7 +59,6 @@ import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
-import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
@@ -143,6 +142,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
     private var adapter by Delegates.notNull<ChatAdapter>()
 
+    private var stringProvider = Dependencies.getStringProvider()
     private var isInBottom = true
     private var downloadFileHolder: AttachmentFile? = null
     private var theme: UiTheme by Delegates.notNull()
@@ -515,7 +515,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             context.startActivity(intent)
         } else {
             Logger.e(TAG, "No email client, uri - $uri")
-            showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+            showToast(stringProvider.getRemoteString(R.string.error_general))
         }
     }
 
@@ -526,7 +526,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             context.startActivity(intent)
         } else {
             Logger.e(TAG, "No dialer uri - $uri")
-            showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+            showToast(stringProvider.getRemoteString(R.string.error_general))
         }
     }
 
@@ -536,7 +536,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 context.startActivity(it)
             } else {
                 Logger.e(TAG, "No app to open url - $uri")
-                showToast(context.getString(R.string.glia_dialog_unexpected_error_title))
+                showToast(stringProvider.getRemoteString(R.string.error_general))
             }
         }
     }
@@ -563,7 +563,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
                 Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
                 Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
-                Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog((it as OperatorName).operatorName) }
+                Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog() }
                 Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
                 Dialog.MODE_NO_MORE_OPERATORS -> post { showNoMoreOperatorsAvailableDialog() }
                 Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
@@ -633,10 +633,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-                message = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                positiveButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-                negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
+                message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     this.context.openNotificationChannelScreen()
@@ -660,10 +660,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = resources.getString(R.string.glia_dialog_allow_notifications_title),
-                message = resources.getString(R.string.glia_dialog_allow_notifications_message),
-                positiveButtonText = resources.getString(R.string.glia_dialog_allow_notifications_yes),
-                negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_notifications_allow_title),
+                message = stringProvider.getRemoteString(R.string.android_notifications_allow_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     controller?.notificationDialogDismissed()
@@ -686,10 +686,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             alertDialog = Dialogs.showScreenSharingDialog(
                 context,
                 theme,
-                resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
-                resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
-                R.string.glia_dialog_screen_sharing_offer_accept,
-                R.string.glia_dialog_screen_sharing_offer_decline,
+                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
+                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
+                R.string.general_accept,
+                R.string.general_decline,
                 { screenSharingController?.onScreenSharingAccepted(context.requireActivity()) }
             ) { screenSharingController?.onScreenSharingDeclined() }
         }
@@ -922,10 +922,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         alertDialog = Dialogs.showOptionsDialog(
             context = context,
             theme = theme,
-            title = resources.getString(R.string.glia_dialog_leave_queue_title),
-            message = resources.getString(R.string.glia_dialog_leave_queue_message),
-            positiveButtonText = resources.getString(R.string.glia_dialog_leave_queue_yes),
-            negativeButtonText = resources.getString(R.string.glia_dialog_leave_queue_no),
+            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
+            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogYesClicked()
@@ -944,16 +944,14 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         )
     }
 
-    private fun showEndEngagementDialog(operatorName: String) {
+    private fun showEndEngagementDialog() {
         alertDialog = Dialogs.showOptionsDialog(
             context = context,
             theme = theme,
-            title = resources.getString(R.string.glia_dialog_end_engagement_title),
-            message = resources.getString(
-                R.string.glia_dialog_end_engagement_message
-            ),
-            positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
-            negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
+            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
+            message = stringProvider.getRemoteString(R.string.engagement_end_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogYesClicked()
@@ -1013,8 +1011,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
-            R.string.glia_dialog_operators_unavailable_title,
-            R.string.glia_dialog_operators_unavailable_message
+            R.string.engagement_queue_closed_header,
+            R.string.engagement_queue_closed_message
         ) {
             dismissAlertDialog()
             controller?.noMoreOperatorsAvailableDismissed()
@@ -1033,8 +1031,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showUnexpectedErrorDialog() {
         showAlertDialog(
-            R.string.glia_dialog_unexpected_error_title,
-            R.string.glia_dialog_unexpected_error_message
+            R.string.error_general,
+            R.string.engagement_queue_reconnection_failed_try_again
         ) {
             dismissAlertDialog()
             controller?.unexpectedErrorDialogDismissed()
@@ -1044,10 +1042,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showOverlayPermissionsDialog() {
         showOptionsDialog(
-            resources.getString(R.string.glia_dialog_overlay_permissions_title),
-            resources.getString(R.string.glia_dialog_overlay_permissions_message),
-            resources.getString(R.string.glia_dialog_overlay_permissions_ok),
-            resources.getString(R.string.glia_dialog_overlay_permissions_no),
+            stringProvider.getRemoteString(R.string.android_overlay_title),
+            stringProvider.getRemoteString(R.string.android_overlay_message),
+            stringProvider.getRemoteString(R.string.general_ok),
+            stringProvider.getRemoteString(R.string.general_no),
             {
                 controller?.overlayPermissionsDialogDismissed()
                 dismissAlertDialog()

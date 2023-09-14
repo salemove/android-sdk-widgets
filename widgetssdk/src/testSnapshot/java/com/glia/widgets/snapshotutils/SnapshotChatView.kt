@@ -69,12 +69,12 @@ internal interface SnapshotChatView : SnapshotContent {
             whenever(useCaseFactoryMock.createGetImageFileFromDownloadsUseCase()).thenReturn(getImageFileFromDownloadsUseCaseMock)
             whenever(useCaseFactoryMock.createGetImageFileFromNetworkUseCase()).thenReturn(getImageFileFromNetworkUseCaseMock)
 
+            val rp = ResourceProvider(snapshotContent.context)
+            val sp: StringProvider = SnapshotStringProvider(snapshotContent.context)
             Dependencies.setControllerFactory(controllerFactoryMock)
             Dependencies.setUseCaseFactory(useCaseFactoryMock)
-            val rp = ResourceProvider(snapshotContent.context)
             Dependencies.setResourceProvider(rp)
-            val sp: StringProvider = SnapshotStringProvider(rp)
-            //Dependencies.setStringProvider(sp)
+            Dependencies.setStringProvider(sp)
         }
 
         fun tearDown() {

@@ -1,11 +1,11 @@
 package com.glia.widgets.chat
 
+import android.content.Context
 import com.glia.widgets.StringProvider
-import com.glia.widgets.helper.ResourceProvider
 
-class SnapshotStringProvider(private val resourceProvider: ResourceProvider): StringProvider {
+class SnapshotStringProvider(private val context: Context): StringProvider {
 
     override fun getRemoteString(stringKey: Int, vararg values: String?): String {
-        return resourceProvider.getResourceKey(stringKey)
+        return context.resources.getResourceName(stringKey).split("/")[1]
     }
 }

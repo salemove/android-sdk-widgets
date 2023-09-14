@@ -8,7 +8,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:navigationContentDescription="@string/glia_top_app_bar_navigate_up_content_description"
         android:elevation="0dp"
         app:elevation="0dp"
         app:menu="@menu/top_app_bar"

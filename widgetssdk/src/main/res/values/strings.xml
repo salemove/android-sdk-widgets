@@ -71,7 +71,7 @@
         <string name="glia_chat_attachment_open_button_label">Open</string>
         <string name="glia_chat_new_messages">New Messages</string>
         <string name="glia_chat_attachment_remove_item_content_description">Remove attachment %1$s</string>
-    <string name="glia_top_app_bar_close">Close</string>
+        <string name="glia_top_app_bar_close">Close</string>
     <string name="glia_call_chat_one_content_description">Chat. %1$d unread message</string>
     <string name="glia_call_chat_other_content_description">Chat. %1$d unread messages</string>
     <string name="glia_call_operator_name_hint">Operator name</string>
@@ -113,7 +113,7 @@
         <string name="glia_chat_attachment_item_content_description">Attachment %1$s, size %2$s. %3$s</string>
         <string name="glia_view_file_error_message">Can\'t open file</string>
         <string name="glia_view_file_not_ready_for_preview">The image is not ready for preview. Please try again later.</string>
-    <string name="glia_top_app_bar_navigate_up_content_description">Navigate Up</string>
+        <string name="glia_top_app_bar_navigate_up_content_description">Navigate Up</string>
         <string name="glia_top_app_bar_chat_end_content_description">End engagement</string>
         <string name="glia_dialog_screen_sharing_offer_enable_notifications_title">Start Screen Sharing?</string>
         <string name="glia_dialog_screen_sharing_offer_enable_notifications_message">The operator has requested to share your screen. To do this, you need to turn on app\'s notifications. Do this now?</string>

@@ -5,9 +5,11 @@ import android.content.Context
 import android.view.View
 import android.view.Window
 import androidx.core.graphics.toColorInt
+import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.ChatViewCallback
+import com.glia.widgets.chat.SnapshotStringProvider
 import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
@@ -69,7 +71,10 @@ internal interface SnapshotChatView : SnapshotContent {
 
             Dependencies.setControllerFactory(controllerFactoryMock)
             Dependencies.setUseCaseFactory(useCaseFactoryMock)
-            Dependencies.setResourceProvider(ResourceProvider(snapshotContent.context))
+            val rp = ResourceProvider(snapshotContent.context)
+            Dependencies.setResourceProvider(rp)
+            val sp: StringProvider = SnapshotStringProvider(rp)
+            //Dependencies.setStringProvider(sp)
         }
 
         fun tearDown() {

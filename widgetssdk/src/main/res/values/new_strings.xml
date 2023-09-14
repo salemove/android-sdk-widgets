@@ -108,7 +108,7 @@
     <string name="chat_file_too_large_error">@string/glia_chat_attachment_upload_error_file_size_over_limit</string>
     <string name="chat_file_infected_error">@string/glia_chat_attachment_upload_error_failed_to_check_safety</string>
     <string name="error_internal">@string/glia_chat_attachment_upload_error_internal_error</string>
-
+    <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
 
     <!-- Call -->
     <string name="engagement_connect_with">@string/glia_call_connecting_with</string>
@@ -122,6 +122,7 @@
     <string name="general_no">@string/glia_dialog_no</string>
     <string name="general_ok">@string/glia_dialog_ok</string>
     <string name="general_accept">@string/glia_dialog_accept</string>
+    <string name="general_close">@string/glia_top_app_bar_close</string>
 
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
@@ -130,7 +131,6 @@
     <!-- NEW REFERENCES -->
     <!-- NEW REFERENCES -->
     <string name="alert_action_settings">Settings</string><!-- TODO UNUSED IN ANDROID -->
-    <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
     <string name="android_call_mute_accessibility">@string/glia_call_mute_content_description</string>
     <string name="android_call_on_hold_accessibility">@string/glia_call_operator_status_on_hold_description</string>
     <string name="android_call_speaker_off_accessibility">@string/glia_call_speaker_off_content_description</string>
@@ -188,7 +188,6 @@
     <string name="general_back">Back</string> <!-- TODO NEW -->
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
     <string name="general_cancel">@string/glia_dialog_cancel</string>
-    <string name="general_close">@string/glia_top_app_bar_close</string>
     <string name="general_comment">@string/glia_survey_open_text_item_edit_hint</string>
     <string name="general_decline">@string/glia_dialog_decline</string>
     <string name="general_download">@string/glia_chat_attachment_download_button_label</string>

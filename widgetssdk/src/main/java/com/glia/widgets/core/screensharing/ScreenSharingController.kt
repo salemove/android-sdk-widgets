@@ -3,7 +3,6 @@ package com.glia.widgets.core.screensharing
 import android.app.Activity
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
-import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
@@ -99,6 +98,7 @@ internal class ScreenSharingController(
 
     fun onScreenSharingAccepted(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAccepted")
+        dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAccepted(
             activity,
@@ -109,6 +109,7 @@ internal class ScreenSharingController(
 
     fun onScreenSharingAcceptedAndPermissionAsked(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAcceptedAndPermissionAsked")
+        dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAcceptedAndPermissionAsked(
             activity,
@@ -119,6 +120,7 @@ internal class ScreenSharingController(
 
     fun onScreenSharingDeclined() {
         Logger.d(TAG, "onScreenSharingDeclined")
+        dialogController.dismissCurrentDialog()
         repository.onScreenSharingDeclined()
         hasPendingScreenSharingRequest = false
         hideScreenSharingEnabledNotification()

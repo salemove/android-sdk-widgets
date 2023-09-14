@@ -15,7 +15,8 @@
         android:orientation="vertical"
         android:paddingTop="@dimen/glia_large"
         android:paddingHorizontal="@dimen/glia_large"
-        android:background="@drawable/bg_message">
+        android:background="@drawable/bg_message"
+        android:backgroundTint="?attr/gliaSystemAgentBubbleColor">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image"

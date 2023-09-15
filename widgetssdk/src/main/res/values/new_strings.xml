@@ -141,7 +141,7 @@
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
     <string name="general_accessibility_close">Close Button</string>
-    <string name="general_powered_by">@string/glia_chat_glia_logo_content_description</string>
+    <string name="general_powered">@string/glia_chat_glia_logo_content_description</string>
     <string name="general_yes">@string/glia_dialog_yes</string>
     <string name="general_no">@string/glia_dialog_no</string>
     <string name="general_ok">@string/glia_dialog_ok</string>

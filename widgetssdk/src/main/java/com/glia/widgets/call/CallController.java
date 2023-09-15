@@ -826,7 +826,9 @@ public class CallController implements
                         break;
                 }
             });
-            omnibrowseEngagement.on(Engagement.Events.END, engagementState -> viewCallback.destroyView());
+            omnibrowseEngagement.on(Engagement.Events.END, engagementState -> {
+                if (viewCallback != null) viewCallback.destroyView();
+            });
         });
     }
 

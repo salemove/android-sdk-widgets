@@ -66,13 +66,24 @@ internal class ScreenSharingController(
         viewCallbacks.forEach(Consumer { obj: ViewCallback -> obj.onScreenSharingRequestSuccess() })
     }
 
-    fun onResume(activity: Activity) {
+    fun onResume(activity: Activity, requestScreenSharingCallback: (() -> Unit)? = null) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
             if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
+                if (dialogController.isEnableScreenSharingNotificationsAndStartSharingDialogShown) {
+                    // Do not need to request dialog again if this dialog is already shown.
+                    //
+                    // It prevents the infinity cycle of trying to display
+                    // this dialog if the CallVisualizerSupportActivity is used for it.
+                    return
+                }
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
-                onScreenSharingAccepted(activity)
+                if (requestScreenSharingCallback != null) {
+                    requestScreenSharingCallback()
+                } else {
+                    onScreenSharingAccepted(activity)
+                }
             }
         }
     }

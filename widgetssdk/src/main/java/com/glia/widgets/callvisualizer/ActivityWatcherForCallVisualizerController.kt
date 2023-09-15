@@ -141,12 +141,10 @@ internal class ActivityWatcherForCallVisualizerController(
         }
         watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
-        watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {
         Logger.d(TAG, "onNegativeButtonDialogButtonClicked() - $currentDialogMode")
-        watcher.removeDialogFromStack()
         when (currentDialogMode) {
             MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING,
@@ -162,6 +160,7 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_VISITOR_CODE,
             MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
         }
+        watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
     }
 
@@ -170,7 +169,9 @@ internal class ActivityWatcherForCallVisualizerController(
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
-        screenSharingController.onResume(activity)
+        screenSharingController.onResume(activity) {
+            startScreenSharing(activity)
+        }
     }
 
     private fun removeScreenSharingCallback() {

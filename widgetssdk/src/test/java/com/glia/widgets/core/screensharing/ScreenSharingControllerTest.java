@@ -2,6 +2,7 @@ package com.glia.widgets.core.screensharing;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 @RunWith(RobolectricTestRunner.class)
 public class ScreenSharingControllerTest {
@@ -93,16 +97,29 @@ public class ScreenSharingControllerTest {
     }
 
     @Test
-    public void onResume_hidesDialogShowsNotificationAcceptsScreenSharing_whenNotificationChannelEnabled() {
+    public void onResume_acceptsScreenSharing_whenNotificationChannelEnabled() {
         subjectUnderTest.hasPendingScreenSharingRequest = true;
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
-                .thenReturn(true);
+            .thenReturn(true);
 
-        subjectUnderTest.onResume(mock(Activity.class));
+        subjectUnderTest.onResume(mock(Activity.class), null);
 
-        verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
+    }
+
+    @Test
+    public void onResume_requestScreenSharingCallback_whenCallbackIsNotNull() {
+        Function0<Unit> requestScreenSharingCallback = mock(Function0.class);
+        subjectUnderTest.hasPendingScreenSharingRequest = true;
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
+            .thenReturn(true);
+
+        subjectUnderTest.onResume(mock(Activity.class), requestScreenSharingCallback);
+
+        verify(requestScreenSharingCallback).invoke();
+        verify(showScreenSharingNotificationUseCase, never()).invoke();
+        verify(gliaScreenSharingRepository, never()).onScreenSharingAccepted(any(), any());
     }
 
     @Test
@@ -111,25 +128,35 @@ public class ScreenSharingControllerTest {
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
                 .thenReturn(false);
 
-        subjectUnderTest.onResume(mock(Activity.class));
+        subjectUnderTest.onResume(mock(Activity.class), null);
 
         verify(dialogController).showEnableScreenSharingNotificationsAndStartSharingDialog();
     }
 
     @Test
-    public void onScreenSharingAccepted_hidesDialogShowsNotificationAcceptsScreenSharing() {
+    public void onResume_doNothing_whenEnableScreenSharingNotificationsAndStartSharingDialogShown() {
+        subjectUnderTest.hasPendingScreenSharingRequest = true;
+        when(hasScreenSharingNotificationChannelEnabledUseCase.invoke())
+            .thenReturn(false);
+        when(dialogController.isEnableScreenSharingNotificationsAndStartSharingDialogShown()).thenReturn(true);
+
+        subjectUnderTest.onResume(mock(Activity.class), null);
+
+        verify(dialogController, never()).showEnableScreenSharingNotificationsAndStartSharingDialog();
+    }
+
+    @Test
+    public void onScreenSharingAccepted_acceptsScreenSharing() {
         subjectUnderTest.onScreenSharingAccepted(mock(Activity.class));
 
-        verify(dialogController).dismissCurrentDialog();
         verify(showScreenSharingNotificationUseCase).invoke();
         verify(gliaScreenSharingRepository).onScreenSharingAccepted(any(), any());
     }
 
     @Test
-    public void onScreenSharingDeclined_hidesDialogShowsNotificationAcceptsScreenSharing() {
+    public void onScreenSharingDeclined_declinesScreenSharing() {
         subjectUnderTest.onScreenSharingDeclined();
 
-        verify(dialogController).dismissCurrentDialog();
         verify(gliaScreenSharingRepository).onScreenSharingDeclined();
     }
 

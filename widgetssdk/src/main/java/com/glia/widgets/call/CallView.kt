@@ -220,10 +220,10 @@ internal class CallView(
         floatingVisitorVideoContainer.onResume()
         callController?.onResume()
         operatorVideoView?.resumeRendering()
+        dialogController?.addCallback(dialogCallback)
         screenSharingController?.setViewCallback(screenSharingViewCallback)
         screenSharingController?.onResume(context.requireActivity())
         serviceChatHeadController?.onResume(this)
-        dialogController?.addCallback(dialogCallback)
     }
 
     fun onPause() {
@@ -390,17 +390,14 @@ internal class CallView(
                 positiveButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
                 negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
                 positiveButtonClickListener = {
-                    dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     this.context.openNotificationChannelScreen()
                 },
                 negativeButtonClickListener = {
-                    dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 },
                 cancelListener = {
-                    it.dismiss()
                     callController?.notificationsDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 }

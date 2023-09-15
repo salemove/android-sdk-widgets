@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_x_small"
-        android:text="@string/glia_chat_delivered"
+        tools:text="@string/glia_chat_delivered"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="?attr/gliaBaseNormalColor"
         android:visibility="gone"

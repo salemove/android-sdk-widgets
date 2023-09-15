@@ -32,6 +32,8 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
+import org.jetbrains.annotations.TestOnly;
+
 public class Dependencies {
 
     private final static String TAG = "Dependencies";
@@ -50,6 +52,7 @@ public class Dependencies {
     public static void onAppCreate(Application application) {
         resourceProvider = new ResourceProvider(application.getBaseContext());
         stringProvider = new StringProviderImpl(resourceProvider);
+        notificationManager = new NotificationManager(application, stringProvider);
         notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
@@ -102,6 +105,11 @@ public class Dependencies {
                 repositoryFactory.getCallVisualizerRepository(),
                 repositoryFactory.getGliaEngagementRepository()
         );
+    }
+
+    @TestOnly
+    public static void setStringProvider(StringProvider sp) {
+        stringProvider = sp;
     }
 
     public static StringProvider getStringProvider() {

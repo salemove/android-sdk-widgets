@@ -8,7 +8,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:navigationContentDescription="@string/glia_top_app_bar_navigate_up_content_description"
         android:elevation="0dp"
         app:elevation="0dp"
         app:menu="@menu/top_app_bar"
@@ -33,7 +32,6 @@
                 android:id="@+id/end_screen_sharing_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/glia_top_app_bar_end_screen_sharing_description"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_screensharing_off"
                 android:background="@null"
@@ -47,8 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="@dimen/glia_app_bar_end_button_width"
-                android:text="@string/glia_top_app_bar_chat_end"
-                android:contentDescription="@string/glia_top_app_bar_chat_end_content_description"
+                tools:text="@string/glia_top_app_bar_chat_end"
                 android:visibility="gone" />
 
         </LinearLayout>

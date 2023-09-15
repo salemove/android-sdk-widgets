@@ -22,6 +22,7 @@ internal class VisitorMessageViewHolder(
     private val visitorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.visitorMessage
     }
+    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         uiTheme.visitorMessageBackgroundColor?.let(itemView::getColorStateListCompat)
@@ -42,16 +43,17 @@ internal class VisitorMessageViewHolder(
         binding.content.applyLayerTheme(visitorTheme?.background)
         binding.content.applyTextTheme(visitorTheme?.text)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
+        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_status_delivered)
     }
 
     fun bind(item: VisitorMessageItem) {
         binding.content.text = item.message
         binding.deliveredView.isVisible = item.showDelivered
-        val contentDescription = itemView.resources.getString(
+        val contentDescription = stringProvider.getRemoteString(
             if (item.showDelivered) {
-                R.string.glia_chat_visitor_message_delivered_content_description
+                R.string.android_chat_visitor_delivered_accessibility_message
             } else {
-                R.string.glia_chat_visitor_message_content_description
+                R.string.android_chat_visitor_accessibility_message
             },
             item.message
         )

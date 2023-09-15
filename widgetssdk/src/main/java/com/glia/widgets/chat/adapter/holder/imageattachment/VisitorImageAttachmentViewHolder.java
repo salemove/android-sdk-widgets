@@ -11,13 +11,16 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 
 public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder {
     private final TextView deliveredView;
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
 
     public VisitorImageAttachmentViewHolder(
         @NonNull View itemView,
@@ -28,6 +31,7 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
     ) {
         super(itemView, getImageFileFromCacheUseCase, getImageFileFromDownloadsUseCase, getImageFileFromNetworkUseCase);
         deliveredView = itemView.findViewById(R.id.delivered_view);
+        deliveredView.setText(stringProvider.getRemoteString(R.string.chat_status_delivered));
         setupDeliveredView(itemView.getContext(), uiTheme);
     }
 
@@ -40,11 +44,11 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
 
     private void setAccessibilityLabels(boolean showDelivered) {
         if (showDelivered) {
-            itemView.setContentDescription(itemView.getResources().getString(
-                R.string.glia_chat_visitor_image_delivered_content_description));
+            itemView.setContentDescription(stringProvider.getRemoteString(
+                R.string.android_chat_visitor_delivered_accessibility_image));
         } else {
-            itemView.setContentDescription(itemView.getResources().getString(
-                R.string.glia_chat_visitor_image_content_description));
+            itemView.setContentDescription(stringProvider.getRemoteString(
+                R.string.android_chat_visitor_accessibility_image));
         }
     }
 

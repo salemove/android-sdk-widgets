@@ -18,6 +18,7 @@ internal open class OperatorBaseViewHolder(
     unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val stringProvider = Dependencies.getStringProvider()
     val operatorTheme: MessageBalloonTheme? by lazy {
         unifiedTheme?.chatTheme?.operatorMessage
     }
@@ -42,16 +43,16 @@ internal open class OperatorBaseViewHolder(
             }
 
             operatorName.isNullOrEmpty().not() -> {
-                itemView.contentDescription = itemView.resources.getString(
-                    R.string.glia_chat_operator_name_message_content_description,
+                itemView.contentDescription = stringProvider.getRemoteString(
+                    R.string.android_chat_operator_name_accessibility_message,
                     operatorName,
                     message
                 )
             }
 
             else -> {
-                itemView.contentDescription = itemView.resources.getString(
-                    R.string.glia_chat_operator_message_content_description,
+                itemView.contentDescription = stringProvider.getRemoteString(
+                    R.string.android_chat_accessibility_message,
                     message
                 )
             }

@@ -29,6 +29,7 @@ internal class OperatorStatusViewHolder(
     private val engagementStatesTheme: EngagementStatesTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.connect
     }
+    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         applyBaseConfig(uiTheme)
@@ -46,6 +47,7 @@ internal class OperatorStatusViewHolder(
             chatStartingCaptionView.typeface = it
             chatStartedNameView.setTypeface(it, Typeface.BOLD)
             chatStartedCaptionView.typeface = it
+            chatStartedCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connect_placeholder)
         }
         engagementStatesTheme?.operator.also(statusPictureView::applyOperatorTheme)
     }
@@ -86,8 +88,8 @@ internal class OperatorStatusViewHolder(
         statusPictureView.showPlaceholder()
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_in_queue_message_content_description,
+        itemView.contentDescription = stringProvider.getRemoteString(
+            R.string.android_chat_queue_accessibility_label,
             companyName ?: ""
         )
 
@@ -101,29 +103,12 @@ internal class OperatorStatusViewHolder(
         applyChatStartedViewsVisibility()
 
         chatStartedNameView.text = operatorName
-        chatStartedCaptionView.text =
-            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined,
-            operatorName
-        )
+        stringProvider.getRemoteString(R.string.chat_operator_joined, operatorName).apply {
+            chatStartedCaptionView.text = this
+            itemView.contentDescription = this
+        }
 
         engagementStatesTheme?.connected.also(::applyEngagementState)
-    }
-
-    private fun applyJoinedState(operatorName: String) {
-        chatStartedNameView.text = operatorName
-        chatStartedCaptionView.text =
-            itemView.resources.getString(R.string.glia_chat_operator_has_joined, operatorName)
-        itemView.contentDescription = itemView.resources.getString(
-            R.string.glia_chat_operator_has_joined,
-            operatorName
-        )
-
-        applyChatStartingViewsVisibility(false)
-        applyChatStartedViewsVisibility()
-
-        engagementStatesTheme?.connecting.also(::applyEngagementState)
     }
 
     private fun applyTransferringState() {
@@ -132,8 +117,7 @@ internal class OperatorStatusViewHolder(
         chatStartedNameView.isVisible = true
         chatStartedCaptionView.isVisible = false
 
-        chatStartedNameView.text =
-            itemView.resources.getString(R.string.glia_chat_visitor_status_transferring)
+        chatStartedNameView.text = stringProvider.getRemoteString(R.string.engagement_queue_transferring_message)
 
         engagementStatesTheme?.transferring.also(::applyEngagementState)
     }

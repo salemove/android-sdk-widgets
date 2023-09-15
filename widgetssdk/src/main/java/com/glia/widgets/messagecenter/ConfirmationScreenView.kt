@@ -35,6 +35,7 @@ class ConfirmationScreenView(
     defStyleRes
 ) {
 
+    private val stringProvider = Dependencies.getStringProvider()
     private val unifiedTheme: SecureConversationsConfirmationScreenTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.secureConversationsConfirmationScreenTheme
     }
@@ -52,6 +53,9 @@ class ConfirmationScreenView(
         orientation = VERTICAL
         setBackgroundColor(ContextCompat.getColor(this.context, R.color.glia_chat_background_color))
         checkMessagesButton.setOnClickListener { onCheckMessagesButtonClickListener?.onClick(it) }
+        binding.title.text = stringProvider.getRemoteString(R.string.general_thank_you)
+        binding.subtitle.text = stringProvider.getRemoteString(R.string.message_center_confirmation_subtitle)
+        binding.btnCheckMessagesConfirmationScreen.text = stringProvider.getRemoteString(R.string.message_center_check_messages)
         setupUnifiedTheme()
     }
 

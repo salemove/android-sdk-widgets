@@ -971,7 +971,7 @@ internal class CallView(
                 callState.callStatus.formattedOperatorName,
                 ""
             )
-            if (callState.companyName != null) { // TODO FIXME before release
+            if (callState.companyName != null) { // TODO FIXME Make CompanyName configurable from remote strings
                 companyNameView.text = callState.companyName
                 companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
                 msrView.text = stringProvider.getRemoteString(

@@ -305,7 +305,10 @@ internal class CallView(
             operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring_message))
         } else {
             operatorNameView.text = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
+<<<<<<< HEAD
             operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
+=======
+>>>>>>> 4f1c4803 (Implemented remote strings call)
             handleOperatorStatusViewOperatorImage(state)
         }
         operatorStatusView.isVisible = state.showOperatorStatusView()
@@ -339,6 +342,7 @@ internal class CallView(
 
     private fun handleOperatorVideoState(state: CallState) {
         if (state.showOperatorVideo() && operatorVideoContainer.visibility == GONE) {
+            operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_video_operator_accessibility_label)
             operatorVideoContainer.visibility = VISIBLE
             showOperatorVideo(state.callStatus.operatorMediaState)
         } else if (!state.showOperatorVideo() && operatorVideoContainer.visibility == VISIBLE) {
@@ -558,7 +562,10 @@ internal class CallView(
         chatButtonLabel.text = stringProvider.getRemoteString(R.string.media_text_name)
         speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_button_speaker)
         minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
+<<<<<<< HEAD
         companyNameView.text = stringProvider.getRemoteString(R.string.general_company_name)
+=======
+>>>>>>> 4f1c4803 (Implemented remote strings call)
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)
         callTheme?.operator.also(operatorNameView::applyThemeAsDefault)
@@ -971,8 +978,12 @@ internal class CallView(
                 ""
             )
             if (callState.companyName != null) {
+                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name)
                 companyNameView.text = callState.companyName
+<<<<<<< HEAD
                 companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
+=======
+>>>>>>> 4f1c4803 (Implemented remote strings call)
                 msrView.text = stringProvider.getRemoteString(
                     R.string.engagement_connect_with,
                     callState.callStatus.formattedOperatorName,

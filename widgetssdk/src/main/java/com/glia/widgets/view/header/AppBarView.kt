@@ -207,7 +207,6 @@ class AppBarView @JvmOverloads constructor(
     internal fun applyHeaderTheme(headerTheme: HeaderTheme?) {
         headerTheme?.apply {
             binding.toolbar.applyColorTheme(background?.fill)
-            binding.toolbar.navigationContentDescription = stringProvider.getRemoteString(R.string.android_app_bar_nav_up_accessibility)
             backButton?.iconColor?.also { binding.toolbar.setNavigationIconTint(it.primaryColor) }
             text?.also(::applyTitleTheme)
             closeButton?.iconColor?.also { leaveQueueIcon.icon?.setTintCompat(it.primaryColor) }

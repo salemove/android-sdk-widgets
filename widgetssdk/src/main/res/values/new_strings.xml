@@ -91,7 +91,6 @@
     <string name="engagement_connect_placeholder">@string/glia_chat_in_queue_message</string>
     <string name="chat_status_delivered">@string/glia_chat_delivered</string>
     <string name="chat_unread_message_divider">@string/glia_chat_new_messages</string>
-    <string name="general_company_name">@string/glia_call_company_name_hint</string>
     <string name="chat_attach_files">@string/glia_chat_add_attachment_description</string>
     <string name="send_message_send">@string/glia_chat_send_content_description</string>
     <string name="android_chat_file_visitor_accessibility">@string/glia_chat_visitor_file_content_description</string>
@@ -123,6 +122,8 @@
     <string name="general_ok">@string/glia_dialog_ok</string>
     <string name="general_accept">@string/glia_dialog_accept</string>
     <string name="general_close">@string/glia_top_app_bar_close</string>
+    <string name="general_company_name">CompanyName OÜ</string>
+    <string name="general_company_name_hint">@string/glia_call_company_name_hint</string>
 
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>

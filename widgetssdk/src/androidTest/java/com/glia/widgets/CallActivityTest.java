@@ -83,6 +83,10 @@ public class CallActivityTest {
         // set up ResourceProvider
         resourceProvider = new ResourceProvider(appContext);
         Dependencies.setResourceProvider(resourceProvider);
+
+        // set up StringProvider
+        StringProvider stringProvider = new TestStringProvider(appContext);
+        Dependencies.setStringProvider(stringProvider);
     }
 
     @Test
@@ -352,7 +356,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_operator_video_content_description);
+            String expected = appContext.getString(R.string.call_video_operator_accessibility_label);
             onView(withId(R.id.operator_video_container)).check(matches(withContentDescription(expected)));
         }
     }
@@ -392,7 +396,7 @@ public class CallActivityTest {
 
             Thread.sleep(1000);
 
-            onView(withContentDescription(R.string.glia_top_app_bar_navigate_up_content_description)).perform(click());
+            onView(withContentDescription(R.string.android_app_bar_nav_up_accessibility)).perform(click());
 
             assertEquals(Lifecycle.State.DESTROYED, scenario.getState());
         }
@@ -412,7 +416,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.general_company_name);
+            String expected = appContext.getString(R.string.general_company_name_hint);
             onView(withId(R.id.company_name_view)).check(matches(withHint(expected)));
         }
     }

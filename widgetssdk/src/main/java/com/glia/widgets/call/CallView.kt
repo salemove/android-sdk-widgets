@@ -219,6 +219,7 @@ internal class CallView(
 
     fun onResume() {
         floatingVisitorVideoContainer.onResume()
+        floatingVisitorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_video_visitor_accessibility_label)
         callController?.onResume()
         operatorVideoView?.resumeRendering()
         dialogController?.addCallback(dialogCallback)
@@ -283,6 +284,7 @@ internal class CallView(
     private fun handleCallTimerView(callState: CallState) {
         callTimerView.isVisible = callState.showCallTimerView()
         callState.callStatus.time?.also(callTimerView::setText)
+        callTimerView.contentDescription = stringProvider.getRemoteString(R.string.chat_duration_accessibility_label)
     }
 
     private fun handleContinueBrowsingView(callState: CallState) {
@@ -290,8 +292,8 @@ internal class CallView(
             resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE &&
             callState.showContinueBrowsingView()
 
-        continueBrowsingView.text = resources.getString(
-            if (callState.showOnHold()) R.string.glia_call_continue_browsing_on_hold else R.string.glia_call_continue_browsing
+        continueBrowsingView.text = stringProvider.getRemoteString(
+            if (callState.showOnHold()) R.string.call_on_hold_bottom_text else R.string.engagement_queue_wait_message
         )
     }
 
@@ -302,6 +304,8 @@ internal class CallView(
             operatorStatusView.showTransferring()
             operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring_message))
         } else {
+            operatorNameView.text = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
+            operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
             handleOperatorStatusViewOperatorImage(state)
         }
         operatorStatusView.isVisible = state.showOperatorStatusView()
@@ -348,8 +352,8 @@ internal class CallView(
             speakerButton,
             theme.iconCallSpeakerOn,
             theme.iconCallSpeakerOff,
-            R.string.glia_call_speaker_on_content_description,
-            R.string.glia_call_speaker_off_content_description,
+            R.string.android_call_speaker_on_accessibility,
+            R.string.android_call_speaker_off_accessibility,
             isSpeakerOn
         )
         speakerButtonLabel.isActivated = isSpeakerOn
@@ -460,7 +464,7 @@ internal class CallView(
             if (isActivated) activatedContentDescription else notActivatedContentDescription
 
         floatingActionButton.isActivated = isActivated
-        floatingActionButton.contentDescription = resources.getString(contentDescription)
+        floatingActionButton.contentDescription = stringProvider.getRemoteString(contentDescription)
         floatingActionButton.setImageResource(imageRes ?: return)
     }
 
@@ -550,10 +554,20 @@ internal class CallView(
         chatButtonBadgeView.applyBadgeTheme(callTheme?.buttonBar?.badge)
 
         // Texts
+        appBar.setTitle(stringProvider.getRemoteString(R.string.media_audio_name))
+        chatButtonLabel.text = stringProvider.getRemoteString(R.string.media_text_name)
+        speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_button_speaker)
+        minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
+        companyNameView.text = stringProvider.getRemoteString(R.string.general_company_name)
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)
         callTheme?.operator.also(operatorNameView::applyThemeAsDefault)
         callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
+
+        // Hints and content descriptions
+        companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
+        operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_video_operator_accessibility_label)
+        binding.callTimerView.hint = stringProvider.getRemoteString(R.string.chat_duration_accessibility_label)
 
         // Background
         callTheme?.background?.fill.also(::applyColorTheme)
@@ -946,19 +960,24 @@ internal class CallView(
                 appBar.hideEndScreenSharingButton()
             }
             if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
-                setTitle(resources.getString(R.string.glia_call_video_app_bar_title))
+                setTitle(stringProvider.getRemoteString(R.string.media_video_name))
             } else {
-                setTitle(resources.getString(R.string.glia_call_audio_app_bar_title))
+                setTitle(stringProvider.getRemoteString(R.string.media_audio_name))
             }
             operatorNameView.text = callState.callStatus.formattedOperatorName
-            connectingView.contentDescription = resources.getString(
-                R.string.glia_call_connecting_with,
+            connectingView.contentDescription = stringProvider.getRemoteString(
+                R.string.engagement_connect_with,
                 callState.callStatus.formattedOperatorName,
                 ""
             )
             if (callState.companyName != null) {
                 companyNameView.text = callState.companyName
-                msrView.setText(R.string.glia_call_in_queue_message)
+                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
+                msrView.text = stringProvider.getRemoteString(
+                    R.string.engagement_connect_with,
+                    callState.callStatus.formattedOperatorName,
+                    ""
+                )
             }
             chatButtonBadgeView.text = callState.messagesNotSeen.toString()
             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE &&
@@ -979,8 +998,8 @@ internal class CallView(
                 videoButton,
                 theme.iconCallVideoOn,
                 theme.iconCallVideoOff,
-                R.string.glia_call_video_on_content_description,
-                R.string.glia_call_video_off_content_description,
+                R.string.android_call_video_on_accessibility,
+                R.string.android_call_video_off_accessibility,
                 callState.hasVideo
             )
             videoButton.isActivated = callState.hasVideo
@@ -989,13 +1008,13 @@ internal class CallView(
                 muteButton,
                 theme.iconCallAudioOff, // mute (eg. mic-off) button activated icon
                 theme.iconCallAudioOn, // mute (eg. mic-off) button deactivated icon
-                R.string.glia_call_mute_content_description,
-                R.string.glia_call_unmute_content_description,
+                R.string.android_call_mute_accessibility,
+                R.string.android_call_unmute_accessibility,
                 callState.isMuted
             )
             muteButtonLabel.isActivated = callState.isMuted
-            muteButtonLabel.setText(
-                if (callState.isMuted) R.string.glia_call_mute_button_unmute else R.string.glia_call_mute_button_mute
+            muteButtonLabel.text = stringProvider.getRemoteString(
+                if (callState.isMuted) R.string.call_button_unmute else R.string.call_button_mute
             )
 
             callState.chatButtonViewState.apply {
@@ -1030,16 +1049,11 @@ internal class CallView(
             }
 
             chatButton.contentDescription =
-                if (callState.messagesNotSeen == 0) {
-                    resources.getString(R.string.glia_call_chat_zero_content_description)
-                } else {
-                    resources.getQuantityString(
-                        R.plurals.chat_message_unread_accessibility_label,
-                        callState.messagesNotSeen,
-                        callState.messagesNotSeen
-                    )
+                when (callState.messagesNotSeen) {
+                    0 -> stringProvider.getRemoteString(R.string.media_text_name)
+                    1 -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_single_item_accessibility_label, callState.messagesNotSeen.toString())
+                    else -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_multiple_items_accessibility_label, callState.messagesNotSeen.toString())
                 }
-
             applyTextThemeBasedOnCallState(callState)
         }
     }

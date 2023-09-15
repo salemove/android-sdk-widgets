@@ -127,11 +127,14 @@ class AppBarView @JvmOverloads constructor(
         leaveQueueIcon.applyIconColorTheme(exitQueueButtonColor)
         endScreenShareButton.applyImageColorTheme(endScreenShareButtonColor)
         binding.title.applyTextTheme(chatHeaderTitleColor, textFont)
-        binding.endButton.applyButtonTheme(
-            backgroundColor = systemNegativeColor,
-            textColor = baseLightColor,
-            textFont = textFont
-        )
+
+        if (!Utils.isAttributeOverridden(context, R.attr.gliaHeaderEndButtonStyle, R.style.ThemeOverlay_Glia_Chat)) {
+            binding.endButton.applyButtonTheme(
+                backgroundColor = systemNegativeColor,
+                textColor = baseLightColor,
+                textFont = textFont
+            )
+        }
     }
 
     fun hideBackButton() {

@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
 import androidx.annotation.StyleableRes;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -467,5 +468,19 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static boolean isAttributeOverridden(
+        Context context,
+        @AttrRes int attrId,
+        @StyleRes int styleRes
+    ) {
+        int resourceId = getAttrResourceId(context, attrId);
+
+        TypedArray typedArray = context.obtainStyledAttributes(styleRes, new int[]{attrId});
+        int gliaResourceId = typedArray.getResourceId(0, 0);
+        typedArray.recycle();
+
+        return resourceId != gliaResourceId;
     }
 }

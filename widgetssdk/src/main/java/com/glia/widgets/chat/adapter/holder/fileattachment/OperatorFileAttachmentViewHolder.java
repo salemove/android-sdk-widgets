@@ -9,13 +9,16 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.OperatorAttachmentItem;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.OperatorStatusView;
 
 public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     private final OperatorStatusView operatorStatusView;
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
 
     public OperatorFileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme) {
         super(itemView);
@@ -43,16 +46,16 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
 
         String name = item.getAttachmentFile().getName();
         String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
-        itemView.setContentDescription(itemView.getResources().getString(R.string.glia_chat_operator_file_content_description, name, byteSize));
+        itemView.setContentDescription(stringProvider.getRemoteString(R.string.android_chat_file_operator_accessibility, name, byteSize));
 
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
             public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
-                String actionLabel = host.getResources().getString(item.isFileExists()
-                    ? R.string.glia_chat_attachment_open_button_label
-                    : R.string.glia_chat_attachment_download_button_label);
+                String actionLabel = stringProvider.getRemoteString(item.isFileExists()
+                    ? R.string.general_open
+                    : R.string.general_download);
 
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
                     = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(

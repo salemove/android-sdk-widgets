@@ -1,6 +1,7 @@
 package com.glia.widgets.chat.adapter.holder
 
 import androidx.recyclerview.widget.RecyclerView
+import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatNewMessagesDividerLayoutBinding
 import com.glia.widgets.di.Dependencies
@@ -19,6 +20,7 @@ internal class NewMessagesDividerViewHolder(
     private val theme: ChatTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme
     }
+    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         setupUiTheme(uiTheme, binding)
@@ -50,6 +52,7 @@ internal class NewMessagesDividerViewHolder(
     }
 
     private fun setupUnifiedUiTheme(binding: ChatNewMessagesDividerLayoutBinding) {
+        binding.newMessagesTv.text = stringProvider.getRemoteString(R.string.chat_unread_message_divider)
         theme?.apply {
             newMessagesDividerColorTheme.also {
                 binding.newMessagesDividerLeft.applyColorTheme(it)

@@ -52,7 +52,7 @@ class ChatHeadView @JvmOverloads constructor(
 ),
     ChatHeadContract.View {
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
-
+    private val stringProvider = Dependencies.getStringProvider()
     private var sdkConfiguration: GliaSdkConfiguration? = null
     private var configuration: ChatHeadConfiguration by Delegates.notNull()
 
@@ -240,9 +240,7 @@ class ChatHeadView @JvmOverloads constructor(
     private fun setAccessibilityLabels() {
         val view = binding.root
         view.isFocusable = true
-        view.contentDescription =
-            context.getString(R.string.glia_chat_head_view_content_description)
-
+        view.contentDescription = stringProvider.getRemoteString(R.string.android_bubble_accessibility)
         ViewCompat.setAccessibilityDelegate(
             view,
             object : AccessibilityDelegateCompat() {

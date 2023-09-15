@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.applyButtonTheme
 import com.glia.widgets.helper.applyIconColorTheme
@@ -44,6 +45,7 @@ class AppBarView @JvmOverloads constructor(
 
     @DrawableRes
     private var iconAppBarBackRes: Int? = null
+    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         setDefaults(attrs)
@@ -62,6 +64,9 @@ class AppBarView @JvmOverloads constructor(
             ).also {
                 binding.toolbar.setNavigationIcon(it)
             }
+            binding.endButton.text = stringProvider.getRemoteString(R.string.general_end)
+            binding.endButton.contentDescription = stringProvider.getRemoteString(R.string.android_app_bar_end_engagement_accessibility_label)
+            binding.endScreenSharingButton.contentDescription = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end)
 
             val titleColorRes = getTypedArrayResId(
                 this,
@@ -76,7 +81,7 @@ class AppBarView @JvmOverloads constructor(
                 R.attr.gliaChatHeaderHomeButtonTintColor
             )
             binding.toolbar.navigationIcon?.setTint(getColorCompat(homeButtonTintColor))
-
+            binding.toolbar.navigationContentDescription = stringProvider.getRemoteString(R.string.android_app_bar_nav_up_accessibility)
             val backgroundTintList = getTypedArrayResId(
                 this,
                 R.styleable.AppBarView_android_backgroundTint,
@@ -97,6 +102,7 @@ class AppBarView @JvmOverloads constructor(
                 R.attr.gliaChatHeaderExitQueueButtonTintColor
             )
             leaveQueueIcon.icon?.setTint(getColorCompat(leaveIconTint))
+            leaveQueueIcon.title = stringProvider.getRemoteString(R.string.general_close)
         }
     }
 

@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.text.Html
 import android.text.Spanned
-import android.text.format.DateUtils
 import androidx.annotation.ColorInt
 import androidx.core.graphics.drawable.DrawableCompat
 import com.glia.androidsdk.Engagement
@@ -29,8 +28,6 @@ internal fun ColorStateList?.colorForState(state: IntArray): Int? = this?.getCol
 internal fun String.separateStringWithSymbol(symbol: String): String = asSequence().joinToString(symbol)
 
 internal fun Queue.supportMessaging() = state.medias.contains(Engagement.MediaType.MESSAGING)
-
-internal fun formatElapsedTime(elapsedMilliseconds: Long) = DateUtils.formatElapsedTime(elapsedMilliseconds / DateUtils.SECOND_IN_MILLIS)
 
 internal fun String.combineStringWith(string: String, separator: String) : String {
     return this + separator + string

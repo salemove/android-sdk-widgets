@@ -26,7 +26,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="12dp"
             android:layout_weight="1"
-            android:text="@string/glia_chat_attachment_upload_menu_gallery"
+            android:maxLines="1"
+            tools:text="@string/glia_chat_attachment_upload_menu_gallery"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textColor="?attr/gliaBaseDarkColor" />
 
@@ -59,7 +60,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="12dp"
             android:layout_weight="1"
-            android:text="@string/glia_chat_attachment_upload_menu_take_photo"
+            android:maxLines="1"
+            tools:text="@string/glia_chat_attachment_upload_menu_take_photo"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textColor="?attr/gliaBaseDarkColor" />
 
@@ -92,7 +94,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="12dp"
             android:layout_weight="1"
-            android:text="@string/glia_chat_attachment_upload_menu_browse"
+            android:maxLines="1"
+            tools:text="@string/glia_chat_attachment_upload_menu_browse"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textColor="?attr/gliaBaseDarkColor" />
 

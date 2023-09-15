@@ -6,8 +6,8 @@ class StringProviderImpl(private val resourceProvider: ResourceProvider): String
 
     override fun getRemoteString(stringKey: Int, vararg values: String): String {
         // TODO IMPLEMENT NEW METHOD FROM CORE
-        val fallback = resourceProvider.getString(stringKey, values)
         val key = resourceProvider.getResourceKey(stringKey)
+        val fallback = resourceProvider.getString(stringKey, *values)
         // TODO IMPLEMENT NEW METHOD FROM CORE
         return key
     }

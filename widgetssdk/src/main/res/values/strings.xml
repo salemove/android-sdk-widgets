@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="glia_survey_yes_no_item_yes">Yes</string>
-    <string name="glia_survey_yes_no_item_no">No</string>
         <string name="glia_dialog_yes">Yes</string>
         <string name="glia_dialog_no">No</string>
         <string name="glia_dialog_ok">OK</string>
     <string name="glia_call_visitor_video_on_hold_text">You</string>
         <string name="glia_dialog_unexpected_error_title">Something went wrong</string>
-    <string name="glia_survey_cancel_label">Cancel</string>
-    <string name="glia_survey_submit_label">Submit</string>
+        <string name="glia_survey_submit_label">Submit</string>
     <string name="glia_top_app_bar_chat_end">End</string>
         <string name="glia_chat_attachment_upload_error_internal_error">Internal error</string>
         <string name="glia_dialog_accept">Accept</string>
         <string name="glia_dialog_cancel">Cancel</string>
-    <string name="glia_survey_open_text_item_edit_hint">Comment</string>
+        <string name="glia_survey_open_text_item_edit_hint">Comment</string>
     <string name="message_center_send_message_btn">Send</string>
         <string name="glia_dialog_decline">Decline</string>
         <string name="glia_chat_glia_logo_content_description">Powered by </string>
@@ -84,8 +81,8 @@
         <string name="glia_call_operator_profile_picture_content_description">Operator Avatar</string>
         <string name="glia_call_operator_video_content_description">Operator\'s Video</string>
         <string name="glia_call_visitor_video_content_description">Your Video</string>
-    <string name="glia_survey_required_error_message">Please provide an answer.</string>
-    <string name="glia_survey_require_label_content_description">%1$s. Required.</string>
+        <string name="glia_survey_required_error_message">Please provide an answer.</string>
+        <string name="glia_survey_require_label_content_description">%1$s. Required.</string>
     <string name="message_center_message_limit_error_message">The message cannot exceed 10000 characters.</string>
     <string name="message_center_title">Welcome to Message Center</string>
     <string name="message_center_check_messages_btn">Check messages</string>
@@ -157,7 +154,7 @@
     <string name="glia_preview_activity_menu_save_button">Save</string>
     <string name="glia_preview_activity_menu_share_button">Share</string>
         <string name="glia_preview_activity_image_content_description">Preview content</string>
-    <string name="glia_survey_network_unavailable">The survey could not be submitted due to a network error. Please try again.</string>
+        <string name="glia_survey_network_unavailable">The survey could not be submitted due to a network error. Please try again.</string>
     <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
         <string name="glia_visitor_code_content_description">Your five-digit visitor code is</string>
         <string name="glia_visitor_code_loading">Loading your visitor code</string>

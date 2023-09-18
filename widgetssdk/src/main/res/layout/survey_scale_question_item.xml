@@ -83,11 +83,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/glia_system_negative_color"
-        android:text="@string/glia_survey_required_error_message"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:drawablePadding="@dimen/glia_small"
         app:drawableStartCompat="@drawable/ic_attention"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="@string/survey_action_validation_error" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import com.glia.androidsdk.omnibrowse.VisitorCode
@@ -84,7 +83,7 @@ class VisitorCodeView internal constructor(
         closeButton.setOnClickListener { controller.onCloseButtonClicked() }
         logoContainer = findViewById(R.id.logo_container)
         logoText = findViewById(R.id.powered_by_text)
-        logoText.text = stringProvider.getRemoteString(R.string.general_powered_by)
+        logoText.text = stringProvider.getRemoteString(R.string.general_powered)
         logoView = findViewById(R.id.logo_view)
         readTypedArray()
         applyRemoteThemeConfig(Dependencies.getGliaThemeManager().theme)

@@ -2,14 +2,15 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.glia.widgets.call.CallButtonLabelView
         android:id="@+id/chat_button_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/glia_call_chat_button_label"
+        tools:text="@string/glia_call_chat_button_label"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="@color/glia_base_light_color"
         android:importantForAccessibility="no"
@@ -69,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/glia_call_mute_button_mute"
+        tools:text="@string/glia_call_mute_button_mute"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="@color/glia_base_light_color"
         android:importantForAccessibility="no"
@@ -95,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/glia_call_speaker_button_label"
+        tools:text="@string/glia_call_speaker_button_label"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="@color/glia_base_light_color"
         android:importantForAccessibility="no"
@@ -121,7 +122,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/glia_call_minimize_button_label"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textColor="@color/glia_base_light_color"
         android:importantForAccessibility="no"

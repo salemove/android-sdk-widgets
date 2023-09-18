@@ -140,7 +140,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lightTint="@color/glia_base_light_color"
         app:negativeTint="@color/glia_system_negative_color"
-        app:titleText="@string/glia_call_audio_app_bar_title" />
+        tools:titleText="@string/media_audio_name" />
 
     <TextView
         android:id="@+id/continue_browsing_view"

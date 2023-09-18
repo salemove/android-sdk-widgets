@@ -117,12 +117,37 @@
 
     <!-- Call -->
     <string name="engagement_connect_with">@string/glia_call_connecting_with</string>
+    <string name="android_call_speaker_on_accessibility">@string/glia_call_speaker_on_content_description</string>
+    <string name="android_call_speaker_off_accessibility">@string/glia_call_speaker_off_content_description</string>
+    <string name="media_video_name">@string/glia_call_video_app_bar_title</string>
+    <string name="media_audio_name">@string/glia_call_audio_app_bar_title</string>
+    <string name="android_call_video_off_accessibility">@string/glia_call_video_off_content_description</string>
+    <string name="android_call_video_on_accessibility">@string/glia_call_video_on_content_description</string>
+    <string name="android_call_mute_accessibility">@string/glia_call_mute_content_description</string>
+    <string name="android_call_unmute_accessibility">@string/glia_call_unmute_content_description</string>
+    <string name="call_button_mute">@string/glia_call_mute_button_mute</string>
+    <string name="call_button_unmute">@string/glia_call_mute_button_unmute</string>
+    <string name="call_on_hold">@string/glia_call_on_hold</string>
+    <string name="engagement_minimize_video_button">@string/glia_call_minimize_button_label</string>
+    <string name="call_operator_avatar_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
+    <string name="call_video_operator_accessibility_label">@string/glia_call_operator_video_content_description</string>
+    <string name="call_video_visitor_accessibility_label">@string/glia_call_visitor_video_content_description</string>
+    <string name="android_call_on_hold_accessibility">@string/glia_call_operator_status_on_hold_description</string>
 
+
+    <string name="call_button_speaker">@string/glia_call_speaker_button_label</string>
+    <string name="chat_operator_name_accessibility_label">@string/glia_call_operator_name_hint</string>
+    <string name="chat_duration_accessibility_label">@string/glia_call_call_duration_hint</string>
+    <string name="call_on_hold_bottom_text">@string/glia_call_continue_browsing_on_hold</string>
+    <string name="engagement_queue_wait_message">@string/glia_call_continue_browsing</string>
+
+    <string name="call_buttons_chat_badge_value_multiple_items_accessibility_label">@string/glia_call_chat_other_content_description</string>
+    <string name="call_buttons_chat_badge_value_single_item_accessibility_label">@string/glia_call_chat_one_content_description</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
     <string name="general_accessibility_close">Close Button</string>
-    <string name="general_powered_by">@string/glia_chat_glia_logo_content_description</string>
+    <string name="general_powered">@string/glia_chat_glia_logo_content_description</string>
     <string name="general_yes">@string/glia_dialog_yes</string>
     <string name="general_no">@string/glia_dialog_no</string>
     <string name="general_ok">@string/glia_dialog_ok</string>
@@ -139,13 +164,6 @@
     <!-- NEW REFERENCES -->
     <!-- NEW REFERENCES -->
     <string name="alert_action_settings">Settings</string><!-- TODO UNUSED IN ANDROID -->
-    <string name="android_call_mute_accessibility">@string/glia_call_mute_content_description</string>
-    <string name="android_call_on_hold_accessibility">@string/glia_call_operator_status_on_hold_description</string>
-    <string name="android_call_speaker_off_accessibility">@string/glia_call_speaker_off_content_description</string>
-    <string name="android_call_speaker_on_accessibility">@string/glia_call_speaker_on_content_description</string>
-    <string name="android_call_unmute_accessibility">@string/glia_call_unmute_content_description</string>
-    <string name="android_call_video_off_accessibility">@string/glia_call_video_off_content_description</string>
-    <string name="android_call_video_on_accessibility">@string/glia_call_video_on_content_description</string>
     <string name="android_call_queue_message">@string/glia_call_in_queue_message</string>
     <string name="android_chat_queue_accessibility_label">@string/glia_chat_in_queue_message_content_description</string>
     <string name="android_file_select_title">@string/glia_chat_select_file_title</string>
@@ -158,33 +176,20 @@
     <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
     <string name="call_bubble_accessibility_hint">Deactivates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_bubble_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
-    <string name="call_button_mute">@string/glia_call_mute_button_mute</string>
-    <string name="call_button_speaker">@string/glia_call_speaker_button_label</string>
-    <string name="call_button_unmute">@string/glia_call_mute_button_unmute</string>
-    <string name="call_buttons_chat_badge_value_multiple_items_accessibility_label">@string/glia_call_chat_other_content_description</string>
-    <string name="call_buttons_chat_badge_value_single_item_accessibility_label">@string/glia_call_chat_one_content_description</string>
     <string name="call_connect_first_text_accessibility_hint">Displays operator name.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_connect_second_text_accessibility_hint">Displays call duration.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_header_close_button_accessibility_hint">Activates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_on_hold_bottom_text">@string/glia_call_continue_browsing_on_hold</string>
-    <string name="call_on_hold">@string/glia_call_on_hold</string>
     <string name="call_operator_avatar_accessibility_hint">Displays operator avatar or placeholder.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_operator_avatar_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
     <string name="call_operator_name_accessibility_hint">Displays operator name.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_video_operator_accessibility_label">@string/glia_call_operator_video_content_description</string>
-    <string name="call_video_visitor_accessibility_label">@string/glia_call_visitor_video_content_description</string>
-    <string name="chat_duration_accessibility_label">@string/glia_call_call_duration_hint</string>
+
 
     <string name="chat_input_send">@string/message_center_send_message_btn</string>
     <plurals name="chat_message_unread_accessibility_label"><item quantity="one">@string/glia_call_chat_one_content_description</item><item quantity="other">@string/glia_call_chat_other_content_description</item></plurals>
     <string name="chat_operator_avatar_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
-    <string name="chat_operator_name_accessibility_label">@string/glia_call_operator_name_hint</string>
     <string name="chat_status_typing">Operator typing</string>
     <string name="engagement_default_operator_name">Operator</string> <!-- TODO NEW TO ANDROID -->
-    <string name="engagement_minimize_video_button">@string/glia_call_minimize_button_label</string>
     <string name="engagement_offer_upgrade">{operatorName} has offered you to upgrade</string> <!-- TODO NEW -->
     <string name="engagement_queue_reconnection_failed_try_again">@string/glia_dialog_unexpected_error_message</string>
-    <string name="engagement_queue_wait_message">@string/glia_call_continue_browsing</string>
     <string name="engagement_secure_messaging_title">@string/message_center_screen_title</string>
 
     <string name="error_unexpected_title">We\'re sorry, there has been an unexpected error.</string> <!-- TODO NEW -->
@@ -203,9 +208,7 @@
     <string name="general_tank_you">@string/message_center_confirmation_screen_title</string>
     <string name="general_you">@string/glia_call_visitor_video_on_hold_text</string>
     <string name="media_messaging_description">@string/message_center_description</string>
-    <string name="media_audio_name">@string/glia_call_audio_app_bar_title</string>
     <string name="media_phone_name">Phone</string> <!-- TODO NEW -->
-    <string name="media_video_name">@string/glia_call_video_app_bar_title</string>
     <string name="message_center_check_messages">@string/message_center_check_messages_btn</string>
     <string name="message_center_confirmation_check_messages_accessibility_hint">Navigates you to the chat transcript.</string><!-- TODO NEW-->
     <string name="message_center_confirmation_check_messages_accessibility_label">Checks messages</string><!-- TODO NEW-->

@@ -159,7 +159,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_speaker_on_content_description);
+            String expected = appContext.getString(R.string.android_call_speaker_on_accessibility);
             onView(withId(R.id.speaker_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -179,7 +179,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_speaker_off_content_description);
+            String expected = appContext.getString(R.string.android_call_speaker_off_accessibility);
             onView(withId(R.id.speaker_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -239,7 +239,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_video_on_content_description);
+            String expected = appContext.getString(R.string.android_call_video_on_accessibility);
             onView(withId(R.id.video_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -259,7 +259,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_video_off_content_description);
+            String expected = appContext.getString(R.string.android_call_video_off_accessibility);
             onView(withId(R.id.video_button)).check(matches(withContentDescription(expected)));
         }
     }
@@ -318,7 +318,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_connecting_with, "FormattedOperatorName", "");
+            String expected = appContext.getString(R.string.engagement_connect_with, "FormattedOperatorName", "");
             onView(withId(R.id.connecting_view)).check(matches(withContentDescription(expected)));
         }
     }
@@ -337,7 +337,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_visitor_video_content_description);
+            String expected = appContext.getString(R.string.call_video_visitor_accessibility_label);
             onView(withId(R.id.floating_visitor_video)).check(matches(withContentDescription(expected)));
         }
     }
@@ -454,7 +454,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_call_duration_hint);
+            String expected = appContext.getString(R.string.chat_duration_accessibility_label);
             onView(withId(R.id.call_timer_view)).check(matches(withHint(expected)));
         }
     }

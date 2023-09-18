@@ -24,34 +24,34 @@
         android:id="@+id/yes_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="@string/glia_survey_yes_no_item_yes"
         android:layout_marginTop="@dimen/glia_large"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginBottom="@dimen/glia_large"
         app:layout_constraintBottom_toTopOf="@id/required_error"
         app:layout_constraintTop_toBottomOf="@id/tv_title"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/general_yes" />
 
     <com.glia.widgets.view.button.GliaSurveyOptionButton
         android:id="@+id/no_button"
         android:layout_width="0dp"
         android:layout_height="@dimen/glia_survey_option_button_height"
-        android:text="@string/glia_survey_yes_no_item_no"
         android:layout_marginStart="@dimen/glia_large"
         app:layout_constraintTop_toTopOf="@id/yes_button"
         app:layout_constraintStart_toEndOf="@+id/yes_button"
-        app:layout_constraintBottom_toBottomOf="@id/yes_button" />
+        app:layout_constraintBottom_toBottomOf="@id/yes_button"
+        tools:text="@string/general_no" />
 
     <TextView
         android:id="@+id/required_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/glia_system_negative_color"
-        android:text="@string/glia_survey_required_error_message"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:drawablePadding="@dimen/glia_small"
         app:drawableStartCompat="@drawable/ic_attention"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="@string/survey_action_validation_error" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

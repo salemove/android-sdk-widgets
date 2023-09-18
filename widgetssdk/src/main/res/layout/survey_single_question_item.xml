@@ -32,8 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_small"
         android:textColor="@color/glia_system_negative_color"
-        android:text="@string/glia_survey_required_error_message"
         android:drawablePadding="@dimen/glia_small"
-        app:drawableStartCompat="@drawable/ic_attention" />
+        app:drawableStartCompat="@drawable/ic_attention"
+        tools:text="@string/survey_action_validation_error" />
 
 </LinearLayout>

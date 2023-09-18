@@ -144,6 +144,11 @@
     <string name="call_buttons_chat_badge_value_multiple_items_accessibility_label">@string/glia_call_chat_other_content_description</string>
     <string name="call_buttons_chat_badge_value_single_item_accessibility_label">@string/glia_call_chat_one_content_description</string>
 
+    <!-- Survey -->
+    <string name="android_survey_error_network">@string/glia_survey_network_unavailable</string>
+    <string name="survey_question_title_accessibility_label">@string/glia_survey_require_label_content_description</string>
+    <string name="survey_action_validation_error">@string/glia_survey_required_error_message</string>
+
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
     <string name="general_accessibility_close">Close Button</string>
@@ -156,6 +161,9 @@
     <string name="general_company_name">CompanyName OÜ</string>
     <string name="general_company_name_hint">@string/glia_call_company_name_hint</string>
     <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
+    <string name="general_cancel">@string/glia_dialog_cancel</string>
+    <string name="general_submit">@string/glia_survey_submit_label</string>
+    <string name="general_comment">@string/glia_survey_open_text_item_edit_hint</string>
 
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
@@ -172,7 +180,6 @@
     <string name="android_preview_menu_share">@string/glia_preview_activity_menu_share_button</string>
     <string name="android_preview_share_error_message">@string/glia_preview_activity_image_share_fail_msg</string>
     <string name="android_preview_share_title">@string/glia_preview_activity_image_share_title</string>
-    <string name="android_survey_error_network">@string/glia_survey_network_unavailable</string>
     <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
     <string name="call_bubble_accessibility_hint">Deactivates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_bubble_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
@@ -195,8 +202,6 @@
     <string name="error_unexpected_title">We\'re sorry, there has been an unexpected error.</string> <!-- TODO NEW -->
     <string name="general_back">Back</string> <!-- TODO NEW -->
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
-    <string name="general_cancel">@string/glia_dialog_cancel</string>
-    <string name="general_comment">@string/glia_survey_open_text_item_edit_hint</string>
     <string name="general_decline">@string/glia_dialog_decline</string>
     <string name="general_download">@string/glia_chat_attachment_download_button_label</string>
     <string name="general_end">@string/glia_top_app_bar_chat_end</string>
@@ -204,7 +209,6 @@
     <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
     <string name="general_retry">Retry</string><!-- TODO NEW -->
     <string name="general_selected">Selected</string><!-- TODO NEW, maybe unify? -->
-    <string name="general_submit">@string/glia_survey_submit_label</string>
     <string name="general_tank_you">@string/message_center_confirmation_screen_title</string>
     <string name="general_you">@string/glia_call_visitor_video_on_hold_text</string>
     <string name="media_messaging_description">@string/message_center_description</string>
@@ -223,12 +227,6 @@
     <string name="message_center_welcome_title">@string/message_center_title</string>
     <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
     <string name="send_message_sending">@string/message_center_progress_bar_content_description</string>
-    <string name="survey_action_validation_error">@string/glia_survey_required_error_message</string>
-    <string name="survey_question_option_button_selected_accessibility_label">Selected: {buttonTitle}</string><!-- TODO NEW-->
-    <string name="survey_question_option_button_unselected_accessibility_label">Unselected: {buttonTitle}</string><!-- TODO NEW-->
-    <string name="survey_question_text_field_accessibility_hint">Enter the answer</string><!-- TODO NEW -->
-    <string name="survey_question_title_accessibility_label">@string/glia_survey_require_label_content_description</string>
-    <string name="survey_validation_title_accessibility_label">Please provide an answer for question above</string><!-- TODO NEW-->
 
 
     <!--    GVA -->

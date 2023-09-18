@@ -35,7 +35,6 @@ import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
 import com.glia.widgets.view.button.BaseConfigurableButton
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.glia.widgets.view.unifiedui.applyButtonTheme
-import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
@@ -473,7 +472,7 @@ object Dialogs {
         dialog.findViewById<View>(R.id.logo_container)?.isVisible = notWhitelabel
         if (notWhitelabel) {
             dialog.findViewById<TextView>(R.id.powered_by_text)?.apply {
-                text = stringProvider.getRemoteString(R.string.general_powered_by)
+                text = stringProvider.getRemoteString(R.string.general_powered)
                 baseShadeColor?.run {
                     applyTextColorTheme(ColorTheme(false, listOf(this)))
                 }

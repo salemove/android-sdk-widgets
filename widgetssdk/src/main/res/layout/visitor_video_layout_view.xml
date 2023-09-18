@@ -9,7 +9,6 @@
         android:layout_width="@dimen/glia_visitor_video_width"
         android:layout_height="@dimen/glia_visitor_video_height"
         android:layout_margin="@dimen/glia_large"
-        android:contentDescription="@string/glia_call_visitor_video_content_description"
         app:cardBackgroundColor="@android:color/transparent"
         app:cardCornerRadius="0dp"
         app:cardPreventCornerOverlap="true"

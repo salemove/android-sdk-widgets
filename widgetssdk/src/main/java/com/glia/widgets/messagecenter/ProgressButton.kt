@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ProgressButtonBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.applyShadow
 import com.glia.widgets.helper.getAttr
 import com.glia.widgets.helper.getColorCompat
@@ -52,6 +53,7 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
 
     private val progressBar get() = binding.progressBar
     // End Widgets + Binding
+    private val stringProvider = Dependencies.getStringProvider()
 
     @get:ColorInt
     private val gliaBrandPrimaryColor: Int by lazy { // btn bg
@@ -82,10 +84,8 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         isFocusable = true
         isClickable = true
         accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
-        contentDescription = this.context.getString(R.string.message_center_send_message_btn)
-        foreground = getDrawableCompat(
-            getAttr(android.R.attr.selectableItemBackground, android.R.color.transparent)
-        )
+        contentDescription = stringProvider.getRemoteString(R.string.chat_input_send)
+        foreground = getDrawableCompat(getAttr(android.R.attr.selectableItemBackground, android.R.color.transparent))
         applyDefaultTheme()
     }
 
@@ -98,6 +98,7 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         buttonTheme.elevation?.also { elevation = it }
         buttonTheme.shadowColor?.also(::applyShadow)
         title.applyTextTheme(buttonTheme.text)
+        title.text = stringProvider.getRemoteString(R.string.chat_input_send)
     }
 
     internal fun updateProgressTheme(colorTheme: ColorTheme?) {
@@ -126,6 +127,7 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
     private fun showIndicator(show: Boolean) {
         TransitionManager.beginDelayedTransition(this, MaterialFade())
         progressBar.isVisible = show
+        progressBar.contentDescription = stringProvider.getRemoteString(R.string.send_message_sending)
     }
 
     private fun applyDefaultTheme() {

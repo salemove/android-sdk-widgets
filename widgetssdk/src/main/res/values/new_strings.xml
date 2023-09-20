@@ -103,7 +103,6 @@
     <string name="android_chat_file_visitor_accessibility">@string/glia_chat_visitor_file_content_description</string>
     <string name="android_chat_file_visitor_delivered_accessibility">@string/glia_chat_visitor_file_delivered_content_description</string>
     <string name="android_bubble_accessibility">@string/glia_chat_head_view_content_description</string>
-
     <string name="android_upload_error_engagement_missing">@string/glia_chat_attachment_upload_error_engagement_missing</string>
     <string name="android_upload_error_file_limit">@string/glia_chat_attachment_upload_error_file_count_limit_reached</string>
     <string name="android_upload_error_forbidden">@string/glia_chat_attachment_upload_error_file_upload_forbidden</string>
@@ -114,6 +113,7 @@
     <string name="chat_file_too_large_error">@string/glia_chat_attachment_upload_error_file_size_over_limit</string>
     <string name="chat_file_infected_error">@string/glia_chat_attachment_upload_error_failed_to_check_safety</string>
     <string name="error_internal">@string/glia_chat_attachment_upload_error_internal_error</string>
+    <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
 
     <!-- Call -->
     <string name="engagement_connect_with">@string/glia_call_connecting_with</string>
@@ -133,14 +133,11 @@
     <string name="call_video_operator_accessibility_label">@string/glia_call_operator_video_content_description</string>
     <string name="call_video_visitor_accessibility_label">@string/glia_call_visitor_video_content_description</string>
     <string name="android_call_on_hold_accessibility">@string/glia_call_operator_status_on_hold_description</string>
-
-
     <string name="call_button_speaker">@string/glia_call_speaker_button_label</string>
     <string name="chat_operator_name_accessibility_label">@string/glia_call_operator_name_hint</string>
     <string name="chat_duration_accessibility_label">@string/glia_call_call_duration_hint</string>
     <string name="call_on_hold_bottom_text">@string/glia_call_continue_browsing_on_hold</string>
     <string name="engagement_queue_wait_message">@string/glia_call_continue_browsing</string>
-
     <string name="call_buttons_chat_badge_value_multiple_items_accessibility_label">@string/glia_call_chat_other_content_description</string>
     <string name="call_buttons_chat_badge_value_single_item_accessibility_label">@string/glia_call_chat_one_content_description</string>
 
@@ -148,6 +145,18 @@
     <string name="android_survey_error_network">@string/glia_survey_network_unavailable</string>
     <string name="survey_question_title_accessibility_label">@string/glia_survey_require_label_content_description</string>
     <string name="survey_action_validation_error">@string/glia_survey_required_error_message</string>
+
+    <!-- Secure messaging -->
+    <string name="message_center_welcome_message_length_warning">@string/message_center_message_limit_error_message</string>
+    <string name="message_center_welcome_title">@string/message_center_title</string>
+    <string name="message_center_check_messages">@string/message_center_check_messages_btn</string>
+    <string name="message_center_welcome_message_title">@string/message_center_message_title</string>
+    <string name="message_center_welcome_message_text_view_placeholder">@string/message_center_message_edit_text_hint</string>
+    <string name="message_center_confirmation_subtitle">@string/message_center_confirmation_screen_message</string>
+    <string name="engagement_secure_messaging_title">@string/message_center_screen_title</string>
+    <string name="media_messaging_description">@string/message_center_description</string>
+    <string name="send_message_sending">@string/message_center_progress_bar_content_description</string>
+    <string name="chat_input_send">@string/message_center_send_message_btn</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
@@ -160,7 +169,7 @@
     <string name="general_close">@string/glia_top_app_bar_close</string>
     <string name="general_company_name">CompanyName OÜ</string>
     <string name="general_company_name_hint">@string/glia_call_company_name_hint</string>
-    <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
+    <string name="general_thank_you">@string/message_center_confirmation_screen_title</string>
     <string name="general_cancel">@string/glia_dialog_cancel</string>
     <string name="general_submit">@string/glia_survey_submit_label</string>
     <string name="general_comment">@string/glia_survey_open_text_item_edit_hint</string>
@@ -168,6 +177,12 @@
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
     <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates new visitor code</string>
+    <string name="message_center_confirmation_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
+    <string name="message_center_confirmation_check_messages_accessibility_label">Checks messages</string>
+    <string name="message_center_welcome_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
+    <string name="message_center_welcome_file_picker_label_accessibility_hint">Navigates you to the chat transcript.</string>
+    <string name="message_center_welcome_file_picker_label_accessibility_label">File picker</string>
+    <string name="message_center_welcome_send_accessibility_hint">Navigates you to the chat transcript.</string>
 
     <!-- NEW REFERENCES -->
     <!-- NEW REFERENCES -->
@@ -188,17 +203,12 @@
     <string name="call_header_close_button_accessibility_hint">Activates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_operator_avatar_accessibility_hint">Displays operator avatar or placeholder.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_operator_name_accessibility_hint">Displays operator name.</string><!-- TODO ADA NEW IN ANDROID -->
-
-
-    <string name="chat_input_send">@string/message_center_send_message_btn</string>
     <plurals name="chat_message_unread_accessibility_label"><item quantity="one">@string/glia_call_chat_one_content_description</item><item quantity="other">@string/glia_call_chat_other_content_description</item></plurals>
     <string name="chat_operator_avatar_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
     <string name="chat_status_typing">Operator typing</string>
     <string name="engagement_default_operator_name">Operator</string> <!-- TODO NEW TO ANDROID -->
     <string name="engagement_offer_upgrade">{operatorName} has offered you to upgrade</string> <!-- TODO NEW -->
     <string name="engagement_queue_reconnection_failed_try_again">@string/glia_dialog_unexpected_error_message</string>
-    <string name="engagement_secure_messaging_title">@string/message_center_screen_title</string>
-
     <string name="error_unexpected_title">We\'re sorry, there has been an unexpected error.</string> <!-- TODO NEW -->
     <string name="general_back">Back</string> <!-- TODO NEW -->
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
@@ -209,24 +219,9 @@
     <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
     <string name="general_retry">Retry</string><!-- TODO NEW -->
     <string name="general_selected">Selected</string><!-- TODO NEW, maybe unify? -->
-    <string name="general_tank_you">@string/message_center_confirmation_screen_title</string>
     <string name="general_you">@string/glia_call_visitor_video_on_hold_text</string>
-    <string name="media_messaging_description">@string/message_center_description</string>
     <string name="media_phone_name">Phone</string> <!-- TODO NEW -->
-    <string name="message_center_check_messages">@string/message_center_check_messages_btn</string>
-    <string name="message_center_confirmation_check_messages_accessibility_hint">Navigates you to the chat transcript.</string><!-- TODO NEW-->
-    <string name="message_center_confirmation_check_messages_accessibility_label">Checks messages</string><!-- TODO NEW-->
-    <string name="message_center_confirmation_subtitle">@string/message_center_confirmation_screen_message</string><!-- Removed newline -->
-    <string name="message_center_welcome_check_messages_accessibility_hint">Navigates you to the chat transcript.</string><!-- TODO NEW-->
-    <string name="message_center_welcome_file_picker_label_accessibility_hint">Navigates you to the chat transcript.</string><!-- TODO NEW-->
-    <string name="message_center_welcome_file_picker_label_accessibility_label">File picker</string><!-- TODO NEW-->
-    <string name="message_center_welcome_message_length_warning">@string/message_center_message_limit_error_message</string>
-    <string name="message_center_welcome_message_text_view_placeholder">@string/message_center_message_edit_text_hint</string>
-    <string name="message_center_welcome_message_title">@string/message_center_message_title</string>
-    <string name="message_center_welcome_send_accessibility_hint">Navigates you to the chat transcript.</string><!-- TODO NEW-->
-    <string name="message_center_welcome_title">@string/message_center_title</string>
     <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
-    <string name="send_message_sending">@string/message_center_progress_bar_content_description</string>
 
 
     <!--    GVA -->

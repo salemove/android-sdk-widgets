@@ -305,6 +305,7 @@ internal class CallView(
             operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring_message))
         } else {
             operatorNameView.text = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
+            operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
             handleOperatorStatusViewOperatorImage(state)
         }
         operatorStatusView.isVisible = state.showOperatorStatusView()
@@ -970,7 +971,9 @@ internal class CallView(
                 callState.callStatus.formattedOperatorName,
                 ""
             )
-            if (callState.companyName != null) {
+            if (callState.companyName != null) { // TODO FIXME Make CompanyName configurable from remote strings
+                companyNameView.text = callState.companyName
+                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
                 msrView.text = stringProvider.getRemoteString(
                     R.string.engagement_connect_with,
                     callState.callStatus.formattedOperatorName,

@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="@dimen/glia_app_bar_end_button_width"
-                tools:text="@string/glia_top_app_bar_chat_end"
+                tools:text="@string/general_end"
                 android:visibility="gone" />
 
         </LinearLayout>

@@ -77,8 +77,14 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.save_item).isVisible = showDownloadIcon
-        menu.findItem(R.id.share_item).isVisible = showShareIcon
+        menu.findItem(R.id.save_item).also {
+            it.title = stringProvider.getRemoteString(R.string.android_preview_menu_save)
+            it.isVisible = showDownloadIcon
+        }
+        menu.findItem(R.id.share_item).also {
+            it.title = stringProvider.getRemoteString(R.string.android_preview_menu_share)
+            it.isVisible = showShareIcon
+        }
         return true
     }
 

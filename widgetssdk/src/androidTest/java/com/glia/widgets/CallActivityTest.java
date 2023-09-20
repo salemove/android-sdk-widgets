@@ -139,7 +139,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getString(R.string.glia_call_minimize_content_description);
+            String expected = appContext.getString(R.string.engagement_minimize_video_button);
             onView(withId(R.id.minimize_button)).check(matches(withContentDescription(expected)));
         }
     }

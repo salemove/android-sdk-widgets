@@ -31,6 +31,8 @@
     <string name="android_preview_save_error_message">@string/glia_preview_activity_image_save_fail_msg</string>
     <string name="android_preview_failed_message">@string/glia_preview_activity_preview_failed_msg</string>
     <string name="android_preview_accessibility_image">@string/glia_preview_activity_image_content_description</string>
+    <string name="android_preview_menu_save">@string/glia_preview_activity_menu_save_button</string>
+    <string name="android_preview_menu_share">@string/glia_preview_activity_menu_share_button</string>
 
     <!-- Dialogs -->
     <string name="android_notifications_allow_message">@string/glia_dialog_allow_notifications_message</string>
@@ -140,6 +142,7 @@
     <string name="engagement_queue_wait_message">@string/glia_call_continue_browsing</string>
     <string name="call_buttons_chat_badge_value_multiple_items_accessibility_label">@string/glia_call_chat_other_content_description</string>
     <string name="call_buttons_chat_badge_value_single_item_accessibility_label">@string/glia_call_chat_one_content_description</string>
+    <string name="general_you">@string/glia_call_visitor_video_on_hold_text</string>
 
     <!-- Survey -->
     <string name="android_survey_error_network">@string/glia_survey_network_unavailable</string>
@@ -173,6 +176,7 @@
     <string name="general_cancel">@string/glia_dialog_cancel</string>
     <string name="general_submit">@string/glia_survey_submit_label</string>
     <string name="general_comment">@string/glia_survey_open_text_item_edit_hint</string>
+    <string name="general_end">@string/glia_top_app_bar_chat_end</string>
 
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
@@ -190,11 +194,6 @@
     <string name="android_call_queue_message">@string/glia_call_in_queue_message</string>
     <string name="android_chat_queue_accessibility_label">@string/glia_chat_in_queue_message_content_description</string>
     <string name="android_file_select_title">@string/glia_chat_select_file_title</string>
-    <string name="android_preview_error_fetch">@string/glia_preview_activity_img_fetch_fail_msg</string>
-    <string name="android_preview_menu_save">@string/glia_preview_activity_menu_save_button</string>
-    <string name="android_preview_menu_share">@string/glia_preview_activity_menu_share_button</string>
-    <string name="android_preview_share_error_message">@string/glia_preview_activity_image_share_fail_msg</string>
-    <string name="android_preview_share_title">@string/glia_preview_activity_image_share_title</string>
     <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
     <string name="call_bubble_accessibility_hint">Deactivates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
     <string name="call_bubble_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
@@ -214,12 +213,10 @@
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
     <string name="general_decline">@string/glia_dialog_decline</string>
     <string name="general_download">@string/glia_chat_attachment_download_button_label</string>
-    <string name="general_end">@string/glia_top_app_bar_chat_end</string>
     <string name="general_message">Message</string> <!-- TODO NEW -->
     <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
     <string name="general_retry">Retry</string><!-- TODO NEW -->
     <string name="general_selected">Selected</string><!-- TODO NEW, maybe unify? -->
-    <string name="general_you">@string/glia_call_visitor_video_on_hold_text</string>
     <string name="media_phone_name">Phone</string> <!-- TODO NEW -->
     <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
 

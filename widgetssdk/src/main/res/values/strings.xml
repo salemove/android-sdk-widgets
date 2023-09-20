@@ -3,10 +3,10 @@
         <string name="glia_dialog_yes">Yes</string>
         <string name="glia_dialog_no">No</string>
         <string name="glia_dialog_ok">OK</string>
-    <string name="glia_call_visitor_video_on_hold_text">You</string>
+        <string name="glia_call_visitor_video_on_hold_text">You</string>
         <string name="glia_dialog_unexpected_error_title">Something went wrong</string>
         <string name="glia_survey_submit_label">Submit</string>
-    <string name="glia_top_app_bar_chat_end">End</string>
+        <string name="glia_top_app_bar_chat_end">End</string>
         <string name="glia_chat_attachment_upload_error_internal_error">Internal error</string>
         <string name="glia_dialog_accept">Accept</string>
         <string name="glia_dialog_cancel">Cancel</string>
@@ -16,7 +16,6 @@
         <string name="glia_chat_glia_logo_content_description">Powered by </string>
         <string name="glia_chat_title">Chat</string>
         <string name="glia_call_audio_app_bar_title">Audio Call</string>
-    <string name="glia_call_video_button_label">Video</string> <!-- TODO unify with glia_call_app_bar_title -->
         <string name="glia_call_video_app_bar_title">Video Call</string>
         <string name="glia_chat_add_attachment_description">Pick attachment</string>
         <string name="glia_chat_send_content_description">Send message</string>
@@ -123,10 +122,6 @@
         <string name="glia_dialog_permission_error_title">Additional Permissions Required</string>
         <string name="glia_dialog_permission_error_message">Please make sure all required permissions are enabled.</string>
         <string name="glia_call_in_queue_message">An operator will be with you shortly.</string>
-    <plurals name="glia_call_chat_content_description">
-        <item quantity="one">@string/call_buttons_chat_badge_value_single_item_accessibility_label</item>
-        <item quantity="other">@string/call_buttons_chat_badge_value_multiple_items_accessibility_label</item>
-    </plurals>
         <string name="glia_call_video_on_content_description">Turn off video</string>
         <string name="glia_call_video_off_content_description">Turn on video</string>
         <string name="glia_call_mute_content_description">Unmute microphone</string>
@@ -147,19 +142,15 @@
         <string name="glia_preview_activity_preview_failed_msg">Could not load the image preview. Please try again.</string>
         <string name="glia_preview_activity_image_save_success_msg">The image was saved successfully.</string>
         <string name="glia_preview_activity_image_save_fail_msg">Could not save the image.</string>
-    <string name="glia_preview_activity_image_share_fail_msg">Could not share the image. Please try again.</string>
-    <string name="glia_preview_activity_image_share_title">Share Image</string>
         <string name="glia_preview_activity_toolbar_title">Preview</string>
-    <string name="glia_preview_activity_img_fetch_fail_msg">Could not fetch the image. Please try again.</string>
-    <string name="glia_preview_activity_menu_save_button">Save</string>
-    <string name="glia_preview_activity_menu_share_button">Share</string>
+        <string name="glia_preview_activity_menu_save_button">Save</string>
+        <string name="glia_preview_activity_menu_share_button">Share</string>
         <string name="glia_preview_activity_image_content_description">Preview content</string>
         <string name="glia_survey_network_unavailable">The survey could not be submitted due to a network error. Please try again.</string>
-    <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
+        <string name="glia_chat_head_view_content_description">Back to the Engagement. Floating Button.</string>
         <string name="glia_visitor_code_content_description">Your five-digit visitor code is</string>
         <string name="glia_visitor_code_loading">Loading your visitor code</string>
         <string name="glia_visitor_code_refresh_button">Refresh</string>
-    <string name="glia_call_minimize_content_description">@string/glia_call_minimize_button_label</string>
         <string name="glia_top_app_bar_end_screen_sharing_description">@string/call_visualizer_button</string>
         <string name="glia_call_chat_zero_content_description">@string/media_text_name</string>
         <string name="glia_call_chat_button_label">@string/media_text_name</string>

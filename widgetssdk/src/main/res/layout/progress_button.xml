@@ -21,7 +21,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/glia_medium"
             android:accessibilityLiveRegion="polite"
-            tools:contentDescription="@string/message_center_progress_bar_content_description"
             android:importantForAccessibility="yes"
             android:indeterminate="true"
             android:visibility="gone"

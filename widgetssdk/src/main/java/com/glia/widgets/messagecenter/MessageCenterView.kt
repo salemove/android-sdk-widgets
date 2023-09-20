@@ -82,11 +82,13 @@ class MessageCenterView(
     private val dialogCallback: DialogController.Callback = DialogController.Callback {
         onDialogState(it)
     }
+    private val stringProvider = Dependencies.getStringProvider()
 
     init {
         isSaveEnabled = true
         orientation = VERTICAL
         defaultStatusBarColor = window?.statusBarColor
+        appBar?.setTitle(stringProvider.getRemoteString(R.string.engagement_secure_messaging_title))
         // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f)
         readTypedArray(attrs, defStyleAttr, defStyleRes)

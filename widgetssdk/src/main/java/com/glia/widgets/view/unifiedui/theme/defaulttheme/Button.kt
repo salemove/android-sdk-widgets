@@ -49,7 +49,7 @@ internal fun OutlinedButtonTheme(
  * Default theme for GVA Button
  */
 internal fun GvaDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
-    DefaultButtonTheme(text = baseDarkColorTheme, background = backgroundColorTheme)
+    DefaultButtonTheme(text = baseDarkColorTheme, background = baseLightColorTheme)
 }
 
 private fun DefaultButtonTheme(

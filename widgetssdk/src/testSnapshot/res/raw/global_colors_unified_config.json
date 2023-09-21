@@ -6,7 +6,7 @@
     "baseLight": "#CDEF01",
     "baseDark": "#7890AB",
     "baseShade": "#654321",
-    "background": "#123456",
+    "baseNeutral": "#F584F9",
     "systemNegative": "#A09876"
   }
 }

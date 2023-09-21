@@ -52,7 +52,7 @@ internal fun SecureConversationsWelcomeScreenTheme(pallet: ColorPallet):
             filePickerButtonDisabledTheme = it.baseShadeColorTheme,
             attachmentListTheme = null,
             pickMediaTheme = DefaultAttachmentsPopupTheme(it),
-            backgroundTheme = it.backgroundColorTheme
+            backgroundTheme = it.baseLightColorTheme
         )
     }
 }
@@ -82,7 +82,7 @@ internal fun SecureConversationsConfirmationScreenTheme(pallet: ColorPallet):
     return pallet.let {
         SecureConversationsConfirmationScreenTheme(
             headerTheme = PrimaryColorHeaderTheme(it),
-            backgroundTheme = it.backgroundColorTheme,
+            backgroundTheme = it.baseLightColorTheme,
             iconColorTheme = it.primaryColorTheme,
             titleTheme = BaseDarkColorTextTheme(it),
             subtitleTheme = BaseDarkColorTextTheme(it),

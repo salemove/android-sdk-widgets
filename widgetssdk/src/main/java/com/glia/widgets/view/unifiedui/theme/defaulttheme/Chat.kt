@@ -20,7 +20,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
  */
 internal fun ChatTheme(pallet: ColorPallet): ChatTheme =
     ChatTheme(
-        background = LayerTheme(fill = pallet.backgroundColorTheme),
+        background = LayerTheme(fill = pallet.baseLightColorTheme),
         header = PrimaryColorHeaderTheme(pallet),
         operatorMessage = ChatOperatorMessageTheme(pallet),
         visitorMessage = ChatVisitorMessageTheme(pallet),
@@ -46,7 +46,7 @@ private fun MediaUpgradeTheme(pallet: ColorPallet) = pallet.run {
         baseDarkColorTheme,
         baseNormalColorTheme,
         primaryColorTheme,
-        backgroundColorTheme,
+        baseLightColorTheme,
         baseShadeColorTheme
     ) {
         MediaUpgradeTheme(
@@ -54,7 +54,7 @@ private fun MediaUpgradeTheme(pallet: ColorPallet) = pallet.run {
             description = TextTheme(textColor = baseNormalColorTheme),
             iconColor = primaryColorTheme,
             background = LayerTheme(
-                fill = backgroundColorTheme,
+                fill = baseLightColorTheme,
                 stroke = baseShadeColorTheme?.primaryColor
             )
         )
@@ -68,10 +68,13 @@ private fun ChatOperatorMessageTheme(
     pallet: ColorPallet
 ): MessageBalloonTheme? = pallet.run {
     val userImage = UserImageTheme(this)
-    composeIfAtLeastOneNotNull(userImage, baseDarkColorTheme) {
+    composeIfAtLeastOneNotNull(userImage, baseDarkColorTheme, baseNeutralColorTheme) {
         MessageBalloonTheme(
             text = BaseDarkColorTextTheme(this),
-            userImage = userImage
+            userImage = userImage,
+            background = LayerTheme(
+                fill = baseNeutralColorTheme
+            )
         )
     }
 }
@@ -96,11 +99,11 @@ private fun ChatVisitorMessageTheme(
  */
 private fun ChatResponseCardTheme(pallet: ColorPallet): ResponseCardTheme? {
     return pallet.run {
-        composeIfAtLeastOneNotNull(primaryColorTheme, baseLightColorTheme, baseDarkColorTheme) {
+        composeIfAtLeastOneNotNull(primaryColorTheme, baseNeutralColorTheme, baseDarkColorTheme) {
             ResponseCardTheme(
                 option = ResponseCardOptionTheme(normal = NeutralDefaultButtonTheme(this)),
                 background = LayerTheme(
-                    fill = baseLightColorTheme,
+                    fill = baseNeutralColorTheme,
                     stroke = primaryColorTheme?.primaryColor
                 ),
                 text = BaseDarkColorTextTheme(this)
@@ -124,7 +127,8 @@ private fun ChatInputTheme(pallet: ColorPallet): InputTheme? {
                 text = BaseDarkColorTextTheme(this),
                 placeholder = BaseNormalColorTextTheme(pallet),
                 divider = baseShadeColorTheme,
-                sendButton = ButtonTheme(iconColor = primaryColorTheme)
+                sendButton = ButtonTheme(iconColor = primaryColorTheme),
+                mediaButton = ButtonTheme(iconColor = baseNormalColorTheme)
             )
         }
     }

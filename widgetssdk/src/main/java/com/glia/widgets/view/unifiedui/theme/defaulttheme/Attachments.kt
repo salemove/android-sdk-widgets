@@ -12,7 +12,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
  */
 internal fun DefaultAttachmentsPopupTheme(pallet: ColorPallet): AttachmentsPopupTheme? =
     pallet.run {
-        composeIfAtLeastOneNotNull(baseDarkColorTheme, baseShadeColorTheme) {
+        composeIfAtLeastOneNotNull(baseDarkColorTheme, baseShadeColorTheme, baseNeutralColorTheme) {
             val attachmentItem = AttachmentItemTheme(
                 text = BaseDarkColorTextTheme(this),
                 iconColor = baseDarkColorTheme
@@ -21,7 +21,8 @@ internal fun DefaultAttachmentsPopupTheme(pallet: ColorPallet): AttachmentsPopup
                 photoLibrary = attachmentItem,
                 takePhoto = attachmentItem,
                 browse = attachmentItem,
-                dividerColor = baseShadeColorTheme
+                dividerColor = baseShadeColorTheme,
+                background = baseNeutralColorTheme
             )
         }
     }

@@ -5,12 +5,12 @@ import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.google.gson.annotations.SerializedName
 
 internal data class GlobalColorsConfig(
-    @SerializedName("background")
-    val backgroundColorConfig: ColorRemoteConfig?,
     @SerializedName("baseDark")
     val baseDarkColorConfig: ColorRemoteConfig?,
     @SerializedName("baseLight")
     val baseLightColorConfig: ColorRemoteConfig?,
+    @SerializedName("baseNeutral")
+    val baseNeutralColorConfig: ColorRemoteConfig?,
     @SerializedName("baseNormal")
     val baseNormalColorConfig: ColorRemoteConfig?,
     @SerializedName("baseShade")
@@ -23,13 +23,13 @@ internal data class GlobalColorsConfig(
     val systemNegativeColorConfig: ColorRemoteConfig?
 ) {
     fun toColorPallet(): ColorPallet = ColorPallet(
-        backgroundColorConfig?.toColorTheme(),
-        baseDarkColorConfig?.toColorTheme(),
-        baseLightColorConfig?.toColorTheme(),
-        baseNormalColorConfig?.toColorTheme(),
-        baseShadeColorConfig?.toColorTheme(),
-        primaryColorConfig?.toColorTheme(),
-        secondaryColorConfig?.toColorTheme(),
-        systemNegativeColorConfig?.toColorTheme()
+        baseDarkColorTheme = baseDarkColorConfig?.toColorTheme(),
+        baseLightColorTheme = baseLightColorConfig?.toColorTheme(),
+        baseNeutralColorTheme = baseNeutralColorConfig?.toColorTheme(),
+        baseNormalColorTheme = baseNormalColorConfig?.toColorTheme(),
+        baseShadeColorTheme = baseShadeColorConfig?.toColorTheme(),
+        primaryColorTheme = primaryColorConfig?.toColorTheme(),
+        secondaryColorTheme = secondaryColorConfig?.toColorTheme(),
+        systemNegativeColorTheme = systemNegativeColorConfig?.toColorTheme()
     )
 }

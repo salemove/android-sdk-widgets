@@ -567,7 +567,7 @@ internal class CallView(
         callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
 
         // Hints and content descriptions
-        companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
+        operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_video_operator_accessibility_label)
         operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
         binding.callTimerView.hint = stringProvider.getRemoteString(R.string.chat_duration_accessibility_label)
         minimizeButton.contentDescription = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
@@ -976,7 +976,7 @@ internal class CallView(
             )
             if (callState.companyName != null) { // TODO FIXME Make CompanyName configurable from remote strings
                 companyNameView.text = callState.companyName
-                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
+                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name)
                 msrView.text = stringProvider.getRemoteString(
                     R.string.android_call_queue_message
                 )

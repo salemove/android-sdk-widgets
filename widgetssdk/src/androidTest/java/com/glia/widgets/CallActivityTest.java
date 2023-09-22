@@ -403,25 +403,6 @@ public class CallActivityTest {
     }
 
     @Test
-    public void testCompanyNameHint() {
-        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
-
-        try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
-            CallStatus callStatus = mock(CallStatus.class);
-            when(callStatus.getFormattedOperatorName()).thenReturn("FormattedOperatorName");
-            CallStateHelper callState = new CallStateHelper.Builder()
-                    .setVisible(true)
-                    .setCallStatus(callStatus)
-                    .build();
-
-            callViewCallback.emitState(callState.makeCallState());
-
-            String expected = appContext.getString(R.string.general_company_name_hint);
-            onView(withId(R.id.company_name_view)).check(matches(withHint(expected)));
-        }
-    }
-
-    @Test
     public void testOperatorNameHint() {
         when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
 

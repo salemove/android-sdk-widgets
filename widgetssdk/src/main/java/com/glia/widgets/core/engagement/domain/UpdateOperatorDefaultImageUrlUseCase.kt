@@ -9,6 +9,7 @@ internal class UpdateOperatorDefaultImageUrlUseCase(
     private val siteInfoUseCase: SiteInfoUseCase
 ) {
     operator fun invoke() = siteInfoUseCase.execute { response, _ ->
+        operatorRepository.setIsAlwaysUseDefaultOperatorPicture(response.isAlwaysUseDefaultOperatorPicture)
         response.defaultOperatorPicture?.url?.getOrNull()?.also(operatorRepository::updateOperatorDefaultImageUrl)
     }
 }

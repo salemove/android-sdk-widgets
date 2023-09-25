@@ -22,6 +22,8 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
@@ -327,17 +329,17 @@ object Dialogs {
 
             when (mediaUpgrade.mediaUpgradeMode) {
                 MediaUpgrade.MODE_AUDIO -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_audio_title, mediaUpgrade.operatorName)
+                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_audio_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
                     titleIconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_audio_accessibility_icon)
                 }
                 MediaUpgrade.MODE_VIDEO_ONE_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_video_one_way_title, mediaUpgrade.operatorName)
+                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_video_one_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                     titleIconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_video_accessibility_icon)
                 }
                 MediaUpgrade.MODE_VIDEO_TWO_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_video_two_way_title, mediaUpgrade.operatorName)
+                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_video_two_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                     titleIconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_video_accessibility_icon)
                 }

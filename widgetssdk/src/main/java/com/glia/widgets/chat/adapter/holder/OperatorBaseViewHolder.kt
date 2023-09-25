@@ -4,6 +4,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.di.Dependencies
@@ -45,15 +47,15 @@ internal open class OperatorBaseViewHolder(
             operatorName.isNullOrEmpty().not() -> {
                 itemView.contentDescription = stringProvider.getRemoteString(
                     R.string.android_chat_operator_name_accessibility_message,
-                    operatorName,
-                    message
+                    StringKeyPair(StringKey.OPERATOR_NAME, operatorName ?: ""),
+                    StringKeyPair(StringKey.MESSAGE, message ?: "")
                 )
             }
 
             else -> {
                 itemView.contentDescription = stringProvider.getRemoteString(
                     R.string.android_chat_accessibility_message,
-                    message
+                    StringKeyPair(StringKey.MESSAGE, message ?: "")
                 )
             }
         }

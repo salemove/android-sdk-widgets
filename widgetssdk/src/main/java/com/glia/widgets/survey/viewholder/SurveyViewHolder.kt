@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
@@ -44,13 +46,13 @@ abstract class SurveyViewHolder(
             val context = title.context
             val color = ContextCompat.getColor(context, R.color.glia_system_negative_color)
             val colorString = String.format("%X", color).substring(2)
-            val source = stringProvider.getRemoteString(
+            val source = context.getString(
                 R.string.glia_survey_require_label,
                 questionText,
                 colorString
             )
             title.text = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
-            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_title_accessibility_label, questionText)
+            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_title_accessibility_label)
         } else {
             title.text = questionText
             title.contentDescription = null

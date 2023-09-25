@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.fileupload.model.FileAttachment.Status
 import com.glia.widgets.databinding.ChatAttachmentUploadedItemBinding
@@ -181,13 +183,13 @@ class ViewHolder(
     ) {
         removeItemButton.contentDescription = stringProvider.getRemoteString(
             R.string.chat_upload_remove_accessibility_label,
-            displayName
+            StringKeyPair(StringKey.NAME, displayName)
         )
         itemView.contentDescription = stringProvider.getRemoteString(
             R.string.android_chat_file_accessibility,
-            displayName,
-            size,
-            getStatusIndicatorText(attachment.attachmentStatus)
+            StringKeyPair(StringKey.NAME, displayName),
+            StringKeyPair(StringKey.SIZE, size ?: "N/A"),
+            StringKeyPair(StringKey.STATUS, getStatusIndicatorText(attachment.attachmentStatus))
         )
     }
 

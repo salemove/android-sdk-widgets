@@ -5,6 +5,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
@@ -95,7 +97,7 @@ internal class OperatorStatusViewHolder(
         applyChatStartedViewsVisibility(false)
         itemView.contentDescription = stringProvider.getRemoteString(
             R.string.android_chat_queue_accessibility_label,
-            companyName ?: ""
+            StringKeyPair(StringKey.COMPANY_NAME, companyName ?: "")
         )
 
         engagementStatesTheme?.queue.also(::applyEngagementState)
@@ -108,7 +110,7 @@ internal class OperatorStatusViewHolder(
         applyChatStartedViewsVisibility()
 
         chatStartedNameView.text = operatorName
-        stringProvider.getRemoteString(R.string.chat_operator_joined, operatorName).apply {
+        stringProvider.getRemoteString(R.string.chat_operator_joined, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)).apply {
             chatStartedCaptionView.text = this
             itemView.contentDescription = this
         }

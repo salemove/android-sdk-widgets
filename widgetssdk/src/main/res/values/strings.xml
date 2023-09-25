@@ -24,7 +24,7 @@
         <string name="message_center_progress_bar_content_description">Sending</string>
         <string name="glia_chat_delivered">Delivered</string>
         <string name="glia_chat_enter_message">Enter message</string>
-        <string name="glia_call_connecting_with">Connecting with %1$s\n%2$s</string> <!-- TODO remove second arg -->
+        <string name="glia_call_connecting_with">Connecting with %1$s%2$s</string> <!-- TODO remove second arg -->
         <string name="glia_dialog_engagement_ended_title">Engagement Ended</string>
         <string name="glia_chat_attachment_upload_error_failed_to_check_safety">Failed to confirm the safety of the file.</string>
         <string name="glia_chat_attachment_upload_ready_to_send">Ready to send</string>
@@ -81,7 +81,7 @@
         <string name="glia_call_operator_video_content_description">Operator\'s Video</string>
         <string name="glia_call_visitor_video_content_description">Your Video</string>
         <string name="glia_survey_required_error_message">Please provide an answer.</string>
-        <string name="glia_survey_require_label_content_description">%1$s. Required.</string>
+        <string name="glia_survey_require_label_content_description">Required.</string>
         <string name="message_center_message_limit_error_message">The message cannot exceed 10000 characters.</string>
         <string name="message_center_title">Welcome to Message Center</string>
         <string name="message_center_check_messages_btn">Check messages</string>

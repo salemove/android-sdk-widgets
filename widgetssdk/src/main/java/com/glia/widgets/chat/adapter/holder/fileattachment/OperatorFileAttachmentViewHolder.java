@@ -9,6 +9,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.glia.widgets.R;
+import com.glia.widgets.StringKey;
+import com.glia.widgets.StringKeyPair;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.ChatAdapter;
@@ -46,7 +48,13 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
 
         String name = item.getAttachmentFile().getName();
         String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
-        itemView.setContentDescription(stringProvider.getRemoteString(R.string.android_chat_file_operator_accessibility, name, byteSize));
+        itemView.setContentDescription(
+            stringProvider.getRemoteString(
+                R.string.android_chat_file_operator_accessibility,
+                new StringKeyPair(StringKey.NAME, name),
+                new StringKeyPair(StringKey.SIZE, byteSize)
+            )
+        );
 
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override

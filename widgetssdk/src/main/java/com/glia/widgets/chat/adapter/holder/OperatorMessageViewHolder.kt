@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
@@ -105,13 +107,13 @@ internal class OperatorMessageViewHolder(
         if (!TextUtils.isEmpty(item.operatorName)) {
             itemView.contentDescription = stringProvider.getRemoteString(
                 R.string.android_chat_operator_name_accessibility_message,
-                item.operatorName,
-                item.content
+                StringKeyPair(StringKey.OPERATOR_NAME, item.operatorName ?: "" ),
+                StringKeyPair(StringKey.MESSAGE, item.content ?: "")
             )
         } else {
             itemView.contentDescription = stringProvider.getRemoteString(
                 R.string.android_chat_accessibility_message,
-                item.content
+                StringKeyPair(StringKey.MESSAGE, item.content ?: "")
             )
         }
     }

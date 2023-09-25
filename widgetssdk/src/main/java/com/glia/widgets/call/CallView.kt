@@ -29,6 +29,8 @@ import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
@@ -945,11 +947,7 @@ internal class CallView(
 
     override fun emitState(callState: CallState) {
         post {
-            connectingView.text = stringProvider.getRemoteString(
-                R.string.android_call_queue_message,
-                callState.callStatus.formattedOperatorName,
-                callState.callStatus.time
-            )
+            connectingView.text = stringProvider.getRemoteString(R.string.android_call_queue_message)
 
             handleCallTimerView(callState)
 
@@ -971,8 +969,8 @@ internal class CallView(
             operatorNameView.text = callState.callStatus.formattedOperatorName
             connectingView.contentDescription = stringProvider.getRemoteString(
                 R.string.engagement_connect_with,
-                callState.callStatus.formattedOperatorName,
-                ""
+                StringKeyPair(StringKey.OPERATOR_NAME, callState.callStatus.formattedOperatorName),
+                StringKeyPair(StringKey.BADGE_VALUE, "")
             )
             if (callState.companyName != null) { // TODO FIXME Make CompanyName configurable from remote strings
                 companyNameView.text = callState.companyName
@@ -1054,8 +1052,8 @@ internal class CallView(
             chatButton.contentDescription =
                 when (callState.messagesNotSeen) {
                     0 -> stringProvider.getRemoteString(R.string.media_text_name)
-                    1 -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_single_item_accessibility_label, callState.messagesNotSeen.toString())
-                    else -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_multiple_items_accessibility_label, callState.messagesNotSeen.toString())
+                    1 -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_single_item_accessibility_label, StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString()))
+                    else -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_multiple_items_accessibility_label, StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString()))
                 }
             applyTextThemeBasedOnCallState(callState)
         }

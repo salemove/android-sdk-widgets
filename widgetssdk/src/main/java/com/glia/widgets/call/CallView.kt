@@ -304,7 +304,7 @@ internal class CallView(
             operatorStatusView.showTransferring()
             operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring_message))
         } else {
-            operatorNameView.text = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
+            operatorNameView.text = stringProvider.getRemoteString(R.string.general_company_name)
             operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
             handleOperatorStatusViewOperatorImage(state)
         }
@@ -318,6 +318,7 @@ internal class CallView(
             showOperatorProfileImageOnConnecting(state)
         } else {
             operatorStatusView.showPlaceholder()
+            connectingView.text = stringProvider.getRemoteString(R.string.android_call_queue_message)
         }
     }
 
@@ -558,7 +559,6 @@ internal class CallView(
         chatButtonLabel.text = stringProvider.getRemoteString(R.string.media_text_name)
         speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_button_speaker)
         minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
-        minimizeButton.contentDescription = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
         companyNameView.text = stringProvider.getRemoteString(R.string.general_company_name)
         videoButtonLabel.text = stringProvider.getRemoteString(R.string.media_video_name)
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
@@ -567,10 +567,11 @@ internal class CallView(
         callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
 
         // Hints and content descriptions
-        companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
         operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_video_operator_accessibility_label)
         operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
         binding.callTimerView.hint = stringProvider.getRemoteString(R.string.chat_duration_accessibility_label)
+        minimizeButton.contentDescription = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
+        operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_video_operator_accessibility_label)
 
         // Background
         callTheme?.background?.fill.also(::applyColorTheme)
@@ -945,7 +946,7 @@ internal class CallView(
     override fun emitState(callState: CallState) {
         post {
             connectingView.text = stringProvider.getRemoteString(
-                R.string.engagement_connect_with,
+                R.string.android_call_queue_message,
                 callState.callStatus.formattedOperatorName,
                 callState.callStatus.time
             )
@@ -975,11 +976,9 @@ internal class CallView(
             )
             if (callState.companyName != null) { // TODO FIXME Make CompanyName configurable from remote strings
                 companyNameView.text = callState.companyName
-                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name_hint)
+                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name)
                 msrView.text = stringProvider.getRemoteString(
-                    R.string.engagement_connect_with,
-                    callState.callStatus.formattedOperatorName,
-                    ""
+                    R.string.android_call_queue_message
                 )
             }
             chatButtonBadgeView.text = callState.messagesNotSeen.toString()
@@ -1019,6 +1018,7 @@ internal class CallView(
             muteButtonLabel.text = stringProvider.getRemoteString(
                 if (callState.isMuted) R.string.call_button_unmute else R.string.call_button_mute
             )
+            onHoldTextView.text = stringProvider.getRemoteString(R.string.call_on_hold)
 
             callState.chatButtonViewState.apply {
                 if (this == ViewState.SHOW) {

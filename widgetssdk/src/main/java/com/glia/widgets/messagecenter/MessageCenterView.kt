@@ -88,7 +88,6 @@ class MessageCenterView(
         isSaveEnabled = true
         orientation = VERTICAL
         defaultStatusBarColor = window?.statusBarColor
-        appBar?.setTitle(stringProvider.getRemoteString(R.string.engagement_secure_messaging_title))
         // Is needed to overlap existing app bar in existing view with this view's app bar.
         ViewCompat.setElevation(this, 100.0f)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
@@ -123,6 +122,7 @@ class MessageCenterView(
         controller?.ensureMessageCenterAvailability()
         setupAppBarUnifiedTheme(unifiedTheme?.secureConversationsWelcomeScreenTheme?.headerTheme)
         appBar?.hideBackButton()
+        appBar?.setTitle(stringProvider.getRemoteString(R.string.engagement_secure_messaging_title))
         initCallbacks()
     }
 

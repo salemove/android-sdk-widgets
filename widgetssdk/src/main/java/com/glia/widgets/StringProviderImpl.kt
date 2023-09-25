@@ -9,6 +9,6 @@ class StringProviderImpl(private val resourceProvider: ResourceProvider): String
         val key = resourceProvider.getResourceKey(stringKey)
         val fallback = resourceProvider.getString(stringKey, *values)
         // TODO IMPLEMENT NEW METHOD FROM CORE
-        return key
+        return fallback
     }
 }

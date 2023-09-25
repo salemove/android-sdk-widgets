@@ -119,6 +119,7 @@
 
     <!-- Call -->
     <string name="engagement_connect_with">@string/glia_call_connecting_with</string>
+    <string name="android_call_queue_message">@string/glia_call_in_queue_message</string>
     <string name="android_call_speaker_on_accessibility">@string/glia_call_speaker_on_content_description</string>
     <string name="android_call_speaker_off_accessibility">@string/glia_call_speaker_off_content_description</string>
     <string name="media_video_name">@string/glia_call_video_app_bar_title</string>
@@ -170,8 +171,7 @@
     <string name="general_ok">@string/glia_dialog_ok</string>
     <string name="general_accept">@string/glia_dialog_accept</string>
     <string name="general_close">@string/glia_top_app_bar_close</string>
-    <string name="general_company_name">CompanyName OÜ</string>
-    <string name="general_company_name_hint">@string/glia_call_company_name_hint</string>
+    <string name="general_company_name">@string/glia_call_company_name_hint</string>
     <string name="general_thank_you">@string/message_center_confirmation_screen_title</string>
     <string name="general_cancel">@string/glia_dialog_cancel</string>
     <string name="general_submit">@string/glia_survey_submit_label</string>
@@ -191,7 +191,6 @@
     <!-- NEW REFERENCES -->
     <!-- NEW REFERENCES -->
     <string name="alert_action_settings">Settings</string><!-- TODO UNUSED IN ANDROID -->
-    <string name="android_call_queue_message">@string/glia_call_in_queue_message</string>
     <string name="android_chat_queue_accessibility_label">@string/glia_chat_in_queue_message_content_description</string>
     <string name="android_file_select_title">@string/glia_chat_select_file_title</string>
     <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>

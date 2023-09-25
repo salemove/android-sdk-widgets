@@ -623,7 +623,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
         } else {
-            showToolbar(stringProvider.getRemoteString(R.string.message_center_header))
+            showToolbar(stringProvider.getRemoteString(R.string.media_text_name))
             binding.appBarView.showBackButton()
         }
     }

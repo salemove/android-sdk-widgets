@@ -33,6 +33,11 @@ internal class OperatorStatusViewHolder(
 
     init {
         applyBaseConfig(uiTheme)
+        setBaseStrings()
+    }
+
+    private fun setBaseStrings() {
+        chatStartingCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connect_placeholder)
     }
 
     private fun applyBaseConfig(uiTheme: UiTheme) {

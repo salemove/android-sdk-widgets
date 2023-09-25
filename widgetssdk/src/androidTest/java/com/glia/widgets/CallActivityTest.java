@@ -85,7 +85,7 @@ public class CallActivityTest {
         Dependencies.setResourceProvider(resourceProvider);
 
         // set up StringProvider
-        StringProvider stringProvider = new TestStringProvider(appContext);
+        StringProvider stringProvider = new AndroidTestStringProvider(appContext);
         Dependencies.setStringProvider(stringProvider);
     }
 
@@ -399,25 +399,6 @@ public class CallActivityTest {
             onView(withContentDescription(R.string.android_app_bar_nav_up_accessibility)).perform(click());
 
             assertEquals(Lifecycle.State.DESTROYED, scenario.getState());
-        }
-    }
-
-    @Test
-    public void testCompanyNameHint() {
-        when(callController.shouldShowMediaEngagementView(anyBoolean())).thenReturn(true);
-
-        try (ActivityScenario<CallActivity> ignored = launch(CallActivity.class)) {
-            CallStatus callStatus = mock(CallStatus.class);
-            when(callStatus.getFormattedOperatorName()).thenReturn("FormattedOperatorName");
-            CallStateHelper callState = new CallStateHelper.Builder()
-                    .setVisible(true)
-                    .setCallStatus(callStatus)
-                    .build();
-
-            callViewCallback.emitState(callState.makeCallState());
-
-            String expected = appContext.getString(R.string.general_company_name_hint);
-            onView(withId(R.id.company_name_view)).check(matches(withHint(expected)));
         }
     }
 

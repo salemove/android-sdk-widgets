@@ -188,7 +188,7 @@ class ViewHolder(
         itemView.contentDescription = stringProvider.getRemoteString(
             R.string.android_chat_file_accessibility,
             StringKeyPair(StringKey.NAME, displayName),
-            StringKeyPair(StringKey.SIZE, size ?: "N/A"),
+            StringKeyPair(StringKey.SIZE, size ?: stringProvider.getRemoteString(R.string.general_unknown)),
             StringKeyPair(StringKey.STATUS, getStatusIndicatorText(attachment.attachmentStatus))
         )
     }

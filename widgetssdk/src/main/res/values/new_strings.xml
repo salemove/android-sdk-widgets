@@ -177,6 +177,7 @@
     <string name="general_submit">@string/glia_survey_submit_label</string>
     <string name="general_comment">@string/glia_survey_open_text_item_edit_hint</string>
     <string name="general_end">@string/glia_top_app_bar_chat_end</string>
+    <string name="general_unknown">Unknown</string>
 
     <!-- iOS only -->
     <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>

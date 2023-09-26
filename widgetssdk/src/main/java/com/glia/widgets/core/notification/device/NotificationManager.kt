@@ -36,7 +36,7 @@ internal class NotificationManager(private val applicationContext: Application, 
             val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_CALL_CHANNEL_ID,
-                stringProvider.getRemoteString(R.string.android_notification_audio_call_channel_name),
+                applicationContext.getString(R.string.android_notification_audio_call_channel_name),
                 importance
             )
             notificationManager.createNotificationChannel(notificationChannel)
@@ -49,7 +49,7 @@ internal class NotificationManager(private val applicationContext: Application, 
             val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
                 NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID,
-                stringProvider.getRemoteString(R.string.android_notification_screen_sharing_channel_name),
+                applicationContext.getString(R.string.android_notification_screen_sharing_channel_name),
                 importance
             )
             notificationManager.createNotificationChannel(notificationChannel)

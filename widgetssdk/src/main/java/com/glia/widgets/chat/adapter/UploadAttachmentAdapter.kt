@@ -182,7 +182,7 @@ class ViewHolder(
         attachment: FileAttachment
     ) {
         removeItemButton.contentDescription = stringProvider.getRemoteString(
-            R.string.chat_upload_remove_accessibility_label,
+            R.string.chat_file_remove_upload_accessibility_label,
             StringKeyPair(StringKey.NAME, displayName)
         )
         itemView.contentDescription = stringProvider.getRemoteString(
@@ -232,10 +232,10 @@ class ViewHolder(
         Status.ERROR_NETWORK_TIMEOUT -> R.string.android_upload_error_network
         Status.ERROR_INVALID_INPUT -> R.string.android_upload_error_invalid_input
         Status.ERROR_PERMISSIONS_DENIED -> R.string.android_upload_error_permissions
-        Status.ERROR_FORMAT_UNSUPPORTED -> R.string.chat_attachement_upload_unsupported_file
-        Status.ERROR_FILE_TOO_LARGE -> R.string.chat_file_too_large_error
+        Status.ERROR_FORMAT_UNSUPPORTED -> R.string.chat_attachement_unsupported_file
+        Status.ERROR_FILE_TOO_LARGE -> R.string.chat_file_size_limit_error
         Status.ERROR_ENGAGEMENT_MISSING -> R.string.android_upload_error_engagement_missing
-        Status.ERROR_SECURITY_SCAN_FAILED -> R.string.chat_file_infected_error
+        Status.ERROR_SECURITY_SCAN_FAILED -> R.string.chat_file_infected_file_error
         Status.ERROR_FILE_UPLOAD_FORBIDDEN -> R.string.android_upload_error_forbidden
         Status.ERROR_SUPPORTED_FILE_ATTACHMENT_COUNT_EXCEEDED -> R.string.android_upload_error_file_limit
         else -> R.string.error_internal

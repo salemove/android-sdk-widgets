@@ -161,6 +161,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
         verify(watcher).openOverlayPermissionView()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -169,6 +170,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         resetMocks()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -192,6 +194,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -217,6 +220,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openCallActivity()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -238,6 +242,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openOverlayPermissionView()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -260,6 +265,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -281,6 +287,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).openSupportActivity(any())
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -291,6 +298,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -312,6 +320,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).openSupportActivity(any())
+        verify(watcher).destroySupportActivityIfExists()
     }
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
@@ -321,6 +330,8 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test

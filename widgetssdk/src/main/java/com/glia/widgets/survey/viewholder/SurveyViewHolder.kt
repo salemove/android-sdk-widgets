@@ -8,8 +8,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.R
-import com.glia.widgets.StringKey
-import com.glia.widgets.StringKeyPair
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
@@ -52,7 +50,7 @@ abstract class SurveyViewHolder(
                 colorString
             )
             title.text = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
-            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_title_accessibility_label)
+            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_required_accessibility_label)
         } else {
             title.text = questionText
             title.contentDescription = null

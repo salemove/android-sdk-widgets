@@ -168,7 +168,7 @@ class ChatHeadView @JvmOverloads constructor(
     private fun applyBubbleTheme() {
         bubbleTheme?.badge?.also(binding.chatBubbleBadge::applyBadgeTheme)
         bubbleTheme?.onHoldOverlay?.also {
-            binding.onHoldIcon.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_accessibility)
+            binding.onHoldIcon.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_icon_accessibility)
             it.tintColor.also(binding.onHoldIcon::applyImageColorTheme)
             it.backgroundColor?.primaryColorStateList?.also(binding.onHoldIcon::setBackgroundTintList)
         }

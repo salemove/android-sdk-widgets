@@ -105,7 +105,7 @@ class MessageView(
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
-        messageErrorTextView.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_length_warning)
+        messageErrorTextView.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_length_error)
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
             setDefaultTheme(this)
         }
@@ -162,9 +162,9 @@ class MessageView(
     private fun setupViewAppearance() {
         title.text = stringProvider.getRemoteString(R.string.message_center_welcome_title)
         description.text = stringProvider.getRemoteString(R.string.media_messaging_description)
-        checkMessagesButton.text = stringProvider.getRemoteString(R.string.message_center_check_messages)
+        checkMessagesButton.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
         messageTitle.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_title)
-        messageEditText.hint = stringProvider.getRemoteString(R.string.message_center_welcome_message_text_view_placeholder)
+        messageEditText.hint = stringProvider.getRemoteString(R.string.message_center_welcome_message_input_placeholder)
         uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
         uploadAttachmentAdapter.setItemCallback { onRemoveAttachmentListener?.invoke(it) }
         uploadAttachmentAdapter.registerAdapterDataObserver(

@@ -234,7 +234,7 @@ object Dialogs {
                 applyTextTheme(alertTheme?.message)
             }
             findViewById<ImageButton>(R.id.close_dialog_button).apply {
-                contentDescription = stringProvider.getRemoteString(R.string.general_accessibility_close)
+                contentDescription = stringProvider.getRemoteString(R.string.general_close_accessibility)
                 setOnClickListener(buttonClickListener)
                 applyImageColorTheme(baseNormalColor)
                 applyImageColorTheme(alertTheme?.closeButtonColor)
@@ -329,19 +329,16 @@ object Dialogs {
 
             when (mediaUpgrade.mediaUpgradeMode) {
                 MediaUpgrade.MODE_AUDIO -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_audio_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
+                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_audio_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
-                    titleIconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_audio_accessibility_icon)
                 }
                 MediaUpgrade.MODE_VIDEO_ONE_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_video_one_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
+                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_video_one_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
-                    titleIconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_video_accessibility_icon)
                 }
                 MediaUpgrade.MODE_VIDEO_TWO_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.upgrade_video_two_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
+                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_video_two_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
-                    titleIconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_video_accessibility_icon)
                 }
             }
         }
@@ -386,7 +383,6 @@ object Dialogs {
 
         return showDialog(context, getScreenSharingLayout(theme), theme.baseLightColor) {
             findViewById<ImageView>(R.id.title_icon).apply {
-                contentDescription = stringProvider.getRemoteString(R.string.android_screen_sharing_accessibility_icon)
                 applyImageColorTheme(primaryBrandColor)
                 applyImageColorTheme(alertTheme?.titleImageColor)
             }

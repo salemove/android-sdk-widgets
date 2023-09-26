@@ -49,7 +49,7 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
 
     private void setAccessibilityLabels() {
         itemView.setContentDescription(stringProvider.getRemoteString(
-                R.string.android_chat_operator_accessibility_image));
+                R.string.android_chat_operator_image_attachment_accessibility));
         ViewCompat.setAccessibilityDelegate(itemView, new AccessibilityDelegateCompat() {
             @Override
             public void onInitializeAccessibilityNodeInfo(@NonNull View host, @NonNull AccessibilityNodeInfoCompat info) {

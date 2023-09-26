@@ -67,9 +67,9 @@ class EndScreenSharingView(
     }
 
     private fun setupViewTextResources() {
-        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_view_title))
+        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_header))
         binding.screenSharingLabel.text = stringProvider.getRemoteString(R.string.call_visualizer_label)
-        binding.endSharingButton.text = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end)
+        binding.endSharingButton.text = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end_title)
     }
 
     private fun applyDefaultTheme(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {

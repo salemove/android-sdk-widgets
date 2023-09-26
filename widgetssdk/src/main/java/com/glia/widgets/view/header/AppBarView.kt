@@ -66,7 +66,7 @@ class AppBarView @JvmOverloads constructor(
             }
             binding.endButton.text = stringProvider.getRemoteString(R.string.general_end)
             binding.endButton.contentDescription = stringProvider.getRemoteString(R.string.android_app_bar_end_engagement_accessibility_label)
-            binding.endScreenSharingButton.contentDescription = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end)
+            binding.endScreenSharingButton.contentDescription = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end_title)
 
             val titleColorRes = getTypedArrayResId(
                 this,

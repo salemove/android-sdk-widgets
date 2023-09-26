@@ -136,7 +136,7 @@ internal class GvaGalleryItemViewHolder(
             .joinToString(separator = ". ")
 
         itemView.contentDescription = itemView.resources.getString(
-            R.string.gva_gallery_card_message_content_description,
+            R.string.gva_gallery_card_message_accessibility,
             cardContentDescription,
             position + 1,
             size

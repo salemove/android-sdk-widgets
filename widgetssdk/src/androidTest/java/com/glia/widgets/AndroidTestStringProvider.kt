@@ -4,7 +4,8 @@ import android.content.Context
 
 class AndroidTestStringProvider(private val context: Context): StringProvider {
 
-    override fun getRemoteString(stringKey: Int, vararg values: String?): String {
-        return context.getString(stringKey, *values)
+    override fun getRemoteString(stringKey: Int, vararg values: StringKeyPair?): String {
+        val vals = values.map { pair -> pair?.value }.toTypedArray()
+        return context.getString(stringKey, *vals)
     }
 }

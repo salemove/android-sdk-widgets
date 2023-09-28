@@ -3,6 +3,8 @@ package com.glia.widgets.chat.adapter.holder
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
@@ -55,7 +57,7 @@ internal class VisitorMessageViewHolder(
             } else {
                 R.string.android_chat_visitor_accessibility_message
             },
-            item.message
+            StringKeyPair(StringKey.MESSAGE, item.message)
         )
         itemView.contentDescription = contentDescription
     }

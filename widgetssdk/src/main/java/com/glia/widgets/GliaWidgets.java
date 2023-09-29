@@ -39,6 +39,9 @@ public class GliaWidgets {
     /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     *
+     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig.Builder#companyName}
+     * or customize the strings from GliaHub
      */
     public static final String COMPANY_NAME = "company_name";
     /**

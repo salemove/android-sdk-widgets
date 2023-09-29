@@ -8,7 +8,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
-import com.glia.androidsdk.Glia;
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.StringProviderImpl;
@@ -52,6 +51,7 @@ public class Dependencies {
     public static void onAppCreate(Application application) {
         resourceProvider = new ResourceProvider(application.getBaseContext());
         stringProvider = new StringProviderImpl(resourceProvider);
+        sdkConfigurationManager.setStringProvider(stringProvider);
         notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);

@@ -140,6 +140,33 @@ object Dialogs {
         }
     }
 
+    fun showLiveObservationOptInDialog(
+        context: Context,
+        theme: UiTheme,
+        companyName: String, //TODO after LO-https://glia.atlassian.net/browse/MOB-2270 release, it is possible to get company name by calling `Dependencies.getSdkConfigurationManager().companyName`
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener
+    ): AlertDialog {
+        // TODO refactor this block to match Custom Locales when https://glia.atlassian.net/browse/MOB-2270 released
+        //***************** Block Start
+        val title = context.getString(R.string.live_observation_confirm_title)
+        val message = context.getString(R.string.live_observation_confirm_message, companyName)
+        val positiveButtonText = context.getString(R.string.general_allow)
+        val negativeButtonText = context.getString(R.string.glia_dialog_cancel)
+        //***************** Block End
+
+        return showOptionsDialog(
+            context = context,
+            theme = theme,
+            title = title,
+            message = message,
+            positiveButtonText = positiveButtonText,
+            negativeButtonText = negativeButtonText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+        )
+    }
+
     @JvmOverloads
     fun showOptionsDialog(
         context: Context,
@@ -150,13 +177,13 @@ object Dialogs {
         negativeButtonText: String,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener,
-        cancelListener: DialogInterface.OnCancelListener,
+        cancelListener: DialogInterface.OnCancelListener? = null,
         isButtonsColorsReversed: Boolean = false
     ): AlertDialog {
         return showDialog(
-            context,
-            getOptionsAlertDialogLayout(theme, isButtonsColorsReversed),
-            theme.baseLightColor
+            context = context,
+            layoutRes = getOptionsAlertDialogLayout(theme, isButtonsColorsReversed),
+            backgroundTint = theme.baseLightColor
         ) {
             setOnCancelListener(cancelListener)
 

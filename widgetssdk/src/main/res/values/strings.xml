@@ -262,4 +262,9 @@
     <string name="gva_not_supported">This action is not currently supported on mobile.</string>
     <string name="gva_gallery_card_message_content_description">%1$s \n Card: %2$d of %3$d.</string><!--does not synchronized yet-->
 
+    <!--    LO, TODO refactor to match Custom Locales when https://glia.atlassian.net/browse/MOB-2270 released-->
+    <string name="live_observation_confirm_title">Before We Continue</string>
+    <string name="live_observation_confirm_message">Please allow the %1$s representative to view this application screen for improved support.</string>
+    <string name="general_allow">Allow</string>
+
 </resources>

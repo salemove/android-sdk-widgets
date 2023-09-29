@@ -5,6 +5,7 @@ import android.view.View
 import android.view.Window
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
@@ -36,13 +37,15 @@ internal class ActivityWatcherForChatHeadTest {
     private val onEngagementUseCase = Mockito.mock(GliaOnEngagementUseCase::class.java)
     private val isFromCallScreenUseCase = Mockito.mock(IsFromCallScreenUseCase::class.java)
     private val updateFromCallScreenUseCase = Mockito.mock(UpdateFromCallScreenUseCase::class.java)
+    private val isCallVisualizerUseCase = Mockito.mock(IsCallVisualizerUseCase::class.java)
     private val controller = ActivityWatcherForChatHeadController(
         serviceChatHeadController,
         applicationChatHeadController,
         screenSharingController,
         onEngagementUseCase,
         isFromCallScreenUseCase,
-        updateFromCallScreenUseCase
+        updateFromCallScreenUseCase,
+        isCallVisualizerUseCase
     )
     private val activity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)
@@ -60,6 +63,7 @@ internal class ActivityWatcherForChatHeadTest {
 
     @Test
     fun `onActivityResumed bubble is resumed when onScreenSharingStarted`() {
+        whenever(isCallVisualizerUseCase()).thenReturn(true)
         `onActivityResumed callbacks are set when call or chat are not active`()
         whenever(watcher.fetchGliaOrRootView()).thenReturn(view)
         controller.screenSharingViewCallback?.onScreenSharingRequestSuccess()

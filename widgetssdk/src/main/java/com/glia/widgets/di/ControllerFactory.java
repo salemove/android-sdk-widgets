@@ -359,7 +359,8 @@ public class ControllerFactory {
             activityWatcherforCallVisualizerController = new ActivityWatcherForCallVisualizerController(
                 getCallVisualizerController(),
                 getScreenSharingController(),
-                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase());
+                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
+                useCaseFactory.createIsCallVisualizerUseCase());
         }
         return activityWatcherforCallVisualizerController;
     }
@@ -372,7 +373,8 @@ public class ControllerFactory {
                 getScreenSharingController(),
                 useCaseFactory.createOnEngagementUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
-                useCaseFactory.createUpdateFromCallScreenUseCase());
+                useCaseFactory.createUpdateFromCallScreenUseCase(),
+                useCaseFactory.createIsCallVisualizerUseCase());
         }
         return activityWatcherForChatHeadController;
     }

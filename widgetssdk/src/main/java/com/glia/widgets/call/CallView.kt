@@ -306,7 +306,7 @@ internal class CallView(
             operatorStatusView.showTransferring()
             operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring_message))
         } else {
-            operatorNameView.text = stringProvider.getRemoteString(R.string.general_company_name)
+            operatorNameView.text = Dependencies.getSdkConfigurationManager().companyName
             operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
             handleOperatorStatusViewOperatorImage(state)
         }
@@ -561,7 +561,7 @@ internal class CallView(
         chatButtonLabel.text = stringProvider.getRemoteString(R.string.media_text_name)
         speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_button_speaker)
         minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
-        companyNameView.text = stringProvider.getRemoteString(R.string.general_company_name)
+        companyNameView.text = Dependencies.getSdkConfigurationManager().companyName
         videoButtonLabel.text = stringProvider.getRemoteString(R.string.media_video_name)
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)
@@ -972,9 +972,9 @@ internal class CallView(
                 StringKeyPair(StringKey.OPERATOR_NAME, callState.callStatus.formattedOperatorName),
                 StringKeyPair(StringKey.BADGE_VALUE, "")
             )
-            if (callState.companyName != null) { // TODO FIXME Make CompanyName configurable from remote strings
+            if (callState.companyName != null) {
                 companyNameView.text = callState.companyName
-                companyNameView.hint = stringProvider.getRemoteString(R.string.general_company_name)
+                companyNameView.hint = callState.companyName
                 msrView.text = stringProvider.getRemoteString(
                     R.string.android_call_queue_message
                 )

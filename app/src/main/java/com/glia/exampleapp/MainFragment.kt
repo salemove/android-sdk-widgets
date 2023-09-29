@@ -26,7 +26,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.fcm.GliaPushMessage
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.visitor.Authentication
-import com.glia.exampleapp.GliaWidgetsConfigManager.createDefaultConfig
+import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
@@ -218,8 +218,7 @@ class MainFragment : Fragment() {
 
     private fun setNavigationIntentData(intent: Intent) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        intent.putExtra(GliaWidgets.COMPANY_NAME, getCompanyNameFromPrefs(sharedPreferences))
-            .putExtra(GliaWidgets.QUEUE_ID, getQueueIdFromPrefs(sharedPreferences))
+        intent.putExtra(GliaWidgets.QUEUE_ID, getQueueIdFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
             .putExtra(GliaWidgets.USE_OVERLAY, getUseOverlay(sharedPreferences))

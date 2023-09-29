@@ -16,7 +16,7 @@ import com.glia.widgets.UiTheme
  * glia://widgets/secret?site_id={site_id}&api_key_secret={api_key_secret}&api_key_id={api_key_id}&queue_id={queue_id}&visitor_context_asset_id={visitor_context_asset_id}
  * where all query params are mandatory except visitor_context_asset_id
  */
-object GliaWidgetsConfigManager {
+object ExampleAppConfigManager {
     private const val SECRET_KEY = "secret"
     private const val SITE_ID_KEY = "site_id"
     private const val API_KEY_SECRET_KEY = "api_key_secret"

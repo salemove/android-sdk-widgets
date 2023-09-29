@@ -151,6 +151,11 @@ public class DialogController {
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_UNAUTHENTICATED));
     }
 
+    public void showLiveObservationOptInDialog() {
+        Logger.d(TAG, "Show Live Observation Opt In Dialog");
+        dialogManager.addAndEmit(new DialogState(Dialog.MODE_LIVE_OBSERVATION_OPT_IN));
+    }
+
     public void addCallback(Callback callback) {
         Logger.d(TAG, "addCallback");
         viewCallbacks.add(callback);

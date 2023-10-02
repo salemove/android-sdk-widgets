@@ -10,6 +10,7 @@ import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.domain.gva.IsGvaUseCase
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.OperatorChatItem
+import com.glia.widgets.chat.model.ServerChatItem
 import com.glia.widgets.chat.model.VisitorChatItem
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
@@ -67,7 +68,7 @@ internal class AppendNewOperatorMessageUseCase(
             else -> appendNewResponseCardOrTextItemUseCase(state.chatItems, chatMessageInternal)
         }
 
-        state.apply { addedMessagesCount = chatItems.count() - itemsCount }
+        state.apply { addedMessagesCount = chatItems.count { it is ServerChatItem || it is VisitorChatItem } - itemsCount }
 
 
         val lastMessageWithVisibleOperatorImage = state.lastMessageWithVisibleOperatorImage

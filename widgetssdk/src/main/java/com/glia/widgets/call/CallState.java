@@ -26,23 +26,25 @@ class CallState {
     public final boolean isOnlyTimeChanged;
     public final boolean isCallVisualizer;
 
-    @NonNull
-    @Override
-    public String toString() {
-        return "CallState{" +
-                "integratorCallStarted=" + integratorCallStarted +
-                ", isVisible=" + isVisible +
-                ", messagesNotSeen=" + messagesNotSeen +
-                ", callStatus=" + callStatus +
-                ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
-                ", isMuted=" + isMuted +
-                ", hasVideo=" + hasVideo +
-                ", companyName: " + companyName +
-                ", requestedMediaType: " + requestedMediaType +
-                ", isSpeakerOn: " + isSpeakerOn +
-                ", isOnHold: " + isOnHold +
-                ", isCallVisualizer: " + isCallVisualizer +
-                '}';
+    public final String queueId;
+    public final String visitorContextAssetId;
+
+    private CallState(Builder builder) {
+        this.integratorCallStarted = builder.integratorCallStarted;
+        this.isVisible = builder.isVisible;
+        this.messagesNotSeen = builder.messagesNotSeen;
+        this.callStatus = builder.callStatus;
+        this.landscapeLayoutControlsVisible = builder.landscapeLayoutControlsVisible;
+        this.isMuted = builder.isMuted;
+        this.hasVideo = builder.hasVideo;
+        this.companyName = builder.companyName;
+        this.requestedMediaType = builder.requestedMediaType;
+        this.isSpeakerOn = builder.isSpeakerOn;
+        this.isOnHold = builder.isOnHold;
+        this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
+        this.isCallVisualizer = builder.isCallVisualizer;
+        this.queueId = builder.queueId;
+        this.visitorContextAssetId = builder.visitorContextAssetId;
     }
 
     @Override
@@ -51,8 +53,8 @@ class CallState {
         if (o == null || getClass() != o.getClass()) return false;
         CallState callState = (CallState) o;
         return integratorCallStarted == callState.integratorCallStarted &&
-                isVisible == callState.isVisible &&
-                messagesNotSeen == callState.messagesNotSeen &&
+            isVisible == callState.isVisible &&
+            messagesNotSeen == callState.messagesNotSeen &&
                 landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
                 isMuted == callState.isMuted &&
                 hasVideo == callState.hasVideo &&
@@ -117,25 +119,33 @@ class CallState {
         return callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted;
     }
 
-    public CallState initCall(String companyName, Engagement.MediaType requestedMediaType) {
-        return new Builder()
-                .copyFrom(this)
-                .setIntegratorCallStarted(true)
-                .setVisible(true)
-                .setIsOnHold(false)
-                .setCompanyName(companyName)
-                .setRequestedMediaType(requestedMediaType)
-                .createCallState();
+    @NonNull
+    @Override
+    public String toString() {
+        return "CallState{" +
+            "integratorCallStarted=" + integratorCallStarted +
+            ", isVisible=" + isVisible +
+            ", messagesNotSeen=" + messagesNotSeen +
+            ", callStatus=" + callStatus +
+            ", landscapeLayoutControlsVisible=" + landscapeLayoutControlsVisible +
+            ", isMuted=" + isMuted +
+            ", hasVideo=" + hasVideo +
+            ", companyName: " + companyName +
+            ", requestedMediaType: " + requestedMediaType +
+            ", isSpeakerOn: " + isSpeakerOn +
+            ", isOnHold: " + isOnHold +
+            ", isCallVisualizer: " + isCallVisualizer +
+            '}';
     }
 
     public CallState stop() {
         return new Builder()
-                .copyFrom(this)
-                .setIntegratorCallStarted(false)
-                .setVisible(false)
-                .setIsOnHold(false)
-                .setCallStatus(new CallStatus.EngagementNotOngoing(callStatus.getVisitorMediaState()))
-                .createCallState();
+            .copyFrom(this)
+            .setIntegratorCallStarted(false)
+            .setVisible(false)
+            .setIsOnHold(false)
+            .setCallStatus(new CallStatus.EngagementNotOngoing(callStatus.getVisitorMediaState()))
+            .createCallState();
     }
 
     public CallState changeNumberOfMessages(int numberOfMessages) {
@@ -403,14 +413,27 @@ class CallState {
 
     private boolean isVisitorVideoPlaying(VisitorMediaState visitorMediaState) {
         return visitorMediaState != null &&
-                visitorMediaState.getVideo() != null &&
-                visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
+            visitorMediaState.getVideo() != null &&
+            visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
     }
 
     private boolean isMuted(VisitorMediaState visitorMediaState) {
         return visitorMediaState == null ||
-                visitorMediaState.getAudio() == null ||
-                visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
+            visitorMediaState.getAudio() == null ||
+            visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
+    }
+
+    public CallState initCall(String companyName, String queueId, String visitorContextAssetId, Engagement.MediaType requestedMediaType) {
+        return new Builder()
+            .copyFrom(this)
+            .setIntegratorCallStarted(true)
+            .setVisible(true)
+            .setIsOnHold(false)
+            .setCompanyName(companyName)
+            .setQueueId(queueId)
+            .setVisitorContextAssetId(visitorContextAssetId)
+            .setRequestedMediaType(requestedMediaType)
+            .createCallState();
     }
 
     public static class Builder {
@@ -428,6 +451,8 @@ class CallState {
         //May be helpful when converting to Kotlin, as android studio makes fields nullable.
         private boolean isOnlyTimeChanged = false;
         private boolean isCallVisualizer;
+        private String queueId;
+        private String visitorContextAssetId;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -494,6 +519,16 @@ class CallState {
             return this;
         }
 
+        public Builder setQueueId(String queueId) {
+            this.queueId = queueId;
+            return this;
+        }
+
+        public Builder setVisitorContextAssetId(String visitorContextAssetId) {
+            this.visitorContextAssetId = visitorContextAssetId;
+            return this;
+        }
+
         public Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
@@ -509,28 +544,14 @@ class CallState {
             //as we are updating this field only when only time is changed, so needs to make it false every time.
             isOnlyTimeChanged = false;
             isCallVisualizer = callState.isCallVisualizer;
+            queueId = callState.queueId;
+            visitorContextAssetId = callState.visitorContextAssetId;
             return this;
         }
 
         public CallState createCallState() {
             return new CallState(this);
         }
-    }
-
-    private CallState(Builder builder) {
-        this.integratorCallStarted = builder.integratorCallStarted;
-        this.isVisible = builder.isVisible;
-        this.messagesNotSeen = builder.messagesNotSeen;
-        this.callStatus = builder.callStatus;
-        this.landscapeLayoutControlsVisible = builder.landscapeLayoutControlsVisible;
-        this.isMuted = builder.isMuted;
-        this.hasVideo = builder.hasVideo;
-        this.companyName = builder.companyName;
-        this.requestedMediaType = builder.requestedMediaType;
-        this.isSpeakerOn = builder.isSpeakerOn;
-        this.isOnHold = builder.isOnHold;
-        this.isOnlyTimeChanged = builder.isOnlyTimeChanged;
-        this.isCallVisualizer = builder.isCallVisualizer;
     }
 
     public enum ViewState {

@@ -6,13 +6,13 @@ import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShow
 import com.glia.widgets.core.dialog.model.DialogState;
 import com.glia.widgets.helper.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DialogController {
     private final static String TAG = "DialogController";
 
-    private final List<Callback> viewCallbacks = new ArrayList<>();
+    private final Set<Callback> viewCallbacks = new HashSet<>();
 
     private final SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase;
     private final SetEnableCallNotificationChannelDialogShownUseCase setEnableCallNotificationChannelDialogShownUseCase;

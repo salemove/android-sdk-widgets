@@ -261,6 +261,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     ) {
         Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
         Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
+        dialogController?.addCallback(dialogCallback)
         controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
         serviceChatHeadController?.init()
     }
@@ -503,7 +504,35 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             override fun requestOpenEmailClient(uri: Uri) {
                 this@ChatView.requestOpenEmailClient(uri)
             }
+
+            override fun showLiveObservationOptInDialog(companyName: String) {
+                this@ChatView.showLiveObservationOptInDialog(companyName)
+            }
         }
+    }
+
+    private fun showLiveObservationOptInDialog(companyName: String) {
+        if (alertDialog?.isShowing == true) return
+
+        alertDialog = Dialogs.showLiveObservationOptInDialog(
+            context = context,
+            theme = theme,
+            companyName = companyName,
+            positiveButtonClickListener = { onLiveObservationOptInDialogAllowed() },
+            negativeButtonClickListener = { onLiveObservationOptInDialogDismissed() }
+        )
+    }
+
+    private fun onLiveObservationOptInDialogAllowed() {
+        dismissAlertDialog()
+        controller?.onLiveObservationDialogAllowed()
+    }
+
+    private fun onLiveObservationOptInDialogDismissed() {
+        dismissAlertDialog()
+        controller?.onLiveObservationDialogRejected()
+        onEndListener?.onEnd()
+        chatEnded()
     }
 
     private fun requestOpenEmailClient(uri: Uri) {
@@ -572,6 +601,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
                     showAllowScreenSharingNotificationsAndStartSharingDialog()
                 }
+
+                Dialog.MODE_LIVE_OBSERVATION_OPT_IN -> post { controller?.onLiveObservationOptInDialogRequested() }
 
                 Dialog.MODE_VISITOR_CODE -> {
                     Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
@@ -979,6 +1010,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         neutralButtonClickListener: OnClickListener,
         cancelListener: DialogInterface.OnCancelListener
     ) {
+        dismissAlertDialog()
         alertDialog = Dialogs.showOptionsDialog(
             context = this.context,
             theme = theme,
@@ -1081,10 +1113,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (resultCode != Activity.RESULT_OK) return
         when (requestCode) {
-            OPEN_DOCUMENT_ACTION_REQUEST, CAPTURE_VIDEO_ACTION_REQUEST -> handleDocumentOrVideoActionResult(
-                intent
-            )
-
+            OPEN_DOCUMENT_ACTION_REQUEST, CAPTURE_VIDEO_ACTION_REQUEST -> handleDocumentOrVideoActionResult(intent)
             CAPTURE_IMAGE_ACTION_REQUEST -> handleCaptureImageActionResult()
         }
     }
@@ -1302,7 +1331,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.apply {
             chatRecyclerView.updatePadding(bottom = dialogHeight)
             chatRecyclerView.scrollBy(0, dialogHeight)
-            groupChatControls.isGone = true
+            chatMessageLayout.isGone = true
             operatorTypingAnimationView.isGone = true
         }
     }

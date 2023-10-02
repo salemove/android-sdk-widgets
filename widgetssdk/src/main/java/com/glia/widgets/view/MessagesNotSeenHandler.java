@@ -1,12 +1,16 @@
 package com.glia.widgets.view;
 
+import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.chat.domain.GliaOnMessageUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal;
 import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listener {
 
@@ -16,6 +20,7 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
     private final List<MessagesNotSeenHandlerListener> listeners = new ArrayList<>();
     private int count = 0;
     private boolean isCounting = false;
+    private final Set<String> messageIds = new HashSet<>();
 
     public MessagesNotSeenHandler(
             GliaOnMessageUseCase gliaOnMessageUseCase,
@@ -32,13 +37,13 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
 
     public void chatOnBackClicked() {
         Logger.d(TAG, "chatOnBackClicked");
-        emitCount(0);
+        reset();
         isCounting = true;
     }
 
     public void callChatButtonClicked() {
         Logger.d(TAG, "callChatButtonClicked");
-        emitCount(0);
+        reset();
         isCounting = false;
     }
 
@@ -53,7 +58,7 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
     }
 
     public void chatUpgradeOfferAccepted() {
-        emitCount(0);
+        reset();
     }
 
     public void addListener(MessagesNotSeenHandlerListener listener) {
@@ -91,13 +96,26 @@ public class MessagesNotSeenHandler implements GliaOnEngagementEndUseCase.Listen
 
     @Override
     public void engagementEnded() {
+        reset();
+    }
+
+    private void reset() {
         emitCount(0);
+        messageIds.clear();
     }
 
     public void onMessage(ChatMessageInternal messageInternal) {
-        if (isCounting && messageInternal.isNotVisitor()) {
+        if (isCounting && messageInternal.isNotVisitor() && isNew(messageInternal)) {
             emitCount(count + 1);
         }
+    }
+
+    private boolean isNew(ChatMessageInternal messageInternal) {
+        return Optional.ofNullable(messageInternal)
+            .map(ChatMessageInternal::getChatMessage)
+            .map(ChatMessage::getId)
+            .map(messageIds::add)
+            .orElse(false);
     }
 
     public void onDestroy() {

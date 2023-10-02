@@ -29,7 +29,6 @@ import io.reactivex.Single
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.processors.BehaviorProcessor
-import io.reactivex.processors.PublishProcessor
 import io.reactivex.schedulers.Schedulers
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -70,7 +69,7 @@ class ChatManagerTest {
     private lateinit var compositeDisposable: CompositeDisposable
     private lateinit var stateProcessor: BehaviorProcessor<ChatManager.State>
     private lateinit var quickReplies: BehaviorProcessor<List<GvaButton>>
-    private lateinit var action: PublishProcessor<ChatManager.Action>
+    private lateinit var action: BehaviorProcessor<ChatManager.Action>
 
     @Before
     fun setUp() {
@@ -87,7 +86,7 @@ class ChatManagerTest {
         compositeDisposable = spy()
         stateProcessor = spy(BehaviorProcessor.create())
         quickReplies = BehaviorProcessor.create()
-        action = PublishProcessor.create()
+        action = BehaviorProcessor.create()
 
         subjectUnderTest = spy(
             ChatManager(

@@ -156,10 +156,4 @@
             tools:tint="@color/glia_brand_primary_color" />
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_chat_controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:constraint_referenced_ids="divider_view, add_attachment_queue, chat_message_layout" />
-
 </merge>

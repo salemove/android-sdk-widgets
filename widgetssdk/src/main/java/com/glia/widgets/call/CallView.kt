@@ -267,6 +267,8 @@ internal class CallView(
                 Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
                     showAllowScreenSharingNotificationsAndStartSharingDialog()
                 }
+
+                Dialog.MODE_LIVE_OBSERVATION_OPT_IN -> post { callController?.onLiveObservationDialogRequested() }
                 Dialog.MODE_VISITOR_CODE -> {
                     Logger.e(TAG, "DialogController callback in CallView with MODE_VISITOR_CODE")
                 } // Should never happen inside CallView
@@ -784,6 +786,25 @@ internal class CallView(
             callController?.unexpectedErrorDialogDismissed()
             onEndListener?.onEnd()
         }
+    }
+
+    override fun showLiveObservationOptInDialog(companyName: String) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showLiveObservationOptInDialog(
+            context = context,
+            theme = theme,
+            companyName = companyName,
+            positiveButtonClickListener = {
+                dismissAlertDialog()
+                callController?.onLiveObservationDialogAllowed()
+            },
+            negativeButtonClickListener = {
+                dismissAlertDialog()
+                callController?.onLiveObservationDialogRejected()
+                onEndListener?.onEnd()
+                callEnded()
+            }
+        )
     }
 
     private fun showOverlayPermissionsDialog() {

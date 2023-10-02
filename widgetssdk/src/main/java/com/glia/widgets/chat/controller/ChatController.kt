@@ -37,7 +37,6 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
-import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
@@ -258,6 +257,24 @@ internal class ChatController(
         updateAllowFileSendState()
     }
 
+    fun onLiveObservationOptInDialogRequested() {
+        if (isOngoingEngagementUseCase()) return
+        viewCallback?.showLiveObservationOptInDialog(chatState.companyName.orEmpty())
+    }
+
+    fun onLiveObservationDialogAllowed() {
+        Logger.d(TAG, "onLiveObservationDialogAllowed")
+        dialogController.dismissCurrentDialog()
+        queueForEngagement()
+    }
+
+    fun onLiveObservationDialogRejected() {
+        Logger.d(TAG, "onLiveObservationDialogRejected")
+        isVisitorEndEngagement = true
+        stop()
+        dialogController.dismissDialogs()
+    }
+
     private fun queueForEngagement() {
         disposable.add(
             queueForChatEngagementUseCase
@@ -353,7 +370,7 @@ internal class ChatController(
     private fun onSendMessageOperatorOffline(message: Unsent) {
         appendUnsentMessage(message)
         if (!chatState.engagementRequested) {
-            queueForEngagement()
+            viewInitPreQueueing()
         }
     }
 
@@ -645,17 +662,15 @@ internal class ChatController(
         }
     }
 
-    private fun viewInitQueueing() {
-        Logger.d(TAG, "viewInitQueueing")
+    private fun viewInitPreQueueing() {
+        Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
-        emitViewState { chatState.queueingStarted() }
+        dialogController.showLiveObservationOptInDialog()
     }
 
-    private fun updateQueueing(items: MutableList<ChatItem>) {
-        (chatState.operatorStatusItem as? OperatorStatusItem.InQueue)?.also {
-            items.remove(it)
-            items.add(OperatorStatusItem.InQueue(chatState.companyName))
-        }
+    private fun viewInitQueueing() {
+        Logger.d(TAG, "viewInitQueueing")
+        emitViewState { chatState.queueingStarted() }
     }
 
     private fun destroyView() {
@@ -820,7 +835,7 @@ internal class ChatController(
 
         if (!hasHistory) {
             if (!chatState.engagementRequested && !isSecureEngagement) {
-                queueForEngagement()
+                viewInitPreQueueing()
             } else {
                 Logger.d(TAG, "Opened empty Secure Conversations chat")
             }

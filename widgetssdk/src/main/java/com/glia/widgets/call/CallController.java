@@ -297,26 +297,48 @@ public class CallController implements
         if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog()) {
             return;
         }
-        emitViewState(callState.initCall(companyName, mediaType));
+        emitViewState(callState.initCall(companyName, queueId, visitorContextAssetId, mediaType));
         createNewTimerStatusCallback();
         initControllerCallbacks();
         initMessagesNotSeenCallback();
         onEngagementUseCase.execute(this);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
-        disposable.add(
-                gliaQueueForMediaEngagementUseCase
-                        .execute(queueId, visitorContextAssetId, mediaType)
-                        .subscribe(
-                                this::queueForEngagementStarted,
-                                this::queueForEngagementError
-                        )
-        );
+        dialogController.showLiveObservationOptInDialog();
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
         connectingTimerCounter.addRawValueListener(connectingTimerStatusListener);
         minimizeHandler.addListener(this::minimizeView);
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener);
+    }
+
+    public void onLiveObservationDialogRequested() {
+        if (isOngoingEngagementUseCase.invoke()) return;
+        viewCallback.showLiveObservationOptInDialog(callState.companyName);
+    }
+
+    private void queueForEngagement(String queueId, String visitorContextAssetId, Engagement.MediaType mediaType) {
+        disposable.add(
+            gliaQueueForMediaEngagementUseCase
+                .execute(queueId, visitorContextAssetId, mediaType)
+                .subscribe(
+                    this::queueForEngagementStarted,
+                    this::queueForEngagementError
+                )
+        );
+    }
+
+    public void onLiveObservationDialogAllowed() {
+        Logger.d(TAG, "onLiveObservationDialogAllowed");
+        dialogController.dismissCurrentDialog();
+        queueForEngagement(callState.queueId, callState.visitorContextAssetId, callState.requestedMediaType);
+    }
+
+    public void onLiveObservationDialogRejected() {
+        Logger.d(TAG, "onLiveObservationDialogRejected");
+        isVisitorEndEngagement = true;
+        stop();
+        dialogController.dismissDialogs();
     }
 
     public void onDestroy(boolean retain) {
@@ -684,8 +706,7 @@ public class CallController implements
     }
 
     private void initMessagesNotSeenCallback() {
-        messagesNotSeenHandlerListener = count ->
-                emitViewState(callState.changeNumberOfMessages(count));
+        messagesNotSeenHandlerListener = count -> emitViewState(callState.changeNumberOfMessages(count));
     }
 
     private void showUpgradeAudioDialog(MediaUpgradeOffer mediaUpgradeOffer) {

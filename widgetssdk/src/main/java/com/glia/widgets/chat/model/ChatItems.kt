@@ -104,16 +104,6 @@ internal sealed class OperatorMessageItem : OperatorChatItem(ChatAdapter.OPERATO
         override val content: String?
     ) : OperatorMessageItem() {
         override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
-
-        fun asPlainText(): PlainText = PlainText(
-            id = id,
-            timestamp = timestamp,
-            showChatHead = showChatHead,
-            operatorProfileImgUrl = operatorProfileImgUrl,
-            operatorId = operatorId,
-            operatorName = operatorName,
-            content = content
-        )
     }
 
     data class ResponseCard(

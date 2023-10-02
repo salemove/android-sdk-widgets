@@ -33,7 +33,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.processors.BehaviorProcessor
-import io.reactivex.processors.PublishProcessor
 import io.reactivex.schedulers.Schedulers
 
 internal class ChatManager constructor(
@@ -47,9 +46,9 @@ internal class ChatManager constructor(
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
-    private val state: BehaviorProcessor<State> = BehaviorProcessor.create(),
+    private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
-    private val action: PublishProcessor<Action> = PublishProcessor.create()
+    private val action: BehaviorProcessor<Action> = BehaviorProcessor.create()
 ) {
     fun initialize(
         onHistoryLoaded: (hasHistory: Boolean) -> Unit,
@@ -74,6 +73,7 @@ internal class ChatManager constructor(
         state.onNext(State())
         quickReplies.onNext(emptyList())
         compositeDisposable.clear()
+        action.onNext(Action.None)
     }
 
     fun onChatAction(action: Action) {
@@ -179,7 +179,7 @@ internal class ChatManager constructor(
             Action.OnMediaUpgradeCanceled -> mapMediaUpgradeCanceled(state)
             is Action.OnMediaUpgradeTimerUpdated -> mapMediaUpgradeTimerUpdated(action.formattedValue, state)
             is Action.CustomCardClicked -> mapCustomCardClicked(action, state)
-            Action.ChatRestored -> state
+            Action.ChatRestored, Action.None -> state
             is Action.MessageSent -> mapMessageSent(action.message, state)
         }
     }
@@ -354,6 +354,7 @@ internal class ChatManager constructor(
         object OnMediaUpgradeCanceled : Action
         data class CustomCardClicked(val customCard: CustomCardChatItem, val attachment: SingleChoiceAttachment) : Action
         object ChatRestored : Action
+        object None : Action
         data class MessageSent(val message: VisitorMessage) : Action
     }
 }

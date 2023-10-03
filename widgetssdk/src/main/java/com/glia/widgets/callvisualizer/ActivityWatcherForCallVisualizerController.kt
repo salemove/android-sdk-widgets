@@ -14,6 +14,7 @@ import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
+import com.glia.widgets.core.dialog.Dialog.MODE_LIVE_OBSERVATION_OPT_IN
 import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
 import com.glia.widgets.core.dialog.Dialog.MODE_NONE
 import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
@@ -121,6 +122,7 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.showAllowScreenSharingNotificationsAndStartSharingDialog()
             MODE_VISITOR_CODE -> watcher.showVisitorCodeDialog()
             MODE_START_SCREEN_SHARING -> watcher.showScreenSharingDialog()
+            MODE_LIVE_OBSERVATION_OPT_IN -> watcher.showLiveObservationOptInDialog()
             else -> {
                 Logger.d(TAG, "Unexpected dialog mode received - ${state.mode}")
             }
@@ -139,6 +141,8 @@ internal class ActivityWatcherForCallVisualizerController(
                 watcher.dismissOverlayDialog()
                 watcher.openOverlayPermissionView()
             }
+
+            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onLiveObservationOptInDialogAllowed()
             else -> Logger.d(TAG, "Not relevant")
         }
         watcher.removeDialogFromStack()
@@ -155,11 +159,14 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_OVERLAY_PERMISSION -> {
                 watcher.dismissOverlayDialog()
             }
+
             MODE_MEDIA_UPGRADE -> {
                 mediaUpgradeOffer?.decline { error ->
                     onMediaUpgradeDecline(error)
                 }
             }
+
+            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onLiveObservationOptInDialogRejected()
             MODE_VISITOR_CODE,
             MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
         }

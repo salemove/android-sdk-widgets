@@ -12,4 +12,8 @@ interface CallVisualizerCallback {
         mediaUpgradeOffer: MediaUpgradeOffer,
         operatorNameFormatted: String
     )
+
+    fun onEngagementRequested()
+    fun onLiveObservationOptInDialogAllowed()
+    fun onLiveObservationOptInDialogRejected()
 }

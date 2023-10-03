@@ -55,6 +55,19 @@ internal class CallVisualizerController(
         dialogController.showUpgradeVideoDialog2Way(mediaUpgradeOffer, operatorNameFormatted)
     }
 
+    override fun onEngagementRequested() {
+        dialogController.dismissVisitorCodeDialog()
+        dialogController.showLiveObservationOptInDialog()
+    }
+
+    override fun onLiveObservationOptInDialogAllowed() {
+        callVisualizerRepository.onLiveObservationDialogAllowed()
+    }
+
+    override fun onLiveObservationOptInDialogRejected() {
+        callVisualizerRepository.onLiveObservationDialogRejected()
+    }
+
     override fun onSurveyLoaded(survey: Survey?) {
         // Call Visualizer doesn't suppose to have a Survey,
         // so just destroying controllers

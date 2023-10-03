@@ -1,7 +1,6 @@
 package com.glia.widgets.callvisualizer
 
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaDirection
@@ -18,10 +17,11 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
 
     private lateinit var callback: CallVisualizerCallback
     private var visitorContext: String? = null
+    private var engagementRequest: IncomingEngagementRequest? = null
 
     fun init(callVisualizerCallback: CallVisualizerCallback) {
         this.callback = callVisualizerCallback
-        autoAcceptEngagementRequest()
+        observeEngagementRequest()
         showDialogOnMediaUpgradeRequest()
         Logger.d(TAG, "CallVisualizerRepository initialized")
     }
@@ -42,16 +42,34 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
         }
     }
 
-    private fun autoAcceptEngagementRequest() {
-        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST) { engagementRequest: IncomingEngagementRequest ->
-            val onResult = Consumer { error: GliaException? ->
-                if (error != null) {
-                    Logger.e(TAG, "Error during accepting engagement request, reason" + error.message)
-                } else {
-                    Logger.i(TAG, "Incoming Call Visualizer engagement auto accepted")
-                }
+    fun onLiveObservationDialogAllowed() {
+        Logger.d(TAG, "onLiveObservationDialogAllowed")
+
+        engagementRequest?.accept(visitorContext) {
+            if (it != null) {
+                Logger.e(TAG, "Error during accepting engagement request, reason" + it.message)
+            } else {
+                Logger.i(TAG, "Incoming Call Visualizer engagement auto accepted")
             }
-            engagementRequest.accept(visitorContext ?: null as String?, onResult)
+        }
+    }
+
+    fun onLiveObservationDialogRejected() {
+        Logger.d(TAG, "onLiveObservationDialogRejected")
+
+        engagementRequest?.decline {
+            if (it != null) {
+                Logger.e(TAG, "Error during declining engagement request, reason" + it.message)
+            } else {
+                Logger.i(TAG, "Incoming Call Visualizer engagement auto rejected")
+            }
+        }
+    }
+
+    private fun observeEngagementRequest() {
+        gliaCore.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST) { engagementRequest: IncomingEngagementRequest ->
+            this.engagementRequest = engagementRequest
+            callback.onEngagementRequested()
         }
     }
 

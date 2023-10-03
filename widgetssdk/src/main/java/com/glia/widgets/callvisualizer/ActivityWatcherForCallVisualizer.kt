@@ -1,9 +1,11 @@
 package com.glia.widgets.callvisualizer
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
@@ -37,6 +39,7 @@ import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.Dialogs
 import java.lang.ref.WeakReference
 
+@SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizer(
     private val dialogController: DialogController,
     val controller: ActivityWatcherForCallVisualizerContract.Controller
@@ -50,18 +53,18 @@ internal class ActivityWatcherForCallVisualizer(
         controller.setWatcher(this)
     }
 
-    var alertDialog: AlertDialog? = null
-    val dialogCallback: DialogController.Callback = DialogController.Callback {
+    private var alertDialog: AlertDialog? = null
+    private val dialogCallback: DialogController.Callback = DialogController.Callback {
         controller.onDialogControllerCallback(it)
     }
-    var cameraPermissionLauncher: ActivityResultLauncher<String>? = null
-    var overlayPermissionLauncher: ActivityResultLauncher<String>? = null
+    private var cameraPermissionLauncher: ActivityResultLauncher<String>? = null
+    private var overlayPermissionLauncher: ActivityResultLauncher<String>? = null
 
     /**
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
      * @return Currently resumed activity.
      */
-    var resumedActivity: WeakReference<Activity?> = WeakReference(null)
+    private var resumedActivity: WeakReference<Activity?> = WeakReference(null)
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         super.onActivityCreated(activity, savedInstanceState)
@@ -124,8 +127,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     private fun registerForCameraPermissionResult(activity: Activity) {
         (activity as? ComponentActivity?)?.let { componentActivity ->
-            cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
-                    isGranted: Boolean ->
+            cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
                 controller.setIsWaitingMediaProjectionResult(false)
                 controller.onRequestedCameraPermissionResult(isGranted)
             }
@@ -138,8 +140,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     private fun registerForOverlayPermissionResult(activity: Activity) {
         (activity as? ComponentActivity?)?.let { componentActivity ->
-            overlayPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) {
-                    isGranted: Boolean ->
+            overlayPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
                 controller.setIsWaitingMediaProjectionResult(false)
                 controller.onMediaProjectionPermissionResult(isGranted, componentActivity)
             }
@@ -229,29 +230,28 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showAllowNotificationsDialog() {
-        val activity = resumedActivity.get() ?: return
-        if (alertDialog != null && alertDialog!!.isShowing) {
-            return
+        showAlertDialogOnUiThreadWithStyledContext(
+            "Show allow notifications dialog",
+            UiTheme.UiThemeBuilder().build()
+        ) { context, uiTheme, activity ->
+            alertDialog = Dialogs.showOptionsDialog(
+                context = context,
+                theme = uiTheme,
+                title = activity.getString(R.string.glia_dialog_allow_notifications_title),
+                message = activity.getString(R.string.glia_dialog_allow_notifications_message),
+                positiveButtonText = activity.getString(R.string.glia_dialog_allow_notifications_yes),
+                negativeButtonText = activity.getString(R.string.glia_dialog_allow_notifications_no),
+                positiveButtonClickListener = {
+                    controller.onPositiveDialogButtonClicked()
+                },
+                negativeButtonClickListener = {
+                    controller.onNegativeDialogButtonClicked()
+                },
+                cancelListener = {
+                    controller.onNegativeDialogButtonClicked()
+                }
+            )
         }
-        Logger.d(TAG, "Show allow notifications dialog")
-        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-        alertDialog = Dialogs.showOptionsDialog(
-            context = contextWithStyle,
-            theme = UiTheme.UiThemeBuilder().build(),
-            title = activity.getString(R.string.glia_dialog_allow_notifications_title),
-            message = activity.getString(R.string.glia_dialog_allow_notifications_message),
-            positiveButtonText = activity.getString(R.string.glia_dialog_allow_notifications_yes),
-            negativeButtonText = activity.getString(R.string.glia_dialog_allow_notifications_no),
-            positiveButtonClickListener = {
-                controller.onPositiveDialogButtonClicked()
-            },
-            negativeButtonClickListener = {
-                controller.onNegativeDialogButtonClicked()
-            },
-            cancelListener = {
-                controller.onNegativeDialogButtonClicked()
-            }
-        )
     }
 
     override fun openNotificationChannelScreen() {
@@ -259,17 +259,13 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
-        val activity = resumedActivity.get() ?: return
-        if (alertDialog != null && alertDialog!!.isShowing) {
-            return
-        }
-        Logger.d(TAG, "Show screen sharing and notifications dialog")
-        val theme = UiTheme.UiThemeBuilder().build()
-        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-        activity.runOnUiThread {
+        showAlertDialogOnUiThreadWithStyledContext(
+            "Show screen sharing and notifications dialog",
+            UiTheme.UiThemeBuilder().build()
+        ) { context, uiTheme, activity ->
             alertDialog = Dialogs.showOptionsDialog(
-                context = contextWithStyle,
-                theme = theme,
+                context = context,
+                theme = uiTheme,
                 title = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
                 message = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
                 positiveButtonText = activity.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
@@ -288,15 +284,13 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showOverlayPermissionsDialog() {
-        val activity = resumedActivity.get() ?: return
-        if (alertDialog != null && alertDialog!!.isShowing) {
-            return
-        }
-        activity.runOnUiThread {
-            Logger.d(TAG, "Show overlay permissions dialog")
+        showAlertDialogOnUiThreadWithStyledContext(
+            "Show overlay permissions dialog",
+            UiTheme.UiThemeBuilder().build()
+        ) { context, uiTheme, activity ->
             alertDialog = Dialogs.showOptionsDialog(
-                activity.wrapWithMaterialThemeOverlay(),
-                UiTheme.UiThemeBuilder().build(),
+                context,
+                uiTheme,
                 activity.getString(R.string.glia_dialog_overlay_permissions_title),
                 activity.getString(R.string.glia_dialog_overlay_permissions_message),
                 activity.getString(R.string.glia_dialog_overlay_permissions_ok),
@@ -315,18 +309,10 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showScreenSharingDialog() {
-        val activity = resumedActivity.get() ?: return
-        if (alertDialog != null && alertDialog!!.isShowing) {
-            return
-        }
-        activity.runOnUiThread {
-            Logger.d(TAG, "Show screen sharing dialog")
-            val theme = getRuntimeTheme(activity)
-            val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-
+        showAlertDialogOnUiThreadWithStyledContext("Show screen sharing dialog") { context, uiTheme, activity ->
             alertDialog = Dialogs.showScreenSharingDialog(
-                contextWithStyle,
-                theme,
+                context,
+                uiTheme,
                 activity.getString(R.string.glia_dialog_screen_sharing_offer_title),
                 activity.getString(R.string.glia_dialog_screen_sharing_offer_message),
                 R.string.glia_dialog_screen_sharing_offer_accept,
@@ -339,21 +325,43 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade) {
-        val activity = resumedActivity.get() ?: return
-        if (alertDialog != null && alertDialog!!.isShowing) {
-            return
-        }
-        activity.runOnUiThread {
-            Logger.d(TAG, "Show upgrade dialog")
-            val theme = getRuntimeTheme(activity)
-            val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-
-            alertDialog = Dialogs.showUpgradeDialog(contextWithStyle, theme, mediaUpgrade, {
+        showAlertDialogOnUiThreadWithStyledContext("Show upgrade dialog") { context, uiTheme, _ ->
+            alertDialog = Dialogs.showUpgradeDialog(context, uiTheme, mediaUpgrade, {
                 controller.onMediaUpgradeReceived(mediaUpgrade.mediaUpgradeOffer)
                 dialogController.dismissCurrentDialog()
             }) {
                 controller.onNegativeDialogButtonClicked()
             }
+        }
+    }
+
+    private fun showAlertDialogOnUiThreadWithStyledContext(
+        logMessage: String? = null,
+        uiTheme: UiTheme? = null,
+        callback: (Context, UiTheme, Activity) -> Unit
+    ) {
+        if (alertDialog != null && alertDialog!!.isShowing) {
+            return
+        }
+
+        resumedActivity.get()?.apply {
+            runOnUiThread {
+                logMessage?.let { Logger.d(TAG, it) }
+                callback(wrapWithMaterialThemeOverlay(), uiTheme ?: getRuntimeTheme(this), this)
+            }
+        }
+    }
+
+    override fun showLiveObservationOptInDialog() {
+        val companyName = Dependencies.getSdkConfigurationManager().companyName
+        showAlertDialogOnUiThreadWithStyledContext("Show live observation opt in dialog") { context, uiTheme, _ ->
+            Dialogs.showLiveObservationOptInDialog(
+                context = context,
+                theme = uiTheme,
+                companyName = companyName,
+                positiveButtonClickListener = { controller.onPositiveDialogButtonClicked() },
+                negativeButtonClickListener = { controller.onNegativeDialogButtonClicked() }
+            )
         }
     }
 

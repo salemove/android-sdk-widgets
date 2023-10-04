@@ -39,7 +39,7 @@ internal class OperatorStatusViewHolder(
     }
 
     private fun setBaseStrings() {
-        chatStartingCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connect_placeholder)
+        chatStartingCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connection_screen_message)
     }
 
     private fun applyBaseConfig(uiTheme: UiTheme) {
@@ -54,7 +54,7 @@ internal class OperatorStatusViewHolder(
             chatStartingCaptionView.typeface = it
             chatStartedNameView.setTypeface(it, Typeface.BOLD)
             chatStartedCaptionView.typeface = it
-            chatStartedCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connect_placeholder)
+            chatStartedCaptionView.text = stringProvider.getRemoteString(R.string.engagement_connection_screen_message)
         }
         engagementStatesTheme?.operator.also(statusPictureView::applyOperatorTheme)
     }
@@ -96,7 +96,7 @@ internal class OperatorStatusViewHolder(
         applyChatStartingViewsVisibility()
         applyChatStartedViewsVisibility(false)
         itemView.contentDescription = stringProvider.getRemoteString(
-            R.string.android_chat_queue_accessibility_label,
+            R.string.android_chat_queue_message_accessibility_label,
             StringKeyPair(StringKey.COMPANY_NAME, companyName ?: "")
         )
 
@@ -110,7 +110,7 @@ internal class OperatorStatusViewHolder(
         applyChatStartedViewsVisibility()
 
         chatStartedNameView.text = operatorName
-        stringProvider.getRemoteString(R.string.chat_operator_joined, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)).apply {
+        stringProvider.getRemoteString(R.string.chat_operator_joined_system_message, StringKeyPair(StringKey.OPERATOR_NAME, operatorName)).apply {
             chatStartedCaptionView.text = this
             itemView.contentDescription = this
         }
@@ -124,7 +124,7 @@ internal class OperatorStatusViewHolder(
         chatStartedNameView.isVisible = true
         chatStartedCaptionView.isVisible = false
 
-        chatStartedNameView.text = stringProvider.getRemoteString(R.string.engagement_queue_transferring_message)
+        chatStartedNameView.text = stringProvider.getRemoteString(R.string.engagement_queue_transferring)
 
         engagementStatesTheme?.transferring.also(::applyEngagementState)
     }

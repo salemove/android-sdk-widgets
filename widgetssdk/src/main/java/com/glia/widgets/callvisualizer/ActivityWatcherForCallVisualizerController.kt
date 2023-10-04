@@ -141,6 +141,7 @@ internal class ActivityWatcherForCallVisualizerController(
         }
         watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
+        watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {
@@ -169,7 +170,9 @@ internal class ActivityWatcherForCallVisualizerController(
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
-        screenSharingController.onResume(activity)
+        screenSharingController.onResume(activity) {
+            startScreenSharing(activity)
+        }
     }
 
     private fun removeScreenSharingCallback() {

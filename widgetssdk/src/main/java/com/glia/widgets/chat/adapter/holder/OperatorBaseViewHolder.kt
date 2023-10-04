@@ -54,7 +54,7 @@ internal open class OperatorBaseViewHolder(
 
             else -> {
                 itemView.contentDescription = stringProvider.getRemoteString(
-                    R.string.android_chat_accessibility_message,
+                    R.string.android_chat_operator_message_accessibility,
                     StringKeyPair(StringKey.MESSAGE, message ?: "")
                 )
             }

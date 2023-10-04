@@ -72,10 +72,10 @@ public class CallActivity extends AppCompatActivity {
     private int getTitleText() {
         switch (configuration.getMediaType()) {
             case VIDEO:
-                return R.string.media_video_name;
+                return R.string.engagement_video_title;
             case AUDIO:
             default:
-                return R.string.media_audio_name;
+                return R.string.engagement_audio_title;
         }
     }
 

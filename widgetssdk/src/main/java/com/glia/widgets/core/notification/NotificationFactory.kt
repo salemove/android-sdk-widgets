@@ -35,7 +35,7 @@ internal object NotificationFactory {
             .setOngoing(true)
             .addAction(
                 R.drawable.ic_baseline_close,
-                stringProvider.getRemoteString(R.string.android_notification_end_sharing),
+                stringProvider.getRemoteString(R.string.android_notification_end_screen_sharing_title),
                 pendingIntent
             ).build()
     }
@@ -70,7 +70,7 @@ internal object NotificationFactory {
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
-            title = stringProvider.getRemoteString(R.string.android_notification_one_way_video_call_title),
+            title = stringProvider.getRemoteString(R.string.android_notification_one_way_video_title),
             message = message
         )
     }
@@ -85,7 +85,7 @@ internal object NotificationFactory {
         return createCallNotification(
             context = context,
             icon = R.drawable.ic_baseline_videocam,
-            title = stringProvider.getRemoteString(R.string.android_notification_two_way_video_call_title),
+            title = stringProvider.getRemoteString(R.string.android_notification_two_way_video_title),
             message = message
         )
     }

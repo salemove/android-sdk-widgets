@@ -147,7 +147,7 @@ class VisitorCodeView internal constructor(
             showSuccess()
             successTitle.contentDescription = stringProvider.getRemoteString(R.string.android_visitor_code_loading)
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
-            closeButton.contentDescription = stringProvider.getRemoteString(R.string.general_accessibility_close)
+            closeButton.contentDescription = stringProvider.getRemoteString(R.string.general_close_accessibility)
         }
     }
 

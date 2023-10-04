@@ -50,7 +50,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
         itemView.setContentDescription(
             stringProvider.getRemoteString(
-                R.string.android_chat_file_operator_accessibility,
+                R.string.android_chat_operator_file_accessibility,
                 new StringKeyPair(StringKey.NAME, name),
                 new StringKeyPair(StringKey.SIZE, byteSize)
             )

@@ -42,7 +42,7 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
             Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
             deliveredView.setTypeface(fontFamily);
         }
-        deliveredView.setText(stringProvider.getRemoteString(R.string.chat_status_delivered));
+        deliveredView.setText(stringProvider.getRemoteString(R.string.chat_message_delivered));
         deliveredView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
     }
 
@@ -56,8 +56,8 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
         String name = item.getAttachmentFile().getName();
         String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
         itemView.setContentDescription(stringProvider.getRemoteString(item.getShowDelivered()
-                ? R.string.android_chat_file_visitor_delivered_accessibility
-                : R.string.android_chat_file_visitor_accessibility,
+                ? R.string.android_chat_visitor_file_delivered_accessibility
+                : R.string.android_chat_visitor_file_accessibility,
             new StringKeyPair(StringKey.NAME, name),
             new StringKeyPair(StringKey.SIZE, byteSize)
             )

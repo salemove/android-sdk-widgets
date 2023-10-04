@@ -45,7 +45,7 @@ internal class VisitorMessageViewHolder(
         binding.content.applyLayerTheme(visitorTheme?.background)
         binding.content.applyTextTheme(visitorTheme?.text)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
-        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_status_delivered)
+        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_message_delivered)
     }
 
     fun bind(item: VisitorMessageItem) {
@@ -53,9 +53,9 @@ internal class VisitorMessageViewHolder(
         binding.deliveredView.isVisible = item.showDelivered
         val contentDescription = stringProvider.getRemoteString(
             if (item.showDelivered) {
-                R.string.android_chat_visitor_delivered_accessibility_message
+                R.string.android_chat_visitor_message_delivered_accessibility
             } else {
-                R.string.android_chat_visitor_accessibility_message
+                R.string.android_chat_visitor_message_accessibility
             },
             StringKeyPair(StringKey.MESSAGE, item.message)
         )

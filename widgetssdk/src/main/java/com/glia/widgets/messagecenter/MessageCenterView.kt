@@ -218,7 +218,7 @@ class MessageCenterView(
             this.context,
             theme,
             R.string.error_general,
-            R.string.engagement_queue_reconnection_failed_try_again
+            R.string.engagement_queue_reconnection_failed
         ) {
             controller?.dismissCurrentDialog()
         }

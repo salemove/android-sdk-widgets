@@ -178,15 +178,15 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun showOnImageSaveSuccess() {
-        showToast(R.string.android_preview_save_success_message)
+        showToast(R.string.android_preview_save_success)
     }
 
     override fun showOnImageSaveFailed() {
-        showToast(R.string.android_preview_save_error_message)
+        showToast(R.string.android_preview_save_error)
     }
 
     override fun showOnImageLoadingFailed() {
-        showToast(R.string.android_preview_failed_message)
+        showToast(R.string.android_image_preview_fetch_error)
     }
 
     override fun engagementEnded() {

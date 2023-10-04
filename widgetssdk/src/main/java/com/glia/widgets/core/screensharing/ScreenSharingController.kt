@@ -66,7 +66,7 @@ internal class ScreenSharingController(
         viewCallbacks.forEach(Consumer { obj: ViewCallback -> obj.onScreenSharingRequestSuccess() })
     }
 
-    fun onResume(activity: Activity) {
+    fun onResume(activity: Activity, requestScreenSharingCallback: (() -> Unit)? = null) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
             if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
@@ -79,7 +79,11 @@ internal class ScreenSharingController(
                 }
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
-                onScreenSharingAccepted(activity)
+                if (requestScreenSharingCallback != null) {
+                    requestScreenSharingCallback()
+                } else {
+                    onScreenSharingAccepted(activity)
+                }
             }
         }
     }
@@ -94,6 +98,7 @@ internal class ScreenSharingController(
 
     fun onScreenSharingAccepted(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAccepted")
+        dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAccepted(
             activity,
@@ -104,6 +109,7 @@ internal class ScreenSharingController(
 
     fun onScreenSharingAcceptedAndPermissionAsked(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAcceptedAndPermissionAsked")
+        dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
         repository.onScreenSharingAcceptedAndPermissionAsked(
             activity,
@@ -114,6 +120,7 @@ internal class ScreenSharingController(
 
     fun onScreenSharingDeclined() {
         Logger.d(TAG, "onScreenSharingDeclined")
+        dialogController.dismissCurrentDialog()
         repository.onScreenSharingDeclined()
         hasPendingScreenSharingRequest = false
         hideScreenSharingEnabledNotification()

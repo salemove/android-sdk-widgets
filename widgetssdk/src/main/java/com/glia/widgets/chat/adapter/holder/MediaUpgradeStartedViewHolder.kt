@@ -70,15 +70,13 @@ internal class MediaUpgradeStartedViewHolder(
         when (chatItem) {
             is MediaUpgradeStartedTimerItem.Audio -> {
                 upgradeAudioIcon?.also(binding.iconView::setImageResource)
-                binding.iconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_audio_accessibility_icon)
-                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_upgrade_audio_text)
+                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_media_upgrade_audio_system_message)
                 setMediaUpgradeTheme(chatTheme?.audioUpgrade)
             }
 
             is MediaUpgradeStartedTimerItem.Video -> {
                 upgradeVideoIcon?.also(binding.iconView::setImageResource)
-                binding.iconView.contentDescription = stringProvider.getRemoteString(R.string.android_chat_video_accessibility_icon)
-                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_upgrade_video_text)
+                binding.titleView.text = stringProvider.getRemoteString(R.string.chat_media_upgrade_video_system_message)
                 setMediaUpgradeTheme(chatTheme?.videoUpgrade)
             }
         }

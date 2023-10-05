@@ -50,7 +50,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/video_button"
         app:layout_constraintStart_toStartOf="@id/video_button"
-        tools:text="@string/media_video_name" />
+        tools:text="@string/engagement_video_title" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/video_button"

@@ -168,7 +168,7 @@ class ChatHeadView @JvmOverloads constructor(
     private fun applyBubbleTheme() {
         bubbleTheme?.badge?.also(binding.chatBubbleBadge::applyBadgeTheme)
         bubbleTheme?.onHoldOverlay?.also {
-            binding.onHoldIcon.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_accessibility)
+            binding.onHoldIcon.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_icon_accessibility)
             it.tintColor.also(binding.onHoldIcon::applyImageColorTheme)
             it.backgroundColor?.primaryColorStateList?.also(binding.onHoldIcon::setBackgroundTintList)
         }
@@ -317,7 +317,6 @@ class ChatHeadView @JvmOverloads constructor(
             cls: Class<*>,
             sdkConfiguration: GliaSdkConfiguration
         ): Intent = Intent(context, cls)
-            .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.companyName)
             .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.queueId)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.contextAssetId)
             .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.runTimeTheme)

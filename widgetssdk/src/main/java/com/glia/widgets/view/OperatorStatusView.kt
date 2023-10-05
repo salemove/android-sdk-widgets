@@ -142,7 +142,7 @@ class OperatorStatusView @JvmOverloads constructor(
     }
 
     internal fun applyOnHoldOverlayTheme(onHoldOverlayTheme: OnHoldOverlayTheme?) {
-        onHoldOverlayView.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_accessibility)
+        onHoldOverlayView.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_icon_accessibility)
         onHoldOverlayView.applyImageColorTheme(onHoldOverlayTheme?.tintColor)
         onHoldOverlayTheme?.backgroundColor?.primaryColorStateList?.also(onHoldOverlayView::setBackgroundTintList)
     }

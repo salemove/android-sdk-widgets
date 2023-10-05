@@ -141,6 +141,7 @@ internal class ActivityWatcherForCallVisualizerController(
         }
         watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
+        watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {

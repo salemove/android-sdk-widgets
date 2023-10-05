@@ -239,8 +239,8 @@ internal class ActivityWatcherForCallVisualizer(
         alertDialog = Dialogs.showOptionsDialog(
             context = contextWithStyle,
             theme = UiTheme.UiThemeBuilder().build(),
-            title = stringProvider.getRemoteString(R.string.android_notifications_allow_title),
-            message = stringProvider.getRemoteString(R.string.android_notifications_allow_message),
+            title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
+            message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
             positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
             negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
@@ -298,8 +298,8 @@ internal class ActivityWatcherForCallVisualizer(
             alertDialog = Dialogs.showOptionsDialog(
                 activity.wrapWithMaterialThemeOverlay(),
                 UiTheme.UiThemeBuilder().build(),
-                stringProvider.getRemoteString(R.string.android_overlay_title),
-                stringProvider.getRemoteString(R.string.android_overlay_message),
+                stringProvider.getRemoteString(R.string.android_overlay_permission_title),
+                stringProvider.getRemoteString(R.string.android_overlay_permission_message),
                 stringProvider.getRemoteString(R.string.general_ok),
                 stringProvider.getRemoteString(R.string.general_no),
                 {

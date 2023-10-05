@@ -39,7 +39,7 @@
             android:importantForAccessibility="no"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            tools:text="@string/message_center_send_message_btn"
+            tools:text="@string/general_send"
             android:textAppearance="?attr/textAppearanceSubtitle2"
             android:textColor="?attr/gliaBaseLightColor"
             tools:textColor="@color/glia_disable_button_text" />

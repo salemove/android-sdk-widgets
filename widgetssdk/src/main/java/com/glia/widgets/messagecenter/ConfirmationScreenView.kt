@@ -55,7 +55,7 @@ class ConfirmationScreenView(
         checkMessagesButton.setOnClickListener { onCheckMessagesButtonClickListener?.onClick(it) }
         binding.title.text = stringProvider.getRemoteString(R.string.general_thank_you)
         binding.subtitle.text = stringProvider.getRemoteString(R.string.message_center_confirmation_subtitle)
-        binding.btnCheckMessagesConfirmationScreen.text = stringProvider.getRemoteString(R.string.message_center_check_messages)
+        binding.btnCheckMessagesConfirmationScreen.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
         setupUnifiedTheme()
     }
 

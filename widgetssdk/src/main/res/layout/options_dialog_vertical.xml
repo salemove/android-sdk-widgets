@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginTop="@dimen/glia_x_large"
-        tools:text="@string/android_overlay_title"
+        tools:text="@string/android_overlay_permission_title"
         tools:textSize="20sp" />
 
     <TextView

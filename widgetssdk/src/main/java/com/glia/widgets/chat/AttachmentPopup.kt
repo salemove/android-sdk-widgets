@@ -41,12 +41,12 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
         onTakePhotoClicked: () -> Unit,
         onBrowseClicked: () -> Unit
     ) {
-        binding.photoLibraryTitle.text = stringProvider.getRemoteString(R.string.chat_attachement_photo_library)
+        binding.photoLibraryTitle.text = stringProvider.getRemoteString(R.string.chat_attachment_photo_library)
         binding.photoLibraryItem.setOnClickListener {
             popupWindow.dismiss()
             onGalleryClicked()
         }
-        binding.photoOrVideoTitle.text = stringProvider.getRemoteString(R.string.chat_attachement_take_photo)
+        binding.photoOrVideoTitle.text = stringProvider.getRemoteString(R.string.chat_attachment_take_photo)
         binding.photoOrVideoItem.setOnClickListener {
             popupWindow.dismiss()
             onTakePhotoClicked()

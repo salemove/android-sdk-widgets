@@ -31,7 +31,7 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
     ) {
         super(itemView, getImageFileFromCacheUseCase, getImageFileFromDownloadsUseCase, getImageFileFromNetworkUseCase);
         deliveredView = itemView.findViewById(R.id.delivered_view);
-        deliveredView.setText(stringProvider.getRemoteString(R.string.chat_status_delivered));
+        deliveredView.setText(stringProvider.getRemoteString(R.string.chat_message_delivered));
         setupDeliveredView(itemView.getContext(), uiTheme);
     }
 
@@ -45,10 +45,10 @@ public class VisitorImageAttachmentViewHolder extends ImageAttachmentViewHolder 
     private void setAccessibilityLabels(boolean showDelivered) {
         if (showDelivered) {
             itemView.setContentDescription(stringProvider.getRemoteString(
-                R.string.android_chat_visitor_delivered_accessibility_image));
+                R.string.android_chat_visitor_image_attachment_delivered_accessibility));
         } else {
             itemView.setContentDescription(stringProvider.getRemoteString(
-                R.string.android_chat_visitor_accessibility_image));
+                R.string.android_chat_visitor_image_attachment_accessibility));
         }
     }
 

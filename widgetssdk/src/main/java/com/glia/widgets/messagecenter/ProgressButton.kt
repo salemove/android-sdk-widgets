@@ -84,7 +84,8 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         isFocusable = true
         isClickable = true
         accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
-        contentDescription = stringProvider.getRemoteString(R.string.chat_input_send)
+        contentDescription = stringProvider.getRemoteString(R.string.general_send)
+        title.text = stringProvider.getRemoteString(R.string.general_send)
         foreground = getDrawableCompat(getAttr(android.R.attr.selectableItemBackground, android.R.color.transparent))
         applyDefaultTheme()
     }
@@ -98,7 +99,6 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
         buttonTheme.elevation?.also { elevation = it }
         buttonTheme.shadowColor?.also(::applyShadow)
         title.applyTextTheme(buttonTheme.text)
-        title.text = stringProvider.getRemoteString(R.string.chat_input_send)
     }
 
     internal fun updateProgressTheme(colorTheme: ColorTheme?) {
@@ -107,7 +107,6 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
-
         statefulWidgetAdapter.updateState(if (enabled) State.ENABLED else State.DISABLED)
     }
 
@@ -127,7 +126,7 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
     private fun showIndicator(show: Boolean) {
         TransitionManager.beginDelayedTransition(this, MaterialFade())
         progressBar.isVisible = show
-        progressBar.contentDescription = stringProvider.getRemoteString(R.string.send_message_sending)
+        progressBar.contentDescription = stringProvider.getRemoteString(R.string.general_sending)
     }
 
     private fun applyDefaultTheme() {

@@ -72,10 +72,10 @@ public class CallActivity extends AppCompatActivity {
     private int getTitleText() {
         switch (configuration.getMediaType()) {
             case VIDEO:
-                return R.string.media_video_name;
+                return R.string.engagement_video_title;
             case AUDIO:
             default:
-                return R.string.media_audio_name;
+                return R.string.engagement_audio_title;
         }
     }
 
@@ -134,7 +134,6 @@ public class CallActivity extends AppCompatActivity {
         Logger.d(TAG, "navigateToChat");
         GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class)
-                .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName())
                 .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
                 .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
                 .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())

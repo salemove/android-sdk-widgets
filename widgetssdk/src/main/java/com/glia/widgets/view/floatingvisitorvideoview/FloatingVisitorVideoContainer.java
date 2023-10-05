@@ -89,7 +89,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_layout_view, this);
         floatingVisitorVideoView = findViewById(R.id.visitor_video_card);
-        floatingVisitorVideoView.setContentDescription(stringProvider.getRemoteString(R.string.call_video_visitor_accessibility_label));
+        floatingVisitorVideoView.setContentDescription(stringProvider.getRemoteString(R.string.call_visitor_video_accessibility_label));
         setController(Dependencies.getControllerFactory().getFloatingVisitorVideoController());
         controller.setView(this);
         setVisitorVideoContainerTouchListener();

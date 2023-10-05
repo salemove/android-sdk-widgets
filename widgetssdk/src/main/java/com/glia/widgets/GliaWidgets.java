@@ -39,8 +39,12 @@ public class GliaWidgets {
     /**
      * Use with {@link android.os.Bundle} to pass in the name of your company as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
+     *
+     * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig.Builder#companyName}
+     * or customize the strings from GliaHub
      */
     public static final String COMPANY_NAME = "company_name";
+
     /**
      * Use with {@link android.os.Bundle} to pass in the id of the queue you wish to enroll in
      * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
@@ -206,7 +210,6 @@ public class GliaWidgets {
     public static void endEngagement() {
         Logger.d(TAG, "endEngagement");
         Dependencies.getControllerFactory().destroyControllers();
-
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
             if (e != null) {
                 Logger.e(TAG, "Ending engagement error: " + e);

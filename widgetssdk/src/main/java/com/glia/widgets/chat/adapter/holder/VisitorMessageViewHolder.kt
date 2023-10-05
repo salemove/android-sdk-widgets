@@ -3,6 +3,8 @@ package com.glia.widgets.chat.adapter.holder
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
@@ -43,7 +45,7 @@ internal class VisitorMessageViewHolder(
         binding.content.applyLayerTheme(visitorTheme?.background)
         binding.content.applyTextTheme(visitorTheme?.text)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
-        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_status_delivered)
+        binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_message_delivered)
     }
 
     fun bind(item: VisitorMessageItem) {
@@ -51,11 +53,11 @@ internal class VisitorMessageViewHolder(
         binding.deliveredView.isVisible = item.showDelivered
         val contentDescription = stringProvider.getRemoteString(
             if (item.showDelivered) {
-                R.string.android_chat_visitor_delivered_accessibility_message
+                R.string.android_chat_visitor_message_delivered_accessibility
             } else {
-                R.string.android_chat_visitor_accessibility_message
+                R.string.android_chat_visitor_message_accessibility
             },
-            item.message
+            StringKeyPair(StringKey.MESSAGE, item.message)
         )
         itemView.contentDescription = contentDescription
     }

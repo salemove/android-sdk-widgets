@@ -5,6 +5,8 @@ import android.widget.TextView
 import androidx.core.view.MarginLayoutParamsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
@@ -63,8 +65,8 @@ internal class SystemMessageViewHolder(
         content.apply {
             text = message
             stringProvider.getRemoteString(
-                R.string.android_chat_accessibility_message,
-                message
+                R.string.android_chat_operator_message_accessibility,
+                StringKeyPair(StringKey.MESSAGE, message)
             )
         }
     }

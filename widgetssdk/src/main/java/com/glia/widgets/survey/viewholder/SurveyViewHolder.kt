@@ -44,13 +44,13 @@ abstract class SurveyViewHolder(
             val context = title.context
             val color = ContextCompat.getColor(context, R.color.glia_system_negative_color)
             val colorString = String.format("%X", color).substring(2)
-            val source = stringProvider.getRemoteString(
+            val source = context.getString(
                 R.string.glia_survey_require_label,
                 questionText,
                 colorString
             )
             title.text = Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
-            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_title_accessibility_label, questionText)
+            title.contentDescription = stringProvider.getRemoteString(R.string.survey_question_required_accessibility_label)
         } else {
             title.text = questionText
             title.contentDescription = null

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        tools:titleText="@string/call_visualizer_screen_sharing_view_title"
+        tools:titleText="@string/call_visualizer_screen_sharing_header_title"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView

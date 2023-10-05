@@ -30,7 +30,6 @@ class CallIntentBuilder {
         validateWidgetsSdkConfiguration();
         GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
         return new Intent(context, CallActivity.class)
-                .putExtra(GliaWidgets.COMPANY_NAME, sdkConfiguration.getCompanyName())
                 .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
                 .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
                 .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())

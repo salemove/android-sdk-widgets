@@ -489,7 +489,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             }
 
             override fun showBroadcastNotSupportedToast() {
-                showToast(stringProvider.getRemoteString(R.string.gva_error_unsupported))
+                showToast(stringProvider.getRemoteString(R.string.gva_unsupported_action_error))
             }
 
             override fun requestOpenUri(uri: Uri) {
@@ -623,7 +623,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             binding.appBarView.hideBackButton()
             binding.appBarView.showXButton()
         } else {
-            showToolbar(stringProvider.getRemoteString(R.string.media_text_name))
+            showToolbar(stringProvider.getRemoteString(R.string.engagement_chat_title))
             binding.appBarView.showBackButton()
         }
     }
@@ -660,8 +660,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = stringProvider.getRemoteString(R.string.android_notifications_allow_title),
-                message = stringProvider.getRemoteString(R.string.android_notifications_allow_message),
+                title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
+                message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
                 positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
                 negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
@@ -773,7 +773,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         binding.addAttachmentQueue.layoutManager = LinearLayoutManager(this.context)
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTheme(theme)
-        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.media_text_name))
+        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.engagement_chat_title))
 
         // icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
@@ -815,7 +815,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
 
         binding.gvaQuickRepliesLayout.updateTheme(theme)
-        binding.sendButton.contentDescription = stringProvider.getRemoteString(R.string.send_message_send)
+        binding.sendButton.contentDescription = stringProvider.getRemoteString(R.string.general_send)
         applyTheme(Dependencies.getGliaThemeManager().theme)
     }
 
@@ -1034,7 +1034,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun showUnexpectedErrorDialog() {
         showAlertDialog(
             R.string.error_general,
-            R.string.engagement_queue_reconnection_failed_try_again
+            R.string.engagement_queue_reconnection_failed
         ) {
             dismissAlertDialog()
             controller?.unexpectedErrorDialogDismissed()
@@ -1044,8 +1044,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showOverlayPermissionsDialog() {
         showOptionsDialog(
-            stringProvider.getRemoteString(R.string.android_overlay_title),
-            stringProvider.getRemoteString(R.string.android_overlay_message),
+            stringProvider.getRemoteString(R.string.android_overlay_permission_title),
+            stringProvider.getRemoteString(R.string.android_overlay_permission_message),
             stringProvider.getRemoteString(R.string.general_ok),
             stringProvider.getRemoteString(R.string.general_no),
             {
@@ -1132,7 +1132,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     fun fileDownloadFailed(file: AttachmentFile) {
         submitUpdatedItems(file, isDownloading = false, isFileExists = false)
-        showToast(stringProvider.getRemoteString(R.string.android_chat_download_failed))
+        showToast(stringProvider.getRemoteString(R.string.chat_download_failed))
     }
 
     fun fileDownloadCompleted(file: AttachmentFile) {

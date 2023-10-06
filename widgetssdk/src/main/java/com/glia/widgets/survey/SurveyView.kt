@@ -257,7 +257,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onNetworkTimeout() {
-        context.showToast(R.string.glia_survey_network_unavailable)
+        context.showToast(stringProvider.getRemoteString(R.string.glia_survey_network_unavailable))
     }
 
     override fun finish() {

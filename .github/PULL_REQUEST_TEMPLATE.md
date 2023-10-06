@@ -12,4 +12,7 @@ https://glia.atlassian.net/browse/MOB-xxx
 
 **Additional info:**
 
+ - [ ] Tests updated? Added? Unit, acceptance, snapshots?
+ - [ ] Logging for future troubleshooting of client issues added?
+
 **Screenshots:**

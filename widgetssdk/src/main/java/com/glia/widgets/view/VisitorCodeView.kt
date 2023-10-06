@@ -147,7 +147,7 @@ class VisitorCodeView internal constructor(
             showSuccess()
             successTitle.contentDescription = stringProvider.getRemoteString(R.string.android_visitor_code_loading)
             successTitle.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED)
-            closeButton.contentDescription = stringProvider.getRemoteString(R.string.general_close_accessibility)
+            closeButton.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_close_accessibility_hint)
         }
     }
 
@@ -167,7 +167,7 @@ class VisitorCodeView internal constructor(
 
     private fun showFailure() {
         failureTitle.text = stringProvider.getRemoteString(R.string.visitor_code_failed)
-        refreshButton.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_refresh_accessibility_label)
+        refreshButton.contentDescription = stringProvider.getRemoteString(R.string.call_visualizer_visitor_code_refresh_accessibility_hint)
         refreshButton.text = stringProvider.getRemoteString(R.string.general_refresh)
         failureContainer.visibility = VISIBLE
         successContainer.visibility = GONE

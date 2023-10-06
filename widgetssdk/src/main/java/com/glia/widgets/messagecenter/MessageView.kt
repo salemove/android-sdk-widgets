@@ -163,8 +163,10 @@ class MessageView(
         title.text = stringProvider.getRemoteString(R.string.message_center_welcome_title)
         description.text = stringProvider.getRemoteString(R.string.message_center_welcome_subtitle)
         checkMessagesButton.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
+        checkMessagesButton.contentDescription = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages_accessibility_hint)
         messageTitle.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_title)
         messageEditText.hint = stringProvider.getRemoteString(R.string.message_center_welcome_message_input_placeholder)
+        addAttachmentButton.contentDescription = stringProvider.getRemoteString(R.string.message_center_welcome_file_picker_label_accessibility_label)
         uploadAttachmentAdapter = UploadAttachmentAdapter(isMessageCenter = true)
         uploadAttachmentAdapter.setItemCallback { onRemoveAttachmentListener?.invoke(it) }
         uploadAttachmentAdapter.registerAdapterDataObserver(

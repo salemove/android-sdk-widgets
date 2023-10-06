@@ -56,6 +56,7 @@ class ConfirmationScreenView(
         binding.title.text = stringProvider.getRemoteString(R.string.general_thank_you)
         binding.subtitle.text = stringProvider.getRemoteString(R.string.message_center_confirmation_subtitle)
         binding.btnCheckMessagesConfirmationScreen.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
+        binding.btnCheckMessagesConfirmationScreen.contentDescription = stringProvider.getRemoteString(R.string.message_center_confirmation_check_messages_accessibility_hint)
         setupUnifiedTheme()
     }
 

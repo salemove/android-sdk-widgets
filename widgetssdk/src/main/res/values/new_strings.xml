@@ -21,7 +21,9 @@
     <string name="screen_sharing_visitor_screen_end_title">@string/call_visualizer_button</string>
     <string name="android_visitor_code_loading">@string/glia_visitor_code_loading</string>
     <string name="call_visualizer_visitor_code_title_accessibility_hint">@string/glia_visitor_code_content_description</string>
-    <string name="call_visualizer_visitor_code_refresh_accessibility_label">Refresh Button</string>
+    <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates a new visitor code</string>
+    <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes the visitor code</string>
+
 
     <!-- File preview -->
     <string name="android_preview_title">@string/glia_preview_activity_toolbar_title</string>
@@ -147,13 +149,16 @@
     <string name="message_center_welcome_message_length_error">@string/message_center_message_limit_error_message</string>
     <string name="message_center_welcome_title">@string/message_center_title</string>
     <string name="message_center_welcome_check_messages">@string/message_center_check_messages_btn</string>
+    <string name="message_center_welcome_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
     <string name="message_center_welcome_message_title">@string/message_center_message_title</string>
     <string name="message_center_welcome_message_input_placeholder">@string/message_center_message_edit_text_hint</string>
     <string name="message_center_confirmation_subtitle">@string/message_center_confirmation_screen_message</string>
+    <string name="message_center_confirmation_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
     <string name="engagement_secure_messaging_title">@string/message_center_screen_title</string>
     <string name="message_center_welcome_subtitle">@string/message_center_description</string>
     <string name="general_sending">@string/message_center_progress_bar_content_description</string>
     <string name="general_send">@string/message_center_send_message_btn</string>
+    <string name="message_center_welcome_file_picker_label_accessibility_label">File picker</string>
 
     <!-- General -->
     <string name="general_refresh">@string/glia_visitor_code_refresh_button</string>
@@ -173,16 +178,6 @@
     <string name="general_end">@string/glia_top_app_bar_chat_end</string>
     <string name="general_download">@string/glia_chat_attachment_download_button_label</string>
     <string name="general_unknown">Unknown</string>
-
-    <!-- iOS only -->
-    <string name="call_visualizer_visitor_code_close_accessibility_hint">Closes visitor code</string>
-    <string name="call_visualizer_visitor_code_refresh_accessibility_hint">Generates new visitor code</string>
-    <string name="message_center_confirmation_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
-    <string name="message_center_confirmation_check_messages_accessibility_label">Checks messages</string>
-    <string name="message_center_welcome_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
-    <string name="message_center_welcome_file_picker_label_accessibility_hint">Navigates you to the chat transcript.</string>
-    <string name="message_center_welcome_file_picker_label_accessibility_label">File picker</string>
-    <string name="message_center_welcome_send_accessibility_hint">Navigates you to the chat transcript.</string>
 
     <!-- NEW REFERENCES -->
     <!-- NEW REFERENCES -->

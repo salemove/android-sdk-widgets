@@ -54,7 +54,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setTitle(R.string.android_preview_title)
+        title = stringProvider.getRemoteString(R.string.android_preview_title)
 
         applyInsets()
         onImageDataReceived(intent)
@@ -178,15 +178,15 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun showOnImageSaveSuccess() {
-        showToast(R.string.android_preview_save_success)
+        showToast(stringProvider.getRemoteString(R.string.android_preview_save_success))
     }
 
     override fun showOnImageSaveFailed() {
-        showToast(R.string.android_preview_save_error)
+        showToast(stringProvider.getRemoteString(R.string.android_preview_save_error))
     }
 
     override fun showOnImageLoadingFailed() {
-        showToast(R.string.android_image_preview_fetch_error)
+        showToast(stringProvider.getRemoteString(R.string.android_image_preview_fetch_error))
     }
 
     override fun engagementEnded() {

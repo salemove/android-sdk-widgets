@@ -224,7 +224,6 @@ object Dialogs {
         return showDialog(context, R.layout.alert_dialog, theme.baseLightColor) {
             findViewById<TextView>(R.id.dialog_title_view).apply {
                 text = stringProvider.getRemoteString(title)
-                setText(title)
                 applyTextTheme(baseDarkColor, fontFamily)
                 applyTextTheme(alertTheme?.title)
             }

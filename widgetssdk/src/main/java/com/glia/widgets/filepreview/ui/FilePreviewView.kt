@@ -14,8 +14,7 @@ class FilePreviewView @JvmOverloads constructor(
     private val stringProvider = Dependencies.getStringProvider()
 
     init {
-        contentDescription =
-            stringProvider.getRemoteString(R.string.android_image_preview_accessibility)
+        contentDescription = stringProvider.getRemoteString(R.string.android_image_preview_accessibility)
         scaleType = ScaleType.FIT_CENTER
         transitionName = context.getString(R.string.glia_file_preview_transition_name)
     }

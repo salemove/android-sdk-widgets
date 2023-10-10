@@ -1,15 +1,15 @@
 package com.glia.widgets.core.configuration;
 
+import com.glia.androidsdk.Glia;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.R;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.di.Dependencies;
 
 import org.jetbrains.annotations.Nullable;
 
 public class GliaSdkConfigurationManager {
-
-    StringProvider stringProvider;
 
     private boolean useOverlay = false;
     private ScreenSharing.Mode screenSharingMode = null;
@@ -27,15 +27,15 @@ public class GliaSdkConfigurationManager {
 
     public String getCompanyName() {
         fetchRemoteCompanyName();
+        if (companyName == null) {
+            Dependencies.getResourceProvider().getString(R.string.general_company_name);
+        }
         return companyName;
     }
 
     private void fetchRemoteCompanyName() {
-        if (stringProvider == null) {
-            return;
-        }
-        String remoteCompanyName = stringProvider.getRemoteString(R.string.general_company_name);
-        if (remoteCompanyName != null && !remoteCompanyName.isEmpty()) {
+        String remoteCompanyName = Glia.getRemoteString(Dependencies.getResourceProvider().getResourceKey(R.string.general_company_name));
+        if (remoteCompanyName != null && !remoteCompanyName.trim().isEmpty()) {
             companyName = remoteCompanyName;
         }
     }
@@ -68,9 +68,5 @@ public class GliaSdkConfigurationManager {
                 .useOverlay(useOverlay)
                 .runTimeTheme(uiTheme)
                 .build();
-    }
-
-    public void setStringProvider(StringProvider stringProvider) {
-        this.stringProvider = stringProvider;
     }
 }

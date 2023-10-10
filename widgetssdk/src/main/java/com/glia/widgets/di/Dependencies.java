@@ -51,7 +51,6 @@ public class Dependencies {
     public static void onAppCreate(Application application) {
         resourceProvider = new ResourceProvider(application.getBaseContext());
         stringProvider = new StringProviderImpl(resourceProvider);
-        sdkConfigurationManager.setStringProvider(stringProvider);
         notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);

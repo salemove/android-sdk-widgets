@@ -299,7 +299,7 @@ public class CallActivityTest {
 
             callViewCallback.emitState(callState.makeCallState());
 
-            String expected = appContext.getResources().getQuantityString(R.plurals.chat_message_unread_accessibility_label, 15, 15);
+            String expected = appContext.getResources().getString(R.string.glia_call_chat_other_content_description, 15);
             onView(withId(R.id.chat_button)).check(matches(withContentDescription(expected)));
         }
     }

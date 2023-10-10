@@ -61,6 +61,7 @@
     <string name="media_upgrade_audio_title">@string/glia_dialog_upgrade_audio_title</string>
     <string name="media_upgrade_video_one_way_title">@string/glia_dialog_upgrade_video_1_way_title</string>
     <string name="media_upgrade_video_two_way_title">@string/glia_dialog_upgrade_video_2_way_title</string>
+    <string name="engagement_queue_reconnection_failed">@string/glia_dialog_unexpected_error_message</string>
 
     <!-- Chat -->
     <string name="engagement_chat_title">@string/glia_chat_title</string>
@@ -111,6 +112,7 @@
     <string name="chat_file_infected_file_error">@string/glia_chat_attachment_upload_error_failed_to_check_safety</string>
     <string name="error_internal">@string/glia_chat_attachment_upload_error_internal_error</string>
     <string name="android_app_bar_nav_up_accessibility">@string/glia_top_app_bar_navigate_up_content_description</string>
+    <string name="android_chat_queue_message_accessibility_label">@string/glia_chat_in_queue_message_content_description</string>
 
     <!-- Call -->
     <string name="engagement_connection_screen_connect_with">@string/glia_call_connecting_with</string>
@@ -178,34 +180,21 @@
     <string name="general_end">@string/glia_top_app_bar_chat_end</string>
     <string name="general_download">@string/glia_chat_attachment_download_button_label</string>
     <string name="general_unknown">Unknown</string>
+    <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
+    <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
+
+    <!-- Screen sharing -->
+    <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
 
     <!-- NEW REFERENCES -->
-    <!-- NEW REFERENCES -->
-    <string name="alert_action_settings">Settings</string><!-- TODO UNUSED IN ANDROID -->
-    <string name="android_chat_queue_message_accessibility_label">@string/glia_chat_in_queue_message_content_description</string>
-    <string name="android_file_select_title">@string/glia_chat_select_file_title</string>
-    <string name="android_upload_menu_take_photo">@string/glia_chat_attachment_upload_menu_take_photo</string>
-    <string name="call_bubble_accessibility_hint">Deactivates minimize.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_bubble_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
-    <string name="call_connect_first_text_accessibility_hint">Displays operator name.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_connect_second_text_accessibility_hint">Displays call duration.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_operator_avatar_accessibility_hint">Displays operator avatar or placeholder.</string><!-- TODO ADA NEW IN ANDROID -->
-    <string name="call_operator_name_accessibility_hint">Shows operator name.</string><!-- TODO ADA NEW IN ANDROID -->
-    <plurals name="chat_message_unread_accessibility_label"><item quantity="one">@string/glia_call_chat_one_content_description</item><item quantity="other">@string/glia_call_chat_other_content_description</item></plurals>
-    <string name="chat_operator_avatar_accessibility_label">@string/glia_call_operator_profile_picture_content_description</string>
-    <string name="chat_status_typing">Operator typing</string>
     <string name="engagement_default_operator">Operator</string> <!-- TODO NEW TO ANDROID -->
     <string name="engagement_media_upgrade_offer">{operatorName} has offered you to upgrade</string> <!-- TODO NEW -->
-    <string name="engagement_queue_reconnection_failed">@string/glia_dialog_unexpected_error_message</string>
     <string name="error_unexpected_title">Something went wrong.</string> <!-- TODO NEW -->
     <string name="general_back">Back</string> <!-- TODO NEW -->
-    <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
     <string name="general_message">Message</string> <!-- TODO NEW -->
-    <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
     <string name="general_retry">Retry</string><!-- TODO NEW -->
     <string name="general_selected">Selected</string><!-- TODO NEW, maybe unify? -->
     <string name="engagement_phone_title">Phone</string> <!-- TODO NEW -->
-    <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
 
     <!--    GVA -->
     <string name="gva_unsupported_action_error">This action is not currently supported on mobile.</string>

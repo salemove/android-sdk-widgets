@@ -67,8 +67,8 @@ class EndScreenSharingView(
     }
 
     private fun setupViewTextResources() {
-        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_header))
-        binding.screenSharingLabel.text = stringProvider.getRemoteString(R.string.call_visualizer_label)
+        binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_header_title))
+        binding.screenSharingLabel.text = stringProvider.getRemoteString(R.string.call_visualizer_screen_sharing_message)
         binding.endSharingButton.text = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_end_title)
     }
 

@@ -11,6 +11,7 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
 import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
@@ -29,7 +30,8 @@ import com.glia.widgets.helper.TAG
 internal class ActivityWatcherForCallVisualizerController(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
-    private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
+    private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
+    private val isCallVisualizerUseCase: IsCallVisualizerUseCase
 ) : ActivityWatcherForCallVisualizerContract.Controller {
 
     @VisibleForTesting
@@ -141,6 +143,7 @@ internal class ActivityWatcherForCallVisualizerController(
         }
         watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
+        watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {
@@ -167,6 +170,12 @@ internal class ActivityWatcherForCallVisualizerController(
     private fun addScreenSharingCallback(activity: Activity) {
         // Call and Chat screens process screen sharing requests on their own.
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
+        if (!isCallVisualizerUseCase()) {
+            // Show screen sharing requests for any screen (not only Chat and Call) for Call Visualizer only.
+            // For Omnicore engagement show only on Chat and Call screen.
+            removeScreenSharingCallback()
+            return
+        }
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
         screenSharingController.onResume(activity) {

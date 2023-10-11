@@ -12,6 +12,7 @@ import androidx.core.util.Pair;
 
 import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.ContextExtensionsKt;
 import com.glia.widgets.view.ViewHelpers;
@@ -33,6 +34,8 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
         super(context, attrs, defStyleAttr);
         init();
     }
+
+    private StringProvider stringProvider = Dependencies.getStringProvider();
 
     @Override
     public void setController(FloatingVisitorVideoContract.Controller controller) {
@@ -86,6 +89,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.visitor_video_layout_view, this);
         floatingVisitorVideoView = findViewById(R.id.visitor_video_card);
+        floatingVisitorVideoView.setContentDescription(stringProvider.getRemoteString(R.string.call_visitor_video_accessibility_label));
         setController(Dependencies.getControllerFactory().getFloatingVisitorVideoController());
         controller.setView(this);
         setVisitorVideoContainerTouchListener();

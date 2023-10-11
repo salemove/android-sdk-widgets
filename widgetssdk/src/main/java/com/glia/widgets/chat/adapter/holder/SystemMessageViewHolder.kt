@@ -5,6 +5,8 @@ import android.widget.TextView
 import androidx.core.view.MarginLayoutParamsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.di.Dependencies
@@ -21,7 +23,7 @@ internal class SystemMessageViewHolder(
     uiTheme: UiTheme
 ) : RecyclerView.ViewHolder(binding.root) {
     private val content: TextView by lazy { binding.root }
-
+    private val stringProvider = Dependencies.getStringProvider()
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
     }
@@ -62,9 +64,9 @@ internal class SystemMessageViewHolder(
     fun bind(message: String) {
         content.apply {
             text = message
-            resources.getString(
-                R.string.glia_chat_operator_message_content_description,
-                message
+            stringProvider.getRemoteString(
+                R.string.android_chat_operator_message_accessibility,
+                StringKeyPair(StringKey.MESSAGE, message)
             )
         }
     }

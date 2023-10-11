@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.FileHelper;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -21,6 +23,7 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private final LinearProgressIndicator progressIndicator;
     private final TextView titleText;
     private final TextView statusIndicator;
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
 
     public FileAttachmentViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -29,6 +32,7 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         progressIndicator = itemView.findViewById(R.id.progress_indicator);
         titleText = itemView.findViewById(R.id.item_title);
         statusIndicator = itemView.findViewById(R.id.status_indicator);
+        statusIndicator.setContentDescription(stringProvider.getRemoteString(R.string.general_download));
 
         setupExtensionContainer(itemView);
     }
@@ -82,11 +86,11 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
 
     private void updateStatusIndicator(boolean isFileExists, boolean isDownloading) {
         if (isDownloading) {
-            statusIndicator.setText(R.string.glia_chat_attachment_downloading_label);
+            statusIndicator.setText(stringProvider.getRemoteString(R.string.chat_download_downloading));
         } else if (isFileExists) {
-            statusIndicator.setText(R.string.glia_chat_attachment_open_button_label);
+            statusIndicator.setText(stringProvider.getRemoteString(R.string.general_open));
         } else {
-            statusIndicator.setText(R.string.glia_chat_attachment_download_button_label);
+            statusIndicator.setText(stringProvider.getRemoteString(R.string.general_download));
         }
     }
 

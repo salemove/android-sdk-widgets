@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.OperatorStatusViewBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
 import com.glia.widgets.helper.getColorStateListCompat
@@ -50,6 +51,7 @@ class OperatorStatusView @JvmOverloads constructor(
 
     private var operatorImageSize: Int by Delegates.notNull()
     private var operatorImageContentPadding: Int by Delegates.notNull()
+    private var stringProvider = Dependencies.getStringProvider()
 
     private val operatorImageLargeSize by lazy {
         resources.getDimensionPixelSize(R.dimen.glia_chat_profile_picture_large_size)
@@ -99,6 +101,7 @@ class OperatorStatusView @JvmOverloads constructor(
         theme.brandPrimaryColor?.let(::getColorCompat)
             ?.also(binding.rippleAnimation::addColorFilter)
 
+        profilePictureView.contentDescription = stringProvider.getRemoteString(R.string.call_operator_avatar_accessibility_label)
         profilePictureView.setImageDrawable(profilePictureBackgroundColorDrawable)
         theme.baseLightColor?.let(::getColorStateListCompat)
             ?.also(placeholderView::setImageTintList)
@@ -139,6 +142,7 @@ class OperatorStatusView @JvmOverloads constructor(
     }
 
     internal fun applyOnHoldOverlayTheme(onHoldOverlayTheme: OnHoldOverlayTheme?) {
+        onHoldOverlayView.contentDescription = stringProvider.getRemoteString(R.string.android_call_on_hold_icon_accessibility)
         onHoldOverlayView.applyImageColorTheme(onHoldOverlayTheme?.tintColor)
         onHoldOverlayTheme?.backgroundColor?.primaryColorStateList?.also(onHoldOverlayView::setBackgroundTintList)
     }

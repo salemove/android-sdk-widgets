@@ -14,6 +14,9 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
     @VisibleForTesting
     var operatorDefaultImageUrl: String? = null
 
+    @VisibleForTesting
+    var isAlwaysUseDefaultOperatorPicture: Boolean = false
+
     fun getOperatorById(operatorId: String, callback: Consumer<LocalOperator?>) {
         val cachedOperator = cachedOperators[operatorId]
         if (cachedOperator != null) {
@@ -28,7 +31,13 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
     fun emit(operator: Operator) = putOperator(mapOperator(operator))
 
     @VisibleForTesting
-    fun mapOperator(operator: Operator): LocalOperator = operator.run { LocalOperator(id, name, imageUrl ?: operatorDefaultImageUrl) }
+    fun mapOperator(operator: Operator): LocalOperator = operator.run { LocalOperator(id, name, getOperatorImage(operator.imageUrl)) }
+
+    @VisibleForTesting
+    fun getOperatorImage(imageUrl: String?): String? {
+        return if (isAlwaysUseDefaultOperatorPicture || imageUrl == null) operatorDefaultImageUrl
+        else imageUrl
+    }
 
     @VisibleForTesting
     fun putOperator(operator: LocalOperator) {
@@ -39,4 +48,7 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
         operatorDefaultImageUrl = imageUrl
     }
 
+    fun setIsAlwaysUseDefaultOperatorPicture(isAlwaysUseDefaultOperatorPicture: Boolean?) {
+        this.isAlwaysUseDefaultOperatorPicture = isAlwaysUseDefaultOperatorPicture ?: false
+    }
 }

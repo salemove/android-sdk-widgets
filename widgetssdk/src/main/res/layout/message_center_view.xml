@@ -11,7 +11,7 @@
         android:id="@+id/app_bar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/message_center_screen_title" />
+        tools:titleText="@string/message_center_screen_title" />
 
     <com.glia.widgets.messagecenter.ConfirmationScreenView
         android:id="@+id/confirmation_view"

@@ -59,6 +59,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     private val binding: SurveyViewBinding by lazy {
         SurveyViewBinding.inflate(layoutInflater, this)
     }
+    private val stringProvider = Dependencies.getStringProvider()
 
     private val cardView: CardView get() = binding.cardView
     private val title: TextView get() = binding.surveyTitle
@@ -78,6 +79,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
 
     init {
         readTypedArray(attrs, defStyleAttr, defStyleRes)
+        setupViewAppearance()
         initCallbacks()
         initAdapter()
     }
@@ -85,6 +87,11 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         applyStyle(uiTheme.surveyStyle)
+    }
+
+    private fun setupViewAppearance() {
+        submitButton.text = stringProvider.getRemoteString(R.string.general_submit)
+        cancelButton.text = stringProvider.getRemoteString(R.string.general_cancel)
     }
 
     fun setOnTitleUpdatedListener(onTitleUpdatedListener: OnTitleUpdatedListener?) {
@@ -250,7 +257,7 @@ class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onNetworkTimeout() {
-        context.showToast(R.string.glia_survey_network_unavailable)
+        context.showToast(stringProvider.getRemoteString(R.string.glia_survey_network_unavailable))
     }
 
     override fun finish() {

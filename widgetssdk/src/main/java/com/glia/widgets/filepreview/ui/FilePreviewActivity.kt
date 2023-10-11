@@ -26,6 +26,8 @@ import com.glia.widgets.helper.showToast
 import java.io.File
 
 internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.View {
+    private val stringProvider = Dependencies.getStringProvider()
+
     private val binding: FilePreviewActivityBinding by lazy {
         FilePreviewActivityBinding.inflate(
             layoutInflater
@@ -52,12 +54,13 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setTitle(R.string.glia_preview_activity_toolbar_title)
+        title = stringProvider.getRemoteString(R.string.android_preview_title)
 
         applyInsets()
         onImageDataReceived(intent)
 
         setSupportActionBar(binding.toolbar)
+        binding.toolbar.contentDescription = stringProvider.getRemoteString(R.string.android_preview_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
@@ -74,8 +77,14 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.save_item).isVisible = showDownloadIcon
-        menu.findItem(R.id.share_item).isVisible = showShareIcon
+        menu.findItem(R.id.save_item).also {
+            it.title = stringProvider.getRemoteString(R.string.android_preview_menu_save)
+            it.isVisible = showDownloadIcon
+        }
+        menu.findItem(R.id.share_item).also {
+            it.title = stringProvider.getRemoteString(R.string.android_preview_menu_share)
+            it.isVisible = showShareIcon
+        }
         return true
     }
 
@@ -169,15 +178,15 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun showOnImageSaveSuccess() {
-        showToast(R.string.glia_preview_activity_image_save_success_msg)
+        showToast(stringProvider.getRemoteString(R.string.android_preview_save_success))
     }
 
     override fun showOnImageSaveFailed() {
-        showToast(R.string.glia_preview_activity_image_save_fail_msg)
+        showToast(stringProvider.getRemoteString(R.string.android_preview_save_error))
     }
 
     override fun showOnImageLoadingFailed() {
-        showToast(R.string.glia_preview_activity_preview_failed_msg)
+        showToast(stringProvider.getRemoteString(R.string.android_image_preview_fetch_error))
     }
 
     override fun engagementEnded() {

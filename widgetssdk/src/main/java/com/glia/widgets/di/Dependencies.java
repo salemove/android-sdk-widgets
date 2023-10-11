@@ -9,6 +9,8 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
 import com.glia.widgets.GliaWidgetsConfig;
+import com.glia.widgets.StringProvider;
+import com.glia.widgets.StringProviderImpl;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
@@ -29,6 +31,8 @@ import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
+import org.jetbrains.annotations.TestOnly;
+
 public class Dependencies {
 
     private final static String TAG = "Dependencies";
@@ -42,9 +46,12 @@ public class Dependencies {
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
+    private static StringProvider stringProvider;
 
     public static void onAppCreate(Application application) {
-        notificationManager = new NotificationManager(application);
+        resourceProvider = new ResourceProvider(application.getBaseContext());
+        stringProvider = new StringProviderImpl(resourceProvider);
+        notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
 
@@ -91,12 +98,20 @@ public class Dependencies {
                 );
         application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest);
 
-        resourceProvider = new ResourceProvider(application.getBaseContext());
         callVisualizerManager = new CallVisualizerManager(
                 useCaseFactory.getVisitorCodeViewBuilderUseCase(),
                 repositoryFactory.getCallVisualizerRepository(),
                 repositoryFactory.getGliaEngagementRepository()
         );
+    }
+
+    @TestOnly
+    public static void setStringProvider(StringProvider sp) {
+        stringProvider = sp;
+    }
+
+    public static StringProvider getStringProvider() {
+        return stringProvider;
     }
 
     public static UseCaseFactory getUseCaseFactory() {

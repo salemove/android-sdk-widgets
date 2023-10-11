@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
@@ -30,7 +32,7 @@ internal class OperatorMessageViewHolder(
     private val operatorTheme: MessageBalloonTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
     }
-
+    private val stringProvider = Dependencies.getStringProvider()
     private val messageContentView: TextView by lazy {
         ChatReceiveMessageContentBinding.inflate(
             itemView.layoutInflater,
@@ -103,15 +105,15 @@ internal class OperatorMessageViewHolder(
         messageContentView.text = item.content
         binding.contentLayout.addView(messageContentView)
         if (!TextUtils.isEmpty(item.operatorName)) {
-            itemView.contentDescription = itemView.resources.getString(
-                R.string.glia_chat_operator_name_message_content_description,
-                item.operatorName,
-                item.content
+            itemView.contentDescription = stringProvider.getRemoteString(
+                R.string.android_chat_operator_name_accessibility_message,
+                StringKeyPair(StringKey.OPERATOR_NAME, item.operatorName ?: "" ),
+                StringKeyPair(StringKey.MESSAGE, item.content ?: "")
             )
         } else {
-            itemView.contentDescription = itemView.resources.getString(
-                R.string.glia_chat_operator_message_content_description,
-                item.content
+            itemView.contentDescription = stringProvider.getRemoteString(
+                R.string.android_chat_operator_message_accessibility,
+                StringKeyPair(StringKey.MESSAGE, item.content ?: "")
             )
         }
     }

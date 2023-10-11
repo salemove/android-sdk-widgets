@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:paddingBottom="@dimen/glia_large">
 
     <TextView
@@ -13,7 +14,7 @@
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_large_x_large"
         android:textAppearance="?attr/textAppearanceBody1"
-        android:text="@string/glia_survey_scale_item_title"
+        tools:text="Title"
         android:textColor="?attr/gliaBaseDarkColor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
@@ -82,11 +83,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/glia_system_negative_color"
-        android:text="@string/glia_survey_required_error_message"
         android:layout_marginStart="@dimen/glia_large_x_large"
         android:drawablePadding="@dimen/glia_small"
         app:drawableStartCompat="@drawable/ic_attention"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="@string/survey_action_validation_error" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

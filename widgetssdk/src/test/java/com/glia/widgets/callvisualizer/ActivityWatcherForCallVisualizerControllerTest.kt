@@ -12,6 +12,7 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
 import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
@@ -51,13 +52,15 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     private val callVisualizerController = mock(CallVisualizerController::class.java)
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
+    private val isCallVisualizerUseCase = mock(IsCallVisualizerUseCase::class.java)
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
     private val isShowOverlayPermissionRequestDialogUseCase =
         mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
     private val controller = ActivityWatcherForCallVisualizerController(
         callVisualizerController,
         screenSharingController,
-        isShowOverlayPermissionRequestDialogUseCase
+        isShowOverlayPermissionRequestDialogUseCase,
+        isCallVisualizerUseCase
     )
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
@@ -95,6 +98,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onActivityResumed error is shown when onScreenSharingError`() {
+        whenever(isCallVisualizerUseCase()).thenReturn(true)
         mockOnActivityResumeAndEnsureCallbacksSet(supportActivity)
         controller.screenSharingViewCallback?.onScreenSharingRequestError(
             GliaException(
@@ -123,6 +127,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
             isCallOrChatActiveUseCase
         )
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        whenever(isCallVisualizerUseCase()).thenReturn(true)
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
         controller.onActivityResumed(nonCallVisualizerSupportActivity)
 
@@ -161,6 +166,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
         verify(watcher).openOverlayPermissionView()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -169,6 +175,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         resetMocks()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -192,6 +199,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -217,6 +225,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openCallActivity()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -238,6 +247,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openOverlayPermissionView()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -260,6 +270,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -281,6 +292,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).openSupportActivity(any())
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -291,6 +303,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test
@@ -311,8 +324,10 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
         verify(watcher).openSupportActivity(any())
     }
+
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
@@ -321,6 +336,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isSupportActivityOpen()
+        verify(watcher).destroySupportActivityIfExists()
     }
 
     @Test

@@ -29,6 +29,8 @@ import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.R
+import com.glia.widgets.StringKey
+import com.glia.widgets.StringKeyPair
 import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
@@ -37,7 +39,6 @@ import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
-import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
@@ -155,6 +156,8 @@ internal class CallView(
     private var alertDialog: AlertDialog? = null
     private var currentDialogState: DialogState? = null
 
+    private val stringProvider = Dependencies.getStringProvider()
+
     @JvmOverloads
     constructor(
         context: Context,
@@ -218,6 +221,7 @@ internal class CallView(
 
     fun onResume() {
         floatingVisitorVideoContainer.onResume()
+        floatingVisitorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_visitor_video_accessibility_label)
         callController?.onResume()
         operatorVideoView?.resumeRendering()
         dialogController?.addCallback(dialogCallback)
@@ -254,7 +258,7 @@ internal class CallView(
                 Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
                 Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
                 Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
-                Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog((it as OperatorName).operatorName) }
+                Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog() }
                 Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
                 Dialog.MODE_NO_MORE_OPERATORS -> post { showNoMoreOperatorsAvailableDialog() }
                 Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
@@ -282,6 +286,7 @@ internal class CallView(
     private fun handleCallTimerView(callState: CallState) {
         callTimerView.isVisible = callState.showCallTimerView()
         callState.callStatus.time?.also(callTimerView::setText)
+        callTimerView.contentDescription = stringProvider.getRemoteString(R.string.call_duration_accessibility_label)
     }
 
     private fun handleContinueBrowsingView(callState: CallState) {
@@ -289,8 +294,8 @@ internal class CallView(
             resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE &&
             callState.showContinueBrowsingView()
 
-        continueBrowsingView.text = resources.getString(
-            if (callState.showOnHold()) R.string.glia_call_continue_browsing_on_hold else R.string.glia_call_continue_browsing
+        continueBrowsingView.text = stringProvider.getRemoteString(
+            if (callState.showOnHold()) R.string.call_on_hold_bottom_text else R.string.engagement_queue_wait_message
         )
     }
 
@@ -299,8 +304,10 @@ internal class CallView(
         operatorStatusView.setShowOnHold(state.showOnHold())
         if (state.isTransferring) {
             operatorStatusView.showTransferring()
-            operatorNameView.setText(R.string.glia_chat_visitor_status_transferring)
+            operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring))
         } else {
+            operatorNameView.text = Dependencies.getSdkConfigurationManager().companyName
+            operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
             handleOperatorStatusViewOperatorImage(state)
         }
         operatorStatusView.isVisible = state.showOperatorStatusView()
@@ -313,6 +320,7 @@ internal class CallView(
             showOperatorProfileImageOnConnecting(state)
         } else {
             operatorStatusView.showPlaceholder()
+            connectingView.text = stringProvider.getRemoteString(R.string.android_call_queue_message)
         }
     }
 
@@ -347,8 +355,8 @@ internal class CallView(
             speakerButton,
             theme.iconCallSpeakerOn,
             theme.iconCallSpeakerOff,
-            R.string.glia_call_speaker_on_content_description,
-            R.string.glia_call_speaker_off_content_description,
+            R.string.android_call_turn_speaker_off_button_accessibility,
+            R.string.android_call_turn_speaker_on_button_accessibility,
             isSpeakerOn
         )
         speakerButtonLabel.isActivated = isSpeakerOn
@@ -358,10 +366,10 @@ internal class CallView(
         alertDialog = Dialogs.showOptionsDialog(
             context = this.context,
             theme = theme,
-            title = resources.getString(R.string.glia_dialog_leave_queue_title),
-            message = resources.getString(R.string.glia_dialog_leave_queue_message),
-            positiveButtonText = resources.getString(R.string.glia_dialog_leave_queue_yes),
-            negativeButtonText = resources.getString(R.string.glia_dialog_leave_queue_no),
+            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
+            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
@@ -385,10 +393,10 @@ internal class CallView(
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_title),
-                message = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_message),
-                positiveButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_yes),
-                negativeButtonText = resources.getString(R.string.glia_dialog_screen_sharing_offer_enable_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
+                message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     callController?.notificationsDialogDismissed()
                     this.context.openNotificationChannelScreen()
@@ -410,10 +418,10 @@ internal class CallView(
             alertDialog = Dialogs.showOptionsDialog(
                 context = this.context,
                 theme = theme,
-                title = resources.getString(R.string.glia_dialog_allow_notifications_title),
-                message = resources.getString(R.string.glia_dialog_allow_notifications_message),
-                positiveButtonText = resources.getString(R.string.glia_dialog_allow_notifications_yes),
-                negativeButtonText = resources.getString(R.string.glia_dialog_allow_notifications_no),
+                title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
+                message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
+                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
@@ -437,10 +445,10 @@ internal class CallView(
                 Dialogs.showScreenSharingDialog(
                     this.context,
                     theme,
-                    resources.getText(R.string.glia_dialog_screen_sharing_offer_title).toString(),
-                    resources.getText(R.string.glia_dialog_screen_sharing_offer_message).toString(),
-                    R.string.glia_dialog_screen_sharing_offer_accept,
-                    R.string.glia_dialog_screen_sharing_offer_decline,
+                    stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
+                    stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
+                    R.string.general_accept,
+                    R.string.general_decline,
                     { screenSharingController!!.onScreenSharingAccepted(context.requireActivity()) }
                 ) { screenSharingController!!.onScreenSharingDeclined() }
         }
@@ -459,7 +467,7 @@ internal class CallView(
             if (isActivated) activatedContentDescription else notActivatedContentDescription
 
         floatingActionButton.isActivated = isActivated
-        floatingActionButton.contentDescription = resources.getString(contentDescription)
+        floatingActionButton.contentDescription = stringProvider.getRemoteString(contentDescription)
         floatingActionButton.setImageResource(imageRes ?: return)
     }
 
@@ -549,10 +557,23 @@ internal class CallView(
         chatButtonBadgeView.applyBadgeTheme(callTheme?.buttonBar?.badge)
 
         // Texts
+        appBar.setTitle(stringProvider.getRemoteString(R.string.engagement_audio_title))
+        chatButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_chat_title)
+        speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_speaker_button)
+        minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
+        companyNameView.text = Dependencies.getSdkConfigurationManager().companyName
+        videoButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_video_title)
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)
         callTheme?.operator.also(operatorNameView::applyThemeAsDefault)
         callTheme?.bottomText.also(continueBrowsingView::applyTextTheme)
+
+        // Hints and content descriptions
+        operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_operator_video_accessibility_label)
+        operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
+        binding.callTimerView.hint = stringProvider.getRemoteString(R.string.call_duration_accessibility_label)
+        minimizeButton.contentDescription = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
+        operatorVideoContainer.contentDescription = stringProvider.getRemoteString(R.string.call_operator_video_accessibility_label)
 
         // Background
         callTheme?.background?.fill.also(::applyColorTheme)
@@ -651,17 +672,14 @@ internal class CallView(
         }
     }
 
-    private fun showEndEngagementDialog(operatorName: String) {
+    private fun showEndEngagementDialog() {
         alertDialog = Dialogs.showOptionsDialog(
             context = this.context,
             theme = theme,
-            title = resources.getString(R.string.glia_dialog_end_engagement_title),
-            message = resources.getString(
-                R.string.glia_dialog_end_engagement_message,
-                operatorName
-            ),
-            positiveButtonText = resources.getString(R.string.glia_dialog_end_engagement_yes),
-            negativeButtonText = resources.getString(R.string.glia_dialog_end_engagement_no),
+            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
+            message = stringProvider.getRemoteString(R.string.engagement_end_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
+            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
@@ -735,8 +753,8 @@ internal class CallView(
 
     private fun showNoMoreOperatorsAvailableDialog() {
         showAlertDialog(
-            R.string.glia_dialog_operators_unavailable_title,
-            R.string.glia_dialog_operators_unavailable_message
+            R.string.engagement_queue_closed_header,
+            R.string.engagement_queue_closed_message
         ) {
             dismissAlertDialog()
             callController?.noMoreOperatorsAvailableDismissed()
@@ -748,8 +766,8 @@ internal class CallView(
 
     private fun showUnexpectedErrorDialog() {
         showAlertDialog(
-            R.string.glia_dialog_unexpected_error_title,
-            R.string.glia_dialog_unexpected_error_message
+            R.string.error_general,
+            R.string.engagement_queue_reconnection_failed
         ) {
             dismissAlertDialog()
             callController?.unexpectedErrorDialogDismissed()
@@ -759,8 +777,8 @@ internal class CallView(
 
     override fun showMissingPermissionsDialog() {
         showAlertDialog(
-            R.string.glia_dialog_permission_error_title,
-            R.string.glia_dialog_permission_error_message
+            R.string.android_permissions_title,
+            R.string.android_permissions_message
         ) {
             dismissAlertDialog()
             callController?.unexpectedErrorDialogDismissed()
@@ -770,10 +788,10 @@ internal class CallView(
 
     private fun showOverlayPermissionsDialog() {
         showOptionsDialog(
-            resources.getString(R.string.glia_dialog_overlay_permissions_title),
-            resources.getString(R.string.glia_dialog_overlay_permissions_message),
-            resources.getString(R.string.glia_dialog_overlay_permissions_ok),
-            resources.getString(R.string.glia_dialog_overlay_permissions_no),
+            stringProvider.getRemoteString(R.string.android_overlay_permission_title),
+            stringProvider.getRemoteString(R.string.android_overlay_permission_message),
+            stringProvider.getRemoteString(R.string.general_ok),
+            stringProvider.getRemoteString(R.string.general_no),
             {
                 dismissAlertDialog()
                 callController?.overlayPermissionsDialogDismissed()
@@ -929,11 +947,8 @@ internal class CallView(
 
     override fun emitState(callState: CallState) {
         post {
-            connectingView.text = resources.getString(
-                R.string.glia_call_connecting_with,
-                callState.callStatus.formattedOperatorName,
-                callState.callStatus.time
-            )
+            connectingView.text = stringProvider.getRemoteString(R.string.android_call_queue_message)
+
             handleCallTimerView(callState)
 
             // No need to manage the remaining view's states if only time has changed
@@ -947,19 +962,22 @@ internal class CallView(
                 appBar.hideEndScreenSharingButton()
             }
             if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
-                setTitle(resources.getString(R.string.glia_call_video_app_bar_title))
+                setTitle(stringProvider.getRemoteString(R.string.engagement_video_title))
             } else {
-                setTitle(resources.getString(R.string.glia_call_audio_app_bar_title))
+                setTitle(stringProvider.getRemoteString(R.string.engagement_audio_title))
             }
             operatorNameView.text = callState.callStatus.formattedOperatorName
-            connectingView.contentDescription = resources.getString(
-                R.string.glia_call_connecting_with,
-                callState.callStatus.formattedOperatorName,
-                ""
+            connectingView.contentDescription = stringProvider.getRemoteString(
+                R.string.engagement_connection_screen_connect_with,
+                StringKeyPair(StringKey.OPERATOR_NAME, callState.callStatus.formattedOperatorName ?: ""),
+                StringKeyPair(StringKey.BADGE_VALUE, "")
             )
             if (callState.companyName != null) {
                 companyNameView.text = callState.companyName
-                msrView.setText(R.string.glia_call_in_queue_message)
+                companyNameView.hint = callState.companyName
+                msrView.text = stringProvider.getRemoteString(
+                    R.string.android_call_queue_message
+                )
             }
             chatButtonBadgeView.text = callState.messagesNotSeen.toString()
             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE &&
@@ -980,8 +998,8 @@ internal class CallView(
                 videoButton,
                 theme.iconCallVideoOn,
                 theme.iconCallVideoOff,
-                R.string.glia_call_video_on_content_description,
-                R.string.glia_call_video_off_content_description,
+                R.string.android_call_turn_video_off_button_accessibility,
+                R.string.android_call_turn_video_on_button_accessibility,
                 callState.hasVideo
             )
             videoButton.isActivated = callState.hasVideo
@@ -990,14 +1008,15 @@ internal class CallView(
                 muteButton,
                 theme.iconCallAudioOff, // mute (eg. mic-off) button activated icon
                 theme.iconCallAudioOn, // mute (eg. mic-off) button deactivated icon
-                R.string.glia_call_mute_content_description,
-                R.string.glia_call_unmute_content_description,
+                R.string.android_call_unmute_button_accessibility,
+                R.string.android_call_mute_button_accessibility,
                 callState.isMuted
             )
             muteButtonLabel.isActivated = callState.isMuted
-            muteButtonLabel.setText(
-                if (callState.isMuted) R.string.glia_call_mute_button_unmute else R.string.glia_call_mute_button_mute
+            muteButtonLabel.text = stringProvider.getRemoteString(
+                if (callState.isMuted) R.string.call_unmute_button else R.string.call_mute_button
             )
+            onHoldTextView.text = stringProvider.getRemoteString(R.string.call_on_hold_icon)
 
             callState.chatButtonViewState.apply {
                 if (this == ViewState.SHOW) {
@@ -1031,16 +1050,11 @@ internal class CallView(
             }
 
             chatButton.contentDescription =
-                if (callState.messagesNotSeen == 0) {
-                    resources.getString(R.string.glia_call_chat_zero_content_description)
-                } else {
-                    resources.getQuantityString(
-                        R.plurals.glia_call_chat_content_description,
-                        callState.messagesNotSeen,
-                        callState.messagesNotSeen
-                    )
+                when (callState.messagesNotSeen) {
+                    0 -> stringProvider.getRemoteString(R.string.engagement_chat_title)
+                    1 -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_single_item_accessibility_label, StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString()))
+                    else -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_multiple_items_accessibility_label, StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString()))
                 }
-
             applyTextThemeBasedOnCallState(callState)
         }
     }

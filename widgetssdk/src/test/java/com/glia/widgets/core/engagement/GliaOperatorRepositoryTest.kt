@@ -96,6 +96,38 @@ class GliaOperatorRepositoryTest {
         verify(callback).accept(null)
     }
 
+    @Test
+    fun `getOperatorImage returns default image url when operator image null and isAlwaysUseDefaultOperatorPicture true`() {
+        repository.operatorDefaultImageUrl = "default"
+        repository.isAlwaysUseDefaultOperatorPicture = true
+
+        assertEquals("default", repository.getOperatorImage(null))
+    }
+
+    @Test
+    fun `getOperatorImage returns default image url when operator image null and isAlwaysUseDefaultOperatorPicture false`() {
+        repository.operatorDefaultImageUrl = "default"
+        repository.isAlwaysUseDefaultOperatorPicture = false
+
+        assertEquals("default", repository.getOperatorImage(null))
+    }
+
+    @Test
+    fun `getOperatorImage returns default image url when operator image exists and isAlwaysUseDefaultOperatorPicture true`() {
+        repository.operatorDefaultImageUrl = "default"
+        repository.isAlwaysUseDefaultOperatorPicture = true
+
+        assertEquals("default", repository.getOperatorImage(null))
+    }
+
+    @Test
+    fun `getOperatorImage returns image Url when operator image exists and isAlwaysUseDefaultOperatorPicture false`() {
+        repository.operatorDefaultImageUrl = "default"
+        repository.isAlwaysUseDefaultOperatorPicture = false
+
+        assertEquals("imageUrl", repository.getOperatorImage("imageUrl"))
+    }
+
     private fun stubGetOperatorResponse(operator: Operator?, exception: GliaException?) {
         doAnswer { invocation: InvocationOnMock ->
             invocation.getArgument<RequestCallback<Operator?>>(1).apply { onResult(operator, exception) }

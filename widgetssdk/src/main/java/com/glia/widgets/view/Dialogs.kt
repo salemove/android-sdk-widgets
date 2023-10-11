@@ -160,7 +160,7 @@ object Dialogs {
         val title = context.getString(R.string.live_observation_confirm_title)
         val message = context.getString(R.string.live_observation_confirm_message, companyName)
         val positiveButtonText = context.getString(R.string.general_allow)
-        val negativeButtonText = context.getString(R.string.glia_dialog_cancel)
+        val negativeButtonText = context.getString(R.string.general_cancel)
         //***************** Block End
 
         return showOptionsDialog(

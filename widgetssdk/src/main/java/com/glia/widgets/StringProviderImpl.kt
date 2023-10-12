@@ -22,11 +22,11 @@ class StringProviderImpl(private val resourceProvider: ResourceProvider): String
                 }
                 cleanupRemainingReferences(returnValue)
             } ?: kotlin.run {
-                "_" + resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
+                resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
             }
         } catch (e: GliaException) {
             Logger.e("StringProvider", "**** ATTENTION **** \n An engagement view was opened immediately after Glia was initialized. \n It is strongly suggested to keep the initialization and actual engagement start separated by a little more time to allow custom locales feature to work properly.\n For further information See the  Custom Locales migration guide", e)
-            "_" + resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
+            resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
         }
     }
 

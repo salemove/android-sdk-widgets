@@ -161,7 +161,7 @@ class MessageView(
 
     private fun setupViewAppearance() {
         title.text = stringProvider.getRemoteString(R.string.message_center_welcome_title)
-        description.text = stringProvider.getRemoteString(R.string.media_messaging_description)
+        description.text = stringProvider.getRemoteString(R.string.message_center_welcome_subtitle)
         checkMessagesButton.text = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages)
         checkMessagesButton.contentDescription = stringProvider.getRemoteString(R.string.message_center_welcome_check_messages_accessibility_hint)
         messageTitle.text = stringProvider.getRemoteString(R.string.message_center_welcome_message_title)

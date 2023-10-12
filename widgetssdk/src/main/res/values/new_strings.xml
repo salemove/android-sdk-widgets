@@ -16,7 +16,7 @@
     <!-- Call Visualizer -->
     <string name="call_visualizer_visitor_code_title">@string/glia_visitor_code_view_title</string>
     <string name="visitor_code_failed">@string/glia_visitor_code_error_title</string>
-    <string name="call_visualizer_screen_sharing_header">@string/call_visualizer_screen_sharing_title</string>
+    <string name="call_visualizer_screen_sharing_header_title">@string/call_visualizer_screen_sharing_title</string>
     <string name="call_visualizer_screen_sharing_message">@string/call_visualizer_label</string>
     <string name="screen_sharing_visitor_screen_end_title">@string/call_visualizer_button</string>
     <string name="android_visitor_code_loading">@string/glia_visitor_code_loading</string>
@@ -157,7 +157,7 @@
     <string name="message_center_confirmation_subtitle">@string/message_center_confirmation_screen_message</string>
     <string name="message_center_confirmation_check_messages_accessibility_hint">Navigates you to the chat transcript.</string>
     <string name="engagement_secure_messaging_title">@string/message_center_screen_title</string>
-    <string name="media_messaging_description">@string/message_center_description</string>
+    <string name="message_center_welcome_subtitle">@string/message_center_description</string>
     <string name="general_sending">@string/message_center_progress_bar_content_description</string>
     <string name="general_send">@string/message_center_send_message_btn</string>
     <string name="message_center_welcome_file_picker_label_accessibility_label">File picker</string>

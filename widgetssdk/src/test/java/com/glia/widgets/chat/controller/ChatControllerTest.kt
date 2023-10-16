@@ -21,6 +21,7 @@ import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.engagement.domain.AcknowledgmentDialogUseCase
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
@@ -109,6 +110,7 @@ class ChatControllerTest {
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
     private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
+    private lateinit var acknowledgmentDialogUseCase: AcknowledgmentDialogUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -162,6 +164,7 @@ class ChatControllerTest {
         determineGvaButtonTypeUseCase = mock()
         isAuthenticatedUseCase = mock()
         updateOperatorDefaultImageUrlUseCase = mock()
+        acknowledgmentDialogUseCase = mock()
         chatManager = mock()
 
         chatController = ChatController(
@@ -211,6 +214,7 @@ class ChatControllerTest {
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
             updateOperatorDefaultImageUrlUseCase = updateOperatorDefaultImageUrlUseCase,
+            acknowledgmentDialogUseCase = acknowledgmentDialogUseCase,
             chatManager = chatManager
         )
     }

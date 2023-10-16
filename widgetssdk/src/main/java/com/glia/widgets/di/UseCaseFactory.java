@@ -75,6 +75,7 @@ import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDi
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
+import com.glia.widgets.core.engagement.domain.AcknowledgmentDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
@@ -1038,6 +1039,10 @@ public class UseCaseFactory {
     @NonNull
     public UpdateOperatorDefaultImageUrlUseCase createUpdateOperatorDefaultImageUrlUseCase() {
         return new UpdateOperatorDefaultImageUrlUseCase(repositoryFactory.getOperatorRepository(), createSiteInfoUseCase());
+    }
+
+    public AcknowledgmentDialogUseCase createAcknowledgmentDialogUseCase() {
+        return new AcknowledgmentDialogUseCase(createSiteInfoUseCase());
     }
 
     public void resetState() {

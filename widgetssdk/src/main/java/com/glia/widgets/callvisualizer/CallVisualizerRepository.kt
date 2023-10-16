@@ -42,26 +42,26 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
         }
     }
 
-    fun onLiveObservationDialogAllowed() {
-        Logger.d(TAG, "onLiveObservationDialogAllowed")
+    fun acceptEngagementRequest() {
+        Logger.d(TAG, "acceptEngagementRequest")
 
         engagementRequest?.accept(visitorContext) {
             if (it != null) {
                 Logger.e(TAG, "Error during accepting engagement request, reason" + it.message)
             } else {
-                Logger.i(TAG, "Incoming Call Visualizer engagement auto accepted")
+                Logger.i(TAG, "Incoming Call Visualizer engagement was accepted")
             }
         }
     }
 
-    fun onLiveObservationDialogRejected() {
-        Logger.d(TAG, "onLiveObservationDialogRejected")
+    fun declineEngagementRequest() {
+        Logger.d(TAG, "declineEngagementRequest")
 
         engagementRequest?.decline {
             if (it != null) {
                 Logger.e(TAG, "Error during declining engagement request, reason" + it.message)
             } else {
-                Logger.i(TAG, "Incoming Call Visualizer engagement auto rejected")
+                Logger.i(TAG, "Incoming Call Visualizer engagement was rejected")
             }
         }
     }

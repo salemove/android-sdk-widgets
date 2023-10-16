@@ -134,6 +134,7 @@ public class ControllerFactory {
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase(),
                 useCaseFactory.createUpdateOperatorDefaultImageUrlUseCase(),
+                useCaseFactory.createAcknowledgmentDialogUseCase(),
                 managerFactory.getChatManager()
             );
         } else {
@@ -182,6 +183,7 @@ public class ControllerFactory {
                 useCaseFactory.createIsOngoingEngagementUseCase(),
                 useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
+                useCaseFactory.createAcknowledgmentDialogUseCase(),
                 useCaseFactory.createHandleCallPermissionsUseCase());
         } else {
             Logger.d(TAG, "retained call controller");

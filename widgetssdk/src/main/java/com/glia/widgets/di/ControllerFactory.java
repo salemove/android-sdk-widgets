@@ -309,6 +309,7 @@ public class ControllerFactory {
                 useCaseFactory.getGliaSurveyUseCase(),
                 useCaseFactory.createOnCallVisualizerUseCase(),
                 useCaseFactory.createOnCallVisualizerEndUseCase(),
+                useCaseFactory.createAcknowledgmentDialogUseCase(),
                 useCaseFactory.createIsCallOrChatScreenActiveUseCase()
             );
         }

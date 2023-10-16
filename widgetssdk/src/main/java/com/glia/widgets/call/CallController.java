@@ -29,6 +29,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.engagement.domain.AcknowledgmentDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
@@ -66,6 +67,7 @@ import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.disposables.CompositeDisposable;
+import kotlin.Unit;
 
 public class CallController implements
         GliaOnEngagementUseCase.Listener,
@@ -111,6 +113,7 @@ public class CallController implements
     private final IsOngoingEngagementUseCase isOngoingEngagementUseCase;
     private final TurnSpeakerphoneUseCase turnSpeakerphoneUseCase;
     private final HandleCallPermissionsUseCase handleCallPermissionsUseCase;
+    private final AcknowledgmentDialogUseCase acknowledgmentDialogUseCase;
     private final String TAG = "CallController";
     private final CompositeDisposable disposable = new CompositeDisposable();
     private CallViewCallback viewCallback;
@@ -160,6 +163,7 @@ public class CallController implements
             IsOngoingEngagementUseCase isOngoingEngagementUseCase,
             SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase,
             TurnSpeakerphoneUseCase turnSpeakerphoneUseCase,
+            AcknowledgmentDialogUseCase acknowledgmentDialogUseCase,
             HandleCallPermissionsUseCase handleCallPermissionsUseCase) {
         Logger.d(TAG, "constructor");
         this.sdkConfigurationManager = sdkConfigurationManager;
@@ -210,6 +214,7 @@ public class CallController implements
         this.setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase;
         this.turnSpeakerphoneUseCase = turnSpeakerphoneUseCase;
         this.handleCallPermissionsUseCase = handleCallPermissionsUseCase;
+        this.acknowledgmentDialogUseCase = acknowledgmentDialogUseCase;
 
         if (isCallVisualizerUseCase.invoke()) {
             shouldShowMediaEngagementView(true);
@@ -303,7 +308,14 @@ public class CallController implements
         initMessagesNotSeenCallback();
         onEngagementUseCase.execute(this);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
-        dialogController.showLiveObservationOptInDialog();
+        acknowledgmentDialogUseCase.invoke(shouldShow -> {
+            if (shouldShow) {
+                dialogController.showLiveObservationOptInDialog();
+            } else {
+                queueForEngagement(queueId, visitorContextAssetId, mediaType);
+            }
+            return Unit.INSTANCE;
+        });
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);

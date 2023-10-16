@@ -43,6 +43,7 @@ import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.engagement.domain.AcknowledgmentDialogUseCase
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
@@ -141,6 +142,7 @@ internal class ChatController(
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase,
+    private val acknowledgmentDialogUseCase: AcknowledgmentDialogUseCase,
     private val chatManager: ChatManager
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
@@ -658,7 +660,13 @@ internal class ChatController(
     private fun viewInitPreQueueing() {
         Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
-        dialogController.showLiveObservationOptInDialog()
+        acknowledgmentDialogUseCase{ shouldShow ->
+            if (shouldShow) {
+                dialogController.showLiveObservationOptInDialog()
+            } else {
+                queueForEngagement()
+            }
+        }
     }
 
     private fun viewInitQueueing() {

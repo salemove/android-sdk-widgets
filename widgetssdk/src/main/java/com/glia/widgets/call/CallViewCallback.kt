@@ -9,5 +9,5 @@ internal interface CallViewCallback {
     fun destroyView()
     fun minimizeView()
     fun showMissingPermissionsDialog()
-    fun showLiveObservationOptInDialog(companyName: String)
+    fun showEngagementConfirmationDialog(companyName: String)
 }

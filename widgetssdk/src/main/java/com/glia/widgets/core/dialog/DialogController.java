@@ -151,7 +151,7 @@ public class DialogController {
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_UNAUTHENTICATED));
     }
 
-    public void showLiveObservationOptInDialog() {
+    public void showEngagementConfirmationDialog() {
         Logger.d(TAG, "Show Live Observation Opt In Dialog");
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_LIVE_OBSERVATION_OPT_IN));
     }

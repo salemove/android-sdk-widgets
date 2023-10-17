@@ -788,9 +788,9 @@ internal class CallView(
         }
     }
 
-    override fun showLiveObservationOptInDialog(companyName: String) {
+    override fun showEngagementConfirmationDialog(companyName: String) {
         dismissAlertDialog()
-        alertDialog = Dialogs.showLiveObservationOptInDialog(
+        alertDialog = Dialogs.showEngagementConfirmationDialog(
             context = context,
             theme = theme,
             companyName = companyName,

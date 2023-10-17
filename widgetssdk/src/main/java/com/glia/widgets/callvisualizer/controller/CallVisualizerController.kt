@@ -10,7 +10,7 @@ import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase
 import com.glia.widgets.core.dialog.DialogController
-import com.glia.widgets.core.engagement.domain.AcknowledgmentDialogUseCase
+import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.survey.OnSurveyListener
 import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
@@ -23,7 +23,7 @@ internal class CallVisualizerController(
     private val surveyUseCase: GliaSurveyUseCase,
     private val onCallVisualizerUseCase: GliaOnCallVisualizerUseCase,
     private val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase,
-    private val acknowledgmentDialogUseCase: AcknowledgmentDialogUseCase,
+    private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
 ) : CallVisualizerCallback,
     GliaOnCallVisualizerUseCase.Listener,
@@ -60,20 +60,20 @@ internal class CallVisualizerController(
     override fun onEngagementRequested() {
         dialogController.dismissVisitorCodeDialog()
 
-        acknowledgmentDialogUseCase{shouldShow ->
+        confirmationDialogUseCase{ shouldShow ->
             if (shouldShow) {
-                dialogController.showLiveObservationOptInDialog()
+                dialogController.showEngagementConfirmationDialog()
             } else {
                 callVisualizerRepository.acceptEngagementRequest()
             }
         }
     }
 
-    override fun onLiveObservationOptInDialogAllowed() {
+    override fun onEngagementConfirmationDialogAllowed() {
         callVisualizerRepository.acceptEngagementRequest()
     }
 
-    override fun onLiveObservationOptInDialogRejected() {
+    override fun onEngagementConfirmationDialogRejected() {
         callVisualizerRepository.declineEngagementRequest()
     }
 

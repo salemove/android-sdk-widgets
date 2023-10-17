@@ -134,7 +134,7 @@ public class ControllerFactory {
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase(),
                 useCaseFactory.createUpdateOperatorDefaultImageUrlUseCase(),
-                useCaseFactory.createAcknowledgmentDialogUseCase(),
+                useCaseFactory.createConfirmationDialogUseCase(),
                 managerFactory.getChatManager()
             );
         } else {
@@ -183,7 +183,7 @@ public class ControllerFactory {
                 useCaseFactory.createIsOngoingEngagementUseCase(),
                 useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
-                useCaseFactory.createAcknowledgmentDialogUseCase(),
+                useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createHandleCallPermissionsUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
@@ -311,7 +311,7 @@ public class ControllerFactory {
                 useCaseFactory.getGliaSurveyUseCase(),
                 useCaseFactory.createOnCallVisualizerUseCase(),
                 useCaseFactory.createOnCallVisualizerEndUseCase(),
-                useCaseFactory.createAcknowledgmentDialogUseCase(),
+                useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createIsCallOrChatScreenActiveUseCase()
             );
         }

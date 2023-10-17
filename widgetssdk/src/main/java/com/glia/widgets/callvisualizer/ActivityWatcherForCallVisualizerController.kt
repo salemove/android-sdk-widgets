@@ -122,7 +122,7 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.showAllowScreenSharingNotificationsAndStartSharingDialog()
             MODE_VISITOR_CODE -> watcher.showVisitorCodeDialog()
             MODE_START_SCREEN_SHARING -> watcher.showScreenSharingDialog()
-            MODE_LIVE_OBSERVATION_OPT_IN -> watcher.showLiveObservationOptInDialog()
+            MODE_LIVE_OBSERVATION_OPT_IN -> watcher.showEngagementConfirmationDialog()
             else -> {
                 Logger.d(TAG, "Unexpected dialog mode received - ${state.mode}")
             }
@@ -142,7 +142,7 @@ internal class ActivityWatcherForCallVisualizerController(
                 watcher.openOverlayPermissionView()
             }
 
-            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onLiveObservationOptInDialogAllowed()
+            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onEngagementConfirmationDialogAllowed()
             else -> Logger.d(TAG, "Not relevant")
         }
         watcher.removeDialogFromStack()
@@ -166,7 +166,7 @@ internal class ActivityWatcherForCallVisualizerController(
                 }
             }
 
-            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onLiveObservationOptInDialogRejected()
+            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onEngagementConfirmationDialogRejected()
             MODE_VISITOR_CODE,
             MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
         }

@@ -7,7 +7,7 @@ internal class AcknowledgmentDialogUseCase(
 ) {
     operator fun invoke(callback: (shouldShow: Boolean) -> Unit) {
         siteInfoUseCase.execute { siteInfo, _ ->
-            callback(siteInfo?.isAcknowledgmentDialogEnabled ?: false)
+            callback(siteInfo?.isConfirmationDialogEnabled ?: false)
         }
     }
 }

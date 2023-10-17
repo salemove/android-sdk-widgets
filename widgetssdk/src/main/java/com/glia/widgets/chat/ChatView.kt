@@ -505,30 +505,30 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 this@ChatView.requestOpenEmailClient(uri)
             }
 
-            override fun showLiveObservationOptInDialog(companyName: String) {
-                this@ChatView.showLiveObservationOptInDialog(companyName)
+            override fun showEngagementConfirmationDialog(companyName: String) {
+                this@ChatView.showEngagementConfirmationDialog(companyName)
             }
         }
     }
 
-    private fun showLiveObservationOptInDialog(companyName: String) {
+    private fun showEngagementConfirmationDialog(companyName: String) {
         if (alertDialog?.isShowing == true) return
 
-        alertDialog = Dialogs.showLiveObservationOptInDialog(
+        alertDialog = Dialogs.showEngagementConfirmationDialog(
             context = context,
             theme = theme,
             companyName = companyName,
-            positiveButtonClickListener = { onLiveObservationOptInDialogAllowed() },
-            negativeButtonClickListener = { onLiveObservationOptInDialogDismissed() }
+            positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
+            negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() }
         )
     }
 
-    private fun onLiveObservationOptInDialogAllowed() {
+    private fun onEngagementConfirmationDialogAllowed() {
         dismissAlertDialog()
         controller?.onLiveObservationDialogAllowed()
     }
 
-    private fun onLiveObservationOptInDialogDismissed() {
+    private fun onEngagementConfirmationDialogDismissed() {
         dismissAlertDialog()
         controller?.onLiveObservationDialogRejected()
         onEndListener?.onEnd()
@@ -602,7 +602,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     showAllowScreenSharingNotificationsAndStartSharingDialog()
                 }
 
-                Dialog.MODE_LIVE_OBSERVATION_OPT_IN -> post { controller?.onLiveObservationOptInDialogRequested() }
+                Dialog.MODE_LIVE_OBSERVATION_OPT_IN -> post { controller?.onEngagementConfirmationDialogRequested() }
 
                 Dialog.MODE_VISITOR_CODE -> {
                     Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")

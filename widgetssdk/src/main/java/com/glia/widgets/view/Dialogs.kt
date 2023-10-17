@@ -148,7 +148,7 @@ object Dialogs {
         }
     }
 
-    fun showLiveObservationOptInDialog(
+    fun showEngagementConfirmationDialog(
         context: Context,
         theme: UiTheme,
         companyName: String,

@@ -353,10 +353,10 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    override fun showLiveObservationOptInDialog() {
+    override fun showEngagementConfirmationDialog() {
         val companyName = Dependencies.getSdkConfigurationManager().companyName
         showAlertDialogOnUiThreadWithStyledContext("Show live observation opt in dialog") { context, uiTheme, _ ->
-            Dialogs.showLiveObservationOptInDialog(
+            Dialogs.showEngagementConfirmationDialog(
                 context = context,
                 theme = uiTheme,
                 companyName = companyName,

@@ -14,6 +14,6 @@ interface CallVisualizerCallback {
     )
 
     fun onEngagementRequested()
-    fun onLiveObservationOptInDialogAllowed()
-    fun onLiveObservationOptInDialogRejected()
+    fun onEngagementConfirmationDialogAllowed()
+    fun onEngagementConfirmationDialogRejected()
 }

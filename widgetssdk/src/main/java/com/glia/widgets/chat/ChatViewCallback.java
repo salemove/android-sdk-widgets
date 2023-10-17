@@ -55,5 +55,5 @@ public interface ChatViewCallback {
 
     void requestOpenEmailClient(@NotNull Uri uri);
 
-    void showLiveObservationOptInDialog(@NonNull String companyName);
+    void showEngagementConfirmationDialog(@NonNull String companyName);
 }

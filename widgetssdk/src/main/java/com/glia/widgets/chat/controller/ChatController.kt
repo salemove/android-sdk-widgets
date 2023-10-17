@@ -43,7 +43,7 @@ import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.engagement.domain.AcknowledgmentDialogUseCase
+import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
@@ -142,7 +142,7 @@ internal class ChatController(
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase,
-    private val acknowledgmentDialogUseCase: AcknowledgmentDialogUseCase,
+    private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     private val chatManager: ChatManager
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
@@ -258,9 +258,9 @@ internal class ChatController(
         updateAllowFileSendState()
     }
 
-    fun onLiveObservationOptInDialogRequested() {
+    fun onEngagementConfirmationDialogRequested() {
         if (isOngoingEngagementUseCase()) return
-        viewCallback?.showLiveObservationOptInDialog(chatState.companyName.orEmpty())
+        viewCallback?.showEngagementConfirmationDialog(chatState.companyName.orEmpty())
     }
 
     fun onLiveObservationDialogAllowed() {
@@ -660,9 +660,9 @@ internal class ChatController(
     private fun viewInitPreQueueing() {
         Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
-        acknowledgmentDialogUseCase{ shouldShow ->
+        confirmationDialogUseCase{ shouldShow ->
             if (shouldShow) {
-                dialogController.showLiveObservationOptInDialog()
+                dialogController.showEngagementConfirmationDialog()
             } else {
                 queueForEngagement()
             }

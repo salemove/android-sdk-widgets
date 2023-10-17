@@ -51,6 +51,6 @@ class ActivityWatcherForCallVisualizerContract {
         fun callOverlayDialog()
         fun dismissOverlayDialog()
         fun isSupportActivityOpen(): Boolean
-        fun showLiveObservationOptInDialog()
+        fun showEngagementConfirmationDialog()
     }
 }

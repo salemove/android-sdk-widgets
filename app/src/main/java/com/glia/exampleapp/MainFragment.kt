@@ -378,6 +378,7 @@ class MainFragment : Fragment() {
         GliaWidgets.init(
             createDefaultConfig(
                 context = requireActivity().applicationContext,
+//                manualLocaleOverride = "en_EXPL"
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalGlobalColors(requireContext()),
 //                runtimeConfig = createSampleRuntimeConfig(),
 //                region = "us"

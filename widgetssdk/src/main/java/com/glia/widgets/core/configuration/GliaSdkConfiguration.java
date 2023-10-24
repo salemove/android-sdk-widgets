@@ -19,6 +19,7 @@ public class GliaSdkConfiguration {
     private final boolean useOverlay;
     private final ScreenSharing.Mode screenSharingMode;
     private final ChatType chatType;
+    private final String manualLocaleOverride;
 
     public String getCompanyName() {
         return this.companyName;
@@ -53,6 +54,10 @@ public class GliaSdkConfiguration {
         return chatType;
     }
 
+    public String getManualStringOverrideL() {
+        return manualLocaleOverride;
+    }
+
     public static class Builder {
         private String companyName;
         private String queueId;
@@ -62,6 +67,7 @@ public class GliaSdkConfiguration {
         private boolean useOverlay;
         private ScreenSharing.Mode screenSharingMode;
         private ChatType chatType;
+        private String manualLocaleOverride;
 
         public Builder companyName(String companyName) {
             this.companyName = companyName;
@@ -99,6 +105,11 @@ public class GliaSdkConfiguration {
             return this;
         }
 
+        public Builder manualLocaleOverride(String manualLocaleOverride) {
+            this.manualLocaleOverride = manualLocaleOverride;
+            return this;
+        }
+
         public Builder intent(Intent intent) {
             this.companyName = Dependencies.getSdkConfigurationManager().getCompanyName();
             this.queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID);
@@ -130,5 +141,6 @@ public class GliaSdkConfiguration {
         this.useOverlay = builder.useOverlay;
         this.screenSharingMode = builder.screenSharingMode;
         this.chatType = builder.chatType;
+        this.manualLocaleOverride = builder.manualLocaleOverride;
     }
 }

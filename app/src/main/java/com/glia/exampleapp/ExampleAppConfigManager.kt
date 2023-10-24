@@ -106,7 +106,8 @@ object ExampleAppConfigManager {
         runtimeConfig: UiTheme? = null,
         region: String? = null,
         baseDomain: String = DEFAULT_BASE_DOMAIN,
-        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
+        manualLocaleOverride: String? = null
     ): GliaWidgetsConfig {
         val siteRegion = region ?: preferences.getString(
             context.getString(R.string.pref_environment),
@@ -149,6 +150,7 @@ object ExampleAppConfigManager {
             .setContext(context)
             .setUiJsonRemoteConfig(uiJsonRemoteConfig ?: Utils.getRemoteThemeByPrefs(preferences, context.resources))
             .setUiTheme(runtimeConfig ?: Utils.getRunTimeThemeByPrefs(preferences, context.resources))
+            .setManualLocaleOverride(manualLocaleOverride)
             .build()
     }
 }

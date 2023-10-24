@@ -5,8 +5,7 @@ import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.widgets.helper.Logger
 
-
-class StringProviderImpl(private val resourceProvider: ResourceProvider): StringProvider {
+class StringProviderImpl(private val resourceProvider: ResourceProvider) : StringProvider {
 
     private val regex = "(\\{[a-zA-Z\\d]*\\})".toRegex()
 
@@ -25,7 +24,15 @@ class StringProviderImpl(private val resourceProvider: ResourceProvider): String
                 resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
             }
         } catch (e: GliaException) {
-            Logger.e("StringProvider", "**** ATTENTION **** \n An engagement view was opened immediately after Glia was initialized. \n It is strongly suggested to keep the initialization and actual engagement start separated by a little more time to allow custom locales feature to work properly.\n For further information See the  Custom Locales migration guide", e)
+            Logger.e(
+                "StringProvider",
+                "**** ATTENTION **** \n " +
+                    "An engagement view was opened immediately after Glia was initialized. \n " +
+                    "It is strongly suggested to keep the initialization and actual engagement " +
+                    "start separated by a little more time to allow custom locales feature to work properly.\n " +
+                    "For further information See the  Custom Locales migration guide",
+                e
+            )
             resourceProvider.getString(stringKey, *values.map { pair -> pair?.value }.toTypedArray())
         }
     }

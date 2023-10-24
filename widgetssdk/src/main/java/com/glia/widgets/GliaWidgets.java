@@ -142,6 +142,7 @@ public class GliaWidgets {
             .setRegion(gliaWidgetsConfig.getRegion())
             .setBaseDomain(gliaWidgetsConfig.getBaseDomain())
             .setContext(gliaWidgetsConfig.getContext())
+            .setManualLocaleOverride(gliaWidgetsConfig.getManualLocaleOverride())
             .build();
     }
 

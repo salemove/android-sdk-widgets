@@ -12,7 +12,6 @@ import com.glia.widgets.chat.domain.GliaOnMessageUseCase
 import com.glia.widgets.chat.domain.HandleCustomCardClickUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SendUnsentMessagesUseCase
-import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.GvaQuickReplies
 import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
@@ -593,24 +592,24 @@ class ChatManagerTest {
         val chatMessageInternal = mockChatMessage<SystemMessage>()
         doReturn(true).whenever(state).isNew(chatMessageInternal)
 
-        whenever(loadHistoryUseCase()) doReturn Single.just(mock())
+        whenever(loadHistoryUseCase()) doReturn Single.just(ChatHistoryResponse(emptyList()))
         whenever(onMessageUseCase()) doReturn Observable.just(chatMessageInternal)
 
-        val chatItems = mutableListOf<ChatItem>(mock())
         subjectUnderTest.apply {
             val onHistoryLoaded = mock<(hasHistory: Boolean) -> Unit>()
             val onQuickReplyReceived = mock<(List<GvaButton>) -> Unit>()
             val onOperatorMessageReceived = mock<(count: Int) -> Unit>()
-            val itemsFlowable = initialize(onHistoryLoaded, onQuickReplyReceived, onOperatorMessageReceived)
+
+            initialize(onHistoryLoaded, onQuickReplyReceived, onOperatorMessageReceived).test().assertNoErrors().awaitCount(1)
+
             verify(this).subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
-
-            val test = itemsFlowable.test()
-
-            stateProcessor.onNext(ChatManager.State(chatItems = chatItems))
+            verify(this).subscribeToState(onHistoryLoaded, onOperatorMessageReceived)
+            verify(this).subscribeToQuickReplies(onQuickReplyReceived)
 
             verify(this, atLeastOnce()).updateQuickReplies(any())
 
-            assertEquals(test.values().last().last(), chatItems.last())
+            stateProcessor.onNext(state)
+            verify(state).immutableChatItems
         }
     }
 

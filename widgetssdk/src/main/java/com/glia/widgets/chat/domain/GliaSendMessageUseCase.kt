@@ -1,10 +1,10 @@
 package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
+import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.engagement.GliaEngagementStateRepository
@@ -25,7 +25,7 @@ internal class GliaSendMessageUseCase(
         fun messageSent(message: VisitorMessage?)
         fun onMessageValidated()
         fun errorOperatorNotOnline(message: Unsent)
-        fun error(ex: GliaException)
+        fun error(ex: GliaException, message: Unsent)
 
         fun errorMessageInvalid() {
             // Currently, no need for this method, but have to keep it because it describes case in else branch
@@ -39,32 +39,11 @@ internal class GliaSendMessageUseCase(
         return fileAttachments.isNotEmpty()
     }
 
-    private fun sendMessageWithAttachments(
-        message: String,
-        fileAttachments: List<FileAttachment>,
-        listener: Listener
-    ) {
-        val filesAttachment = fileAttachments
-            .map { it.engagementFile }
-            .toTypedArray()
-            .let { FilesAttachment.from(it) }
+    private fun sendMessage(payload: SendMessagePayload, listener: Listener) {
         if (isSecureEngagement) {
-            secureConversationsRepository.send(message, engagementConfigRepository.queueIds, filesAttachment, listener)
+            secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
         } else {
-            if (message.isNotEmpty()) {
-                chatRepository.sendMessageWithAttachment(message, filesAttachment, listener)
-            } else {
-                chatRepository.sendMessageAttachment(filesAttachment, listener)
-            }
-        }
-        fileAttachmentRepository.detachFiles(fileAttachments)
-    }
-
-    private fun sendMessage(message: String, listener: Listener) {
-        if (isSecureEngagement) {
-            secureConversationsRepository.send(message, engagementConfigRepository.queueIds, listener)
-        } else {
-            chatRepository.sendMessage(message, listener)
+            chatRepository.sendMessage(payload, listener)
         }
     }
 
@@ -73,29 +52,27 @@ internal class GliaSendMessageUseCase(
             fileAttachmentRepository.readyToSendFileAttachments
         if (canSendMessage(message, fileAttachments.size)) {
             listener.onMessageValidated()
+            val attachments = if (hasFileAttachments(fileAttachments)) fileAttachments else null
+            val payload = SendMessagePayload(content = message, fileAttachments = attachments)
             if (isOperatorOnline || isSecureEngagement) {
-                if (hasFileAttachments(fileAttachments)) {
-                    sendMessageWithAttachments(message, fileAttachments, listener)
-                } else {
-                    sendMessage(message, listener)
-                }
+                sendMessage(payload, listener)
             } else {
-                listener.errorOperatorNotOnline(Unsent.Message(message))
+                listener.errorOperatorNotOnline(Unsent(payload = payload))
             }
+            fileAttachmentRepository.detachFiles(fileAttachments)
         } else {
             listener.errorMessageInvalid()
         }
     }
 
     fun execute(singleChoiceAttachment: SingleChoiceAttachment, listener: Listener) {
+        val payload = SendMessagePayload(attachment = singleChoiceAttachment)
         when {
-            isSecureEngagement -> singleChoiceAttachment.apply {
-                secureConversationsRepository.send(selectedOptionText, engagementConfigRepository.queueIds, singleChoiceAttachment, listener)
-            }
+            isSecureEngagement -> secureConversationsRepository.send(payload, engagementConfigRepository.queueIds, listener)
 
-            isOperatorOnline -> chatRepository.sendMessageSingleChoice(singleChoiceAttachment, listener)
+            isOperatorOnline -> chatRepository.sendMessage(payload, listener)
 
-            else -> listener.errorOperatorNotOnline(Unsent.Attachment(singleChoiceAttachment))
+            else -> listener.errorOperatorNotOnline(Unsent(payload = payload))
         }
     }
 

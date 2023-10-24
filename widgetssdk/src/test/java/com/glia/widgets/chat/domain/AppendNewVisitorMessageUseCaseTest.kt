@@ -4,6 +4,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.ChatManager
+import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorChatItem
@@ -56,25 +57,30 @@ class AppendNewVisitorMessageUseCaseTest {
         val content = "content"
         whenever(visitorMessage.content) doReturn content
 
-        state.unsentItems.add(Unsent.Message(message = content))
+        state.unsentItems.add(Unsent(SendMessagePayload(content = content)))
         assertFalse(useCase.addUnsentItem(state, visitorMessage))
     }
 
     @Test
     fun `addUnsentItem returns true when unsentItems and chatItems contain received message`() {
-        val lastDelivered: VisitorChatItem = VisitorMessageItem("message", "id", 1, true)
+        val lastDelivered: VisitorChatItem = VisitorMessageItem("message", "id1", 1, true)
 
         useCase.lastDeliveredItem = lastDelivered
         state.chatItems.add(lastDelivered)
 
+        val id = "id2"
         val content = "content"
         whenever(visitorMessage.content) doReturn content
-        whenever(visitorMessage.id) doReturn "id"
+        whenever(visitorMessage.id) doReturn id
         whenever(visitorMessage.timestamp) doReturn 1
 
-        val unsentMessage = Unsent.Message(message = content)
+        val unsentMessage: Unsent = mock()
+        val unsentMessageItem = VisitorMessageItem(content, id, 2, showDelivered = false, showError = true)
+        whenever(unsentMessage.messageId) doReturn id
+        whenever(unsentMessage.chatMessage) doReturn unsentMessageItem
+
         state.unsentItems.add(unsentMessage)
-        state.chatItems.add(unsentMessage.chatMessage)
+        state.chatItems.add(unsentMessageItem)
 
         assertTrue(useCase.addUnsentItem(state, visitorMessage))
         assertTrue(state.unsentItems.isEmpty())

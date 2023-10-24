@@ -53,6 +53,7 @@ import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(
     private val uiTheme: UiTheme,
+    private val onMessageClickListener: OnMessageClickListener,
     private val onOptionClickedListener: OnOptionClickedListener,
     private val onFileItemClickListener: OnFileItemClickListener,
     private val onImageItemClickListener: OnImageItemClickListener,
@@ -98,6 +99,7 @@ internal class ChatAdapter(
             VISITOR_MESSAGE_TYPE -> {
                 VisitorMessageViewHolder(
                     ChatVisitorMessageLayoutBinding.inflate(inflater, parent, false),
+                    onMessageClickListener,
                     uiTheme
                 )
             }
@@ -215,10 +217,10 @@ internal class ChatAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
         val isHandled: Boolean = when (holder) {
-            is MediaUpgradeStartedViewHolder -> updateMediaUpgradeTimer(payloads, holder)
-            is VisitorMessageViewHolder -> updateDeliveredState(payloads, holder)
-            is VisitorFileAttachmentViewHolder -> updateDeliveredState(payloads, holder)
-            is VisitorImageAttachmentViewHolder -> updateDeliveredState(payloads, holder)
+            is MediaUpgradeStartedViewHolder -> updateMediaUpgradeStartedViewHolder(payloads, holder)
+            is VisitorMessageViewHolder -> updateVisitorMessageViewHolder(payloads, holder)
+            is VisitorFileAttachmentViewHolder -> updateVisitorFileAttachmentViewHolder(payloads, holder)
+            is VisitorImageAttachmentViewHolder -> updateVisitorImageAttachmentViewHolder(payloads, holder)
             else -> false
         }
 
@@ -227,30 +229,45 @@ internal class ChatAdapter(
         }
     }
 
-    private fun updateDeliveredState(payloads: MutableList<Any>, holder: VisitorMessageViewHolder): Boolean =
-        payloads.lastOrNull { it is Boolean }?.let {
-            holder.updateDelivered(it as Boolean)
-            true
-        } ?: false
+    private fun updateVisitorMessageViewHolder(payloads: MutableList<Any>, holder: VisitorMessageViewHolder): Boolean =
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
+            is ChatAdapterPayload.ShowDelivered -> {
+                holder.updateDelivered(payload.showDelivered)
+                true
+            }
+            is ChatAdapterPayload.ShowError -> {
+                holder.updateError(payload.showError)
+                true
+            }
+            else -> false
+        }
 
-    private fun updateDeliveredState(payloads: MutableList<Any>, holder: VisitorFileAttachmentViewHolder): Boolean =
-        payloads.lastOrNull { it is Boolean }?.let {
-            holder.updateDelivered(it as Boolean)
-            true
-        } ?: false
+    private fun updateVisitorFileAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorFileAttachmentViewHolder): Boolean =
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
+            is ChatAdapterPayload.ShowDelivered -> {
+                holder.updateDelivered(payload.showDelivered)
+                true
+            }
+            else -> false
+        }
 
-    private fun updateDeliveredState(payloads: MutableList<Any>, holder: VisitorImageAttachmentViewHolder): Boolean =
-        payloads.lastOrNull { it is Boolean }?.let {
-            holder.updateDelivered(it as Boolean)
-            true
-        } ?: false
+    private fun updateVisitorImageAttachmentViewHolder(payloads: MutableList<Any>, holder: VisitorImageAttachmentViewHolder): Boolean =
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
+            is ChatAdapterPayload.ShowDelivered -> {
+                holder.updateDelivered(payload.showDelivered)
+                true
+            }
+            else -> false
+        }
 
-    private fun updateMediaUpgradeTimer(payloads: MutableList<Any>, viewHolder: MediaUpgradeStartedViewHolder): Boolean = payloads.run {
-        firstOrNull() as? String
-    }?.let {
-        viewHolder.updateTime(it)
-        true
-    } ?: false
+    private fun updateMediaUpgradeStartedViewHolder(payloads: MutableList<Any>, viewHolder: MediaUpgradeStartedViewHolder): Boolean =
+        when (val payload = payloads.lastOrNull { it is ChatAdapterPayload } ) {
+            is ChatAdapterPayload.Time -> {
+                viewHolder.updateTime(payload.time)
+                true
+            }
+            else -> false
+        }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val chatItem = differ.currentList[position]) {
@@ -260,15 +277,10 @@ internal class ChatAdapter(
             is MediaUpgradeStartedTimerItem -> (holder as MediaUpgradeStartedViewHolder).bind(chatItem)
             is OperatorAttachmentItem.Image -> (holder as OperatorImageAttachmentViewHolder).bind(chatItem, onImageItemClickListener)
             is OperatorAttachmentItem.File -> (holder as OperatorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener)
-            is VisitorAttachmentItem.File -> (holder as VisitorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener)
-            is VisitorAttachmentItem.Image -> {
-                val viewHolder = holder as VisitorImageAttachmentViewHolder
-                viewHolder.bind(chatItem.attachmentFile, chatItem.showDelivered)
-                viewHolder.itemView.setOnClickListener {
-                    onImageItemClickListener.onImageItemClick(chatItem.attachmentFile, it)
-                }
-            }
-
+            is VisitorAttachmentItem.File ->
+                (holder as VisitorFileAttachmentViewHolder).bind(chatItem, onFileItemClickListener, onMessageClickListener)
+            is VisitorAttachmentItem.Image ->
+                (holder as VisitorImageAttachmentViewHolder).bind(chatItem, onImageItemClickListener, onMessageClickListener)
             is SystemChatItem -> (holder as SystemMessageViewHolder).bind(chatItem.message)
             is GvaResponseText -> (holder as GvaResponseTextViewHolder).bind(chatItem)
             is GvaQuickReplies -> (holder as GvaResponseTextViewHolder).bind(chatItem.asResponseText())
@@ -318,6 +330,9 @@ internal class ChatAdapter(
 
     fun interface OnGvaButtonsClickListener {
         fun onGvaButtonClicked(gvaButton: GvaButton)
+    }
+    fun interface OnMessageClickListener {
+        fun onMessageClick(messageId: String)
     }
 
     companion object {

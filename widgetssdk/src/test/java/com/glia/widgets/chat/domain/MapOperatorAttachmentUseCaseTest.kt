@@ -2,6 +2,7 @@ package com.glia.widgets.chat.domain
 
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.chat.MockChatMessageInternal
+import com.glia.widgets.chat.model.Attachment
 import com.glia.widgets.chat.model.OperatorAttachmentItem
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -20,6 +21,7 @@ class MapOperatorAttachmentUseCaseTest {
     @Before
     fun setUp() {
         mockAttachment = mock()
+        whenever(mockAttachment.id) doReturn "attachment_id"
         mockChatMessageInternal.mockChatMessage()
         mockChatMessageInternal.mockOperatorProperties()
     }
@@ -35,11 +37,11 @@ class MapOperatorAttachmentUseCaseTest {
         mockChatMessageInternal.apply {
             val mappedMessage = useCase(mockAttachment, chatMessageInternal, true)
             assertTrue(mappedMessage is OperatorAttachmentItem.Image)
-            assertEquals(mappedMessage.attachmentFile, mockAttachment)
-            assertEquals(mappedMessage.timestamp, messageTimeStamp)
-            assertEquals(mappedMessage.showChatHead, true)
-            assertEquals(mappedMessage.operatorProfileImgUrl, operatorImageUrl)
-            assertEquals(mappedMessage.operatorId, operatorId)
+            assertEquals(Attachment.Remote(mockAttachment), mappedMessage.attachment)
+            assertEquals(messageTimeStamp, mappedMessage.timestamp)
+            assertEquals(true, mappedMessage.showChatHead)
+            assertEquals(operatorImageUrl, mappedMessage.operatorProfileImgUrl)
+            assertEquals(operatorId, mappedMessage.operatorId)
         }
     }
 
@@ -49,11 +51,11 @@ class MapOperatorAttachmentUseCaseTest {
         mockChatMessageInternal.apply {
             val mappedMessage = useCase(mockAttachment, chatMessageInternal, false)
             assertTrue(mappedMessage is OperatorAttachmentItem.File)
-            assertEquals(mappedMessage.attachmentFile, mockAttachment)
-            assertEquals(mappedMessage.timestamp, messageTimeStamp)
-            assertEquals(mappedMessage.showChatHead, false)
-            assertEquals(mappedMessage.operatorProfileImgUrl, operatorImageUrl)
-            assertEquals(mappedMessage.operatorId, operatorId)
+            assertEquals(Attachment.Remote(mockAttachment), mappedMessage.attachment)
+            assertEquals(messageTimeStamp, mappedMessage.timestamp)
+            assertEquals(false, mappedMessage.showChatHead)
+            assertEquals(operatorImageUrl, mappedMessage.operatorProfileImgUrl)
+            assertEquals(operatorId, mappedMessage.operatorId)
         }
     }
 }

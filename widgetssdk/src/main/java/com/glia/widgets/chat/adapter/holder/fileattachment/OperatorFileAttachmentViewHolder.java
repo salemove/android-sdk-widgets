@@ -29,7 +29,7 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     }
 
     public void bind(OperatorAttachmentItem.File item, ChatAdapter.OnFileItemClickListener listener) {
-        super.setData(item.isFileExists(), item.isDownloading(), item.getAttachmentFile(), listener);
+        super.setData(item.isFileExists(), item.isDownloading(), item.getAttachment(), listener);
         updateOperatorStatusView(item);
     }
 
@@ -46,8 +46,9 @@ public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
             operatorStatusView.showPlaceholder();
         }
 
-        String name = item.getAttachmentFile().getName();
-        String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
+        String name = getAttachmentName(item.getAttachment());
+        long size = getAttachmentSize(item.getAttachment());
+        String byteSize = Formatter.formatFileSize(itemView.getContext(), size);
         itemView.setContentDescription(
             stringProvider.getRemoteString(
                 R.string.android_chat_operator_file_accessibility,

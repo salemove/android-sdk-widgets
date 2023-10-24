@@ -156,6 +156,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
     private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
+    private val onMessageClickListener = ChatAdapter.OnMessageClickListener { messageId: String ->
+        controller?.onMessageClicked(messageId)
+    }
     private val onOptionClickedListener = OnOptionClickedListener { item, selectedOption ->
         Logger.d(TAG, "singleChoiceCardClicked")
         controller?.singleChoiceOptionClicked(item, selectedOption)
@@ -748,6 +751,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun setupViewAppearance() {
         adapter = ChatAdapter(
             theme,
+            onMessageClickListener,
             onOptionClickedListener,
             this,
             this,

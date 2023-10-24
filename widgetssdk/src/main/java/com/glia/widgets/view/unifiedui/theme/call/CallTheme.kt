@@ -1,5 +1,6 @@
 package com.glia.widgets.view.unifiedui.theme.call
 
+import com.glia.widgets.view.unifiedui.theme.SnackBarTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
@@ -13,5 +14,6 @@ internal data class CallTheme(
     val header: HeaderTheme? = null,
     val operator: TextTheme? = null,
     val topText: TextTheme? = null,
-    val connect: EngagementStatesTheme? = null
+    val connect: EngagementStatesTheme? = null,
+    val snackBar: SnackBarTheme? = null
 )

@@ -17,5 +17,6 @@ internal data class UnifiedTheme(
     val surveyTheme: SurveyTheme? = null,
     val callVisualizerTheme: CallVisualizerTheme? = null,
     val secureConversationsWelcomeScreenTheme: SecureConversationsWelcomeScreenTheme? = null,
-    val secureConversationsConfirmationScreenTheme: SecureConversationsConfirmationScreenTheme? = null
+    val secureConversationsConfirmationScreenTheme: SecureConversationsConfirmationScreenTheme? = null,
+    val snackBarTheme: SnackBarTheme? = null
 )

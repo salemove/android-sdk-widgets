@@ -15,15 +15,16 @@ import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 internal fun CallTheme(pallet: ColorPallet) = pallet.run {
     val header = CallHeaderTheme(this)
 
-    // must not have a background in default theme to imitate native dialler
+    // must not have a background in the default theme to imitate native dialer
     CallTheme(
         bottomText = BaseLightColorTextTheme(this),
-        buttonBar = ButtonBarTheme(pallet),
+        buttonBar = ButtonBarTheme(this),
         duration = BaseLightColorTextTheme(this),
         header = header,
         operator = BaseLightColorTextTheme(this),
         topText = BaseLightColorTextTheme(this),
-        connect = CallEngagementStatesTheme(pallet)
+        connect = CallEngagementStatesTheme(this),
+        snackBar = CallSnackBarTheme(this)
     )
 }
 

@@ -10,9 +10,20 @@ internal class ChatAdapterDiffCallback : DiffUtil.ItemCallback<ChatItem>() {
     override fun areContentsTheSame(oldItem: ChatItem, newItem: ChatItem): Boolean = oldItem.areContentsTheSame(newItem)
 
     override fun getChangePayload(oldItem: ChatItem, newItem: ChatItem): Any? = when {
-        oldItem is MediaUpgradeStartedTimerItem.Audio && newItem is MediaUpgradeStartedTimerItem.Audio -> newItem.time
-        oldItem is MediaUpgradeStartedTimerItem.Video && newItem is MediaUpgradeStartedTimerItem.Video -> newItem.time
-        oldItem is VisitorChatItem && newItem is VisitorChatItem -> newItem.showDelivered
+        oldItem is MediaUpgradeStartedTimerItem.Audio && newItem is MediaUpgradeStartedTimerItem.Audio -> ChatAdapterPayload.Time(newItem.time)
+        oldItem is MediaUpgradeStartedTimerItem.Video && newItem is MediaUpgradeStartedTimerItem.Video -> ChatAdapterPayload.Time(newItem.time)
+        oldItem is VisitorChatItem && newItem is VisitorChatItem ->
+            if (oldItem.showDelivered != newItem.showDelivered)
+                ChatAdapterPayload.ShowDelivered(newItem.showDelivered)
+            else if (oldItem.showError != newItem.showError)
+                ChatAdapterPayload.ShowError(newItem.showError)
+            else null
         else -> null
     }
+}
+
+internal sealed class ChatAdapterPayload {
+    internal data class Time(val time: String) : ChatAdapterPayload()
+    internal data class ShowDelivered(val showDelivered: Boolean) : ChatAdapterPayload()
+    internal data class ShowError(val showError: Boolean) : ChatAdapterPayload()
 }

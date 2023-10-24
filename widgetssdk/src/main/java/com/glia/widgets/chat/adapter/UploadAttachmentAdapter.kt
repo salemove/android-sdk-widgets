@@ -115,7 +115,6 @@ class ViewHolder(
         val displayName = attachment?.displayName ?: return
 
         val size = Formatter.formatFileSize(context, attachment.size)
-        val mimeType = attachment.mimeType
 
         removeItemButton.setOnClickListener { callback?.onRemoveItemClicked(attachment) }
 
@@ -123,14 +122,13 @@ class ViewHolder(
 
         updateTitleAndStatusText(displayName, size, attachment.attachmentStatus)
 
-        updateExtensionType(attachment, mimeType, displayName)
+        updateExtensionType(attachment, displayName)
 
         updateContentDescription(displayName, size, attachment)
     }
 
     private fun updateExtensionType(
         attachment: FileAttachment,
-        mimeType: String,
         displayName: String
     ) {
         if (attachment.attachmentStatus.isError) {
@@ -150,7 +148,7 @@ class ViewHolder(
             extensionTypeImage.scaleType = ImageView.ScaleType.FIT_XY
             extensionTypeImage.imageTintList = null
 
-            if (mimeType.startsWith("image")) {
+            if (attachment.isImage) {
                 showExtensionTypeImage()
                 Picasso.get()
                     .load(attachment.uri)

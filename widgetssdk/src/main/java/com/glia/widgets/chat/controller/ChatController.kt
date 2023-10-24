@@ -173,8 +173,8 @@ internal class ChatController(
                 onSendMessageOperatorOffline(message)
             }
 
-            override fun error(ex: GliaException) {
-                onMessageSendError(ex)
+            override fun error(ex: GliaException, message: Unsent) {
+                onMessageSendError(ex, message)
             }
         }
     private var isVisitorEndEngagement = false
@@ -343,9 +343,11 @@ internal class ChatController(
         sendMessagePreview("")
     }
 
-    private fun onMessageSendError(exception: GliaException) {
+    private fun onMessageSendError(ignore: GliaException, message: Unsent) {
         Logger.d(TAG, "messageSent exception")
-        error(exception)
+
+        chatManager.onChatAction(ChatManager.Action.MessageSendError(message))
+        scrollChatToBottom()
     }
 
     private fun onSendMessageOperatorOffline(message: Unsent) {
@@ -997,6 +999,10 @@ internal class ChatController(
             is Gva.ButtonType.PostBack -> sendGvaResponse(buttonType.singleChoiceAttachment)
             is Gva.ButtonType.Url -> viewCallback?.requestOpenUri(buttonType.uri)
         }
+    }
+
+    fun onMessageClicked(messageId: String) {
+        chatManager.onChatAction(ChatManager.Action.MessageClicked(messageId))
     }
 
     private fun scrollChatToBottom() {

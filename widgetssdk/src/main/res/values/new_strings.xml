@@ -81,10 +81,12 @@
     <string name="engagement_queue_transferring">@string/glia_chat_visitor_status_transferring</string>
     <string name="android_chat_visitor_message_accessibility">@string/glia_chat_visitor_message_content_description</string>
     <string name="android_chat_visitor_message_delivered_accessibility">@string/glia_chat_visitor_message_delivered_content_description</string>
+    <string name="android_chat_visitor_message_not_delivered_accessibility">Your message: %1$s \n Failed to deliver.</string>
     <string name="android_chat_operator_name_accessibility_message">@string/glia_chat_operator_name_message_content_description</string>
     <string name="android_chat_operator_message_accessibility">@string/glia_chat_operator_message_content_description</string>
     <string name="android_chat_visitor_image_attachment_accessibility">@string/glia_chat_visitor_image_content_description</string>
     <string name="android_chat_visitor_image_attachment_delivered_accessibility">@string/glia_chat_visitor_image_delivered_content_description</string>
+    <string name="android_chat_visitor_image_attachment_not_delivered_accessibility">Your attached image. \n Failed to deliver.</string>
     <string name="android_chat_operator_image_attachment_accessibility">@string/glia_chat_operator_image_content_description</string>
     <string name="android_chat_operator_file_accessibility">@string/glia_chat_operator_file_content_description</string>
     <string name="chat_download_downloading">@string/glia_chat_attachment_downloading_label</string>
@@ -96,10 +98,12 @@
     <string name="chat_file_upload_in_progress">@string/glia_chat_attachment_upload_uploading</string>
     <string name="engagement_connection_screen_message">@string/glia_chat_in_queue_message</string>
     <string name="chat_message_delivered">@string/glia_chat_delivered</string>
+    <string name="chat_message_delivery_failed_retry">Failed to deliver. Tap to retry.</string>
     <string name="chat_unread_message_divider">@string/glia_chat_new_messages</string>
     <string name="chat_attach_files">@string/glia_chat_add_attachment_description</string>
     <string name="android_chat_visitor_file_accessibility">@string/glia_chat_visitor_file_content_description</string>
     <string name="android_chat_visitor_file_delivered_accessibility">@string/glia_chat_visitor_file_delivered_content_description</string>
+    <string name="android_chat_visitor_file_not_delivered_accessibility">Your attached file %1$s, size %2$s. \n Failed to deliver.</string>
     <string name="android_bubble_accessibility">@string/glia_chat_head_view_content_description</string>
     <string name="android_upload_error_engagement_missing">@string/glia_chat_attachment_upload_error_engagement_missing</string>
     <string name="android_upload_error_file_limit">@string/glia_chat_attachment_upload_error_file_count_limit_reached</string>
@@ -182,6 +186,7 @@
     <string name="general_unknown">Unknown</string>
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
     <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
+    <string name="general_retry">Retry</string>
 
     <!-- Screen sharing -->
     <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
@@ -192,7 +197,6 @@
     <string name="error_unexpected_title">Something went wrong.</string> <!-- TODO NEW -->
     <string name="general_back">Back</string> <!-- TODO NEW -->
     <string name="general_message">Message</string> <!-- TODO NEW -->
-    <string name="general_retry">Retry</string><!-- TODO NEW -->
     <string name="general_selected">Selected</string><!-- TODO NEW, maybe unify? -->
     <string name="engagement_phone_title">Phone</string> <!-- TODO NEW -->
 

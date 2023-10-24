@@ -1,9 +1,9 @@
 package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
+import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.core.engagement.GliaEngagementRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -55,10 +55,12 @@ internal class SendSecureMessageUseCase(
         queueIds: Array<String>,
         callback: RequestCallback<VisitorMessage?>
     ) {
+        val payload = SendMessagePayload(content = message)
+
         if (hasOngoingEngagement) {
-            chatRepository.sendMessage(message, callback)
+            chatRepository.sendMessage(payload, callback)
         } else {
-            secureConversationsRepository.send(message, queueIds, callback)
+            secureConversationsRepository.send(payload, queueIds, callback)
         }
     }
 
@@ -68,15 +70,15 @@ internal class SendSecureMessageUseCase(
         fileAttachments: List<FileAttachment>,
         callback: RequestCallback<VisitorMessage?>
     ) {
-        val filesAttachment = fileAttachments
-            .map { it.engagementFile }
-            .toTypedArray()
-            .let { FilesAttachment.from(it) }
+        val payload = SendMessagePayload(
+            content = message,
+            fileAttachments = fileAttachments.ifEmpty { null }
+        )
 
         if (hasOngoingEngagement) {
-            chatRepository.sendMessageWithAttachment(message, filesAttachment, callback)
+            chatRepository.sendMessage(payload, callback)
         } else {
-            secureConversationsRepository.send(message, queueIds, filesAttachment, callback)
+            secureConversationsRepository.send(payload, queueIds, callback)
         }
     }
 }

@@ -2,11 +2,12 @@ package com.glia.widgets.core.secureconversations
 
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.RequestCallback
-import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.secureconversations.SecureConversations
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
+import com.glia.widgets.chat.model.SendMessagePayload
+import com.glia.widgets.chat.model.Unsent
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
@@ -20,25 +21,14 @@ internal class SecureConversationsRepository(private val secureConversations: Se
         secureConversations.fetchChatTranscript(listener::loaded)
     }
 
-    fun send(message: String, queueIds: Array<String>, attachment: MessageAttachment, callback: RequestCallback<VisitorMessage?>) {
+    fun send(payload: SendMessagePayload, queueIds: Array<String>, callback: RequestCallback<VisitorMessage?>) {
         _messageSendingObservable.onNext(true)
-        secureConversations.send(message, queueIds, attachment, handleResult(callback))
+        secureConversations.send(payload.payload, queueIds, handleResult(callback))
     }
 
-    fun send(message: String, queueIds: Array<String>, callback: RequestCallback<VisitorMessage?>) {
-        _messageSendingObservable.onNext(true)
-        secureConversations.send(message, queueIds, handleResult(callback))
-    }
-
-    fun send(message: String, queueIds: Array<String>, attachment: MessageAttachment, listener: GliaSendMessageUseCase.Listener) {
-        send(message, queueIds, attachment) { visitorMessage, ex ->
-            onMessageReceived(visitorMessage, ex, listener)
-        }
-    }
-
-    fun send(message: String, queueIds: Array<String>, listener: GliaSendMessageUseCase.Listener) {
-        send(message, queueIds) { visitorMessage, ex ->
-            onMessageReceived(visitorMessage, ex, listener)
+    fun send(payload: SendMessagePayload, queueIds: Array<String>, listener: GliaSendMessageUseCase.Listener) {
+        send(payload, queueIds) { visitorMessage, ex ->
+            onMessageReceived(visitorMessage, ex, listener, payload)
         }
     }
 
@@ -56,10 +46,11 @@ internal class SecureConversationsRepository(private val secureConversations: Se
     private fun onMessageReceived(
         visitorMessage: VisitorMessage?,
         ex: GliaException?,
-        listener: GliaSendMessageUseCase.Listener
+        listener: GliaSendMessageUseCase.Listener,
+        payload: SendMessagePayload
     ) {
         if (ex != null) {
-            listener.error(ex)
+            listener.error(ex, Unsent(payload = payload, error = ex))
         } else {
             listener.messageSent(visitorMessage)
         }

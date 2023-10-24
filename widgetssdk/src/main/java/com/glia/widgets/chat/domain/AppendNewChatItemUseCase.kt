@@ -134,11 +134,11 @@ internal class AppendNewVisitorMessageUseCase(
     fun addUnsentItem(state: ChatManager.State, message: VisitorMessage): Boolean {
         if (state.unsentItems.isEmpty()) return false
 
-        val unsentMessage = state.unsentItems.firstOrNull { it.content == message.content } ?: return false
+        val unsentMessage = state.unsentItems.firstOrNull { it.messageId == message.id } ?: return false
         state.unsentItems.remove(unsentMessage)
 
-        val index = state.chatItems.indexOf(unsentMessage.chatMessage)
-        if (index != -1) {
+        val index = unsentMessage.chatMessage?.let { state.chatItems.indexOf(it) }
+        if (index != null && index >= 0) {
             if (lastDeliveredItem != null) {
                 val lastDeliveredIndex = state.chatItems.indexOf(lastDeliveredItem!!)
                 state.chatItems[lastDeliveredIndex] = lastDeliveredItem!!.withDeliveredStatus(false)
@@ -154,10 +154,8 @@ internal class AppendNewVisitorMessageUseCase(
 
         return false
     }
-
     operator fun invoke(state: ChatManager.State, chatMessageInternal: ChatMessageInternal) {
         val message = chatMessageInternal.chatMessage as VisitorMessage
-
         if (!addUnsentItem(state, message)) {
             message.apply {
                 val files = (attachment as? FilesAttachment)?.files

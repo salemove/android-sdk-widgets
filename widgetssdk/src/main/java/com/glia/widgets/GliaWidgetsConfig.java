@@ -7,6 +7,8 @@ import androidx.annotation.Nullable;
 import com.glia.androidsdk.SiteApiKey;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Configurations used to initialize Glia SDK
  *
@@ -28,6 +30,7 @@ public class GliaWidgetsConfig {
     private final ScreenSharing.Mode screenSharingMode;
     private final boolean useOverlay;
     private final UiTheme uiTheme;
+    private final String manualLocaleOverride;
 
     private GliaWidgetsConfig(Builder builder) {
         this.siteApiKey = builder.siteApiKey;
@@ -41,6 +44,7 @@ public class GliaWidgetsConfig {
         this.screenSharingMode = builder.screenSharingMode != null ? builder.screenSharingMode : DEFAULT_SCREEN_SHARING_MODE;
         this.useOverlay = builder.useOverlay != null ? builder.useOverlay : DEFAULT_USE_OVERLAY;
         this.uiTheme = builder.uiTheme;
+        this.manualLocaleOverride = builder.manualLocaleOverride;
     }
 
     public String getSiteId() {
@@ -86,6 +90,10 @@ public class GliaWidgetsConfig {
 
     public int getRequestCode() {
         return requestCode;
+    }
+
+    public String getManualLocaleOverride() {
+        return manualLocaleOverride;
     }
 
     /**
@@ -142,6 +150,7 @@ public class GliaWidgetsConfig {
         ScreenSharing.Mode screenSharingMode;
         Boolean useOverlay;
         UiTheme uiTheme;
+        String manualLocaleOverride;
 
         public Builder() {
             requestCode = 45554442;
@@ -233,6 +242,15 @@ public class GliaWidgetsConfig {
          */
         public Builder setUiTheme(UiTheme uiTheme) {
             this.uiTheme = uiTheme;
+            return this;
+        }
+
+        /**
+         * @param manualLocaleOverride - manual locale override if you wish not to use the default locale
+         * @return Builder instance
+         */
+        public Builder setManualLocaleOverride(String manualLocaleOverride) {
+            this.manualLocaleOverride = manualLocaleOverride;
             return this;
         }
 

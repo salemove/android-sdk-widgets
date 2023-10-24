@@ -18,6 +18,8 @@ public class GliaSdkConfigurationManager {
     private ScreenSharing.Mode screenSharingMode = null;
     private String companyName = null;
 
+    private String manualLocaleOverride = null;
+
     private UiTheme uiTheme = null;
 
     public boolean isUseOverlay() {
@@ -94,6 +96,7 @@ public class GliaSdkConfigurationManager {
                 .companyName(companyName)
                 .screenSharingMode(screenSharingMode)
                 .useOverlay(useOverlay)
+                .manualLocaleOverride(manualLocaleOverride)
                 .runTimeTheme(uiTheme)
                 .build();
     }

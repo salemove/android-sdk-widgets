@@ -7,6 +7,7 @@ import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
+import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.UiTheme;
@@ -40,8 +41,14 @@ public class OperatorImageAttachmentViewHolder extends ImageAttachmentViewHolder
     }
 
     public void bind(OperatorAttachmentItem.Image item, ChatAdapter.OnImageItemClickListener onImageItemClickListener) {
-        super.bind(item.getAttachmentFile());
-        itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(item.getAttachmentFile(), v));
+        super.bind(item.getAttachment());
+        AttachmentFile attachmentFile = item.getAttachment().getRemoteAttachment();
+        if (attachmentFile != null) {
+            itemView.setOnClickListener(v -> onImageItemClickListener.onImageItemClick(attachmentFile, v));
+        } else {
+            itemView.setOnClickListener(null);
+        }
+
         updateOperatorStatus(item);
 
         setAccessibilityLabels();

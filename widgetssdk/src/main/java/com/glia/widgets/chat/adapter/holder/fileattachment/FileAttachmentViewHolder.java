@@ -13,6 +13,8 @@ import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.chat.adapter.ChatAdapter;
+import com.glia.widgets.chat.model.Attachment;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.FileHelper;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -38,14 +40,24 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     }
 
     protected void setData(
+        boolean isFileExists,
+        boolean isDownloading,
+        Attachment attachment,
+        ChatAdapter.OnFileItemClickListener listener
+    ) {
+        setData(false, isFileExists, isDownloading, attachment, listener);
+    }
+
+    protected void setData(
+            boolean isLocalFile,
             boolean isFileExists,
             boolean isDownloading,
-            AttachmentFile attachmentFile,
+            Attachment attachment,
             ChatAdapter.OnFileItemClickListener listener
     ) {
-        updateClickListener(isFileExists, isDownloading, attachmentFile, listener);
-        updateTitle(attachmentFile);
-        updateStatusIndicator(isFileExists, isDownloading);
+        updateClickListener(isFileExists, isDownloading, attachment, listener);
+        updateTitle(attachment);
+        updateStatusIndicator(isLocalFile, isFileExists, isDownloading);
         updateProgressIndicator(isDownloading);
     }
 
@@ -61,10 +73,11 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private void updateClickListener(
             boolean isFileExists,
             boolean isDownloading,
-            AttachmentFile attachmentFile,
+            Attachment attachment,
             ChatAdapter.OnFileItemClickListener listener
     ) {
-        if (isDownloading) {
+        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
+        if (isDownloading || attachmentFile == null) {
             itemView.setOnClickListener(null);
         } else {
             itemView.setOnClickListener(v -> {
@@ -77,14 +90,40 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private void updateTitle(AttachmentFile attachmentFile) {
-        String name = attachmentFile.getName();
-        long byteSize = attachmentFile.getSize();
+    private void updateTitle(Attachment attachment) {
+        String name = getAttachmentName(attachment);
+        long byteSize = getAttachmentSize(attachment);
         titleText.setText(String.format("%s • %s", name, Formatter.formatFileSize(itemView.getContext(), byteSize)));
         extensionTypeText.setText(FileHelper.toFileExtensionOrEmpty(name).toUpperCase());
     }
 
-    private void updateStatusIndicator(boolean isFileExists, boolean isDownloading) {
+    public String getAttachmentName(Attachment attachment) {
+        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
+        if (attachmentFile != null) {
+            return attachmentFile.getName();
+        }
+        FileAttachment fileAttachment = attachment.getLocalAttachment();
+        if (fileAttachment != null) {
+            return fileAttachment.getDisplayName();
+        }
+        return "";
+    }
+
+    public long getAttachmentSize(Attachment attachment) {
+        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
+        if (attachmentFile != null) {
+            return attachmentFile.getSize();
+        }
+        FileAttachment fileAttachment = attachment.getLocalAttachment();
+        if (fileAttachment != null) {
+            return fileAttachment.getSize();
+        }
+        return 0;
+    }
+
+    private void updateStatusIndicator(boolean isLocalFile, boolean isFileExists, boolean isDownloading) {
+        statusIndicator.setVisibility(isLocalFile ? View.GONE : View.VISIBLE);
+
         if (isDownloading) {
             statusIndicator.setText(stringProvider.getRemoteString(R.string.chat_download_downloading));
         } else if (isFileExists) {

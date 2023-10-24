@@ -19,9 +19,10 @@ class MapVisitorAttachmentUseCaseTest {
     @Before
     fun setUp() {
         mockAttachment = mock()
+        whenever(mockAttachment.id) doReturn "attachment_id"
 
         visitorMessage = mock()
-        whenever(visitorMessage.id) doReturn "id"
+        whenever(visitorMessage.id) doReturn "message_id"
         whenever(visitorMessage.timestamp) doReturn -1
     }
 

@@ -6,11 +6,11 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.chat.Chat;
 import com.glia.androidsdk.chat.ChatMessage;
-import com.glia.androidsdk.chat.MessageAttachment;
 import com.glia.androidsdk.chat.OperatorTypingStatus;
-import com.glia.androidsdk.chat.SingleChoiceAttachment;
 import com.glia.androidsdk.chat.VisitorMessage;
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase.Listener;
+import com.glia.widgets.chat.model.SendMessagePayload;
+import com.glia.widgets.chat.model.Unsent;
 import com.glia.widgets.di.GliaCore;
 
 import java.util.function.Consumer;
@@ -66,49 +66,25 @@ public class GliaChatRepository {
                 value.getChat().sendMessagePreview(message));
     }
 
-    public void sendMessage(String message, RequestCallback<VisitorMessage> callback) {
+    public void sendMessage(SendMessagePayload payload, RequestCallback<VisitorMessage> callback) {
         gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, callback));
+            engagement.getChat().sendMessage(payload.getPayload(), callback));
     }
 
-    public void sendMessage(String message, Listener listener) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
-    }
-
-    public void sendMessageSingleChoice(SingleChoiceAttachment singleChoiceAttachment, Listener listener) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(singleChoiceAttachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener)));
-    }
-
-    public void sendMessageWithAttachment(String message, MessageAttachment attachment, RequestCallback<VisitorMessage> callback) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, attachment, callback)
+    public void sendMessage(SendMessagePayload payload, Listener listener) {
+        sendMessage(
+            payload,
+            (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener, payload)
         );
     }
 
-    public void sendMessageWithAttachment(String message, MessageAttachment attachment, Listener listener) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(message, attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
-        );
-    }
-
-    public void sendMessageAttachment(MessageAttachment attachment, Listener listener) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage("", attachment, (visitorMessage, ex) -> onMessageReceived(visitorMessage, ex, listener))
-        );
-    }
-
-    public void sendResponse(SingleChoiceAttachment attachment, RequestCallback<VisitorMessage> callback) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement ->
-                engagement.getChat().sendMessage(attachment, callback)
-        );
-    }
-
-    private void onMessageReceived(VisitorMessage visitorMessage, GliaException ex, Listener listener) {
+    private void onMessageReceived(VisitorMessage visitorMessage, GliaException ex, Listener listener, SendMessagePayload payload) {
         if (listener != null) {
-            if (ex != null) listener.error(ex);
-            else listener.messageSent(visitorMessage);
+            if (ex != null) {
+                listener.error(ex, new Unsent(payload, ex));
+            } else {
+                listener.messageSent(visitorMessage);
+            }
         }
     }
 }

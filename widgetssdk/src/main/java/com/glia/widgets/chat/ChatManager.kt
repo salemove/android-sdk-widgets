@@ -122,9 +122,13 @@ internal class ChatManager constructor(
 
     @VisibleForTesting
     fun checkUnsentMessages(state: State) {
-        sendUnsentMessagesUseCase(state.unsentItems.firstOrNull() ?: return) {
+        val unsent = state.unsentItems.firstOrNull { it.error == null } ?: return
+        sendUnsentMessagesUseCase(unsent, {
             onChatAction(Action.MessageSent(it))
-        }
+        }, {
+            onChatAction(Action.RemoveMessage(unsent.messageId))
+            onChatAction(Action.MessageSendError(unsent.copy(error = it)))
+        })
     }
 
     @VisibleForTesting
@@ -180,7 +184,10 @@ internal class ChatManager constructor(
             is Action.OnMediaUpgradeTimerUpdated -> mapMediaUpgradeTimerUpdated(action.formattedValue, state)
             is Action.CustomCardClicked -> mapCustomCardClicked(action, state)
             Action.ChatRestored -> state
+            is Action.MessageClicked -> mapMessageClicked(action.messageId, state)
             is Action.MessageSent -> mapMessageSent(action.message, state)
+            is Action.MessageSendError -> addErrorMessage(action.message, state)
+            is Action.RemoveMessage -> removeMessage(action.messageId, state)
         }
     }
 
@@ -248,11 +255,63 @@ internal class ChatManager constructor(
     }
 
     @VisibleForTesting
+    fun mapMessageClicked(messageId: String, state: State): State {
+        val unsent = state.unsentItems.firstOrNull { it.messageId == messageId }
+
+        return if (unsent != null) {
+            state.apply {
+                onChatAction(Action.RemoveMessage(messageId))
+                sendUnsentMessagesUseCase(unsent, {
+                    onChatAction(Action.MessageSent(it))
+                }, {
+                    onChatAction(Action.MessageSendError(unsent))
+                })
+            }
+        } else {
+            state
+        }
+    }
+
+    @VisibleForTesting
     fun addUnsentMessage(message: Unsent, state: State): State {
         state.unsentItems += message
         return state.apply {
-            val index = if (chatItems.lastOrNull() is OperatorStatusItem.InQueue) chatItems.lastIndex else chatItems.lastIndex + 1
-            chatItems.add(index, message.chatMessage)
+            message.chatMessage?.let {
+                val index = indexForMessageItem(chatItems)
+                chatItems.add(index, it)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    fun addErrorMessage(message: Unsent, state: State): State {
+        return state.apply {
+            unsentItems += message
+
+            message.chatMessage?.let {
+                val index = indexForMessageItem(chatItems)
+                chatItems.add(index, it)
+            }
+            message.attachmentItems?.let {
+                chatItems += it
+            }
+        }
+    }
+
+    /**
+     * Returns the index where the new message should be placed.
+     * If engagement hasn't started yet, the message should placed before the operator status item.
+     * */
+    private fun indexForMessageItem(chatItems: List<ChatItem>) =
+        if (chatItems.lastOrNull() is OperatorStatusItem.InQueue) chatItems.lastIndex else chatItems.lastIndex + 1
+
+    @VisibleForTesting
+    fun removeMessage(messageId: String, state: State): State {
+        return state.apply {
+            unsentItems.removeIf { it.messageId == messageId }
+            chatItems.removeAll { it.id == messageId }
+
+            checkUnsentMessages(state)
         }
     }
 
@@ -354,6 +413,9 @@ internal class ChatManager constructor(
         object OnMediaUpgradeCanceled : Action
         data class CustomCardClicked(val customCard: CustomCardChatItem, val attachment: SingleChoiceAttachment) : Action
         object ChatRestored : Action
+        data class MessageClicked(val messageId: String) : Action
         data class MessageSent(val message: VisitorMessage) : Action
+        data class MessageSendError(val message: Unsent) : Action
+        data class RemoveMessage(val messageId: String) : Action
     }
 }

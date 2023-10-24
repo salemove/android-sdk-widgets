@@ -24,17 +24,32 @@ import com.glia.widgets.di.Dependencies;
 
 public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     private final TextView deliveredView;
+    private final TextView errorView;
     private final StringProvider stringProvider = Dependencies.getStringProvider();
+    private VisitorAttachmentItem.File item;
 
     public VisitorFileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme) {
         super(itemView);
         deliveredView = itemView.findViewById(R.id.delivered_view);
+        errorView = itemView.findViewById(R.id.error_view);
         setupDeliveredView(itemView.getContext(), uiTheme);
+        setupErrorView(itemView.getContext(), uiTheme);
     }
 
-    public void bind(VisitorAttachmentItem.File item, ChatAdapter.OnFileItemClickListener listener) {
-        super.setData(item.isFileExists(), item.isDownloading(), item.getAttachmentFile(), listener);
-        updateDeliveredView(item);
+    public void bind(
+        VisitorAttachmentItem.File item,
+        ChatAdapter.OnFileItemClickListener onFileItemClickListener,
+        ChatAdapter.OnMessageClickListener onMessageClickListener
+    ) {
+        this.item = item;
+        boolean isLocalFile = item.getAttachment().getLocalAttachment() != null;
+        super.setData(isLocalFile, item.isFileExists(), item.isDownloading(), item.getAttachment(), onFileItemClickListener);
+        if (isLocalFile) {
+            itemView.setOnClickListener(view -> onMessageClickListener.onMessageClick(item.getId()));
+        }
+        setShowDelivered(item.getShowDelivered());
+        setShowError(item.getShowError());
+        setAccessibilityLabels(item.getShowDelivered());
     }
 
     private void setupDeliveredView(Context context, UiTheme uiTheme) {
@@ -43,21 +58,46 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
             deliveredView.setTypeface(fontFamily);
         }
         deliveredView.setText(stringProvider.getRemoteString(R.string.chat_message_delivered));
-        deliveredView.setTextColor(ContextCompat.getColor(context, uiTheme.getBaseNormalColor()));
+        Integer baseNormalColor = uiTheme.getBaseNormalColor();
+        if (baseNormalColor != null) {
+            deliveredView.setTextColor(ContextCompat.getColor(context, baseNormalColor));
+        }
     }
 
-    private void updateDeliveredView(VisitorAttachmentItem item) {
-        deliveredView.setVisibility(item.getShowDelivered() ? View.VISIBLE : View.GONE);
-
-        setAccessibilityLabels(item);
+    private void setupErrorView(Context context, UiTheme uiTheme) {
+        if (uiTheme.getFontRes() != null) {
+            Typeface fontFamily = ResourcesCompat.getFont(context, uiTheme.getFontRes());
+            errorView.setTypeface(fontFamily);
+        }
+        errorView.setText(stringProvider.getRemoteString(R.string.chat_message_delivery_failed_retry));
+        Integer systemNegativeColor = uiTheme.getSystemNegativeColor();
+        if (systemNegativeColor != null) {
+            errorView.setTextColor(ContextCompat.getColor(context, systemNegativeColor));
+        }
     }
 
-    private void setAccessibilityLabels(VisitorAttachmentItem item) {
-        String name = item.getAttachmentFile().getName();
-        String byteSize = Formatter.formatFileSize(itemView.getContext(), item.getAttachmentFile().getSize());
-        itemView.setContentDescription(stringProvider.getRemoteString(item.getShowDelivered()
-                ? R.string.android_chat_visitor_file_delivered_accessibility
-                : R.string.android_chat_visitor_file_accessibility,
+    private void setShowDelivered(boolean showDelivered) {
+        deliveredView.setVisibility(!item.getShowError() && showDelivered ? View.VISIBLE : View.GONE);
+    }
+
+    private void setShowError(boolean showError) {
+        errorView.setVisibility(showError ? View.VISIBLE : View.GONE);
+    }
+
+    private void setAccessibilityLabels(boolean showDelivered) {
+        String name = getAttachmentName(item.getAttachment());
+        long size = getAttachmentSize(item.getAttachment());
+        String byteSize = Formatter.formatFileSize(itemView.getContext(), size);
+        int stringKey;
+        if (item.getShowError()) {
+            stringKey = R.string.android_chat_visitor_file_not_delivered_accessibility;
+        } else if (showDelivered) {
+            stringKey = R.string.android_chat_visitor_file_delivered_accessibility;
+        } else {
+            stringKey = R.string.android_chat_visitor_file_accessibility;
+        }
+        itemView.setContentDescription(stringProvider.getRemoteString(
+            stringKey,
             new StringKeyPair(StringKey.NAME, name),
             new StringKeyPair(StringKey.SIZE, byteSize)
             )
@@ -68,9 +108,14 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
             public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfoCompat info) {
                 super.onInitializeAccessibilityNodeInfo(host, info);
 
-                String actionLabel = stringProvider.getRemoteString(item.isFileExists()
-                    ? R.string.general_open
-                    : R.string.general_download);
+                String actionLabel;
+                if (item.getShowError()) {
+                    actionLabel = stringProvider.getRemoteString(R.string.general_retry);
+                } else if (item.isFileExists()) {
+                    actionLabel = stringProvider.getRemoteString(R.string.general_open);
+                } else {
+                    actionLabel = stringProvider.getRemoteString(R.string.general_download);
+                }
 
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat actionClick
                     = new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
@@ -81,6 +126,7 @@ public class VisitorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     }
 
     public void updateDelivered(boolean delivered) {
-        deliveredView.setVisibility(delivered ? View.VISIBLE : View.GONE);
+        setShowDelivered(delivered);
+        setAccessibilityLabels(delivered);
     }
 }

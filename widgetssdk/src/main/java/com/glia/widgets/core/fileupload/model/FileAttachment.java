@@ -75,6 +75,10 @@ public class FileAttachment {
         return this.mimeType;
     }
 
+    public boolean isImage() {
+        return mimeType.startsWith("image");
+    }
+
     public enum Status {
         UPLOADING(false),
         SECURITY_SCAN(false),

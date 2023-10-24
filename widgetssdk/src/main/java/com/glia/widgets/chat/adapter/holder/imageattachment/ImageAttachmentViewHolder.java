@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.glia.androidsdk.chat.AttachmentFile;
 import com.glia.widgets.R;
+import com.glia.widgets.chat.model.Attachment;
+import com.glia.widgets.core.fileupload.model.FileAttachment;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase;
 import com.glia.widgets.helper.FileHelper;
 import com.glia.widgets.helper.Logger;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.squareup.picasso.Picasso;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -47,7 +50,19 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
         this.getImageFileFromNetworkUseCase = getImageFileFromNetworkUseCase;
     }
 
-    public void bind(AttachmentFile attachmentFile) {
+    public void bind(Attachment attachment) {
+        AttachmentFile attachmentFile = attachment.getRemoteAttachment();
+        if (attachmentFile != null) {
+            bind(attachmentFile);
+        }
+
+        FileAttachment fileAttachment = attachment.getLocalAttachment();
+        if (fileAttachment != null) {
+            bind(fileAttachment);
+        }
+    }
+
+    private void bind(AttachmentFile attachmentFile) {
         imageView.setImageResource(android.R.color.transparent); // clear the previous view state
 
         String imageName = FileHelper.getFileName(attachmentFile);
@@ -69,6 +84,12 @@ public class ImageAttachmentViewHolder extends RecyclerView.ViewHolder {
                 );
 
         setAccessibilityActions();
+    }
+
+    private void bind(FileAttachment fileAttachment) {
+        Picasso.get()
+            .load(fileAttachment.getUri())
+            .into(imageView);
     }
 
     private void setAccessibilityActions() {

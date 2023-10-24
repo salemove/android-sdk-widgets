@@ -19,6 +19,7 @@ import com.glia.widgets.chat.model.MediaUpgradeStartedTimerItem
 import com.glia.widgets.chat.model.NewMessagesDividerItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
+import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
@@ -181,7 +182,7 @@ class ChatManagerTest {
 
     @Test
     fun `addUnsentMessage adds Unsent message before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
-        val message: Unsent.Message = Unsent.Message(message = "message")
+        val message = Unsent(SendMessagePayload(content = "message"))
         val inQueue = OperatorStatusItem.InQueue("company_name")
         assertTrue(state.unsentItems.isEmpty())
         assertTrue(state.chatItems.isEmpty())
@@ -472,18 +473,16 @@ class ChatManagerTest {
 
     @Test
     fun `checkUnsentMessages calls sendUnsentMessagesUseCase when unsent messages list is not empty`() {
-        val mockUnsentMessage: Unsent.Message = mock {
-            on { message } doReturn "message"
-        }
+        val unsentMessage = Unsent(SendMessagePayload(content = "message"))
 
-        whenever(sendUnsentMessagesUseCase(any(), any())).thenAnswer {
+        whenever(sendUnsentMessagesUseCase(any(), any(), any())).thenAnswer {
             (it.getArgument(1) as ((VisitorMessage) -> Unit)).invoke(mock())
         }
 
-        state.unsentItems.add(mockUnsentMessage)
+        state.unsentItems.add(unsentMessage)
 
         subjectUnderTest.checkUnsentMessages(state)
-        verify(sendUnsentMessagesUseCase).invoke(any(), any())
+        verify(sendUnsentMessagesUseCase).invoke(any(), any(), any())
         verify(subjectUnderTest).onChatAction(any())
     }
 

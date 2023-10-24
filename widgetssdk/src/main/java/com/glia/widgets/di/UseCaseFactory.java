@@ -1027,7 +1027,12 @@ public class UseCaseFactory {
 
     @NonNull
     public SendUnsentMessagesUseCase createSendUnsentMessagesUseCase() {
-        return new SendUnsentMessagesUseCase(repositoryFactory.getGliaMessageRepository());
+        return new SendUnsentMessagesUseCase(
+            repositoryFactory.getGliaMessageRepository(),
+            repositoryFactory.getSecureConversationsRepository(),
+            repositoryFactory.getEngagementConfigRepository(),
+            createIsSecureEngagementUseCase()
+        );
     }
 
     @NonNull

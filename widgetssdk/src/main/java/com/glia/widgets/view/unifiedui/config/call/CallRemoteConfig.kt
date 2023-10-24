@@ -4,6 +4,7 @@ import com.glia.widgets.view.unifiedui.config.base.HeaderRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.LayerRemoteConfig
 import com.glia.widgets.view.unifiedui.config.base.TextRemoteConfig
 import com.glia.widgets.view.unifiedui.config.chat.EngagementStatesRemoteConfig
+import com.glia.widgets.view.unifiedui.config.snackbar.SnackBarRemoteConfig
 import com.glia.widgets.view.unifiedui.theme.call.CallTheme
 import com.google.gson.annotations.SerializedName
 
@@ -30,7 +31,10 @@ internal data class CallRemoteConfig(
     val topTextRemoteConfig: TextRemoteConfig?,
 
     @SerializedName("connect")
-    val connect: EngagementStatesRemoteConfig?
+    val connect: EngagementStatesRemoteConfig?,
+
+    @SerializedName("snackBar")
+    val snackBarRemoteConfig: SnackBarRemoteConfig?
 ) {
     fun toCallTheme(): CallTheme = CallTheme(
         background = background?.toLayerTheme(),
@@ -40,6 +44,7 @@ internal data class CallRemoteConfig(
         header = headerRemoteConfig?.toHeaderTheme(),
         operator = operator?.toTextTheme(),
         topText = topTextRemoteConfig?.toTextTheme(),
-        connect = connect?.toEngagementStatesTheme()
+        connect = connect?.toEngagementStatesTheme(),
+        snackBar = snackBarRemoteConfig?.toSnackBarTheme()
     )
 }

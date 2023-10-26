@@ -12,12 +12,9 @@ import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.MessageAttachment
-import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.engagement.data.LocalOperator
-import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.view.unifiedui.deepMerge
 import kotlin.jvm.optionals.getOrNull
 
@@ -55,6 +52,3 @@ internal val AttachmentFile.isImage: Boolean get() = contentType.startsWith("ima
 internal fun MessageAttachment.asSingleChoice(): SingleChoiceAttachment? = this as? SingleChoiceAttachment
 
 internal fun ChatMessage.isValid(): Boolean = content.isNotBlank() || attachment != null || metadata?.takeIf { it.length() > 0 } != null
-
-internal fun OperatorMessage.toChatMessageInternal(): ChatMessageInternal =
-    ChatMessageInternal(this, LocalOperator(operatorId.orEmpty(), operatorName.orEmpty(), operatorImageUrl))

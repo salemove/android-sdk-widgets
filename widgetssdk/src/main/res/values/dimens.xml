@@ -80,13 +80,16 @@
 
     <dimen name="glia_single_choice_card_image_height">200dp</dimen>
 
-    <!--    Message Center Welcome Screen-->
+    <!-- Message Center Welcome Screen -->
     <dimen name="glia_welcome_screen_input_min_height">168dp</dimen>
     <dimen name="glia_welcome_screen_input_title_margin">56dp</dimen>
 
-    <!--    Message Center Confirmation Screen-->
+    <!-- Message Center Confirmation Screen -->
     <dimen name="glia_confirmation_screen_confirmation_icon_size">144dp</dimen>
     <dimen name="glia_confirmation_screen_title_top_margin">32dp</dimen>
     <dimen name="glia_confirmation_screen_message_top_margin">16dp</dimen>
     <dimen name="glia_confirmation_screen_button_bottom_margin">24dp</dimen>
+
+    <!-- Live Observation -->
+    <dimen name="glia_snack_bar_bottom_margin">72dp</dimen>
 </resources>

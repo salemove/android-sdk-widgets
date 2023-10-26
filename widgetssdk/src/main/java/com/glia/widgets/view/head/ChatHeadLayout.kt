@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
+import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
@@ -167,7 +168,7 @@ class ChatHeadLayout @JvmOverloads constructor(
     private fun initConfigurations() {
         isClickable = false
         isFocusable = false
-        ViewCompat.setElevation(this, 100.0f)
+        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
     }
 
     @SuppressLint("ClickableViewAccessibility")

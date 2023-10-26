@@ -13,6 +13,7 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
+import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
@@ -91,7 +92,7 @@ class MessageCenterView(
         orientation = VERTICAL
         defaultStatusBarColor = window?.statusBarColor
         // Is needed to overlap existing app bar in existing view with this view's app bar.
-        ViewCompat.setElevation(this, 100.0f)
+        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
         readTypedArray(attrs, defStyleAttr, defStyleRes)
 
         handleInsetChanges()

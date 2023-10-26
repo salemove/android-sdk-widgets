@@ -21,6 +21,7 @@ import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
+import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
@@ -66,11 +67,13 @@ class ChatHeadView @JvmOverloads constructor(
     @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ServiceChatHeadController
     private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
+    private var isCallVisualizerUseCase: IsCallVisualizerUseCase
     private var theme: UiTheme? = null
 
     init {
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
         isCallVisualizerScreenSharingUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerScreenSharingUseCase()
+        isCallVisualizerUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerUseCase()
         setAccessibilityLabels()
         readTypedArray()
     }
@@ -91,9 +94,11 @@ class ChatHeadView @JvmOverloads constructor(
 
     override fun showUnreadMessageCount(unreadMessageCount: Int) {
         post {
-            binding.chatBubbleBadge.apply {
-                text = unreadMessageCount.toString()
-                isVisible = isDisplayUnreadMessageBadge(unreadMessageCount)
+            if (!isCallVisualizerUseCase.invoke()) {
+                binding.chatBubbleBadge.apply {
+                    text = unreadMessageCount.toString()
+                    isVisible = isDisplayUnreadMessageBadge(unreadMessageCount)
+                }
             }
         }
     }

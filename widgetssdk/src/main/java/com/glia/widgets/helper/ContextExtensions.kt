@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.util.AttributeSet
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
@@ -43,3 +44,6 @@ internal fun Context.showToast(
 ) {
     Toast.makeText(this, message, duration).show()
 }
+
+internal val Activity.rootView: View
+    get() = findViewById(android.R.id.content) ?: window.decorView.findViewById(android.R.id.content)

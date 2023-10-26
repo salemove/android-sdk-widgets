@@ -199,7 +199,8 @@
 
     <!--    Live Observation -->
     <string name="live_observation_confirm_title">Before We Continue</string>
-    <string name="live_observation_confirm_message">Please allow the %1$s representative to view this application screen for improved support.</string>
+    <string name="live_observation_confirm_message">Please allow the {companyName} representative to view this application screen for improved support.</string>
+    <string name="live_observation_indicator_message">App screen is visible to the agent</string>
 
     <!--    GVA -->
     <string name="gva_unsupported_action_error">This action is not currently supported on mobile.</string>

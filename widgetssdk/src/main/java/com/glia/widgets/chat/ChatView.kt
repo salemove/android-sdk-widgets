@@ -39,6 +39,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
+import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
@@ -769,7 +770,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun initConfigurations() {
         isInvisible = true
         // needed to overlap existing app bar in existing view with this view's app bar.
-        ViewCompat.setElevation(this, 100.0f)
+        ViewCompat.setElevation(this, Constants.WIDGETS_SDK_LAYER_ELEVATION)
     }
 
     private fun bindViews() {

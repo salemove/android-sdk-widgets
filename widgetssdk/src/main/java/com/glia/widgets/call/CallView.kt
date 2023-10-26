@@ -28,6 +28,7 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
+import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.StringKey
 import com.glia.widgets.StringKeyPair
@@ -599,7 +600,7 @@ internal class CallView(
         visibility = INVISIBLE
         setBackgroundColor(getColorCompat(R.color.glia_transparent_black_bg))
         // needed to overlap existing app bar in existing view with this view's app bar.
-        elevation = 100f
+        elevation = Constants.WIDGETS_SDK_LAYER_ELEVATION
     }
 
     private fun readTypedArray(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {

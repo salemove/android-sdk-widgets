@@ -21,4 +21,9 @@ public class Constants {
      * Global media timer interval value
      */
     public static final int CALL_TIMER_INTERVAL_VALUE = 1000;
+
+    /**
+     * Needed to overlap existing app bar in existing view with this view's app bar.
+     */
+    public static final float WIDGETS_SDK_LAYER_ELEVATION = 100f;
 }

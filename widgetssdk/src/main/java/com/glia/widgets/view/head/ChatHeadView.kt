@@ -94,7 +94,9 @@ class ChatHeadView @JvmOverloads constructor(
 
     override fun showUnreadMessageCount(unreadMessageCount: Int) {
         post {
-            if (!isCallVisualizerUseCase.invoke()) {
+            if (isCallVisualizerUseCase.invoke()) {
+                binding.chatBubbleBadge.isVisible = false
+            } else {
                 binding.chatBubbleBadge.apply {
                     text = unreadMessageCount.toString()
                     isVisible = isDisplayUnreadMessageBadge(unreadMessageCount)

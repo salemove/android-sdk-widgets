@@ -23,10 +23,10 @@ import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.hasChildOfType
 import com.glia.widgets.messagecenter.MessageCenterView
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
-import java.lang.ref.WeakReference
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
@@ -35,7 +35,7 @@ internal class ActivityWatcherForChatHead(
 
     init {
         topActivityObserver.subscribe(
-            { activity -> resumedActivity = WeakReference(activity) },
+            { resumedActivity = it },
             { error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error) }
         )
         controller.setWatcher(this)
@@ -46,8 +46,8 @@ internal class ActivityWatcherForChatHead(
      * @return Currently resumed activity.
      */
 
-    private var resumedActivity: WeakReference<Activity?> = WeakReference(null)
-    private var chatHeadLayout: WeakReference<ChatHeadLayout> = WeakReference(null)
+    private var resumedActivity: Activity? by WeakReferenceDelegate()
+    private var chatHeadLayout: ChatHeadLayout? by WeakReferenceDelegate()
     private var screenOrientation: Int? = null
     private var chatHeadViewPosition: Pair<Int, Int>? = null
 
@@ -73,29 +73,29 @@ internal class ActivityWatcherForChatHead(
         chatHeadLayout.setNavigationCallback(
             object : ChatHeadLayout.NavigationCallback {
                 override fun onNavigateToEndScreenSharing() {
-                    navigateToEndScreenSharing(resumedActivity.get())
+                    navigateToEndScreenSharing(resumedActivity)
                 }
 
                 override fun onNavigateToChat() {
-                    navigateToChat(resumedActivity.get())
+                    navigateToChat(resumedActivity)
                 }
 
                 override fun onNavigateToCall() {
-                    navigateToCall(resumedActivity.get())
+                    navigateToCall(resumedActivity)
                     if (controller.isFromCallScreen()) {
                         // Finish ChatActivity if bubble is tapped from ChatActivity
                         controller.resetFromCallScreen()
-                        resumedActivity.get()?.finish()
+                        resumedActivity?.finish()
                     }
                 }
             }
         )
         chatHeadLayout.visibility = View.VISIBLE
-        this.chatHeadLayout = WeakReference(chatHeadLayout)
+        this.chatHeadLayout = chatHeadLayout
     }
 
     override fun addChatHeadLayoutIfAbsent() {
-        val activity = resumedActivity.get() ?: return
+        val activity = resumedActivity ?: return
         val viewName = fetchGliaOrRootView()?.javaClass?.simpleName
         if (hasGliaView(activity) || !controller.shouldShowBubble(viewName)) return
         val viewGroup = (fetchGliaOrRootView() as? ViewGroup) ?: return
@@ -105,7 +105,7 @@ internal class ActivityWatcherForChatHead(
         try {
             Logger.d(TAG, "Adding application-only bubble")
             activity.runOnUiThread {
-                chatHeadLayout.get()?.let {
+                chatHeadLayout?.let {
                     if (!viewGroup.contains(it)) {
                         viewGroup.addView(it)
                     } else {
@@ -121,12 +121,12 @@ internal class ActivityWatcherForChatHead(
     override fun removeChatHeadLayoutIfPresent() {
         Logger.d(TAG, "Removing application-only bubble")
         saveBubblePosition()
-        (fetchGliaOrRootView() as? ViewGroup)?.removeView(chatHeadLayout.get())
-        chatHeadLayout.clear()
+        (fetchGliaOrRootView() as? ViewGroup)?.removeView(chatHeadLayout)
+        chatHeadLayout = null
     }
 
     private fun saveBubblePosition() {
-        chatHeadLayout.get()?.getPosition()?.let {
+        chatHeadLayout?.getPosition()?.let {
             if (it.first == null || it.second == null) return
             chatHeadViewPosition = Pair(it.first, it.second)
         }
@@ -137,7 +137,7 @@ internal class ActivityWatcherForChatHead(
 
     private fun restoreBubblePosition() {
         chatHeadViewPosition?.let {
-            chatHeadLayout.get()?.setPosition(it.first.toFloat(), it.second.toFloat())
+            chatHeadLayout?.setPosition(it.first.toFloat(), it.second.toFloat())
         }
     }
 
@@ -152,7 +152,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     override fun fetchGliaOrRootView(): View? {
-        return resumedActivity.get()?.let {
+        return resumedActivity?.let {
             return it.findViewById(R.id.call_view)
                 ?: it.findViewById<FilePreviewView>(R.id.file_preview_view)
                 ?: it.findViewById<ChatView>(R.id.chat_view)
@@ -164,7 +164,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     override fun openCallActivity() {
-        resumedActivity.get()?.let {
+        resumedActivity?.let {
             val intent = CallActivity.getIntent(
                 it,
                 getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))

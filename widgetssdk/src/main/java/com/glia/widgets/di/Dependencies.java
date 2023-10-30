@@ -29,6 +29,7 @@ import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
+import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservation;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
 import org.jetbrains.annotations.TestOnly;
@@ -81,27 +82,34 @@ public class Dependencies {
         initApplicationLifecycleObserver(new ApplicationLifecycleManager(), controllerFactory.getChatHeadController());
 
         ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer =
-                new ActivityWatcherForCallVisualizer(
-                        getControllerFactory().getDialogController(),
-                        getControllerFactory().getActivityWatcherForCallVisualizerController()
-                );
+            new ActivityWatcherForCallVisualizer(
+                getControllerFactory().getDialogController(),
+                getControllerFactory().getActivityWatcherForCallVisualizerController()
+            );
         application.registerActivityLifecycleCallbacks(activityWatcherForCallVisualizer);
 
         ActivityWatcherForChatHead activityWatcherForChatHead =
-                new ActivityWatcherForChatHead(
-                        getControllerFactory().getActivityWatcherForChatHeadController());
+            new ActivityWatcherForChatHead(
+                getControllerFactory().getActivityWatcherForChatHeadController());
         application.registerActivityLifecycleCallbacks(activityWatcherForChatHead);
 
+        ActivityWatcherForLiveObservation activityWatcherForLiveObservation = new ActivityWatcherForLiveObservation(
+            stringProvider,
+            getGliaThemeManager(),
+            controllerFactory.getActivityWatcherForLiveObservationController()
+        );
+        application.registerActivityLifecycleCallbacks(activityWatcherForLiveObservation);
+
         ActivityWatcherForPermissionsRequest activityWatcherForPermissionsRequest =
-                new ActivityWatcherForPermissionsRequest(
-                        getControllerFactory().getPermissionsController()
-                );
+            new ActivityWatcherForPermissionsRequest(
+                getControllerFactory().getPermissionsController()
+            );
         application.registerActivityLifecycleCallbacks(activityWatcherForPermissionsRequest);
 
         callVisualizerManager = new CallVisualizerManager(
-                useCaseFactory.getVisitorCodeViewBuilderUseCase(),
-                repositoryFactory.getCallVisualizerRepository(),
-                repositoryFactory.getGliaEngagementRepository()
+            useCaseFactory.getVisitorCodeViewBuilderUseCase(),
+            repositoryFactory.getCallVisualizerRepository(),
+            repositoryFactory.getGliaEngagementRepository()
         );
     }
 

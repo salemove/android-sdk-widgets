@@ -34,10 +34,10 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
+import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.Dialogs
-import java.lang.ref.WeakReference
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizer(
@@ -47,7 +47,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     init {
         topActivityObserver.subscribe(
-            { activity -> resumedActivity = WeakReference(activity) },
+            { resumedActivity = it },
             { error -> Logger.e(TAG, "Observable monitoring top activity FAILED", error) }
         )
         controller.setWatcher(this)
@@ -65,7 +65,7 @@ internal class ActivityWatcherForCallVisualizer(
      * Returns last activity that called [Activity.onResume], but didn't call [Activity.onPause] yet
      * @return Currently resumed activity.
      */
-    private var resumedActivity: WeakReference<Activity?> = WeakReference(null)
+    private var resumedActivity: Activity? by WeakReferenceDelegate()
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         super.onActivityCreated(activity, savedInstanceState)
@@ -90,7 +90,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun checkInitialCameraPermission() {
-        resumedActivity.get()?.run {
+        resumedActivity?.run {
             controller.onInitialCameraPermissionResult(
                 isGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED,
                 isComponentActivity = this is ComponentActivity
@@ -99,7 +99,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun requestCameraPermission() {
-        if (resumedActivity.get() is ComponentActivity) {
+        if (resumedActivity is ComponentActivity) {
             cameraPermissionLauncher?.run {
                 controller.setIsWaitingMediaProjectionResult(true)
                 this.launch(Manifest.permission.CAMERA)
@@ -108,7 +108,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun requestOverlayPermission() {
-        if (resumedActivity.get() is ComponentActivity) {
+        if (resumedActivity is ComponentActivity) {
             overlayPermissionLauncher?.run {
                 controller.setIsWaitingMediaProjectionResult(true)
                 this.launch(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
@@ -117,7 +117,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun openOverlayPermissionView() {
-        val activity = resumedActivity.get() ?: return
+        val activity = resumedActivity ?: return
         val overlayIntent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
             Uri.parse("package:${activity.packageName}")
@@ -189,7 +189,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun openCallActivity() {
-        resumedActivity.get()?.let {
+        resumedActivity?.let {
             val intent = CallActivity.getIntent(
                 it,
                 getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
@@ -209,7 +209,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showToast(message: String, duration: Int) {
-        resumedActivity.get()?.let {
+        resumedActivity?.let {
             Toast.makeText(it, message, duration).show()
         }
     }
@@ -256,7 +256,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun openNotificationChannelScreen() {
-        resumedActivity.get()?.openNotificationChannelScreen()
+        resumedActivity?.openNotificationChannelScreen()
     }
 
     override fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
@@ -345,7 +345,7 @@ internal class ActivityWatcherForCallVisualizer(
             return
         }
 
-        resumedActivity.get()?.apply {
+        resumedActivity?.apply {
             runOnUiThread {
                 logMessage?.let { Logger.d(TAG, it) }
                 callback(wrapWithMaterialThemeOverlay(), uiTheme ?: getRuntimeTheme(this), this)
@@ -375,7 +375,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showVisitorCodeDialog() {
-        val activity = resumedActivity.get() ?: return
+        val activity = resumedActivity ?: return
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
@@ -393,12 +393,12 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun isSupportActivityOpen(): Boolean {
-        val activity = resumedActivity.get()
+        val activity = resumedActivity
         return (activity == null || activity is CallVisualizerSupportActivity)
     }
 
     override fun openSupportActivity(permissionType: PermissionType) {
-        resumedActivity.get()?.run {
+        resumedActivity?.run {
             val intent = Intent(this, CallVisualizerSupportActivity::class.java)
             intent.putExtra(PERMISSION_TYPE_TAG, permissionType)
             startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
@@ -406,7 +406,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun destroySupportActivityIfExists() {
-        resumedActivity.get()?.let {
+        resumedActivity?.let {
             if (!it.isFinishing && !controller.isWaitingMediaProjectionResult()) destroySupportActivityIfExists(it)
         }
     }

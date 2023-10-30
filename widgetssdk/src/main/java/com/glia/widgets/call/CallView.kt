@@ -1003,6 +1003,7 @@ internal class CallView(
                 callState.hasVideo
             )
             videoButton.isActivated = callState.hasVideo
+            floatingVisitorVideoContainer.visibility = if (callState.hasVideo) VISIBLE else GONE
 
             setButtonActivated(
                 muteButton,

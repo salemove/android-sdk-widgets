@@ -32,6 +32,8 @@ import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
+import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationContract;
+import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationController;
 
 public class ControllerFactory {
 
@@ -55,6 +57,8 @@ public class ControllerFactory {
     private CallVisualizerController callVisualizerController;
     private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
+
+    private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
 
     public ControllerFactory(
         RepositoryFactory repositoryFactory,
@@ -247,6 +251,7 @@ public class ControllerFactory {
         getCallVisualizerController().init();
         getScreenSharingController().init();
         getActivityWatcherForChatHeadController().init();
+        getActivityWatcherForLiveObservationController().init();
     }
 
     public FilePreviewController getImagePreviewController() {
@@ -386,5 +391,12 @@ public class ControllerFactory {
         return new PermissionsRequestController(
             repositoryFactory.getPermissionsRequestRepository()
         );
+    }
+
+    public ActivityWatcherForLiveObservationContract.Controller getActivityWatcherForLiveObservationController() {
+        if (activityWatcherForLiveObservationController == null) {
+            activityWatcherForLiveObservationController = new ActivityWatcherForLiveObservationController(useCaseFactory.getLiveObservationUseCase());
+        }
+        return activityWatcherForLiveObservationController;
     }
 }

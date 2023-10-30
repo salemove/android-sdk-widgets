@@ -43,6 +43,7 @@ public class GliaWidgets {
      * @deprecated Use {@link com.glia.widgets.GliaWidgetsConfig.Builder#companyName}
      * or customize the strings from GliaHub
      */
+    @Deprecated
     public static final String COMPANY_NAME = "company_name";
 
     /**

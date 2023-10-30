@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.glia.widgets.base.BaseActivityWatcher
-import java.lang.ref.WeakReference
+import com.glia.widgets.helper.WeakReferenceDelegate
 
 internal class ActivityWatcherForPermissionsRequest(
     private val controller: PermissionsRequestContract.Controller
@@ -17,33 +17,33 @@ internal class ActivityWatcherForPermissionsRequest(
         controller.setWatcher(this)
     }
 
-    private var currentActivity: WeakReference<Activity?> = WeakReference(null)
+    private var currentActivity: Activity? by WeakReferenceDelegate()
 
     private val permissionsLaunchers = mutableMapOf<Int, ActivityResultLauncher<Array<String>>>()
 
-    override fun hasCurrentActivity(): Boolean = currentActivity.get() != null
+    override fun hasCurrentActivity(): Boolean = currentActivity != null
 
-    override fun currentActivityIsComponentActivity(): Boolean = currentActivity.get() is ComponentActivity
+    override fun currentActivityIsComponentActivity(): Boolean = currentActivity is ComponentActivity
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         super.onActivityCreated(activity, savedInstanceState)
 
-        currentActivity = WeakReference(activity)
+        currentActivity = activity
         registerForPermissionsResult(activity)
     }
 
     override fun onActivityResumed(activity: Activity) {
         super.onActivityResumed(activity)
 
-        currentActivity = WeakReference(activity)
+        currentActivity = activity
         controller.onActivityResumed()
     }
 
     override fun onActivityDestroyed(activity: Activity) {
         super.onActivityDestroyed(activity)
 
-        if (activity == currentActivity.get()) {
-            currentActivity = WeakReference(null)
+        if (activity == currentActivity) {
+            currentActivity = null
         }
         val hashCode = System.identityHashCode(activity)
         permissionsLaunchers.remove(hashCode)?.unregister()
@@ -51,7 +51,7 @@ internal class ActivityWatcherForPermissionsRequest(
     }
 
     override fun requestPermissions(permissions: Array<String>): Int? {
-        currentActivity.get()?.let {
+        currentActivity?.let {
             System.identityHashCode(it)
         }?.let { hashCode ->
             permissionsLaunchers[hashCode]?.let {
@@ -74,14 +74,14 @@ internal class ActivityWatcherForPermissionsRequest(
     }
 
     override fun openSupportActivity() {
-        currentActivity.get()?.run {
+        currentActivity?.run {
             val intent = Intent(this, PermissionsSupportActivity::class.java)
             startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
         }
     }
 
     override fun destroySupportActivityIfExists() {
-        currentActivity.get()?.let { destroySupportActivityIfExists(it) }
+        currentActivity?.let { destroySupportActivityIfExists(it) }
     }
 
     private fun destroySupportActivityIfExists(activity: Activity) {

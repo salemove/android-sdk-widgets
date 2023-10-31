@@ -325,18 +325,26 @@ object Dialogs {
 
             setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
 
-
             when (mediaUpgrade.mediaUpgradeMode) {
                 MediaUpgrade.MODE_AUDIO -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_audio_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
+                    titleView.text = stringProvider.getRemoteString(
+                        R.string.media_upgrade_audio_title,
+                        StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)
+                    )
                     titleIconView.setImageResource(theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
                 }
                 MediaUpgrade.MODE_VIDEO_ONE_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_video_one_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
+                    titleView.text = stringProvider.getRemoteString(
+                        R.string.media_upgrade_video_one_way_title,
+                        StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)
+                    )
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                 }
                 MediaUpgrade.MODE_VIDEO_TWO_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(R.string.media_upgrade_video_two_way_title, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName))
+                    titleView.text = stringProvider.getRemoteString(
+                        R.string.media_upgrade_video_two_way_title,
+                        StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)
+                    )
                     titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
                 }
             }
@@ -465,7 +473,7 @@ object Dialogs {
         clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
     }
 
-    private fun setupPoweredByGlia(dialog: Dialog, @NonNull notWhitelabel: Boolean, baseShadeColor: Int?){
+    private fun setupPoweredByGlia(dialog: Dialog, @NonNull notWhitelabel: Boolean, baseShadeColor: Int?) {
         dialog.findViewById<View>(R.id.logo_container)?.isVisible = notWhitelabel
         if (notWhitelabel) {
             dialog.findViewById<TextView>(R.id.powered_by_text)?.apply {

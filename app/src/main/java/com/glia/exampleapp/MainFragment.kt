@@ -54,7 +54,6 @@ class MainFragment : Fragment() {
                 .build()
         }
 
-
     private val authToken: String
         get() {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -329,10 +328,13 @@ class MainFragment : Fragment() {
         val container = LinearLayout(context)
         container.orientation = LinearLayout.VERTICAL
         val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
         )
         val marginInDp = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics
+            TypedValue.COMPLEX_UNIT_DIP,
+            16f,
+            resources.displayMetrics
         ).toInt()
         layoutParams.setMargins(marginInDp, 0, marginInDp, 0)
         jwtInput.layoutParams = layoutParams
@@ -377,7 +379,7 @@ class MainFragment : Fragment() {
 
         GliaWidgets.init(
             createDefaultConfig(
-                context = requireActivity().applicationContext,
+                context = requireActivity().applicationContext
 //                manualLocaleOverride = "en_EXPL"
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalGlobalColors(requireContext()),
 //                runtimeConfig = createSampleRuntimeConfig(),
@@ -390,7 +392,7 @@ class MainFragment : Fragment() {
 
     private fun createSampleRuntimeConfig(): UiTheme = UiTheme(
         gvaQuickReplyTextColor = android.R.color.holo_green_dark,
-        gvaQuickReplyStrokeColor = android.R.color.holo_green_dark,
+        gvaQuickReplyStrokeColor = android.R.color.holo_green_dark
     )
 
     private fun prepareAuthentication() {

@@ -53,7 +53,6 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import java.util.UUID
 
-
 @RunWith(RobolectricTestRunner::class)
 class ChatManagerTest {
     private lateinit var onMessageUseCase: GliaOnMessageUseCase
@@ -106,7 +105,6 @@ class ChatManagerTest {
                 action
             )
         )
-
         state = spy(ChatManager.State())
     }
 
@@ -127,9 +125,7 @@ class ChatManagerTest {
         stateProcessor.onNext(state)
         whenever(markMessagesReadWithDelayUseCase()) doReturn Completable.complete()
         assertTrue(stateProcessor.value!!.chatItems.contains(NewMessagesDividerItem))
-
         subjectUnderTest.markMessagesReadWithDelay()
-
         verify(subjectUnderTest).removeNewMessagesDivider(any())
         assertFalse(stateProcessor.value!!.chatItems.contains(NewMessagesDividerItem))
         verify(compositeDisposable).add(any())
@@ -139,10 +135,8 @@ class ChatManagerTest {
     @Test
     fun `mapInQueue adds OperatorStatusItem_InQueue to chatItems and updates operatorStatusItem`() {
         val companyName = "company Name"
-
         val newState = subjectUnderTest.mapInQueue(companyName, state)
         val lastItem = newState.chatItems.last() as OperatorStatusItem.InQueue
-
         assertEquals(companyName, lastItem.companyName)
         assertEquals(companyName, newState.operatorStatusItem!!.companyName)
         assertEquals(lastItem, newState.operatorStatusItem)
@@ -160,7 +154,6 @@ class ChatManagerTest {
     fun `mapOperatorConnected adds OperatorStatusItem_Connected when the old is null`() {
         val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
         subjectUnderTest.mapOperatorConnected(action, state)
-
         verify(subjectUnderTest).checkUnsentMessages(any())
         val newItem = state.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
@@ -171,16 +164,13 @@ class ChatManagerTest {
     @Test
     fun `mapOperatorConnected replaces old OperatorStatusItem when the old is exists`() {
         val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
-
         state.apply {
             operatorStatusItem = OperatorStatusItem.Transferring
             chatItems.add(mock())
             chatItems.add(mock())
             chatItems.add(OperatorStatusItem.Transferring)
         }
-
         val newState = subjectUnderTest.mapOperatorConnected(action, state)
-
         verify(subjectUnderTest).checkUnsentMessages(any())
         val newItem = newState.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
@@ -192,21 +182,14 @@ class ChatManagerTest {
     @Test
     fun `addUnsentMessage adds Unsent message before OperatorStatusItem when chatItems contain OperatorStatusItem_InQueue`() {
         val message: Unsent.Message = Unsent.Message(message = "message")
-
         val inQueue = OperatorStatusItem.InQueue("company_name")
-
-
         assertTrue(state.unsentItems.isEmpty())
         assertTrue(state.chatItems.isEmpty())
-
         val newState = subjectUnderTest.addUnsentMessage(message, state)
-
         assertTrue(newState.unsentItems.count() == 1)
         assertTrue(newState.chatItems.count() == 1)
         assertEquals(newState.unsentItems.last().chatMessage, newState.chatItems.last())
-
         newState.chatItems.add(inQueue)
-
         subjectUnderTest.addUnsentMessage(message, state).apply {
             assertTrue(unsentItems.count() == 2)
             assertTrue(chatItems.count() == 3)
@@ -656,5 +639,4 @@ class ChatManagerTest {
         whenever(chatMessageInternal.chatMessage) doReturn chatMessage
         return chatMessageInternal
     }
-
 }

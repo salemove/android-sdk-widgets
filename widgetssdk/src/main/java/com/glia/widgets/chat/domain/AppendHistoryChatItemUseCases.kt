@@ -18,7 +18,6 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asSingleChoice
 
-
 internal class AppendHistoryChatMessageUseCase(
     private val appendHistoryVisitorChatItemUseCase: AppendHistoryVisitorChatItemUseCase,
     private val appendHistoryOperatorChatItemUseCase: AppendHistoryOperatorChatItemUseCase,
@@ -101,7 +100,6 @@ internal class AppendHistoryVisitorChatItemUseCase(
                 chatItems += VisitorMessageItem(content, id, timestamp)
             }
         }
-
     }
 }
 
@@ -120,7 +118,7 @@ internal class AppendGvaMessageItemUseCase(private val mapGvaUseCase: MapGvaUseC
 
 internal class AppendHistoryCustomCardItemUseCase(
     private val customCardTypeUseCase: CustomCardTypeUseCase,
-    private val customCardShouldShowUseCase: CustomCardShouldShowUseCase,
+    private val customCardShouldShowUseCase: CustomCardShouldShowUseCase
 ) {
     operator fun invoke(chatItems: MutableList<ChatItem>, message: OperatorMessage, viewType: Int) {
         val customCardType = customCardTypeUseCase.execute(viewType) ?: return

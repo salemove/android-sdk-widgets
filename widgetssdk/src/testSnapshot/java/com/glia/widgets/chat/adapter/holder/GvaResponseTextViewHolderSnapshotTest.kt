@@ -65,7 +65,7 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
             setupView(
                 gvaResponseText(
                     showChatHead = true
-                ),
+                )
             ).viewHolder.itemView
         )
     }

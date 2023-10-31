@@ -196,7 +196,6 @@ internal class ChatAdapter(
                 )
             }
 
-
             else -> {
                 var customCardViewHolder: CustomCardViewHolder? = null
                 if (customCardAdapter != null) {
@@ -333,13 +332,13 @@ internal class ChatAdapter(
         const val NEW_MESSAGES_DIVIDER_TYPE = 8
         const val SYSTEM_MESSAGE_TYPE = 9
 
-        //GVA Types
+        // GVA Types
         const val GVA_RESPONSE_TEXT_TYPE = 10
         const val GVA_QUICK_REPLIES_TYPE = 11
         const val GVA_PERSISTENT_BUTTONS_TYPE = 12
         const val GVA_GALLERY_CARDS_TYPE = 13
 
-        //Custom Card
+        // Custom Card
         const val CUSTOM_CARD_TYPE = 14 // Should be the last type with the highest value
     }
 

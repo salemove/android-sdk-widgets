@@ -77,7 +77,7 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
             setupView(
                 gvaPersistentButtons(
                     showChatHead = true
-                ),
+                )
             ).viewHolder.itemView
         )
     }

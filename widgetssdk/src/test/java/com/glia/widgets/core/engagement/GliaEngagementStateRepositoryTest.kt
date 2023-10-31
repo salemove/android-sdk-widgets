@@ -18,7 +18,6 @@ class GliaEngagementStateRepositoryTest {
     private val ID1 = "1"
     private val ID2 = "2"
 
-
     @Test
     fun `mapToEngagementStateChangeEvent returns NoEngagement when engagementState null and is not ongoing engagement`() {
         assertTrue(repo.mapToEngagementStateChangeEvent(null, null) is EngagementStateEvent.NoEngagementEvent)

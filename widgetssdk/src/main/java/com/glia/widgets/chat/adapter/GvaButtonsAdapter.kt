@@ -47,7 +47,10 @@ internal class GvaButtonsAdapter(
 
             buttonTheme?.also(it::applyButtonTheme)
         }
-        button.layoutParams = LinearLayoutCompat.LayoutParams(LinearLayoutCompat.LayoutParams.MATCH_PARENT, LinearLayoutCompat.LayoutParams.WRAP_CONTENT)
+        button.layoutParams = LinearLayoutCompat.LayoutParams(
+            LinearLayoutCompat.LayoutParams.MATCH_PARENT,
+            LinearLayoutCompat.LayoutParams.WRAP_CONTENT
+        )
         return ButtonViewHolder(button)
     }
 

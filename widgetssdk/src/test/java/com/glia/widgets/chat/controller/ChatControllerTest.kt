@@ -219,9 +219,7 @@ class ChatControllerTest {
     fun `onGvaButtonClicked triggers viewCallback showBroadcastNotSupportedToast when gva type is BroadcastEvent`() {
         val gvaButton: GvaButton = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.BroadcastEvent
-
         chatController.onGvaButtonClicked(gvaButton)
-
         verify(chatViewCallback).showBroadcastNotSupportedToast()
     }
 
@@ -230,9 +228,7 @@ class ChatControllerTest {
         val gvaButton: GvaButton = mock()
         val uri: Uri = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Url(uri)
-
         chatController.onGvaButtonClicked(gvaButton)
-
         verify(chatViewCallback).requestOpenUri(uri)
     }
 
@@ -241,9 +237,7 @@ class ChatControllerTest {
         val gvaButton: GvaButton = mock()
         val uri: Uri = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Phone(uri)
-
         chatController.onGvaButtonClicked(gvaButton)
-
         verify(chatViewCallback).requestOpenDialer(uri)
     }
 
@@ -252,9 +246,7 @@ class ChatControllerTest {
         val gvaButton: GvaButton = mock()
         val uri: Uri = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Email(uri)
-
         chatController.onGvaButtonClicked(gvaButton)
-
         verify(chatViewCallback).requestOpenEmailClient(uri)
     }
 
@@ -263,13 +255,9 @@ class ChatControllerTest {
         val gvaButton = GvaButton(text = "text", value = "value")
         val singleChoiceAttachment = gvaButton.toResponse()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.PostBack(singleChoiceAttachment)
-
         chatController.onGvaButtonClicked(gvaButton)
-
         assertEquals(gvaButton.text, singleChoiceAttachment.selectedOptionText)
         assertEquals(gvaButton.value, singleChoiceAttachment.selectedOption)
-
         verify(sendMessageUseCase).execute(any<SingleChoiceAttachment>(), any())
     }
-
 }

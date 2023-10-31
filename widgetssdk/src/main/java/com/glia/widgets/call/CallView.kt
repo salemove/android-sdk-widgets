@@ -1053,8 +1053,14 @@ internal class CallView(
             chatButton.contentDescription =
                 when (callState.messagesNotSeen) {
                     0 -> stringProvider.getRemoteString(R.string.engagement_chat_title)
-                    1 -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_single_item_accessibility_label, StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString()))
-                    else -> stringProvider.getRemoteString(R.string.call_buttons_chat_badge_value_multiple_items_accessibility_label, StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString()))
+                    1 -> stringProvider.getRemoteString(
+                        R.string.call_buttons_chat_badge_value_single_item_accessibility_label,
+                        StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString())
+                    )
+                    else -> stringProvider.getRemoteString(
+                        R.string.call_buttons_chat_badge_value_multiple_items_accessibility_label,
+                        StringKeyPair(StringKey.BADGE_VALUE, callState.messagesNotSeen.toString())
+                    )
                 }
             applyTextThemeBasedOnCallState(callState)
         }

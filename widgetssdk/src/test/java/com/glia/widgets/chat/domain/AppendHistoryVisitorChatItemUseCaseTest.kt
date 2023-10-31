@@ -57,7 +57,6 @@ class AppendHistoryVisitorChatItemUseCaseTest {
         assertTrue(items.isEmpty())
     }
 
-
     @Test
     fun `invoke adds VisitorAttachmentItem before VisitorMessageItem_History when both present`() {
         whenever(mapVisitorAttachmentUseCase.invoke(any(), any(), any())) doReturn mock<VisitorAttachmentItem.File>()

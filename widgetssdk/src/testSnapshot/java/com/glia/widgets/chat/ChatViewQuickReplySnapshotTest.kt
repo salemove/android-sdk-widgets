@@ -1,14 +1,11 @@
 package com.glia.widgets.chat
 
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.StringProvider
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import com.glia.widgets.snapshotutils.SnapshotGva
 import org.junit.Test
-import org.mockito.kotlin.mock
 
 internal class ChatViewQuickReplySnapshotTest : SnapshotTest(), SnapshotChatView, SnapshotGva {
 

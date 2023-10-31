@@ -6,7 +6,8 @@ import com.google.gson.JsonObject
 
 internal interface SnapshotGva : SnapshotTheme {
 
-    fun gvaLongTitle() = "\uD83D\uDE80 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at interdum nisi. Nullam sem urna, vehicula eget metus vel."
+    fun gvaLongTitle() = "\uD83D\uDE80 Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+        "Etiam at interdum nisi. Nullam sem urna, vehicula eget metus vel."
 
     fun gvaLongSubtitle() = "<b>Quisque ut sollicitudin augue \uD83D\uDC40</b><br>" +
         "Ut lobortis sit amet neque nec <i>gravida</i>:" +

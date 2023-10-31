@@ -56,9 +56,7 @@ internal class ChatManager constructor(
         onQuickReplyReceived: (List<GvaButton>) -> Unit,
         onOperatorMessageReceived: (count: Int) -> Unit
     ): Flowable<List<ChatItem>> {
-
         subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
-
         return state.doOnNext(::updateQuickReplies).map(State::immutableChatItems).onBackpressureLatest().share()
     }
 
@@ -132,18 +130,12 @@ internal class ChatManager constructor(
     @VisibleForTesting
     fun mapChatHistory(historyResponse: ChatHistoryResponse, currentState: State? = null): State {
         val state: State = currentState ?: State()
-
         if (historyResponse.items.isEmpty()) return state
-
         val chatItems: MutableList<ChatItem> = mutableListOf()
-
         val rawItems = historyResponse.items
 
-
         for (index in rawItems.indices.reversed()) {
-
             val rawMessage = rawItems[index]
-
             if (state.isNew(rawMessage)) {
                 appendHistoryChatMessageUseCase(chatItems, rawMessage, index == rawItems.lastIndex)
             }
@@ -217,7 +209,6 @@ internal class ChatManager constructor(
         } else {
             chatItems[index] = newItem
         }
-
     }
 
     @VisibleForTesting

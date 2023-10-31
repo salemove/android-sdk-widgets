@@ -35,12 +35,9 @@ class AppendNewVisitorMessageUseCaseTest {
         mapVisitorAttachmentUseCase = mock()
         useCase = spy(AppendNewVisitorMessageUseCase(mapVisitorAttachmentUseCase))
         state = ChatManager.State()
-
         chatMessageInternal = mock()
         visitorMessage = mock()
-
         whenever(chatMessageInternal.chatMessage) doReturn visitorMessage
-
     }
 
     @Test

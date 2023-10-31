@@ -38,10 +38,10 @@ internal class ChatItemHeightManager(
         chatItems
             ?.filterIsInstance<GvaGalleryCards>() // Currently the HeightManager works only for GvaGalleryCards
             ?.forEach { chatItem ->
-            if (!measuredHeightsMap.contains(chatItem)) {
-                measuredHeightsMap[chatItem] = measureHeight(chatItem)
+                if (!measuredHeightsMap.contains(chatItem)) {
+                    measuredHeightsMap[chatItem] = measureHeight(chatItem)
+                }
             }
-        }
     }
 
     private fun measureHeight(gvaGalleryCards: GvaGalleryCards): Int {

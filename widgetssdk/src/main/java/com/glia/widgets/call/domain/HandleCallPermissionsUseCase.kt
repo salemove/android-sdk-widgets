@@ -9,8 +9,7 @@ internal class HandleCallPermissionsUseCase(
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
     private val permissionManager: PermissionManager
 ) {
-    operator fun invoke(mediaType: Engagement.MediaType,
-                        callback: PermissionsGrantedCallback) {
+    operator fun invoke(mediaType: Engagement.MediaType, callback: PermissionsGrantedCallback) {
         val permissions = permissionManager.getPermissionsForEngagementMediaType(
             mediaType,
             isCallVisualizerUseCase()

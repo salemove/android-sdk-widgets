@@ -35,8 +35,11 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
 
     @VisibleForTesting
     fun getOperatorImage(imageUrl: String?): String? {
-        return if (isAlwaysUseDefaultOperatorPicture || imageUrl == null) operatorDefaultImageUrl
-        else imageUrl
+        return if (isAlwaysUseDefaultOperatorPicture || imageUrl == null) {
+            operatorDefaultImageUrl
+        } else {
+            imageUrl
+        }
     }
 
     @VisibleForTesting

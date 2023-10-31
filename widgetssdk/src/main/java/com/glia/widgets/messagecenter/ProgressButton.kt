@@ -52,6 +52,7 @@ class ProgressButton @JvmOverloads constructor(context: Context, attrs: Attribut
     private val title get() = binding.titleBtn
 
     private val progressBar get() = binding.progressBar
+
     // End Widgets + Binding
     private val stringProvider = Dependencies.getStringProvider()
 

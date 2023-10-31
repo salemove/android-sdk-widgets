@@ -43,7 +43,8 @@ internal interface AttachmentItem {
 }
 
 internal data class CustomCardChatItem(
-    val message: ChatMessage, private val customCardViewType: Int
+    val message: ChatMessage,
+    private val customCardViewType: Int
 ) : ServerChatItem(customCardViewType) {
     override val id: String = message.id
     override val timestamp: Long = message.timestamp
@@ -191,7 +192,6 @@ internal sealed class OperatorStatusItem : ChatItem(ChatAdapter.OPERATOR_STATUS_
     object Transferring : OperatorStatusItem() {
         override val companyName: String? = null
     }
-
 }
 
 // Visitor

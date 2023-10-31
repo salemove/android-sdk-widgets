@@ -34,9 +34,7 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
         mapOperatorAttachmentUseCase = mock()
         mapOperatorPlainTextUseCase = mock()
         mapResponseCardUseCase = mock()
-
         useCase = spy(AppendHistoryResponseCardOrTextItemUseCase(mapOperatorAttachmentUseCase, mapOperatorPlainTextUseCase, mapResponseCardUseCase))
-
         mockChatMessageInternal.mockChatMessage()
         mockChatMessageInternal.mockOperatorProperties()
     }
@@ -51,7 +49,6 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
     fun `addResponseCard adds OperatorMessageItem_ResponseCard to provided list`() {
         whenever(mapResponseCardUseCase.invoke(any(), any(), any())) doReturn mock()
         useCase.addResponseCard(items, mock(), mockChatMessageInternal.chatMessageInternal, true)
-
         assertTrue(items.count() == 1)
         assertTrue(items.first() is OperatorMessageItem.ResponseCard)
     }
@@ -60,9 +57,7 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
     fun `addPlainTextAndAttachments adds OperatorMessageItem_PlainText when chatMessage content is not empty`() {
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn mock()
         whenever(mapOperatorPlainTextUseCase.invoke(any(), any())) doReturn mock<OperatorMessageItem.PlainText>()
-
         useCase.addPlainTextAndAttachments(items, mockChatMessageInternal.chatMessageInternal, true)
-
         assertTrue(items.count() == 1)
         assertTrue(items.first() is OperatorMessageItem.PlainText)
     }
@@ -72,9 +67,7 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn mock()
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.content) doReturn ""
         whenever(mapOperatorPlainTextUseCase.invoke(any(), any())) doReturn mock<OperatorMessageItem.PlainText>()
-
         useCase.addPlainTextAndAttachments(items, mockChatMessageInternal.chatMessageInternal, true)
-
         assertTrue(items.isEmpty())
     }
 
@@ -83,15 +76,10 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
         val filesAttachment: FilesAttachment = mock()
         val file: AttachmentFile = mock()
         whenever(filesAttachment.files) doReturn arrayOf(file)
-
         whenever(mapOperatorAttachmentUseCase.invoke(any(), any(), any())) doReturn mock<OperatorAttachmentItem.File>()
-
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn filesAttachment
-
         whenever(mapOperatorPlainTextUseCase.invoke(any(), any())) doReturn mock<OperatorMessageItem.PlainText>()
-
         useCase.addPlainTextAndAttachments(items, mockChatMessageInternal.chatMessageInternal, true)
-
         assertTrue(items.count() == 2)
         assertTrue(items.first() is OperatorAttachmentItem.File)
         assertTrue(items[1] is OperatorMessageItem.PlainText)
@@ -103,19 +91,13 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
         val file1: AttachmentFile = mock()
         val file2: AttachmentFile = mock()
         whenever(filesAttachment.files) doReturn arrayOf(file1, file2)
-
         val operatorAttachment1 = mock<OperatorAttachmentItem.Image>()
         val operatorAttachment2 = mock<OperatorAttachmentItem.File>()
-
         whenever(mapOperatorAttachmentUseCase.invoke(eq(file1), any(), any())) doReturn operatorAttachment1
         whenever(mapOperatorAttachmentUseCase.invoke(eq(file2), any(), any())) doReturn operatorAttachment2
-
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn filesAttachment
-
         whenever(mapOperatorPlainTextUseCase.invoke(any(), any())) doReturn mock<OperatorMessageItem.PlainText>()
-
         useCase.addPlainTextAndAttachments(items, mockChatMessageInternal.chatMessageInternal, true)
-
         assertTrue(items.count() == 3)
         assertTrue(items.first() is OperatorAttachmentItem.File)
         assertTrue(items[1] is OperatorAttachmentItem.Image)
@@ -126,11 +108,8 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
     fun `addPlainTextAndAttachments adds Response Card when chatMessage is the latest in history and has SingleChoiceAttachment`() {
         val singleChoiceAttachment: SingleChoiceAttachment = mock()
         whenever(singleChoiceAttachment.options) doReturn arrayOf(mock())
-
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn singleChoiceAttachment
-
         useCase.invoke(items, mockChatMessageInternal.chatMessageInternal, isLatest = true, showChatHead = true)
-
         verify(useCase).addResponseCard(any(), any(), any(), any())
         verify(useCase, never()).addPlainTextAndAttachments(any(), any(), any())
     }
@@ -139,11 +118,8 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
     fun `addPlainTextAndAttachments adds Plain Text when chatMessage is not the latest in history and has SingleChoiceAttachment`() {
         val singleChoiceAttachment: SingleChoiceAttachment = mock()
         whenever(singleChoiceAttachment.options) doReturn arrayOf(mock())
-
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn singleChoiceAttachment
-
         useCase.invoke(items, mockChatMessageInternal.chatMessageInternal, isLatest = false, showChatHead = true)
-
         verify(useCase, never()).addResponseCard(any(), any(), any(), any())
         verify(useCase).addPlainTextAndAttachments(any(), any(), any())
     }
@@ -152,11 +128,8 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
     fun `addPlainTextAndAttachments adds Plain Text when chatMessage is the latest in history and has empty SingleChoiceAttachment`() {
         val singleChoiceAttachment: SingleChoiceAttachment = mock()
         whenever(singleChoiceAttachment.options) doReturn arrayOf()
-
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn singleChoiceAttachment
-
         useCase.invoke(items, mockChatMessageInternal.chatMessageInternal, isLatest = false, showChatHead = true)
-
         verify(useCase, never()).addResponseCard(any(), any(), any(), any())
         verify(useCase).addPlainTextAndAttachments(any(), any(), any())
     }
@@ -164,11 +137,8 @@ class AppendHistoryResponseCardOrTextItemUseCaseTest {
     @Test
     fun `addPlainTextAndAttachments adds Plain Text when chatMessage does not has SingleChoiceAttachment`() {
         whenever(mockChatMessageInternal.chatMessageInternal.chatMessage.attachment) doReturn mock<FilesAttachment>()
-
         useCase.invoke(items, mockChatMessageInternal.chatMessageInternal, isLatest = false, showChatHead = true)
-
         verify(useCase, never()).addResponseCard(any(), any(), any(), any())
         verify(useCase).addPlainTextAndAttachments(any(), any(), any())
     }
-
 }

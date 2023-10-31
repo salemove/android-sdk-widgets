@@ -508,7 +508,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun requestOpenEmailClient(uri: Uri) {
         val intent = Intent(Intent.ACTION_SENDTO)
-            .setData(Uri.parse("mailto:")) //This step makes sure that only email apps handle this.
+            .setData(Uri.parse("mailto:")) // This step makes sure that only email apps handle this.
             .putExtra(Intent.EXTRA_EMAIL, arrayOf(uri.schemeSpecificPart))
 
         if (intent.resolveActivity(context.packageManager) != null) {
@@ -599,7 +599,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun updateChatEditText(chatState: ChatState) {
         when (chatState.chatInputMode) {
-            ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.hint = stringProvider.getRemoteString(R.string.chat_message_start_engagement_placeholder)
+            ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.hint = stringProvider.getRemoteString(
+                R.string.chat_message_start_engagement_placeholder
+            )
             else -> binding.chatEditText.hint = stringProvider.getRemoteString(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled

@@ -17,7 +17,6 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.asSingleChoice
 
-
 internal class AppendNewChatMessageUseCase(
     private val appendNewOperatorMessageUseCase: AppendNewOperatorMessageUseCase,
     private val appendNewVisitorMessageUseCase: AppendNewVisitorMessageUseCase,
@@ -69,10 +68,7 @@ internal class AppendNewOperatorMessageUseCase(
 
         state.apply { addedMessagesCount = chatItems.count() - itemsCount }
 
-
         val lastMessageWithVisibleOperatorImage = state.lastMessageWithVisibleOperatorImage
-
-
         val lastItem = state.chatItems.lastOrNull()
 
         if (lastItem !is OperatorChatItem) {

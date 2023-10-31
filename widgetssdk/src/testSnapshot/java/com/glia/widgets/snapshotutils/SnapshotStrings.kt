@@ -11,6 +11,11 @@ interface SnapshotStrings {
     )
 
     fun shortLengthTexts() = listOf(
-        "Maecenas dolor", "Dignissim", "Vestibulum risus", "Ut posuere", "Interdum", "Sed quis ex nisl"
+        "Maecenas dolor",
+        "Dignissim",
+        "Vestibulum risus",
+        "Ut posuere",
+        "Interdum",
+        "Sed quis ex nisl"
     )
 }

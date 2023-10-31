@@ -62,7 +62,6 @@ class GvaChip @JvmOverloads constructor(
             applyQuickReplyTheme()
         }
     }
-
 }
 
 class GvaChipGroup @JvmOverloads constructor(
@@ -87,7 +86,6 @@ class GvaChipGroup @JvmOverloads constructor(
     }
 
     internal fun setButtons(buttons: List<GvaButton>) {
-
         val hasItems = buttons.isNotEmpty()
 
         if (hasItems) {
@@ -115,9 +113,7 @@ class GvaChipGroup @JvmOverloads constructor(
         }
     }
 
-
     internal fun interface OnItemClickedListener {
         fun onItemClicked(gvaButton: GvaButton)
     }
-
 }

@@ -49,5 +49,4 @@ internal class GvaGalleryViewHolder(
             contentBinding.cardRecyclerView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         }
     }
-
 }

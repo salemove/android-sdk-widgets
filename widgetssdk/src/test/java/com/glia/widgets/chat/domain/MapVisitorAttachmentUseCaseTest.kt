@@ -46,5 +46,4 @@ class MapVisitorAttachmentUseCaseTest {
         assertEquals(newAttachment.timestamp, visitorMessage.timestamp)
         assertEquals(newAttachment.showDelivered, false)
     }
-
 }

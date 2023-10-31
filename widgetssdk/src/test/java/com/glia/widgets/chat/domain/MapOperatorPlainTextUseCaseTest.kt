@@ -46,7 +46,6 @@ class MapOperatorPlainTextUseCaseTest {
             val message = useCase(chatMessageInternal, false)
 
             assertTrue(message is OperatorMessageItem.PlainText)
-
             assertEquals(message.showChatHead, false)
             assertEquals(message.id, messageId)
             assertEquals(message.timestamp, messageTimeStamp)
@@ -56,5 +55,4 @@ class MapOperatorPlainTextUseCaseTest {
             assertEquals(message.content, content)
         }
     }
-
 }

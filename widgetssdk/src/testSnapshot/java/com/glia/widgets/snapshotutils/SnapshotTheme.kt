@@ -141,7 +141,7 @@ internal interface SnapshotTheme : SnapshotContent {
             iconOnHold = iconOnHold,
             iconEndScreenShare = iconEndScreenShare,
             whiteLabel = whiteLabel,
-            gliaAlertDialogButtonUseVerticalAlignment = gliaAlertDialogButtonUseVerticalAlignment,
+            gliaAlertDialogButtonUseVerticalAlignment = gliaAlertDialogButtonUseVerticalAlignment
         )
     }
 }

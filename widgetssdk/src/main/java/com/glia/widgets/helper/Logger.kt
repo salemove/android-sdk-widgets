@@ -74,11 +74,11 @@ object Logger {
                     Throwable::class.java
                 )
             } catch (e: IllegalAccessException) {
-                Log.d(TAG, "Unable to log message using Core SDK logger $e")
+                Log.d(TAG, "Unable to access Core SDK logger function $e")
             } catch (e: InvocationTargetException) {
-                Log.d(TAG, "Unable to log message using Core SDK logger $e")
+                Log.d(TAG, "Unable to invoke Core SDK logger function $e")
             } catch (e: NoSuchMethodException) {
-                Log.d(TAG, "Unable to log message using Core SDK logger $e")
+                Log.d(TAG, "Unable to find Core SDK logger function $e")
             }
         }
 

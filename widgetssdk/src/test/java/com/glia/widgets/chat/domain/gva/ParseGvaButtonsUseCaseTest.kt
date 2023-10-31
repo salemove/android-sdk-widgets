@@ -38,12 +38,8 @@ class ParseGvaButtonsUseCaseTest {
 
     @Test
     fun `invoke returns empty list when invalid JSON passed`() {
-
         val jsonObject = JSONObject()
-
         val buttons = useCase(jsonObject)
-
         assertEquals(buttons, emptyList<GvaButton>())
-
     }
 }

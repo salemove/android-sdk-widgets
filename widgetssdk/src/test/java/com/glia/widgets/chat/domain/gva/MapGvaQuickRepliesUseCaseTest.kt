@@ -22,15 +22,11 @@ class MapGvaQuickRepliesUseCaseTest {
 
     @Before
     fun setUp() {
-
         parseGvaButtonsUseCase = mock()
         whenever(parseGvaButtonsUseCase(anyOrNull())) doReturn emptyList()
-
         gvaResponseText = mock()
-
         mapGvaResponseTextUseCase = mock()
         whenever(mapGvaResponseTextUseCase(any(), any())) doReturn gvaResponseText
-
         useCase = MapGvaQuickRepliesUseCase(parseGvaButtonsUseCase)
     }
 

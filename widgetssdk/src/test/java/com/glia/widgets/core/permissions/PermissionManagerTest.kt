@@ -49,44 +49,65 @@ class PermissionManagerTest {
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is TEXT`() {
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.TEXT, false)
 
-        assertEquals(Permissions(emptyList(), emptyList()), result)
+        assertEquals(
+            Permissions(
+                emptyList(),
+                emptyList()
+            ),
+            result
+        )
     }
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is AUDIO`() {
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, false)
 
-        assertEquals(Permissions(
-            listOf(Manifest.permission.RECORD_AUDIO),
-            emptyList()
-        ), result)
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.RECORD_AUDIO),
+                emptyList()
+            ),
+            result
+        )
     }
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is VIDEO`() {
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, false)
 
-        assertEquals(Permissions(
-            listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
-            emptyList()
-        ), result)
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
+                emptyList()
+            ),
+            result
+        )
     }
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is AUDIO, isCallVisualizer`() {
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, true)
 
-        assertEquals(Permissions(emptyList(), emptyList()), result)
+        assertEquals(
+            Permissions(
+                emptyList(),
+                emptyList()
+            ),
+            result
+        )
     }
 
     @Test
     fun `getPermissionsForEngagementMediaType returns empty lists of permissions when mediaType is VIDEO, isCallVisualizer`() {
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, true)
 
-        assertEquals(Permissions(
-            listOf(Manifest.permission.CAMERA),
-            emptyList()
-        ), result)
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.CAMERA),
+                emptyList()
+            ),
+            result
+        )
     }
 
     @Test
@@ -97,13 +118,14 @@ class PermissionManagerTest {
             permissionsRequestRepository,
             Build.VERSION_CODES.S
         )
-
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.TEXT, false)
-
-        assertEquals(Permissions(
-            emptyList(),
-            listOf(Manifest.permission.BLUETOOTH_CONNECT)
-        ), result)
+        assertEquals(
+            Permissions(
+                emptyList(),
+                listOf(Manifest.permission.BLUETOOTH_CONNECT)
+            ),
+            result
+        )
     }
 
     @Test
@@ -117,10 +139,13 @@ class PermissionManagerTest {
 
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, false)
 
-        assertEquals(Permissions(
-            listOf(Manifest.permission.RECORD_AUDIO),
-            listOf(Manifest.permission.BLUETOOTH_CONNECT)
-        ), result)
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.RECORD_AUDIO),
+                listOf(Manifest.permission.BLUETOOTH_CONNECT)
+            ),
+            result
+        )
     }
 
     @Test
@@ -134,10 +159,13 @@ class PermissionManagerTest {
 
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, false)
 
-        assertEquals(Permissions(
-            listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
-            listOf(Manifest.permission.BLUETOOTH_CONNECT)
-        ), result)
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
+                listOf(Manifest.permission.BLUETOOTH_CONNECT)
+            ),
+            result
+        )
     }
 
     @Test
@@ -151,7 +179,13 @@ class PermissionManagerTest {
 
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.AUDIO, true)
 
-        assertEquals(Permissions(emptyList(), emptyList()), result)
+        assertEquals(
+            Permissions(
+                emptyList(),
+                emptyList()
+            ),
+            result
+        )
     }
 
     @Test
@@ -165,10 +199,13 @@ class PermissionManagerTest {
 
         val result = permissionManager.getPermissionsForEngagementMediaType(Engagement.MediaType.VIDEO, true)
 
-        assertEquals(Permissions(
-            listOf(Manifest.permission.CAMERA),
-            emptyList()
-        ), result)
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.CAMERA),
+                emptyList()
+            ),
+            result
+        )
     }
 
     // Tests for .handlePermissions()

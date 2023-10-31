@@ -13,14 +13,13 @@ class GliaSdkConfigurationManagerTest {
 
     private val configurationManager: GliaSdkConfigurationManager = mock()
     private val resourceProvider: ResourceProvider = mock()
+
     @Test
     fun `getCompanyName returns local default when remote value is null`() {
         whenever(configurationManager.fetchRemoteCompanyName()).thenReturn(null)
         whenever(configurationManager.resourceProvider).thenReturn(resourceProvider)
         whenever(resourceProvider.getString(R.string.general_company_name)).thenReturn(DEFAULT_LOCAL_COMPANY_NAME)
-
         whenever(configurationManager.companyName).thenCallRealMethod()
-
         assertEquals(DEFAULT_LOCAL_COMPANY_NAME, configurationManager.companyName)
     }
 
@@ -29,9 +28,7 @@ class GliaSdkConfigurationManagerTest {
         whenever(configurationManager.fetchRemoteCompanyName()).thenReturn("")
         whenever(configurationManager.resourceProvider).thenReturn(resourceProvider)
         whenever(resourceProvider.getString(R.string.general_company_name)).thenReturn(DEFAULT_LOCAL_COMPANY_NAME)
-
         whenever(configurationManager.companyName).thenCallRealMethod()
-
         assertEquals(DEFAULT_LOCAL_COMPANY_NAME, configurationManager.companyName)
     }
 
@@ -40,9 +37,7 @@ class GliaSdkConfigurationManagerTest {
         whenever(configurationManager.fetchRemoteCompanyName()).thenReturn("Remote company name")
         whenever(configurationManager.resourceProvider).thenReturn(resourceProvider)
         whenever(resourceProvider.getString(R.string.general_company_name)).thenReturn(DEFAULT_LOCAL_COMPANY_NAME)
-
         whenever(configurationManager.companyName).thenCallRealMethod()
-
         assertEquals("Remote company name", configurationManager.companyName)
     }
 
@@ -52,9 +47,7 @@ class GliaSdkConfigurationManagerTest {
         whenever(configurationManager.resourceProvider).thenReturn(resourceProvider)
         whenever(resourceProvider.getString(R.string.general_company_name)).thenReturn(DEFAULT_LOCAL_COMPANY_NAME)
         whenever(configurationManager.isCompanyNameSetFromWidgetsConfig).thenReturn(true)
-
         whenever(configurationManager.companyName).thenCallRealMethod()
-
         assertEquals(null, configurationManager.companyName)
     }
 }

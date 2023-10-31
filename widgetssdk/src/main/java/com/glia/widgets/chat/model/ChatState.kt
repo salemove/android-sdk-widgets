@@ -51,7 +51,7 @@ internal data class ChatState(
         formattedOperatorName = null,
         operatorProfileImgUrl = null,
         chatInputMode = ChatInputMode.ENABLED,
-        engagementRequested = true,
+        engagementRequested = true
     )
 
     fun setSecureMessagingState(): ChatState = copy(
@@ -92,7 +92,7 @@ internal data class ChatState(
 
     fun historyLoaded(): ChatState = copy(
         chatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
-        isAttachmentButtonNeeded = false,
+        isAttachmentButtonNeeded = false
     )
 
     fun upgradeMedia(isVideo: Boolean?): ChatState = copy(isMediaUpgradeVide = isVideo)

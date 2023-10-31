@@ -62,11 +62,13 @@ internal class PermissionManager(
         return Permissions(requiredPermissions, additionalPermissions)
     }
 
-    fun handlePermissions(necessaryPermissions: List<String>? = null,
-                          additionalPermissions: List<String>? = null,
-                          necessaryPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
-                          additionalPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
-                          callback: PermissionsRequestResult? = null) {
+    fun handlePermissions(
+        necessaryPermissions: List<String>? = null,
+        additionalPermissions: List<String>? = null,
+        necessaryPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
+        additionalPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
+        callback: PermissionsRequestResult? = null
+    ) {
         val missingNecessaryPermissions = necessaryPermissions
             ?.filter { !hasPermission(it) }
         val missingAdditionalPermissions = additionalPermissions
@@ -88,12 +90,13 @@ internal class PermissionManager(
     }
 
     @VisibleForTesting
-    fun requestGroupedPermissions(necessaryPermissions: List<String>? = null,
-                                  additionalPermissions: List<String>? = null,
-                                  necessaryPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
-                                  additionalPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
-                                  callback: PermissionsRequestResult? = null) {
-
+    fun requestGroupedPermissions(
+        necessaryPermissions: List<String>? = null,
+        additionalPermissions: List<String>? = null,
+        necessaryPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
+        additionalPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
+        callback: PermissionsRequestResult? = null
+    ) {
         val allPermissions = (necessaryPermissions ?: emptyList()) + (additionalPermissions ?: emptyList())
 
         if (allPermissions.isEmpty()) {

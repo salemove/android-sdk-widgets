@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
-import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import com.glia.widgets.R
 import com.google.android.material.theme.overlay.MaterialThemeOverlay

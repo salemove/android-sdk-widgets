@@ -32,7 +32,7 @@ internal fun Queue.supportMessaging() = state.medias.contains(Engagement.MediaTy
 
 internal fun formatElapsedTime(elapsedMilliseconds: Long) = DateUtils.formatElapsedTime(elapsedMilliseconds / DateUtils.SECOND_IN_MILLIS)
 
-internal fun String.combineStringWith(string: String, separator: String) : String {
+internal fun String.combineStringWith(string: String, separator: String): String {
     return this + separator + string
 }
 

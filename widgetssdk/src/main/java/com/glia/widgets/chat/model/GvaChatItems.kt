@@ -51,11 +51,17 @@ internal data class GvaQuickReplies(
     override val timestamp: Long = -1,
     override val operatorProfileImgUrl: String? = null,
     override val operatorName: String? = null,
-    val options: List<GvaButton> = listOf(),
+    val options: List<GvaButton> = listOf()
 ) : GvaOperatorChatItem(ChatAdapter.GVA_QUICK_REPLIES_TYPE) {
     override fun withShowChatHead(showChatHead: Boolean): OperatorChatItem = copy(showChatHead = showChatHead)
 
     fun asResponseText(): GvaResponseText = GvaResponseText(
-        id, content, showChatHead, operatorId, timestamp, operatorProfileImgUrl, operatorName
+        id,
+        content,
+        showChatHead,
+        operatorId,
+        timestamp,
+        operatorProfileImgUrl,
+        operatorName
     )
 }

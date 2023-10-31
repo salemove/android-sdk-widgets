@@ -59,7 +59,6 @@ class MapResponseCardUseCaseTest {
             val message = useCase(attachment, chatMessageInternal, false)
 
             assertTrue(message is OperatorMessageItem.ResponseCard)
-
             assertEquals(message.showChatHead, false)
             assertEquals(message.id, messageId)
             assertEquals(message.timestamp, messageTimeStamp)
@@ -71,5 +70,4 @@ class MapResponseCardUseCaseTest {
             assertEquals(message.choiceCardImageUrl, imageUrl)
         }
     }
-
 }

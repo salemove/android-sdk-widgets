@@ -32,11 +32,8 @@ class AppendGvaMessageItemUseCaseTest {
     @Test
     fun `invoke adds GvaOperatorChatItem to the list`() {
         whenever(mapGvaUseCase.invoke(any(), any())) doReturn mock<GvaOperatorChatItem>()
-
         useCase(items, mock())
-
         assertTrue(items.count() == 1)
         assertTrue(items.first() is GvaOperatorChatItem)
     }
-
 }

@@ -4,8 +4,6 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.Unsent
-
-
 internal class SendUnsentMessagesUseCase(private val chatRepository: GliaChatRepository) {
     operator fun invoke(message: Unsent, onSuccess: (VisitorMessage) -> Unit) {
         when (message) {

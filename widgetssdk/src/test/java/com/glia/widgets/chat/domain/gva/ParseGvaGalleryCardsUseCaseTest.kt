@@ -42,7 +42,6 @@ class ParseGvaGalleryCardsUseCaseTest {
                 Assert.assertEquals(button.text, buttonJson["text"])
                 Assert.assertEquals(button.url, buttonJson.opt("url"))
             }
-
         }
     }
 }

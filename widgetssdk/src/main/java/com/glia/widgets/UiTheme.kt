@@ -1049,7 +1049,6 @@ data class UiTheme(
             this.surveyStyle = surveyStyle
         }
 
-
         fun setGvaQuickReplyBackgroundColor(@ColorRes gvaQuickReplyBackgroundColor: Int?) {
             this.gvaQuickReplyBackgroundColor = gvaQuickReplyBackgroundColor
         }

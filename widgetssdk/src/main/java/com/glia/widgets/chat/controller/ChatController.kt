@@ -496,7 +496,7 @@ internal class ChatController(
 
         engagementStateEventDisposable = getGliaEngagementStateFlowableUseCase
             .execute()
-            .subscribe({ onEngagementStateChanged(it) }) { Logger.e(TAG, it.message) }
+            .subscribe({ onEngagementStateChanged(it) }) { throwable -> throwable.message?.let { Logger.e(TAG, it) } }
         disposable.add(engagementStateEventDisposable!!)
     }
 

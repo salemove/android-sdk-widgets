@@ -152,7 +152,7 @@ class VisitorCodeView internal constructor(
     }
 
     override fun showError(throwable: Throwable) {
-        Logger.e(TAG, throwable.message, throwable)
+        throwable.message?.let { Logger.e(TAG, it, throwable) }
         runOnUi {
             showProgressBar(false)
             showFailure()

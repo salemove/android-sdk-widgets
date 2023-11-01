@@ -395,7 +395,10 @@ public class ControllerFactory {
 
     public ActivityWatcherForLiveObservationContract.Controller getActivityWatcherForLiveObservationController() {
         if (activityWatcherForLiveObservationController == null) {
-            activityWatcherForLiveObservationController = new ActivityWatcherForLiveObservationController(useCaseFactory.getLiveObservationUseCase());
+            activityWatcherForLiveObservationController = new ActivityWatcherForLiveObservationController(
+                useCaseFactory.getLiveObservationUseCase(),
+                useCaseFactory.createLiveObservationPopupUseCase()
+            );
         }
         return activityWatcherForLiveObservationController;
     }

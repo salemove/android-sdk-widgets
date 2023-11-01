@@ -1,5 +1,8 @@
 package com.glia.widgets;
 
+import static com.glia.widgets.helper.Logger.SITE_ID_KEY;
+import static java.util.Collections.singletonMap;
+
 import android.app.Application;
 import android.content.Intent;
 
@@ -8,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
+import com.glia.androidsdk.LoggingAdapter;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
@@ -130,6 +134,7 @@ public class GliaWidgets {
         GliaConfig gliaConfig = createGliaConfig(gliaWidgetsConfig);
         Dependencies.glia().init(gliaConfig);
         Dependencies.init(gliaWidgetsConfig);
+        setupLoggingMetadata(gliaWidgetsConfig);
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
     }
@@ -321,6 +326,22 @@ public class GliaWidgets {
      */
     public static String getWidgetsCoreSdkVersion() {
         return BuildConfig.GLIA_CORE_SDK_VERSION;
+    }
+
+    /**
+     * This function is used to add logging adapter(s).
+     * Function is primarily used by Glia Android Core SDK.
+     *
+     * @param loggingAdapter is an implementation of {@link com.glia.androidsdk.LoggingAdapter}.
+     *                       Provides a way to log errors or debug data.
+     */
+    /** @noinspection unused*/
+    public static void setLoggerAdapter(LoggingAdapter loggingAdapter) {
+        Logger.addAdapter(loggingAdapter);
+    }
+
+    private static void setupLoggingMetadata(GliaWidgetsConfig gliaWidgetsConfig) {
+        Logger.addGlobalMetadata(singletonMap(SITE_ID_KEY, gliaWidgetsConfig.getSiteId()));
     }
 
     // More info about global Rx error handler:

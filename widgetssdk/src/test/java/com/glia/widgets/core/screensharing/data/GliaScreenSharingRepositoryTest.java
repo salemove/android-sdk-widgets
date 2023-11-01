@@ -92,6 +92,7 @@ public class GliaScreenSharingRepositoryTest {
         OmnicoreEngagement engagement = mock(OmnicoreEngagement.class);
         ScreenSharing screenSharing = mock(ScreenSharing.class);
         ScreenSharingRequest request = mock(ScreenSharingRequest.class);
+        GliaException gliaException = new GliaException("Mock debug message", GliaException.Cause.INTERNAL_ERROR);
         doAnswer(invocation -> {
             Consumer<OmnicoreEngagement> callback = invocation.getArgument(1);
             callback.accept(engagement);
@@ -112,7 +113,7 @@ public class GliaScreenSharingRepositoryTest {
         }).when(OMNIBROWSE).on(any(), any());
         doAnswer(invocation -> {
             Consumer<GliaException> callback = invocation.getArgument(3);
-            callback.accept(mock(GliaException.class));
+            callback.accept(gliaException);
             return null;
         }).when(request).accept(any(), any(Activity.class), anyInt(), any());
         subjectUnderTest.init(screenSharingCallback);

@@ -1,5 +1,8 @@
 package com.glia.widgets;
 
+import static com.glia.widgets.helper.Logger.SITE_ID_KEY;
+import static java.util.Collections.singletonMap;
+
 import android.app.Application;
 import android.content.Intent;
 
@@ -130,6 +133,7 @@ public class GliaWidgets {
         GliaConfig gliaConfig = createGliaConfig(gliaWidgetsConfig);
         Dependencies.glia().init(gliaConfig);
         Dependencies.init(gliaWidgetsConfig);
+        setupLoggingMetadata(gliaWidgetsConfig);
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
     }
@@ -321,6 +325,10 @@ public class GliaWidgets {
      */
     public static String getWidgetsCoreSdkVersion() {
         return BuildConfig.GLIA_CORE_SDK_VERSION;
+    }
+
+    private static void setupLoggingMetadata(GliaWidgetsConfig gliaWidgetsConfig) {
+        Logger.addGlobalMetadata(singletonMap(SITE_ID_KEY, gliaWidgetsConfig.getSiteId()));
     }
 
     // More info about global Rx error handler:

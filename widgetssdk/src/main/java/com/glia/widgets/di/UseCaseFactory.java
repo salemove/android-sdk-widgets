@@ -138,6 +138,7 @@ import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCas
 import com.glia.widgets.helper.rx.Schedulers;
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase;
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
+import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.glia.widgets.view.snackbar.LiveObservationUseCase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -1044,6 +1045,10 @@ public class UseCaseFactory {
 
     public ConfirmationDialogUseCase createConfirmationDialogUseCase() {
         return new ConfirmationDialogUseCase(createSiteInfoUseCase());
+    }
+
+    public LiveObservationPopupUseCase createLiveObservationPopupUseCase() {
+        return new LiveObservationPopupUseCase(createSiteInfoUseCase());
     }
 
     public LiveObservationUseCase getLiveObservationUseCase() {

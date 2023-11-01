@@ -738,7 +738,9 @@
           },
           "border": {
             "type": "fill",
-            "value": ["#7933b6"]
+            "value": [
+              "#7933b6"
+            ]
           },
           "borderWidth": 2,
           "cornerRadius": 5
@@ -816,6 +818,36 @@
           "type": "gradient",
           "value": ["#00e4e7", "#0800e7"]
         }
+      }
+    }
+  },
+  "snackBar": {
+    "background": {
+      "type": "fill",
+      "value": [
+        "#f39c12"
+      ]
+    },
+    "text": {
+      "type": "fill",
+      "value": [
+        "#3769b6"
+      ]
+    }
+  },
+  "callScreen": {
+    "snackBar": {
+      "background": {
+        "type": "fill",
+        "value": [
+          "#f39c12"
+        ]
+      },
+      "text": {
+        "type": "fill",
+        "value": [
+          "#3769b6"
+        ]
       }
     }
   }

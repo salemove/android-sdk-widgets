@@ -60,7 +60,7 @@ internal open class ImageAttachmentViewHolder(
             .observeOn(schedulers.mainScheduler)
             .subscribe({ bm: Bitmap? -> imageView.setImageBitmap(bm) }
             ) { error: Throwable ->
-                e(TAG, error.message)
+                error.message?.let { e(TAG, it) }
                 imageView.setBackgroundColor(Color.BLACK)
             }
         setAccessibilityActions()

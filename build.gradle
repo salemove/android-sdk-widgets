@@ -29,7 +29,7 @@ allprojects {
 
     // Internal maven repository with Core SDK build from `feature/live-observation` branch
     // TODO: delete before merging to `development` branch
-    maven { url "https://s01.oss.sonatype.org/content/repositories/comglia-1231" }
+    maven { url "https://s01.oss.sonatype.org/content/repositories/comglia-1236" }
   }
 }
 

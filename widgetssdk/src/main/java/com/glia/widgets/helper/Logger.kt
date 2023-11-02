@@ -17,47 +17,35 @@ object Logger {
     }
 
     @JvmStatic
-    fun d(tag: String, message: String?) {
-        // No need to log an empty message
-        if (message == null) return
-
+    fun d(tag: String, message: String) {
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
-    fun d(tag: String, message: String?, metadata: Map<String, String>? = null) {
-        // No need to log an empty message
-        if (message == null) return
-
+    fun d(tag: String, message: String, metadata: Map<String, String>? = null) {
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(metadata))
         })
     }
 
     @JvmStatic
-    fun e(tag: String, message: String?) {
-        if (message == null) return
-
+    fun e(tag: String, message: String) {
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, null, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
-    fun e(tag: String, message: String?, throwable: Throwable?) {
-        if (message == null) return
-
+    fun e(tag: String, message: String, throwable: Throwable?) {
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, throwable, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
-    fun e(tag: String, message: String?, throwable: Throwable?, metadata: Map<String, String>? = null) {
-        if (message == null) return
-
+    fun e(tag: String, message: String, throwable: Throwable?, metadata: Map<String, String>? = null) {
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, throwable, concatGlobalMeta(metadata))
         })

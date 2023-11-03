@@ -328,13 +328,6 @@ public class GliaWidgets {
         return BuildConfig.GLIA_CORE_SDK_VERSION;
     }
 
-    /**
-     * This function is used to add logging adapter(s).
-     * Function is primarily used by Glia Android Core SDK.
-     *
-     * @param loggingAdapter is an implementation of {@link com.glia.androidsdk.LoggingAdapter}.
-     *                       Provides a way to log errors or debug data.
-     */
     /** @noinspection unused*/
     public static void setLoggerAdapter(LoggingAdapter loggingAdapter) {
         Logger.addAdapter(loggingAdapter);

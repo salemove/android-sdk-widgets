@@ -58,6 +58,7 @@
     <string name="settings_operator_layout_styling">Operator Layout Styling</string>
     <string name="settings_other">Other</string>
     <string name="settings_company_name">Company name</string>
+    <string name="settings_manual_locale_override">Manual locale override</string>
     <string name="settings_authorization">Authorization type (needs restart)</string>
     <string name="settings_authorization_summary">Authorization type</string>
     <string name="settings_queue_id">Queue id</string>

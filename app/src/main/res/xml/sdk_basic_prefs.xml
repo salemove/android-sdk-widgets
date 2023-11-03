@@ -43,6 +43,12 @@
             app:key="@string/pref_use_alert_dialog_button_vertical_alignment"
             app:title="@string/settings_use_alert_dialog_button_vertical_alignment" />
 
+        <EditTextPreference
+            app:defaultValue=""
+            app:key="@string/pref_manual_locale_override"
+            app:title="@string/settings_manual_locale_override"
+            app:useSimpleSummaryProvider="true" />
+
         <ListPreference
             android:layout_height="wrap_content"
             android:defaultValue="@string/screen_sharing_mode_unbounded"

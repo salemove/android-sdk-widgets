@@ -106,8 +106,7 @@ object ExampleAppConfigManager {
         runtimeConfig: UiTheme? = null,
         region: String? = null,
         baseDomain: String = DEFAULT_BASE_DOMAIN,
-        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context),
-        manualLocaleOverride: String? = null
+        preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     ): GliaWidgetsConfig {
         val siteRegion = region ?: preferences.getString(
             context.getString(R.string.pref_environment),
@@ -139,6 +138,7 @@ object ExampleAppConfigManager {
         } else {
             ScreenSharing.Mode.UNBOUNDED
         }
+        val manualLocaleOverride = preferences.getString(context.getString(R.string.pref_manual_locale_override), null)
         return GliaWidgetsConfig.Builder()
             .setSiteApiKey(SiteApiKey(apiKeyId!!, apiKeySecret!!))
             .setSiteId(siteId)

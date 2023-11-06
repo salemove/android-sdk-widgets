@@ -7,5 +7,6 @@ internal data class MessageBalloonTheme(
     val background: LayerTheme? = null,
     val text: TextTheme? = null,
     val status: TextTheme? = null,
+    val error: TextTheme? = null,
     val userImage: UserImageTheme? = null
 )

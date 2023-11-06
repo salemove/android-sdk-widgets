@@ -23,10 +23,13 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseC
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.helper.requireActivity
+import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import io.mockk.every
 import io.mockk.mockkStatic
+import io.reactivex.schedulers.TestScheduler
 import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
@@ -35,6 +38,9 @@ internal interface SnapshotChatView : SnapshotContent {
     val chatViewMock: Mock
 
     class Mock(private val snapshotContent: SnapshotContent) {
+        val computationScheduler = TestScheduler()
+        val mainScheduler = TestScheduler()
+
         lateinit var activityMock: Activity
         lateinit var windowMock: Window
 
@@ -75,6 +81,12 @@ internal interface SnapshotChatView : SnapshotContent {
             Dependencies.setUseCaseFactory(useCaseFactoryMock)
             Dependencies.setResourceProvider(rp)
             Dependencies.setStringProvider(sp)
+
+            val schedulers = mock<Schedulers>()
+            whenever(schedulers.computationScheduler) doReturn computationScheduler
+            whenever(schedulers.mainScheduler) doReturn mainScheduler
+            Dependencies.setSchedulers(schedulers)
+
         }
 
         fun tearDown() {

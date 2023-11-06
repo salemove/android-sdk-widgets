@@ -2929,8 +2929,23 @@
         "foreground": {
           "type": "fill",
           "value": [
-            "#FFFFFF"
+            "#8E8E93"
           ]
+        }
+      },
+      "error": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": ["#FFFFFF"]
+        },
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#FF0000"]
         }
       },
       "text": {

@@ -15,7 +15,6 @@ import com.glia.widgets.StringProvider;
 import com.glia.widgets.chat.adapter.ChatAdapter;
 import com.glia.widgets.chat.model.Attachment;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.FileHelper;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -25,10 +24,11 @@ public class FileAttachmentViewHolder extends RecyclerView.ViewHolder {
     private final LinearProgressIndicator progressIndicator;
     private final TextView titleText;
     private final TextView statusIndicator;
-    private final StringProvider stringProvider = Dependencies.getStringProvider();
+    private final StringProvider stringProvider;
 
-    public FileAttachmentViewHolder(@NonNull View itemView) {
+    public FileAttachmentViewHolder(@NonNull View itemView, @NonNull StringProvider stringProvider) {
         super(itemView);
+        this.stringProvider = stringProvider;
         extensionContainerView = itemView.findViewById(R.id.type_indicator_view);
         extensionTypeText = itemView.findViewById(R.id.type_indicator_text);
         progressIndicator = itemView.findViewById(R.id.progress_indicator);

@@ -89,7 +89,8 @@ private fun ChatVisitorMessageTheme(
         MessageBalloonTheme(
             background = LayerTheme(fill = primaryColorTheme),
             text = BaseLightColorTextTheme(this),
-            status = TextTheme(textColor = baseNormalColorTheme)
+            status = TextTheme(textColor = baseNormalColorTheme),
+            error = TextTheme(textColor = systemNegativeColorTheme)
         )
     }
 }

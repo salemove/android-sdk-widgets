@@ -329,7 +329,7 @@ public class GliaWidgets {
     }
 
     /** @noinspection unused*/
-    public static void setLoggerAdapter(LoggingAdapter loggingAdapter) {
+    public static void setLoggingAdapter(LoggingAdapter loggingAdapter) {
         Logger.addAdapter(loggingAdapter);
     }
 

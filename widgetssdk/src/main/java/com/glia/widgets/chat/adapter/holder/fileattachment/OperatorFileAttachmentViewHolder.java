@@ -20,10 +20,15 @@ import com.glia.widgets.view.OperatorStatusView;
 
 public class OperatorFileAttachmentViewHolder extends FileAttachmentViewHolder {
     private final OperatorStatusView operatorStatusView;
-    private final StringProvider stringProvider = Dependencies.getStringProvider();
+    private final StringProvider stringProvider;
 
     public OperatorFileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme) {
-        super(itemView);
+        this(itemView, uiTheme, Dependencies.getStringProvider());
+    }
+
+    public OperatorFileAttachmentViewHolder(@NonNull View itemView, UiTheme uiTheme, @NonNull StringProvider stringProvider) {
+        super(itemView, stringProvider);
+        this.stringProvider = stringProvider;
         operatorStatusView = itemView.findViewById(R.id.chat_head_view);
         setupOperatorStatusView(uiTheme);
     }

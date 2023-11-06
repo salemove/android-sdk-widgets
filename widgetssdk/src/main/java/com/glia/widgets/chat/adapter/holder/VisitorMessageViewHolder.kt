@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.glia.widgets.R
 import com.glia.widgets.StringKey
 import com.glia.widgets.StringKeyPair
+import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.model.VisitorMessageItem
@@ -20,18 +21,20 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
+import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class VisitorMessageViewHolder(
     private val binding: ChatVisitorMessageLayoutBinding,
     private val onMessageClickListener: ChatAdapter.OnMessageClickListener,
-    uiTheme: UiTheme
+    uiTheme: UiTheme,
+    unifiedTheme: UnifiedTheme? = Dependencies.getGliaThemeManager().theme,
+    private val stringProvider: StringProvider = Dependencies.getStringProvider()
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val visitorTheme: MessageBalloonTheme? by lazy {
-        Dependencies.getGliaThemeManager().theme?.chatTheme?.visitorMessage
+        unifiedTheme?.chatTheme?.visitorMessage
     }
-    private val stringProvider = Dependencies.getStringProvider()
 
     private lateinit var id: String
     private var showDelivered: Boolean = false
@@ -60,6 +63,7 @@ internal class VisitorMessageViewHolder(
         binding.content.applyLayerTheme(visitorTheme?.background)
         binding.content.applyTextTheme(visitorTheme?.text)
         binding.deliveredView.applyTextTheme(visitorTheme?.status)
+        binding.errorView.applyTextTheme(visitorTheme?.error)
         binding.deliveredView.text = stringProvider.getRemoteString(R.string.chat_message_delivered)
         binding.errorView.text = stringProvider.getRemoteString(R.string.chat_message_delivery_failed_retry)
     }
@@ -107,11 +111,16 @@ internal class VisitorMessageViewHolder(
         ViewCompat.setAccessibilityDelegate(itemView, object : AccessibilityDelegateCompat() {
             override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
-                val actionLabel = stringProvider.getRemoteString(R.string.general_retry)
-                val actionClick = AccessibilityActionCompat(
-                    AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
-                )
-                info.addAction(actionClick)
+                if (showError) {
+                    val actionLabel = stringProvider.getRemoteString(R.string.general_retry)
+                    val actionClick = AccessibilityActionCompat(
+                        AccessibilityNodeInfoCompat.ACTION_CLICK, actionLabel
+                    )
+                    info.addAction(actionClick)
+                } else {
+                    info.removeAction(AccessibilityActionCompat.ACTION_CLICK)
+                    info.isClickable = false
+                }
             }
         })
     }

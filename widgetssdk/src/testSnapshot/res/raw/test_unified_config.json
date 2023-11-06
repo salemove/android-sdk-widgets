@@ -744,6 +744,79 @@
           "cornerRadius": 5
         }
       }
+    },
+    "visitorMessage": {
+      "background": {
+        "color": {
+          "type": "gradient",
+          "value": ["#ffbd16", "#e77e10"]
+        },
+        "border": {
+          "type": "fill",
+          "value": ["#a24f00"]
+        },
+        "borderWidth": 3,
+        "cornerRadius": 2
+      },
+      "status": {
+        "alignment": "center",
+        "background": {
+          "type": "gradient",
+          "value": ["#72ff6a", "#00e793"]
+        },
+        "font": {
+          "size": 17,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#0073ff"]
+        }
+      },
+      "error": {
+        "alignment": "center",
+        "background": {
+          "type": "gradient",
+          "value": ["#ee60ff", "#e72881"]
+        },
+        "font": {
+          "size": 14,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#fff800"]
+        }
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "gradient",
+          "value": ["#5f44b8", "#e78698"]
+        },
+        "font": {
+          "size": 19,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#ff00c3"]
+        }
+      },
+      "userImage": {
+        "placeholderColor": {
+          "type": "gradient",
+          "value": ["#e78738", "#77e723"]
+        },
+        "placeholderBackgroundColor": {
+          "type": "gradient",
+          "value": ["#e4e700", "#e700e3"]
+        },
+        "imageBackgroundColor": {
+          "type": "gradient",
+          "value": ["#00e4e7", "#0800e7"]
+        }
+      }
     }
   }
 }

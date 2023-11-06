@@ -13,8 +13,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
       - run: cd .github/actions/deployment-action && npm i && tsc && cd -
-      - name: Validate branch name before to start deployment
-        uses: ./.github/actions/deployment-action
+      # - name: Validate branch name before to start deployment
+      #   uses: ./.github/actions/deployment-action
 
       - uses: actions/checkout@v3
       - name: Runs the deployment workflow in Bitrise

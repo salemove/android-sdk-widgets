@@ -37,6 +37,9 @@ import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SystemChatItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.chat.model.VisitorMessageItem
+import com.glia.widgets.databinding.ChatAttachmentOperatorImageLayoutBinding
+import com.glia.widgets.databinding.ChatAttachmentVisitorFileLayoutBinding
+import com.glia.widgets.databinding.ChatAttachmentVisitorImageLayoutBinding
 import com.glia.widgets.databinding.ChatGvaGalleryLayoutBinding
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatMediaUpgradeLayoutBinding
@@ -45,10 +48,12 @@ import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
 import com.glia.widgets.helper.layoutInflater
+import com.glia.widgets.helper.rx.Schedulers
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 
 internal class ChatAdapter(
@@ -63,7 +68,8 @@ internal class ChatAdapter(
     private val customCardAdapter: CustomCardAdapter?,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
-    private val getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase
+    private val getImageFileFromNetworkUseCase: GetImageFileFromNetworkUseCase,
+    private val schedulers: Schedulers = Dependencies.getSchedulers()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val differ = AsyncListDiffer(this, ChatAdapterDiffCallback())
 
@@ -81,18 +87,20 @@ internal class ChatAdapter(
             }
 
             VISITOR_FILE_VIEW_TYPE -> {
-                val view =
-                    inflater.inflate(R.layout.chat_attachment_visitor_file_layout, parent, false)
-                VisitorFileAttachmentViewHolder(view, uiTheme)
+                VisitorFileAttachmentViewHolder(
+                    ChatAttachmentVisitorFileLayoutBinding.inflate(inflater, parent, false),
+                    uiTheme
+                )
             }
 
             VISITOR_IMAGE_VIEW_TYPE -> {
                 VisitorImageAttachmentViewHolder(
-                    inflater.inflate(R.layout.chat_attachment_visitor_image_layout, parent, false),
-                    uiTheme,
+                    ChatAttachmentVisitorImageLayoutBinding.inflate(inflater, parent, false),
                     getImageFileFromCacheUseCase,
                     getImageFileFromDownloadsUseCase,
-                    getImageFileFromNetworkUseCase
+                    getImageFileFromNetworkUseCase,
+                    schedulers,
+                    uiTheme
                 )
             }
 
@@ -106,11 +114,12 @@ internal class ChatAdapter(
 
             OPERATOR_IMAGE_VIEW_TYPE -> {
                 OperatorImageAttachmentViewHolder(
-                    inflater.inflate(R.layout.chat_attachment_operator_image_layout, parent, false),
-                    uiTheme,
+                    ChatAttachmentOperatorImageLayoutBinding.inflate(inflater, parent, false),
                     getImageFileFromCacheUseCase,
                     getImageFileFromDownloadsUseCase,
-                    getImageFileFromNetworkUseCase
+                    getImageFileFromNetworkUseCase,
+                    schedulers,
+                    uiTheme
                 )
             }
 

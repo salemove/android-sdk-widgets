@@ -26,12 +26,11 @@ import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
+import com.glia.widgets.helper.rx.Schedulers;
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.controller.ServiceChatHeadController;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
-
-import org.jetbrains.annotations.TestOnly;
 
 public class Dependencies {
 
@@ -47,8 +46,10 @@ public class Dependencies {
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
     private static StringProvider stringProvider;
+    private static Schedulers schedulers;
 
     public static void onAppCreate(Application application) {
+        schedulers = new GliaWidgetsSchedulers();
         resourceProvider = new ResourceProvider(application.getBaseContext());
         stringProvider = new StringProviderImpl(resourceProvider);
         notificationManager = new NotificationManager(application, stringProvider);
@@ -70,7 +71,7 @@ public class Dependencies {
                 sdkConfigurationManager,
                 new ChatHeadManager(application),
                 audioControlManager,
-                new GliaWidgetsSchedulers(),
+                schedulers,
                 gliaCore
         );
         initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase());
@@ -105,7 +106,16 @@ public class Dependencies {
         );
     }
 
-    @TestOnly
+    @VisibleForTesting
+    public static void setSchedulers(Schedulers schedulers) {
+        Dependencies.schedulers = schedulers;
+    }
+
+    public static Schedulers getSchedulers() {
+        return schedulers;
+    }
+
+    @VisibleForTesting
     public static void setStringProvider(StringProvider sp) {
         stringProvider = sp;
     }

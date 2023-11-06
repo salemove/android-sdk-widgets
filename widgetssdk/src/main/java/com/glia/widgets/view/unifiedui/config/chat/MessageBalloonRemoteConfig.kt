@@ -15,6 +15,9 @@ internal data class MessageBalloonRemoteConfig(
     @SerializedName("status")
     val status: TextRemoteConfig?,
 
+    @SerializedName("error")
+    val error: TextRemoteConfig?,
+
     @SerializedName("userImage")
     val userImageRemoteConfig: UserImageRemoteConfig?
 ) {
@@ -22,6 +25,7 @@ internal data class MessageBalloonRemoteConfig(
         background = background?.toLayerTheme(),
         text = textRemoteConfig?.toTextTheme(),
         status = status?.toTextTheme(),
+        error = error?.toTextTheme(),
         userImage = userImageRemoteConfig?.toUserImageTheme()
     )
 }

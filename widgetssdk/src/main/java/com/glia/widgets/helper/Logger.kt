@@ -1,5 +1,7 @@
 package com.glia.widgets.helper
 
+import android.util.Log
+import com.glia.androidsdk.BuildConfig
 import com.glia.androidsdk.LogLevel
 import com.glia.androidsdk.LoggingAdapter
 import java.util.function.Consumer
@@ -11,13 +13,18 @@ object Logger {
     private val loggingAdapters = mutableListOf<LoggingAdapter>()
     private val globalMetadata = mutableMapOf<String, String>()
 
+    @Suppress("unused")
     @JvmStatic
-    fun addAdapter(loggingAdapter: LoggingAdapter) {
+    private fun addAdapter(loggingAdapter: LoggingAdapter) {
         loggingAdapters.add(loggingAdapter)
     }
 
     @JvmStatic
     fun d(tag: String, message: String) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.d(tag, message)
+        }
+
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(null))
         })
@@ -25,6 +32,10 @@ object Logger {
 
     @JvmStatic
     fun d(tag: String, message: String, metadata: Map<String, String>? = null) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.d(tag, message)
+        }
+
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(metadata))
         })
@@ -32,6 +43,10 @@ object Logger {
 
     @JvmStatic
     fun e(tag: String, message: String) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.e(tag, message)
+        }
+
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, null, concatGlobalMeta(null))
         })
@@ -39,6 +54,10 @@ object Logger {
 
     @JvmStatic
     fun e(tag: String, message: String, throwable: Throwable?) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.e(tag, message, throwable)
+        }
+
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, throwable, concatGlobalMeta(null))
         })
@@ -46,6 +65,10 @@ object Logger {
 
     @JvmStatic
     fun e(tag: String, message: String, throwable: Throwable?, metadata: Map<String, String>? = null) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.e(tag, message, throwable)
+        }
+
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, throwable, concatGlobalMeta(metadata))
         })

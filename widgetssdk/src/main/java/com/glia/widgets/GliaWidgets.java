@@ -11,7 +11,6 @@ import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.LoggingAdapter;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
@@ -326,11 +325,6 @@ public class GliaWidgets {
      */
     public static String getWidgetsCoreSdkVersion() {
         return BuildConfig.GLIA_CORE_SDK_VERSION;
-    }
-
-    /** @noinspection unused*/
-    public static void setLoggingAdapter(LoggingAdapter loggingAdapter) {
-        Logger.addAdapter(loggingAdapter);
     }
 
     private static void setupLoggingMetadata(GliaWidgetsConfig gliaWidgetsConfig) {

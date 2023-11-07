@@ -1,25 +1,12 @@
 package com.glia.widgets.view
 
-import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.annotation.ColorRes
-import androidx.annotation.LayoutRes
-import androidx.annotation.NonNull
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.StringKey
@@ -29,123 +16,183 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.applyButtonTheme
-import com.glia.widgets.helper.applyImageColorTheme
-import com.glia.widgets.helper.applyTextTheme
 import com.glia.widgets.helper.asActivity
-import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
-import com.glia.widgets.view.button.BaseConfigurableButton
-import com.glia.widgets.view.button.GliaPositiveButton
-import com.glia.widgets.view.unifiedui.applyButtonTheme
-import com.glia.widgets.view.unifiedui.applyImageColorTheme
-import com.glia.widgets.view.unifiedui.applyTextColorTheme
-import com.glia.widgets.view.unifiedui.applyTextTheme
-import com.glia.widgets.view.unifiedui.theme.alert.AlertTheme
-import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.dialog.base.DialogPayload
+import com.glia.widgets.view.dialog.base.DialogService
+import com.glia.widgets.view.dialog.base.DialogType
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-object Dialogs {
+internal object Dialogs {
+    private val dialogService: DialogService by lazy { DialogService(Dependencies.getGliaThemeManager().theme) }
 
     private val stringProvider: StringProvider by lazy { Dependencies.getStringProvider() }
-    private val alertTheme: AlertTheme?
-        get() = Dependencies.getGliaThemeManager().theme?.alertTheme
 
-    private fun BaseConfigurableButton.applyAlertTheme(theme: AlertTheme?) {
-        if (this is GliaPositiveButton) {
-            applyButtonTheme(theme?.positiveButton)
-        } else {
-            applyButtonTheme(theme?.negativeButton)
-        }
+    private val poweredByText: String by lazy { stringProvider.getRemoteString(R.string.general_powered) }
+    private val closeBtnAccessibility: String by lazy { stringProvider.getRemoteString(R.string.general_close_accessibility) }
+    private val yes: String by lazy { stringProvider.getRemoteString(R.string.general_yes) }
+    private val ok: String by lazy { stringProvider.getRemoteString(R.string.general_ok) }
+    private val no: String by lazy { stringProvider.getRemoteString(R.string.general_no) }
+    private val allow: String by lazy { stringProvider.getRemoteString(R.string.general_allow) }
+    private val cancel: String by lazy { stringProvider.getRemoteString(R.string.general_cancel) }
+    private val accept: String by lazy { stringProvider.getRemoteString(R.string.general_accept) }
+    private val decline: String by lazy { stringProvider.getRemoteString(R.string.general_decline) }
+
+    fun showNoMoreOperatorsAvailableDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+        val payload = DialogPayload.AlertDialog(
+            title = stringProvider.getRemoteString(R.string.engagement_queue_closed_header),
+            message = stringProvider.getRemoteString(R.string.engagement_queue_closed_message),
+            buttonVisible = true,
+            buttonDescription = closeBtnAccessibility,
+            buttonClickListener = buttonClickListener
+        )
+
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
     }
 
-    private fun isUseVerticalAlignment(theme: UiTheme) =
-        alertTheme?.isVerticalAxis ?: theme.isAlertDialogButtonUseVerticalAlignment()
-
-    private fun getOptionsAlertDialogLayout(
-        theme: UiTheme,
-        isButtonsColorsReversed: Boolean
-    ): Int {
-        val useVerticalAlignment = isUseVerticalAlignment(theme)
-
-        return when {
-            useVerticalAlignment && isButtonsColorsReversed -> R.layout.options_dialog_vertical_reversed
-            useVerticalAlignment -> R.layout.options_dialog_vertical
-            isButtonsColorsReversed -> R.layout.options_dialog_reversed
-            else -> R.layout.options_dialog
-        }
+    fun showUnexpectedErrorDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+        val payload = DialogPayload.AlertDialog(
+            title = stringProvider.getRemoteString(R.string.error_general),
+            message = stringProvider.getRemoteString(R.string.engagement_queue_reconnection_failed),
+            buttonVisible = true,
+            buttonDescription = closeBtnAccessibility,
+            buttonClickListener = buttonClickListener
+        )
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
     }
 
-    private fun getUpgradeDialogLayout(theme: UiTheme) =
-        if (isUseVerticalAlignment(theme)) {
-            R.layout.upgrade_dialog_vertical
-        } else {
-            R.layout.upgrade_dialog
-        }
-
-    private fun getScreenSharingLayout(theme: UiTheme): Int =
-        if (isUseVerticalAlignment(theme)) R.layout.screensharing_dialog_vertical else R.layout.screensharing_dialog
-
-    private fun setDialogBackground(dialog: Dialog, @ColorRes tintRes: Int?) {
-        val decorView = dialog.window?.decorView ?: return
-
-        alertTheme?.backgroundColor?.primaryColorStateList?.let(decorView::setBackgroundTintList)
-            ?: tintRes?.let { ContextCompat.getColorStateList(dialog.context, it) }?.also {
-                decorView.backgroundTintList = it
-            }
+    fun showMissingPermissionsDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+        val payload = DialogPayload.AlertDialog(
+            title = stringProvider.getRemoteString(R.string.android_permissions_title),
+            message = stringProvider.getRemoteString(R.string.android_permissions_message),
+            buttonVisible = true,
+            buttonDescription = closeBtnAccessibility,
+            buttonClickListener = buttonClickListener
+        )
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
     }
 
-    private fun showDialogBasedOnView(
+    fun showOverlayPermissionsDialog(
         context: Context,
-        theme: UiTheme,
-        view: VisitorCodeView,
-        horizontalInset: Int = 0,
-        cancelable: Boolean = true
+        uiTheme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener,
+        onCancelListener: DialogInterface.OnCancelListener
     ): AlertDialog {
-        val dialog = MaterialAlertDialogBuilder(context)
-            .setView(view)
-            .setBackgroundInsetStart(horizontalInset)
-            .setBackgroundInsetEnd(horizontalInset)
-            .setCancelable(cancelable)
-            .setOnCancelListener {
-                Dependencies.getControllerFactory().dialogController.dismissVisitorCodeDialog()
-                context.asActivity()?.let {
-                    if (it is CallVisualizerSupportActivity) {
-                        it.overridePendingTransition(0, 0)
-                        it.finish()
-                    }
-                }
-            }
-            .show()
-            .also { setDialogBackground(it, theme.gliaChatBackgroundColor) }
-        return dialog
+        val payload = DialogPayload.Option(
+            title = stringProvider.getRemoteString(R.string.android_overlay_permission_title),
+            message = stringProvider.getRemoteString(R.string.android_overlay_permission_message),
+            positiveButtonText = ok,
+            negativeButtonText = no,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+
+        )
+
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload)) {
+            setOnCancelListener(onCancelListener)
+        }
     }
 
-    private fun showDialog(
+    fun showEndEngagementDialog(
         context: Context,
-        @LayoutRes layoutRes: Int,
-        @ColorRes backgroundTint: Int? = null,
-        cancelable: Boolean = false,
-        onShow: ((AlertDialog) -> Unit)? = null,
-        onLayout: Dialog.() -> Unit
+        uiTheme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener,
+        onCancelListener: DialogInterface.OnCancelListener
     ): AlertDialog {
-        val verticalInset = context.resources.getDimensionPixelSize(R.dimen.glia_large_x_large)
-        val alertDialog = MaterialAlertDialogBuilder(context)
-            // With setView(int layoutResId) GliaNegativeButton and GliaPositiveButton didn't get the right themes
-            .setView(LayoutInflater.from(context).inflate(layoutRes, null))
-            .setCancelable(cancelable)
-            .setBackgroundInsetBottom(verticalInset)
-            .setBackgroundInsetTop(verticalInset)
-            .create()
+        val payload = DialogPayload.Option(
+            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
+            message = stringProvider.getRemoteString(R.string.engagement_end_message),
+            positiveButtonText = yes,
+            negativeButtonText = no,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+        )
 
-        onShow?.also { listener -> alertDialog.setOnShowListener { listener.invoke(alertDialog) } }
-
-        alertDialog.show()
-
-        return alertDialog.also {
-            it.show()
-            setDialogBackground(it, backgroundTint)
-            onLayout(it)
+        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload)) {
+            setOnCancelListener(onCancelListener)
         }
+    }
+
+    fun showExitQueueDialog(
+        context: Context,
+        uiTheme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener,
+        onCancelListener: DialogInterface.OnCancelListener
+    ): AlertDialog {
+        val payload = DialogPayload.Option(
+            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
+            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
+            positiveButtonText = yes,
+            negativeButtonText = no,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+
+        )
+
+        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload)) {
+            setOnCancelListener(onCancelListener)
+        }
+    }
+
+    fun showAllowScreenSharingNotificationsAndStartSharingDialog(
+        context: Context,
+        uiTheme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener,
+        onCancelListener: DialogInterface.OnCancelListener
+    ): AlertDialog {
+        val payload = DialogPayload.Option(
+            title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
+            message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
+            positiveButtonText = yes,
+            negativeButtonText = no,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+        )
+
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload)) {
+            setOnCancelListener(onCancelListener)
+        }
+    }
+
+    fun showAllowNotificationsDialog(
+        context: Context,
+        uiTheme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener,
+        onCancelListener: DialogInterface.OnCancelListener
+    ): AlertDialog {
+        val payload = DialogPayload.Option(
+            title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
+            message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
+            positiveButtonText = yes,
+            negativeButtonText = no,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+
+        )
+
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload)) {
+            setOnCancelListener(onCancelListener)
+        }
+    }
+
+    fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+        val payload = DialogPayload.AlertDialog(
+            title = stringProvider.getRemoteString(R.string.message_center_unavailable_title),
+            message = stringProvider.getRemoteString(R.string.message_center_not_authenticated_message),
+            buttonVisible = true,
+            buttonDescription = closeBtnAccessibility,
+            buttonClickListener = buttonClickListener
+        )
+        return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
     }
 
     fun showEngagementConfirmationDialog(
@@ -155,152 +202,30 @@ object Dialogs {
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
-        val title = stringProvider.getRemoteString(R.string.live_observation_confirm_title)
-        val message = stringProvider.getRemoteString(R.string.live_observation_confirm_message, StringKeyPair(StringKey.COMPANY_NAME, companyName))
-        val positiveButtonText = stringProvider.getRemoteString(R.string.general_allow)
-        val negativeButtonText = stringProvider.getRemoteString(R.string.general_cancel)
 
-        return showOptionsDialog(
-            context = context,
-            theme = theme,
-            title = title,
-            message = message,
-            positiveButtonText = positiveButtonText,
-            negativeButtonText = negativeButtonText,
+        val payload = DialogPayload.Option(
+            title = stringProvider.getRemoteString(R.string.live_observation_confirm_title),
+            message = stringProvider.getRemoteString(R.string.live_observation_confirm_message, StringKeyPair(StringKey.COMPANY_NAME, companyName)),
+            positiveButtonText = allow,
+            negativeButtonText = cancel,
+            poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
+
         )
+
+        return dialogService.showDialog(context, theme, DialogType.Option(payload))
     }
 
-    @JvmOverloads
-    fun showOptionsDialog(
-        context: Context,
-        theme: UiTheme,
-        title: String,
-        message: String,
-        positiveButtonText: String,
-        negativeButtonText: String,
-        positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener,
-        cancelListener: DialogInterface.OnCancelListener? = null,
-        isButtonsColorsReversed: Boolean = false
-    ): AlertDialog {
-        return showDialog(
-            context = context,
-            layoutRes = getOptionsAlertDialogLayout(theme, isButtonsColorsReversed),
-            backgroundTint = theme.baseLightColor
-        ) {
-            setOnCancelListener(cancelListener)
+    fun showOperatorEndedEngagementDialog(context: Context, theme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
+        val payload = DialogPayload.OperatorEndedEngagement(
+            title = stringProvider.getRemoteString(R.string.engagement_ended_header),
+            message = stringProvider.getRemoteString(R.string.engagement_ended_message),
+            buttonText = ok,
+            buttonClickListener = buttonClickListener
+        )
 
-            val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-            val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
-            val brandPrimaryColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
-            val baseShadeColor = theme.baseShadeColor?.let { ContextCompat.getColor(context, it) }
-            val systemNegativeColor = theme.systemNegativeColor?.let { ContextCompat.getColor(context, it) }
-            val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
-
-            findViewById<TextView>(R.id.dialog_title_view).apply {
-                text = title
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.title)
-            }
-            findViewById<TextView>(R.id.dialog_message_view).apply {
-                text = message
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.message)
-            }
-            findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                text = negativeButtonText
-                setOnClickListener(negativeButtonClickListener)
-                applyButtonTheme(
-                    backgroundColor = if (isButtonsColorsReversed) { brandPrimaryColor } else { systemNegativeColor },
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-            findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                text = positiveButtonText
-                setOnClickListener(positiveButtonClickListener)
-                applyButtonTheme(
-                    backgroundColor = if (isButtonsColorsReversed) { systemNegativeColor } else { brandPrimaryColor },
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-            setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
-        }
-    }
-
-    fun showAlertDialog(
-        context: Context,
-        theme: UiTheme,
-        @StringRes title: Int,
-        @StringRes message: Int,
-        buttonClickListener: View.OnClickListener
-    ): AlertDialog {
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val baseNormalColor = theme.baseNormalColor?.let { ContextCompat.getColor(context, it) }
-
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
-
-        return showDialog(context, R.layout.alert_dialog, theme.baseLightColor) {
-            findViewById<TextView>(R.id.dialog_title_view).apply {
-                text = stringProvider.getRemoteString(title)
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.title)
-            }
-            findViewById<TextView>(R.id.dialog_message_view).apply {
-                text = stringProvider.getRemoteString(message)
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.message)
-            }
-            findViewById<ImageButton>(R.id.close_dialog_button).apply {
-                contentDescription = stringProvider.getRemoteString(R.string.general_close_accessibility)
-                setOnClickListener(buttonClickListener)
-                applyImageColorTheme(baseNormalColor)
-                applyImageColorTheme(alertTheme?.closeButtonColor)
-            }
-        }
-    }
-
-    fun showOperatorEndedEngagementDialog(
-        context: Context,
-        theme: UiTheme,
-        buttonClickListener: View.OnClickListener
-    ): AlertDialog {
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
-        val brandPrimaryColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
-
-        return showDialog(
-            context,
-            R.layout.operator_ended_engagement_dialog,
-            theme.baseLightColor
-        ) {
-            findViewById<TextView>(R.id.dialog_title_view).apply {
-                text = stringProvider.getRemoteString(R.string.engagement_ended_header)
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.title)
-            }
-            findViewById<TextView>(R.id.dialog_message_view).apply {
-                text = stringProvider.getRemoteString(R.string.engagement_ended_message)
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.message)
-            }
-            findViewById<BaseConfigurableButton>(R.id.ok_button).apply {
-                text = stringProvider.getRemoteString(R.string.general_ok)
-                setOnClickListener(buttonClickListener)
-                applyButtonTheme(
-                    backgroundColor = brandPrimaryColor,
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-        }
+        return dialogService.showDialog(context, theme, DialogType.OperatorEndedEngagement(payload))
     }
 
     fun showUpgradeDialog(
@@ -310,152 +235,45 @@ object Dialogs {
         onAcceptOfferClickListener: View.OnClickListener,
         onCloseClickListener: View.OnClickListener
     ): AlertDialog {
-        val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val systemNegativeColor = theme.systemNegativeColor?.let { ContextCompat.getColor(context, it) }
-        val primaryBrandColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
-        val baseShadeColor = theme.baseShadeColor?.let { ContextCompat.getColor(context, it) }
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
+        val titleIconResPair = when (mediaUpgrade.mediaUpgradeMode) {
+            MediaUpgrade.MODE_AUDIO -> R.string.media_upgrade_audio_title to (theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
+            MediaUpgrade.MODE_VIDEO_ONE_WAY -> R.string.media_upgrade_video_one_way_title to (theme.iconUpgradeVideoDialog
+                ?: R.drawable.ic_baseline_videocam)
 
-        return showDialog(context, getUpgradeDialogLayout(theme), theme.baseLightColor) {
-            val titleIconView = findViewById<ImageView>(R.id.chat_title_icon).apply {
-                applyImageColorTheme(primaryBrandColor)
-                applyImageColorTheme(alertTheme?.titleImageColor)
-            }
-            val titleView = findViewById<TextView>(R.id.dialog_title_view).apply {
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.title)
-            }
-            findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                setOnClickListener(onCloseClickListener)
-                text = stringProvider.getRemoteString(R.string.general_decline)
-                applyButtonTheme(
-                    backgroundColor = systemNegativeColor,
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-            findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                setOnClickListener(onAcceptOfferClickListener)
-                text = stringProvider.getRemoteString(R.string.general_accept)
-                applyButtonTheme(
-                    backgroundColor = primaryBrandColor,
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-
-            setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
-
-            when (mediaUpgrade.mediaUpgradeMode) {
-                MediaUpgrade.MODE_AUDIO -> {
-                    titleView.text = stringProvider.getRemoteString(
-                        R.string.media_upgrade_audio_title,
-                        StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)
-                    )
-                    titleIconView.setImageResource(theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
-                }
-                MediaUpgrade.MODE_VIDEO_ONE_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(
-                        R.string.media_upgrade_video_one_way_title,
-                        StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)
-                    )
-                    titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
-                }
-                MediaUpgrade.MODE_VIDEO_TWO_WAY -> {
-                    titleView.text = stringProvider.getRemoteString(
-                        R.string.media_upgrade_video_two_way_title,
-                        StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)
-                    )
-                    titleIconView.setImageResource(theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
-                }
-            }
+            else -> R.string.media_upgrade_video_two_way_title to (theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
         }
-    }
 
-    fun showVisitorCodeDialog(
-        context: Context,
-        theme: UiTheme
-    ): AlertDialog {
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
-        val view = GliaWidgets.getCallVisualizer().createVisitorCodeView(context).apply {
-            setClosable(true)
-        }
-        return showDialogBasedOnView(
-            context = context,
-            view = view,
-            theme = theme
-        ).apply {
-            findViewById<TextView>(R.id.title_view)?.apply {
-                applyTextTheme(baseDarkColor, fontFamily)
-            }
-        }
+        val payload = DialogPayload.Upgrade(
+            title = stringProvider.getRemoteString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)),
+            positiveButtonText = accept,
+            negativeButtonText = decline,
+            poweredByText = poweredByText,
+            iconRes = titleIconResPair.second,
+            positiveButtonClickListener = onAcceptOfferClickListener,
+            negativeButtonClickListener = onCloseClickListener
+
+        )
+
+        return dialogService.showDialog(context, theme, DialogType.Upgrade(payload))
     }
 
     fun showScreenSharingDialog(
         context: Context,
         theme: UiTheme,
-        title: String,
-        message: String,
-        @StringRes positiveButtonText: Int,
-        @StringRes negativeButtonText: Int,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
-        val baseLightColor = theme.baseLightColor?.let { ContextCompat.getColor(context, it) }
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val systemNegativeColor = theme.systemNegativeColor?.let { ContextCompat.getColor(context, it) }
-        val primaryBrandColor = theme.brandPrimaryColor?.let { ContextCompat.getColor(context, it) }
-        val baseShadeColor = theme.baseShadeColor?.let { ContextCompat.getColor(context, it) }
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
+        val payload = DialogPayload.ScreenSharing(
+            title = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
+            message = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
+            positiveButtonText = accept,
+            negativeButtonText = decline,
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+        )
 
-        return showDialog(context, getScreenSharingLayout(theme), theme.baseLightColor) {
-            findViewById<ImageView>(R.id.title_icon).apply {
-                applyImageColorTheme(primaryBrandColor)
-                applyImageColorTheme(alertTheme?.titleImageColor)
-            }
-            findViewById<TextView>(R.id.dialog_title_view).apply {
-                text = title
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.title)
-            }
-            findViewById<TextView>(R.id.dialog_message_view).apply {
-                text = message
-                applyTextTheme(baseDarkColor, fontFamily)
-                applyTextTheme(alertTheme?.message)
-            }
-            findViewById<BaseConfigurableButton>(R.id.decline_button).apply {
-                text = stringProvider.getRemoteString(negativeButtonText)
-                setOnClickListener {
-                    dismiss()
-                    negativeButtonClickListener.onClick(it)
-                }
-                applyButtonTheme(
-                    backgroundColor = systemNegativeColor,
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-            findViewById<BaseConfigurableButton>(R.id.accept_button).apply {
-                text = stringProvider.getRemoteString(positiveButtonText)
-                setOnClickListener {
-                    dismiss()
-                    positiveButtonClickListener.onClick(it)
-                }
-                applyButtonTheme(
-                    backgroundColor = primaryBrandColor,
-                    textColor = baseLightColor,
-                    textFont = fontFamily
-                )
-                applyAlertTheme(alertTheme)
-            }
-
-            setupPoweredByGlia(this, theme.whiteLabel?.not() ?: true, baseShadeColor)
-        }
+        return dialogService.showDialog(context, theme, DialogType.ScreenSharing(payload))
     }
 
     fun showMessageCenterUnavailableDialog(
@@ -463,30 +281,38 @@ object Dialogs {
         theme: UiTheme,
         onShow: ((AlertDialog) -> Unit)? = null
     ): AlertDialog {
-        val baseDarkColor = theme.baseDarkColor?.let { ContextCompat.getColor(context, it) }
-        val fontFamily = theme.fontRes?.let { ResourcesCompat.getFont(context, it) }
+        val payload = DialogPayload.AlertDialog(
+            title = stringProvider.getRemoteString(R.string.message_center_unavailable_title),
+            message = stringProvider.getRemoteString(R.string.message_center_unavailable_message)
+        )
 
-        return showDialog(context, R.layout.alert_dialog, theme.baseLightColor, false, onShow) {
-            findViewById<TextView>(R.id.dialog_title_view).apply {
-                text = stringProvider.getRemoteString(R.string.message_center_unavailable_title)
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.title.also(::applyTextTheme)
-            }
-            findViewById<TextView>(R.id.dialog_message_view).apply {
-                text = stringProvider.getRemoteString(R.string.message_center_unavailable_message)
-                baseDarkColor?.also(::setTextColor)
-                fontFamily?.also(::setTypeface)
-                alertTheme?.message.also(::applyTextTheme)
-            }
-            findViewById<ImageButton>(R.id.close_dialog_button).apply {
-                isGone = true
-            }
+        return dialogService.showDialog(context, theme, DialogType.AlertDialog(payload), onShow = onShow) {
             window?.apply {
                 setGravity(Gravity.BOTTOM)
                 allowOutsideTouch()
             }
         }
+    }
+
+    fun showVisitorCodeDialog(
+        context: Context
+    ): AlertDialog {
+        val view = GliaWidgets.getCallVisualizer().createVisitorCodeView(context).apply {
+            setClosable(true)
+        }
+
+        return MaterialAlertDialogBuilder(context)
+            .setView(view)
+            .setBackgroundInsetStart(0)
+            .setBackgroundInsetEnd(0)
+            .setCancelable(true)
+            .setOnCancelListener {
+                Dependencies.getControllerFactory().dialogController.dismissVisitorCodeDialog()
+                context.asActivity().takeIf { it is CallVisualizerSupportActivity }?.apply {
+                    overridePendingTransition(0, 0)
+                    finish()
+                }
+            }.show()
     }
 
     private fun Window.allowOutsideTouch() {
@@ -495,18 +321,5 @@ object Dialogs {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         )
         clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-    }
-
-    private fun setupPoweredByGlia(dialog: Dialog, @NonNull notWhitelabel: Boolean, baseShadeColor: Int?) {
-        dialog.findViewById<View>(R.id.logo_container)?.isVisible = notWhitelabel
-        if (notWhitelabel) {
-            dialog.findViewById<TextView>(R.id.powered_by_text)?.apply {
-                text = stringProvider.getRemoteString(R.string.general_powered)
-                baseShadeColor?.run {
-                    applyTextColorTheme(ColorTheme(false, listOf(this)))
-                }
-            }
-            dialog.findViewById<ImageView>(R.id.logo_view)?.applyImageColorTheme(baseShadeColor)
-        }
     }
 }

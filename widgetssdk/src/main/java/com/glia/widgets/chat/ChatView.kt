@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.ClipData
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.TypedArray
@@ -19,7 +18,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -664,13 +662,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
-            alertDialog = Dialogs.showOptionsDialog(
-                context = this.context,
-                theme = theme,
-                title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
-                message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
-                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+            alertDialog = Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
+                context = context,
+                uiTheme = theme,
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     this.context.openNotificationChannelScreen()
@@ -680,7 +674,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     controller?.notificationDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 },
-                cancelListener = {
+                onCancelListener = {
                     it.dismiss()
                     controller?.notificationDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
@@ -691,13 +685,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showAllowNotificationsDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
-            alertDialog = Dialogs.showOptionsDialog(
-                context = this.context,
-                theme = theme,
-                title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
-                message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
-                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+            alertDialog = Dialogs.showAllowNotificationsDialog(
+                context = context,
+                uiTheme = theme,
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     controller?.notificationDialogDismissed()
@@ -707,7 +697,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     dismissAlertDialog()
                     controller?.notificationDialogDismissed()
                 },
-                cancelListener = {
+                onCancelListener = {
                     it.dismiss()
                     controller?.notificationDialogDismissed()
                 }
@@ -718,14 +708,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun showScreenSharingDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
             alertDialog = Dialogs.showScreenSharingDialog(
-                context,
-                theme,
-                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
-                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
-                R.string.general_accept,
-                R.string.general_decline,
-                { screenSharingController?.onScreenSharingAccepted(context.requireActivity()) }
-            ) { screenSharingController?.onScreenSharingDeclined() }
+                context = context,
+                theme = theme,
+                positiveButtonClickListener = {
+                    screenSharingController?.onScreenSharingAccepted(context.requireActivity())
+                },
+                negativeButtonClickListener = {
+                    screenSharingController?.onScreenSharingDeclined()
+                }
+            )
         }
     }
 
@@ -955,13 +946,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showExitQueueDialog() {
-        alertDialog = Dialogs.showOptionsDialog(
+        alertDialog = Dialogs.showExitQueueDialog(
             context = context,
-            theme = theme,
-            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
-            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
-            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+            uiTheme = theme,
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogYesClicked()
@@ -972,22 +959,17 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 dismissAlertDialog()
                 controller?.endEngagementDialogDismissed()
             },
-            cancelListener = {
+            onCancelListener = {
                 it.dismiss()
                 controller?.endEngagementDialogDismissed()
-            },
-            isButtonsColorsReversed = true
+            }
         )
     }
 
     private fun showEndEngagementDialog() {
-        alertDialog = Dialogs.showOptionsDialog(
+        alertDialog = Dialogs.showEndEngagementDialog(
             context = context,
-            theme = theme,
-            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
-            message = stringProvider.getRemoteString(R.string.engagement_end_message),
-            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+            uiTheme = theme,
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 controller?.endEngagementDialogYesClicked()
@@ -996,44 +978,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 dismissAlertDialog()
                 controller?.endEngagementDialogDismissed()
             },
-            cancelListener = {
+            onCancelListener = {
                 controller?.endEngagementDialogDismissed()
                 it.dismiss()
-            },
-            isButtonsColorsReversed = true
+            }
         )
-    }
-
-    private fun showOptionsDialog(
-        title: String,
-        message: String,
-        positiveButtonText: String,
-        neutralButtonText: String,
-        positiveButtonClickListener: OnClickListener,
-        neutralButtonClickListener: OnClickListener,
-        cancelListener: DialogInterface.OnCancelListener
-    ) {
-        dismissAlertDialog()
-        alertDialog = Dialogs.showOptionsDialog(
-            context = this.context,
-            theme = theme,
-            title = title,
-            message = message,
-            positiveButtonText = positiveButtonText,
-            negativeButtonText = neutralButtonText,
-            positiveButtonClickListener = positiveButtonClickListener,
-            negativeButtonClickListener = neutralButtonClickListener,
-            cancelListener = cancelListener
-        )
-    }
-
-    private fun showAlertDialog(
-        @StringRes title: Int,
-        @StringRes message: Int,
-        buttonClickListener: OnClickListener
-    ) {
-        dismissAlertDialog()
-        alertDialog = Dialogs.showAlertDialog(context, theme, title, message, buttonClickListener)
     }
 
     private fun showEngagementEndedDialog() {
@@ -1047,10 +996,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showNoMoreOperatorsAvailableDialog() {
-        showAlertDialog(
-            R.string.engagement_queue_closed_header,
-            R.string.engagement_queue_closed_message
-        ) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showNoMoreOperatorsAvailableDialog(context, theme) {
             dismissAlertDialog()
             controller?.noMoreOperatorsAvailableDismissed()
             onEndListener?.onEnd()
@@ -1067,10 +1014,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showUnexpectedErrorDialog() {
-        showAlertDialog(
-            R.string.error_general,
-            R.string.engagement_queue_reconnection_failed
-        ) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showUnexpectedErrorDialog(context, theme) {
             dismissAlertDialog()
             controller?.unexpectedErrorDialogDismissed()
             onEndListener?.onEnd()
@@ -1078,12 +1023,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showOverlayPermissionsDialog() {
-        showOptionsDialog(
-            stringProvider.getRemoteString(R.string.android_overlay_permission_title),
-            stringProvider.getRemoteString(R.string.android_overlay_permission_message),
-            stringProvider.getRemoteString(R.string.general_ok),
-            stringProvider.getRemoteString(R.string.general_no),
-            {
+        dismissAlertDialog()
+
+        alertDialog = Dialogs.showOverlayPermissionsDialog(
+            context = context,
+            uiTheme = theme,
+            positiveButtonClickListener = {
                 controller?.overlayPermissionsDialogDismissed()
                 dismissAlertDialog()
                 val overlayIntent = Intent(
@@ -1093,14 +1038,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 this.context.startActivity(overlayIntent)
             },
-            {
+            negativeButtonClickListener = {
+                controller?.overlayPermissionsDialogDismissed()
+                dismissAlertDialog()
+            },
+            onCancelListener = {
                 controller?.overlayPermissionsDialogDismissed()
                 dismissAlertDialog()
             }
-        ) {
-            controller?.overlayPermissionsDialogDismissed()
-            dismissAlertDialog()
-        }
+        )
     }
 
     private fun chatEnded() {

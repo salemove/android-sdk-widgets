@@ -1,7 +1,6 @@
 package com.glia.widgets.call
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
 import android.content.res.TypedArray
@@ -366,13 +365,9 @@ internal class CallView(
     }
 
     private fun showExitQueueDialog() {
-        alertDialog = Dialogs.showOptionsDialog(
-            context = this.context,
-            theme = theme,
-            title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
-            message = stringProvider.getRemoteString(R.string.engagement_queue_leave_message),
-            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+        alertDialog = Dialogs.showExitQueueDialog(
+            context = context,
+            uiTheme = theme,
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
@@ -383,23 +378,18 @@ internal class CallView(
                 dismissAlertDialog()
                 callController?.endEngagementDialogDismissed()
             },
-            cancelListener = {
+            onCancelListener = {
                 it.dismiss()
                 callController?.endEngagementDialogDismissed()
-            },
-            isButtonsColorsReversed = true
+            }
         )
     }
 
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
-            alertDialog = Dialogs.showOptionsDialog(
-                context = this.context,
-                theme = theme,
-                title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
-                message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
-                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+            alertDialog = Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
+                context = context,
+                uiTheme = theme,
                 positiveButtonClickListener = {
                     callController?.notificationsDialogDismissed()
                     this.context.openNotificationChannelScreen()
@@ -408,7 +398,7 @@ internal class CallView(
                     callController?.notificationsDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 },
-                cancelListener = {
+                onCancelListener = {
                     callController?.notificationsDialogDismissed()
                     screenSharingController?.onScreenSharingDeclined()
                 }
@@ -418,13 +408,9 @@ internal class CallView(
 
     private fun showAllowNotificationsDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
-            alertDialog = Dialogs.showOptionsDialog(
-                context = this.context,
-                theme = theme,
-                title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
-                message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
-                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+            alertDialog = Dialogs.showAllowNotificationsDialog(
+                context = context,
+                uiTheme = theme,
                 positiveButtonClickListener = {
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
@@ -434,7 +420,7 @@ internal class CallView(
                     dismissAlertDialog()
                     callController?.notificationsDialogDismissed()
                 },
-                cancelListener = {
+                onCancelListener = {
                     it.dismiss()
                     callController?.notificationsDialogDismissed()
                 }
@@ -444,16 +430,16 @@ internal class CallView(
 
     private fun showScreenSharingDialog() {
         if (alertDialog == null || !alertDialog!!.isShowing) {
-            alertDialog =
-                Dialogs.showScreenSharingDialog(
-                    this.context,
-                    theme,
-                    stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
-                    stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
-                    R.string.general_accept,
-                    R.string.general_decline,
-                    { screenSharingController!!.onScreenSharingAccepted(context.requireActivity()) }
-                ) { screenSharingController!!.onScreenSharingDeclined() }
+            alertDialog = Dialogs.showScreenSharingDialog(
+                context = context,
+                theme = theme,
+                positiveButtonClickListener = {
+                    screenSharingController!!.onScreenSharingAccepted(context.requireActivity())
+                },
+                negativeButtonClickListener = {
+                    screenSharingController!!.onScreenSharingDeclined()
+                }
+            )
         }
     }
 
@@ -676,13 +662,9 @@ internal class CallView(
     }
 
     private fun showEndEngagementDialog() {
-        alertDialog = Dialogs.showOptionsDialog(
-            context = this.context,
-            theme = theme,
-            title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
-            message = stringProvider.getRemoteString(R.string.engagement_end_message),
-            positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-            negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+        alertDialog = Dialogs.showEndEngagementDialog(
+            context = context,
+            uiTheme = theme,
             positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.endEngagementDialogYesClicked()
@@ -691,11 +673,10 @@ internal class CallView(
                 dismissAlertDialog()
                 callController?.endEngagementDialogDismissed()
             },
-            cancelListener = {
+            onCancelListener = {
                 it.dismiss()
                 callController?.endEngagementDialogDismissed()
-            },
-            isButtonsColorsReversed = true
+            }
         )
     }
 
@@ -705,43 +686,6 @@ internal class CallView(
         }) {
             callController?.declineUpgradeOfferClicked(mediaUpgrade.mediaUpgradeOffer)
         }
-    }
-
-    private fun showOptionsDialog(
-        title: String,
-        message: String,
-        positiveButtonText: String,
-        neutralButtonText: String,
-        positiveButtonClickListener: OnClickListener,
-        neutralButtonClickListener: OnClickListener,
-        cancelListener: DialogInterface.OnCancelListener
-    ) {
-        alertDialog = Dialogs.showOptionsDialog(
-            context = this.context,
-            theme = theme,
-            title = title,
-            message = message,
-            positiveButtonText = positiveButtonText,
-            negativeButtonText = neutralButtonText,
-            positiveButtonClickListener = positiveButtonClickListener,
-            negativeButtonClickListener = neutralButtonClickListener,
-            cancelListener = cancelListener
-        )
-    }
-
-    private fun showAlertDialog(
-        @StringRes title: Int,
-        @StringRes message: Int,
-        buttonClickListener: OnClickListener
-    ) {
-        dismissAlertDialog()
-        alertDialog = Dialogs.showAlertDialog(
-            this.context,
-            theme,
-            title,
-            message,
-            buttonClickListener
-        )
     }
 
     private fun showEngagementEndedDialog() {
@@ -755,23 +699,18 @@ internal class CallView(
     }
 
     private fun showNoMoreOperatorsAvailableDialog() {
-        showAlertDialog(
-            R.string.engagement_queue_closed_header,
-            R.string.engagement_queue_closed_message
-        ) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showNoMoreOperatorsAvailableDialog(context, theme) {
             dismissAlertDialog()
             callController?.noMoreOperatorsAvailableDismissed()
             onEndListener?.onEnd()
             callEnded()
-            alertDialog = null
         }
     }
 
     private fun showUnexpectedErrorDialog() {
-        showAlertDialog(
-            R.string.error_general,
-            R.string.engagement_queue_reconnection_failed
-        ) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showUnexpectedErrorDialog(context, theme) {
             dismissAlertDialog()
             callController?.unexpectedErrorDialogDismissed()
             onEndListener?.onEnd()
@@ -779,10 +718,8 @@ internal class CallView(
     }
 
     override fun showMissingPermissionsDialog() {
-        showAlertDialog(
-            R.string.android_permissions_title,
-            R.string.android_permissions_message
-        ) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showMissingPermissionsDialog(context, theme) {
             dismissAlertDialog()
             callController?.unexpectedErrorDialogDismissed()
             onEndListener?.onEnd()
@@ -809,12 +746,10 @@ internal class CallView(
     }
 
     private fun showOverlayPermissionsDialog() {
-        showOptionsDialog(
-            stringProvider.getRemoteString(R.string.android_overlay_permission_title),
-            stringProvider.getRemoteString(R.string.android_overlay_permission_message),
-            stringProvider.getRemoteString(R.string.general_ok),
-            stringProvider.getRemoteString(R.string.general_no),
-            {
+        alertDialog = Dialogs.showOverlayPermissionsDialog(
+            context = context,
+            uiTheme = theme,
+            positiveButtonClickListener = {
                 dismissAlertDialog()
                 callController?.overlayPermissionsDialogDismissed()
                 val overlayIntent = Intent(
@@ -824,22 +759,21 @@ internal class CallView(
                 overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 this.context.startActivity(overlayIntent)
             },
-            {
+            negativeButtonClickListener = {
                 dismissAlertDialog()
                 callController?.overlayPermissionsDialogDismissed()
+            },
+            onCancelListener = {
+                it.dismiss()
+                callController?.overlayPermissionsDialogDismissed()
             }
-        ) {
-            it.dismiss()
-            callController?.overlayPermissionsDialogDismissed()
-        }
+        )
     }
 
     private fun dismissAlertDialog() {
         currentDialogState = null
-        alertDialog?.apply {
-            dismiss()
-            alertDialog = null
-        }
+        alertDialog?.dismiss()
+        alertDialog = null
     }
 
     private fun callEnded() {

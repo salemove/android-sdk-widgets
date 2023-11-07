@@ -74,7 +74,7 @@ class MessageCenterView(
 
     private var alertDialog: AlertDialog? = null
 
-    // Is needed for setting status bar color back when view is gone
+    // Is needed for setting status bar color back when the view is gone
     private var defaultStatusBarColor: Int? = null
     private var statusBarColor: Int by Delegates.notNull()
 
@@ -183,12 +183,7 @@ class MessageCenterView(
 
     private fun showUnAuthenticatedDialog() {
         changeStatusBarColor(Color.TRANSPARENT)
-        alertDialog = Dialogs.showAlertDialog(
-            context,
-            theme,
-            R.string.message_center_unavailable_title,
-            R.string.message_center_not_authenticated_message
-        ) {
+        alertDialog = Dialogs.showUnAuthenticatedDialog(context, theme) {
             controller?.dismissCurrentDialog()
             controller?.onCloseButtonClicked()
         }
@@ -215,12 +210,8 @@ class MessageCenterView(
     }
 
     private fun showUnexpectedErrorDialog() {
-        alertDialog = Dialogs.showAlertDialog(
-            this.context,
-            theme,
-            R.string.error_general,
-            R.string.engagement_queue_reconnection_failed
-        ) {
+        dismissAlertDialog()
+        alertDialog = Dialogs.showUnexpectedErrorDialog(context, theme) {
             controller?.dismissCurrentDialog()
         }
     }

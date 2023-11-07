@@ -38,6 +38,7 @@ import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.dialog.base.DialogPayload
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizer(
@@ -234,21 +235,17 @@ internal class ActivityWatcherForCallVisualizer(
         showAlertDialogOnUiThreadWithStyledContext(
             "Show allow notifications dialog",
             UiTheme.UiThemeBuilder().build()
-        ) { context, uiTheme, activity ->
-            alertDialog = Dialogs.showOptionsDialog(
+        ) { context, uiTheme, _ ->
+            alertDialog = Dialogs.showAllowNotificationsDialog(
                 context = context,
-                theme = uiTheme,
-                title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
-                message = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_message),
-                positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
-                negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+                uiTheme = uiTheme,
                 positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked()
                 },
                 negativeButtonClickListener = {
                     controller.onNegativeDialogButtonClicked()
                 },
-                cancelListener = {
+                onCancelListener = {
                     controller.onNegativeDialogButtonClicked()
                 }
             )
@@ -263,21 +260,33 @@ internal class ActivityWatcherForCallVisualizer(
         showAlertDialogOnUiThreadWithStyledContext(
             "Show screen sharing and notifications dialog",
             UiTheme.UiThemeBuilder().build()
-        ) { context, uiTheme, activity ->
-            alertDialog = Dialogs.showOptionsDialog(
-                context = context,
-                theme = uiTheme,
+        ) { context, uiTheme, _ ->
+            val payload = DialogPayload.Option(
                 title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
                 message = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_message),
                 positiveButtonText = stringProvider.getRemoteString(R.string.general_yes),
                 negativeButtonText = stringProvider.getRemoteString(R.string.general_no),
+                poweredByText = stringProvider.getRemoteString(R.string.general_powered),
+                positiveButtonClickListener = {
+                    controller.onPositiveDialogButtonClicked()
+                },
+                negativeButtonClickListener = {
+                    controller.onNegativeDialogButtonClicked()
+                }
+
+            )
+
+            alertDialog = Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
+                context = context,
+                uiTheme = uiTheme,
                 positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked()
                 },
                 negativeButtonClickListener = {
                     controller.onNegativeDialogButtonClicked()
                 },
-                cancelListener = {
+                onCancelListener = {
+                    it.dismiss()
                     controller.onNegativeDialogButtonClicked()
                 }
             )
@@ -288,21 +297,18 @@ internal class ActivityWatcherForCallVisualizer(
         showAlertDialogOnUiThreadWithStyledContext(
             "Show overlay permissions dialog",
             UiTheme.UiThemeBuilder().build()
-        ) { context, uiTheme, activity ->
-            alertDialog = Dialogs.showOptionsDialog(
-                context,
-                uiTheme,
-                stringProvider.getRemoteString(R.string.android_overlay_permission_title),
-                stringProvider.getRemoteString(R.string.android_overlay_permission_message),
-                stringProvider.getRemoteString(R.string.general_ok),
-                stringProvider.getRemoteString(R.string.general_no),
-                {
+        ) { context, uiTheme, _ ->
+            alertDialog = Dialogs.showOverlayPermissionsDialog(
+                context = context,
+                uiTheme = uiTheme,
+                positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked()
                 },
-                {
+                negativeButtonClickListener = {
                     controller.onNegativeDialogButtonClicked()
                 },
-                {
+                onCancelListener = {
+                    it.dismiss()
                     controller.onNegativeDialogButtonClicked()
                 }
             )
@@ -312,16 +318,15 @@ internal class ActivityWatcherForCallVisualizer(
     override fun showScreenSharingDialog() {
         showAlertDialogOnUiThreadWithStyledContext("Show screen sharing dialog") { context, uiTheme, activity ->
             alertDialog = Dialogs.showScreenSharingDialog(
-                context,
-                uiTheme,
-                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
-                stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
-                R.string.general_accept,
-                R.string.general_decline,
-                {
+                context = context,
+                theme = uiTheme,
+                positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked(activity)
+                },
+                negativeButtonClickListener = {
+                    controller.onNegativeDialogButtonClicked()
                 }
-            ) { controller.onNegativeDialogButtonClicked() }
+            )
         }
     }
 
@@ -380,10 +385,7 @@ internal class ActivityWatcherForCallVisualizer(
             return
         }
         Logger.d(TAG, "Show visitor code dialog")
-        val theme = UiTheme.UiThemeBuilder().build()
-        val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
-
-        alertDialog = Dialogs.showVisitorCodeDialog(contextWithStyle, theme)
+        alertDialog = Dialogs.showVisitorCodeDialog(activity.wrapWithMaterialThemeOverlay())
     }
 
     private fun getRuntimeTheme(activity: Activity): UiTheme {

@@ -1,13 +1,20 @@
 package com.glia.widgets
 
+import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
+import androidx.core.content.res.ResourcesCompat
+import com.glia.widgets.helper.isAlertDialogButtonUseVerticalAlignment
 import com.glia.widgets.view.configuration.ButtonConfiguration
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.configuration.TextConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
+import com.glia.widgets.view.unifiedui.theme.AlertThemeWrapper
+import com.glia.widgets.view.unifiedui.theme.ColorPallet
+import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
+import com.glia.widgets.view.unifiedui.theme.defaulttheme.AlertTheme
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -418,6 +425,25 @@ data class UiTheme(
         gvaQuickReplyBackgroundColor = builder.gvaQuickReplyBackgroundColor,
         gvaQuickReplyStrokeColor = builder.gvaQuickReplyStrokeColor,
         gvaQuickReplyTextColor = builder.gvaQuickReplyTextColor
+    )
+
+    private fun toColorPallet(context: Context): ColorPallet = context.run {
+        ColorPallet(
+            baseDarkColorTheme = ColorTheme(context.getColor(baseDarkColor ?: R.color.glia_base_dark_color)),
+            baseLightColorTheme = ColorTheme(context.getColor(baseLightColor ?: R.color.glia_base_light_color)),
+            baseNeutralColorTheme = ColorTheme(context.getColor(R.color.glia_system_agent_bubble_color)),
+            baseNormalColorTheme = ColorTheme(context.getColor(baseNormalColor ?: R.color.glia_base_normal_color)),
+            baseShadeColorTheme = ColorTheme(context.getColor(baseShadeColor ?: R.color.glia_base_shade_color)),
+            primaryColorTheme = ColorTheme(context.getColor(brandPrimaryColor ?: R.color.glia_brand_primary_color)),
+            secondaryColorTheme = null,
+            systemNegativeColorTheme = ColorTheme(context.getColor(systemNegativeColor ?: R.color.glia_system_negative_color))
+        )
+    }
+
+    internal fun alertTheme(context: Context): AlertThemeWrapper = AlertThemeWrapper(
+        AlertTheme(toColorPallet(context)).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment()),
+        fontRes?.let { ResourcesCompat.getFont(context, it) },
+        whiteLabel
     )
 
     class UiThemeBuilder {

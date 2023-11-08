@@ -6,7 +6,7 @@ import com.glia.androidsdk.LogLevel
 import com.glia.androidsdk.LoggingAdapter
 import java.util.function.Consumer
 
-object Logger {
+internal object Logger {
 
     const val SITE_ID_KEY = "site_id"
 
@@ -15,7 +15,7 @@ object Logger {
 
     @Suppress("unused")
     @JvmStatic
-    private fun addAdapter(loggingAdapter: LoggingAdapter) {
+    fun addAdapter(loggingAdapter: LoggingAdapter) {
         loggingAdapters.add(loggingAdapter)
     }
 
@@ -38,6 +38,50 @@ object Logger {
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(metadata))
+        })
+    }
+
+    @JvmStatic
+    fun i(tag: String, message: String) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.i(tag, message)
+        }
+
+        loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
+            loggingAdapter.log(LogLevel.INFO, tag, message, concatGlobalMeta(null))
+        })
+    }
+
+    @JvmStatic
+    fun i(tag: String, message: String, metadata: Map<String, String>? = null) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.i(tag, message)
+        }
+
+        loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
+            loggingAdapter.log(LogLevel.INFO, tag, message, concatGlobalMeta(metadata))
+        })
+    }
+
+    @JvmStatic
+    fun w(tag: String, message: String) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.w(tag, message)
+        }
+
+        loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
+            loggingAdapter.log(LogLevel.WARN, tag, message, concatGlobalMeta(null))
+        })
+    }
+
+    @JvmStatic
+    fun w(tag: String, message: String, metadata: Map<String, String>? = null) {
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            Log.w(tag, message)
+        }
+
+        loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
+            loggingAdapter.log(LogLevel.WARN, tag, message, concatGlobalMeta(metadata))
         })
     }
 
@@ -83,11 +127,6 @@ object Logger {
     @Synchronized
     fun removeGlobalMetadata(metaKey: String) {
         globalMetadata.remove(metaKey)
-    }
-
-    @Synchronized
-    fun clearGlobalMetadata() {
-        globalMetadata.clear()
     }
 
     private fun concatGlobalMeta(metadata: Map<String, String>?): Map<String, String> {

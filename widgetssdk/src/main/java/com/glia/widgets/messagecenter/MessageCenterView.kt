@@ -7,7 +7,6 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.Window
 import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -36,6 +35,8 @@ import com.glia.widgets.helper.isKeyboardVisible
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.rootWindowInsetsCompat
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.dialog.base.DialogDelegate
+import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.deepMerge
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -56,8 +57,7 @@ class MessageCenterView(
     attrs,
     defStyleAttr,
     defStyleRes
-),
-    MessageCenterContract.View {
+), MessageCenterContract.View, DialogDelegate by DialogDelegateImpl() {
 
     private var theme: UiTheme by Delegates.notNull()
     private val unifiedTheme: UnifiedTheme? by lazy { Dependencies.getGliaThemeManager().theme }
@@ -73,8 +73,6 @@ class MessageCenterView(
     private val appBar: AppBarView? get() = binding?.appBarView
     private val messageView: MessageView? get() = binding?.messageView
     private val confirmationView: ConfirmationScreenView? get() = binding?.confirmationView
-
-    private var alertDialog: AlertDialog? = null
 
     // Is needed for setting status bar color back when the view is gone
     private var defaultStatusBarColor: Int? = null
@@ -185,9 +183,11 @@ class MessageCenterView(
 
     private fun showUnAuthenticatedDialog() {
         changeStatusBarColor(Color.TRANSPARENT)
-        alertDialog = Dialogs.showUnAuthenticatedDialog(context, theme) {
-            controller?.dismissCurrentDialog()
-            controller?.onCloseButtonClicked()
+        showDialog {
+            Dialogs.showUnAuthenticatedDialog(context, theme) {
+                controller?.dismissCurrentDialog()
+                controller?.onCloseButtonClicked()
+            }
         }
     }
 
@@ -199,27 +199,19 @@ class MessageCenterView(
         )
     }
 
-    private fun dismissAlertDialog() {
-        alertDialog?.apply {
-            dismiss()
-            alertDialog = null
-        }
-    }
-
     private fun clearAndDismissDialogs() {
         controller?.dismissDialogs()
-        dismissAlertDialog()
+        resetDialogStateAndDismiss()
     }
 
-    private fun showUnexpectedErrorDialog() {
-        dismissAlertDialog()
-        alertDialog = Dialogs.showUnexpectedErrorDialog(context, theme) {
+    private fun showUnexpectedErrorDialog() = showDialog {
+        Dialogs.showUnexpectedErrorDialog(context, theme) {
             controller?.dismissCurrentDialog()
         }
     }
 
-    private fun showMessageCenterUnavailableDialog() {
-        alertDialog = Dialogs.showMessageCenterUnavailableDialog(this.context, theme)
+    private fun showMessageCenterUnavailableDialog() = showDialog {
+        Dialogs.showMessageCenterUnavailableDialog(this.context, theme)
     }
 
     override fun showConfirmationScreen() {
@@ -278,12 +270,14 @@ class MessageCenterView(
     }
 
     private fun onDialogState(state: DialogState) {
-        when (state.mode) {
-            Dialog.MODE_NONE -> dismissAlertDialog()
-            Dialog.MODE_UNEXPECTED_ERROR -> showUnexpectedErrorDialog()
-            Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> showMessageCenterUnavailableDialog()
-            Dialog.MODE_UNAUTHENTICATED -> showUnAuthenticatedDialog()
-            else -> throw UnsupportedOperationException("Unexpected dialog type for Message Center screen")
+        if (updateDialogState(state)) {
+            when (state.mode) {
+                Dialog.MODE_NONE -> resetDialogStateAndDismiss()
+                Dialog.MODE_UNEXPECTED_ERROR -> showUnexpectedErrorDialog()
+                Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> showMessageCenterUnavailableDialog()
+                Dialog.MODE_UNAUTHENTICATED -> showUnAuthenticatedDialog()
+                else -> throw UnsupportedOperationException("Unexpected dialog type for Message Center screen")
+            }
         }
     }
 

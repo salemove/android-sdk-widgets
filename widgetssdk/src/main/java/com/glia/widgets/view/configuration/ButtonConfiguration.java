@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
 @Deprecated
@@ -89,6 +90,8 @@ public class ButtonConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = ButtonConfiguration.Builder.class.getSimpleName();
+
         private ColorStateList backgroundColor;
         private ColorStateList strokeColor;
         private Integer strokeWidth;
@@ -135,6 +138,7 @@ public class ButtonConfiguration implements Parcelable {
         }
 
         public ButtonConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             if (textConfiguration == null) {
                 ResourceProvider resourceProvider = Dependencies.getResourceProvider();
                 textConfiguration = new TextConfiguration.Builder()

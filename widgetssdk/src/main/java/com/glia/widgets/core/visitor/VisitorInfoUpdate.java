@@ -1,7 +1,7 @@
 package com.glia.widgets.core.visitor;
 
-import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
+import com.glia.widgets.helper.Logger;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.Map;
@@ -11,6 +11,7 @@ import java.util.Map;
  */
 @Deprecated
 public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
+    private final String TAG = VisitorInfoUpdate.class.getSimpleName();
 
     public String name;
     public String email;
@@ -20,6 +21,10 @@ public class VisitorInfoUpdate implements VisitorInfoUpdateRequest {
     public VisitorInfoUpdateRequest.NoteUpdateMethod noteUpdateMethod = VisitorInfoUpdateRequest.NoteUpdateMethod.APPEND;
     public VisitorInfoUpdateRequest.CustomAttributesUpdateMethod customAttrsUpdateMethod = VisitorInfoUpdateRequest.CustomAttributesUpdateMethod.MERGE;
     public String externalId;
+
+    public VisitorInfoUpdate() {
+        Logger.logDeprecatedClassUse(TAG);
+    }
 
     public void setName(String name) {
         this.name = name;

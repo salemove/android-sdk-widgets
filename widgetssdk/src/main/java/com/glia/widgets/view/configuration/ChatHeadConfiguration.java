@@ -3,6 +3,8 @@ package com.glia.widgets.view.configuration;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.glia.widgets.helper.Logger;
+
 @Deprecated
 public class ChatHeadConfiguration implements Parcelable {
     private final Integer operatorPlaceholderBackgroundColor;
@@ -173,6 +175,8 @@ public class ChatHeadConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = ChatHeadConfiguration.Builder.class.getSimpleName();
+
         private Integer operatorPlaceholderBackgroundColor;
         private Integer operatorPlaceholderIcon;
         private Integer operatorPlaceholderIconTintList;
@@ -237,6 +241,7 @@ public class ChatHeadConfiguration implements Parcelable {
         }
 
         public ChatHeadConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             return new ChatHeadConfiguration(this);
         }
     }

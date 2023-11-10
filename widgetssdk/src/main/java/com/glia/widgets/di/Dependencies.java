@@ -145,10 +145,10 @@ public class Dependencies {
 
     public static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         controllerFactory.init();
-        sdkConfigurationManager.setScreenSharingMode(gliaWidgetsConfig.getScreenSharingMode());
+        sdkConfigurationManager.setScreenSharingMode(gliaWidgetsConfig.screenSharingMode);
         sdkConfigurationManager.setUseOverlay(gliaWidgetsConfig.isUseOverlay());
-        sdkConfigurationManager.setCompanyName(gliaWidgetsConfig.getCompanyName());
-        sdkConfigurationManager.setUiTheme(gliaWidgetsConfig.getUiTheme());
+        sdkConfigurationManager.setCompanyName(gliaWidgetsConfig.companyName);
+        sdkConfigurationManager.setUiTheme(gliaWidgetsConfig.uiTheme);
     }
 
     public static ControllerFactory getControllerFactory() {

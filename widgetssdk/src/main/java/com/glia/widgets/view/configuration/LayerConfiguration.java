@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
 @Deprecated
@@ -44,6 +45,8 @@ public class LayerConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = LayerConfiguration.Builder.class.getSimpleName();
+
         // Background hex color.
         private String backgroundColor;
         // Border hex color.
@@ -75,6 +78,7 @@ public class LayerConfiguration implements Parcelable {
 
         @SuppressLint("ResourceType")
         public LayerConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.backgroundColor == null) {

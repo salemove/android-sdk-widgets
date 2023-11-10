@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.LayerConfiguration;
 import com.glia.widgets.view.configuration.OptionButtonConfiguration;
@@ -32,6 +33,8 @@ public class BooleanQuestionConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = BooleanQuestionConfiguration.Builder.class.getSimpleName();
+
         private TextConfiguration title;
         private OptionButtonConfiguration optionButton;
 
@@ -56,6 +59,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
         }
 
         public BooleanQuestionConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);

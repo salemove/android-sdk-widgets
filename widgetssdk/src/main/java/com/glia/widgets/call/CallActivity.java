@@ -163,6 +163,7 @@ public class CallActivity extends AppCompatActivity {
             GliaSdkConfiguration sdkConfiguration,
             String mediaType
     ) {
+        Logger.logDeprecatedMethodUse(TAG, "getIntent(Context, GliaSdkConfiguration, String)");
         return getIntent(applicationContext,
                 new Configuration.Builder()
                         .setWidgetsConfiguration(sdkConfiguration)

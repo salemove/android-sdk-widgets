@@ -5,11 +5,14 @@ import android.util.AttributeSet;
 
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.TextConfiguration;
 import com.google.android.material.button.MaterialButton;
 
 public abstract class BaseConfigurableButton extends MaterialButton {
+    private final String TAG = BaseConfigurableButton.class.getSimpleName();
+
     private ButtonConfiguration buttonConfiguration;
 
     public abstract ButtonConfiguration getButtonConfigurationFromTheme(UiTheme theme);
@@ -78,6 +81,7 @@ public abstract class BaseConfigurableButton extends MaterialButton {
 
     @Deprecated
     public void setTheme(UiTheme theme) {
+        Logger.logDeprecatedMethodUse(TAG, "setTheme(UiTheme)");
         if (theme == null) return;
         ButtonConfiguration runTimeConfiguration = getButtonConfigurationFromTheme(theme);
         if (runTimeConfiguration == null) return;

@@ -134,19 +134,19 @@ public class GliaWidgets {
         Dependencies.glia().init(gliaConfig);
         Dependencies.init(gliaWidgetsConfig);
         setupLoggingMetadata(gliaWidgetsConfig);
-        Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.getUiJsonRemoteConfig());
         Logger.d(TAG, "init");
+        Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig);
     }
 
     private static GliaConfig createGliaConfig(GliaWidgetsConfig gliaWidgetsConfig) {
         GliaConfig.Builder builder = new GliaConfig.Builder();
         setAuthorization(gliaWidgetsConfig, builder);
         return builder
-            .setSiteId(gliaWidgetsConfig.getSiteId())
-            .setRegion(gliaWidgetsConfig.getRegion())
-            .setBaseDomain(gliaWidgetsConfig.getBaseDomain())
-            .setContext(gliaWidgetsConfig.getContext())
-            .setManualLocaleOverride(gliaWidgetsConfig.getManualLocaleOverride())
+            .setSiteId(gliaWidgetsConfig.siteId)
+            .setRegion(gliaWidgetsConfig.region)
+            .setBaseDomain(gliaWidgetsConfig.baseDomain)
+            .setContext(gliaWidgetsConfig.context)
+            .setManualLocaleOverride(gliaWidgetsConfig.manualLocaleOverride)
             .build();
     }
 
@@ -154,8 +154,8 @@ public class GliaWidgets {
         GliaWidgetsConfig widgetsConfig,
         GliaConfig.Builder builder
     ) {
-        if (widgetsConfig.getSiteApiKey() != null) {
-            builder.setSiteApiKey(widgetsConfig.getSiteApiKey());
+        if (widgetsConfig.siteApiKey != null) {
+            builder.setSiteApiKey(widgetsConfig.siteApiKey);
         } else {
             throw new RuntimeException("Site key or app token is missing");
         }
@@ -231,6 +231,7 @@ public class GliaWidgets {
      */
     @Deprecated
     public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
+        Logger.logDeprecatedMethodUse(TAG, "updateVisitorInfo(VisitorInfoUpdate, Consumer<GliaWidgetException>)");
         Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
             .setName(visitorInfoUpdate.getName())
             .setEmail(visitorInfoUpdate.getEmail())
@@ -257,6 +258,7 @@ public class GliaWidgets {
      */
     @Deprecated
     public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
+        Logger.logDeprecatedMethodUse(TAG, "getVisitorInfo(Consumer<GliaVisitorInfo>, Consumer<GliaWidgetException>)");
         Dependencies.glia().getVisitorInfo((visitorInfo, e) -> {
             if (visitorInfo != null) {
                 visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
@@ -328,7 +330,7 @@ public class GliaWidgets {
     }
 
     private static void setupLoggingMetadata(GliaWidgetsConfig gliaWidgetsConfig) {
-        Logger.addGlobalMetadata(singletonMap(SITE_ID_KEY, gliaWidgetsConfig.getSiteId()));
+        Logger.addGlobalMetadata(singletonMap(SITE_ID_KEY, gliaWidgetsConfig.siteId));
     }
 
     // More info about global Rx error handler:

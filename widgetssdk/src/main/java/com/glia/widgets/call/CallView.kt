@@ -893,7 +893,10 @@ internal class CallView(
     }
 
     @Deprecated("", ReplaceWith("shouldShowMediaEngagementView(isUpgradeToCall)"))
-    fun shouldShowMediaEngagementView() = shouldShowMediaEngagementView(false)
+    fun shouldShowMediaEngagementView() {
+        Logger.logDeprecatedMethodUse(TAG, "shouldShowMediaEngagementView()")
+        shouldShowMediaEngagementView(false)
+    }
 
     fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean) =
         callController?.shouldShowMediaEngagementView(isUpgradeToCall) ?: false

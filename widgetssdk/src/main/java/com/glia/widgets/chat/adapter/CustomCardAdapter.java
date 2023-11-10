@@ -13,6 +13,7 @@ import androidx.collection.SparseArrayCompat;
 import com.glia.androidsdk.chat.ChatMessage;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
+import com.glia.widgets.helper.Logger;
 
 /**
  * The base class of CustomCardAdapter.
@@ -22,6 +23,8 @@ import com.glia.widgets.chat.adapter.holder.CustomCardViewHolder;
  * @see WebViewCardAdapter
  */
 public abstract class CustomCardAdapter {
+    private final String TAG = CustomCardAdapter.class.getSimpleName();
+
     @VisibleForTesting
     // Map of relations between custom card view types and adapter view types.
     // - key is custom card view type;
@@ -107,6 +110,7 @@ public abstract class CustomCardAdapter {
      */
     @Deprecated
     public boolean isInteractable(ChatMessage message, int viewType) {
+        Logger.logDeprecatedMethodUse(TAG, "isInteractable(ChatMessage, int)");
         return true;
     }
 

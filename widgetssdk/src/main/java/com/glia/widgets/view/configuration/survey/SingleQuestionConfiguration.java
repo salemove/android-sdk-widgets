@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.TextConfiguration;
 
@@ -36,6 +37,8 @@ public class SingleQuestionConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = SingleQuestionConfiguration.Builder.class.getSimpleName();
+
         private TextConfiguration title;
         private String tintColor;
         private TextConfiguration optionText;
@@ -72,6 +75,7 @@ public class SingleQuestionConfiguration implements Parcelable {
 
         @SuppressLint("ResourceType")
         public SingleQuestionConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);

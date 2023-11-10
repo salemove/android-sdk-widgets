@@ -9,6 +9,8 @@ import java.util.function.Consumer
 internal object Logger {
 
     const val SITE_ID_KEY = "site_id"
+    private const val DEPRECATED_METHOD_CALL_LOG_MESSAGE = "Deprecated method usage: "
+    private const val DEPRECATED_CLASS_CALL_LOG_MESSAGE = "Deprecated class usage: "
 
     private val loggingAdapters = mutableListOf<LoggingAdapter>()
     private val globalMetadata = mutableMapOf<String, String>()
@@ -22,6 +24,7 @@ internal object Logger {
     @JvmStatic
     fun d(tag: String, message: String) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.d(tag, message)
         }
 
@@ -33,6 +36,7 @@ internal object Logger {
     @JvmStatic
     fun d(tag: String, message: String, metadata: Map<String, String>? = null) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.d(tag, message)
         }
 
@@ -44,6 +48,7 @@ internal object Logger {
     @JvmStatic
     fun i(tag: String, message: String) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.i(tag, message)
         }
 
@@ -55,6 +60,7 @@ internal object Logger {
     @JvmStatic
     fun i(tag: String, message: String, metadata: Map<String, String>? = null) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.i(tag, message)
         }
 
@@ -66,6 +72,7 @@ internal object Logger {
     @JvmStatic
     fun w(tag: String, message: String) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.w(tag, message)
         }
 
@@ -77,6 +84,7 @@ internal object Logger {
     @JvmStatic
     fun w(tag: String, message: String, metadata: Map<String, String>? = null) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.w(tag, message)
         }
 
@@ -88,6 +96,7 @@ internal object Logger {
     @JvmStatic
     fun e(tag: String, message: String) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.e(tag, message)
         }
 
@@ -99,6 +108,7 @@ internal object Logger {
     @JvmStatic
     fun e(tag: String, message: String, throwable: Throwable?) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.e(tag, message, throwable)
         }
 
@@ -110,11 +120,40 @@ internal object Logger {
     @JvmStatic
     fun e(tag: String, message: String, throwable: Throwable?, metadata: Map<String, String>? = null) {
         if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
             Log.e(tag, message, throwable)
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
             loggingAdapter.error(tag, message, throwable, concatGlobalMeta(metadata))
+        })
+    }
+
+    @JvmStatic
+    fun logDeprecatedMethodUse(tag: String, methodName: String) {
+        val logMessage = DEPRECATED_METHOD_CALL_LOG_MESSAGE + methodName
+
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
+            Log.d(tag, logMessage)
+        }
+
+        loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
+            loggingAdapter.log(LogLevel.INFO, tag, logMessage, concatGlobalMeta(null))
+        })
+    }
+
+    @JvmStatic
+    fun logDeprecatedClassUse(tag: String) {
+        val logMessage = DEPRECATED_CLASS_CALL_LOG_MESSAGE + tag
+
+        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
+            // Log to console even if there were no any logging adapter set for debug build
+            Log.d(tag, logMessage)
+        }
+
+        loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
+            loggingAdapter.log(LogLevel.INFO, tag, logMessage, concatGlobalMeta(null))
         })
     }
 

@@ -7,9 +7,8 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
-
-import kotlinx.parcelize.Parcelize;
 
 @Deprecated
 //Removed textTypeFaceStyle and allCaps because those properties were unused
@@ -69,6 +68,8 @@ public class TextConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = TextConfiguration.Builder.class.getSimpleName();
+
         private float textSize;
         private ColorStateList textColor;
         private ColorStateList hintColor;
@@ -146,6 +147,7 @@ public class TextConfiguration implements Parcelable {
         }
 
         public TextConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.textSize == 0) {

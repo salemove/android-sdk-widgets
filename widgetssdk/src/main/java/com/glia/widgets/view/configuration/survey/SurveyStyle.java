@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.LayerConfiguration;
@@ -75,6 +76,8 @@ public class SurveyStyle implements Parcelable {
     }
 
     public static class Builder {
+        private final String TAG = SurveyStyle.Builder.class.getSimpleName();
+
         // Layer style.
         private LayerConfiguration layerConfiguration;
         // Header text style.
@@ -173,6 +176,7 @@ public class SurveyStyle implements Parcelable {
         }
 
         public SurveyStyle build() {
+            Logger.logDeprecatedClassUse(TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
 
             if (this.layerConfiguration == null) {

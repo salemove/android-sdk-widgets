@@ -4,6 +4,8 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.widgets.core.engagement.domain.ResetSurveyUseCase
 import com.glia.widgets.di.ControllerFactory
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 /**
  * Wrapper class for {@link com.glia.androidsdk.visitor.Authentication}
@@ -24,6 +26,7 @@ internal class AuthenticationManager(
         ReplaceWith("authenticate(jwtToken, null, requestCallback)")
     )
     override fun authenticate(requestCallback: RequestCallback<Void>, jwtToken: String) {
+        Logger.logDeprecatedMethodUse(TAG, "authenticate(RequestCallback<Void>, String)")
         cleanup()
         authentication.authenticate(jwtToken, null, requestCallback)
     }

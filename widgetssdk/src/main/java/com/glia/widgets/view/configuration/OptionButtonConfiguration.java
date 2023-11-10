@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.glia.widgets.R;
 import com.glia.widgets.di.Dependencies;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 
 @Deprecated
@@ -57,6 +58,8 @@ public class OptionButtonConfiguration implements Parcelable {
 
     @Deprecated
     public static class Builder {
+        private final String TAG = OptionButtonConfiguration.Builder.class.getSimpleName();
+
         // Title text for normal state.
         private TextConfiguration normalText;
         // Option layer for normal state.
@@ -101,6 +104,7 @@ public class OptionButtonConfiguration implements Parcelable {
         }
 
         public OptionButtonConfiguration build() {
+            Logger.logDeprecatedClassUse(TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.normalText == null) {
                 this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);

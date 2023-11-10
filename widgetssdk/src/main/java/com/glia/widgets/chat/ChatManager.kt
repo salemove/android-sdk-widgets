@@ -27,6 +27,7 @@ import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.isValid
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,7 +37,7 @@ import io.reactivex.processors.BehaviorProcessor
 import io.reactivex.processors.PublishProcessor
 import io.reactivex.schedulers.Schedulers
 
-internal class ChatManager constructor(
+internal class ChatManager(
     private val onMessageUseCase: GliaOnMessageUseCase,
     private val loadHistoryUseCase: GliaLoadHistoryUseCase,
     private val addNewMessagesDividerUseCase: AddNewMessagesDividerUseCase,
@@ -159,6 +160,8 @@ internal class ChatManager constructor(
 
     @VisibleForTesting
     fun mapNewMessage(chatMessage: ChatMessageInternal, messagesState: State): State {
+        check(chatMessage.chatMessage.isValid()) { "Invalid chat message passed -> ${chatMessage.chatMessage}" }
+
         if (messagesState.isNew(chatMessage)) {
             appendNewChatMessageUseCase(messagesState, chatMessage)
             if (chatMessage.chatMessage is VisitorMessage) {

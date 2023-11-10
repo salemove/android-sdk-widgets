@@ -10,6 +10,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.AttachmentFile
+import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SingleChoiceAttachment
@@ -52,6 +53,8 @@ internal fun String.fromHtml(flags: Int = Html.FROM_HTML_MODE_COMPACT): Spanned 
 internal val AttachmentFile.isImage: Boolean get() = contentType.startsWith("image")
 
 internal fun MessageAttachment.asSingleChoice(): SingleChoiceAttachment? = this as? SingleChoiceAttachment
+
+internal fun ChatMessage.isValid(): Boolean = content.isNotBlank() || attachment != null || metadata?.takeIf { it.length() > 0 } != null
 
 internal fun OperatorMessage.toChatMessageInternal(): ChatMessageInternal =
     ChatMessageInternal(this, LocalOperator(operatorId.orEmpty(), operatorName.orEmpty(), operatorImageUrl))

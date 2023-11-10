@@ -87,6 +87,7 @@ import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
+import com.glia.widgets.helper.isValid
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -158,7 +159,7 @@ internal class ChatController(
         object : GliaSendMessageUseCase.Listener {
             override fun messageSent(message: VisitorMessage?) {
                 Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
-                message?.also { chatManager.onChatAction(ChatManager.Action.MessageSent(it)) }
+                message?.takeIf { it.isValid() }?.also { chatManager.onChatAction(ChatManager.Action.MessageSent(it)) }
                 scrollChatToBottom()
             }
 

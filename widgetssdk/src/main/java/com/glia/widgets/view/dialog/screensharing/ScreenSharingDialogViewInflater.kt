@@ -30,16 +30,14 @@ internal class ScreenSharingDialogViewInflater(
     layoutInflater: LayoutInflater,
     themeWrapper: AlertThemeWrapper,
     payload: DialogPayload.ScreenSharing
-) :
-    BaseScreenSharingDialogViewInflater<ScreenSharingDialogViewBinding>(ScreenSharingDialogViewBinding(layoutInflater), themeWrapper, payload)
+) : BaseScreenSharingDialogViewInflater<ScreenSharingDialogViewBinding>(ScreenSharingDialogViewBinding(layoutInflater), themeWrapper, payload)
 
 internal class VerticalScreenSharingDialogViewInflater(
     layoutInflater: LayoutInflater,
     themeWrapper: AlertThemeWrapper,
     payload: DialogPayload.ScreenSharing
-) :
-    BaseScreenSharingDialogViewInflater<VerticalScreenSharingDialogViewBinding>(
-        VerticalScreenSharingDialogViewBinding(layoutInflater),
-        themeWrapper,
-        payload
-    )
+) : BaseScreenSharingDialogViewInflater<VerticalScreenSharingDialogViewBinding>(
+    VerticalScreenSharingDialogViewBinding(layoutInflater),
+    themeWrapper,
+    payload
+)

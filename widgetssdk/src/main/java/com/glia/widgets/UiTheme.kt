@@ -443,7 +443,8 @@ data class UiTheme(
     internal fun alertTheme(context: Context): AlertThemeWrapper = AlertThemeWrapper(
         AlertTheme(toColorPallet(context)).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment()),
         fontRes?.let { ResourcesCompat.getFont(context, it) },
-        whiteLabel
+        whiteLabel,
+        iconLeaveQueue
     )
 
     class UiThemeBuilder {

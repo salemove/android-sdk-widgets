@@ -11,12 +11,11 @@ internal class AlertDialogViewInflater(
     layoutInflater: LayoutInflater,
     themeWrapper: AlertThemeWrapper,
     payload: DialogPayload.AlertDialog
-) :
-    DialogViewInflater<AlertDialogViewBinding, DialogPayload.AlertDialog>(
-        AlertDialogViewBinding(layoutInflater),
-        themeWrapper,
-        payload
-    ) {
+) : DialogViewInflater<AlertDialogViewBinding, DialogPayload.AlertDialog>(
+    AlertDialogViewBinding(layoutInflater),
+    themeWrapper,
+    payload
+) {
     override fun setup(binding: AlertDialogViewBinding, themeWrapper: AlertThemeWrapper, payload: DialogPayload.AlertDialog) {
         val theme = themeWrapper.theme
 
@@ -25,5 +24,6 @@ internal class AlertDialogViewInflater(
         binding.closeBtn.isVisible = payload.buttonVisible
         payload.buttonClickListener?.also(binding.closeBtn::setOnClickListener)
         payload.buttonDescription?.also { binding.closeBtn.contentDescription = it }
+        themeWrapper.iconLeaveQueue?.also { binding.closeBtn.setImageResource(it) }
     }
 }

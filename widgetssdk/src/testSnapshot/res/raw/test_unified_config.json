@@ -850,5 +850,172 @@
         ]
       }
     }
+  },
+  "alert": {
+    "backgroundColor": {
+      "type": "fill",
+      "value": [
+        "#ffd100"
+      ]
+    },
+    "buttonAxis": "vertical",
+    "closeButtonColor": {
+      "type": "fill",
+      "value": [
+        "#000000"
+      ]
+    },
+    "message": {
+      "alignment": "leading",
+      "background": {
+        "type": "fill",
+        "value": [
+          "#FF0000"
+        ]
+      },
+      "font": {
+        "size": 14,
+        "style": "regular"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#000000"
+        ]
+      }
+    },
+    "negativeButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "borderWidth": 0,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "cornerRadius": 8
+      },
+      "shadow": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "FF0000"
+          ]
+        },
+        "offset": 0,
+        "opacity": 1,
+        "radius": 8
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": [
+            "FF0000"
+          ]
+        },
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#000000"
+          ]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": [
+          "#ffd100"
+        ]
+      }
+    },
+    "positiveButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        },
+        "borderWidth": 0,
+        "color": {
+          "type": "fill",
+          "value": [
+            "#04728c"
+          ]
+        },
+        "cornerRadius": 8
+      },
+      "shadow": {
+        "color": {
+          "type": "fill",
+          "value": [
+            "FF0000"
+          ]
+        },
+        "offset": 0,
+        "opacity": 1,
+        "radius": 8
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": [
+            "FF0000"
+          ]
+        },
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#FFFFFF"
+          ]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": [
+          "#FFFFFF"
+        ]
+      }
+    },
+    "title": {
+      "alignment": "center",
+      "background": {
+        "type": "fill",
+        "value": [
+          "#FFFFFF"
+        ]
+      },
+      "font": {
+        "size": 24,
+        "style": "regular"
+      },
+      "foreground": {
+        "type": "fill",
+        "value": [
+          "#000000"
+        ]
+      }
+    },
+    "titleImageColor": {
+      "type": "fill",
+      "value": [
+        "#04728c"
+      ]
+    }
   }
 }

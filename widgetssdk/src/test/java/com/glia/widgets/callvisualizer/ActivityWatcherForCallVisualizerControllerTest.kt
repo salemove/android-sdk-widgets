@@ -9,10 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
 import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
@@ -52,15 +53,13 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     private val callVisualizerController = mock(CallVisualizerController::class.java)
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
-    private val isCallVisualizerUseCase = mock(IsCallVisualizerUseCase::class.java)
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
     private val isShowOverlayPermissionRequestDialogUseCase =
         mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
     private val controller = ActivityWatcherForCallVisualizerController(
         callVisualizerController,
         screenSharingController,
-        isShowOverlayPermissionRequestDialogUseCase,
-        isCallVisualizerUseCase
+        isShowOverlayPermissionRequestDialogUseCase
     )
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
@@ -78,13 +77,36 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     }
 
     @Test
-    fun `onActivityResumed screen sharing skipped when call or chat is active`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase)
-            .thenReturn(isCallOrChatActiveUseCase)
+    fun `addScreenSharingCallback screen sharing skipped when call or chat is active`() {
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
-        controller.onActivityResumed(activity)
-        verify(callVisualizerController).setOnEngagementEndedCallback(any())
-        verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
+        val spyController = spy(controller)
+        spyController.addScreenSharingCallback(activity)
+        verify(spyController, never()).setupScreenSharingViewCallback()
+
+        resetMocks()
+    }
+
+    @Test
+    fun `onActivityResumed will trigger engagement start callback when Call Visualizer engagement started`() {
+        val spyController = spy(controller)
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        spyController.onActivityResumed(activity)
+        verify(watcher, never()).engagementStarted()
+        verify(spyController, never()).addScreenSharingCallback(activity)
+        verify(spyController, never()).setupScreenSharingViewCallback()
+
+        val kArgumentCaptor: KArgumentCaptor<(OmnibrowseEngagement) -> Unit> = argumentCaptor<(OmnibrowseEngagement) -> Unit>()
+
+        verify(callVisualizerController).setOnEngagementStartListener(kArgumentCaptor.capture())
+
+        val mockEngagement: OmnibrowseEngagement = mock()
+        kArgumentCaptor.lastValue.invoke(mockEngagement)
+
+        verify(watcher).engagementStarted()
+
+        resetMocks()
     }
 
     @Test
@@ -97,23 +119,33 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     }
 
     @Test
-    fun `onActivityResumed error is shown when onScreenSharingError`() {
-        whenever(isCallVisualizerUseCase()).thenReturn(true)
-        mockOnActivityResumeAndEnsureCallbacksSet(supportActivity)
-        controller.screenSharingViewCallback?.onScreenSharingRequestError(
-            GliaException(
-                "message",
-                GliaException.Cause.INTERNAL_ERROR
-            )
-        )
+    fun `addScreenSharingCallback error is shown when onScreenSharingError`() {
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
+        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        val intent = mock(Intent::class.java)
+        whenever(supportActivity.intent).thenReturn(intent)
+        whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(ScreenSharing)
+        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
+        controller.onActivityResumed(activity)
+        controller.addScreenSharingCallback(activity)
+        verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
+
+        verify(screenSharingController).setViewCallback(anyOrNull())
+        verify(screenSharingController).onResume(eq(activity), notNull())
+        verify(callVisualizerController).setOnEngagementEndedCallback(any())
+        verify(callVisualizerController).setOnEngagementStartListener(any())
+        verify(watcher).setupDialogCallback()
+        verify(watcher).requestCameraPermission()
+        cleanup()
+        resetMocks()
+
+        controller.screenSharingViewCallback?.onScreenSharingRequestError(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
         verify(watcher).showToast("message")
     }
 
     @Test
     fun `onActivityResumed does not call permissions when not CallVisualizerSupportActivity`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(
-            isCallOrChatActiveUseCase
-        )
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
         controller.onActivityResumed(nonCallVisualizerSupportActivity)
         resetMocks()
@@ -122,14 +154,11 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     }
 
     @Test
-    fun `onActivityResumed start screen sharing when ScreenSharingController calls requestScreenSharingCallback`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(
-            isCallOrChatActiveUseCase
-        )
+    fun `addScreenSharingCallback start screen sharing when ScreenSharingController calls requestScreenSharingCallback`() {
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
-        whenever(isCallVisualizerUseCase()).thenReturn(true)
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
-        controller.onActivityResumed(nonCallVisualizerSupportActivity)
+        controller.addScreenSharingCallback(nonCallVisualizerSupportActivity)
 
         val argumentCaptor = argumentCaptor<Function0<Unit>>()
         verify(screenSharingController).onResume(eq(nonCallVisualizerSupportActivity), argumentCaptor.capture())
@@ -146,13 +175,13 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).dismissAlertDialog()
         verify(watcher).removeDialogCallback()
         verify(callVisualizerController).removeOnEngagementEndedCallback()
+        verify(callVisualizerController).removeOnEngagementStartListener()
         verify(screenSharingController).removeViewCallback(anyOrNull())
     }
 
     @Test
     fun `isCallOrChatActive returns mocked value when called`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase)
-            .thenReturn(isCallOrChatActiveUseCase)
+        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
         assertTrue(controller.isCallOrChatActive(activity))
         verify(callVisualizerController).isCallOrChatScreenActiveUseCase
@@ -473,31 +502,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         val state = DialogState.MediaUpgrade(offer, "name", MODE_MEDIA_UPGRADE)
         controller.onDialogControllerCallback(state)
         verify(watcher).showUpgradeDialog(state)
-    }
-
-    private fun mockOnActivityResumeAndEnsureCallbacksSet(activity: Activity) {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(
-            isCallOrChatActiveUseCase
-        )
-        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
-        val intent = mock(Intent::class.java)
-        whenever(supportActivity.intent).thenReturn(intent)
-        whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(
-            ScreenSharing
-        )
-        controller.onInitialCameraPermissionResult(
-            isGranted = false,
-            isComponentActivity = true
-        )
-        controller.onActivityResumed(activity)
-        verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
-        verify(screenSharingController).setViewCallback(anyOrNull())
-        verify(screenSharingController).onResume(eq(activity), notNull())
-        verify(callVisualizerController).setOnEngagementEndedCallback(any())
-        verify(watcher).setupDialogCallback()
-        verify(watcher).requestCameraPermission()
-        cleanup()
-        resetMocks()
     }
 
     // Required because MediaUpgradeOffer has 'final' fields which Mockito can't mock

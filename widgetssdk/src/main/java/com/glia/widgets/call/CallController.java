@@ -69,11 +69,8 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.disposables.CompositeDisposable;
 import kotlin.Unit;
 
-public class CallController implements
-        GliaOnEngagementUseCase.Listener,
-        GliaOnEngagementEndUseCase.Listener,
-        OnSurveyListener,
-        VisitorMediaUpdatesListener {
+public class CallController
+    implements GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener, VisitorMediaUpdatesListener {
 
     private static final int MAX_IDLE_TIME = 3200;
     private static final int INACTIVITY_TIMER_TICKER_VALUE = 400;
@@ -128,57 +125,57 @@ public class CallController implements
     private boolean shouldHandleEndedEngagement = false;
 
     public CallController(
-            GliaSdkConfigurationManager sdkConfigurationManager,
-            MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
-            TimeCounter sharedTimer,
-            CallViewCallback callViewCallback,
-            TimeCounter inactivityTimeCounter,
-            TimeCounter connectingTimerCounter,
-            MinimizeHandler minimizeHandler,
-            DialogController dialogController,
-            MessagesNotSeenHandler messagesNotSeenHandler,
-            CallNotificationUseCase callNotificationUseCase,
-            GliaQueueForMediaEngagementUseCase queueForMediaEngagementUseCase,
-            GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
-            GliaOnEngagementUseCase onEngagementUseCase,
-            AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
-            RemoveOperatorMediaStateListenerUseCase removeOperatorMediaStateListenerUseCase,
-            GliaOnEngagementEndUseCase onEngagementEndUseCase,
-            GliaEndEngagementUseCase endEngagementUseCase,
-            ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
-            IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
-            HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
-            IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase,
-            GliaSurveyUseCase surveyUseCase,
-            AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
-            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
-            AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase,
-            RemoveMediaUpgradeOfferCallbackUseCase removeMediaUpgradeCallbackUseCase,
-            ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
-            ToggleVisitorVideoUseCase toggleVisitorVideoUseCase,
-            GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
-            UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
-            QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
-            IsCallVisualizerUseCase isCallVisualizerUseCase,
-            IsOngoingEngagementUseCase isOngoingEngagementUseCase,
-            SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase,
-            TurnSpeakerphoneUseCase turnSpeakerphoneUseCase,
-            ConfirmationDialogUseCase confirmationDialogUseCase,
-            HandleCallPermissionsUseCase handleCallPermissionsUseCase) {
+        GliaSdkConfigurationManager sdkConfigurationManager,
+        MediaUpgradeOfferRepository mediaUpgradeOfferRepository,
+        TimeCounter sharedTimer,
+        CallViewCallback callViewCallback,
+        TimeCounter inactivityTimeCounter,
+        TimeCounter connectingTimerCounter,
+        MinimizeHandler minimizeHandler,
+        DialogController dialogController,
+        MessagesNotSeenHandler messagesNotSeenHandler,
+        CallNotificationUseCase callNotificationUseCase,
+        GliaQueueForMediaEngagementUseCase queueForMediaEngagementUseCase,
+        GliaCancelQueueTicketUseCase cancelQueueTicketUseCase,
+        GliaOnEngagementUseCase onEngagementUseCase,
+        AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
+        RemoveOperatorMediaStateListenerUseCase removeOperatorMediaStateListenerUseCase,
+        GliaOnEngagementEndUseCase onEngagementEndUseCase,
+        GliaEndEngagementUseCase endEngagementUseCase,
+        ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
+        IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
+        HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
+        IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase,
+        GliaSurveyUseCase surveyUseCase,
+        AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
+        RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
+        AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase,
+        RemoveMediaUpgradeOfferCallbackUseCase removeMediaUpgradeCallbackUseCase,
+        ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase,
+        ToggleVisitorVideoUseCase toggleVisitorVideoUseCase,
+        GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase,
+        UpdateFromCallScreenUseCase updateFromCallScreenUseCase,
+        QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
+        IsCallVisualizerUseCase isCallVisualizerUseCase,
+        IsOngoingEngagementUseCase isOngoingEngagementUseCase,
+        SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase,
+        TurnSpeakerphoneUseCase turnSpeakerphoneUseCase,
+        ConfirmationDialogUseCase confirmationDialogUseCase,
+        HandleCallPermissionsUseCase handleCallPermissionsUseCase) {
         Logger.d(TAG, "constructor");
         this.sdkConfigurationManager = sdkConfigurationManager;
         this.viewCallback = callViewCallback;
         this.callState = new CallState.Builder()
-                .setIntegratorCallStarted(false)
-                .setVisible(false)
-                .setMessagesNotSeen(0)
-                .setCallStatus(new CallStatus.EngagementNotOngoing(null))
-                .setLandscapeLayoutControlsVisible(false)
-                .setIsSpeakerOn(false)
-                .setIsMuted(false)
-                .setHasVideo(false)
-                .setIsCallVisualizer(isCallVisualizerUseCase.invoke())
-                .createCallState();
+            .setIntegratorCallStarted(false)
+            .setVisible(false)
+            .setMessagesNotSeen(0)
+            .setCallStatus(new CallStatus.EngagementNotOngoing(null))
+            .setLandscapeLayoutControlsVisible(false)
+            .setIsSpeakerOn(false)
+            .setIsMuted(false)
+            .setHasVideo(false)
+            .setIsCallVisualizer(isCallVisualizerUseCase.invoke())
+            .createCallState();
         this.dialogController = dialogController;
         this.callTimer = sharedTimer;
         this.mediaUpgradeOfferRepository = mediaUpgradeOfferRepository;
@@ -247,8 +244,8 @@ public class CallController implements
         mediaUpgradeOfferRepository.startListening();
         if (!connectingTimerCounter.isRunning()) {
             connectingTimerCounter.startNew(
-                    Constants.CALL_TIMER_DELAY,
-                    Constants.CALL_TIMER_INTERVAL_VALUE
+                Constants.CALL_TIMER_DELAY,
+                Constants.CALL_TIMER_INTERVAL_VALUE
             );
         }
         emitViewState(callState.engagementStarted());
@@ -265,7 +262,7 @@ public class CallController implements
         if (isUpgradeToCall) {
             initCall(companyName, queueId, visitorContextAssetId, mediaType, useOverlays, screenSharingMode);
             if (serviceChatHeadController != null) {
-              serviceChatHeadController.init();
+                serviceChatHeadController.init();
             }
             return;
         }
@@ -273,7 +270,7 @@ public class CallController implements
             if (isPermissionsGranted) {
                 initCall(companyName, queueId, visitorContextAssetId, mediaType, useOverlays, screenSharingMode);
                 if (serviceChatHeadController != null) {
-                  serviceChatHeadController.init();
+                    serviceChatHeadController.init();
                 }
             } else {
                 if (viewCallback != null) {
@@ -311,20 +308,26 @@ public class CallController implements
         initMessagesNotSeenCallback();
         onEngagementUseCase.execute(this);
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener);
-        confirmationDialogUseCase.invoke(shouldShow -> {
-            if (shouldShow) {
-                dialogController.showEngagementConfirmationDialog();
-            } else {
-                queueForEngagement(queueId, visitorContextAssetId, mediaType);
-            }
-            return Unit.INSTANCE;
-        });
+        tryToQueueForEngagement(queueId, visitorContextAssetId, mediaType);
         onEngagementEndUseCase.execute(this);
         mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback);
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener);
         connectingTimerCounter.addRawValueListener(connectingTimerStatusListener);
         minimizeHandler.addListener(this::minimizeView);
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener);
+    }
+
+    private void tryToQueueForEngagement(String queueId, String visitorContextAssetId, Engagement.MediaType mediaType) {
+        if (!isOngoingEngagementUseCase.invoke()) {
+            confirmationDialogUseCase.invoke(shouldShow -> {
+                if (shouldShow) {
+                    dialogController.showEngagementConfirmationDialog();
+                } else {
+                    queueForEngagement(queueId, visitorContextAssetId, mediaType);
+                }
+                return Unit.INSTANCE;
+            });
+        }
     }
 
     public void onLiveObservationDialogRequested() {
@@ -487,8 +490,8 @@ public class CallController implements
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer mediaUpgradeOffer) {
         Logger.d(TAG, "upgradeToAudioClicked");
         mediaUpgradeOfferRepository.acceptOffer(
-                mediaUpgradeOffer,
-                MediaUpgradeOfferRepository.Submitter.CALL
+            mediaUpgradeOffer,
+            MediaUpgradeOfferRepository.Submitter.CALL
         );
         dialogController.dismissCurrentDialog();
     }
@@ -496,8 +499,8 @@ public class CallController implements
     public void declineUpgradeOfferClicked(MediaUpgradeOffer mediaUpgradeOffer) {
         Logger.d(TAG, "closeUpgradeDialogClicked");
         mediaUpgradeOfferRepository.declineOffer(
-                mediaUpgradeOffer,
-                MediaUpgradeOfferRepository.Submitter.CALL
+            mediaUpgradeOffer,
+            MediaUpgradeOfferRepository.Submitter.CALL
         );
         dialogController.dismissCurrentDialog();
     }
@@ -516,25 +519,25 @@ public class CallController implements
 
     public void muteButtonClicked() {
         disposable.add(
-                toggleVisitorAudioMediaMuteUseCase
-                        .execute()
-                        .subscribe(
-                                () -> { // no-op
-                                },
-                                error -> Logger.e(TAG, "Muting failed with error: " + error.toString())
-                        )
+            toggleVisitorAudioMediaMuteUseCase
+                .execute()
+                .subscribe(
+                    () -> { // no-op
+                    },
+                    error -> Logger.e(TAG, "Muting failed with error: " + error.toString())
+                )
         );
     }
 
     public void videoButtonClicked() {
         disposable.add(
-                toggleVisitorVideoUseCase
-                        .execute()
-                        .subscribe(
-                                () -> { // no-op
-                                },
-                                error -> Logger.e(TAG, "Toggling visitor video error: " + error.toString())
-                        )
+            toggleVisitorVideoUseCase
+                .execute()
+                .subscribe(
+                    () -> { // no-op
+                    },
+                    error -> Logger.e(TAG, "Toggling visitor video error: " + error.toString())
+                )
         );
     }
 
@@ -544,7 +547,7 @@ public class CallController implements
 
     public void onNewOperatorMediaState(@Nullable OperatorMediaState operatorMediaState) {
         Logger.d(TAG, "newOperatorMediaState: " + operatorMediaState +
-                ", timertaskrunning: " + callTimer.isRunning());
+            ", timertaskrunning: " + callTimer.isRunning());
         if (operatorMediaState == null) {
             return;
         }
@@ -661,8 +664,8 @@ public class CallController implements
 
             @Override
             public void upgradeOfferChoiceSubmitSuccess(
-                    MediaUpgradeOffer offer,
-                    MediaUpgradeOfferRepository.Submitter submitter
+                MediaUpgradeOffer offer,
+                MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess");
                 Engagement.MediaType mediaType;
@@ -676,7 +679,7 @@ public class CallController implements
 
             @Override
             public void upgradeOfferChoiceDeclinedSuccess(
-                    MediaUpgradeOfferRepository.Submitter submitter
+                MediaUpgradeOfferRepository.Submitter submitter
             ) {
                 Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess");
             }
@@ -706,10 +709,10 @@ public class CallController implements
             public void onNewRawTimerValue(int timerValue) {
                 if (callState.isCallOngoingAndOperatorIsConnecting()) {
                     emitViewState(
-                            callState
-                                    .connectingTimerValueChanged(
-                                            String.valueOf(TimeUnit.MILLISECONDS.toSeconds(timerValue))
-                                    )
+                        callState
+                            .connectingTimerValueChanged(
+                                String.valueOf(TimeUnit.MILLISECONDS.toSeconds(timerValue))
+                            )
                     );
                 }
             }
@@ -734,16 +737,16 @@ public class CallController implements
     private void showUpgradeVideoDialog2Way(MediaUpgradeOffer mediaUpgradeOffer) {
         if (callState.isMediaEngagementStarted())
             dialogController.showUpgradeVideoDialog2Way(
-                    mediaUpgradeOffer,
-                    callState.callStatus.getFormattedOperatorName()
+                mediaUpgradeOffer,
+                callState.callStatus.getFormattedOperatorName()
             );
     }
 
     private void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer) {
         if (callState.isMediaEngagementStarted())
             dialogController.showUpgradeVideoDialog1Way(
-                    mediaUpgradeOffer,
-                    callState.callStatus.getFormattedOperatorName()
+                mediaUpgradeOffer,
+                callState.callStatus.getFormattedOperatorName()
             );
     }
 
@@ -779,11 +782,11 @@ public class CallController implements
     private void stop() {
         Logger.d(TAG, "Stop, engagement ended");
         disposable.add(
-                cancelQueueTicketUseCase.execute()
-                        .subscribe(
-                                this::queueForEngagementStopped,
-                                throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
-                        )
+            cancelQueueTicketUseCase.execute()
+                .subscribe(
+                    this::queueForEngagementStopped,
+                    throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
+                )
         );
         endEngagementUseCase.invoke();
         mediaUpgradeOfferRepository.stopAll();
@@ -797,8 +800,8 @@ public class CallController implements
             formattedTime = callState.callStatus.getTime();
         }
         emitViewState(callState.videoCallOperatorVideoStarted(
-                operatorMediaState,
-                formattedTime
+            operatorMediaState,
+            formattedTime
         ));
         callNotificationUseCase.invoke(callState.callStatus.getVisitorMediaState(), operatorMediaState);
         connectingTimerCounter.stop();
@@ -811,8 +814,8 @@ public class CallController implements
             formattedTime = callState.callStatus.getTime();
 
         emitViewState(callState.audioCallStarted(
-                operatorMediaState,
-                formattedTime
+            operatorMediaState,
+            formattedTime
         ));
 
         callNotificationUseCase.invoke(callState.callStatus.getVisitorMediaState(), operatorMediaState);
@@ -827,19 +830,19 @@ public class CallController implements
         callNotificationUseCase.removeAllNotifications();
         if (!connectingTimerCounter.isRunning()) {
             connectingTimerCounter.startNew(
-                    Constants.CALL_TIMER_DELAY,
-                    Constants.CALL_TIMER_INTERVAL_VALUE
+                Constants.CALL_TIMER_DELAY,
+                Constants.CALL_TIMER_INTERVAL_VALUE
             );
         }
     }
 
     private void subscribeToEngagementStateChange() {
         disposable.add(
-                getGliaEngagementStateFlowableUseCase.execute()
-                        .subscribe(
-                                this::onEngagementStateChanged,
-                                throwable -> Logger.e(TAG, "subscribeToEngagementStateChange error: " + throwable.getMessage())
-                        )
+            getGliaEngagementStateFlowableUseCase.execute()
+                .subscribe(
+                    this::onEngagementStateChanged,
+                    throwable -> Logger.e(TAG, "subscribeToEngagementStateChange error: " + throwable.getMessage())
+                )
         );
     }
 
@@ -887,7 +890,7 @@ public class CallController implements
 
     private void onEngagementOngoing(Operator operator) {
         if (!(callState.callStatus instanceof CallStatus.EngagementOngoingAudioCallStarted) &&
-                !(callState.callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted)) {
+            !(callState.callStatus instanceof CallStatus.EngagementOngoingVideoCallStarted)) {
             onOperatorConnected(operator);
         }
     }
@@ -922,23 +925,23 @@ public class CallController implements
 
     private void onOperatorConnectedAndVideoCallOngoing(String operatorName, String profileImgUrl) {
         emitViewState(
-                callState
-                        .operatorConnecting(operatorName, profileImgUrl)
-                        .videoCallOperatorVideoStarted(
-                                callState.callStatus.getOperatorMediaState(),
-                                callState.callStatus.getTime()
-                        )
+            callState
+                .operatorConnecting(operatorName, profileImgUrl)
+                .videoCallOperatorVideoStarted(
+                    callState.callStatus.getOperatorMediaState(),
+                    callState.callStatus.getTime()
+                )
         );
     }
 
     private void onOperatorConnectedAndAudioCallOngoing(String operatorName, String profileImgUrl) {
         emitViewState(
-                callState
-                        .operatorConnecting(operatorName, profileImgUrl)
-                        .audioCallStarted(
-                                callState.callStatus.getOperatorMediaState(),
-                                callState.callStatus.getTime()
-                        )
+            callState
+                .operatorConnecting(operatorName, profileImgUrl)
+                .audioCallStarted(
+                    callState.callStatus.getOperatorMediaState(),
+                    callState.callStatus.getTime()
+                )
         );
     }
 
@@ -949,8 +952,8 @@ public class CallController implements
     private void showCallNotification() {
         if (hasCallNotificationChannelEnabledUseCase.invoke()) {
             callNotificationUseCase.invoke(
-                    callState.callStatus.getVisitorMediaState(),
-                    callState.callStatus.getOperatorMediaState()
+                callState.callStatus.getVisitorMediaState(),
+                callState.callStatus.getOperatorMediaState()
             );
         }
     }
@@ -967,11 +970,11 @@ public class CallController implements
     private void observeQueueTicketState() {
         Logger.d(TAG, "observeQueueTicketState");
         disposable.add(
-                ticketStateChangeToUnstaffedUseCase
-                        .execute()
-                        .subscribe(dialogController::showNoMoreOperatorsAvailableDialog,
-                                error -> Logger.e(TAG, "Error happened while observing queue state : " + error.toString())
-                        )
+            ticketStateChangeToUnstaffedUseCase
+                .execute()
+                .subscribe(dialogController::showNoMoreOperatorsAvailableDialog,
+                    error -> Logger.e(TAG, "Error happened while observing queue state : " + error.toString())
+                )
         );
     }
 }

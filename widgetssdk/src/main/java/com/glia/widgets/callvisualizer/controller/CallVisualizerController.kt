@@ -31,6 +31,7 @@ internal class CallVisualizerController(
     OnSurveyListener {
 
     private var engagementEndedCallback: (() -> Unit)? = null
+    private var startEngagementListener: ((OmnibrowseEngagement) -> Unit)? = null
 
     fun init() {
         Logger.d(TAG, "CallVisualizerController initialized")
@@ -60,7 +61,7 @@ internal class CallVisualizerController(
     override fun onEngagementRequested() {
         dialogController.dismissVisitorCodeDialog()
 
-        confirmationDialogUseCase{ shouldShow ->
+        confirmationDialogUseCase { shouldShow ->
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
             } else {
@@ -87,6 +88,7 @@ internal class CallVisualizerController(
     override fun newEngagementLoaded(engagement: OmnibrowseEngagement) {
         Logger.i(TAG, "New Call visualizer engagement loaded")
         surveyUseCase.registerListener(this)
+        startEngagementListener?.invoke(engagement)
     }
 
     override fun callVisualizerEngagementEnded() {
@@ -99,7 +101,15 @@ internal class CallVisualizerController(
         this.engagementEndedCallback = callback
     }
 
+    fun setOnEngagementStartListener(callback: (OmnibrowseEngagement) -> Unit) {
+        startEngagementListener = callback
+    }
+
     fun removeOnEngagementEndedCallback() {
         this.engagementEndedCallback = null
+    }
+
+    fun removeOnEngagementStartListener() {
+        startEngagementListener = null
     }
 }

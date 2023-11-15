@@ -26,6 +26,7 @@ class ActivityWatcherForCallVisualizerContract {
         fun onMediaProjectionRejected()
         fun isWaitingMediaProjectionResult(): Boolean
         fun setIsWaitingMediaProjectionResult(isWaiting: Boolean)
+        fun addScreenSharingCallback(activity: Activity)
     }
 
     interface Watcher {
@@ -52,5 +53,6 @@ class ActivityWatcherForCallVisualizerContract {
         fun dismissOverlayDialog()
         fun isSupportActivityOpen(): Boolean
         fun showEngagementConfirmationDialog()
+        fun engagementStarted()
     }
 }

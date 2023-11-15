@@ -367,8 +367,8 @@ public class ControllerFactory {
             activityWatcherforCallVisualizerController = new ActivityWatcherForCallVisualizerController(
                 getCallVisualizerController(),
                 getScreenSharingController(),
-                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
-                useCaseFactory.createIsCallVisualizerUseCase());
+                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase()
+            );
         }
         return activityWatcherforCallVisualizerController;
     }

@@ -348,6 +348,10 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
+    override fun engagementStarted() {
+        controller.addScreenSharingCallback(resumedActivity ?: return)
+    }
+
     override fun setupDialogCallback() {
         dialogController.addCallback(dialogCallback)
     }

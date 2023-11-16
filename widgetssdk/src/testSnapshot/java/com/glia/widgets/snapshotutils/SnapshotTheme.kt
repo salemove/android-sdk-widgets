@@ -86,8 +86,8 @@ internal interface SnapshotTheme : SnapshotContent {
         @DrawableRes iconPlaceholder: Int? = R.drawable.test_ic_placeholder,
         @DrawableRes iconOnHold: Int? = R.drawable.test_ic_on_hold,
         @DrawableRes iconEndScreenShare: Int? = R.drawable.test_ic_end_screen_share,
-        whiteLabel: Boolean? = null,
-        gliaAlertDialogButtonUseVerticalAlignment: Boolean? = null
+        whiteLabel: Boolean? = true,
+        gliaAlertDialogButtonUseVerticalAlignment: Boolean? = true
     ): UiTheme {
         return UiTheme(
             appBarTitle = "Snapshot Test",

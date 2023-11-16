@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"
@@ -32,7 +32,7 @@
 
     <TextView
         android:id="@+id/dialog_title_view"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_small"
         android:gravity="center"
@@ -43,7 +43,7 @@
 
     <TextView
         android:id="@+id/dialog_message_view"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_medium"
         android:gravity="center"
@@ -58,10 +58,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/glia_large_x_large"
         android:layout_marginEnd="@dimen/glia_small"
-        tools:text="@string/glia_dialog_decline"
         app:layout_constraintEnd_toStartOf="@id/accept_button"
+        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/dialog_message_view" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_message_view"
+        tools:text="@string/glia_dialog_decline" />
 
     <com.glia.widgets.view.button.GliaPositiveButton
         android:id="@+id/accept_button"
@@ -69,33 +70,33 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/glia_small"
         android:layout_marginTop="@dimen/glia_large_x_large"
-        tools:text="@string/glia_dialog_accept"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toEndOf="@id/decline_button"
-        app:layout_constraintTop_toBottomOf="@id/dialog_message_view" />
+        app:layout_constraintTop_toBottomOf="@id/dialog_message_view"
+        tools:text="@string/glia_dialog_accept" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/logo_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/accept_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/accept_button">
 
         <TextView
             android:id="@+id/powered_by_text"
+            style="@style/Application.Glia.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Powered by"
-            style="@style/Application.Glia.Caption"
-            android:textColor="@color/glia_base_normal_color_50"
             android:layout_marginEnd="@dimen/glia_medium"
             android:importantForAccessibility="no"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            android:textColor="@color/glia_base_normal_color_50"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/logo_view"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            tools:text="Powered by" />
 
         <ImageView
             android:id="@+id/logo_view"
@@ -105,11 +106,11 @@
             android:layout_marginBottom="@dimen/glia_pre_x_large"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_glia_logo"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/powered_by_text"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -118,10 +119,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/glia_large_x_large"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintTop_toBottomOf="@id/logo_container"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo_container"
+        app:layout_constraintVertical_bias="0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

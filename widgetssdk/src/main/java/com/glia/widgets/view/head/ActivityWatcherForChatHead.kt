@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.util.Pair
+import androidx.core.view.contains
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.base.BaseActivityWatcher
@@ -103,7 +104,15 @@ internal class ActivityWatcherForChatHead(
         createChatHeadLayout(activity)
         try {
             Logger.d(TAG, "Adding application-only bubble")
-            activity.runOnUiThread { viewGroup.addView(chatHeadLayout.get()) }
+            activity.runOnUiThread {
+                chatHeadLayout.get()?.let {
+                    if (!viewGroup.contains(it)) {
+                        viewGroup.addView(it)
+                    } else {
+                        Logger.e(TAG, "Duplicate bubble adding detected")
+                    }
+                }
+            }
         } catch (e: IllegalStateException) {
             Log.d(TAG, "Cannot add bubble: $e")
         }

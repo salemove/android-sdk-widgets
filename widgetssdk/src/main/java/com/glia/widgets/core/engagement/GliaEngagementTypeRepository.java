@@ -2,7 +2,6 @@ package com.glia.widgets.core.engagement;
 
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
-import com.glia.widgets.helper.Logger;
 
 public class GliaEngagementTypeRepository {
     private final GliaEngagementRepository engagementRepository;

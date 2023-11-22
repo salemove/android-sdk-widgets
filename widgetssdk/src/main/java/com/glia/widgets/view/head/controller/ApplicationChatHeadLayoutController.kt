@@ -1,25 +1,15 @@
 package com.glia.widgets.view.head.controller
 
 import com.glia.androidsdk.Operator
-import com.glia.androidsdk.comms.VisitorMediaState
-import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
-import com.glia.androidsdk.omnicore.OmnicoreEngagement
-import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase
-import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUseCase
-import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
-import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener
-import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase
-import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
+import com.glia.widgets.engagement.CurrentOperatorUseCase
+import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.VisitorMediaUseCase
 import com.glia.widgets.helper.imageUrl
+import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadLayoutContract
 import io.reactivex.disposables.CompositeDisposable
@@ -27,22 +17,12 @@ import io.reactivex.disposables.CompositeDisposable
 internal class ApplicationChatHeadLayoutController(
     private val isDisplayApplicationChatHeadUseCase: IsDisplayApplicationChatHeadUseCase,
     private val navigationDestinationUseCase: ResolveChatHeadNavigationUseCase,
-    private val gliaOnEngagementUseCase: GliaOnEngagementUseCase,
-    private val onEngagementEndUseCase: GliaOnEngagementEndUseCase,
-    private val gliaOnCallVisualizerUseCase: GliaOnCallVisualizerUseCase,
-    private val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
-    private val addVisitorMediaStateListenerUseCase: AddVisitorMediaStateListenerUseCase,
-    private val removeVisitorMediaStateListenerUseCase: RemoveVisitorMediaStateListenerUseCase,
-    private val getOperatorFlowableUseCase: GetOperatorFlowableUseCase,
-    private val setPendingSurveyUseCase: SetPendingSurveyUseCase,
-    private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
-) : ChatHeadLayoutContract.Controller,
-    VisitorMediaUpdatesListener,
-    GliaOnEngagementUseCase.Listener,
-    GliaOnEngagementEndUseCase.Listener,
-    GliaOnCallVisualizerUseCase.Listener,
-    GliaOnCallVisualizerEndUseCase.Listener {
+    private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
+    private val engagementStateUseCase: EngagementStateUseCase,
+    private val currentOperatorUseCase: CurrentOperatorUseCase,
+    private val visitorMediaUseCase: VisitorMediaUseCase
+) : ChatHeadLayoutContract.Controller {
     private val engagementDisposables = CompositeDisposable()
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
     private var state = State.ENDED
@@ -52,12 +32,13 @@ internal class ApplicationChatHeadLayoutController(
 
     /*
      * We need to keep track of the currently active (topmost) view. This can be either ChatView
-     * or CallView. CallView has translucent theme and this changes the usual lifecycle of an activity.
-     * When the translucent CallActivity is on top of the ChatActivity and config change happens (e.g screen rotation)
-     * then ChatActivity onResume and onPause are called right after CallActivity's onResume. Current
+     * or CallView. CallView has a translucent theme and this changes the usual lifecycle of an activity.
+     * When the translucent CallActivity is on top of the ChatActivity and config change happens (e.g., screen rotation)
+     * then ChatActivity onResume and onPause are called right after CallActivity's onResume. The current
      * solution ignores such onResume calls because another activity is already in resumed state.
      */
     private var resumedViewName: String? = null
+
     override fun onChatHeadClicked() {
         val destination = navigationDestinationUseCase.execute() ?: return
         when (destination) {
@@ -74,19 +55,10 @@ internal class ApplicationChatHeadLayoutController(
 
     override fun onDestroy() {
         chatHeadLayout?.hide()
-        gliaOnEngagementUseCase.unregisterListener(this)
-        gliaOnCallVisualizerUseCase.unregisterListener(this)
         messagesNotSeenHandler.removeListener { count: Int -> onUnreadMessageCountChange(count) }
-        onEngagementEndUseCase.unregisterListener(this)
-        onCallVisualizerEndUseCase.unregisterListener(this)
-        removeVisitorMediaStateListenerUseCase.execute(this)
     }
 
-    override fun onNewVisitorMediaState(visitorMediaState: VisitorMediaState?) {
-        // No-op
-    }
-
-    override fun onHoldChanged(isOnHold: Boolean) {
+    private fun onHoldChanged(isOnHold: Boolean) {
         this.isOnHold = isOnHold
         updateChatHeadView()
     }
@@ -102,12 +74,18 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     private fun init() {
-        gliaOnEngagementUseCase.execute(this)
-        gliaOnCallVisualizerUseCase(this)
-        messagesNotSeenHandler.addListener { count: Int -> onUnreadMessageCountChange(count) }
-        onEngagementEndUseCase.execute(this)
-        onCallVisualizerEndUseCase.execute(this)
-        addVisitorMediaStateListenerUseCase.execute(this)
+        messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
+        engagementStateUseCase()
+            .unSafeSubscribe {
+                when (it) {
+                    com.glia.widgets.engagement.State.FinishedCallVisualizer, com.glia.widgets.engagement.State.FinishedOmniCore -> engagementEnded()
+                    com.glia.widgets.engagement.State.StartedCallVisualizer, com.glia.widgets.engagement.State.StartedOmniCore -> onNewEngagementLoaded()
+                    else -> {
+                        //no-op
+                    }
+                }
+            }
+        visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
     }
 
     override fun onResume(viewName: String) {
@@ -134,17 +112,12 @@ internal class ApplicationChatHeadLayoutController(
         return resumedViewName != null && resumedViewName == viewName
     }
 
-    override fun engagementEnded() {
-        setPendingSurveyUseCase.invoke()
+    private fun engagementEnded() {
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0
         engagementDisposables.clear()
         updateChatHeadView()
-    }
-
-    override fun callVisualizerEngagementEnded() {
-        engagementEnded()
     }
 
     private fun onUnreadMessageCountChange(count: Int) {
@@ -185,19 +158,8 @@ internal class ApplicationChatHeadLayoutController(
 
     private fun onNewEngagementLoaded() {
         state = State.ENGAGEMENT
-        engagementDisposables.add(
-            getOperatorFlowableUseCase.execute()
-                .subscribe({ operatorDataLoaded(it) }) { Logger.e(TAG, "getOperatorFlowableUseCase error: " + it.message) }
-        )
+        engagementDisposables.add(currentOperatorUseCase().subscribe(::operatorDataLoaded))
         updateChatHeadView()
-    }
-
-    override fun newEngagementLoaded(engagement: OmnibrowseEngagement) {
-        onNewEngagementLoaded()
-    }
-
-    override fun newEngagementLoaded(engagement: OmnicoreEngagement?) {
-        onNewEngagementLoaded()
     }
 
     private enum class State {

@@ -22,10 +22,10 @@ import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.Unsent
-import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isValid
@@ -47,7 +47,7 @@ internal class ChatManager(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
-    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
@@ -101,7 +101,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit): Flowable<State> {
-        val historyEvent = if (isAuthenticatedUseCase() || isOngoingEngagementUseCase()) {
+        val historyEvent = if (isAuthenticatedUseCase() || hasOngoingEngagementUseCase()) {
             loadHistoryUseCase()
                 .doOnSuccess { historyLoaded.onNext(true) }
                 .zipWith(state.firstOrError(), ::mapChatHistory)
@@ -262,6 +262,7 @@ internal class ChatManager(
 
     @VisibleForTesting
     fun mapOperatorJoined(action: Action.OperatorJoined, state: State): State = state.apply {
+        chatItems -= OperatorStatusItem.Transferring
         chatItems += action.run {
             OperatorStatusItem.Joined(companyName, operatorFormattedName, operatorImageUrl)
         }
@@ -319,7 +320,7 @@ internal class ChatManager(
 
     /**
      * Returns the index where the new message should be placed.
-     * If engagement hasn't started yet, the message should placed before the operator status item.
+     * If engagement hasn't started yet, the message should be placed before the operator status item.
      * */
     private fun indexForMessageItem(chatItems: List<ChatItem>) =
         if (chatItems.lastOrNull() is OperatorStatusItem.InQueue) chatItems.lastIndex else chatItems.lastIndex + 1

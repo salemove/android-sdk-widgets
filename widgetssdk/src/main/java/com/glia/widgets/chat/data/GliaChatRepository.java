@@ -37,20 +37,12 @@ public class GliaChatRepository {
         gliaCore.getChatHistory(historyLoadedListener::loaded);
     }
 
-    public void listenForEngagementMessages(MessageListener listener, Engagement engagement) {
-        engagement.getChat().on(Chat.Events.MESSAGE, listener::onMessage);
-    }
-
     public void listenForAllMessages(Consumer<ChatMessage> listener) {
         gliaCore.on(Glia.Events.CHAT_MESSAGE, listener);
     }
 
     public void listenForOperatorTyping(OperatorTypingListener listener, Engagement engagement) {
         engagement.getChat().on(Chat.Events.OPERATOR_TYPING_STATUS, listener::onOperatorTyping);
-    }
-
-    public void unregisterEngagementMessageListener(MessageListener listener) {
-        gliaCore.getCurrentEngagement().ifPresent(engagement -> engagement.getChat().off(Chat.Events.MESSAGE, listener::onMessage));
     }
 
     public void unregisterAllMessageListener(Consumer<ChatMessage> listener) {

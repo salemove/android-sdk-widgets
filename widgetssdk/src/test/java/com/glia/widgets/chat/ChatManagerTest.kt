@@ -219,10 +219,13 @@ class ChatManagerTest {
     @Test
     fun `mapOperatorJoined adds OperatorStatusItem_Joined to chatItems when called`() {
         val action: ChatManager.Action.OperatorJoined = ChatManager.Action.OperatorJoined("", "", "")
-
+        subjectUnderTest.mapTransferring(state).apply {
+            assertTrue(chatItems.contains(OperatorStatusItem.Transferring))
+        }
         subjectUnderTest.mapOperatorJoined(action, state).apply {
             assertTrue(chatItems.count() == 1)
             assertTrue(chatItems.last() is OperatorStatusItem.Joined)
+            assertFalse(chatItems.contains(OperatorStatusItem.Transferring))
         }
     }
 

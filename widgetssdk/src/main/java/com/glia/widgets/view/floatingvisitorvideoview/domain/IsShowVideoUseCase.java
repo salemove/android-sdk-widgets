@@ -1,8 +1,8 @@
 package com.glia.widgets.view.floatingvisitorvideoview.domain;
 
 import com.glia.androidsdk.comms.Media;
+import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.Video;
-import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.helper.rx.Schedulers;
 
 import io.reactivex.Single;
@@ -14,13 +14,13 @@ public class IsShowVideoUseCase {
         this.schedulers = schedulers;
     }
 
-    public Single<Boolean> execute(VisitorMediaState visitorMediaState, boolean isOnHold) {
+    public Single<Boolean> execute(MediaState visitorMediaState, boolean isOnHold) {
         return Single.just(hasVideoAvailable(visitorMediaState, isOnHold))
                 .subscribeOn(schedulers.getComputationScheduler())
                 .observeOn(schedulers.getMainScheduler());
     }
 
-    private boolean hasVideoAvailable(VisitorMediaState visitorMediaState, boolean isOnHold) {
+    private boolean hasVideoAvailable(MediaState visitorMediaState, boolean isOnHold) {
         return visitorMediaState != null &&
                 visitorMediaState.getVideo() != null &&
                 isVideoFeedActiveStatus(visitorMediaState.getVideo(), isOnHold);

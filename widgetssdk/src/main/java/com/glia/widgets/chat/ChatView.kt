@@ -265,7 +265,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
         dialogController?.addCallback(dialogCallback)
         controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
-        serviceChatHeadController?.init()
     }
 
     /**
@@ -1049,7 +1048,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun chatEnded() {
-        Dependencies.getControllerFactory().destroyControllers()
+        Dependencies.destroyControllers()
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {

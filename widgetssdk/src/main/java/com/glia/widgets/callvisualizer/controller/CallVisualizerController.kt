@@ -1,115 +1,100 @@
 package com.glia.widgets.callvisualizer.controller
 
+import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
+import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.androidsdk.engagement.Survey
-import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
-import com.glia.widgets.callvisualizer.CallVisualizerCallback
-import com.glia.widgets.callvisualizer.CallVisualizerRepository
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
-import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCase
-import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.survey.OnSurveyListener
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
-import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.CurrentOperatorUseCase
+import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.EngagementRequestUseCase
+import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.State
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.formattedName
+import io.reactivex.Flowable
 
 internal class CallVisualizerController(
-    private val callVisualizerRepository: CallVisualizerRepository,
     private val dialogController: DialogController,
-    private val surveyUseCase: GliaSurveyUseCase,
-    private val onCallVisualizerUseCase: GliaOnCallVisualizerUseCase,
-    private val onCallVisualizerEndUseCase: GliaOnCallVisualizerEndUseCase,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
-    @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase
-) : CallVisualizerCallback,
-    GliaOnCallVisualizerUseCase.Listener,
-    GliaOnCallVisualizerEndUseCase.Listener,
-    OnSurveyListener {
+    @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase,
+    private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
+    private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
+    private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
+    private val engagementRequestUseCase: EngagementRequestUseCase,
+    private val currentOperatorUseCase: CurrentOperatorUseCase,
+    private val engagementStateUseCase: EngagementStateUseCase
+) {
 
-    private var engagementEndedCallback: (() -> Unit)? = null
-    private var startEngagementListener: ((OmnibrowseEngagement) -> Unit)? = null
+    val engagementStartFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.StartedCallVisualizer }
+    val engagementEndFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.FinishedCallVisualizer }
+
+    val acceptMediaUpgradeOfferResult = acceptMediaUpgradeOfferUseCase.result
+
+    private var visitorContextAssetId: String? = null
 
     fun init() {
         Logger.d(TAG, "CallVisualizerController initialized")
-        callVisualizerRepository.init(this)
         registerCallVisualizerListeners()
     }
 
+    @SuppressLint("CheckResult")
     private fun registerCallVisualizerListeners() {
-        onCallVisualizerUseCase(this) // newEngagementLoaded() callback
-        onCallVisualizerEndUseCase.execute(this) // engagementEnded callback
+        mediaUpgradeOfferUseCase().withLatestFrom(currentOperatorUseCase()) { offer, operator ->
+            offer to operator.formattedName
+        }.subscribe {
+            Logger.d(TAG, "upgradeOfferConsumer, offer: ${it.first}")
+            if (it.first.video == MediaDirection.TWO_WAY) {
+                onTwoWayMediaUpgradeRequest(it.first, it.second)
+            } else if (it.first.video == MediaDirection.ONE_WAY) {
+                onOneWayMediaUpgradeRequest(it.first, it.second)
+            }
+        }
+        engagementRequestUseCase().subscribe { onEngagementRequested() }
     }
 
-    override fun onOneWayMediaUpgradeRequest(
-        mediaUpgradeOffer: MediaUpgradeOffer,
-        operatorNameFormatted: String
-    ) {
+    fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer) {
+        acceptMediaUpgradeOfferUseCase(offer)
+    }
+
+    fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer) {
+        declineMediaUpgradeOfferUseCase(offer)
+    }
+
+    private fun onOneWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorNameFormatted: String) {
         dialogController.showUpgradeVideoDialog1Way(mediaUpgradeOffer, operatorNameFormatted)
     }
 
-    override fun onTwoWayMediaUpgradeRequest(
-        mediaUpgradeOffer: MediaUpgradeOffer,
-        operatorNameFormatted: String
-    ) {
+    private fun onTwoWayMediaUpgradeRequest(mediaUpgradeOffer: MediaUpgradeOffer, operatorNameFormatted: String) {
         dialogController.showUpgradeVideoDialog2Way(mediaUpgradeOffer, operatorNameFormatted)
     }
 
-    override fun onEngagementRequested() {
+    private fun onEngagementRequested() {
         dialogController.dismissVisitorCodeDialog()
 
         confirmationDialogUseCase { shouldShow ->
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
             } else {
-                callVisualizerRepository.acceptEngagementRequest()
+                engagementRequestUseCase.accept(visitorContextAssetId.orEmpty())
             }
         }
     }
 
-    override fun onEngagementConfirmationDialogAllowed() {
-        callVisualizerRepository.acceptEngagementRequest()
+    fun onEngagementConfirmationDialogAllowed() {
+        engagementRequestUseCase.accept(visitorContextAssetId.orEmpty())
     }
 
-    override fun onEngagementConfirmationDialogRejected() {
-        callVisualizerRepository.declineEngagementRequest()
+    fun onEngagementConfirmationDialogDeclined() {
+        engagementRequestUseCase.decline()
     }
 
-    override fun onSurveyLoaded(survey: Survey?) {
-        // Call Visualizer doesn't suppose to have a Survey,
-        // so just destroying controllers
-        surveyUseCase.unregisterListener(this)
-        Dependencies.getControllerFactory().destroyControllers()
-    }
-
-    override fun newEngagementLoaded(engagement: OmnibrowseEngagement) {
-        Logger.i(TAG, "New Call visualizer engagement loaded")
-        surveyUseCase.registerListener(this)
-        startEngagementListener?.invoke(engagement)
-    }
-
-    override fun callVisualizerEngagementEnded() {
-        engagementEndedCallback?.invoke()
-        // Beware, this function is called before onSurveyLoaded()
-        // No need to do anything currently
-    }
-
-    fun setOnEngagementEndedCallback(callback: () -> Unit) {
-        this.engagementEndedCallback = callback
-    }
-
-    fun setOnEngagementStartListener(callback: (OmnibrowseEngagement) -> Unit) {
-        startEngagementListener = callback
-    }
-
-    fun removeOnEngagementEndedCallback() {
-        this.engagementEndedCallback = null
-    }
-
-    fun removeOnEngagementStartListener() {
-        startEngagementListener = null
+    fun saveVisitorContextAssetId(visitorContextAssetId: String) {
+        this.visitorContextAssetId = visitorContextAssetId
     }
 }

@@ -94,9 +94,7 @@ internal class MessageCenterController(
     }
 
     private fun updateAllowFileSendState() {
-        siteInfoUseCase.execute { siteInfo: SiteInfo?, _ ->
-            onSiteInfoReceived(siteInfo)
-        }
+        siteInfoUseCase { siteInfo: SiteInfo?, _ -> onSiteInfoReceived(siteInfo) }
     }
 
     private fun onSiteInfoReceived(siteInfo: SiteInfo?) {
@@ -130,7 +128,6 @@ internal class MessageCenterController(
     fun handleSendMessageResult(gliaException: GliaException?) {
         if (gliaException == null) {
             view?.showConfirmationScreen()
-            serviceChatHeadController.init()
         } else {
             when (gliaException.cause) {
                 GliaException.Cause.AUTHENTICATION_ERROR -> {

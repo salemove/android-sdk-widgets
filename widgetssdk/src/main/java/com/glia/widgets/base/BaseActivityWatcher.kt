@@ -7,9 +7,9 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.lang.ref.WeakReference
 
-internal open class BaseActivityWatcher : Application.ActivityLifecycleCallbacks {
+internal open class BaseActivityWatcher : SimpleActivityLifecycleCallbacks() {
 
-    private val resumedActivities = object : ArrayList<WeakReference<Activity>>(1) {
+    private val _resumedActivities = object : ArrayList<WeakReference<Activity>>(1) {
         fun add(activity: Activity) {
             super.add(WeakReference(activity))
         }
@@ -36,22 +36,51 @@ internal open class BaseActivityWatcher : Application.ActivityLifecycleCallbacks
             return activityList
         }
     }
+    val resumedActivities: List<Activity> get() = _resumedActivities.getAll()
+
     private val resumedActivitySubject: PublishSubject<List<Activity>> = PublishSubject.create()
     val topActivityObserver: Observable<Activity> = resumedActivitySubject
         .filter { list -> list.isNotEmpty() }
         .map { list -> list.last() }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-    override fun onActivityStarted(activity: Activity) {}
     override fun onActivityResumed(activity: Activity) {
-        resumedActivities.add(activity)
-        resumedActivitySubject.onNext(resumedActivities.getAll())
+        _resumedActivities.add(activity)
+        resumedActivitySubject.onNext(_resumedActivities.getAll())
     }
+
     override fun onActivityPaused(activity: Activity) {
-        resumedActivities.remove(activity)
-        resumedActivitySubject.onNext(resumedActivities.getAll())
+        _resumedActivities.remove(activity)
+        resumedActivitySubject.onNext(_resumedActivities.getAll())
     }
-    override fun onActivityStopped(activity: Activity) {}
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-    override fun onActivityDestroyed(activity: Activity) {}
+}
+
+internal open class SimpleActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+
+    }
+
+    override fun onActivityStarted(activity: Activity) {
+
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+
+    }
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+
+    }
+
+    override fun onActivityDestroyed(activity: Activity) {
+
+    }
+
 }

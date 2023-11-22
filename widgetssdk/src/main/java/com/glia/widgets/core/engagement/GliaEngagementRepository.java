@@ -23,20 +23,19 @@ public class GliaEngagementRepository {
     }
 
     public void listenForEngagementEnd(OmnicoreEngagement engagement, Runnable engagementEnded) {
-        engagement.on(Engagement.Events.END, engagementEnded);
+//        engagement.on(Engagement.Events.END, engagementEnded);
     }
 
     public void listenForEngagementEnd(OmnibrowseEngagement engagement, Runnable engagementEnded) {
         engagement.on(Engagement.Events.END, engagementEnded);
     }
 
-    public void unregisterEngagementEndListener(Runnable engagementEnded) {
+    public void unregisterEngagementEndListener(@NonNull Runnable engagementEnded) {
         // Engagement#off(Event, Callback) does not support `null` callback
         if (engagementEnded == null) {
             return;
         }
-        gliaCore.getCurrentEngagement().ifPresent(
-                engagement -> engagement.off(Engagement.Events.END, engagementEnded));
+        gliaCore.getCurrentEngagement().ifPresent(engagement -> engagement.off(Engagement.Events.END, engagementEnded));
     }
 
     public void endEngagement() {

@@ -14,6 +14,8 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
+import com.glia.widgets.engagement.end.EndEngagementController;
+import com.glia.widgets.engagement.end.EndEngagementControllerImpl;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -50,6 +52,8 @@ public class ControllerFactory {
     private final FilePreviewController filePreviewController;
     private final ChatHeadPosition chatHeadPosition;
     private final ManagerFactory managerFactory;
+
+    private final EndEngagementController endEngagementController;
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
@@ -57,7 +61,6 @@ public class ControllerFactory {
     private CallVisualizerController callVisualizerController;
     private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
-
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
 
     public ControllerFactory(
@@ -86,6 +89,7 @@ public class ControllerFactory {
         this.chatHeadPosition = ChatHeadPosition.getInstance();
         this.sdkConfigurationManager = sdkConfigurationManager;
         this.managerFactory = managerFactory;
+        this.endEngagementController = new EndEngagementControllerImpl(repositoryFactory.getEngagementEndRepository());
     }
 
     public ChatController getChatController(ChatViewCallback chatViewCallback) {
@@ -252,6 +256,7 @@ public class ControllerFactory {
         getScreenSharingController().init();
         getActivityWatcherForChatHeadController().init();
         getActivityWatcherForLiveObservationController().init();
+        endEngagementController.initialize();
     }
 
     public FilePreviewController getImagePreviewController() {
@@ -401,5 +406,9 @@ public class ControllerFactory {
             );
         }
         return activityWatcherForLiveObservationController;
+    }
+
+    public EndEngagementController getEndEngagementController() {
+        return endEngagementController;
     }
 }

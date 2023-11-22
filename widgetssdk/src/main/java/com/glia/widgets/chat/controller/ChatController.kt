@@ -183,7 +183,6 @@ internal class ChatController(
 
     @Volatile
     private var isChatViewPaused = false
-    private var shouldHandleEndedEngagement = false
 
     // TODO pending photoCaptureFileUri - need to move some place better
     var photoCaptureFileUri: Uri? = null
@@ -299,7 +298,7 @@ internal class ChatController(
     fun onDestroy(retain: Boolean) {
         Logger.d(TAG, "onDestroy, retain:$retain")
         dialogController.dismissMessageCenterUnavailableDialog()
-        destroyView()
+//        destroyView()
 
         // viewCallback is accessed from multiple threads
         // and must be protected from race condition
@@ -316,7 +315,6 @@ internal class ChatController(
             engagementEndUseCase.unregisterListener(this)
             onOperatorTypingUseCase.unregisterListener()
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
-            shouldHandleEndedEngagement = false
             chatManager.reset()
         }
     }
@@ -478,24 +476,7 @@ internal class ChatController(
 
     fun onResume() {
         Logger.d(TAG, "onResume")
-        if (hasPendingSurveyUseCase.invoke()) {
-            shouldHandleEndedEngagement = true
-            surveyUseCase.registerListener(this)
-            return
-        }
-        if (shouldHandleEndedEngagement) {
-            // Engagement has been started
-            if (!isOngoingEngagementUseCase.invoke()) {
-                // Engagement has ended
-                surveyUseCase.registerListener(this)
-            } else {
-                // Engagement is ongoing
-                onResumeSetup()
-            }
-        } else {
-            // New session
-            onResumeSetup()
-        }
+        onResumeSetup()
     }
 
     private fun onResumeSetup() {
@@ -527,7 +508,6 @@ internal class ChatController(
             )
 
             EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CONNECTED -> {
-                shouldHandleEndedEngagement = true
                 onOperatorConnected(visitor.visit(engagementState))
             }
 
@@ -874,9 +854,8 @@ internal class ChatController(
                 Dependencies.getControllerFactory().destroyControllers()
             }
 
-            shouldHandleEndedEngagement && !isVisitorEndEngagement -> {
+            !isVisitorEndEngagement -> {
                 // Show "Engagement ended" pop-up
-                shouldHandleEndedEngagement = false
                 dialogController.showEngagementEndedDialog()
             }
 

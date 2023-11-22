@@ -21,6 +21,7 @@ import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.notification.device.INotificationManager;
 import com.glia.widgets.core.notification.device.NotificationManager;
 import com.glia.widgets.core.permissions.PermissionManager;
+import com.glia.widgets.engagement.end.ActivityWatcherForEngagementEnd;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
 import com.glia.widgets.helper.Logger;
@@ -40,14 +41,13 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static CallVisualizerManager callVisualizerManager;
-    private static GliaSdkConfigurationManager sdkConfigurationManager =
-            new GliaSdkConfigurationManager();
     private static UseCaseFactory useCaseFactory;
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
     private static ResourceProvider resourceProvider;
     private static StringProvider stringProvider;
     private static Schedulers schedulers;
+    private static GliaSdkConfigurationManager sdkConfigurationManager = new GliaSdkConfigurationManager();
 
     public static void onAppCreate(Application application) {
         schedulers = new GliaWidgetsSchedulers();
@@ -58,22 +58,22 @@ public class Dependencies {
         RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
 
         PermissionManager permissionManager = new PermissionManager(
-                application,
-                ContextCompat::checkSelfPermission,
-                repositoryFactory.getPermissionsRequestRepository(),
-                Build.VERSION.SDK_INT
+            application,
+            ContextCompat::checkSelfPermission,
+            repositoryFactory.getPermissionsRequestRepository(),
+            Build.VERSION.SDK_INT
         );
         AudioControlManager audioControlManager = new AudioControlManager(application);
         useCaseFactory = new UseCaseFactory(
-                repositoryFactory,
-                permissionManager,
-                new PermissionDialogManager(application),
-                notificationManager,
-                sdkConfigurationManager,
-                new ChatHeadManager(application),
-                audioControlManager,
-                schedulers,
-                gliaCore
+            repositoryFactory,
+            permissionManager,
+            new PermissionDialogManager(application),
+            notificationManager,
+            sdkConfigurationManager,
+            new ChatHeadManager(application),
+            audioControlManager,
+            schedulers,
+            gliaCore
         );
         initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase());
 
@@ -112,11 +112,11 @@ public class Dependencies {
             repositoryFactory.getCallVisualizerRepository(),
             repositoryFactory.getGliaEngagementRepository()
         );
-    }
 
-    @VisibleForTesting
-    public static void setSchedulers(Schedulers schedulers) {
-        Dependencies.schedulers = schedulers;
+        ActivityWatcherForEngagementEnd activityWatcherForEngagementEnd = new ActivityWatcherForEngagementEnd(
+            controllerFactory.getEndEngagementController()
+        );
+        application.registerActivityLifecycleCallbacks(activityWatcherForEngagementEnd);
     }
 
     public static Schedulers getSchedulers() {
@@ -124,16 +124,26 @@ public class Dependencies {
     }
 
     @VisibleForTesting
-    public static void setStringProvider(StringProvider sp) {
-        stringProvider = sp;
+    public static void setSchedulers(Schedulers schedulers) {
+        Dependencies.schedulers = schedulers;
     }
 
     public static StringProvider getStringProvider() {
         return stringProvider;
     }
 
+    @VisibleForTesting
+    public static void setStringProvider(StringProvider sp) {
+        stringProvider = sp;
+    }
+
     public static UseCaseFactory getUseCaseFactory() {
         return useCaseFactory;
+    }
+
+    @VisibleForTesting
+    public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
+        Dependencies.useCaseFactory = useCaseFactory;
     }
 
     @NonNull
@@ -169,11 +179,6 @@ public class Dependencies {
         Dependencies.controllerFactory = controllerFactory;
     }
 
-    @VisibleForTesting
-    public static void setUseCaseFactory(UseCaseFactory useCaseFactory) {
-        Dependencies.useCaseFactory = useCaseFactory;
-    }
-
     public static GliaCore glia() {
         return gliaCore;
     }
@@ -197,8 +202,8 @@ public class Dependencies {
     }
 
     private static void initApplicationLifecycleObserver(
-            ApplicationLifecycleManager lifecycleManager,
-            ServiceChatHeadController chatBubbleController
+        ApplicationLifecycleManager lifecycleManager,
+        ServiceChatHeadController chatBubbleController
     ) {
         lifecycleManager.addObserver((source, event) -> {
             if (event == Lifecycle.Event.ON_STOP) {
@@ -210,8 +215,8 @@ public class Dependencies {
     }
 
     private static void initAudioControlManager(
-            AudioControlManager audioControlManager,
-            OnAudioStartedUseCase onAudioStartedUseCase
+        AudioControlManager audioControlManager,
+        OnAudioStartedUseCase onAudioStartedUseCase
     ) {
         audioControlManager.init(onAudioStartedUseCase);
     }

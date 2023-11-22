@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.util.Pair;
 
-import com.glia.androidsdk.comms.VisitorMediaState;
+import com.glia.androidsdk.comms.MediaState;
 import com.glia.widgets.R;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.di.Dependencies;
@@ -43,7 +43,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     }
 
     @Override
-    public void show(VisitorMediaState state) {
+    public void show(MediaState state) {
         if (!floatingVisitorVideoView.hasVideo() && state != null) {
             floatingVisitorVideoView.showVisitorVideo(
                     state.getVideo().createVideoView(ContextExtensionsKt.asActivity(getContext()))
@@ -61,13 +61,11 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
     @Override
     public void onResume() {
         floatingVisitorVideoView.onResume();
-        controller.onResume();
     }
 
     @Override
     public void onPause() {
         floatingVisitorVideoView.onPause();
-        controller.onPause();
     }
 
     @Override
@@ -93,6 +91,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
         setController(Dependencies.getControllerFactory().getFloatingVisitorVideoController());
         controller.setView(this);
         setVisitorVideoContainerTouchListener();
+        hide();
     }
 
     @SuppressLint("ClickableViewAccessibility")

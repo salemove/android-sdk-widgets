@@ -1,41 +1,28 @@
 package com.glia.widgets.core.audio.domain
 
-import com.glia.androidsdk.comms.VisitorMediaState
-import com.glia.widgets.core.operator.GliaOperatorMediaRepository
-import com.glia.widgets.core.visitor.GliaVisitorMediaRepository
-import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener
-import io.reactivex.Observable
+import com.glia.androidsdk.comms.MediaState
+import com.glia.widgets.engagement.OperatorMediaUseCase
+import com.glia.widgets.engagement.VisitorMediaUseCase
+import com.glia.widgets.helper.hasAudio
+import io.reactivex.Flowable
 
-class OnAudioStartedUseCase(
-    private val operatorMediaRepository: GliaOperatorMediaRepository,
-    private val visitorMediaRepository: GliaVisitorMediaRepository
+internal class OnAudioStartedUseCase(
+    private val operatorMediaUseCase: OperatorMediaUseCase,
+    private val visitorMediaUseCase: VisitorMediaUseCase
 ) {
-    operator fun invoke(): Observable<Boolean> {
+    operator fun invoke(): Flowable<Boolean> {
         val array = arrayOf(
             operatorMediaObservable(),
             visitorMediaObservable()
         )
-        return Observable.combineLatest(array) {
+        return Flowable.combineLatest(array) {
             val isOperatorAudio = it[0] as Boolean
             val isVisitorAudio = it[1] as Boolean
             return@combineLatest isOperatorAudio || isVisitorAudio
-        }
-            .distinctUntilChanged()
+        }.distinctUntilChanged()
     }
 
-    private fun operatorMediaObservable() = Observable.create { observer ->
-        operatorMediaRepository.addMediaStateListener {
-            observer.onNext(it?.audio != null)
-        }
-    }
+    private fun operatorMediaObservable() = visitorMediaUseCase().map(MediaState::hasAudio)
 
-    private fun visitorMediaObservable() = Observable.create { observer ->
-        visitorMediaRepository.addVisitorMediaStateListener(object : VisitorMediaUpdatesListener {
-            override fun onNewVisitorMediaState(visitorMediaState: VisitorMediaState?) {
-                observer.onNext(visitorMediaState?.audio != null)
-            }
-
-            override fun onHoldChanged(isOnHold: Boolean) {}
-        })
-    }
+    private fun visitorMediaObservable() = operatorMediaUseCase().map(MediaState::hasAudio)
 }

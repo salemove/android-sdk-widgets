@@ -34,12 +34,10 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
     fun mapOperator(operator: Operator): LocalOperator = operator.run { LocalOperator(id, name, getOperatorImage(operator.imageUrl)) }
 
     @VisibleForTesting
-    fun getOperatorImage(imageUrl: String?): String? {
-        return if (isAlwaysUseDefaultOperatorPicture || imageUrl == null) {
-            operatorDefaultImageUrl
-        } else {
-            imageUrl
-        }
+    fun getOperatorImage(imageUrl: String?): String? = if (isAlwaysUseDefaultOperatorPicture || imageUrl == null) {
+        operatorDefaultImageUrl
+    } else {
+        imageUrl
     }
 
     @VisibleForTesting

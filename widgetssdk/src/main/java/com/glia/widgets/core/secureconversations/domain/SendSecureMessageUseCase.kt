@@ -4,11 +4,11 @@ import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.SendMessagePayload
-import com.glia.widgets.core.engagement.GliaEngagementRepository
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
 
 internal class SendSecureMessageUseCase(
     private val queueId: String,
@@ -16,11 +16,11 @@ internal class SendSecureMessageUseCase(
     private val secureConversationsRepository: SecureConversationsRepository,
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
     private val chatRepository: GliaChatRepository,
-    private val engagementRepository: GliaEngagementRepository
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase
 ) {
 
     private val hasOngoingEngagement: Boolean
-        get() = engagementRepository.hasOngoingEngagement()
+        get() = hasOngoingEngagementUseCase()
 
     operator fun invoke(
         callback: RequestCallback<VisitorMessage?>

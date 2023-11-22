@@ -1,7 +1,7 @@
 package com.glia.widgets.core.callvisualizer.domain
 
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository
+import com.glia.widgets.engagement.EngagementTypeUseCase
 
-class IsCallVisualizerScreenSharingUseCase(private val engagementTypeRepository: GliaEngagementTypeRepository) {
-    operator fun invoke(): Boolean = engagementTypeRepository.isCallVisualizerScreenSharing
+internal class IsCallVisualizerScreenSharingUseCase(private val engagementTypeUseCase: EngagementTypeUseCase) {
+    operator fun invoke(): Boolean = engagementTypeUseCase.isCallVisualizerScreenSharing
 }

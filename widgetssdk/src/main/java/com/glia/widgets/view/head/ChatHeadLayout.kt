@@ -29,8 +29,7 @@ class ChatHeadLayout @JvmOverloads constructor(
     attrs,
     defStyleAttr,
     defStyleRes
-),
-    ChatHeadLayoutContract.View {
+), ChatHeadLayoutContract.View {
     private var chatHeadController: ChatHeadLayoutContract.Controller by Delegates.notNull()
 
     private var navigationCallback: NavigationCallback? = null

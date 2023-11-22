@@ -70,7 +70,7 @@ class ChatHeadService : Service() {
 
     override fun attachBaseContext(newBase: Context) {
         /*Since a Service doesn't really have a theme, need to force style to avoid crashes in views attached with this context.
-        Otherwise this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.*/
+        Otherwise, this leads to exceptions like "You need to use a Theme.AppCompat theme (or descendant) with ShapeableImageView.*/
         super.attachBaseContext(ContextThemeWrapper(newBase, R.style.Application_Glia_Chat_Activity))
     }
 
@@ -82,7 +82,7 @@ class ChatHeadService : Service() {
         val layoutParams = layoutParams
         initChatHeadPosition(layoutParams, controller.chatHeadPosition)
         initChatHeadView(controller, windowManager, layoutParams)
-        controller.onSetChatHeadView(chatHeadView)
+        controller.onSetChatHeadView(chatHeadView!!)
         controller.updateChatHeadView()
         windowManager.addView(chatHeadView, layoutParams)
     }
@@ -130,7 +130,7 @@ class ChatHeadService : Service() {
 
     companion object {
         @JvmStatic
-        fun getIntent(context: Context?): Intent {
+        fun getIntent(context: Context): Intent {
             return Intent(context, ChatHeadService::class.java)
         }
     }

@@ -78,6 +78,12 @@
             android:noHistory="true"
             android:theme="@style/Application.Glia.Translucent.Activity" />
 
+        <activity
+            android:name=".view.dialog.holder.DialogHolderActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:theme="@style/Application.Glia.Translucent.Activity" />
+
         <service
             android:name=".core.chathead.ChatHeadService"
             android:enabled="true"

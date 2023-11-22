@@ -1,31 +1,31 @@
 package com.glia.widgets.core.queue.domain;
 
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.queue.domain.exception.EngagementOngoingException;
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
 import com.glia.widgets.helper.rx.Schedulers;
 
 import io.reactivex.Completable;
 
 public class GliaQueueForChatEngagementUseCase {
     private final Schedulers schedulers;
-    private final GliaEngagementRepository engagementRepository;
+    private final HasOngoingEngagementUseCase hasOngoingEngagementUseCase;
     private final GliaQueueRepository repository;
 
     public GliaQueueForChatEngagementUseCase(
-            Schedulers schedulers,
-            GliaQueueRepository repository,
-            GliaEngagementRepository engagementRepository
+        Schedulers schedulers,
+        GliaQueueRepository repository,
+        HasOngoingEngagementUseCase hasOngoingEngagementUseCase
     ) {
         this.repository = repository;
-        this.engagementRepository = engagementRepository;
+        this.hasOngoingEngagementUseCase = hasOngoingEngagementUseCase;
         this.schedulers = schedulers;
     }
 
     public Completable execute(String queueId, String  visitorContextAssetId) {
-        if (engagementRepository.hasOngoingEngagement()) {
+        if (hasOngoingEngagementUseCase.invoke()) {
             return Completable.error(new EngagementOngoingException());
         } else {
             return startQueueing(queueId, visitorContextAssetId);

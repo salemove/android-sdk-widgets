@@ -203,8 +203,7 @@ public class GliaWidgets {
      */
     public static void clearVisitorSession() {
         Logger.i(TAG, "Clear visitor session");
-        Dependencies.getControllerFactory().destroyControllers();
-        Dependencies.getUseCaseFactory().resetState();
+        Dependencies.destroyControllersAndResetEngagementData();
         Dependencies.glia().clearVisitorSession();
     }
 
@@ -215,12 +214,7 @@ public class GliaWidgets {
      */
     public static void endEngagement() {
         Logger.i(TAG, "End engagement by integrator");
-        Dependencies.getControllerFactory().destroyControllers();
-        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
-            if (e != null) {
-                Logger.e(TAG, "Ending engagement error: " + e);
-            }
-        }));
+        Dependencies.getUseCaseFactory().getEndEngagementUseCase().invoke(true);
     }
 
     /**
@@ -253,7 +247,7 @@ public class GliaWidgets {
     /**
      * Fetches the visitor's information
      * <p>
-     * If visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
+     * If a visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
      *
      * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#getVisitorInfo(RequestCallback)}
      */

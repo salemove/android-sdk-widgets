@@ -1,27 +1,22 @@
 package com.glia.widgets.filepreview.ui
 
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.PutImageFileToDownloadsUseCase
-import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.TAG
 import io.reactivex.disposables.CompositeDisposable
 
 internal class FilePreviewController @JvmOverloads constructor(
     private val getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase,
     private val getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase,
     private val putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase,
-    private val onEngagementEndUseCase: GliaOnEngagementEndUseCase,
     private var state: State = State(),
     private val disposables: CompositeDisposable = CompositeDisposable()
-) : FilePreviewContract.Controller, GliaOnEngagementEndUseCase.Listener {
+) : FilePreviewContract.Controller {
     private var view: FilePreviewContract.View? = null
 
     fun setView(view: FilePreviewContract.View) {
         this.view = view
         state.reset()
-        onEngagementEndUseCase.execute(this)
     }
 
     @Synchronized
@@ -63,11 +58,6 @@ internal class FilePreviewController @JvmOverloads constructor(
         )
     }
 
-    override fun engagementEnded() {
-        Logger.d(TAG, "engagementEndedByOperator")
-        view?.engagementEnded()
-    }
-
     private fun onRequestImageFromCache() {
         setState(state.loadingImageFromCache())
 
@@ -84,7 +74,6 @@ internal class FilePreviewController @JvmOverloads constructor(
 
     override fun onDestroy() {
         disposables.clear()
-        onEngagementEndUseCase.unregisterListener(this)
         state.reset()
     }
 }

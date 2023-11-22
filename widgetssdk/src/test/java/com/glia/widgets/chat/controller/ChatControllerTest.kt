@@ -17,8 +17,6 @@ import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
-import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
@@ -47,7 +45,6 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
@@ -202,7 +199,7 @@ class ChatControllerTest {
             isFromCallScreenUseCase = isFromCallScreenUseCase,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
             ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase,
-            isOngoingEngagementUseCase = isOngoingEngagementUseCase,
+            hasOngoingEngagementUseCase = isOngoingEngagementUseCase,
             isSecureEngagementUseCase = isSecureEngagementUseCase,
             engagementConfigUseCase = engagementConfigUseCase,
             addMediaUpgradeCallbackUseCase = addMediaUpgradeOfferCallbackUseCase,
@@ -211,7 +208,7 @@ class ChatControllerTest {
             isQueueingEngagementUseCase = isQueueingEngagementUseCase,
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
-            isCallVisualizerUseCase = isCallVisualizerUseCase,
+            isCurrentEngagementCallVisualizer = isCallVisualizerUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,

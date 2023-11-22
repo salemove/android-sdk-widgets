@@ -7,16 +7,16 @@ import com.glia.widgets.chat.data.GliaChatRepository
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
-import com.glia.widgets.core.engagement.GliaEngagementStateRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.engagement.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,
     private val fileAttachmentRepository: FileAttachmentRepository,
-    private val engagementStateRepository: GliaEngagementStateRepository,
+    private val isOperatorPresentUseCase: IsOperatorPresentUseCase,
     private val engagementConfigRepository: GliaEngagementConfigRepository,
     private val secureConversationsRepository: SecureConversationsRepository,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase
@@ -77,7 +77,7 @@ internal class GliaSendMessageUseCase(
     }
 
     private val isOperatorOnline: Boolean
-        get() = engagementStateRepository.isOperatorPresent
+        get() = isOperatorPresentUseCase()
 
     private fun canSendMessage(message: String, numOfAttachment: Int): Boolean {
         return message.isNotEmpty() || numOfAttachment > 0

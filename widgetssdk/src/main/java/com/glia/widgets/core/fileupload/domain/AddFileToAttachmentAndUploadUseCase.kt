@@ -3,16 +3,16 @@ package com.glia.widgets.core.fileupload.domain
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
-import com.glia.widgets.core.engagement.GliaEngagementRepository
 import com.glia.widgets.core.engagement.exception.EngagementMissingException
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.core.fileupload.model.FileAttachment
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
 
-class AddFileToAttachmentAndUploadUseCase(
-    private val gliaEngagementRepository: GliaEngagementRepository,
+internal class AddFileToAttachmentAndUploadUseCase(
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val engagementConfigRepository: GliaEngagementConfigRepository
 ) {
@@ -20,7 +20,7 @@ class AddFileToAttachmentAndUploadUseCase(
         get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
 
     private val hasNoOngoingEngagement: Boolean
-        get() = !gliaEngagementRepository.hasOngoingEngagement()
+        get() = !hasOngoingEngagementUseCase()
 
     private val isNotSecureEngagement: Boolean
         get() = engagementConfigRepository.chatType != ChatType.SECURE_MESSAGING

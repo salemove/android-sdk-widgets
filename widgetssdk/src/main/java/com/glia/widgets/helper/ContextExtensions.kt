@@ -10,6 +10,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
 import androidx.annotation.StyleRes
+import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
@@ -47,3 +48,9 @@ internal fun Context.showToast(
 
 internal val Activity.rootView: View
     get() = findViewById(android.R.id.content) ?: window.decorView.findViewById(android.R.id.content)
+
+internal val Activity.qualifiedName: String
+    get() = this::class.qualifiedName!!
+
+internal val Activity.isGlia: Boolean
+    get() = qualifiedName.startsWith(BuildConfig.LIBRARY_PACKAGE_NAME)

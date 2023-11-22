@@ -1,39 +1,31 @@
 package com.glia.widgets.core.callvisualizer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.glia.androidsdk.GliaException;
 import androidx.annotation.NonNull;
 
-import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
-import com.glia.widgets.callvisualizer.CallVisualizerRepository;
-import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
+import com.glia.androidsdk.GliaException;
+import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
+import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.view.VisitorCodeView;
 
 public class CallVisualizerManager implements CallVisualizer {
 
-    private final CallVisualizerRepository callVisualizerRepository;
     private final VisitorCodeViewBuilderUseCase buildVisitorCodeUseCase;
-    private final GliaEngagementRepository engagementRepository;
-    private Runnable onEngagementStartRunnable;
-    private Runnable onEngagementEndRunnable;
-    private boolean isListeningForEngagement = false;
+    private final CallVisualizerController callVisualizerController;
     public static final String TAG = CallVisualizer.class.getSimpleName();
-
     public GliaSdkConfiguration configuration;
 
     public CallVisualizerManager(
-            VisitorCodeViewBuilderUseCase buildVisitorCodeUseCase,
-            CallVisualizerRepository callVisualizerRepository,
-            GliaEngagementRepository engagementRepository
+        VisitorCodeViewBuilderUseCase buildVisitorCodeUseCase,
+        CallVisualizerController callVisualizerController
     ) {
         this.buildVisitorCodeUseCase = buildVisitorCodeUseCase;
-        this.callVisualizerRepository = callVisualizerRepository;
-        this.engagementRepository = engagementRepository;
+        this.callVisualizerController = callVisualizerController;
     }
 
     private void checkForProperInit() {
@@ -45,53 +37,31 @@ public class CallVisualizerManager implements CallVisualizer {
     @Override
     public VisitorCodeView createVisitorCodeView(Context context) {
         checkForProperInit();
-        startListeningForEngagements();
         return buildVisitorCodeUseCase.invoke(context, false);
     }
 
     @Override
     public void showVisitorCodeDialog(Context context) {
         checkForProperInit();
-        startListeningForEngagements();
         Dependencies.getControllerFactory().getDialogController().showVisitorCodeDialog();
     }
 
     @Override
     public void addVisitorContext(String visitorContext) {
-        callVisualizerRepository.addVisitorContext(visitorContext);
+        callVisualizerController.saveVisitorContextAssetId(visitorContext);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void onEngagementStart(@NonNull Runnable runnable) {
-        onEngagementStartRunnable = runnable;
-    }
-
-    @Override
-    public void onEngagementEnd(Runnable runnable) {
-        onEngagementEndRunnable = runnable;
-    }
-
-    private void startListeningForEngagements() {
-        // Can't start Core SDK listener on this class init/construction because this class is initialized
-        // on `Application.onCreate()` before the Glia Core SDK is initialised.
-        if (isListeningForEngagement) return;
-        isListeningForEngagement = true;
-        // Subscribe only once because otherwise need to add method to unsubscribe
-        engagementRepository.listenForCallVisualizerEngagement((engagement) -> {
-            if (onEngagementStartRunnable != null) {
-                onEngagementStartRunnable.run();
-            }
-
-            startListeningForEngagementEnd(engagement);
+        callVisualizerController.getEngagementStartFlow().subscribe(ignore -> runnable.run(), ignore -> {
         });
     }
 
-    private void startListeningForEngagementEnd(OmnibrowseEngagement engagement) {
-        engagementRepository.listenForEngagementEnd(engagement, () -> {
-            if (onEngagementEndRunnable != null) {
-                onEngagementEndRunnable.run();
-                engagementRepository.unregisterEngagementEndListener(onEngagementEndRunnable);
-            }
+    @SuppressLint("CheckResult")
+    @Override
+    public void onEngagementEnd(Runnable runnable) {
+        callVisualizerController.getEngagementEndFlow().subscribe(ignore -> runnable.run(), ignore -> {
         });
     }
 }

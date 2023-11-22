@@ -1,0 +1,369 @@
+package com.glia.widgets.engagement
+
+import android.annotation.SuppressLint
+import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Glia
+import com.glia.androidsdk.IncomingEngagementRequest
+import com.glia.androidsdk.Operator
+import com.glia.androidsdk.chat.Chat
+import com.glia.androidsdk.chat.OperatorTypingStatus
+import com.glia.androidsdk.comms.Media
+import com.glia.androidsdk.comms.MediaState
+import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.comms.OperatorMediaState
+import com.glia.androidsdk.comms.VisitorMediaState
+import com.glia.androidsdk.engagement.EngagementState
+import com.glia.androidsdk.omnibrowse.Omnibrowse
+import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
+import com.glia.androidsdk.omnicore.OmnicoreEngagement
+import com.glia.widgets.core.engagement.GliaOperatorRepository
+import com.glia.widgets.core.queue.GliaQueueRepository
+import com.glia.widgets.di.GliaCore
+import com.glia.widgets.helper.Data
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.view.unifiedui.unsafeMerge
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.processors.BehaviorProcessor
+import io.reactivex.processors.PublishProcessor
+import java.util.function.Consumer
+
+private const val TAG = "EngagementRepository"
+
+internal class EngagementRepositoryImpl(
+    private val core: GliaCore,
+    private val queueRepository: GliaQueueRepository,
+    private val operatorRepository: GliaOperatorRepository
+) : EngagementRepository {
+    private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
+
+    private val omniCoreEngagementCallback = Consumer<OmnicoreEngagement>(::handleOmniCoreEngagement)
+    private val callVisualizerEngagementCallback = Consumer<OmnibrowseEngagement>(::handleCallVisualizerEngagement)
+    private val engagementStateCallback: Consumer<EngagementState> = Consumer(::handleEngagementState)
+    private val engagementEndCallback: Runnable = Runnable(::handleEngagementEnd)
+
+    private var currentEngagement: Engagement? = null
+
+    private val _engagementRequest: BehaviorProcessor<IncomingEngagementRequest> = BehaviorProcessor.create()
+    override val engagementRequest: Flowable<IncomingEngagementRequest> = _engagementRequest.onBackpressureLatest()
+
+    private val _engagementState: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State.NoEngagement)
+    override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer()
+
+    private val _survey: PublishProcessor<SurveyState> = PublishProcessor.create()
+    override val survey: Flowable<SurveyState> = _survey
+
+    private val _currentOperator: BehaviorProcessor<Data<Operator>> = BehaviorProcessor.createDefault(Data.Empty)
+    override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest()
+    private val currentOperatorValue: Operator? get() = with(_currentOperator.value as? Data.Value) { this?.result }
+    override val isOperatorPresent: Boolean get() = currentOperatorValue != null
+
+    //--Media--
+    private val mediaUpgradeOfferCallback: Consumer<MediaUpgradeOffer> = Consumer(::handleMediaUpgradeOffer)
+    private val operatorMediaStateUpdateCallback: Consumer<OperatorMediaState> = Consumer(::handleOperatorMediaStateUpdate)
+    private val visitorMediaStateUpdateCallback: Consumer<VisitorMediaState> = Consumer(::handleVisitorMediaStateUpdate)
+
+    private val _mediaUpgradeOffer: PublishProcessor<MediaUpgradeOffer> = PublishProcessor.create()
+    override val mediaUpgradeOffer: Flowable<MediaUpgradeOffer> = _mediaUpgradeOffer.onBackpressureLatest()
+
+    private val _mediaUpgradeOfferResult: PublishProcessor<Result<MediaUpgradeOffer>> = PublishProcessor.create()
+    override val mediaUpgradeOfferAcceptResult: Flowable<Result<MediaUpgradeOffer>> = _mediaUpgradeOfferResult.onBackpressureLatest()
+
+    private val _visitorMediaState: BehaviorProcessor<Data<MediaState>> = BehaviorProcessor.createDefault(Data.Empty)
+    override val visitorMediaState: Flowable<Data<MediaState>> = _visitorMediaState
+    override val visitorCurrentMediaState: MediaState? get() = _visitorMediaState.value?.let { it as? Data.Value }?.result
+
+    private val _onHoldState: BehaviorProcessor<Boolean> = BehaviorProcessor.create()
+    override val onHoldState: Flowable<Boolean> = _onHoldState
+
+    private val _operatorMediaState: BehaviorProcessor<Data<MediaState>> = BehaviorProcessor.createDefault(Data.Empty)
+    override val operatorMediaState: Flowable<Data<MediaState>> = _operatorMediaState
+    override val operatorCurrentMediaState: MediaState? get() = _operatorMediaState.value?.let { it as? Data.Value }?.result
+
+    //--Chat--
+    private val operatorTypingCallback: Consumer<OperatorTypingStatus> = Consumer(::handleOperatorTypingStatus)
+
+    private val _operatorTypingStatus: PublishProcessor<Boolean> = PublishProcessor.create()
+    override val operatorTypingStatus: Flowable<Boolean> = _operatorTypingStatus.distinctUntilChanged()
+
+    override val hasOngoingEngagement: Boolean
+        get() = currentEngagement != null
+
+    override val isCallVisualizerEngagement: Boolean
+        get() = currentEngagement is OmnibrowseEngagement
+
+    override fun initialize() {
+        core.on(Glia.Events.ENGAGEMENT, omniCoreEngagementCallback)
+        core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT, callVisualizerEngagementCallback)
+        core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST, engagementRequestCallback)
+    }
+
+    override fun reset() {
+        _survey.onNext(SurveyState.Empty)
+        _engagementState.onNext(State.NoEngagement)
+        currentEngagement?.also(::unsubscribeFromEngagementEvents)
+        currentEngagement?.media?.also(::unsubscribeFromEngagementMediaEvents)
+        currentEngagement?.chat?.also(::unsubscribeFromEngagementChatEvents)
+        _operatorMediaState.onNext(Data.Empty)
+        _visitorMediaState.onNext(Data.Empty)
+        _currentOperator.onNext(Data.Empty)
+    }
+
+    override fun endEngagement(silently: Boolean) {
+        currentEngagement?.also {
+            currentEngagement = null
+            Logger.i(TAG, "Engagement ended locally, silently:$silently")
+            unsubscribeFromEngagementEvents(it)
+            unsubscribeFromEngagementMediaEvents(it.media)
+            unsubscribeFromEngagementChatEvents(it.chat)
+            notifyEngagementEnded(it)
+            it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
+            if (silently || it is OmnibrowseEngagement) {
+                _survey.onNext(SurveyState.Empty)
+            } else {
+                fetchSurvey(it, false)
+            }
+            _operatorMediaState.onNext(Data.Empty)
+            _visitorMediaState.onNext(Data.Empty)
+            _currentOperator.onNext(Data.Empty)
+        }
+    }
+
+    override fun acceptCurrentEngagementRequest(visitorContextAssetId: String) {
+        _engagementRequest.firstOrError().flatMapCompletable { accept(it, visitorContextAssetId) }.unsafeMerge({
+            Logger.i(TAG, "Incoming Call Visualizer engagement was accepted")
+        })
+    }
+
+    private fun accept(request: IncomingEngagementRequest, visitorContextAssetId: String): Completable = Completable.create { emitter ->
+        request.accept(visitorContextAssetId) { ex ->
+            if (ex == null) {
+                emitter.onComplete()
+            } else {
+                emitter.onError(ex)
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    override fun declineCurrentEngagementRequest() {
+        _engagementRequest.firstOrError().flatMapCompletable(::decline).subscribe({
+            Logger.i(TAG, "Incoming Call Visualizer engagement was declined")
+        }, {
+            Logger.e(TAG, "Error during declining engagement request, reason" + it.message)
+        })
+    }
+
+    private fun decline(request: IncomingEngagementRequest): Completable = Completable.create { emitter ->
+        request.decline { ex ->
+            if (ex == null) {
+                emitter.onComplete()
+            } else {
+                emitter.onError(ex)
+            }
+        }
+    }
+
+    override fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer) {
+        offer.accept {
+            if (it == null) {
+                Logger.d(TAG, "Media upgrade offer successfully accepted")
+                _mediaUpgradeOfferResult.onNext(Result.success(offer))
+            } else {
+                Logger.d(TAG, "Failed to accept media upgrade offer")
+                _mediaUpgradeOfferResult.onNext(Result.failure(it))
+            }
+        }
+    }
+
+    override fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer) {
+        offer.decline {
+            if (it == null) {
+                Logger.d(TAG, "Media upgrade offer successfully declined")
+            } else {
+                Logger.d(TAG, "Failed to decline media upgrade offer")
+            }
+        }
+    }
+
+    private fun fetchSurvey(engagement: Engagement, isOperator: Boolean) {
+        engagement.getSurvey { survey, _ ->
+            when {
+                survey != null -> {
+                    Logger.i(TAG, "Survey loaded")
+                    _survey.onNext(SurveyState.Value(survey))
+                }
+
+                isOperator -> _survey.onNext(SurveyState.EmptyFromOperatorRequest)
+                else -> _survey.onNext(SurveyState.Empty)
+            }
+        }
+    }
+
+    private fun handleIncomingEngagementRequest(engagementRequest: IncomingEngagementRequest) {
+        _engagementRequest.onNext(engagementRequest)
+    }
+
+    private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
+        Logger.i(TAG, "Omnicore Engagement started")
+        currentEngagement = engagement
+        operatorRepository.emit(engagement.state.operator)
+        _engagementState.onNext(State.StartedOmniCore)
+        queueRepository.onEngagementStarted()
+
+        subscribeToEngagementEvents(engagement)
+        subscribeToEngagementMediaEvents(engagement.media)
+        subscribeToEngagementChatEvents(engagement.chat)
+    }
+
+    private fun handleCallVisualizerEngagement(engagement: OmnibrowseEngagement) {
+        Logger.i(TAG, "Call Visualizer Engagement started")
+        currentEngagement = engagement
+        operatorRepository.emit(engagement.state.operator)
+        _engagementState.onNext(State.StartedCallVisualizer)
+        queueRepository.onEngagementStarted()
+
+        subscribeToEngagementEvents(engagement)
+        subscribeToEngagementMediaEvents(engagement.media)
+        //No need for chat events here
+    }
+
+    private fun subscribeToEngagementEvents(engagement: Engagement) {
+        engagement.on(Engagement.Events.END, engagementEndCallback)
+        engagement.on(Engagement.Events.STATE_UPDATE, engagementStateCallback)
+    }
+
+    private fun unsubscribeFromEngagementEvents(engagement: Engagement) {
+        engagement.off(Engagement.Events.END, engagementEndCallback)
+        engagement.off(Engagement.Events.STATE_UPDATE, engagementStateCallback)
+    }
+
+    private fun subscribeToEngagementMediaEvents(media: Media) {
+        media.on(Media.Events.MEDIA_UPGRADE_OFFER, mediaUpgradeOfferCallback)
+        media.on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateUpdateCallback)
+        media.on(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateUpdateCallback)
+    }
+
+    private fun unsubscribeFromEngagementMediaEvents(media: Media) {
+        media.off(Media.Events.MEDIA_UPGRADE_OFFER, mediaUpgradeOfferCallback)
+        media.off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateUpdateCallback)
+        media.off(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateUpdateCallback)
+    }
+
+    private fun subscribeToEngagementChatEvents(chat: Chat) {
+        chat.on(Chat.Events.OPERATOR_TYPING_STATUS, operatorTypingCallback)
+    }
+
+    private fun unsubscribeFromEngagementChatEvents(chat: Chat) {
+        chat.off(Chat.Events.OPERATOR_TYPING_STATUS, operatorTypingCallback)
+    }
+
+    private fun handleEngagementState(state: EngagementState) {
+        operatorRepository.emit(state.operator)
+
+        val updateState = when {
+            state.visitorStatus == EngagementState.VisitorStatus.TRANSFERRING -> {
+                Logger.i(TAG, "Transfer engagement")
+                EngagementUpdateState.Transferring
+            }
+
+            !isOperatorPresent -> {
+                Logger.i(TAG, "Operator connected")
+                EngagementUpdateState.OperatorConnected(state.operator)
+            }
+
+            currentOperatorValue?.id != state.operator.id -> {
+                Logger.i(TAG, "Operator changed")
+                EngagementUpdateState.OperatorChanged(state.operator)
+            }
+
+            else -> EngagementUpdateState.Ongoing(state.operator)
+        }
+        _currentOperator.onNext(Data.Value(state.operator))
+
+        _engagementState.onNext(State.Update(state, updateState))
+    }
+
+    private fun handleEngagementEnd() {
+        Logger.i(TAG, "Engagement ended by Operator")
+        currentEngagement?.also {
+            currentEngagement = null
+            notifyEngagementEnded(it)
+            fetchSurvey(it as? OmnicoreEngagement ?: return, true)
+            _operatorMediaState.onNext(Data.Empty)
+            _visitorMediaState.onNext(Data.Empty)
+            _currentOperator.onNext(Data.Empty)
+        }
+    }
+
+    private fun notifyEngagementEnded(engagement: Engagement) {
+        val state = if (engagement is OmnibrowseEngagement)
+            State.FinishedCallVisualizer
+        else
+            State.FinishedOmniCore
+
+        _engagementState.onNext(state)
+    }
+
+    //--Media
+    private fun handleMediaUpgradeOffer(mediaUpgradeOffer: MediaUpgradeOffer) {
+        _mediaUpgradeOffer.onNext(mediaUpgradeOffer)
+    }
+
+    private fun handleOperatorMediaStateUpdate(operatorMediaState: OperatorMediaState) {
+        _operatorMediaState.onNext(Data.Value(operatorMediaState))
+    }
+
+    private fun handleVisitorMediaStateUpdate(visitorMediaState: VisitorMediaState) {
+        _visitorMediaState.onNext(Data.Value(visitorMediaState))
+        subscribeToOnHoldChanges(visitorMediaState)
+    }
+
+    private fun subscribeToOnHoldChanges(mediaState: MediaState) {
+        mediaState.audio?.setOnHoldHandler(::onAudioHoldStateChanged)
+        mediaState.video?.setOnHoldHandler(::onVideoHoldStateChanged)
+    }
+
+    private fun onAudioHoldStateChanged(onHold: Boolean) {
+        updateOnHoldStateIfChanged(onHold)
+    }
+
+    private fun onVideoHoldStateChanged(onHold: Boolean) {
+        updateOnHoldStateIfChanged(onHold)
+    }
+
+    private fun updateOnHoldStateIfChanged(onHold: Boolean) {
+        if (_onHoldState.value == onHold) return
+        _onHoldState.onNext(onHold)
+    }
+
+    override fun muteVisitorAudio() {
+        val mediaState = visitorCurrentMediaState ?: return
+        mediaState.audio?.mute() ?: return
+        _visitorMediaState.onNext(Data.Value(mediaState))
+    }
+
+    override fun unMuteVisitorAudio() {
+        val mediaState = visitorCurrentMediaState ?: return
+        mediaState.audio?.unmute() ?: return
+        _visitorMediaState.onNext(Data.Value(mediaState))
+    }
+
+    override fun pauseVisitorVideo() {
+        val mediaState = visitorCurrentMediaState ?: return
+        mediaState.video?.pause() ?: return
+        _visitorMediaState.onNext(Data.Value(mediaState))
+    }
+
+    override fun resumeVisitorVideo() {
+        val mediaState = visitorCurrentMediaState ?: return
+        mediaState.video?.resume() ?: return
+        _visitorMediaState.onNext(Data.Value(mediaState))
+    }
+
+    //--Chat--
+    private fun handleOperatorTypingStatus(operatorTypingStatus: OperatorTypingStatus) {
+        _operatorTypingStatus.onNext(operatorTypingStatus.isTyping)
+    }
+
+}

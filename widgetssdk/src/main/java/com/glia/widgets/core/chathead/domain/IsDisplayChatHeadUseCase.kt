@@ -4,22 +4,24 @@ import com.glia.widgets.call.CallView
 import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
-import com.glia.widgets.core.engagement.GliaEngagementRepository
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository
 import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.core.queue.GliaQueueRepository
 import com.glia.widgets.core.queue.model.GliaQueueingState
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
+import com.glia.widgets.engagement.EngagementTypeUseCase
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
 import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayChatHeadUseCase(
-    val engagementRepository: GliaEngagementRepository,
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
+    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer,
     private val queueRepository: GliaQueueRepository,
     private val screenSharingRepository: GliaScreenSharingRepository,
     val permissionManager: PermissionManager,
     private val configurationManager: GliaSdkConfigurationManager,
-    private val engagementTypeRepository: GliaEngagementTypeRepository
+    private val engagementTypeUseCase: EngagementTypeUseCase
 ) {
 
     abstract fun isDisplayBasedOnPermission(): Boolean
@@ -38,8 +40,7 @@ internal abstract class IsDisplayChatHeadUseCase(
     }
 
     private fun isCallVisualizerScreenSharing(viewName: String?): Boolean {
-        return engagementRepository.isCallVisualizerEngagement &&
-            screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
+        return isCurrentEngagementCallVisualizer() && screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
     }
 
     private fun isShowForMediaEngagement(viewName: String?): Boolean {
@@ -75,7 +76,7 @@ internal abstract class IsDisplayChatHeadUseCase(
     }
 
     private fun isMediaEngagementOngoing(): Boolean {
-        return engagementRepository.hasOngoingEngagement() && engagementTypeRepository.isMediaEngagement
+        return hasOngoingEngagementUseCase() && engagementTypeUseCase.isMediaEngagement
     }
 
     private fun isChatQueueingOngoing(): Boolean {
@@ -83,6 +84,6 @@ internal abstract class IsDisplayChatHeadUseCase(
     }
 
     private fun isChatEngagementOngoing(): Boolean {
-        return engagementRepository.hasOngoingEngagement() && engagementTypeRepository.isChatEngagement
+        return hasOngoingEngagementUseCase() && engagementTypeUseCase.isChatEngagement
     }
 }

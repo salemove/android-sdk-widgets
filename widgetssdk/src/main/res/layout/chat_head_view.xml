@@ -27,6 +27,9 @@
         android:elevation="@dimen/glia_small"
         android:scaleType="fitCenter"
         app:contentPadding="18dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:srcCompat="@drawable/ic_person"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"
@@ -45,6 +48,7 @@
         android:elevation="@dimen/glia_small"
         android:scaleType="fitCenter"
         app:contentPadding="@dimen/glia_chat_head_content_padding"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/profile_picture_view"
         app:layout_constraintEnd_toEndOf="@id/profile_picture_view"
         app:layout_constraintStart_toStartOf="@id/profile_picture_view"
@@ -68,7 +72,7 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/chat_typing_indicator"
-        tools:visibility="gone" />
+        tools:visibility="visible" />
 
     <com.glia.widgets.view.head.BadgeTextView
         android:id="@+id/chat_bubble_badge"

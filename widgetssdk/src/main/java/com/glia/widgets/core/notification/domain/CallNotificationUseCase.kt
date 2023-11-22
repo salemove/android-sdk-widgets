@@ -1,16 +1,15 @@
 package com.glia.widgets.core.notification.domain
 
 import com.glia.androidsdk.comms.MediaDirection
-import com.glia.androidsdk.comms.OperatorMediaState
-import com.glia.androidsdk.comms.VisitorMediaState
+import com.glia.androidsdk.comms.MediaState
 import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
-internal class CallNotificationUseCase(
+class CallNotificationUseCase(
     private val notificationManager: INotificationManager
 ) {
-    operator fun invoke(visitorMedia: VisitorMediaState? = null, operatorMedia: OperatorMediaState? = null) {
+    operator fun invoke(visitorMedia: MediaState? = null, operatorMedia: MediaState? = null) {
         val audio: MediaDirection
         val video: MediaDirection
         try {
@@ -39,7 +38,7 @@ internal class CallNotificationUseCase(
         invoke(null, null)
     }
 
-    private fun getVideoDirection(visitorMedia: VisitorMediaState?, operatorMedia: OperatorMediaState?): MediaDirection {
+    private fun getVideoDirection(visitorMedia: MediaState?, operatorMedia: MediaState?): MediaDirection {
         if (operatorMedia?.video == null && visitorMedia?.video == null) {
             return MediaDirection.NONE
         }
@@ -52,7 +51,7 @@ internal class CallNotificationUseCase(
         return MediaDirection.TWO_WAY
     }
 
-    private fun getAudioDirection(visitorMedia: VisitorMediaState?, operatorMedia: OperatorMediaState?): MediaDirection {
+    private fun getAudioDirection(visitorMedia: MediaState?, operatorMedia: MediaState?): MediaDirection {
         if (operatorMedia?.audio == null && visitorMedia?.audio == null) {
             return MediaDirection.NONE
         }

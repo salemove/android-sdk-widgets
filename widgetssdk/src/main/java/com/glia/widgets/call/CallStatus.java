@@ -2,8 +2,7 @@ package com.glia.widgets.call;
 
 import androidx.annotation.NonNull;
 
-import com.glia.androidsdk.comms.OperatorMediaState;
-import com.glia.androidsdk.comms.VisitorMediaState;
+import com.glia.androidsdk.comms.MediaState;
 
 import java.util.Objects;
 
@@ -24,16 +23,16 @@ public interface CallStatus {
      */
     String getTime();
 
-    OperatorMediaState getOperatorMediaState();
+    MediaState getOperatorMediaState();
 
-    VisitorMediaState getVisitorMediaState();
+    MediaState getVisitorMediaState();
 
-    void setVisitorMediaState(VisitorMediaState visitorMediaState);
+    void setVisitorMediaState(MediaState visitorMediaState);
 
     class EngagementNotOngoing implements CallStatus {
-        private VisitorMediaState visitorMediaState;
+        private MediaState visitorMediaState;
 
-        public EngagementNotOngoing(VisitorMediaState visitorMediaState) {
+        public EngagementNotOngoing(MediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 
@@ -53,17 +52,17 @@ public interface CallStatus {
         }
 
         @Override
-        public OperatorMediaState getOperatorMediaState() {
+        public MediaState getOperatorMediaState() {
             return null;
         }
 
         @Override
-        public VisitorMediaState getVisitorMediaState() {
+        public MediaState getVisitorMediaState() {
             return this.visitorMediaState;
         }
 
         @Override
-        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+        public void setVisitorMediaState(MediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 
@@ -93,13 +92,13 @@ public interface CallStatus {
         private final String formattedOperatorName;
         private final String time;
         private final String operatorProfileImgUrl;
-        private VisitorMediaState visitorMediaState;
+        private MediaState visitorMediaState;
 
         public EngagementOngoingOperatorIsConnecting(
                 String formattedOperatorName,
                 String time,
                 String operatorProfileImgUrl,
-                VisitorMediaState visitorMediaState
+                MediaState visitorMediaState
         ) {
             this.formattedOperatorName = formattedOperatorName;
             this.time = time;
@@ -123,17 +122,17 @@ public interface CallStatus {
         }
 
         @Override
-        public OperatorMediaState getOperatorMediaState() {
+        public MediaState getOperatorMediaState() {
             return null;
         }
 
         @Override
-        public VisitorMediaState getVisitorMediaState() {
+        public MediaState getVisitorMediaState() {
             return visitorMediaState;
         }
 
         @Override
-        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+        public void setVisitorMediaState(MediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 
@@ -169,15 +168,15 @@ public interface CallStatus {
         private final String formattedOperatorName;
         private final String time;
         private final String operatorProfileImgUrl;
-        private final OperatorMediaState operatorMediaState;
-        private VisitorMediaState visitorMediaState;
+        private final MediaState operatorMediaState;
+        private MediaState visitorMediaState;
 
         public EngagementOngoingAudioCallStarted(
                 String formattedOperatorName,
                 String time,
                 String operatorProfileImgUrl,
-                OperatorMediaState operatorMediaState,
-                VisitorMediaState visitorMediaState
+                MediaState operatorMediaState,
+                MediaState visitorMediaState
         ) {
             this.formattedOperatorName = formattedOperatorName;
             this.time = time;
@@ -202,17 +201,17 @@ public interface CallStatus {
         }
 
         @Override
-        public OperatorMediaState getOperatorMediaState() {
+        public MediaState getOperatorMediaState() {
             return operatorMediaState;
         }
 
         @Override
-        public VisitorMediaState getVisitorMediaState() {
+        public MediaState getVisitorMediaState() {
             return visitorMediaState;
         }
 
         @Override
-        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+        public void setVisitorMediaState(MediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 
@@ -250,15 +249,15 @@ public interface CallStatus {
         private final String formattedOperatorName;
         private final String time;
         private final String operatorProfileImgUrl;
-        private final OperatorMediaState operatorMediaState;
-        private VisitorMediaState visitorMediaState;
+        private final MediaState operatorMediaState;
+        private MediaState visitorMediaState;
 
         public EngagementOngoingVideoCallStarted(
                 String formattedOperatorName,
                 String time,
                 String operatorProfileImgUrl,
-                OperatorMediaState operatorMediaState,
-                VisitorMediaState visitorMediaState
+                MediaState operatorMediaState,
+                MediaState visitorMediaState
         ) {
             this.formattedOperatorName = formattedOperatorName;
             this.time = time;
@@ -283,17 +282,17 @@ public interface CallStatus {
         }
 
         @Override
-        public OperatorMediaState getOperatorMediaState() {
+        public MediaState getOperatorMediaState() {
             return operatorMediaState;
         }
 
         @Override
-        public VisitorMediaState getVisitorMediaState() {
+        public MediaState getVisitorMediaState() {
             return visitorMediaState;
         }
 
         @Override
-        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+        public void setVisitorMediaState(MediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 
@@ -329,12 +328,9 @@ public interface CallStatus {
 
     class EngagementOngoingTransferring implements CallStatus {
         private final String time;
-        private VisitorMediaState visitorMediaState;
+        private MediaState visitorMediaState;
 
-        public EngagementOngoingTransferring(
-                String time,
-                VisitorMediaState visitorMediaState
-        ) {
+        public EngagementOngoingTransferring(String time, MediaState visitorMediaState) {
             setVisitorMediaState(visitorMediaState);
             this.time = time;
         }
@@ -355,17 +351,17 @@ public interface CallStatus {
         }
 
         @Override
-        public OperatorMediaState getOperatorMediaState() {
+        public MediaState getOperatorMediaState() {
             return null;
         }
 
         @Override
-        public VisitorMediaState getVisitorMediaState() {
+        public MediaState getVisitorMediaState() {
             return visitorMediaState;
         }
 
         @Override
-        public void setVisitorMediaState(VisitorMediaState visitorMediaState) {
+        public void setVisitorMediaState(MediaState visitorMediaState) {
             this.visitorMediaState = visitorMediaState;
         }
 

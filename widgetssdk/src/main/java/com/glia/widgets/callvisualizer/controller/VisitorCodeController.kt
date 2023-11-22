@@ -1,26 +1,26 @@
 package com.glia.widgets.callvisualizer.controller
 
-import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.core.dialog.DialogController
-import com.glia.widgets.core.engagement.GliaEngagementRepository
+import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
+import com.glia.widgets.engagement.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class VisitorCodeController(
+internal class VisitorCodeController(
     private val dialogController: DialogController,
     private val visitorCodeRepository: VisitorCodeRepository,
-    private val engagementRepository: GliaEngagementRepository
+    private val engagementStateUseCase: EngagementStateUseCase,
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase
 ) : VisitorCodeContract.Controller {
 
     private var disposable: Disposable? = null
-    private val onEngagementStartConsumer: (Engagement) -> Unit = {
-        view.destroyTimer()
-        dialogController.dismissVisitorCodeDialog()
-    }
+
+    private var engagementStateDisposable: Disposable? = null
 
     private val defaultRefreshDurationMilliseconds: Long = 30 * 60 * 1000L
 
@@ -64,16 +64,20 @@ class VisitorCodeController(
     }
 
     private fun autoCloseOnEngagement() {
-        if (engagementRepository.hasOngoingEngagement()) {
-            // Normally there is no need for visitor code if there is already ongoing engagement.
+        if (hasOngoingEngagementUseCase()) {
+            // Normally, there is no need for visitor code if there is already ongoing engagement.
             // But it also doesn't seem right to just close it if right away when it was open
             return
         }
-        engagementRepository.listenForCallVisualizerEngagement(onEngagementStartConsumer)
+        engagementStateDisposable?.dispose()
+        engagementStateDisposable = engagementStateUseCase().filter { it is State.StartedCallVisualizer }.subscribe {
+            view.destroyTimer()
+            dialogController.dismissVisitorCodeDialog()
+        }
     }
 
     override fun onDestroy() {
-        engagementRepository.unregisterCallVisualizerEngagementListener(onEngagementStartConsumer)
+        engagementStateDisposable?.dispose()
         view.destroyTimer()
     }
 }

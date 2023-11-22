@@ -12,7 +12,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kotlin.jvm.optionals.getOrNull
 
-class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
+internal class SecureFileAttachmentRepository(private val gliaCore: GliaCore) {
     private val secureConversations: SecureConversations by lazy {
         gliaCore.secureConversations
     }

@@ -54,6 +54,13 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
         finishAndRemoveTask();
     }
 
+    @Override
+    public void finishAndRemoveTask() {
+        super.finishAndRemoveTask();
+
+        overridePendingTransition(0, 0);
+    }
+
     private void hideSoftKeyboard() {
         WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), findViewById(R.id.survey_view));
         InsetsKt.hideKeyboard(insetsController);
@@ -66,10 +73,11 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
         SurveyContract.Controller surveyController = Dependencies.getControllerFactory().getSurveyController();
         surveyView.setController(surveyController);
         Bundle extras = getIntent().getExtras();
-        UiTheme uiTheme = extras.getParcelable(GliaWidgets.UI_THEME);
-        surveyView.setTheme(uiTheme);
-
-        Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
-        surveyController.init(survey);
+        if (extras != null) {
+            UiTheme uiTheme = extras.getParcelable(GliaWidgets.UI_THEME);
+            surveyView.setTheme(uiTheme);
+            Survey survey = extras.getParcelable(GliaWidgets.SURVEY);
+            surveyController.init(survey);
+        }
     }
 }

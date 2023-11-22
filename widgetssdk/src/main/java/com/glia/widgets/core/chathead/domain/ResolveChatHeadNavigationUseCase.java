@@ -1,26 +1,26 @@
 package com.glia.widgets.core.chathead.domain;
 
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
+import com.glia.widgets.engagement.EngagementTypeUseCase;
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
 
 public class ResolveChatHeadNavigationUseCase {
-    private final GliaEngagementRepository engagementRepository;
+    private final HasOngoingEngagementUseCase hasOngoingEngagementUseCase;
     private final GliaQueueRepository queueRepository;
-    private final GliaEngagementTypeRepository gliaEngagementTypeRepository;
+    private final EngagementTypeUseCase engagementTypeUseCase;
     private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
 
     public ResolveChatHeadNavigationUseCase(
-            GliaEngagementRepository engagementRepository,
-            GliaQueueRepository queueRepository,
-            GliaEngagementTypeRepository gliaEngagementTypeRepository,
-            IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
+        HasOngoingEngagementUseCase hasOngoingEngagementUseCase,
+        GliaQueueRepository queueRepository,
+        EngagementTypeUseCase engagementTypeUseCase,
+        IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
-        this.engagementRepository = engagementRepository;
+        this.hasOngoingEngagementUseCase = hasOngoingEngagementUseCase;
         this.queueRepository = queueRepository;
-        this.gliaEngagementTypeRepository = gliaEngagementTypeRepository;
+        this.engagementTypeUseCase = engagementTypeUseCase;
         this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
 
@@ -45,7 +45,7 @@ public class ResolveChatHeadNavigationUseCase {
     }
 
     private boolean isMediaEngagementOngoing() {
-        return engagementRepository.hasOngoingEngagement() && gliaEngagementTypeRepository.isMediaEngagement();
+        return hasOngoingEngagementUseCase.invoke() && engagementTypeUseCase.isMediaEngagement();
     }
 
     private boolean isSharingScreen() {

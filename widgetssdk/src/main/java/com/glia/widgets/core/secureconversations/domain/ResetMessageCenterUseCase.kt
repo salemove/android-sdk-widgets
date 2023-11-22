@@ -3,7 +3,7 @@ package com.glia.widgets.core.secureconversations.domain
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository
 import com.glia.widgets.core.secureconversations.SendMessageRepository
 
-class ResetMessageCenterUseCase(
+internal class ResetMessageCenterUseCase(
     private val fileAttachmentRepository: SecureFileAttachmentRepository,
     private val sendMessageRepository: SendMessageRepository
 ) {

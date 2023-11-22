@@ -311,6 +311,7 @@ class MainFragment : Fragment() {
         builder.setView(prepareDialogLayout(jwtInput, externalTokenInput))
         val alertDialog = builder.create()
         alertDialog.setOnShowListener {
+            Glia.getLiveObservation().pause()
             val button = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
             button.setOnClickListener {
                 jwtInput.setText("")
@@ -318,6 +319,10 @@ class MainFragment : Fragment() {
                 clearAuthToken()
             }
         }
+        alertDialog.setOnDismissListener {
+            Glia.getLiveObservation().resume()
+        }
+
         alertDialog.show()
     }
 

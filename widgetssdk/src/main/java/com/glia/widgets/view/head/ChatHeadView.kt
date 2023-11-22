@@ -21,10 +21,10 @@ import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
@@ -50,8 +50,7 @@ class ChatHeadView @JvmOverloads constructor(
     attrs,
     defStyleAttr,
     defStyleRes
-),
-    ChatHeadContract.View {
+), ChatHeadContract.View {
     private val binding by lazy { ChatHeadViewBinding.inflate(layoutInflater, this) }
     private val stringProvider = Dependencies.getStringProvider()
     private var sdkConfiguration: GliaSdkConfiguration? = null
@@ -67,13 +66,13 @@ class ChatHeadView @JvmOverloads constructor(
     @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ServiceChatHeadController
     private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
-    private var isCallVisualizerUseCase: IsCallVisualizerUseCase
+    private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizer
     private var theme: UiTheme? = null
 
     init {
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
         isCallVisualizerScreenSharingUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerScreenSharingUseCase()
-        isCallVisualizerUseCase = Dependencies.getUseCaseFactory().createIsCallVisualizerUseCase()
+        isCallVisualizerUseCase = Dependencies.getUseCaseFactory().isCurrentEngagementCallVisualizer
         setAccessibilityLabels()
         readTypedArray()
     }

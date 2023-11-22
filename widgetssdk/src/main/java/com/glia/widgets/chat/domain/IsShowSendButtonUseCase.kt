@@ -1,11 +1,11 @@
 package com.glia.widgets.chat.domain
 
-import com.glia.widgets.core.engagement.GliaEngagementRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
 
-class IsShowSendButtonUseCase(
-    private val engagementRepository: GliaEngagementRepository,
+internal class IsShowSendButtonUseCase(
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase
 ) {
@@ -25,6 +25,6 @@ class IsShowSendButtonUseCase(
     }
 
     private fun hasEngagementOngoingAndReadyToSendUnsentAttachments(): Boolean {
-        return engagementRepository.hasOngoingEngagement() && hadReadyToSendUnsentAttachments()
+        return hasOngoingEngagementUseCase() && hadReadyToSendUnsentAttachments()
     }
 }

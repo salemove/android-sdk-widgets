@@ -1,5 +1,6 @@
 package com.glia.widgets.chat.controller
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.view.View
 import com.glia.androidsdk.GliaException
@@ -9,11 +10,9 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.chat.VisitorMessage
 import com.glia.androidsdk.comms.MediaDirection
+import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.androidsdk.comms.OperatorMediaState
 import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.androidsdk.engagement.Survey
-import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
@@ -21,7 +20,6 @@ import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.ChatViewCallback
-import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
@@ -38,25 +36,14 @@ import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.Unsent
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
-import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
-import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
-import com.glia.widgets.core.engagement.domain.model.EngagementStateEvent
-import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor
-import com.glia.widgets.core.engagement.domain.model.EngagementStateEventVisitor.OperatorVisitor
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
@@ -64,23 +51,24 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCa
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository.Submitter
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepositoryCallback
-import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
-import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
-import com.glia.widgets.core.operator.GliaOperatorMediaRepository.OperatorMediaStateListener
-import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase
 import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
 import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import com.glia.widgets.core.survey.OnSurveyListener
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.EndEngagementUseCase
+import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.EngagementUpdateState
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
+import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.OperatorMediaUseCase
+import com.glia.widgets.engagement.OperatorTypingUseCase
+import com.glia.widgets.engagement.State
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.Logger
@@ -94,27 +82,22 @@ import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.Observer
 
 internal class ChatController(
     chatViewCallback: ChatViewCallback,
-    private val mediaUpgradeOfferRepository: MediaUpgradeOfferRepository,
     private val callTimer: TimeCounter,
     private val minimizeHandler: MinimizeHandler,
     private val dialogController: DialogController,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
     private val callNotificationUseCase: CallNotificationUseCase,
     private val queueForChatEngagementUseCase: GliaQueueForChatEngagementUseCase,
-    private val getEngagementUseCase: GliaOnEngagementUseCase,
-    private val engagementEndUseCase: GliaOnEngagementEndUseCase,
-    private val onOperatorTypingUseCase: GliaOnOperatorTypingUseCase,
+    private val onOperatorTypingUseCase: OperatorTypingUseCase,
     private val sendMessagePreviewUseCase: GliaSendMessagePreviewUseCase,
     private val sendMessageUseCase: GliaSendMessageUseCase,
-    private val addOperatorMediaStateListenerUseCase: AddOperatorMediaStateListenerUseCase,
     private val cancelQueueTicketUseCase: GliaCancelQueueTicketUseCase,
-    private val endEngagementUseCase: GliaEndEngagementUseCase,
+    private val endEngagementUseCase: EndEngagementUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase,
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
     private val removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase,
@@ -125,39 +108,34 @@ internal class ChatController(
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
     private val siteInfoUseCase: SiteInfoUseCase,
-    private val surveyUseCase: GliaSurveyUseCase,
-    private val getGliaEngagementStateFlowableUseCase: GetEngagementStateFlowableUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
     private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
     private val isQueueingEngagementUseCase: IsQueueingEngagementUseCase,
-    private val addMediaUpgradeCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase,
-    private val removeMediaUpgradeCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
-    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
+    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
-    private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
-    private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
-    private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
+    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
-    private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase,
-    private val chatManager: ChatManager
-) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
+    private val chatManager: ChatManager,
+    private val engagementStateUseCase: EngagementStateUseCase,
+    private val operatorMediaUseCase: OperatorMediaUseCase,
+    private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
+    private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
+    private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
+) {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
-    private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
     private var timerStatusListener: FormattedTimerStatusListener? = null
-    private var engagementStateEventDisposable: Disposable? = null
 
     private val disposable = CompositeDisposable()
-    private val operatorMediaStateListener =
-        OperatorMediaStateListener { onNewOperatorMediaState(it) }
+    private val mediaUpgradeDisposable = CompositeDisposable()
 
     private val sendMessageCallback: GliaSendMessageUseCase.Listener =
         object : GliaSendMessageUseCase.Listener {
@@ -169,9 +147,7 @@ internal class ChatController(
 
             override fun onMessageValidated() {
                 viewCallback?.clearMessageInput()
-                emitViewState {
-                    chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase(""))
-                }
+                emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
             }
 
             override fun errorOperatorNotOnline(message: Unsent) {
@@ -182,13 +158,11 @@ internal class ChatController(
                 onMessageSendError(ex, message)
             }
         }
-    private var isVisitorEndEngagement = false
+
 
     @Volatile
     private var isChatViewPaused = false
-    private var shouldHandleEndedEngagement = false
 
-    // TODO pending photoCaptureFileUri - need to move some place better
     var photoCaptureFileUri: Uri? = null
 
     private val fileAttachmentObserver = Observer { _, _ ->
@@ -206,32 +180,43 @@ internal class ChatController(
 
     private val isSecureEngagement get() = isSecureEngagementUseCase()
 
-    private val isQueueingOrOngoingEngagement get() = isQueueingEngagementUseCase() || isOngoingEngagementUseCase()
+    private val isQueueingOrOngoingEngagement get() = isQueueingEngagementUseCase() || hasOngoingEngagementUseCase()
 
-    fun initChat(
-        companyName: String?,
-        queueId: String?,
-        visitorContextAssetId: String?,
-        chatType: ChatType
-    ) {
+    init {
+        Logger.d(TAG, "constructor")
+
+        // viewCallback is accessed from multiple threads
+        // and must be protected from race condition
+        synchronized(this) { viewCallback = chatViewCallback }
+
+        chatState = ChatState()
+        subscribeToEngagement()
+    }
+
+    fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType) {
         val queueIds = if (queueId != null) arrayOf(queueId) else emptyArray()
         engagementConfigUseCase(chatType, queueIds)
         updateOperatorDefaultImageUrlUseCase()
 
-        if (!hasPendingSurveyUseCase.invoke()) {
-            ensureSecureMessagingAvailable()
+        ensureSecureMessagingAvailable()
 
-            if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
-                if (isSecureEngagement) {
-                    emitViewState { chatState.setSecureMessagingState() }
-                }
-                chatManager.onChatAction(ChatManager.Action.ChatRestored)
-                return
+        if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+            if (isSecureEngagement) {
+                emitViewState { chatState.setSecureMessagingState() }
             }
-
-            emitViewState { chatState.initChat(companyName, queueId, visitorContextAssetId) }
-            initChatManager()
+            chatManager.onChatAction(ChatManager.Action.ChatRestored)
+            return
         }
+
+        emitViewState { chatState.initChat(companyName, queueId, visitorContextAssetId) }
+        initChatManager()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun subscribeToEngagement() {
+        engagementStateUseCase().subscribe({ onEngagementStateChanged(it) }) { throwable -> throwable.message?.let { Logger.e(TAG, it) } }
+        operatorMediaUseCase().subscribe { onNewOperatorMediaState(it) }
+        onOperatorTypingUseCase().subscribe(::onOperatorTyping)
     }
 
     private fun ensureSecureMessagingAvailable() {
@@ -254,8 +239,6 @@ internal class ChatController(
 
     private fun prepareChatComponents() {
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
-        initMediaUpgradeCallback()
-        mediaUpgradeOfferRepository.addCallback(mediaUpgradeOfferRepositoryCallback)
         minimizeHandler.addListener { minimizeView() }
         createNewTimerCallback()
         callTimer.addFormattedValueListener(timerStatusListener)
@@ -263,7 +246,7 @@ internal class ChatController(
     }
 
     fun onEngagementConfirmationDialogRequested() {
-        if (isOngoingEngagementUseCase()) return
+        if (hasOngoingEngagementUseCase()) return
         viewCallback?.showEngagementConfirmationDialog()
     }
 
@@ -271,10 +254,7 @@ internal class ChatController(
 
     fun onLinkClicked(link: Link) {
         Logger.d(TAG, "onLinkClicked")
-        viewCallback?.navigateToWebBrowserActivity(
-            link.title,
-            link.url
-        )
+        viewCallback?.navigateToWebBrowserActivity(link.title, link.url)
     }
 
     fun onLiveObservationDialogAllowed() {
@@ -285,7 +265,6 @@ internal class ChatController(
 
     fun onLiveObservationDialogRejected() {
         Logger.d(TAG, "onLiveObservationDialogRejected")
-        isVisitorEndEngagement = true
         stop()
         dialogController.dismissDialogs()
     }
@@ -311,7 +290,6 @@ internal class ChatController(
     fun onDestroy(retain: Boolean) {
         Logger.d(TAG, "onDestroy, retain:$retain")
         dialogController.dismissMessageCenterUnavailableDialog()
-        destroyView()
 
         // viewCallback is accessed from multiple threads
         // and must be protected from race condition
@@ -319,25 +297,18 @@ internal class ChatController(
         backClickedListener = null
         if (!retain) {
             disposable.clear()
-            mediaUpgradeOfferRepository.stopAll()
-            mediaUpgradeOfferRepositoryCallback = null
             timerStatusListener = null
             callTimer.clear()
             minimizeHandler.clear()
-            getEngagementUseCase.unregisterListener(this)
-            engagementEndUseCase.unregisterListener(this)
-            onOperatorTypingUseCase.unregisterListener()
             removeFileAttachmentObserverUseCase.execute(fileAttachmentObserver)
-            shouldHandleEndedEngagement = false
             chatManager.reset()
         }
     }
 
     fun onPause() {
+        mediaUpgradeDisposable.clear()
         isChatViewPaused = true
         messagesNotSeenHandler.onChatWentBackground()
-        surveyUseCase.unregisterListener(this)
-        mediaUpgradeOfferRepositoryCallback?.let { removeMediaUpgradeCallbackUseCase(it) }
     }
 
     fun onImageItemClick(item: AttachmentFile, view: View) {
@@ -349,11 +320,7 @@ internal class ChatController(
     }
 
     fun onMessageTextChanged(message: String) {
-        emitViewState {
-            chatState
-                .setLastTypedText(message)
-                .setShowSendButton(isShowSendButtonUseCase(message))
-        }
+        emitViewState { chatState.setLastTypedText(message).setShowSendButton(isShowSendButtonUseCase(message)) }
         sendMessagePreview(message)
     }
 
@@ -441,7 +408,6 @@ internal class ChatController(
 
     fun endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked")
-        isVisitorEndEngagement = true
         stop()
         dialogController.dismissDialogs()
     }
@@ -461,7 +427,7 @@ internal class ChatController(
         if (isQueueingEngagementUseCase()) {
             dialogController.showExitQueueDialog()
         } else {
-            Dependencies.getControllerFactory().destroyControllers()
+            Dependencies.destroyControllers()
         }
     }
 
@@ -490,79 +456,89 @@ internal class ChatController(
 
     fun onResume() {
         Logger.d(TAG, "onResume")
-        if (hasPendingSurveyUseCase.invoke()) {
-            shouldHandleEndedEngagement = true
-            surveyUseCase.registerListener(this)
-            return
-        }
-        if (shouldHandleEndedEngagement) {
-            // Engagement has been started
-            if (!isOngoingEngagementUseCase.invoke()) {
-                // Engagement has ended
-                surveyUseCase.registerListener(this)
-            } else {
-                // Engagement is ongoing
-                onResumeSetup()
-            }
-        } else {
-            // New session
-            onResumeSetup()
-        }
+        onResumeSetup()
     }
 
     private fun onResumeSetup() {
+        subscribeToMediaUpgradeEvents()
         isChatViewPaused = false
         messagesNotSeenHandler.callChatButtonClicked()
-        subscribeToEngagementStateChange()
-        surveyUseCase.registerListener(this)
-        mediaUpgradeOfferRepositoryCallback?.let { addMediaUpgradeCallbackUseCase(it) }
 
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog()
         }
     }
 
-    private fun subscribeToEngagementStateChange() {
-        engagementStateEventDisposable?.dispose()
-
-        engagementStateEventDisposable = getGliaEngagementStateFlowableUseCase
-            .execute()
-            .subscribe({ onEngagementStateChanged(it) }) { throwable -> throwable.message?.let { Logger.e(TAG, it) } }
-        disposable.add(engagementStateEventDisposable!!)
+    private fun subscribeToMediaUpgradeEvents() {
+        mediaUpgradeDisposable.addAll(
+            mediaUpgradeOfferUseCase().subscribe(::handleMediaUpgradeRequest),
+            acceptMediaUpgradeOfferUseCase.result.subscribe(::handleMediaUpgradeAcceptResult)
+        )
     }
 
-    private fun onEngagementStateChanged(engagementState: EngagementStateEvent) {
-        val visitor: EngagementStateEventVisitor<Operator> = OperatorVisitor()
-        when (engagementState.type!!) {
-            EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CHANGED -> {
-                Logger.i(TAG, "Operator changed")
-                onOperatorChanged(visitor.visit(engagementState))
+    private fun handleMediaUpgradeAcceptResult(it: MediaUpgradeOffer) {
+        Logger.d(TAG, "Media upgrade request accepted by visitor")
+        val requestedMediaType: String = if (it.video != null && it.video != MediaDirection.NONE) {
+            GliaWidgets.MEDIA_TYPE_VIDEO
+        } else {
+            GliaWidgets.MEDIA_TYPE_AUDIO
+        }
+        emitViewState { chatState.setPendingNavigationType(requestedMediaType) }
+        viewCallback?.apply {
+            navigateToCall(requestedMediaType)
+            Logger.d(TAG, "navigateToCall")
+        }
+    }
+
+    private fun handleMediaUpgradeRequest(it: MediaUpgradeOffer) {
+        when {
+            isChatViewPaused -> return
+            // audio call
+            it.video == MediaDirection.NONE && it.audio == MediaDirection.TWO_WAY -> {
+                Logger.d(TAG, "audioUpgradeRequested")
+                if (chatState.isOperatorOnline) {
+                    dialogController.showUpgradeAudioDialog(it, chatState.formattedOperatorName)
+                }
+            }
+            // video call
+            it.video == MediaDirection.TWO_WAY -> {
+                Logger.d(TAG, "2 way videoUpgradeRequested")
+                if (chatState.isOperatorOnline) {
+                    dialogController.showUpgradeVideoDialog2Way(it, chatState.formattedOperatorName)
+                }
             }
 
-            EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CONNECTED -> {
-                Logger.i(TAG, "Operator connected")
-                shouldHandleEndedEngagement = true
-                onOperatorConnected(visitor.visit(engagementState))
+            it.video == MediaDirection.ONE_WAY -> {
+                Logger.d(TAG, "1 way videoUpgradeRequested")
+                if (chatState.isOperatorOnline) {
+                    dialogController.showUpgradeVideoDialog1Way(it, chatState.formattedOperatorName)
+                }
             }
+        }
+    }
 
-            EngagementStateEvent.Type.ENGAGEMENT_TRANSFERRING -> {
-                Logger.i(TAG, "Transfer engagement")
-                onTransferring()
-            }
-            EngagementStateEvent.Type.ENGAGEMENT_ONGOING -> onEngagementOngoing(
-                visitor.visit(engagementState)
-            )
-
-            EngagementStateEvent.Type.ENGAGEMENT_ENDED -> {
-                Logger.d(TAG, "Engagement ended")
-                if (!isOngoingEngagementUseCase.invoke()) {
+    private fun onEngagementStateChanged(state: State) {
+        when (state) {
+            State.FinishedCallVisualizer, State.FinishedOmniCore -> {
+                if (!hasOngoingEngagementUseCase.invoke()) {
                     dialogController.dismissDialogs()
                 }
             }
 
-            EngagementStateEvent.Type.NO_ENGAGEMENT -> {
-                Logger.d(TAG, "NoEngagement")
+            State.StartedOmniCore -> newEngagementLoaded()
+            is State.Update -> handleEngagementStateUpdate(state.updateState)
+            else -> {
+                // no op
             }
+        }
+    }
+
+    private fun handleEngagementStateUpdate(state: EngagementUpdateState) {
+        when (state) {
+            is EngagementUpdateState.Ongoing -> onEngagementOngoing(state.operator)
+            is EngagementUpdateState.OperatorChanged -> onOperatorChanged(state.operator)
+            is EngagementUpdateState.OperatorConnected -> onOperatorConnected(state.operator)
+            EngagementUpdateState.Transferring -> onTransferring()
         }
     }
 
@@ -592,13 +568,13 @@ internal class ChatController(
     fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer) {
         Logger.i(TAG, "Upgrade offer accepted by visitor")
         messagesNotSeenHandler.chatUpgradeOfferAccepted()
-        acceptMediaUpgradeOfferUseCase(offer, Submitter.CHAT)
+        acceptMediaUpgradeOfferUseCase(offer)
         dialogController.dismissCurrentDialog()
     }
 
     fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer) {
         Logger.i(TAG, "Upgrade offer declined by visitor")
-        mediaUpgradeOfferRepository.declineOffer(offer, Submitter.CHAT)
+        declineMediaUpgradeOfferUseCase(offer)
         dialogController.dismissCurrentDialog()
     }
 
@@ -619,70 +595,12 @@ internal class ChatController(
         emitViewState { chatState.stop() }
     }
 
-    private fun initMediaUpgradeCallback() {
-        mediaUpgradeOfferRepositoryCallback = object : MediaUpgradeOfferRepositoryCallback {
-            override fun newOffer(offer: MediaUpgradeOffer) {
-                when {
-                    isChatViewPaused -> return
-                    offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY -> {
-                        // audio call
-                        Logger.d(TAG, "audioUpgradeRequested")
-                        if (chatState.isOperatorOnline) {
-                            dialogController.showUpgradeAudioDialog(offer, chatState.formattedOperatorName)
-                        }
-                    }
-
-                    offer.video == MediaDirection.TWO_WAY -> {
-                        // video call
-                        Logger.d(TAG, "2 way videoUpgradeRequested")
-                        if (chatState.isOperatorOnline) {
-                            dialogController.showUpgradeVideoDialog2Way(offer, chatState.formattedOperatorName)
-                        }
-                    }
-
-                    offer.video == MediaDirection.ONE_WAY -> {
-                        Logger.d(TAG, "1 way videoUpgradeRequested")
-                        if (chatState.isOperatorOnline) {
-                            dialogController.showUpgradeVideoDialog1Way(offer, chatState.formattedOperatorName)
-                        }
-                    }
-                }
-            }
-
-            override fun upgradeOfferChoiceSubmitSuccess(
-                offer: MediaUpgradeOffer,
-                submitter: Submitter
-            ) {
-                Logger.d(TAG, "Media upgrade request accepted by visitor")
-                if (submitter == Submitter.CHAT) {
-                    val requestedMediaType: String =
-                        if (offer.video != null && offer.video != MediaDirection.NONE) {
-                            GliaWidgets.MEDIA_TYPE_VIDEO
-                        } else {
-                            GliaWidgets.MEDIA_TYPE_AUDIO
-                        }
-                    emitViewState { chatState.setPendingNavigationType(requestedMediaType) }
-                    viewCallback?.apply {
-                        navigateToCall(requestedMediaType)
-                        Logger.d(TAG, "navigateToCall")
-                    }
-                }
-            }
-
-            override fun upgradeOfferChoiceDeclinedSuccess(
-                submitter: Submitter
-            ) {
-                Logger.i(TAG, "Media upgrade request declined by visitor")
-            }
-        }
-    }
-
     private fun viewInitPreQueueing() {
-        if (isOngoingEngagementUseCase()) return
+        if (hasOngoingEngagementUseCase()) return
 
         Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
-        confirmationDialogUseCase{ shouldShow ->
+        confirmationDialogUseCase { shouldShow ->
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
             } else {
@@ -694,13 +612,6 @@ internal class ChatController(
     private fun viewInitQueueing() {
         Logger.d(TAG, "viewInitQueueing")
         emitViewState { chatState.queueingStarted() }
-    }
-
-    private fun destroyView() {
-        viewCallback?.apply {
-            Logger.d(TAG, "destroyingView")
-            destroyView()
-        }
     }
 
     private fun minimizeView() {
@@ -739,13 +650,8 @@ internal class ChatController(
                 }
         )
         endEngagementUseCase()
-        mediaUpgradeOfferRepository.stopAll()
+        mediaUpgradeDisposable.clear()
         emitViewState { chatState.stop() }
-    }
-
-    private fun initGliaEngagementObserving() {
-        getEngagementUseCase.execute(this)
-        engagementEndUseCase.execute(this)
     }
 
     private fun addQuickReplyButtons(options: List<GvaButton>) {
@@ -821,21 +727,7 @@ internal class ChatController(
         viewCallback?.smoothScrollToBottom()
     }
 
-    init {
-        Logger.d(TAG, "constructor")
-
-        // viewCallback is accessed from multiple threads
-        // and must be protected from race condition
-        synchronized(this) { viewCallback = chatViewCallback }
-
-        chatState = ChatState()
-    }
-
-    override fun newEngagementLoaded(engagement: OmnicoreEngagement) {
-        Logger.i(TAG, "New engagement loaded")
-        onOperatorTypingUseCase.execute { onOperatorTyping(it) }
-        addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener)
-        mediaUpgradeOfferRepository.startListening()
+    private fun newEngagementLoaded() {
         emitViewState { chatState.engagementStarted() }
         chatManager.reloadHistoryIfNeeded()
     }
@@ -857,7 +749,7 @@ internal class ChatController(
         Logger.d(TAG, "historyLoaded")
 
         if (!hasHistory) {
-            if (!chatState.engagementRequested && !isSecureEngagement) {
+            if (!isSecureEngagement && !isQueueingOrOngoingEngagement) {
                 viewInitPreQueueing()
             } else {
                 Logger.d(TAG, "Opened empty Secure Conversations chat")
@@ -871,45 +763,15 @@ internal class ChatController(
         }
 
         prepareChatComponents()
-        initGliaEngagementObserving()
     }
 
     private fun emitItems(items: List<ChatItem>) {
         viewCallback?.emitItems(items)
     }
 
-    override fun engagementEnded() {
-        Logger.i(TAG, "Engagement ended")
-        stop()
-    }
-
-    override fun onSurveyLoaded(survey: Survey?) {
-        Logger.i(TAG, "Survey loaded")
-        setPendingSurveyUsedUseCase.invoke()
-        when {
-            viewCallback != null && survey != null -> {
-                // Show survey
-                viewCallback!!.navigateToSurvey(survey)
-                Dependencies.getControllerFactory().destroyControllers()
-            }
-
-            shouldHandleEndedEngagement && !isVisitorEndEngagement -> {
-                // Show "Engagement ended" pop-up
-                shouldHandleEndedEngagement = false
-                dialogController.showEngagementEndedDialog()
-            }
-
-            else -> {
-                // Close chat screen
-                Dependencies.getControllerFactory().destroyControllers()
-                destroyView()
-            }
-        }
-    }
-
-    private fun onNewOperatorMediaState(operatorMediaState: OperatorMediaState?) {
+    private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
         Logger.d(TAG, "newOperatorMediaState: $operatorMediaState")
-        if (chatState.isAudioCallStarted && operatorMediaState?.video != null) {
+        if (chatState.isAudioCallStarted && operatorMediaState.video != null) {
             upgradeMediaItemToVideo()
         } else if (!chatState.isMediaUpgradeStarted) {
             addMediaUpgradeItemToChatItems(operatorMediaState)
@@ -921,10 +783,10 @@ internal class ChatController(
         callNotificationUseCase(operatorMedia = operatorMediaState)
     }
 
-    private fun addMediaUpgradeItemToChatItems(operatorMediaState: OperatorMediaState?) {
+    private fun addMediaUpgradeItemToChatItems(operatorMediaState: MediaState) {
         val isVideo = when {
-            operatorMediaState?.video == null && operatorMediaState?.audio != null -> false
-            operatorMediaState?.video != null -> true
+            operatorMediaState.video == null && operatorMediaState.audio != null -> false
+            operatorMediaState.video != null -> true
             else -> null
         } ?: return
 
@@ -1010,7 +872,7 @@ internal class ChatController(
     }
 
     private fun updateAllowFileSendState() {
-        siteInfoUseCase.execute { siteInfo: SiteInfo?, _ -> onSiteInfoReceived(siteInfo) }
+        siteInfoUseCase { siteInfo: SiteInfo?, _ -> onSiteInfoReceived(siteInfo) }
     }
 
     private fun onSiteInfoReceived(siteInfo: SiteInfo?) {
@@ -1030,7 +892,7 @@ internal class ChatController(
     }
 
     fun isCallVisualizerOngoing(): Boolean {
-        return isCallVisualizerUseCase()
+        return isCurrentEngagementCallVisualizer()
     }
 
     fun onGvaButtonClicked(button: GvaButton) {

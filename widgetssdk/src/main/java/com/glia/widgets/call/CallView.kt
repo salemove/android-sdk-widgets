@@ -82,8 +82,7 @@ internal class CallView(
     attrs,
     defStyleAttr,
     defStyleRes
-), CallViewCallback,
-    DialogDelegate by DialogDelegateImpl() {
+), CallViewCallback, DialogDelegate by DialogDelegateImpl() {
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.callTheme
@@ -188,13 +187,13 @@ internal class CallView(
     }
 
     fun startCall(
-        companyName: String?,
+        companyName: String,
         queueId: String?,
         visitorContextAssetId: String?,
         useOverlays: Boolean,
-        screenSharingMode: ScreenSharing.Mode?,
+        screenSharingMode: ScreenSharing.Mode,
         isUpgradeToCall: Boolean,
-        mediaType: Engagement.MediaType?
+        mediaType: Engagement.MediaType
     ) {
         callController?.startCall(
             companyName,
@@ -203,8 +202,7 @@ internal class CallView(
             mediaType,
             useOverlays,
             screenSharingMode,
-            isUpgradeToCall,
-            serviceChatHeadController
+            isUpgradeToCall
         )
     }
 
@@ -767,7 +765,7 @@ internal class CallView(
     }
 
     private fun callEnded() {
-        Dependencies.getControllerFactory().destroyControllers()
+        Dependencies.destroyControllers()
     }
 
     private fun showOperatorVideo(operatorMediaState: MediaState?) {

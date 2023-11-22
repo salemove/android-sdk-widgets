@@ -6,9 +6,7 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioSwitch
 import io.reactivex.disposables.CompositeDisposable
 
-class AudioControlManager(
-    private val context: Context
-) {
+internal class AudioControlManager(private val context: Context) {
     private val audioSwitch: AudioSwitch by lazy {
         AudioSwitch(context)
     }

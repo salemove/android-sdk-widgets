@@ -1,23 +1,22 @@
 package com.glia.widgets.core.engagement.domain;
 
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
-import com.glia.widgets.core.engagement.GliaEngagementTypeRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
 import com.glia.widgets.core.queue.model.GliaQueueingState;
+import com.glia.widgets.engagement.EngagementTypeUseCase;
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
 
 public class ShouldShowMediaEngagementViewUseCase {
-    private final GliaEngagementRepository engagementRepository;
+    private final HasOngoingEngagementUseCase hasOngoingEngagementUseCase;
     private final GliaQueueRepository queueRepository;
-    private final GliaEngagementTypeRepository gliaEngagementTypeRepository;
+    private final EngagementTypeUseCase engagementTypeUseCase;
 
     public ShouldShowMediaEngagementViewUseCase(
-            GliaEngagementRepository repository,
-            GliaQueueRepository queueRepository,
-            GliaEngagementTypeRepository gliaEngagementTypeRepository
-    ) {
-        this.engagementRepository = repository;
+        HasOngoingEngagementUseCase hasOngoingEngagementUseCase,
+        GliaQueueRepository queueRepository,
+        EngagementTypeUseCase engagementTypeUseCase) {
+        this.hasOngoingEngagementUseCase = hasOngoingEngagementUseCase;
         this.queueRepository = queueRepository;
-        this.gliaEngagementTypeRepository = gliaEngagementTypeRepository;
+        this.engagementTypeUseCase = engagementTypeUseCase;
     }
 
     public boolean execute(boolean isUpgradeToCall) {
@@ -40,10 +39,10 @@ public class ShouldShowMediaEngagementViewUseCase {
     }
 
     private boolean hasOngoingMediaEngagement() {
-        return gliaEngagementTypeRepository.isMediaEngagement();
+        return engagementTypeUseCase.isMediaEngagement();
     }
 
     private boolean hasNoOngoingEngagement() {
-        return !engagementRepository.hasOngoingEngagement();
+        return !hasOngoingEngagementUseCase.invoke();
     }
 }

@@ -50,8 +50,8 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public void updateVisitorInfo(
-            final VisitorInfoUpdateRequest visitorInfoUpdateRequest,
-            final Consumer<GliaException> visitorCallback) {
+        final VisitorInfoUpdateRequest visitorInfoUpdateRequest,
+        final Consumer<GliaException> visitorCallback) {
         Glia.updateVisitorInfo(visitorInfoUpdateRequest, visitorCallback);
     }
 
@@ -187,11 +187,7 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
-        return new AuthenticationManager(
-                Glia.getAuthentication(behavior),
-                Dependencies.getUseCaseFactory().createResetSurveyUseCase(),
-                Dependencies.getControllerFactory()
-        );
+        return new AuthenticationManager(Glia.getAuthentication(behavior));
     }
 
     @Override

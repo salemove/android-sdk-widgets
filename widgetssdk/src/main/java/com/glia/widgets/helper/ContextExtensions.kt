@@ -12,6 +12,7 @@ import androidx.annotation.IntRange
 import androidx.annotation.StyleRes
 import androidx.core.content.withStyledAttributes
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
@@ -50,6 +51,12 @@ internal fun Context.showToast(
 
 internal val Activity.rootView: View
     get() = findViewById(android.R.id.content) ?: window.decorView.findViewById(android.R.id.content)
+
+internal val Activity.qualifiedName: String
+    get() = this::class.qualifiedName!!
+
+internal val Activity.isGlia: Boolean
+    get() = qualifiedName.startsWith(BuildConfig.LIBRARY_PACKAGE_NAME)
 
 internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
     val themedContext = wrapWithMaterialThemeOverlay()

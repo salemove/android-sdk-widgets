@@ -98,7 +98,6 @@
     <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat" parent="">

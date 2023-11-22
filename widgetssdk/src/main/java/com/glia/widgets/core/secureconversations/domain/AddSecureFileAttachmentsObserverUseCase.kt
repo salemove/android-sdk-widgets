@@ -5,7 +5,7 @@ import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.helper.rx.Schedulers
 import io.reactivex.Observable
 
-class AddSecureFileAttachmentsObserverUseCase(
+internal class AddSecureFileAttachmentsObserverUseCase(
     private val repository: SecureFileAttachmentRepository,
     private val schedulers: Schedulers
 ) {

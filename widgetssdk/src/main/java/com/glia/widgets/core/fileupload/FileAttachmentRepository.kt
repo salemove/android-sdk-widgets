@@ -15,7 +15,7 @@ import java.util.Observable
 import java.util.Observer
 import kotlin.jvm.optionals.getOrNull
 
-class FileAttachmentRepository(
+internal class FileAttachmentRepository(
     private val gliaCore: GliaCore,
     private val engagementConfigRepository: GliaEngagementConfigRepository
 ) {

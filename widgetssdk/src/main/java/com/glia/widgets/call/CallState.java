@@ -4,9 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
-import com.glia.androidsdk.comms.OperatorMediaState;
+import com.glia.androidsdk.comms.MediaState;
 import com.glia.androidsdk.comms.Video;
-import com.glia.androidsdk.comms.VisitorMediaState;
 import com.glia.widgets.helper.Logger;
 
 import java.util.Objects;
@@ -31,6 +30,20 @@ class CallState {
 
     public final String queueId;
     public final String visitorContextAssetId;
+
+    public static CallState initial(Boolean isCallVisualizer) {
+        return new Builder()
+            .setIntegratorCallStarted(false)
+            .setVisible(false)
+            .setMessagesNotSeen(0)
+            .setCallStatus(new CallStatus.EngagementNotOngoing(null))
+            .setLandscapeLayoutControlsVisible(false)
+            .setIsSpeakerOn(false)
+            .setIsMuted(false)
+            .setHasVideo(false)
+            .setIsCallVisualizer(isCallVisualizer)
+            .createCallState();
+    }
 
     private CallState(Builder builder) {
         this.integratorCallStarted = builder.integratorCallStarted;
@@ -208,7 +221,7 @@ class CallState {
     }
 
     public CallState videoCallOperatorVideoStarted(
-            OperatorMediaState operatorMediaState,
+            MediaState operatorMediaState,
             String formattedTime
     ) {
         return new Builder()
@@ -224,7 +237,7 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState visitorMediaStateChanged(VisitorMediaState visitorMediaState) {
+    public CallState visitorMediaStateChanged(MediaState visitorMediaState) {
         callStatus.setVisitorMediaState(visitorMediaState);
         return new Builder()
                 .copyFrom(this)
@@ -233,7 +246,7 @@ class CallState {
                 .createCallState();
     }
 
-    public CallState audioCallStarted(OperatorMediaState operatorMediaState, String formattedTime) {
+    public CallState audioCallStarted(MediaState operatorMediaState, String formattedTime) {
         Logger.i(TAG, "Audio or video call started");
         return new Builder()
                 .copyFrom(this)
@@ -418,13 +431,13 @@ class CallState {
                 callStatus.getOperatorMediaState().getVideo() != null;
     }
 
-    private boolean isVisitorVideoPlaying(VisitorMediaState visitorMediaState) {
+    private boolean isVisitorVideoPlaying(MediaState visitorMediaState) {
         return visitorMediaState != null &&
             visitorMediaState.getVideo() != null &&
             visitorMediaState.getVideo().getStatus() == Media.Status.PLAYING;
     }
 
-    private boolean isMuted(VisitorMediaState visitorMediaState) {
+    private boolean isMuted(MediaState visitorMediaState) {
         return visitorMediaState == null ||
             visitorMediaState.getAudio() == null ||
             visitorMediaState.getAudio().getStatus() != Media.Status.PLAYING;
@@ -455,7 +468,7 @@ class CallState {
         private Engagement.MediaType requestedMediaType;
         private boolean isSpeakerOn;
         private boolean isOnHold;
-        //May be helpful when converting to Kotlin, as android studio makes fields nullable.
+        //Maybe helpful when converting to Kotlin, as an android studio makes fields nullable.
         private boolean isOnlyTimeChanged = false;
         private boolean isCallVisualizer;
         private String queueId;

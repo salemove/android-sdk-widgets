@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerContract;
@@ -14,6 +16,8 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
+import com.glia.widgets.engagement.completion.EngagementCompletionController;
+import com.glia.widgets.engagement.completion.EngagementCompletionControllerImpl;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -50,6 +54,8 @@ public class ControllerFactory {
     private final FilePreviewController filePreviewController;
     private final ChatHeadPosition chatHeadPosition;
     private final ManagerFactory managerFactory;
+
+    private EngagementCompletionController engagementCompletionController;
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
@@ -57,7 +63,6 @@ public class ControllerFactory {
     private CallVisualizerController callVisualizerController;
     private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
-
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
 
     public ControllerFactory(
@@ -68,8 +73,7 @@ public class ControllerFactory {
     ) {
         this.repositoryFactory = repositoryFactory;
         messagesNotSeenHandler = new MessagesNotSeenHandler(
-            useCaseFactory.createGliaOnMessageUseCase(),
-            useCaseFactory.createOnEngagementEndUseCase()
+            useCaseFactory.createGliaOnMessageUseCase()
         );
 
         this.useCaseFactory = useCaseFactory;
@@ -80,8 +84,7 @@ public class ControllerFactory {
         this.filePreviewController = new FilePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
-            useCaseFactory.createPutImageFileToDownloadsUseCase(),
-            useCaseFactory.createOnEngagementEndUseCase()
+            useCaseFactory.createPutImageFileToDownloadsUseCase()
         );
         this.chatHeadPosition = ChatHeadPosition.getInstance();
         this.sdkConfigurationManager = sdkConfigurationManager;
@@ -93,21 +96,17 @@ public class ControllerFactory {
             Logger.d(TAG, "new for chat activity");
             retainedChatController = new ChatController(
                 chatViewCallback,
-                repositoryFactory.getMediaUpgradeOfferRepository(),
                 sharedTimer,
                 minimizeHandler,
                 dialogController,
                 messagesNotSeenHandler,
                 useCaseFactory.createCallNotificationUseCase(),
                 useCaseFactory.createQueueForChatEngagementUseCase(),
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createGliaOnOperatorTypingUseCase(),
+                useCaseFactory.operatorTypingUseCase(),
                 useCaseFactory.createGliaSendMessagePreviewUseCase(),
                 useCaseFactory.createGliaSendMessageUseCase(),
-                useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
                 useCaseFactory.createCancelQueueTicketUseCase(),
-                useCaseFactory.createEndEngagementUseCase(),
+                useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                 useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
@@ -118,29 +117,27 @@ public class ControllerFactory {
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createDownloadFileUseCase(),
                 useCaseFactory.createSiteInfoUseCase(),
-                useCaseFactory.getGliaSurveyUseCase(),
-                useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
                 useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                 useCaseFactory.createIsQueueingEngagementUseCase(),
-                useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
-                useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase(),
                 useCaseFactory.createIsSecureEngagementUseCase(),
-                useCaseFactory.createIsOngoingEngagementUseCase(),
+                useCaseFactory.getHasOngoingEngagementUseCase(),
                 useCaseFactory.createSetEngagementConfigUseCase(),
                 useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
-                useCaseFactory.createHasPendingSurveyUseCase(),
-                useCaseFactory.createSetPendingSurveyUsed(),
-                useCaseFactory.createIsCallVisualizerUseCase(),
+                useCaseFactory.getIsCurrentEngagementCallVisualizer(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
-                useCaseFactory.createAcceptMediaUpgradeOfferUseCase(),
                 useCaseFactory.createDetermineGvaButtonTypeUseCase(),
                 useCaseFactory.createIsAuthenticatedUseCase(),
                 useCaseFactory.createUpdateOperatorDefaultImageUrlUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createConfirmationDialogLinksUseCase(),
-                managerFactory.getChatManager()
+                managerFactory.getChatManager(),
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getOperatorMediaUseCase(),
+                useCaseFactory.getMediaUpgradeOfferUseCase(),
+                useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
+                useCaseFactory.getDeclineMediaUpgradeOfferUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -154,7 +151,6 @@ public class ControllerFactory {
             Logger.d(TAG, "new call controller");
             retainedCallController = new CallController(
                 sdkConfigurationManager,
-                repositoryFactory.getMediaUpgradeOfferRepository(),
                 sharedTimer,
                 callViewCallback,
                 new TimeCounter(),
@@ -165,32 +161,28 @@ public class ControllerFactory {
                 useCaseFactory.createCallNotificationUseCase(),
                 useCaseFactory.createQueueForMediaEngagementUseCase(),
                 useCaseFactory.createCancelQueueTicketUseCase(),
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveOperatorMediaStateListenerUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createEndEngagementUseCase(),
+                useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
                 useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
-                useCaseFactory.getGliaSurveyUseCase(),
-                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
-                useCaseFactory.createRemoveMediaUpgradeOfferCallbackUseCase(),
-                useCaseFactory.createToggleVisitorAudioMediaMuteUseCase(),
-                useCaseFactory.createToggleVisitorVideoUseCase(),
-                useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
                 useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
-                useCaseFactory.createIsCallVisualizerUseCase(),
-                useCaseFactory.createIsOngoingEngagementUseCase(),
-                useCaseFactory.createSetPendingSurveyUsed(),
+                useCaseFactory.getIsCurrentEngagementCallVisualizer(),
+                useCaseFactory.getHasOngoingEngagementUseCase(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createConfirmationDialogLinksUseCase(),
-                useCaseFactory.createHandleCallPermissionsUseCase());
+                useCaseFactory.createHandleCallPermissionsUseCase(),
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getOperatorMediaUseCase(),
+                useCaseFactory.getMediaUpgradeOfferUseCase(),
+                useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
+                useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
+                useCaseFactory.getVisitorMediaUseCase(),
+                useCaseFactory.getToggleVisitorAudioMediaStateUseCase(),
+                useCaseFactory.getToggleVisitorVideoMediaStateUseCase()
+            );
         } else {
             Logger.d(TAG, "retained call controller");
             retainedCallController.setViewCallback(callViewCallback);
@@ -255,7 +247,6 @@ public class ControllerFactory {
         getCallVisualizerController().init();
         getScreenSharingController().init();
         getActivityWatcherForChatHeadController().init();
-        getActivityWatcherForLiveObservationController().init();
     }
 
     public FilePreviewController getImagePreviewController() {
@@ -267,17 +258,12 @@ public class ControllerFactory {
             serviceChatHeadController = new ServiceChatHeadController(
                 useCaseFactory.getToggleChatHeadServiceUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createOnCallVisualizerUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createOnCallVisualizerEndUseCase(),
                 messagesNotSeenHandler,
-                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                 chatHeadPosition,
-                useCaseFactory.createGetOperatorFlowableUseCase(),
-                useCaseFactory.createSetPendingSurveyUseCase(),
-                useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
+                useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getCurrentOperatorUseCase(),
+                useCaseFactory.getVisitorMediaUseCase()
             );
         }
         return serviceChatHeadController;
@@ -288,16 +274,11 @@ public class ControllerFactory {
             applicationChatHeadController = new ApplicationChatHeadLayoutController(
                 useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
-                useCaseFactory.createOnEngagementUseCase(),
-                useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createOnCallVisualizerUseCase(),
-                useCaseFactory.createOnCallVisualizerEndUseCase(),
                 messagesNotSeenHandler,
-                useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
-                useCaseFactory.createGetOperatorFlowableUseCase(),
-                useCaseFactory.createSetPendingSurveyUseCase(),
-                useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
+                useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getCurrentOperatorUseCase(),
+                useCaseFactory.getVisitorMediaUseCase()
             );
         }
         return applicationChatHeadController;
@@ -315,13 +296,15 @@ public class ControllerFactory {
     public CallVisualizerController getCallVisualizerController() {
         if (callVisualizerController == null) {
             callVisualizerController = new CallVisualizerController(
-                repositoryFactory.getCallVisualizerRepository(),
                 dialogController,
-                useCaseFactory.getGliaSurveyUseCase(),
-                useCaseFactory.createOnCallVisualizerUseCase(),
-                useCaseFactory.createOnCallVisualizerEndUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
-                useCaseFactory.createIsCallOrChatScreenActiveUseCase()
+                useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
+                useCaseFactory.getMediaUpgradeOfferUseCase(),
+                useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
+                useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
+                useCaseFactory.getEngagementRequestUseCase(),
+                useCaseFactory.getCurrentOperatorUseCase(),
+                useCaseFactory.getEngagementStateUseCase()
             );
         }
         return callVisualizerController;
@@ -329,11 +312,9 @@ public class ControllerFactory {
 
     public FloatingVisitorVideoContract.Controller getFloatingVisitorVideoController() {
         return new FloatingVisitorVideoController(
-            useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
-            useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
             useCaseFactory.createIsShowVideoUseCase(),
-            useCaseFactory.createIsShowOnHoldUseCase()
-        );
+            useCaseFactory.createIsShowOnHoldUseCase(),
+            useCaseFactory.getVisitorMediaUseCase());
     }
 
     public MessageCenterContract.Controller getMessageCenterController(String queueId) {
@@ -363,7 +344,9 @@ public class ControllerFactory {
         return new VisitorCodeController(
             dialogController,
             repositoryFactory.getVisitorCodeRepository(),
-            repositoryFactory.getGliaEngagementRepository());
+            useCaseFactory.getEngagementStateUseCase(),
+            useCaseFactory.getHasOngoingEngagementUseCase()
+        );
     }
 
     public ActivityWatcherForCallVisualizerContract.Controller getActivityWatcherForCallVisualizerController() {
@@ -384,10 +367,10 @@ public class ControllerFactory {
                 serviceChatHeadController,
                 getChatHeadLayoutController(),
                 getScreenSharingController(),
-                useCaseFactory.createOnEngagementUseCase(),
+                useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.createIsCallVisualizerUseCase());
+                useCaseFactory.getIsCurrentEngagementCallVisualizer());
         }
         return activityWatcherForChatHeadController;
     }
@@ -401,10 +384,22 @@ public class ControllerFactory {
     public ActivityWatcherForLiveObservationContract.Controller getActivityWatcherForLiveObservationController() {
         if (activityWatcherForLiveObservationController == null) {
             activityWatcherForLiveObservationController = new ActivityWatcherForLiveObservationController(
-                useCaseFactory.getLiveObservationUseCase(),
+                useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.createLiveObservationPopupUseCase()
             );
         }
         return activityWatcherForLiveObservationController;
+    }
+
+    @NonNull
+    public EngagementCompletionController getEndEngagementController() {
+        if (engagementCompletionController == null) {
+            engagementCompletionController = new EngagementCompletionControllerImpl(
+                useCaseFactory.getSurveyUseCase(),
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getReleaseResourcesUseCase()
+            );
+        }
+        return engagementCompletionController;
     }
 }

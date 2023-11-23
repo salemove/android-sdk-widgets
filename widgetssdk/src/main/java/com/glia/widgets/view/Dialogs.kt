@@ -199,22 +199,27 @@ internal object Dialogs {
         context: Context,
         theme: UiTheme,
         companyName: String,
+        link1ClickListener: View.OnClickListener? = null,
+        link2ClickListener: View.OnClickListener? = null,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
 
-        val payload = DialogPayload.Option(
-            title = stringProvider.getRemoteString(R.string.live_observation_confirm_title),
-            message = stringProvider.getRemoteString(R.string.live_observation_confirm_message, StringKeyPair(StringKey.COMPANY_NAME, companyName)),
+        val payload = DialogPayload.Confirmation(
+            title = stringProvider.getRemoteString(R.string.engagement_confirm_title),
+            message = stringProvider.getRemoteString(R.string.engagement_confirm_message, StringKeyPair(StringKey.COMPANY_NAME, companyName)),
+            link1Text = stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
+            link2Text = stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
             positiveButtonText = allow,
             negativeButtonText = cancel,
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
-            negativeButtonClickListener = negativeButtonClickListener
-
+            negativeButtonClickListener = negativeButtonClickListener,
+            link1ClickListener = link1ClickListener,
+            link2ClickListener = link2ClickListener
         )
 
-        return dialogService.showDialog(context, theme, DialogType.Option(payload))
+        return dialogService.showDialog(context, theme, DialogType.Confirmation(payload))
     }
 
     fun showOperatorEndedEngagementDialog(context: Context, theme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {

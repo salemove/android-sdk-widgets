@@ -517,7 +517,9 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             theme = theme,
             companyName = companyName,
             positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
-            negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() }
+            negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() },
+            link1ClickListener = {}, //TODO: will be implemented on the next task
+            link2ClickListener = {}
         )
     }
 

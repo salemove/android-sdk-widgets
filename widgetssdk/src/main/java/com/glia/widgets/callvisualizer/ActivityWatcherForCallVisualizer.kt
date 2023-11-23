@@ -343,7 +343,9 @@ internal class ActivityWatcherForCallVisualizer(
                 theme = uiTheme,
                 companyName = companyName,
                 positiveButtonClickListener = { controller.onPositiveDialogButtonClicked() },
-                negativeButtonClickListener = { controller.onNegativeDialogButtonClicked() }
+                negativeButtonClickListener = { controller.onNegativeDialogButtonClicked() },
+                link1ClickListener = {}, //TODO: will be implemented on the next task
+                link2ClickListener = {}
             )
         }
     }

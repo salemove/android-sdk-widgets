@@ -10,6 +10,7 @@ internal data class AlertTheme(
     val message: TextTheme? = null,
     val backgroundColor: ColorTheme? = null,
     val closeButtonColor: ColorTheme? = null,
+    val linkButton: ButtonTheme? = null,
     val positiveButton: ButtonTheme? = null,
     val negativeButton: ButtonTheme? = null,
     val isVerticalAxis: Boolean? = null

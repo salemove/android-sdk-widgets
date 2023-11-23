@@ -39,7 +39,6 @@ public class GliaOnEngagementEndUseCase implements
 
         @Override
         public void run() {
-            surveyRepository.onEngagementEnded(engagement);
             if (listener != null) {
                 listener.engagementEnded();
             }

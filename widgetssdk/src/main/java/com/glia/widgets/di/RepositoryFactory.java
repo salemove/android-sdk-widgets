@@ -20,10 +20,6 @@ import com.glia.widgets.core.secureconversations.SecureConversationsRepository;
 import com.glia.widgets.core.secureconversations.SendMessageRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
-import com.glia.widgets.engagement.EngagementDataSourceImpl;
-import com.glia.widgets.engagement.SurveyDataSourceImpl;
-import com.glia.widgets.engagement.end.EngagementEndRepository;
-import com.glia.widgets.engagement.end.EngagementEndRepositoryImpl;
 import com.glia.widgets.filepreview.data.GliaFileRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepositoryImpl;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
@@ -222,12 +218,5 @@ public class RepositoryFactory {
             permissionsRequestRepository = new PermissionsRequestRepository();
         }
         return permissionsRequestRepository;
-    }
-
-    public EngagementEndRepository getEngagementEndRepository() {
-        return new EngagementEndRepositoryImpl(
-            new EngagementDataSourceImpl(gliaCore),
-            new SurveyDataSourceImpl()
-        );
     }
 }

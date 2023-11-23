@@ -2,7 +2,6 @@ package com.glia.widgets.core.authentication
 
 import com.glia.androidsdk.RequestCallback
 import com.glia.androidsdk.visitor.Authentication
-import com.glia.widgets.core.engagement.domain.ResetSurveyUseCase
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -14,7 +13,6 @@ import com.glia.widgets.helper.TAG
  */
 internal class AuthenticationManager(
     private val authentication: Authentication,
-    private val resetSurveyUseCase: ResetSurveyUseCase,
     private val controllerFactory: ControllerFactory
 ) : Authentication {
     override fun setBehavior(behavior: Authentication.Behavior) {
@@ -47,7 +45,7 @@ internal class AuthenticationManager(
 
     private fun cleanup() {
         controllerFactory.destroyControllers()
-        resetSurveyUseCase()
+        controllerFactory.endEngagementController.resetState()
     }
 
     override fun isAuthenticated(): Boolean = authentication.isAuthenticated

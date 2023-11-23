@@ -10,7 +10,6 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUseCase
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
@@ -35,7 +34,6 @@ internal class ApplicationChatHeadLayoutController(
     private val addVisitorMediaStateListenerUseCase: AddVisitorMediaStateListenerUseCase,
     private val removeVisitorMediaStateListenerUseCase: RemoveVisitorMediaStateListenerUseCase,
     private val getOperatorFlowableUseCase: GetOperatorFlowableUseCase,
-    private val setPendingSurveyUseCase: SetPendingSurveyUseCase,
     private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
 ) : ChatHeadLayoutContract.Controller,
     VisitorMediaUpdatesListener,
@@ -135,7 +133,6 @@ internal class ApplicationChatHeadLayoutController(
     }
 
     override fun engagementEnded() {
-        setPendingSurveyUseCase.invoke()
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0

@@ -52,7 +52,7 @@ public class GliaEngagementStateRepository {
         engagement.on(Engagement.Events.STATE_UPDATE, engagementState -> {
             notifyEngagementStateUpdate(engagementState);
         });
-//        engagement.on(Engagement.Events.END, () -> onEngagementEnded(engagement));
+        engagement.on(Engagement.Events.END, () -> onEngagementEnded(engagement));
     }
 
     public void onEngagementEnded(Engagement engagement) {

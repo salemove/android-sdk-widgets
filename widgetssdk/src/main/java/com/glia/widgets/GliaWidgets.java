@@ -204,7 +204,7 @@ public class GliaWidgets {
     public static void clearVisitorSession() {
         Logger.d(TAG, "clearVisitorSession");
         Dependencies.getControllerFactory().destroyControllers();
-        Dependencies.getUseCaseFactory().resetState();
+        Dependencies.getControllerFactory().getEndEngagementController().resetState();
         Dependencies.glia().clearVisitorSession();
     }
 
@@ -215,12 +215,7 @@ public class GliaWidgets {
      */
     public static void endEngagement() {
         Logger.d(TAG, "endEngagement");
-        Dependencies.getControllerFactory().destroyControllers();
-        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
-            if (e != null) {
-                Logger.e(TAG, "Ending engagement error: " + e);
-            }
-        }));
+        Dependencies.getUseCaseFactory().getLocallyEndEngagementSilentlyUseCase().invoke();
     }
 
     /**

@@ -62,12 +62,8 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
-import com.glia.widgets.core.chathead.SurveyStateManager;
-import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase;
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUseCase;
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
@@ -85,7 +81,6 @@ import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
-import com.glia.widgets.core.engagement.domain.ResetSurveyUseCase;
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase;
@@ -126,9 +121,18 @@ import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUs
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.engagement.end.domain.DestroyControllersUseCase;
+import com.glia.widgets.engagement.end.domain.EndEngagementUseCase;
+import com.glia.widgets.engagement.end.domain.EngagementEndEventUseCase;
+import com.glia.widgets.engagement.end.domain.EngagementEndReasonUseCase;
+import com.glia.widgets.engagement.end.domain.EngagementStateUseCase;
+import com.glia.widgets.engagement.end.domain.LoadSurveyUseCase;
+import com.glia.widgets.engagement.end.domain.LocallyEndEngagementSilentlyUseCase;
+import com.glia.widgets.engagement.end.domain.LocallyEndEngagementUseCase;
+import com.glia.widgets.engagement.end.domain.NewEngagementUseCase;
+import com.glia.widgets.engagement.end.domain.ResetEndEngagementReasonUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -144,7 +148,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class UseCaseFactory {
-    private static final SurveyStateManager surveyStateManager = new SurveyStateManager();
     private static CallNotificationUseCase callNotificationUseCase;
     private static ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private static RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
@@ -364,21 +367,6 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public SetPendingSurveyUseCase createSetPendingSurveyUseCase() {
-        return new SetPendingSurveyUseCase(surveyStateManager);
-    }
-
-    @NonNull
-    public HasPendingSurveyUseCase createHasPendingSurveyUseCase() {
-        return new HasPendingSurveyUseCase(surveyStateManager);
-    }
-
-    @NonNull
-    public SetPendingSurveyUsedUseCase createSetPendingSurveyUsed() {
-        return new SetPendingSurveyUsedUseCase(surveyStateManager);
-    }
-
-    @NonNull
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
         return new GliaOnMessageUseCase(
             repositoryFactory.getGliaMessageRepository(),
@@ -573,11 +561,6 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public GliaSurveyUseCase getGliaSurveyUseCase() {
-        return new GliaSurveyUseCase(repositoryFactory.getGliaSurveyRepository());
-    }
-
-    @NonNull
     public GliaSurveyAnswerUseCase getSurveyAnswerUseCase() {
         return new GliaSurveyAnswerUseCase(repositoryFactory.getGliaSurveyRepository());
     }
@@ -745,8 +728,7 @@ public class UseCaseFactory {
     @NonNull
     public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
         return new SetEngagementConfigUseCase(
-            repositoryFactory.getEngagementConfigRepository(),
-            createResetSurveyUseCase()
+            repositoryFactory.getEngagementConfigRepository()
         );
     }
 
@@ -825,11 +807,6 @@ public class UseCaseFactory {
     @NonNull
     DecodeSampledBitmapFromInputStreamUseCase createDecodeSampledBitmapFromInputStreamUseCase() {
         return new DecodeSampledBitmapFromInputStreamUseCase();
-    }
-
-    @NonNull
-    public ResetSurveyUseCase createResetSurveyUseCase() {
-        return new ResetSurveyUseCase(surveyStateManager, repositoryFactory.getGliaSurveyRepository());
     }
 
     @NonNull
@@ -1043,19 +1020,93 @@ public class UseCaseFactory {
         return new UpdateOperatorDefaultImageUrlUseCase(repositoryFactory.getOperatorRepository(), createSiteInfoUseCase());
     }
 
+    @NonNull
     public ConfirmationDialogUseCase createConfirmationDialogUseCase() {
         return new ConfirmationDialogUseCase(createSiteInfoUseCase());
     }
 
+    @NonNull
     public LiveObservationPopupUseCase createLiveObservationPopupUseCase() {
         return new LiveObservationPopupUseCase(createSiteInfoUseCase());
     }
 
+    @NonNull
     public LiveObservationUseCase getLiveObservationUseCase() {
         return new LiveObservationUseCase(repositoryFactory.getGliaEngagementRepository());
     }
 
-    public void resetState() {
-        createResetSurveyUseCase().invoke();
+    @NonNull
+    public DestroyControllersUseCase getDestroyControllersUseCase() {
+        return new DestroyControllersUseCase();
+    }
+
+    @NonNull
+    public NewEngagementUseCase getNewEngagementUseCase() {
+        return new NewEngagementUseCase(
+            DatasourceFactory.getEngagementDataSource()
+        );
+    }
+
+    @NonNull
+    public EndEngagementUseCase getEndEngagementUseCase() {
+        return new EndEngagementUseCase(
+            DatasourceFactory.getEngagementDataSource(),
+            gliaCore
+        );
+    }
+
+    @NonNull
+    public EngagementEndEventUseCase getEngagementEndEventUseCase() {
+        return new EngagementEndEventUseCase(
+            DatasourceFactory.getEngagementDataSource(),
+            getNewEngagementUseCase()
+        );
+    }
+
+    @NonNull
+    public EngagementEndReasonUseCase getEngagementEndReasonUseCase() {
+        return new EngagementEndReasonUseCase(
+            DatasourceFactory.getEngagementEndReasonDataSource()
+        );
+    }
+
+    @NonNull
+    public EngagementStateUseCase getEngagementStateUseCase() {
+        return new EngagementStateUseCase(
+            DatasourceFactory.getEngagementDataSource(),
+            getNewEngagementUseCase()
+        );
+    }
+
+    @NonNull
+    public LoadSurveyUseCase getLoadSurveyUseCase() {
+        return new LoadSurveyUseCase(
+            DatasourceFactory.getSurveyDataSource()
+        );
+    }
+
+    @NonNull
+    public LocallyEndEngagementSilentlyUseCase getLocallyEndEngagementSilentlyUseCase() {
+        return new LocallyEndEngagementSilentlyUseCase(
+            DatasourceFactory.getEngagementEndReasonDataSource(),
+            getEndEngagementUseCase(),
+            getDestroyControllersUseCase()
+        );
+    }
+
+    @NonNull
+    public LocallyEndEngagementUseCase getLocallyEndEngagementUseCase() {
+        return new LocallyEndEngagementUseCase(
+            DatasourceFactory.getEngagementEndReasonDataSource(),
+            getEndEngagementUseCase(),
+            getDestroyControllersUseCase()
+        );
+    }
+
+    @NonNull
+    public ResetEndEngagementReasonUseCase getResetEndEngagementReasonUseCase() {
+        return new ResetEndEngagementReasonUseCase(
+            DatasourceFactory.getEngagementEndReasonDataSource()
+        );
     }
 }

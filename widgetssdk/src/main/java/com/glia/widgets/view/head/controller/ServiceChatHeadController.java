@@ -13,7 +13,6 @@ import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerEndUseCas
 import com.glia.widgets.core.callvisualizer.domain.GliaOnCallVisualizerUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
@@ -33,8 +32,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 public class ServiceChatHeadController
-        implements ChatHeadContract.Controller, VisitorMediaUpdatesListener,
-        GliaOnEngagementEndUseCase.Listener, GliaOnCallVisualizerEndUseCase.Listener {
+    implements ChatHeadContract.Controller, VisitorMediaUpdatesListener,
+    GliaOnEngagementEndUseCase.Listener, GliaOnCallVisualizerEndUseCase.Listener {
     private static final String TAG = ServiceChatHeadController.class.getSimpleName();
 
     private final ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase;
@@ -48,7 +47,6 @@ public class ServiceChatHeadController
     private final AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase;
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final GetOperatorFlowableUseCase getOperatorFlowableUseCase;
-    private final SetPendingSurveyUseCase setPendingSurveyUseCase;
     private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
     private final ChatHeadPosition chatHeadPosition;
 
@@ -75,19 +73,18 @@ public class ServiceChatHeadController
     private Disposable operatorDisposable = null;
 
     public ServiceChatHeadController(
-            ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase,
-            ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase,
-            GliaOnEngagementUseCase gliaOnEngagementUseCase,
-            GliaOnCallVisualizerUseCase gliaOnCallVisualizerUseCase,
-            GliaOnEngagementEndUseCase onEngagementEndUseCase,
-            GliaOnCallVisualizerEndUseCase onCallVisualizerEndUseCase,
-            MessagesNotSeenHandler messagesNotSeenHandler,
-            AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
-            RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
-            ChatHeadPosition chatHeadPosition,
-            GetOperatorFlowableUseCase getOperatorFlowableUseCase,
-            SetPendingSurveyUseCase setPendingSurveyUseCase,
-            IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
+        ToggleChatHeadServiceUseCase toggleChatHeadServiceUseCase,
+        ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase,
+        GliaOnEngagementUseCase gliaOnEngagementUseCase,
+        GliaOnCallVisualizerUseCase gliaOnCallVisualizerUseCase,
+        GliaOnEngagementEndUseCase onEngagementEndUseCase,
+        GliaOnCallVisualizerEndUseCase onCallVisualizerEndUseCase,
+        MessagesNotSeenHandler messagesNotSeenHandler,
+        AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
+        RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
+        ChatHeadPosition chatHeadPosition,
+        GetOperatorFlowableUseCase getOperatorFlowableUseCase,
+        IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
         this.toggleChatHeadServiceUseCase = toggleChatHeadServiceUseCase;
         this.resolveChatHeadNavigationUseCase = resolveChatHeadNavigationUseCase;
@@ -100,7 +97,6 @@ public class ServiceChatHeadController
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
         this.getOperatorFlowableUseCase = getOperatorFlowableUseCase;
-        this.setPendingSurveyUseCase = setPendingSurveyUseCase;
         this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
 
@@ -198,7 +194,6 @@ public class ServiceChatHeadController
 
     @Override
     public void engagementEnded() {
-        setPendingSurveyUseCase.invoke(); // Survey is supported by omnicore engagement only
         callVisualizerEngagementEnded();
     }
 
@@ -215,10 +210,10 @@ public class ServiceChatHeadController
         state = State.ENGAGEMENT;
         if (operatorDisposable != null) operatorDisposable.dispose();
         operatorDisposable = getOperatorFlowableUseCase.execute()
-                .subscribe(
-                        this::operatorDataLoaded,
-                        throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
-                );
+            .subscribe(
+                this::operatorDataLoaded,
+                throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
+            );
         engagementDisposables.add(operatorDisposable);
         gliaOnEngagementEndUseCase.execute(this);
         toggleChatHeadServiceUseCase.invoke(resumedViewName);
@@ -230,10 +225,10 @@ public class ServiceChatHeadController
         state = State.ENGAGEMENT;
         if (operatorDisposable != null) operatorDisposable.dispose();
         operatorDisposable = getOperatorFlowableUseCase.execute()
-                .subscribe(
-                        this::operatorDataLoaded,
-                        throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
-                );
+            .subscribe(
+                this::operatorDataLoaded,
+                throwable -> Logger.e(TAG, "getOperatorFlowableUseCase error: " + throwable.getMessage())
+            );
         engagementDisposables.add(operatorDisposable);
         // To recieve callback to engagementEnded() after Call Visualizer engagement ends
         gliaOnCallVisualizerEndUseCase.execute(this);
@@ -290,7 +285,7 @@ public class ServiceChatHeadController
 
     private boolean isResumedView(View view) {
         return resumedViewName != null &&
-                resumedViewName.equals(view.getClass().getSimpleName());
+            resumedViewName.equals(view.getClass().getSimpleName());
     }
 
     private void updateOnHold() {

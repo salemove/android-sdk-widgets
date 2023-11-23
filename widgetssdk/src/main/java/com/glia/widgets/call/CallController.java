@@ -13,7 +13,6 @@ import com.glia.androidsdk.comms.MediaDirection;
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.VisitorMediaState;
-import com.glia.androidsdk.engagement.Survey;
 import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
@@ -24,7 +23,6 @@ import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase;
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
@@ -51,12 +49,9 @@ import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
 import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
-import com.glia.widgets.core.survey.OnSurveyListener;
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
-import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.CommonExtensionsKt;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -70,7 +65,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import kotlin.Unit;
 
 public class CallController
-    implements GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener, VisitorMediaUpdatesListener {
+    implements GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, VisitorMediaUpdatesListener {
 
     private static final int MAX_IDLE_TIME = 3200;
     private static final int INACTIVITY_TIMER_TICKER_VALUE = 400;
@@ -98,9 +93,7 @@ public class CallController
     private final RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase;
     private final AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase;
     private final RemoveMediaUpgradeOfferCallbackUseCase removeMediaUpgradeCallbackUseCase;
-    private final SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase;
     private final DialogController dialogController;
-    private final GliaSurveyUseCase surveyUseCase;
     private final ToggleVisitorAudioMediaMuteUseCase toggleVisitorAudioMediaMuteUseCase;
     private final ToggleVisitorVideoUseCase toggleVisitorVideoUseCase;
     private final GetEngagementStateFlowableUseCase getGliaEngagementStateFlowableUseCase;
@@ -121,7 +114,6 @@ public class CallController
     private volatile CallState callState;
     private final GliaOperatorMediaRepository.OperatorMediaStateListener operatorMediaStateListener = this::onNewOperatorMediaState;
     private MessagesNotSeenHandler.MessagesNotSeenHandlerListener messagesNotSeenHandlerListener;
-    private boolean isVisitorEndEngagement = false;
 
     public CallController(
         GliaSdkConfigurationManager sdkConfigurationManager,
@@ -145,7 +137,6 @@ public class CallController
         IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
         HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
         IsShowEnableCallNotificationChannelDialogUseCase isShowEnableCallNotificationChannelDialogUseCase,
-        GliaSurveyUseCase surveyUseCase,
         AddVisitorMediaStateListenerUseCase addVisitorMediaStateListenerUseCase,
         RemoveVisitorMediaStateListenerUseCase removeVisitorMediaStateListenerUseCase,
         AddMediaUpgradeOfferCallbackUseCase addMediaUpgradeCallbackUseCase,
@@ -157,7 +148,6 @@ public class CallController
         QueueTicketStateChangeToUnstaffedUseCase ticketStateChangeToUnstaffedUseCase,
         IsCallVisualizerUseCase isCallVisualizerUseCase,
         IsOngoingEngagementUseCase isOngoingEngagementUseCase,
-        SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase,
         TurnSpeakerphoneUseCase turnSpeakerphoneUseCase,
         ConfirmationDialogUseCase confirmationDialogUseCase,
         HandleCallPermissionsUseCase handleCallPermissionsUseCase) {
@@ -195,7 +185,6 @@ public class CallController
         this.isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase;
         this.hasCallNotificationChannelEnabledUseCase = hasCallNotificationChannelEnabledUseCase;
         this.isShowEnableCallNotificationChannelDialogUseCase = isShowEnableCallNotificationChannelDialogUseCase;
-        this.surveyUseCase = surveyUseCase;
         this.addVisitorMediaStateListenerUseCase = addVisitorMediaStateListenerUseCase;
         this.removeVisitorMediaStateListenerUseCase = removeVisitorMediaStateListenerUseCase;
         this.addMediaUpgradeCallbackUseCase = addMediaUpgradeCallbackUseCase;
@@ -207,7 +196,6 @@ public class CallController
         this.ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase;
         this.isCallVisualizerUseCase = isCallVisualizerUseCase;
         this.isOngoingEngagementUseCase = isOngoingEngagementUseCase;
-        this.setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase;
         this.turnSpeakerphoneUseCase = turnSpeakerphoneUseCase;
         this.handleCallPermissionsUseCase = handleCallPermissionsUseCase;
         this.confirmationDialogUseCase = confirmationDialogUseCase;
@@ -291,9 +279,6 @@ public class CallController
         sdkConfigurationManager.setUseOverlay(useOverlays);
         sdkConfigurationManager.setScreenSharingMode(screenSharingMode);
 
-        if (surveyUseCase.hasResult()) {
-            return;
-        }
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
             dialogController.showOverlayPermissionsDialog();
         }
@@ -353,7 +338,6 @@ public class CallController
 
     public void onLiveObservationDialogRejected() {
         Logger.d(TAG, "onLiveObservationDialogRejected");
-        isVisitorEndEngagement = true;
         stop();
         dialogController.dismissDialogs();
     }
@@ -389,7 +373,6 @@ public class CallController
     }
 
     public void onPause() {
-        surveyUseCase.unregisterListener(this);
         removeVisitorMediaStateListenerUseCase.execute(this);
         if (mediaUpgradeOfferRepositoryCallback != null) {
             removeMediaUpgradeCallbackUseCase.invoke(mediaUpgradeOfferRepositoryCallback);
@@ -411,7 +394,6 @@ public class CallController
 
     public void endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked");
-        isVisitorEndEngagement = true;
         stop();
         dialogController.dismissDialogs();
     }
@@ -452,7 +434,6 @@ public class CallController
         addVisitorMediaStateListenerUseCase.execute(this);
         showCallNotification();
         showLandscapeControls();
-        surveyUseCase.registerListener(this);
         if (isCallVisualizerUseCase.invoke()) {
             subscribeToOmnibrowseEvents();
         } else {
@@ -554,20 +535,6 @@ public class CallController
         }
         if (callState.isMediaEngagementStarted() && !callTimer.isRunning() && callTimerStatusListener != null) {
             callTimer.startNew(Constants.CALL_TIMER_DELAY, Constants.CALL_TIMER_INTERVAL_VALUE);
-        }
-    }
-
-    @Override
-    public void onSurveyLoaded(@Nullable Survey survey) {
-        Logger.d(TAG, "newSurveyLoaded");
-        setPendingSurveyUsedUseCase.invoke();
-        if (viewCallback != null && survey != null) {
-            viewCallback.navigateToSurvey(survey);
-            Dependencies.getControllerFactory().destroyControllers();
-        } else if (!isVisitorEndEngagement) {
-            dialogController.showEngagementEndedDialog();
-        } else {
-            Dependencies.getControllerFactory().destroyControllers();
         }
     }
 

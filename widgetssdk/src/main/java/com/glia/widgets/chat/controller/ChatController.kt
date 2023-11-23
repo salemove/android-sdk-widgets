@@ -12,7 +12,6 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.comms.OperatorMediaState
 import com.glia.androidsdk.engagement.EngagementFile
-import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
@@ -39,8 +38,6 @@ import com.glia.widgets.chat.model.GvaButton
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
-import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
-import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
@@ -76,8 +73,6 @@ import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
 import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import com.glia.widgets.core.survey.OnSurveyListener
-import com.glia.widgets.core.survey.domain.GliaSurveyUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
@@ -123,7 +118,6 @@ internal class ChatController(
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val downloadFileUseCase: DownloadFileUseCase,
     private val siteInfoUseCase: SiteInfoUseCase,
-    private val surveyUseCase: GliaSurveyUseCase,
     private val getGliaEngagementStateFlowableUseCase: GetEngagementStateFlowableUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
@@ -135,8 +129,6 @@ internal class ChatController(
     private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
-    private val hasPendingSurveyUseCase: HasPendingSurveyUseCase,
-    private val setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase,
     private val isCallVisualizerUseCase: IsCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
@@ -145,7 +137,7 @@ internal class ChatController(
     private val updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     private val chatManager: ChatManager
-) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
+) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
@@ -179,7 +171,7 @@ internal class ChatController(
                 onMessageSendError(ex, message)
             }
         }
-    private var isVisitorEndEngagement = false
+
 
     @Volatile
     private var isChatViewPaused = false
@@ -214,20 +206,18 @@ internal class ChatController(
         engagementConfigUseCase(chatType, queueIds)
         updateOperatorDefaultImageUrlUseCase()
 
-        if (!hasPendingSurveyUseCase.invoke()) {
-            ensureSecureMessagingAvailable()
+        ensureSecureMessagingAvailable()
 
-            if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
-                if (isSecureEngagement) {
-                    emitViewState { chatState.setSecureMessagingState() }
-                }
-                chatManager.onChatAction(ChatManager.Action.ChatRestored)
-                return
+        if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+            if (isSecureEngagement) {
+                emitViewState { chatState.setSecureMessagingState() }
             }
-
-            emitViewState { chatState.initChat(companyName, queueId, visitorContextAssetId) }
-            initChatManager()
+            chatManager.onChatAction(ChatManager.Action.ChatRestored)
+            return
         }
+
+        emitViewState { chatState.initChat(companyName, queueId, visitorContextAssetId) }
+        initChatManager()
     }
 
     private fun ensureSecureMessagingAvailable() {
@@ -271,7 +261,6 @@ internal class ChatController(
 
     fun onLiveObservationDialogRejected() {
         Logger.d(TAG, "onLiveObservationDialogRejected")
-        isVisitorEndEngagement = true
         stop()
         dialogController.dismissDialogs()
     }
@@ -322,7 +311,6 @@ internal class ChatController(
     fun onPause() {
         isChatViewPaused = true
         messagesNotSeenHandler.onChatWentBackground()
-        surveyUseCase.unregisterListener(this)
         mediaUpgradeOfferRepositoryCallback?.let { removeMediaUpgradeCallbackUseCase(it) }
     }
 
@@ -427,7 +415,6 @@ internal class ChatController(
 
     fun endEngagementDialogYesClicked() {
         Logger.d(TAG, "endEngagementDialogYesClicked")
-        isVisitorEndEngagement = true
         stop()
         dialogController.dismissDialogs()
     }
@@ -483,7 +470,6 @@ internal class ChatController(
         isChatViewPaused = false
         messagesNotSeenHandler.callChatButtonClicked()
         subscribeToEngagementStateChange()
-        surveyUseCase.registerListener(this)
         mediaUpgradeOfferRepositoryCallback?.let { addMediaUpgradeCallbackUseCase(it) }
 
         if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
@@ -643,7 +629,7 @@ internal class ChatController(
     private fun viewInitPreQueueing() {
         Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
-        confirmationDialogUseCase{ shouldShow ->
+        confirmationDialogUseCase { shouldShow ->
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
             } else {
@@ -842,29 +828,6 @@ internal class ChatController(
     override fun engagementEnded() {
         Logger.d(TAG, "engagementEnded")
         stop()
-    }
-
-    override fun onSurveyLoaded(survey: Survey?) {
-        Logger.d(TAG, "newSurveyLoaded")
-        setPendingSurveyUsedUseCase.invoke()
-        when {
-            viewCallback != null && survey != null -> {
-                // Show survey
-                viewCallback!!.navigateToSurvey(survey)
-                Dependencies.getControllerFactory().destroyControllers()
-            }
-
-            !isVisitorEndEngagement -> {
-                // Show "Engagement ended" pop-up
-                dialogController.showEngagementEndedDialog()
-            }
-
-            else -> {
-                // Close chat screen
-                Dependencies.getControllerFactory().destroyControllers()
-                destroyView()
-            }
-        }
     }
 
     private fun onNewOperatorMediaState(operatorMediaState: OperatorMediaState?) {

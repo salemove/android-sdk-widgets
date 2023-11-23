@@ -1,5 +1,7 @@
 package com.glia.widgets.di;
 
+import androidx.annotation.NonNull;
+
 import com.glia.widgets.call.CallController;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerContract;
@@ -16,6 +18,7 @@ import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.engagement.end.EndEngagementController;
 import com.glia.widgets.engagement.end.EndEngagementControllerImpl;
+import com.glia.widgets.engagement.end.EngagementEndRepositoryImpl;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -53,7 +56,7 @@ public class ControllerFactory {
     private final ChatHeadPosition chatHeadPosition;
     private final ManagerFactory managerFactory;
 
-    private final EndEngagementController endEngagementController;
+    private EndEngagementController endEngagementController;
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
@@ -89,7 +92,6 @@ public class ControllerFactory {
         this.chatHeadPosition = ChatHeadPosition.getInstance();
         this.sdkConfigurationManager = sdkConfigurationManager;
         this.managerFactory = managerFactory;
-        this.endEngagementController = new EndEngagementControllerImpl(repositoryFactory.getEngagementEndRepository());
     }
 
     public ChatController getChatController(ChatViewCallback chatViewCallback) {
@@ -122,7 +124,6 @@ public class ControllerFactory {
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createDownloadFileUseCase(),
                 useCaseFactory.createSiteInfoUseCase(),
-                useCaseFactory.getGliaSurveyUseCase(),
                 useCaseFactory.createGetGliaEngagementStateFlowableUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
@@ -134,8 +135,6 @@ public class ControllerFactory {
                 useCaseFactory.createIsOngoingEngagementUseCase(),
                 useCaseFactory.createSetEngagementConfigUseCase(),
                 useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
-                useCaseFactory.createHasPendingSurveyUseCase(),
-                useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createIsCallVisualizerUseCase(),
                 useCaseFactory.createIsFileReadyForPreviewUseCase(),
                 useCaseFactory.createAcceptMediaUpgradeOfferUseCase(),
@@ -177,7 +176,6 @@ public class ControllerFactory {
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
                 useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
-                useCaseFactory.getGliaSurveyUseCase(),
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                 useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                 useCaseFactory.createAddMediaUpgradeOfferCallbackUseCase(),
@@ -189,7 +187,6 @@ public class ControllerFactory {
                 useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                 useCaseFactory.createIsCallVisualizerUseCase(),
                 useCaseFactory.createIsOngoingEngagementUseCase(),
-                useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createHandleCallPermissionsUseCase());
@@ -277,7 +274,6 @@ public class ControllerFactory {
                 useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                 chatHeadPosition,
                 useCaseFactory.createGetOperatorFlowableUseCase(),
-                useCaseFactory.createSetPendingSurveyUseCase(),
                 useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
             );
         }
@@ -297,7 +293,6 @@ public class ControllerFactory {
                 useCaseFactory.createAddVisitorMediaStateListenerUseCase(),
                 useCaseFactory.createRemoveVisitorMediaStateListenerUseCase(),
                 useCaseFactory.createGetOperatorFlowableUseCase(),
-                useCaseFactory.createSetPendingSurveyUseCase(),
                 useCaseFactory.createIsCallVisualizerScreenSharingUseCase()
             );
         }
@@ -318,7 +313,6 @@ public class ControllerFactory {
             callVisualizerController = new CallVisualizerController(
                 repositoryFactory.getCallVisualizerRepository(),
                 dialogController,
-                useCaseFactory.getGliaSurveyUseCase(),
                 useCaseFactory.createOnCallVisualizerUseCase(),
                 useCaseFactory.createOnCallVisualizerEndUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
@@ -408,7 +402,19 @@ public class ControllerFactory {
         return activityWatcherForLiveObservationController;
     }
 
+    @NonNull
     public EndEngagementController getEndEngagementController() {
+        if (endEngagementController == null) {
+            endEngagementController = new EndEngagementControllerImpl(
+                new EngagementEndRepositoryImpl(
+                    useCaseFactory.getLoadSurveyUseCase(),
+                    useCaseFactory.getDestroyControllersUseCase(),
+                    useCaseFactory.getResetEndEngagementReasonUseCase(),
+                    useCaseFactory.getEngagementEndEventUseCase(),
+                    useCaseFactory.getEngagementEndReasonUseCase()
+                )
+            );
+        }
         return endEngagementController;
     }
 }

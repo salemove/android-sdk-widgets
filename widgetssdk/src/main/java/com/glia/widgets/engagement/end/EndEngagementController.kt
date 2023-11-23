@@ -1,5 +1,6 @@
 package com.glia.widgets.engagement.end
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
@@ -21,11 +22,9 @@ internal interface EndEngagementController {
     val state: Flowable<EndEngagement.State>
     fun captureTheme(activity: Activity)
     fun onActivityResumed(activity: Activity)
-
     fun onActivityPaused()
-    fun endEngagement()
-    fun endEngagementSilently()
     fun initialize()
+    fun resetState()
 }
 
 internal class EndEngagementControllerImpl @JvmOverloads constructor(
@@ -45,6 +44,11 @@ internal class EndEngagementControllerImpl @JvmOverloads constructor(
 
     override fun initialize() {
         initTrigger.onComplete()
+    }
+
+    @SuppressLint("CheckResult")
+    override fun resetState() {
+        engagementEndOneTimedResult.singleOrError().subscribe({ it.markConsumed() }, {})
     }
 
     private fun produceState(result: OneTimeEvent<EndEngagement.Result>, activityRef: WeakReference<Activity>): EndEngagement.State {
@@ -87,8 +91,4 @@ internal class EndEngagementControllerImpl @JvmOverloads constructor(
     override fun onActivityPaused() {
         resumedActivity.onNext(WeakReference(null))
     }
-
-    override fun endEngagement() = repository.endEngagement()
-
-    override fun endEngagementSilently() = repository.endEngagementSilently()
 }

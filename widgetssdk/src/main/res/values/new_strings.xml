@@ -202,8 +202,12 @@
     <string name="engagement_phone_title">Phone</string> <!-- TODO NEW -->
 
     <!--    Live Observation -->
-    <string name="live_observation_confirm_title">Before We Continue</string>
-    <string name="live_observation_confirm_message">Please allow the {companyName} representative to view this application screen for improved support.</string>
+    <string name="engagement_confirm_title">Before We Continue</string>
+    <string name="engagement_confirm_message">Please allow the {companyName} representative to view this application screen for improved support.</string>
+    <string name="engagement_confirm_link1_text">Terms and Conditions</string>
+    <string name="engagement_confirm_link1_url"/>
+    <string name="engagement_confirm_link2_text">Privacy Policies</string>
+    <string name="engagement_confirm_link2_url"/>
     <string name="live_observation_indicator_message">App screen is visible to the agent</string>
 
     <!--    GVA -->

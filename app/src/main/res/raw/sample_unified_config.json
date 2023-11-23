@@ -32,6 +32,48 @@
         ]
       }
     },
+    "linkButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": ["#FFFFFF"]
+        },
+        "borderWidth": 0,
+        "color": {
+          "type": "fill",
+          "value": ["#FFFFFF"]
+        },
+        "cornerRadius": 8
+      },
+      "shadow": {
+        "color": {
+          "type": "fill",
+          "value": ["#FF0000"]
+        },
+        "offset": 0,
+        "opacity": 1,
+        "radius": 8
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": ["#FF0000"]
+        },
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#04728c"]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": ["#ffd100"]
+      }
+    },
     "negativeButton": {
       "background": {
         "border": {

@@ -45,8 +45,12 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
         }
     }
 
-    protected fun setupButton(btn: MaterialButton, text: String, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener) {
+    protected fun setupButton(btn: MaterialButton, text: String?, btnTheme: ButtonTheme?, typeface: Typeface?, onClickListener: View.OnClickListener?) {
         btn.apply {
+            if (text.isNullOrEmpty() || onClickListener == null) {
+                this.visibility = View.GONE
+                return@apply
+            }
             this.text = text
             applyButtonTheme(btnTheme)
             setupTypeface(this, typeface)

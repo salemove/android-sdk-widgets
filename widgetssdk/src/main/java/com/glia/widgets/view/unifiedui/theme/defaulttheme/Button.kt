@@ -2,6 +2,7 @@
 
 package com.glia.widgets.view.unifiedui.theme.defaulttheme
 
+import android.graphics.Color
 import com.glia.widgets.view.unifiedui.composeIfAtLeastOneNotNull
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
@@ -27,6 +28,17 @@ internal fun PositiveDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
  */
 internal fun NegativeDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
     DefaultButtonTheme(text = baseLightColorTheme, background = systemNegativeColorTheme)
+}
+
+/**
+ * Default theme for Link Button
+ */
+internal fun LinkDefaultButtonTheme(pallet: ColorPallet) = pallet.run {
+    ButtonTheme(
+        background = LayerTheme(fill = ColorTheme(Color.TRANSPARENT)),
+        text = TextTheme(textColor = primaryColorTheme),
+        elevation = 0f
+    )
 }
 
 /**

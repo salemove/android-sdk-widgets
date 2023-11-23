@@ -726,7 +726,9 @@ internal class CallView(
                 callController?.onLiveObservationDialogRejected()
                 onEndListener?.onEnd()
                 callEnded()
-            }
+            },
+            link1ClickListener = {}, //TODO: will be implemented on the next task
+            link2ClickListener = {}
         )
     }
 

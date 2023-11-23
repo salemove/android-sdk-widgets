@@ -23,6 +23,9 @@ internal data class AlertRemoteConfig(
     @SerializedName("closeButtonColor")
     val closeButtonColor: ColorLayerRemoteConfig?,
 
+    @SerializedName("linkButton")
+    val linkButtonRemoteConfig: ButtonRemoteConfig?,
+
     @SerializedName("positiveButton")
     val positiveButtonRemoteConfig: ButtonRemoteConfig?,
 
@@ -38,6 +41,7 @@ internal data class AlertRemoteConfig(
         message = message?.toTextTheme(),
         backgroundColor = backgroundColor?.toColorTheme(),
         closeButtonColor = closeButtonColor?.toColorTheme(),
+        linkButton = linkButtonRemoteConfig?.toButtonTheme(),
         positiveButton = positiveButtonRemoteConfig?.toButtonTheme(),
         negativeButton = negativeButtonRemoteConfig?.toButtonTheme(),
         isVerticalAxis = buttonAxisRemoteConfig?.isVertical

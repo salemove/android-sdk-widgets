@@ -16,6 +16,20 @@ internal sealed interface DialogPayload {
         val negativeButtonClickListener: View.OnClickListener,
     ) : DialogPayload
 
+    data class Confirmation(
+        override val title: String,
+        val message: String,
+        val positiveButtonText: String,
+        val negativeButtonText: String,
+        val poweredByText: String,
+        val positiveButtonClickListener: View.OnClickListener,
+        val negativeButtonClickListener: View.OnClickListener,
+        val link1Text: String? = null,
+        val link2Text: String? = null,
+        val link1ClickListener: View.OnClickListener? = null,
+        val link2ClickListener: View.OnClickListener? = null,
+    ) : DialogPayload
+
     data class ScreenSharing(
         override val title: String,
         val message: String,

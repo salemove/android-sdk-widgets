@@ -152,7 +152,10 @@ internal fun MaterialButton.applyButtonTheme(buttonTheme: ButtonTheme?) {
         bg.borderWidthInt?.also { strokeWidth = it }
     }
 
-    buttonTheme?.elevation?.also { elevation = it }
+    buttonTheme?.elevation?.also {
+        stateListAnimator = null // Default state list controls the button shadow (elevation)
+        elevation = it
+    }
     buttonTheme?.shadowColor?.also(::applyShadow)
     buttonTheme?.text?.also {
         applyTextTheme(it)

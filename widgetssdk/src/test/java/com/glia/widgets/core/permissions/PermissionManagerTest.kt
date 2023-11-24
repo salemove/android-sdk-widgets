@@ -7,13 +7,17 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 import com.glia.widgets.permissions.PermissionsRequestRepository
 import com.glia.widgets.permissions.PermissionsRequestResult
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.MockedStatic
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
@@ -28,6 +32,7 @@ class PermissionManagerTest {
     private lateinit var permissionsRequestRepository: PermissionsRequestRepository
 
     private lateinit var permissionManager: PermissionManager
+    private var logger: MockedStatic<Logger>? = null
 
     @Before
     fun setUp() {
@@ -41,6 +46,12 @@ class PermissionManagerTest {
             permissionsRequestRepository,
             Build.VERSION_CODES.R
         )
+        logger = Mockito.mockStatic(Logger::class.java)
+    }
+
+    @After
+    fun tearDown() {
+        logger?.close()
     }
 
     // Tests for .getPermissionsForEngagementMediaType()

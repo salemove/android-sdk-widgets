@@ -12,19 +12,24 @@ import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.InsetsKt;
+import com.glia.widgets.helper.Logger;
 
 public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFinishListener {
+    private static final String TAG = SurveyActivity.class.getSimpleName();
+
     private SurveyView surveyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.i(TAG, "Create Survey screen");
         setContentView(R.layout.survey_activity);
         prepareSurveyView();
     }
 
     @Override
     protected void onDestroy() {
+        Logger.i(TAG, "Destroy Survey screen");
         hideSoftKeyboard();
         if (surveyView != null) {
             surveyView.onDestroyView();

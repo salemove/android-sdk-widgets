@@ -78,7 +78,7 @@ public class LayerConfiguration implements Parcelable {
 
         @SuppressLint("ResourceType")
         public LayerConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(LayerConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.backgroundColor == null) {

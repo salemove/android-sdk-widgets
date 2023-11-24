@@ -59,7 +59,7 @@ public class ScaleQuestionConfiguration implements Parcelable {
         }
 
         public ScaleQuestionConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(ScaleQuestionConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);

@@ -38,6 +38,7 @@ public class GliaQueueRepository {
             String queueId,
             String  visitorContextAssetId
     ) {
+        Logger.i(TAG, "Start queueing for chat engagement");
         return queueForEngagement(queueId, visitorContextAssetId)
                 .mergeWith(
                         awaitTicket()
@@ -49,6 +50,7 @@ public class GliaQueueRepository {
                                                        String  visitorContextAssetId,
                                                        Engagement.MediaType mediaType
     ) {
+        Logger.i(TAG, "Start queueing for media engagement");
         return queueForMediaEngagement(queueId, visitorContextAssetId, mediaType)
                 .mergeWith(
                         awaitTicket()
@@ -103,6 +105,7 @@ public class GliaQueueRepository {
     }
 
     public Completable cancelTicket(String ticketId) {
+        Logger.i(TAG, "Cancel queue ticket");
         return Completable.create(emitter -> gliaCore.cancelQueueTicket(ticketId, exception -> {
             if (exception != null) {
                 Logger.e(TAG, "cancelQueueTicketError: " + exception);

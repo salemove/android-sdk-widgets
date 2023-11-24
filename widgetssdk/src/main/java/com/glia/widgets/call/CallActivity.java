@@ -38,6 +38,7 @@ public class CallActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.i(TAG, "Create Call screen");
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
         configuration = CallIntentReader.from(this).getConfiguration();
@@ -93,6 +94,7 @@ public class CallActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Logger.i(TAG, "Destroy Call screen");
         onBackClickedListener = null;
         onNavigateToChatListener = null;
         callView.onDestroy();

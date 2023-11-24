@@ -59,7 +59,7 @@ public class BooleanQuestionConfiguration implements Parcelable {
         }
 
         public BooleanQuestionConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(BooleanQuestionConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);

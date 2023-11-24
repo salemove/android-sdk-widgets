@@ -55,7 +55,7 @@ public class GliaScreenSharingRepository {
             Activity activity,
             ScreenSharing.Mode screenSharingMode
     ) {
-        Logger.d(TAG, "screen sharing accepted by the user");
+        Logger.i(TAG, "Screen sharing accepted by visitor");
         screenSharingRequest.accept(
                 screenSharingMode,
                 activity,
@@ -68,7 +68,7 @@ public class GliaScreenSharingRepository {
             Activity activity,
             ScreenSharing.Mode screenSharingMode
     ) {
-        Logger.d(TAG, "Screen sharing accepted by the user, permission asked");
+        Logger.i(TAG, "Screen sharing accepted by visitor, permission asked");
 
         screenSharingRequest.accept(
                 screenSharingMode,
@@ -79,7 +79,7 @@ public class GliaScreenSharingRepository {
     }
 
     public void onScreenSharingDeclined() {
-        Logger.d(TAG, "screen sharing declined by the user");
+        Logger.i(TAG, "Screen sharing declined by visitor");
         gliaCore.getCurrentEngagement().ifPresent(engagement -> {
             // Pass RESULT_CANCELED to Core SDK to stop waiting for permission result. Otherwise, subsequent screen sharing requests won't be shown to the visitor.
             // Also see related bug ticket: MOB-2102
@@ -146,14 +146,14 @@ public class GliaScreenSharingRepository {
     }
 
     private void onScreenSharingStarted(LocalScreen screen) {
-        Logger.d(TAG, "screen sharing IS SHARING");
+        Logger.i(TAG, "Screen sharing started");
 
         currentScreen = screen;
         callback.onScreenSharingStarted();
     }
 
     private void onScreenSharingEnded() {
-        Logger.d(TAG, "screen sharing NOT SHARING");
+        Logger.i(TAG, "Screen sharing ended");
 
         currentScreen = null;
         callback.onScreenSharingEnded();

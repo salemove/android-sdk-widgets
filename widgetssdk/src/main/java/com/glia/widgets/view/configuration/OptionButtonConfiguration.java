@@ -104,7 +104,7 @@ public class OptionButtonConfiguration implements Parcelable {
         }
 
         public OptionButtonConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(OptionButtonConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.normalText == null) {
                 this.normalText = prepareDefaultTextConfiguration(resourceProvider, R.color.glia_base_dark_color);

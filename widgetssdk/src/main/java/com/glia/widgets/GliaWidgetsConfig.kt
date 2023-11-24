@@ -3,7 +3,7 @@ package com.glia.widgets
 import android.content.Context
 import com.glia.androidsdk.SiteApiKey
 import com.glia.androidsdk.screensharing.ScreenSharing
-import com.glia.widgets.helper.Logger.d
+import com.glia.widgets.helper.Logger.i
 import com.glia.widgets.helper.TAG
 
 /**
@@ -178,7 +178,7 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
 
         fun setUiJsonRemoteConfig(uiJsonRemoteConfig: String?): Builder {
             // Log
-            d(TAG, "Setting Unified UI Config")
+            i(TAG, "Setting Unified UI Config")
             this.uiJsonRemoteConfig = uiJsonRemoteConfig
             return this
         }

@@ -7,10 +7,13 @@ import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.OperatorMediaState;
 import com.glia.androidsdk.comms.Video;
 import com.glia.androidsdk.comms.VisitorMediaState;
+import com.glia.widgets.helper.Logger;
 
 import java.util.Objects;
 
 class CallState {
+    private static final String TAG = CallState.class.getSimpleName();
+
     public final boolean integratorCallStarted;
     public final boolean isVisible;
     public final int messagesNotSeen;
@@ -166,6 +169,7 @@ class CallState {
     }
 
     public CallState engagementStarted() {
+        Logger.i(TAG, "Engagement started");
         return new Builder()
                 .copyFrom(this)
                 .setIsOnHold(false)
@@ -220,6 +224,7 @@ class CallState {
     }
 
     public CallState audioCallStarted(OperatorMediaState operatorMediaState, String formattedTime) {
+        Logger.i(TAG, "Audio or video call started");
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(
@@ -306,6 +311,7 @@ class CallState {
     }
 
     public CallState speakerValueChanged(boolean isSpeakerOn) {
+        Logger.i(TAG, "Speaker value changed to " + isSpeakerOn);
         return new Builder()
                 .copyFrom(this)
                 .setIsSpeakerOn(isSpeakerOn)
@@ -320,6 +326,7 @@ class CallState {
     }
 
     public CallState setTransferring() {
+        Logger.i(TAG, "Transfer the call");
         return new Builder()
                 .copyFrom(this)
                 .setCallStatus(

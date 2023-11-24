@@ -371,7 +371,6 @@ internal class ActivityWatcherForCallVisualizer(
         if (alertDialog != null && alertDialog!!.isShowing) {
             return
         }
-        Logger.d(TAG, "Show visitor code dialog")
         val theme = UiTheme.UiThemeBuilder().build()
         val contextWithStyle = activity.wrapWithMaterialThemeOverlay()
 

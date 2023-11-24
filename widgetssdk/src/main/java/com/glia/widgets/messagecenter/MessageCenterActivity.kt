@@ -71,6 +71,7 @@ class MessageCenterActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Logger.i(TAG, "Create Message Center screen")
         binding = MessageCenterActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -100,6 +101,11 @@ class MessageCenterActivity :
         messageCenterView.onPause()
 
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Logger.i(TAG, "Destroy Message Center screen")
     }
 
     override fun selectAttachmentFile(type: String) {

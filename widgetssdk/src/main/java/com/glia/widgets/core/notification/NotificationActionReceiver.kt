@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 class NotificationActionReceiver : BroadcastReceiver() {
     private val controller: ScreenSharingController by lazy {
@@ -18,6 +20,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     }
 
     private fun onScreenSharingEndPressed() {
+        Logger.i(TAG, "End screen sharing tapped from notification")
         controller.onScreenSharingNotificationEndPressed()
     }
 

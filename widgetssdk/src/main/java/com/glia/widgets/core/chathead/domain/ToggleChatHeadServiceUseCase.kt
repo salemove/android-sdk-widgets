@@ -29,10 +29,10 @@ internal class ToggleChatHeadServiceUseCase(
     override operator fun invoke(viewName: String?): Boolean {
         val isDisplayDeviceBubble = super.invoke(viewName)
         if (isDisplayDeviceBubble) {
-            Logger.d(TAG, "Starting ChatHeadService")
+            Logger.i(TAG, "Bubble: show device bubble")
             chatHeadManager.startChatHeadService()
         } else {
-            Logger.d(TAG, "Stopping ChatHeadService")
+            Logger.d(TAG, "Bubble: hide device bubble")
             chatHeadManager.stopChatHeadService()
         }
         return isDisplayDeviceBubble

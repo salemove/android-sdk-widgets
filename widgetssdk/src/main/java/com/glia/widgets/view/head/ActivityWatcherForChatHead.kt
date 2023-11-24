@@ -107,6 +107,7 @@ internal class ActivityWatcherForChatHead(
             activity.runOnUiThread {
                 chatHeadLayout.get()?.let {
                     if (!viewGroup.contains(it)) {
+                        Logger.i(TAG, "Bubble: show application-only bubble")
                         viewGroup.addView(it)
                     } else {
                         Logger.e(TAG, "Duplicate bubble adding detected")
@@ -119,7 +120,7 @@ internal class ActivityWatcherForChatHead(
     }
 
     override fun removeChatHeadLayoutIfPresent() {
-        Logger.d(TAG, "Removing application-only bubble")
+        Logger.d(TAG, "Bubble: remove application-only bubble")
         saveBubblePosition()
         (fetchGliaOrRootView() as? ViewGroup)?.removeView(chatHeadLayout.get())
         chatHeadLayout.clear()

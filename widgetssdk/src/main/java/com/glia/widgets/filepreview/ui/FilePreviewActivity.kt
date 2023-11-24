@@ -21,6 +21,8 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.databinding.FilePreviewActivityBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.fileProviderAuthority
 import com.glia.widgets.helper.showToast
 import java.io.File
@@ -53,6 +55,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Logger.i(TAG, "Create File Preview screen")
         setContentView(binding.root)
         title = stringProvider.getRemoteString(R.string.android_preview_title)
 
@@ -115,6 +118,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     }
 
     override fun onDestroy() {
+        Logger.i(TAG, "Destroy File Preview screen")
         filePreviewController?.onDestroy()
         super.onDestroy()
     }

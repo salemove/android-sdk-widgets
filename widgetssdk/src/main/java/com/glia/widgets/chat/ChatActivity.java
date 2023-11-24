@@ -16,10 +16,12 @@ import com.glia.widgets.UiTheme;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 
 public class ChatActivity extends AppCompatActivity {
+    private static final String TAG = ChatActivity.class.getSimpleName();
     private ChatView chatView;
 
     private GliaSdkConfiguration configuration;
@@ -64,6 +66,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.i(TAG, "Create Chat screen");
         setContentView(R.layout.chat_activity);
         chatView = findViewById(R.id.chat_view);
 
@@ -113,6 +116,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         chatView.onDestroyView();
+        Logger.i(TAG, "Destroy Chat screen");
         super.onDestroy();
     }
 

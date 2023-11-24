@@ -176,7 +176,7 @@ public class SurveyStyle implements Parcelable {
         }
 
         public SurveyStyle build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(SurveyStyle.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
 
             if (this.layerConfiguration == null) {

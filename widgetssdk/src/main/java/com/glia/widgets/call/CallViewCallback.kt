@@ -10,4 +10,5 @@ internal interface CallViewCallback {
     fun minimizeView()
     fun showMissingPermissionsDialog()
     fun showEngagementConfirmationDialog(companyName: String)
+    fun navigateToWebBrowserActivity(title: String, url: String)
 }

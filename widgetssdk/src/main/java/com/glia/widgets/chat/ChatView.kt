@@ -96,6 +96,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.chat.InputTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UnreadIndicatorTheme
+import com.glia.widgets.webbrowser.WebBrowserActivity
 import com.google.android.material.shape.MarkerEdgeTreatment
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.io.File
@@ -508,6 +509,12 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             override fun showEngagementConfirmationDialog(companyName: String) {
                 this@ChatView.showEngagementConfirmationDialog(companyName)
             }
+
+            override fun navigateToWebBrowserActivity(title: String, url: String) {
+                context.startActivity(
+                    WebBrowserActivity.intent(context, title, url)
+                )
+            }
         }
     }
 
@@ -518,8 +525,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             companyName = companyName,
             positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
             negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() },
-            link1ClickListener = {}, //TODO: will be implemented on the next task
-            link2ClickListener = {}
+            link1ClickListener = { controller?.onLink1Clicked() },
+            link2ClickListener = { controller?.onLink2Clicked() }
         )
     }
 

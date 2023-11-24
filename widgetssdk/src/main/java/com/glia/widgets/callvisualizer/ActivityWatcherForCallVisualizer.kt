@@ -37,6 +37,7 @@ import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.webbrowser.WebBrowserActivity
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizer(
@@ -201,6 +202,13 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
+    override fun openWebBrowserActivity(title: String, url: String) {
+        resumedActivity?.let {
+            val intent = WebBrowserActivity.intent(it, title, url)
+            it.startActivity(intent)
+        }
+    }
+
     private fun getConfigurationBuilder(): Configuration.Builder {
         val configuration = Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
         return Configuration.Builder().setWidgetsConfiguration(configuration)
@@ -344,8 +352,8 @@ internal class ActivityWatcherForCallVisualizer(
                 companyName = companyName,
                 positiveButtonClickListener = { controller.onPositiveDialogButtonClicked() },
                 negativeButtonClickListener = { controller.onNegativeDialogButtonClicked() },
-                link1ClickListener = {}, //TODO: will be implemented on the next task
-                link2ClickListener = {}
+                link1ClickListener = { controller.onLink1Clicked() },
+                link2ClickListener = { controller.onLink2Clicked() }
             )
         }
     }
@@ -377,6 +385,11 @@ internal class ActivityWatcherForCallVisualizer(
     override fun isSupportActivityOpen(): Boolean {
         val activity = resumedActivity
         return (activity == null || activity is CallVisualizerSupportActivity)
+    }
+
+    override fun isWebBrowserActivityOpen(): Boolean {
+        val activity = resumedActivity
+        return (activity == null || activity is WebBrowserActivity)
     }
 
     override fun openSupportActivity(permissionType: PermissionType) {

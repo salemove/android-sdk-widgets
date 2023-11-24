@@ -149,6 +149,7 @@ internal class CallView(
     private var onMinimizeListener: OnMinimizeListener? = null
     private var onNavigateToChatListener: OnNavigateToChatListener? = null
     private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
+    private var onNavigateToWebBrowserListener: OnNavigateToWebBrowserListener? = null
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var defaultStatusBarColor: Int? = null
 
@@ -214,6 +215,7 @@ internal class CallView(
         onBackClickedListener = null
         onNavigateToChatListener = null
         onNavigateToSurveyListener = null
+        onNavigateToWebBrowserListener = null
         destroyControllers()
     }
 
@@ -618,6 +620,10 @@ internal class CallView(
         this.onNavigateToSurveyListener = onNavigateToSurveyListener
     }
 
+    fun setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener: OnNavigateToWebBrowserListener) {
+        this.onNavigateToWebBrowserListener = onNavigateToWebBrowserListener
+    }
+
     fun setOnTitleUpdatedListener(onTitleUpdatedListener: OnTitleUpdatedListener) {
         this.onTitleUpdatedListener = onTitleUpdatedListener
     }
@@ -727,8 +733,8 @@ internal class CallView(
                 onEndListener?.onEnd()
                 callEnded()
             },
-            link1ClickListener = {}, //TODO: will be implemented on the next task
-            link2ClickListener = {}
+            link1ClickListener = { callController?.onLink1Clicked() },
+            link2ClickListener = { callController?.onLink2Clicked() }
         )
     }
 
@@ -823,6 +829,10 @@ internal class CallView(
 
     fun interface OnNavigateToSurveyListener {
         fun onSurvey(survey: Survey)
+    }
+
+    fun interface OnNavigateToWebBrowserListener {
+        fun openLink(title: String, url: String)
     }
 
     fun interface OnTitleUpdatedListener {
@@ -1032,6 +1042,10 @@ internal class CallView(
 
     override fun navigateToSurvey(survey: Survey) {
         onNavigateToSurveyListener?.onSurvey(survey)
+    }
+
+    override fun navigateToWebBrowserActivity(title: String, url: String) {
+        onNavigateToWebBrowserListener?.openLink(title, url)
     }
 
     override fun destroyView() {

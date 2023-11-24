@@ -18,6 +18,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
+import com.glia.widgets.webbrowser.WebBrowserActivity;
 
 public class CallActivity extends AppCompatActivity {
     private static final String TAG = CallActivity.class.getSimpleName();
@@ -34,6 +35,7 @@ public class CallActivity extends AppCompatActivity {
         navigateToSurvey(survey);
         finish();
     };
+    private final CallView.OnNavigateToWebBrowserListener onNavigateToWebBrowserListener = this::navigateToWebBrowser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class CallActivity extends AppCompatActivity {
         callView.setOnMinimizeListener(this::finish);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
         callView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
+        callView.setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener);
 
         if (savedInstanceState == null) {
             startCall();
@@ -148,6 +151,11 @@ public class CallActivity extends AppCompatActivity {
         Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class)
                 .putExtra(GliaWidgets.UI_THEME, configuration.getSdkConfiguration().getRunTimeTheme())
                 .putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
+        startActivity(newIntent);
+    }
+
+    private void navigateToWebBrowser(String title, String url) {
+        Intent newIntent = WebBrowserActivity.Companion.intent(this, title, url);
         startActivity(newIntent);
     }
 

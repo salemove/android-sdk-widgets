@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/lo_controls"
+        android:enabled="true"
+        android:visible="true">
+
+        <item
+            android:id="@+id/lo_pause"
+            android:icon="@android:drawable/ic_media_pause"
+            android:title="Pause LO"
+            android:visible="true"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/lo_resume"
+            android:icon="@android:drawable/ic_media_play"
+            android:title="Pause LO"
+            android:visible="false"
+            app:showAsAction="always" />
+
+    </group>
+
+</menu>

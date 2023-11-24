@@ -16,6 +16,9 @@ class ActivityWatcherForCallVisualizerContract {
         fun removeMediaProjectionLaunchers(activityName: String?)
         fun startMediaProjectionLaunchers(activityName: String, launcher: ActivityResultLauncher<Intent>?)
         fun setWatcher(watcher: Watcher)
+
+        fun onLink1Clicked()
+        fun onLink2Clicked()
         fun onPositiveDialogButtonClicked(activity: Activity? = null)
         fun onNegativeDialogButtonClicked()
         fun onDialogControllerCallback(state: DialogState)
@@ -47,6 +50,7 @@ class ActivityWatcherForCallVisualizerContract {
         fun requestCameraPermission()
         fun requestOverlayPermission()
         fun openSupportActivity(permissionType: PermissionType)
+        fun openWebBrowserActivity(title: String, url: String)
         fun destroySupportActivityIfExists()
         fun checkInitialCameraPermission()
         fun callOverlayDialog()
@@ -54,5 +58,6 @@ class ActivityWatcherForCallVisualizerContract {
         fun isSupportActivityOpen(): Boolean
         fun showEngagementConfirmationDialog()
         fun engagementStarted()
+        fun isWebBrowserActivityOpen(): Boolean
     }
 }

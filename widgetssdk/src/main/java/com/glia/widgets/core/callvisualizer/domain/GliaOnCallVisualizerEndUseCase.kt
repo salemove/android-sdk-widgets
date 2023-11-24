@@ -8,6 +8,8 @@ import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotification
 import com.glia.widgets.core.operator.GliaOperatorMediaRepository
 import com.glia.widgets.core.survey.GliaSurveyRepository
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 
 internal class GliaOnCallVisualizerEndUseCase(
     private val repository: CallVisualizerRepository,
@@ -25,6 +27,7 @@ internal class GliaOnCallVisualizerEndUseCase(
 
     inner class EndCallVisualizerRunnable(private val engagement: Engagement) : Runnable {
         override fun run() {
+            Logger.i(TAG, "Call visualizer engagement ended")
             surveyRepository.onEngagementEnded(engagement)
             listener?.callVisualizerEngagementEnded()
             operatorMediaRepository.onEngagementEnded(engagement)

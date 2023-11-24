@@ -37,10 +37,12 @@ internal class AuthenticationManager(
         requestCallback: RequestCallback<Void>
     ) {
         cleanup()
+        Logger.i(TAG, "Authenticate. Is external access token used: ${externalAccessToken != null}")
         authentication.authenticate(jwtToken, externalAccessToken, requestCallback)
     }
 
     override fun deauthenticate(requestCallback: RequestCallback<Void>) {
+        Logger.i(TAG, "De-authenticate")
         cleanup()
         authentication.deauthenticate(requestCallback)
     }

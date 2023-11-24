@@ -147,7 +147,7 @@ public class TextConfiguration implements Parcelable {
         }
 
         public TextConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(TextConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             // Default configuration
             if (this.textSize == 0) {

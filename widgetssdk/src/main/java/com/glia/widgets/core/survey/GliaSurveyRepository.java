@@ -8,12 +8,14 @@ import com.glia.androidsdk.GliaException;
 import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.di.GliaCore;
+import com.glia.widgets.helper.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class GliaSurveyRepository implements RequestCallback<Survey> {
+    private static final String TAG = GliaSurveyRepository.class.getSimpleName();
 
     private final GliaCore gliaCore;
     private final List<OnSurveyListener> listeners = new ArrayList<>();
@@ -72,6 +74,7 @@ public class GliaSurveyRepository implements RequestCallback<Survey> {
                                     @NonNull String surveyId,
                                     @NonNull String engagementId,
                                     @NonNull Consumer<GliaException> callback) {
+        Logger.i(TAG, "Submit survey answers");
         gliaCore.submitSurveyAnswers(answers, surveyId, engagementId, callback);
     }
 

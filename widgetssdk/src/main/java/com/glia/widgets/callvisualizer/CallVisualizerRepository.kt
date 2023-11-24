@@ -48,7 +48,7 @@ class CallVisualizerRepository(private val gliaCore: GliaCore) {
                 if (error != null) {
                     Logger.e(TAG, "Error during accepting engagement request, reason" + error.message)
                 } else {
-                    Logger.d(TAG, "Incoming Call Visualizer engagement auto accepted")
+                    Logger.i(TAG, "Incoming Call Visualizer engagement auto accepted")
                 }
             }
             engagementRequest.accept(visitorContext ?: null as String?, onResult)

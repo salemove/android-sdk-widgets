@@ -218,7 +218,6 @@ public class CallController implements
 
     @Override
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
-        Logger.d(TAG, "newVisitorMediaState: " + visitorMediaState);
         emitViewState(callState.visitorMediaStateChanged(visitorMediaState));
     }
 
@@ -229,7 +228,7 @@ public class CallController implements
 
     @Override
     public void engagementEnded() {
-        Logger.d(TAG, "engagementEndedByOperator");
+        Logger.i(TAG, "Engagement ended");
         stop();
         if (!isOngoingEngagementUseCase.invoke()) {
             dialogController.dismissDialogs();
@@ -285,8 +284,6 @@ public class CallController implements
                           Engagement.MediaType mediaType,
                           boolean useOverlays,
                           ScreenSharing.Mode screenSharingMode) {
-        Logger.d(TAG, "initCall");
-
         sdkConfigurationManager.setUseOverlay(useOverlays);
         sdkConfigurationManager.setScreenSharingMode(screenSharingMode);
 
@@ -451,7 +448,7 @@ public class CallController implements
     }
 
     public void acceptUpgradeOfferClicked(MediaUpgradeOffer mediaUpgradeOffer) {
-        Logger.d(TAG, "upgradeToAudioClicked");
+        Logger.i(TAG, "Upgrade offer accepted by visitor");
         mediaUpgradeOfferRepository.acceptOffer(
                 mediaUpgradeOffer,
                 MediaUpgradeOfferRepository.Submitter.CALL
@@ -460,7 +457,7 @@ public class CallController implements
     }
 
     public void declineUpgradeOfferClicked(MediaUpgradeOffer mediaUpgradeOffer) {
-        Logger.d(TAG, "closeUpgradeDialogClicked");
+        Logger.i(TAG, "Upgrade offer declined by visitor");
         mediaUpgradeOfferRepository.declineOffer(
                 mediaUpgradeOffer,
                 MediaUpgradeOfferRepository.Submitter.CALL
@@ -536,7 +533,7 @@ public class CallController implements
 
     @Override
     public void onSurveyLoaded(@Nullable Survey survey) {
-        Logger.d(TAG, "newSurveyLoaded");
+        Logger.i(TAG, "Survey loaded");
         setPendingSurveyUsedUseCase.invoke();
         if (viewCallback != null && survey != null) {
             viewCallback.navigateToSurvey(survey);
@@ -557,12 +554,11 @@ public class CallController implements
     }
 
     public void queueForEngagementStarted() {
-        Logger.d(TAG, "queueForEngagementStarted");
         observeQueueTicketState();
     }
 
     public void queueForEngagementStopped() {
-        Logger.d(TAG, "queueForEngagementStopped");
+        Logger.i(TAG, "Queue for engagement stopped due to error or empty queue");
     }
 
     public void queueForEngagementError(Throwable exception) {
@@ -612,15 +608,15 @@ public class CallController implements
             public void newOffer(MediaUpgradeOffer offer) {
                 if (offer.video == MediaDirection.NONE && offer.audio == MediaDirection.TWO_WAY) {
                     // audio call
-                    Logger.d(TAG, "audioUpgradeRequested");
+                    Logger.d(TAG, "Audio upgrade requested");
                     showUpgradeAudioDialog(offer);
                 } else if (offer.video == MediaDirection.TWO_WAY) {
                     // 2 way video call
-                    Logger.d(TAG, "2 way videoUpgradeRequested");
+                    Logger.d(TAG, "2 way video upgrade requested");
                     showUpgradeVideoDialog2Way(offer);
                 } else if (offer.video == MediaDirection.ONE_WAY) {
                     // 1 way video call
-                    Logger.d(TAG, "1 way videoUpgradeRequested");
+                    Logger.d(TAG, "1 way video upgrade requested");
                     showUpgradeVideoDialog1Way(offer);
                 }
             }
@@ -749,7 +745,9 @@ public class CallController implements
                 cancelQueueTicketUseCase.execute()
                         .subscribe(
                                 this::queueForEngagementStopped,
-                                throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
+                                throwable -> {
+                                    if (throwable.getMessage() != null) Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage());
+                                }
                         )
         );
         endEngagementUseCase.invoke();

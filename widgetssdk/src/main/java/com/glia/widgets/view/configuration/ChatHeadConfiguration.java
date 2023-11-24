@@ -241,7 +241,7 @@ public class ChatHeadConfiguration implements Parcelable {
         }
 
         public ChatHeadConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(ChatHeadConfiguration.class.getSimpleName() + "." + TAG);
             return new ChatHeadConfiguration(this);
         }
     }

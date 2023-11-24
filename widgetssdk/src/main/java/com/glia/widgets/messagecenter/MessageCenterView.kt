@@ -22,7 +22,9 @@ import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.SimpleWindowInsetsAndAnimationHandler
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.changeStatusBarColor
@@ -229,6 +231,7 @@ class MessageCenterView(
     }
 
     override fun showConfirmationScreen() {
+        Logger.i(TAG, "Show Message Center Confirmation screen")
         confirmationView?.fadeThrough(messageView!!)
 
         showConfirmationAppBar()

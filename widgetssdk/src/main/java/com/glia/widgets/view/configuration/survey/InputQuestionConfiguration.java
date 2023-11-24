@@ -59,7 +59,7 @@ public class InputQuestionConfiguration implements Parcelable {
         }
 
         public InputQuestionConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(InputQuestionConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);

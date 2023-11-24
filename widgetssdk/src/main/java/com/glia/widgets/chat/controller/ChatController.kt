@@ -259,7 +259,6 @@ internal class ChatController(
     }
 
     private fun queueForEngagement() {
-        Logger.d(TAG, "queueForEngagement")
         disposable.add(
             queueForChatEngagementUseCase
                 .execute(chatState.queueId, chatState.visitorContextAssetId)
@@ -345,7 +344,7 @@ internal class ChatController(
     }
 
     private fun onMessageSendError(ignore: GliaException, message: Unsent) {
-        Logger.d(TAG, "messageSent exception")
+        Logger.i(TAG, "Message send exception")
 
         chatManager.onChatAction(ChatManager.Action.MessageSendError(message))
         scrollChatToBottom()
@@ -503,22 +502,27 @@ internal class ChatController(
     private fun onEngagementStateChanged(engagementState: EngagementStateEvent) {
         val visitor: EngagementStateEventVisitor<Operator> = OperatorVisitor()
         when (engagementState.type!!) {
-            EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CHANGED -> onOperatorChanged(
-                visitor.visit(engagementState)
-            )
+            EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CHANGED -> {
+                Logger.i(TAG, "Operator changed")
+                onOperatorChanged(visitor.visit(engagementState))
+            }
 
             EngagementStateEvent.Type.ENGAGEMENT_OPERATOR_CONNECTED -> {
+                Logger.i(TAG, "Operator connected")
                 shouldHandleEndedEngagement = true
                 onOperatorConnected(visitor.visit(engagementState))
             }
 
-            EngagementStateEvent.Type.ENGAGEMENT_TRANSFERRING -> onTransferring()
+            EngagementStateEvent.Type.ENGAGEMENT_TRANSFERRING -> {
+                Logger.i(TAG, "Transfer engagement")
+                onTransferring()
+            }
             EngagementStateEvent.Type.ENGAGEMENT_ONGOING -> onEngagementOngoing(
                 visitor.visit(engagementState)
             )
 
             EngagementStateEvent.Type.ENGAGEMENT_ENDED -> {
-                Logger.d(TAG, "Engagement Ended")
+                Logger.d(TAG, "Engagement ended")
                 if (!isOngoingEngagementUseCase.invoke()) {
                     dialogController.dismissDialogs()
                 }
@@ -554,14 +558,14 @@ internal class ChatController(
     }
 
     fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer) {
-        Logger.d(TAG, "upgradeToAudioClicked")
+        Logger.i(TAG, "Upgrade offer accepted by visitor")
         messagesNotSeenHandler.chatUpgradeOfferAccepted()
         acceptMediaUpgradeOfferUseCase(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()
     }
 
     fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer) {
-        Logger.d(TAG, "closeUpgradeDialogClicked")
+        Logger.i(TAG, "Upgrade offer declined by visitor")
         mediaUpgradeOfferRepository.declineOffer(offer, Submitter.CHAT)
         dialogController.dismissCurrentDialog()
     }
@@ -617,7 +621,7 @@ internal class ChatController(
                 offer: MediaUpgradeOffer,
                 submitter: Submitter
             ) {
-                Logger.d(TAG, "upgradeOfferChoiceSubmitSuccess")
+                Logger.d(TAG, "Media upgrade request accepted by visitor")
                 if (submitter == Submitter.CHAT) {
                     val requestedMediaType: String =
                         if (offer.video != null && offer.video != MediaDirection.NONE) {
@@ -636,7 +640,7 @@ internal class ChatController(
             override fun upgradeOfferChoiceDeclinedSuccess(
                 submitter: Submitter
             ) {
-                Logger.d(TAG, "upgradeOfferChoiceDeclinedSuccess")
+                Logger.i(TAG, "Media upgrade request declined by visitor")
             }
         }
     }
@@ -693,7 +697,7 @@ internal class ChatController(
         disposable.add(
             cancelQueueTicketUseCase.execute()
                 .subscribe({ queueForEngagementStopped() }) {
-                    Logger.e(TAG, "cancelQueueTicketUseCase error: ${it.message}")
+                    it.message?.let { errorMessage -> Logger.e(TAG, "cancelQueueTicketUseCase error: $errorMessage") }
                 }
         )
         endEngagementUseCase()
@@ -790,7 +794,7 @@ internal class ChatController(
     }
 
     override fun newEngagementLoaded(engagement: OmnicoreEngagement) {
-        Logger.d(TAG, "newEngagementLoaded")
+        Logger.i(TAG, "New engagement loaded")
         onOperatorTypingUseCase.execute { onOperatorTyping(it) }
         addOperatorMediaStateListenerUseCase.execute(operatorMediaStateListener)
         mediaUpgradeOfferRepository.startListening()
@@ -837,12 +841,12 @@ internal class ChatController(
     }
 
     override fun engagementEnded() {
-        Logger.d(TAG, "engagementEnded")
+        Logger.i(TAG, "Engagement ended")
         stop()
     }
 
     override fun onSurveyLoaded(survey: Survey?) {
-        Logger.d(TAG, "newSurveyLoaded")
+        Logger.i(TAG, "Survey loaded")
         setPendingSurveyUsedUseCase.invoke()
         when {
             viewCallback != null && survey != null -> {
@@ -895,7 +899,6 @@ internal class ChatController(
     }
 
     private fun queueForEngagementStarted() {
-        Logger.d(TAG, "queueForEngagementStarted")
         if (chatState.isOperatorOnline) {
             return
         }
@@ -904,7 +907,7 @@ internal class ChatController(
     }
 
     private fun queueForEngagementStopped() {
-        Logger.d(TAG, "queueForEngagementStopped")
+        Logger.i(TAG, "Queue for engagement stopped due to error or empty queue")
     }
 
     private fun queueForEngagementError(exception: Throwable?) {

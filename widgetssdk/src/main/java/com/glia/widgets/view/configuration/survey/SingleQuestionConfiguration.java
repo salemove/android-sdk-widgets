@@ -75,7 +75,7 @@ public class SingleQuestionConfiguration implements Parcelable {
 
         @SuppressLint("ResourceType")
         public SingleQuestionConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(SingleQuestionConfiguration.class.getSimpleName() + "." + TAG);
             ResourceProvider resourceProvider = Dependencies.getResourceProvider();
             if (this.title == null) {
                 this.title = prepareDefaultTitleConfiguration(resourceProvider);

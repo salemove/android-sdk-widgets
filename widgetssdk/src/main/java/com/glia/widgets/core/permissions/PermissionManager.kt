@@ -12,6 +12,8 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
+import com.glia.widgets.helper.Logger
+import com.glia.widgets.helper.TAG
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 import com.glia.widgets.permissions.PermissionsRequestRepository
@@ -36,6 +38,7 @@ internal class PermissionManager(
 
     @SuppressLint("InlinedApi")
     fun getPermissionsForMediaUpgradeOffer(offer: MediaUpgradeOffer): Permissions {
+        Logger.i(TAG, "Request permissions for media upgrade offer")
         val requiredPermissions = emptyList<String>() // required permissions for media upgrade are handling in the Core SDK
         val additionalPermissions = mutableListOf<String>()
         if (sdkInt > Build.VERSION_CODES.R && offer.audio != null && offer.audio == MediaDirection.TWO_WAY) {
@@ -97,6 +100,7 @@ internal class PermissionManager(
         additionalPermissionsGrantedCallback: PermissionsGrantedCallback? = null,
         callback: PermissionsRequestResult? = null
     ) {
+        Logger.i(TAG, "Request permissions")
         val allPermissions = (necessaryPermissions ?: emptyList()) + (additionalPermissions ?: emptyList())
 
         if (allPermissions.isEmpty()) {

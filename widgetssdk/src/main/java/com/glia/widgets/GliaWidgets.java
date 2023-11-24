@@ -134,7 +134,7 @@ public class GliaWidgets {
         Dependencies.glia().init(gliaConfig);
         Dependencies.init(gliaWidgetsConfig);
         setupLoggingMetadata(gliaWidgetsConfig);
-        Logger.d(TAG, "init");
+        Logger.i(TAG, "Initialize Glia Widgets SDK");
         Dependencies.getGliaThemeManager().applyJsonConfig(gliaWidgetsConfig.uiJsonRemoteConfig);
     }
 
@@ -201,7 +201,7 @@ public class GliaWidgets {
      * Clears visitor session
      */
     public static void clearVisitorSession() {
-        Logger.d(TAG, "clearVisitorSession");
+        Logger.i(TAG, "Clear visitor session");
         Dependencies.getControllerFactory().destroyControllers();
         Dependencies.getUseCaseFactory().resetState();
         Dependencies.glia().clearVisitorSession();
@@ -213,7 +213,7 @@ public class GliaWidgets {
      * Ends active engagement if existing and closes Widgets SDK UI (includes bubble).
      */
     public static void endEngagement() {
-        Logger.d(TAG, "endEngagement");
+        Logger.i(TAG, "End engagement by integrator");
         Dependencies.getControllerFactory().destroyControllers();
         Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
             if (e != null) {

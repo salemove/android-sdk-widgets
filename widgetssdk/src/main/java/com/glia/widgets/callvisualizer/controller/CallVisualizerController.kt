@@ -63,6 +63,7 @@ internal class CallVisualizerController(
     }
 
     override fun newEngagementLoaded(engagement: OmnibrowseEngagement) {
+        Logger.i(TAG, "New Call visualizer engagement loaded")
         surveyUseCase.registerListener(this)
     }
 

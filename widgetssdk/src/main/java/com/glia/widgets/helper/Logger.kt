@@ -1,9 +1,10 @@
 package com.glia.widgets.helper
 
 import android.util.Log
-import com.glia.androidsdk.BuildConfig
+import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.LogLevel
 import com.glia.androidsdk.LoggingAdapter
+import com.glia.widgets.BuildConfig
 import java.util.function.Consumer
 
 internal object Logger {
@@ -11,9 +12,14 @@ internal object Logger {
     const val SITE_ID_KEY = "site_id"
     private const val DEPRECATED_METHOD_CALL_LOG_MESSAGE = "Deprecated method usage: "
     private const val DEPRECATED_CLASS_CALL_LOG_MESSAGE = "Deprecated class usage: "
+    internal const val TAG_PREFIX = "Glia Widgets: "
 
     private val loggingAdapters = mutableListOf<LoggingAdapter>()
     private val globalMetadata = mutableMapOf<String, String>()
+    private var isDebug = BuildConfig.DEBUG
+
+    private val setOfUsedDeprecatedFunctions = mutableSetOf<String>()
+    private val setOfUsedDeprecatedClasses = mutableSetOf<String>()
 
     @Suppress("unused")
     @JvmStatic
@@ -21,111 +27,143 @@ internal object Logger {
         loggingAdapters.add(loggingAdapter)
     }
 
+    @VisibleForTesting
+    fun setIsDebug(isDebug: Boolean) {
+        this.isDebug = isDebug
+    }
+
     @JvmStatic
     fun d(tag: String, message: String) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.d(tag, message)
+        if (isDebug) {
+            Log.d(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(null))
+            loggingAdapter.log(LogLevel.DEBUG, TAG_PREFIX + tag, message, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
     fun d(tag: String, message: String, metadata: Map<String, String>? = null) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.d(tag, message)
+        if (isDebug) {
+            Log.d(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.DEBUG, tag, message, concatGlobalMeta(metadata))
+            loggingAdapter.log(LogLevel.DEBUG, TAG_PREFIX + tag, message, concatGlobalMeta(metadata))
         })
     }
 
     @JvmStatic
     fun i(tag: String, message: String) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.i(tag, message)
+        if (isDebug) {
+            Log.i(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.INFO, tag, message, concatGlobalMeta(null))
+            loggingAdapter.log(LogLevel.INFO, TAG_PREFIX + tag, message, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
     fun i(tag: String, message: String, metadata: Map<String, String>? = null) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.i(tag, message)
+        if (isDebug) {
+            Log.i(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.INFO, tag, message, concatGlobalMeta(metadata))
+            loggingAdapter.log(LogLevel.INFO, TAG_PREFIX + tag, message, concatGlobalMeta(metadata))
         })
     }
 
     @JvmStatic
     fun w(tag: String, message: String) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.w(tag, message)
+        if (isDebug) {
+            Log.w(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.WARN, tag, message, concatGlobalMeta(null))
+            loggingAdapter.log(LogLevel.WARN, TAG_PREFIX + tag, message, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
     fun w(tag: String, message: String, metadata: Map<String, String>? = null) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.w(tag, message)
+        if (isDebug) {
+            Log.w(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.WARN, tag, message, concatGlobalMeta(metadata))
+            loggingAdapter.log(LogLevel.WARN, TAG_PREFIX + tag, message, concatGlobalMeta(metadata))
         })
     }
 
     @JvmStatic
     fun e(tag: String, message: String) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.e(tag, message)
+        if (isDebug) {
+            Log.e(TAG_PREFIX + tag, message)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.error(tag, message, null, concatGlobalMeta(null))
+            loggingAdapter.error(TAG_PREFIX + tag, message, null, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
     fun e(tag: String, message: String, throwable: Throwable?) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.e(tag, message, throwable)
+        if (isDebug) {
+            Log.e(TAG_PREFIX + tag, message, throwable)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.error(tag, message, throwable, concatGlobalMeta(null))
+            loggingAdapter.error(TAG_PREFIX + tag, message, throwable, concatGlobalMeta(null))
         })
     }
 
     @JvmStatic
     fun e(tag: String, message: String, throwable: Throwable?, metadata: Map<String, String>? = null) {
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.e(tag, message, throwable)
+        if (isDebug) {
+            Log.e(TAG_PREFIX + tag, message, throwable)
+            // Normally, Widgets DEBUG build uses Core SDK with RELEASE build variant.
+            // Hence, Core will add ClientLoggerAdapter to loggingAdapters.
+            // Return to avoid sending logs to ClientLoggerAdapter for Widgets DEBUG build.
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.error(tag, message, throwable, concatGlobalMeta(metadata))
+            loggingAdapter.error(TAG_PREFIX + tag, message, throwable, concatGlobalMeta(metadata))
         })
     }
 
@@ -133,13 +171,15 @@ internal object Logger {
     fun logDeprecatedMethodUse(tag: String, methodName: String) {
         val logMessage = DEPRECATED_METHOD_CALL_LOG_MESSAGE + methodName
 
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.d(tag, logMessage)
+        if (!setOfUsedDeprecatedFunctions.add(logMessage)) return // Log only once per session
+
+        if (isDebug) {
+            // Do not log this event to console for debug builds because we see them in IDE
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.INFO, tag, logMessage, concatGlobalMeta(null))
+            loggingAdapter.log(LogLevel.INFO, TAG_PREFIX + tag, logMessage, concatGlobalMeta(null))
         })
     }
 
@@ -147,13 +187,15 @@ internal object Logger {
     fun logDeprecatedClassUse(tag: String) {
         val logMessage = DEPRECATED_CLASS_CALL_LOG_MESSAGE + tag
 
-        if (loggingAdapters.isEmpty() && BuildConfig.DEBUG) {
-            // Log to console even if there were no any logging adapter set for debug build
-            Log.d(tag, logMessage)
+        if (!setOfUsedDeprecatedClasses.add(logMessage)) return // Log only once per session
+
+        if (isDebug) {
+            // Do not log this event to console for debug builds because we see them in IDE
+            return
         }
 
         loggingAdapters.forEach(Consumer { loggingAdapter: LoggingAdapter ->
-            loggingAdapter.log(LogLevel.INFO, tag, logMessage, concatGlobalMeta(null))
+            loggingAdapter.log(LogLevel.INFO, TAG_PREFIX + tag, logMessage, concatGlobalMeta(null))
         })
     }
 

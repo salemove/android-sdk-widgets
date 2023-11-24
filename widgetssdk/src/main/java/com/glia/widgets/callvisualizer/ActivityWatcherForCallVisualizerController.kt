@@ -251,6 +251,7 @@ internal class ActivityWatcherForCallVisualizerController(
     }
 
     override fun onMediaProjectionPermissionResult(isGranted: Boolean, activity: Activity) {
+        Logger.i(TAG, "Media projection granted by visitor: $isGranted")
         if (isGranted) {
             screenSharingController.onScreenSharingAccepted(activity)
         } else {
@@ -260,6 +261,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     @VisibleForTesting
     internal fun onMediaUpgradeAccept(error: GliaException?) {
+        Logger.d(TAG, "Media upgrade request accepted by visitor")
         error?.let {
             Logger.e(TAG, it.debugMessage, error)
         } ?: run {
@@ -278,6 +280,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     @VisibleForTesting
     internal fun onMediaUpgradeDecline(error: GliaException?) {
+        Logger.i(TAG, "Media upgrade request declined by visitor")
         error?.let {
             Logger.e(TAG, it.debugMessage, error)
         } ?: run {

@@ -138,7 +138,7 @@ public class ButtonConfiguration implements Parcelable {
         }
 
         public ButtonConfiguration build() {
-            Logger.logDeprecatedClassUse(TAG);
+            Logger.logDeprecatedClassUse(ButtonConfiguration.class.getSimpleName() + "." + TAG);
             if (textConfiguration == null) {
                 ResourceProvider resourceProvider = Dependencies.getResourceProvider();
                 textConfiguration = new TextConfiguration.Builder()

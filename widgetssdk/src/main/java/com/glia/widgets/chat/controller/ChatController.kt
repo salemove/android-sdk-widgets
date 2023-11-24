@@ -17,6 +17,7 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.R
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
@@ -151,6 +152,7 @@ internal class ChatController(
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
     private var timerStatusListener: FormattedTimerStatusListener? = null
     private var engagementStateEventDisposable: Disposable? = null
+    private var stringProvider = Dependencies.getStringProvider()
 
     private val disposable = CompositeDisposable()
     private val operatorMediaStateListener =
@@ -262,6 +264,22 @@ internal class ChatController(
     fun onEngagementConfirmationDialogRequested() {
         if (isOngoingEngagementUseCase()) return
         viewCallback?.showEngagementConfirmationDialog(chatState.companyName.orEmpty())
+    }
+
+    fun onLink1Clicked() {
+        Logger.d(TAG, "onLink1Clicked")
+        viewCallback?.navigateToWebBrowserActivity(
+            stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
+            stringProvider.getRemoteString(R.string.engagement_confirm_link1_url)
+        )
+    }
+
+    fun onLink2Clicked() {
+        Logger.d(TAG, "onLink2Clicked")
+        viewCallback?.navigateToWebBrowserActivity(
+            stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
+            stringProvider.getRemoteString(R.string.engagement_confirm_link2_url)
+        )
     }
 
     fun onLiveObservationDialogAllowed() {

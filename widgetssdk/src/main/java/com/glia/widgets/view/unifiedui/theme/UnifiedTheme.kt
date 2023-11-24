@@ -8,6 +8,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.ChatTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyTheme
+import com.glia.widgets.view.unifiedui.webbrowser.WebBrowserTheme
 
 internal data class UnifiedTheme(
     val alertTheme: AlertTheme? = null,
@@ -18,5 +19,6 @@ internal data class UnifiedTheme(
     val callVisualizerTheme: CallVisualizerTheme? = null,
     val secureConversationsWelcomeScreenTheme: SecureConversationsWelcomeScreenTheme? = null,
     val secureConversationsConfirmationScreenTheme: SecureConversationsConfirmationScreenTheme? = null,
-    val snackBarTheme: SnackBarTheme? = null
+    val snackBarTheme: SnackBarTheme? = null,
+    val webBrowserTheme: WebBrowserTheme? = null
 )

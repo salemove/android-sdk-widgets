@@ -227,6 +227,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
     }
@@ -241,6 +242,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         )
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onNegativeDialogButtonClicked()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
@@ -253,6 +255,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openCallActivity()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
     }
@@ -263,6 +266,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         prepareMediaUpgradeApplicationState()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
     }
 
@@ -275,6 +279,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).dismissOverlayDialog()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openOverlayPermissionView()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
     }
@@ -287,6 +292,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).dismissOverlayDialog()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
     }
 
@@ -298,6 +304,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).openNotificationChannelScreen()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
     }
@@ -309,6 +316,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).showAllowNotificationsDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
     }
 
@@ -319,6 +327,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher, never()).showVisitorCodeDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).openSupportActivity(any())
         verify(watcher).destroySupportActivityIfExists()
@@ -331,6 +340,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).showVisitorCodeDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
     }
@@ -342,6 +352,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).showVisitorCodeDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
     }
 
@@ -352,6 +363,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher, never()).showScreenSharingDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
         verify(watcher).openSupportActivity(any())
@@ -364,6 +376,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).showScreenSharingDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
         verify(watcher).destroySupportActivityIfExists()
     }
@@ -376,6 +389,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
+        verify(watcher).isWebBrowserActivityOpen()
         verify(watcher).isSupportActivityOpen()
     }
 

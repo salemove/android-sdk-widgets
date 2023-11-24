@@ -18,6 +18,7 @@ internal fun DefaultTheme(pallet: ColorPallet?): UnifiedTheme? = pallet?.let {
         callVisualizerTheme = CallVisualizerTheme(it),
         secureConversationsWelcomeScreenTheme = SecureConversationsWelcomeScreenTheme(it),
         secureConversationsConfirmationScreenTheme = SecureConversationsConfirmationScreenTheme(it),
-        snackBarTheme = DefaultSnackBarTheme(it)
+        snackBarTheme = DefaultSnackBarTheme(it),
+        webBrowserTheme = WebBrowserTheme(it)
     )
 }

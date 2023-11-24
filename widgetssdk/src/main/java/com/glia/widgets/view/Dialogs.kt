@@ -204,12 +204,14 @@ internal object Dialogs {
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
+        val link1IsPresent = stringProvider.getRemoteString(R.string.engagement_confirm_link1_url).isNullOrEmpty().not()
+        val link2IsPresent = stringProvider.getRemoteString(R.string.engagement_confirm_link2_url).isNullOrEmpty().not()
 
         val payload = DialogPayload.Confirmation(
             title = stringProvider.getRemoteString(R.string.engagement_confirm_title),
             message = stringProvider.getRemoteString(R.string.engagement_confirm_message, StringKeyPair(StringKey.COMPANY_NAME, companyName)),
-            link1Text = stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
-            link2Text = stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
+            link1Text = if (link1IsPresent) stringProvider.getRemoteString(R.string.engagement_confirm_link1_text) else null,
+            link2Text = if (link2IsPresent) stringProvider.getRemoteString(R.string.engagement_confirm_link2_text) else null,
             positiveButtonText = allow,
             negativeButtonText = cancel,
             poweredByText = poweredByText,

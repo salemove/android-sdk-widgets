@@ -18,6 +18,8 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.Constants;
+import com.glia.widgets.R;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;
@@ -113,6 +115,7 @@ public class CallController
     private final ConfirmationDialogUseCase confirmationDialogUseCase;
     private final String TAG = "CallController";
     private final CompositeDisposable disposable = new CompositeDisposable();
+    private final StringProvider stringProvider = Dependencies.getStringProvider();
     private CallViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
@@ -344,6 +347,26 @@ public class CallController
                     this::queueForEngagementError
                 )
         );
+    }
+
+    public void onLink1Clicked() {
+        Logger.d(TAG, "onLink1Clicked");
+        if (viewCallback != null) {
+            viewCallback.navigateToWebBrowserActivity(
+                stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
+                stringProvider.getRemoteString(R.string.engagement_confirm_link1_url)
+            );
+        }
+    }
+
+    public void onLink2Clicked() {
+        Logger.d(TAG, "onLink2Clicked");
+        if (viewCallback != null) {
+            viewCallback.navigateToWebBrowserActivity(
+                stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
+                stringProvider.getRemoteString(R.string.engagement_confirm_link2_url)
+            );
+        }
     }
 
     public void onLiveObservationDialogAllowed() {

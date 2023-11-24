@@ -35,6 +35,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.messagecenter.MessageCenterActivity
+import com.google.android.material.appbar.MaterialToolbar
 import kotlin.concurrent.thread
 
 class MainFragment : Fragment() {
@@ -102,6 +103,25 @@ class MainFragment : Fragment() {
                 showVisitorCode()
             }
         }
+
+        view.findViewById<MaterialToolbar>(R.id.top_app_bar).menu.apply {
+            val pause = findItem(R.id.lo_pause)
+            val resume = findItem(R.id.lo_resume)
+
+            pause.setOnMenuItemClickListener {
+                it.isVisible = false
+                resume.isVisible = true
+                Glia.getLiveObservation().pause()
+                true
+            }
+            resume.setOnMenuItemClickListener {
+                it.isVisible = false
+                pause.isVisible = true
+                Glia.getLiveObservation().resume()
+                true
+            }
+        }
+
         handleOpensFromPushNotification()
     }
 
@@ -311,7 +331,6 @@ class MainFragment : Fragment() {
         builder.setView(prepareDialogLayout(jwtInput, externalTokenInput))
         val alertDialog = builder.create()
         alertDialog.setOnShowListener {
-            Glia.getLiveObservation().pause()
             val button = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
             button.setOnClickListener {
                 jwtInput.setText("")
@@ -319,10 +338,6 @@ class MainFragment : Fragment() {
                 clearAuthToken()
             }
         }
-        alertDialog.setOnDismissListener {
-            Glia.getLiveObservation().resume()
-        }
-
         alertDialog.show()
     }
 

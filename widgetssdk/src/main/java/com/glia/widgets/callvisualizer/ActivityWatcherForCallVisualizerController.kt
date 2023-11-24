@@ -9,6 +9,7 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.R
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
@@ -24,6 +25,7 @@ import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogU
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
@@ -39,6 +41,8 @@ internal class ActivityWatcherForCallVisualizerController(
     @Mode
     private var currentDialogMode: Int = MODE_NONE
     private var shouldWaitMediaProjectionResult: Boolean = false
+
+    private var stringProvider = Dependencies.getStringProvider()
 
     private lateinit var watcher: ActivityWatcherForCallVisualizerContract.Watcher
 
@@ -106,6 +110,11 @@ internal class ActivityWatcherForCallVisualizerController(
         if (state.mode != MODE_NONE) {
             currentDialogMode = state.mode
         }
+        if (watcher.isWebBrowserActivityOpen()) {
+            // Prevent opening the support activity and show the dialog.
+            // We need this if the user opens the links from the engagement confirmation dialog.
+            return
+        }
         if (state.mode != MODE_NONE && !watcher.isSupportActivityOpen()) {
             // This function is executed twice
             // First call opens CallVisualizerSupportActivity and exits the function.
@@ -127,6 +136,22 @@ internal class ActivityWatcherForCallVisualizerController(
                 Logger.d(TAG, "Unexpected dialog mode received - ${state.mode}")
             }
         }
+    }
+
+    override fun onLink1Clicked() {
+        Logger.d(TAG, "onLink1Clicked")
+        watcher.openWebBrowserActivity(
+            stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
+            stringProvider.getRemoteString(R.string.engagement_confirm_link1_url)
+        )
+    }
+
+    override fun onLink2Clicked() {
+        Logger.d(TAG, "onLink2Clicked")
+        watcher.openWebBrowserActivity(
+            stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
+            stringProvider.getRemoteString(R.string.engagement_confirm_link2_url)
+        )
     }
 
     override fun onPositiveDialogButtonClicked(activity: Activity?) {

@@ -60,7 +60,7 @@ public class GliaSdkConfigurationManager {
             remoteCompanyName = Glia.getRemoteString(getResourceProvider().getResourceKey(R.string.general_company_name));
         } catch (Exception e) {
             // Falling back on SDK configuration
-            Logger.e("StringProvider", "**** ATTENTION **** \n An engagement view was opened immediately after Glia was initialized. \n It is strongly suggested to keep the initialization and actual engagement start separated by a little more time to allow custom locales feature to work properly.\n For further information See the  Custom Locales migration guide", e);
+            Dependencies.getStringProvider().reportImproperInitialisation(e);
         }
         return remoteCompanyName;
     }

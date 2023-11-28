@@ -6,14 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.IdRes
-import com.glia.widgets.R
 import com.glia.widgets.StringProvider
+import com.glia.widgets.snapshotutils.SnapshotStringProvider
 import com.glia.widgets.view.snackbar.SnackBarDelegateFactory
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.apps.common.testing.accessibility.framework.replacements.LayoutParams
 import io.mockk.clearMocks
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkClass
 import kotlin.reflect.KClass
 
@@ -28,8 +27,7 @@ internal class SnackBarTestHelper<T : Activity>(private val context: Context, pr
     private lateinit var mockActivity: T
 
     fun setUp() {
-        stringProvider = mockk()
-        every { stringProvider.getRemoteString(any()) } answers { context.getString(R.string.live_observation_indicator_message) }
+        stringProvider = SnapshotStringProvider(context)
 
         mockActivity = mockkClass(kClass)
         every { mockActivity.findViewById<View>(any()) } answers { rootLayout }

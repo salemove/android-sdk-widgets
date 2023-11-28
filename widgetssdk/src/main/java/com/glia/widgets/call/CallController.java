@@ -18,7 +18,6 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.Constants;
-import com.glia.widgets.R;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
@@ -29,8 +28,11 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase;
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.dialog.model.Link;
+import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks;
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
@@ -113,9 +115,9 @@ public class CallController
     private final TurnSpeakerphoneUseCase turnSpeakerphoneUseCase;
     private final HandleCallPermissionsUseCase handleCallPermissionsUseCase;
     private final ConfirmationDialogUseCase confirmationDialogUseCase;
+    private final ConfirmationDialogLinksUseCase confirmationDialogLinksUseCase;
     private final String TAG = "CallController";
     private final CompositeDisposable disposable = new CompositeDisposable();
-    private final StringProvider stringProvider = Dependencies.getStringProvider();
     private CallViewCallback viewCallback;
     private MediaUpgradeOfferRepositoryCallback mediaUpgradeOfferRepositoryCallback;
     private TimeCounter.FormattedTimerStatusListener callTimerStatusListener;
@@ -164,6 +166,7 @@ public class CallController
         SetPendingSurveyUsedUseCase setPendingSurveyUsedUseCase,
         TurnSpeakerphoneUseCase turnSpeakerphoneUseCase,
         ConfirmationDialogUseCase confirmationDialogUseCase,
+        ConfirmationDialogLinksUseCase confirmationDialogLinksUseCase,
         HandleCallPermissionsUseCase handleCallPermissionsUseCase) {
         Logger.d(TAG, "constructor");
         this.sdkConfigurationManager = sdkConfigurationManager;
@@ -215,6 +218,7 @@ public class CallController
         this.turnSpeakerphoneUseCase = turnSpeakerphoneUseCase;
         this.handleCallPermissionsUseCase = handleCallPermissionsUseCase;
         this.confirmationDialogUseCase = confirmationDialogUseCase;
+        this.confirmationDialogLinksUseCase = confirmationDialogLinksUseCase;
 
         if (isCallVisualizerUseCase.invoke()) {
             shouldShowMediaEngagementView(true);
@@ -332,7 +336,7 @@ public class CallController
 
     public void onLiveObservationDialogRequested() {
         if (isOngoingEngagementUseCase.invoke()) return;
-        viewCallback.showEngagementConfirmationDialog(callState.companyName);
+        viewCallback.showEngagementConfirmationDialog();
     }
 
     private void queueForEngagement(String queueId, String visitorContextAssetId, Engagement.MediaType mediaType) {
@@ -346,22 +350,16 @@ public class CallController
         );
     }
 
-    public void onLink1Clicked() {
-        Logger.d(TAG, "onLink1Clicked");
-        if (viewCallback != null) {
-            viewCallback.navigateToWebBrowserActivity(
-                stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
-                stringProvider.getRemoteString(R.string.engagement_confirm_link1_url)
-            );
-        }
+    public ConfirmationDialogLinks getConfirmationDialogLinks() {
+        return confirmationDialogLinksUseCase.invoke();
     }
 
-    public void onLink2Clicked() {
-        Logger.d(TAG, "onLink2Clicked");
+    public void onLinkClicked(Link link) {
+        Logger.d(TAG, "onLinkClicked");
         if (viewCallback != null) {
             viewCallback.navigateToWebBrowserActivity(
-                stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
-                stringProvider.getRemoteString(R.string.engagement_confirm_link2_url)
+                link.getTitle(),
+                link.getUrl()
             );
         }
     }

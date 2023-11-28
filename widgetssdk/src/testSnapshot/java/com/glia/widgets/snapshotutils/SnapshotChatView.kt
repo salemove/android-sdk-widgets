@@ -9,7 +9,6 @@ import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.chat.ChatViewCallback
-import com.glia.widgets.chat.SnapshotStringProvider
 import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState

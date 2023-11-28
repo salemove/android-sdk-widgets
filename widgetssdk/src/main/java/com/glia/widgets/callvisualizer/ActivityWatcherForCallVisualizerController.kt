@@ -21,9 +21,12 @@ import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
 import com.glia.widgets.core.dialog.Dialog.MODE_START_SCREEN_SHARING
 import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
 import com.glia.widgets.core.dialog.Dialog.Mode
+import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
@@ -32,7 +35,8 @@ import com.glia.widgets.helper.TAG
 internal class ActivityWatcherForCallVisualizerController(
     private val callVisualizerController: CallVisualizerController,
     private val screenSharingController: ScreenSharingController,
-    private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
+    private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
+    private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
 ) : ActivityWatcherForCallVisualizerContract.Controller {
 
     @VisibleForTesting
@@ -41,8 +45,6 @@ internal class ActivityWatcherForCallVisualizerController(
     @Mode
     private var currentDialogMode: Int = MODE_NONE
     private var shouldWaitMediaProjectionResult: Boolean = false
-
-    private var stringProvider = Dependencies.getStringProvider()
 
     private lateinit var watcher: ActivityWatcherForCallVisualizerContract.Watcher
 
@@ -138,19 +140,13 @@ internal class ActivityWatcherForCallVisualizerController(
         }
     }
 
-    override fun onLink1Clicked() {
-        Logger.d(TAG, "onLink1Clicked")
-        watcher.openWebBrowserActivity(
-            stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
-            stringProvider.getRemoteString(R.string.engagement_confirm_link1_url)
-        )
-    }
+    override fun getConfirmationDialogLinks() = confirmationDialogLinksUseCase()
 
-    override fun onLink2Clicked() {
-        Logger.d(TAG, "onLink2Clicked")
+    override fun onLinkClicked(link: Link) {
+        Logger.d(TAG, "onLinkClicked")
         watcher.openWebBrowserActivity(
-            stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
-            stringProvider.getRemoteString(R.string.engagement_confirm_link2_url)
+            link.title,
+            link.url
         )
     }
 

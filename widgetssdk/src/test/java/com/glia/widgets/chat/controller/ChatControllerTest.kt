@@ -20,6 +20,7 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
@@ -111,6 +112,7 @@ class ChatControllerTest {
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
     private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
     private lateinit var confirmationDialogUseCase: ConfirmationDialogUseCase
+    private lateinit var confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -165,6 +167,7 @@ class ChatControllerTest {
         isAuthenticatedUseCase = mock()
         updateOperatorDefaultImageUrlUseCase = mock()
         confirmationDialogUseCase = mock()
+        confirmationDialogLinksUseCase = mock()
         chatManager = mock()
 
         chatController = ChatController(
@@ -215,6 +218,7 @@ class ChatControllerTest {
             isAuthenticatedUseCase = isAuthenticatedUseCase,
             updateOperatorDefaultImageUrlUseCase = updateOperatorDefaultImageUrlUseCase,
             confirmationDialogUseCase = confirmationDialogUseCase,
+            confirmationDialogLinksUseCase = confirmationDialogLinksUseCase,
             chatManager = chatManager
         )
     }

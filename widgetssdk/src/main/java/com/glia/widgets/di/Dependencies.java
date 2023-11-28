@@ -73,6 +73,7 @@ public class Dependencies {
                 new ChatHeadManager(application),
                 audioControlManager,
                 schedulers,
+                stringProvider,
                 gliaCore
         );
         initAudioControlManager(audioControlManager, useCaseFactory.createOnAudioStartedUseCase());

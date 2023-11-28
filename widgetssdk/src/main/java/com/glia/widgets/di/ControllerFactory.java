@@ -139,6 +139,7 @@ public class ControllerFactory {
                 useCaseFactory.createIsAuthenticatedUseCase(),
                 useCaseFactory.createUpdateOperatorDefaultImageUrlUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
+                useCaseFactory.createConfirmationDialogLinksUseCase(),
                 managerFactory.getChatManager()
             );
         } else {
@@ -188,6 +189,7 @@ public class ControllerFactory {
                 useCaseFactory.createSetPendingSurveyUsed(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
+                useCaseFactory.createConfirmationDialogLinksUseCase(),
                 useCaseFactory.createHandleCallPermissionsUseCase());
         } else {
             Logger.d(TAG, "retained call controller");
@@ -367,7 +369,8 @@ public class ControllerFactory {
             activityWatcherforCallVisualizerController = new ActivityWatcherForCallVisualizerController(
                 getCallVisualizerController(),
                 getScreenSharingController(),
-                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase()
+                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
+                useCaseFactory.createConfirmationDialogLinksUseCase()
             );
         }
         return activityWatcherforCallVisualizerController;

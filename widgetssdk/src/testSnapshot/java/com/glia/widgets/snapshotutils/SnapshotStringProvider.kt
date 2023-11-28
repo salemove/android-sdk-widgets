@@ -1,4 +1,4 @@
-package com.glia.widgets.chat
+package com.glia.widgets.snapshotutils
 
 import android.content.Context
 import com.glia.widgets.StringKeyPair

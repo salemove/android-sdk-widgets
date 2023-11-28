@@ -71,6 +71,7 @@ import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
+import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
@@ -140,6 +141,7 @@ import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase;
 import com.glia.widgets.view.snackbar.LiveObservationPopupUseCase;
 import com.glia.widgets.view.snackbar.LiveObservationUseCase;
+import com.glia.widgets.StringProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -162,6 +164,7 @@ public class UseCaseFactory {
     private final ChatHeadManager chatHeadManager;
     private final AudioControlManager audioControlManager;
     private final Schedulers schedulers;
+    private final StringProvider stringProvider;
     private final GliaCore gliaCore;
 
     private Gson gvaGson;
@@ -174,6 +177,7 @@ public class UseCaseFactory {
                           ChatHeadManager chatHeadManager,
                           AudioControlManager audioControlManager,
                           Schedulers schedulers,
+                          StringProvider stringProvider,
                           GliaCore gliaCore) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
@@ -183,6 +187,7 @@ public class UseCaseFactory {
         this.chatHeadManager = chatHeadManager;
         this.audioControlManager = audioControlManager;
         this.schedulers = schedulers;
+        this.stringProvider = stringProvider;
         this.gliaCore = gliaCore;
     }
 
@@ -1045,6 +1050,10 @@ public class UseCaseFactory {
 
     public ConfirmationDialogUseCase createConfirmationDialogUseCase() {
         return new ConfirmationDialogUseCase(createSiteInfoUseCase());
+    }
+
+    public ConfirmationDialogLinksUseCase createConfirmationDialogLinksUseCase() {
+        return new ConfirmationDialogLinksUseCase(stringProvider);
     }
 
     public LiveObservationPopupUseCase createLiveObservationPopupUseCase() {

@@ -5,9 +5,11 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.dialog.model.DialogState
 
-class ActivityWatcherForCallVisualizerContract {
+internal class ActivityWatcherForCallVisualizerContract {
 
     interface Controller {
         fun onActivityPaused()
@@ -16,9 +18,8 @@ class ActivityWatcherForCallVisualizerContract {
         fun removeMediaProjectionLaunchers(activityName: String?)
         fun startMediaProjectionLaunchers(activityName: String, launcher: ActivityResultLauncher<Intent>?)
         fun setWatcher(watcher: Watcher)
-
-        fun onLink1Clicked()
-        fun onLink2Clicked()
+        fun getConfirmationDialogLinks(): ConfirmationDialogLinks
+        fun onLinkClicked(link: Link)
         fun onPositiveDialogButtonClicked(activity: Activity? = null)
         fun onNegativeDialogButtonClicked()
         fun onDialogControllerCallback(state: DialogState)

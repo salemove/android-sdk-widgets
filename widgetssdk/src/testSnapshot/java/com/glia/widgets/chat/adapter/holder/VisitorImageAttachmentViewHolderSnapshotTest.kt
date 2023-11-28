@@ -5,7 +5,7 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
-import com.glia.widgets.chat.SnapshotStringProvider
+import com.glia.widgets.snapshotutils.SnapshotStringProvider
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
 import com.glia.widgets.chat.model.Attachment
 import com.glia.widgets.chat.model.VisitorAttachmentItem

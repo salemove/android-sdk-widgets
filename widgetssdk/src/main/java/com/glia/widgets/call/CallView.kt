@@ -718,24 +718,27 @@ internal class CallView(
         }
     }
 
-    override fun showEngagementConfirmationDialog(companyName: String) = showDialog {
-        Dialogs.showEngagementConfirmationDialog(
-            context = context,
-            theme = theme,
-            companyName = companyName,
-            positiveButtonClickListener = {
-                resetDialogStateAndDismiss()
-                callController?.onLiveObservationDialogAllowed()
-            },
-            negativeButtonClickListener = {
-                resetDialogStateAndDismiss()
-                callController?.onLiveObservationDialogRejected()
-                onEndListener?.onEnd()
-                callEnded()
-            },
-            link1ClickListener = { callController?.onLink1Clicked() },
-            link2ClickListener = { callController?.onLink2Clicked() }
-        )
+    override fun showEngagementConfirmationDialog() {
+        callController?.confirmationDialogLinks?.let { links ->
+            showDialog {
+                Dialogs.showEngagementConfirmationDialog(
+                    context = context,
+                    theme = theme,
+                    links = links,
+                    positiveButtonClickListener = {
+                        resetDialogStateAndDismiss()
+                        callController?.onLiveObservationDialogAllowed()
+                    },
+                    negativeButtonClickListener = {
+                        resetDialogStateAndDismiss()
+                        callController?.onLiveObservationDialogRejected()
+                        onEndListener?.onEnd()
+                        callEnded()
+                    },
+                    linkClickListener = { callController?.onLinkClicked(it) }
+                )
+            }
+        }
     }
 
     private fun showOverlayPermissionsDialog() = showDialog {

@@ -506,8 +506,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 this@ChatView.requestOpenEmailClient(uri)
             }
 
-            override fun showEngagementConfirmationDialog(companyName: String) {
-                this@ChatView.showEngagementConfirmationDialog(companyName)
+            override fun showEngagementConfirmationDialog() {
+                this@ChatView.showEngagementConfirmationDialog()
             }
 
             override fun navigateToWebBrowserActivity(title: String, url: String) {
@@ -518,16 +518,19 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
     }
 
-    private fun showEngagementConfirmationDialog(companyName: String) = showDialog {
-        Dialogs.showEngagementConfirmationDialog(
-            context = context,
-            theme = theme,
-            companyName = companyName,
-            positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
-            negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() },
-            link1ClickListener = { controller?.onLink1Clicked() },
-            link2ClickListener = { controller?.onLink2Clicked() }
-        )
+    private fun showEngagementConfirmationDialog() {
+        controller?.getConfirmationDialogLinks()?.let { links ->
+            showDialog {
+                Dialogs.showEngagementConfirmationDialog(
+                    context = context,
+                    theme = theme,
+                    links = links,
+                    positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
+                    negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() },
+                    linkClickListener = { controller?.onLinkClicked(it) }
+                )
+            }
+        }
     }
 
     private fun onEngagementConfirmationDialogAllowed() {

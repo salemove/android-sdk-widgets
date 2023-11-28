@@ -9,6 +9,6 @@ internal interface CallViewCallback {
     fun destroyView()
     fun minimizeView()
     fun showMissingPermissionsDialog()
-    fun showEngagementConfirmationDialog(companyName: String)
+    fun showEngagementConfirmationDialog()
     fun navigateToWebBrowserActivity(title: String, url: String)
 }

@@ -14,6 +14,8 @@ import com.glia.widgets.StringKeyPair
 import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
+import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.asActivity
@@ -198,27 +200,23 @@ internal object Dialogs {
     fun showEngagementConfirmationDialog(
         context: Context,
         theme: UiTheme,
-        companyName: String,
-        link1ClickListener: View.OnClickListener? = null,
-        link2ClickListener: View.OnClickListener? = null,
+        links: ConfirmationDialogLinks,
+        linkClickListener: (Link) -> Unit,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
-        val link1IsPresent = stringProvider.getRemoteString(R.string.engagement_confirm_link1_url).isNullOrEmpty().not()
-        val link2IsPresent = stringProvider.getRemoteString(R.string.engagement_confirm_link2_url).isNullOrEmpty().not()
-
         val payload = DialogPayload.Confirmation(
             title = stringProvider.getRemoteString(R.string.engagement_confirm_title),
-            message = stringProvider.getRemoteString(R.string.engagement_confirm_message, StringKeyPair(StringKey.COMPANY_NAME, companyName)),
-            link1Text = if (link1IsPresent) stringProvider.getRemoteString(R.string.engagement_confirm_link1_text) else null,
-            link2Text = if (link2IsPresent) stringProvider.getRemoteString(R.string.engagement_confirm_link2_text) else null,
+            message = stringProvider.getRemoteString(R.string.engagement_confirm_message),
+            link1Text = links.link1?.title,
+            link2Text = links.link2?.title,
             positiveButtonText = allow,
             negativeButtonText = cancel,
             poweredByText = poweredByText,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener,
-            link1ClickListener = link1ClickListener,
-            link2ClickListener = link2ClickListener
+            link1ClickListener = { links.link1?.let { linkClickListener(it) } },
+            link2ClickListener = { links.link2?.let { linkClickListener(it) } }
         )
 
         return dialogService.showDialog(context, theme, DialogType.Confirmation(payload))

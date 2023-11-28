@@ -344,16 +344,14 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showEngagementConfirmationDialog() {
-        val companyName = Dependencies.getSdkConfigurationManager().companyName
         showAlertDialogOnUiThreadWithStyledContext("Show live observation opt in dialog") { context, uiTheme, _ ->
             Dialogs.showEngagementConfirmationDialog(
                 context = context,
                 theme = uiTheme,
-                companyName = companyName,
+                links = controller.getConfirmationDialogLinks(),
                 positiveButtonClickListener = { controller.onPositiveDialogButtonClicked() },
                 negativeButtonClickListener = { controller.onNegativeDialogButtonClicked() },
-                link1ClickListener = { controller.onLink1Clicked() },
-                link2ClickListener = { controller.onLink2Clicked() }
+                linkClickListener = { controller.onLinkClicked(it) }
             )
         }
     }

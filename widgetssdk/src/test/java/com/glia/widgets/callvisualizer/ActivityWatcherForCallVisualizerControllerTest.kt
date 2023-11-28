@@ -20,6 +20,7 @@ import com.glia.widgets.core.dialog.Dialog.MODE_NONE
 import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
 import com.glia.widgets.core.dialog.Dialog.MODE_START_SCREEN_SHARING
 import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
+import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.screensharing.ScreenSharingController
@@ -56,10 +57,12 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
     private val isShowOverlayPermissionRequestDialogUseCase =
         mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
+    private val confirmationDialogLinksUseCase = mock(ConfirmationDialogLinksUseCase::class.java)
     private val controller = ActivityWatcherForCallVisualizerController(
         callVisualizerController,
         screenSharingController,
-        isShowOverlayPermissionRequestDialogUseCase
+        isShowOverlayPermissionRequestDialogUseCase,
+        confirmationDialogLinksUseCase
     )
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)

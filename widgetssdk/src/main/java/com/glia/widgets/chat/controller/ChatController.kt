@@ -43,7 +43,9 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.chathead.domain.HasPendingSurveyUseCase
 import com.glia.widgets.core.chathead.domain.SetPendingSurveyUsedUseCase
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
 import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
@@ -145,6 +147,7 @@ internal class ChatController(
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
     private val updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
+    private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase,
     private val chatManager: ChatManager
 ) : GliaOnEngagementUseCase.Listener, GliaOnEngagementEndUseCase.Listener, OnSurveyListener {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
@@ -152,7 +155,6 @@ internal class ChatController(
     private var mediaUpgradeOfferRepositoryCallback: MediaUpgradeOfferRepositoryCallback? = null
     private var timerStatusListener: FormattedTimerStatusListener? = null
     private var engagementStateEventDisposable: Disposable? = null
-    private var stringProvider = Dependencies.getStringProvider()
 
     private val disposable = CompositeDisposable()
     private val operatorMediaStateListener =
@@ -263,22 +265,16 @@ internal class ChatController(
 
     fun onEngagementConfirmationDialogRequested() {
         if (isOngoingEngagementUseCase()) return
-        viewCallback?.showEngagementConfirmationDialog(chatState.companyName.orEmpty())
+        viewCallback?.showEngagementConfirmationDialog()
     }
 
-    fun onLink1Clicked() {
-        Logger.d(TAG, "onLink1Clicked")
-        viewCallback?.navigateToWebBrowserActivity(
-            stringProvider.getRemoteString(R.string.engagement_confirm_link1_text),
-            stringProvider.getRemoteString(R.string.engagement_confirm_link1_url)
-        )
-    }
+    fun getConfirmationDialogLinks() = confirmationDialogLinksUseCase()
 
-    fun onLink2Clicked() {
-        Logger.d(TAG, "onLink2Clicked")
+    fun onLinkClicked(link: Link) {
+        Logger.d(TAG, "onLinkClicked")
         viewCallback?.navigateToWebBrowserActivity(
-            stringProvider.getRemoteString(R.string.engagement_confirm_link2_text),
-            stringProvider.getRemoteString(R.string.engagement_confirm_link2_url)
+            link.title,
+            link.url
         )
     }
 

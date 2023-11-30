@@ -1,11 +1,12 @@
 package com.glia.widgets.dialog
 
 import com.glia.widgets.SnapshotTest
+import com.glia.widgets.snapshotutils.SnapshotDialog
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-class UpgradeDialogTest : SnapshotTest(), DialogData {
+class UpgradeDialogTest : SnapshotTest(), SnapshotDialog {
 
     private val dialogType: DialogType = DialogType.Upgrade(
         DialogPayload.Upgrade(

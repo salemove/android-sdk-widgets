@@ -884,6 +884,48 @@
         ]
       }
     },
+    "linkButton": {
+      "background": {
+        "border": {
+          "type": "fill",
+          "value": ["#ff5e3c"]
+        },
+        "borderWidth": 2,
+        "color": {
+          "type": "gradient",
+          "value": ["#e7e6af", "#948bb8"]
+        },
+        "cornerRadius": 8
+      },
+      "shadow": {
+        "color": {
+          "type": "fill",
+          "value": ["#3c0039"]
+        },
+        "offset": 30,
+        "opacity": 20,
+        "radius": 8
+      },
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "fill",
+          "value": ["#358c32"]
+        },
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": ["#ff3d15"]
+        }
+      },
+      "tintColor": {
+        "type": "fill",
+        "value": ["#efff24"]
+      }
+    },
     "negativeButton": {
       "background": {
         "border": {

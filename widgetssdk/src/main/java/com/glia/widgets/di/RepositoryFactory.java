@@ -20,6 +20,8 @@ import com.glia.widgets.core.secureconversations.SecureConversationsRepository;
 import com.glia.widgets.core.secureconversations.SendMessageRepository;
 import com.glia.widgets.core.survey.GliaSurveyRepository;
 import com.glia.widgets.core.visitor.GliaVisitorMediaRepository;
+import com.glia.widgets.engagement.EngagementRepository;
+import com.glia.widgets.engagement.EngagementRepositoryImpl;
 import com.glia.widgets.filepreview.data.GliaFileRepository;
 import com.glia.widgets.filepreview.data.GliaFileRepositoryImpl;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
@@ -50,6 +52,8 @@ public class RepositoryFactory {
     private GliaScreenSharingRepository gliaScreenSharingRepository;
     private ChatScreenRepository chatScreenRepository;
     private CallVisualizerRepository callVisualizerRepository;
+
+    private EngagementRepository engagementRepository;
 
     public RepositoryFactory(
         GliaCore gliaCore,
@@ -219,4 +223,12 @@ public class RepositoryFactory {
         }
         return permissionsRequestRepository;
     }
+
+    public EngagementRepository getEngagementRepository() {
+        if (engagementRepository == null) {
+            engagementRepository = new EngagementRepositoryImpl(gliaCore);
+        }
+        return engagementRepository;
+    }
+
 }

@@ -756,7 +756,7 @@ internal class CallView(
     }
 
     private fun callEnded() {
-        Dependencies.getControllerFactory().destroyControllers()
+        Dependencies.destroyControllers()
     }
 
     private fun showOperatorVideo(operatorMediaState: MediaState?) {

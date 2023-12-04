@@ -49,9 +49,7 @@ public class GliaEngagementStateRepository {
                 .doOnNext(this::updateOperatorOnEngagementStateChanged)
                 .subscribe()
         );
-        engagement.on(Engagement.Events.STATE_UPDATE, engagementState -> {
-            notifyEngagementStateUpdate(engagementState);
-        });
+        engagement.on(Engagement.Events.STATE_UPDATE, this::notifyEngagementStateUpdate);
         engagement.on(Engagement.Events.END, () -> onEngagementEnded(engagement));
     }
 

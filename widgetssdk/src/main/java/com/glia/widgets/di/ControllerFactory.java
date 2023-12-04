@@ -16,9 +16,8 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
-import com.glia.widgets.engagement.end.EndEngagementController;
-import com.glia.widgets.engagement.end.EndEngagementControllerImpl;
-import com.glia.widgets.engagement.end.EngagementEndRepositoryImpl;
+import com.glia.widgets.engagement.end.EngagementCompletionController;
+import com.glia.widgets.engagement.end.EngagementCompletionControllerImpl;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -56,7 +55,7 @@ public class ControllerFactory {
     private final ChatHeadPosition chatHeadPosition;
     private final ManagerFactory managerFactory;
 
-    private EndEngagementController endEngagementController;
+    private EngagementCompletionController engagementCompletionController;
     private ChatController retainedChatController;
     private CallController retainedCallController;
     private ScreenSharingController retainedScreenSharingController;
@@ -253,7 +252,6 @@ public class ControllerFactory {
         getScreenSharingController().init();
         getActivityWatcherForChatHeadController().init();
         getActivityWatcherForLiveObservationController().init();
-        endEngagementController.initialize();
     }
 
     public FilePreviewController getImagePreviewController() {
@@ -403,18 +401,13 @@ public class ControllerFactory {
     }
 
     @NonNull
-    public EndEngagementController getEndEngagementController() {
-        if (endEngagementController == null) {
-            endEngagementController = new EndEngagementControllerImpl(
-                new EngagementEndRepositoryImpl(
-                    useCaseFactory.getLoadSurveyUseCase(),
-                    useCaseFactory.getDestroyControllersUseCase(),
-                    useCaseFactory.getResetEndEngagementReasonUseCase(),
-                    useCaseFactory.getEngagementEndEventUseCase(),
-                    useCaseFactory.getEngagementEndReasonUseCase()
-                )
+    public EngagementCompletionController getEndEngagementController() {
+        if (engagementCompletionController == null) {
+            engagementCompletionController = new EngagementCompletionControllerImpl(
+                useCaseFactory.getSurveyUseCase(),
+                useCaseFactory.getEngagementStateUseCase()
             );
         }
-        return endEngagementController;
+        return engagementCompletionController;
     }
 }

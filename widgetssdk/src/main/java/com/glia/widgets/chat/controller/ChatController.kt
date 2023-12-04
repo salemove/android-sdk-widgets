@@ -434,7 +434,7 @@ internal class ChatController(
         if (isQueueingEngagementUseCase()) {
             dialogController.showExitQueueDialog()
         } else {
-            Dependencies.getControllerFactory().destroyControllers()
+            Dependencies.destroyControllers()
         }
     }
 
@@ -685,7 +685,8 @@ internal class ChatController(
                     Logger.e(TAG, "cancelQueueTicketUseCase error: ${it.message}")
                 }
         )
-        endEngagementUseCase()
+//        endEngagementUseCase()
+        Dependencies.getUseCaseFactory().endEngagementUseCase()
         mediaUpgradeOfferRepository.stopAll()
         emitViewState { chatState.stop() }
     }

@@ -1037,7 +1037,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun chatEnded() {
-        Dependencies.getControllerFactory().destroyControllers()
+        Dependencies.destroyControllers()
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {

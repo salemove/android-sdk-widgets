@@ -123,16 +123,11 @@ import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUse
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
-import com.glia.widgets.engagement.end.domain.DestroyControllersUseCase;
-import com.glia.widgets.engagement.end.domain.EndEngagementUseCase;
-import com.glia.widgets.engagement.end.domain.EngagementEndEventUseCase;
-import com.glia.widgets.engagement.end.domain.EngagementEndReasonUseCase;
-import com.glia.widgets.engagement.end.domain.EngagementStateUseCase;
-import com.glia.widgets.engagement.end.domain.LoadSurveyUseCase;
-import com.glia.widgets.engagement.end.domain.LocallyEndEngagementSilentlyUseCase;
-import com.glia.widgets.engagement.end.domain.LocallyEndEngagementUseCase;
-import com.glia.widgets.engagement.end.domain.NewEngagementUseCase;
-import com.glia.widgets.engagement.end.domain.ResetEndEngagementReasonUseCase;
+import com.glia.widgets.engagement.EndEngagementUseCase;
+import com.glia.widgets.engagement.EngagementStateUseCase;
+import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer;
+import com.glia.widgets.engagement.SurveyUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -1036,77 +1031,28 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public DestroyControllersUseCase getDestroyControllersUseCase() {
-        return new DestroyControllersUseCase();
-    }
-
-    @NonNull
-    public NewEngagementUseCase getNewEngagementUseCase() {
-        return new NewEngagementUseCase(
-            DatasourceFactory.getEngagementDataSource()
-        );
-    }
-
-    @NonNull
     public EndEngagementUseCase getEndEngagementUseCase() {
-        return new EndEngagementUseCase(
-            DatasourceFactory.getEngagementDataSource(),
-            gliaCore
-        );
+        return new EndEngagementUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
-    public EngagementEndEventUseCase getEngagementEndEventUseCase() {
-        return new EngagementEndEventUseCase(
-            DatasourceFactory.getEngagementDataSource(),
-            getNewEngagementUseCase()
-        );
+    public HasOngoingEngagementUseCase getHasOngoingEngagementUseCase() {
+        return new HasOngoingEngagementUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
-    public EngagementEndReasonUseCase getEngagementEndReasonUseCase() {
-        return new EngagementEndReasonUseCase(
-            DatasourceFactory.getEngagementEndReasonDataSource()
-        );
+    public IsCurrentEngagementCallVisualizer getIsCurrentEngagementCallVisualizer() {
+        return new IsCurrentEngagementCallVisualizer(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public SurveyUseCase getSurveyUseCase() {
+        return new SurveyUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public EngagementStateUseCase getEngagementStateUseCase() {
-        return new EngagementStateUseCase(
-            DatasourceFactory.getEngagementDataSource(),
-            getNewEngagementUseCase()
-        );
+        return new EngagementStateUseCase(repositoryFactory.getEngagementRepository());
     }
 
-    @NonNull
-    public LoadSurveyUseCase getLoadSurveyUseCase() {
-        return new LoadSurveyUseCase(
-            DatasourceFactory.getSurveyDataSource()
-        );
-    }
-
-    @NonNull
-    public LocallyEndEngagementSilentlyUseCase getLocallyEndEngagementSilentlyUseCase() {
-        return new LocallyEndEngagementSilentlyUseCase(
-            DatasourceFactory.getEngagementEndReasonDataSource(),
-            getEndEngagementUseCase(),
-            getDestroyControllersUseCase()
-        );
-    }
-
-    @NonNull
-    public LocallyEndEngagementUseCase getLocallyEndEngagementUseCase() {
-        return new LocallyEndEngagementUseCase(
-            DatasourceFactory.getEngagementEndReasonDataSource(),
-            getEndEngagementUseCase(),
-            getDestroyControllersUseCase()
-        );
-    }
-
-    @NonNull
-    public ResetEndEngagementReasonUseCase getResetEndEngagementReasonUseCase() {
-        return new ResetEndEngagementReasonUseCase(
-            DatasourceFactory.getEngagementEndReasonDataSource()
-        );
-    }
 }

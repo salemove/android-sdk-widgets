@@ -187,10 +187,7 @@ class GliaCoreImpl implements GliaCore {
 
     @Override
     public Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
-        return new AuthenticationManager(
-            Glia.getAuthentication(behavior),
-            Dependencies.getControllerFactory()
-        );
+        return new AuthenticationManager(Glia.getAuthentication(behavior));
     }
 
     @Override

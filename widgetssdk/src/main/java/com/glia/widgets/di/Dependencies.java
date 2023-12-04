@@ -48,6 +48,7 @@ public class Dependencies {
     private static StringProvider stringProvider;
     private static Schedulers schedulers;
     private static GliaSdkConfigurationManager sdkConfigurationManager = new GliaSdkConfigurationManager();
+    private static RepositoryFactory repositoryFactory;
 
     public static void onAppCreate(Application application) {
         schedulers = new GliaWidgetsSchedulers();
@@ -55,7 +56,7 @@ public class Dependencies {
         stringProvider = new StringProviderImpl(resourceProvider);
         notificationManager = new NotificationManager(application, stringProvider);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
-        RepositoryFactory repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
+        repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
 
         PermissionManager permissionManager = new PermissionManager(
             application,
@@ -163,6 +164,7 @@ public class Dependencies {
 
     public static void init(GliaWidgetsConfig gliaWidgetsConfig) {
         controllerFactory.init();
+        repositoryFactory.getEngagementRepository().initialize();
         sdkConfigurationManager.setScreenSharingMode(gliaWidgetsConfig.screenSharingMode);
         sdkConfigurationManager.setUseOverlay(gliaWidgetsConfig.isUseOverlay());
         sdkConfigurationManager.setCompanyName(gliaWidgetsConfig.companyName);
@@ -196,6 +198,10 @@ public class Dependencies {
         return resourceProvider;
     }
 
+    public static RepositoryFactory getRepositoryFactory() {
+        return repositoryFactory;
+    }
+
     @VisibleForTesting
     public static void setResourceProvider(ResourceProvider resourceProvider) {
         Dependencies.resourceProvider = resourceProvider;
@@ -219,5 +225,14 @@ public class Dependencies {
         OnAudioStartedUseCase onAudioStartedUseCase
     ) {
         audioControlManager.init(onAudioStartedUseCase);
+    }
+
+    public static void destroyControllers() {
+        getControllerFactory().destroyControllers();
+    }
+
+    public static void reset() {
+        destroyControllers();
+        getRepositoryFactory().getEngagementRepository().reset();
     }
 }

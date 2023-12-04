@@ -67,13 +67,14 @@ public class GliaEngagementRepository {
     }
 
     public boolean hasOngoingEngagement() {
-        return gliaCore.getCurrentEngagement().isPresent();
+        return gliaCore.getCurrentEngagement().isPresent();//TODO when ending engagement locally this shit should be reworked,
+        // because in fact, we're clearing state before we will receive engagement end event, end this could cause bubble to show up after engagement end
     }
 
     public boolean isCallVisualizerEngagement() {
         return gliaCore.getCurrentEngagement()
-                .filter(engagement -> engagement instanceof OmnibrowseEngagement)
-                .isPresent();
+            .filter(engagement -> engagement instanceof OmnibrowseEngagement)
+            .isPresent();
     }
 
     public void getSiteInfo(@NonNull RequestCallback<SiteInfo> callback) {

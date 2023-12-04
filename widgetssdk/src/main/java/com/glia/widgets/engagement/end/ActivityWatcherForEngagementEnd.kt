@@ -6,13 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.collection.ArrayMap
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.SimpleActivityLifecycleCallbacks
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isGlia
 import com.glia.widgets.helper.qualifiedName
@@ -23,7 +24,7 @@ import java.lang.ref.WeakReference
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForEngagementEnd @JvmOverloads constructor(
-    private val controller: EndEngagementController,
+    private val controller: EngagementCompletionController,
     private val activities: ArrayMap<String, WeakReference<Activity>> = ArrayMap()
 ) : SimpleActivityLifecycleCallbacks() {
     private var alertDialog: AlertDialog? = null
@@ -31,11 +32,11 @@ internal class ActivityWatcherForEngagementEnd @JvmOverloads constructor(
     init {
         controller.state.subscribe {
             when (it) {
-                is EndEngagement.State.LaunchDialogHolderActivity -> launchDialogHolderActivity(it.activity)
-                is EndEngagement.State.ShowDialog -> showDialog(it.themedContext, it.theme)
-                is EndEngagement.State.ShowSurvey -> showSurvey(it.activity, it.survey, it.theme)
-                EndEngagement.State.FinishSilently -> finishActivities()
-                EndEngagement.State.Skip -> Log.d(TAG, "New Activity is attached. Skipping event...")
+                is EngagementCompletionController.State.LaunchDialogHolderActivity -> launchDialogHolderActivity(it.activity)
+                EngagementCompletionController.State.ReleaseControllersAndUi -> releaseResources()
+                is EngagementCompletionController.State.ShowOperatorEndedEngagementDialog -> showDialog(it.themedContext, it.uiTheme)
+                is EngagementCompletionController.State.ShowSurvey -> showSurvey(it.activity, it.survey, it.uiTheme)
+                EngagementCompletionController.State.Skip -> Logger.d(TAG, "New Activity is attached. Skipping event...")
             }
         }
     }
@@ -45,7 +46,6 @@ internal class ActivityWatcherForEngagementEnd @JvmOverloads constructor(
     }
 
     private fun showSurvey(activity: Activity, survey: Survey, theme: UiTheme) {
-        finishActivities()
         activity.apply {
             val newIntent: Intent = Intent(this, SurveyActivity::class.java)
                 .putExtra(GliaWidgets.UI_THEME, theme)
@@ -88,6 +88,11 @@ internal class ActivityWatcherForEngagementEnd @JvmOverloads constructor(
 
     override fun onActivityPaused(activity: Activity) {
         controller.onActivityPaused()
+    }
+
+    private fun releaseResources() {
+        Dependencies.destroyControllers()
+        finishActivities()
     }
 
     private fun finishActivities() {

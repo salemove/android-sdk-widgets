@@ -11,10 +11,9 @@ internal class SetEngagementConfigUseCase(
         engagementConfigRepository.chatType = chatType
         engagementConfigRepository.queueIds = queueIds
 
-        // Reset state for secure messaging.
-        // Just needed to show the chat transcript screen.
+        // Resting just in case there is a pending Survey
         if (chatType == ChatType.SECURE_MESSAGING) {
-            Dependencies.getControllerFactory().endEngagementController.resetState()
+            Dependencies.getRepositoryFactory().engagementRepository.reset()
         }
     }
 }

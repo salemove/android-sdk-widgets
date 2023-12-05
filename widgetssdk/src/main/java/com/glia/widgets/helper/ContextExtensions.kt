@@ -53,4 +53,4 @@ internal val Activity.qualifiedName: String
     get() = this::class.qualifiedName!!
 
 internal val Activity.isGlia: Boolean
-    get() = qualifiedName.contains(BuildConfig.LIBRARY_PACKAGE_NAME)
+    get() = qualifiedName.startsWith(BuildConfig.LIBRARY_PACKAGE_NAME)

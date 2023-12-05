@@ -42,7 +42,6 @@ import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
@@ -74,6 +73,7 @@ import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCa
 import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.EndEngagementUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.Logger
@@ -107,7 +107,7 @@ internal class ChatController(
     private val sendMessageUseCase: GliaSendMessageUseCase,
     private val addOperatorMediaStateListenerUseCase: AddOperatorMediaStateListenerUseCase,
     private val cancelQueueTicketUseCase: GliaCancelQueueTicketUseCase,
-    private val endEngagementUseCase: GliaEndEngagementUseCase,
+    private val endEngagementUseCase: EndEngagementUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase,
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
     private val removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase,
@@ -685,8 +685,7 @@ internal class ChatController(
                     Logger.e(TAG, "cancelQueueTicketUseCase error: ${it.message}")
                 }
         )
-//        endEngagementUseCase()
-        Dependencies.getUseCaseFactory().endEngagementUseCase()
+        endEngagementUseCase()
         mediaUpgradeOfferRepository.stopAll()
         emitViewState { chatState.stop() }
     }

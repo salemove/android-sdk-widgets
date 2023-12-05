@@ -3,8 +3,10 @@ package com.glia.widgets.core.visitor;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.VisitorMediaState;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -31,8 +33,8 @@ public class GliaVisitorMediaRepository {
         engagement.getMedia().on(Media.Events.VISITOR_STATE_UPDATE, this::onNewVisitorMediaState);
     }
 
-    public void onEngagementEnded(Engagement engagement) {
-        engagement.getMedia().off(Media.Events.VISITOR_STATE_UPDATE);
+    public void onEngagementEnded() {
+//        engagement.getMedia().off(Media.Events.VISITOR_STATE_UPDATE);
         currentMediaState = null;
         isOnHold = false;
         notifyVisitorMediaStateChanged(null);

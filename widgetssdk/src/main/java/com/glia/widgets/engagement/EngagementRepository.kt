@@ -2,6 +2,10 @@ package com.glia.widgets.engagement
 
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
+import com.glia.androidsdk.comms.Media
+import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.comms.OperatorMediaState
+import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
@@ -39,21 +43,10 @@ internal interface EngagementRepository {
 internal class EngagementRepositoryImpl(
     private val core: GliaCore
 ) : EngagementRepository {
-    private val omniCoreEngagementCallback = Consumer<OmnicoreEngagement> {
-        handleOmniCoreEngagement(it)
-    }
-
-    private val callVisualizerEngagementCallback = Consumer<OmnibrowseEngagement> {
-        handleCallVisualizerEngagement(it)
-    }
-
-    private val engagementStateCallback: Consumer<EngagementState> = Consumer {
-        handleEngagementState(it)
-    }
-
-    private val engagementEndCallback: Runnable = Runnable {
-        handleEngagementEnd()
-    }
+    private val omniCoreEngagementCallback = Consumer<OmnicoreEngagement>(::handleOmniCoreEngagement)
+    private val callVisualizerEngagementCallback = Consumer<OmnibrowseEngagement>(::handleCallVisualizerEngagement)
+    private val engagementStateCallback: Consumer<EngagementState> = Consumer(::handleEngagementState)
+    private val engagementEndCallback: Runnable = Runnable(::handleEngagementEnd)
 
     private var currentEngagement: Engagement? = null
 
@@ -62,6 +55,11 @@ internal class EngagementRepositoryImpl(
 
     private val _survey: PublishProcessor<EngagementRepository.SurveyState> = PublishProcessor.create()
     override val survey: Flowable<EngagementRepository.SurveyState> = _survey
+
+    //--Media--
+    private val mediaUpgradeOfferCallback: Consumer<MediaUpgradeOffer> = Consumer(::handleMediaUpgradeOffer)
+    private val operatorMediaStateUpdateCallback: Consumer<OperatorMediaState> = Consumer(::handleOperatorMediaStateUpdate)
+    private val visitorMediaStateUpdateCallback: Consumer<VisitorMediaState> = Consumer(::handleVisitorMediaStateUpdate)
 
     override val hasOngoingEngagement: Boolean
         get() = currentEngagement != null
@@ -78,11 +76,13 @@ internal class EngagementRepositoryImpl(
         _survey.onNext(EngagementRepository.SurveyState.Empty)
         _engagementState.onNext(EngagementRepository.State.NoEngagement)
         currentEngagement?.also(::unsubscribeFromEngagementEvents)
+        currentEngagement?.let { it.media }?.also(::unsubscribeFromEngagementMediaEvents)
     }
 
     override fun endEngagement(silently: Boolean) {
         currentEngagement?.also {
             unsubscribeFromEngagementEvents(it)
+            unsubscribeFromEngagementMediaEvents(it.media)
             it.end { Logger.d(TAG, "Ending engagement failed") }
             _engagementState.onNext(EngagementRepository.State.Finished)
             if (silently) {
@@ -107,12 +107,14 @@ internal class EngagementRepositoryImpl(
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
         currentEngagement = engagement
         subscribeToEngagementEvents(engagement)
+        subscribeToEngagementMediaEvents(engagement.media)
         _engagementState.onNext(EngagementRepository.State.Started)
     }
 
     private fun handleCallVisualizerEngagement(engagement: OmnibrowseEngagement) {
         currentEngagement = engagement
         subscribeToEngagementEvents(engagement)
+        subscribeToEngagementMediaEvents(engagement.media)
         _engagementState.onNext(EngagementRepository.State.Started)
     }
 
@@ -126,6 +128,18 @@ internal class EngagementRepositoryImpl(
         engagement.off(Engagement.Events.STATE_UPDATE, engagementStateCallback)
     }
 
+    private fun subscribeToEngagementMediaEvents(media: Media) {
+        media.on(Media.Events.MEDIA_UPGRADE_OFFER, mediaUpgradeOfferCallback)
+        media.on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateUpdateCallback)
+        media.on(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateUpdateCallback)
+    }
+
+    private fun unsubscribeFromEngagementMediaEvents(media: Media) {
+        media.off(Media.Events.MEDIA_UPGRADE_OFFER, mediaUpgradeOfferCallback)
+        media.off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateUpdateCallback)
+        media.off(Media.Events.VISITOR_STATE_UPDATE, visitorMediaStateUpdateCallback)
+    }
+
     private fun handleEngagementState(state: EngagementState) {
         _engagementState.onNext(EngagementRepository.State.Update(state))
     }
@@ -134,6 +148,19 @@ internal class EngagementRepositoryImpl(
         _engagementState.onNext(EngagementRepository.State.Finished)
         fetchSurvey(currentEngagement ?: return, true)
         currentEngagement = null
+    }
+
+    //--Media
+    private fun handleMediaUpgradeOffer(mediaUpgradeOffer: MediaUpgradeOffer) {
+        //TODO next step
+    }
+
+    private fun handleOperatorMediaStateUpdate(operatorMediaState: OperatorMediaState) {
+        //TODO next step
+    }
+
+    private fun handleVisitorMediaStateUpdate(visitorMediaState: VisitorMediaState) {
+        //TODO next step
     }
 
 }

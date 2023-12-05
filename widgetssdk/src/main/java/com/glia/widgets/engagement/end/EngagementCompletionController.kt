@@ -11,6 +11,7 @@ import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementRepository
 import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.ReleaseResourcesUseCase
 import com.glia.widgets.engagement.SurveyUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.getFullHybridTheme
@@ -29,7 +30,7 @@ internal interface EngagementCompletionController {
 
     sealed interface State {
         object Skip : State
-        object ReleaseControllersAndUi : State
+        object ReleaseUi : State
         data class ShowSurvey(val survey: Survey, val activity: Activity, val uiTheme: UiTheme) : State
         data class ShowOperatorEndedEngagementDialog(val themedContext: Context, val uiTheme: UiTheme) : State
         data class LaunchDialogHolderActivity(val activity: Activity) : State
@@ -39,6 +40,7 @@ internal interface EngagementCompletionController {
 internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
     private val surveyUseCase: SurveyUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
+    private val releaseResourcesUseCase: ReleaseResourcesUseCase,
     private val resumedActivity: PublishProcessor<WeakReference<Activity>> = PublishProcessor.create()
 ) : EngagementCompletionController {
     private var _currentUiTheme: UiTheme? = null
@@ -55,7 +57,8 @@ internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
     @SuppressLint("CheckResult")
     private fun initObservables() {
         engagementStateUseCase().filter { it is EngagementRepository.State.Finished }.subscribe({
-            submitState(EngagementCompletionController.State.ReleaseControllersAndUi)
+            submitState(EngagementCompletionController.State.ReleaseUi)
+            releaseResourcesUseCase()
         }, {})
         Flowable.combineLatest(surveyUseCase(), resumedActivity, ::produceState).subscribe(::submitState) {
             //no op, this should not happen

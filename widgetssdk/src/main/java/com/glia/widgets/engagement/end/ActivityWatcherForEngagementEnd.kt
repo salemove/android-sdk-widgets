@@ -12,7 +12,6 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.SimpleActivityLifecycleCallbacks
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isGlia
@@ -33,7 +32,7 @@ internal class ActivityWatcherForEngagementEnd @JvmOverloads constructor(
         controller.state.subscribe {
             when (it) {
                 is EngagementCompletionController.State.LaunchDialogHolderActivity -> launchDialogHolderActivity(it.activity)
-                EngagementCompletionController.State.ReleaseControllersAndUi -> releaseResources()
+                EngagementCompletionController.State.ReleaseUi -> finishActivities()
                 is EngagementCompletionController.State.ShowOperatorEndedEngagementDialog -> showDialog(it.themedContext, it.uiTheme)
                 is EngagementCompletionController.State.ShowSurvey -> showSurvey(it.activity, it.survey, it.uiTheme)
                 EngagementCompletionController.State.Skip -> Logger.d(TAG, "New Activity is attached. Skipping event...")
@@ -88,11 +87,6 @@ internal class ActivityWatcherForEngagementEnd @JvmOverloads constructor(
 
     override fun onActivityPaused(activity: Activity) {
         controller.onActivityPaused()
-    }
-
-    private fun releaseResources() {
-        Dependencies.destroyControllers()
-        finishActivities()
     }
 
     private fun finishActivities() {

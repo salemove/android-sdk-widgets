@@ -75,7 +75,6 @@ import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorFlowableUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
@@ -127,6 +126,7 @@ import com.glia.widgets.engagement.EndEngagementUseCase;
 import com.glia.widgets.engagement.EngagementStateUseCase;
 import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
 import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer;
+import com.glia.widgets.engagement.ReleaseResourcesUseCase;
 import com.glia.widgets.engagement.SurveyUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
@@ -327,11 +327,6 @@ public class UseCaseFactory {
             schedulers,
             repositoryFactory.getGliaQueueRepository()
         );
-    }
-
-    @NonNull
-    public GliaEndEngagementUseCase createEndEngagementUseCase() {
-        return new GliaEndEngagementUseCase(repositoryFactory.getGliaEngagementRepository(), repositoryFactory.getChatScreenRepository());
     }
 
     @NonNull
@@ -723,7 +718,8 @@ public class UseCaseFactory {
     @NonNull
     public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
         return new SetEngagementConfigUseCase(
-            repositoryFactory.getEngagementConfigRepository()
+            repositoryFactory.getEngagementConfigRepository(),
+            repositoryFactory.getEngagementRepository()
         );
     }
 
@@ -1053,6 +1049,19 @@ public class UseCaseFactory {
     @NonNull
     public EngagementStateUseCase getEngagementStateUseCase() {
         return new EngagementStateUseCase(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public ReleaseResourcesUseCase getReleaseResourcesUseCase() {
+        return new ReleaseResourcesUseCase(
+            createRemoveScreenSharingNotificationUseCase(),
+            createCallNotificationUseCase(),
+            repositoryFactory.getGliaOperatorMediaRepository(),
+            repositoryFactory.getGliaFileAttachmentRepository(),
+            repositoryFactory.getGliaVisitorMediaRepository(),
+            repositoryFactory.getEngagementConfigRepository(),
+            createUpdateFromCallScreenUseCase()
+        );
     }
 
 }

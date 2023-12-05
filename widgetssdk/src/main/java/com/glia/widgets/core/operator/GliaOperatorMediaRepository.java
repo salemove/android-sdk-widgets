@@ -26,14 +26,13 @@ public class GliaOperatorMediaRepository {
     }
 
     public void onEngagementStarted(Engagement engagement) {
-        engagement.getMedia()
-                .on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
+        engagement.getMedia().on(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
-    public void onEngagementEnded(Engagement engagement) {
+    public void onEngagementEnded() {
         currentMediaState = null;
         notifyOperatorMediaStateChanged(null);
-        engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
+//        engagement.getMedia().off(Media.Events.OPERATOR_STATE_UPDATE, operatorMediaStateConsumer);
     }
 
     public boolean hasOperatorMedia() {

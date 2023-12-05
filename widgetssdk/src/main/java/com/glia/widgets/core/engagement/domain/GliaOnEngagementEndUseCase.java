@@ -42,12 +42,12 @@ public class GliaOnEngagementEndUseCase implements
             if (listener != null) {
                 listener.engagementEnded();
             }
-            operatorMediaRepository.onEngagementEnded(engagement);
+            operatorMediaRepository.onEngagementEnded();
             fileAttachmentRepository.clearObservers();
             fileAttachmentRepository.detachAllFiles();
             removeScreenSharingNotificationUseCase.invoke();
             callNotificationUseCase.removeAllNotifications();
-            gliaVisitorMediaRepository.onEngagementEnded(engagement);
+            gliaVisitorMediaRepository.onEngagementEnded();
             gliaEngagementConfigRepository.reset();
         }
     }

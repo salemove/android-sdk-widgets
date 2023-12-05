@@ -10,7 +10,6 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.site.SiteInfo;
 import com.glia.widgets.di.GliaCore;
-import com.glia.widgets.helper.Logger;
 
 import java.util.function.Consumer;
 
@@ -36,14 +35,6 @@ public class GliaEngagementRepository {
             return;
         }
         gliaCore.getCurrentEngagement().ifPresent(engagement -> engagement.off(Engagement.Events.END, engagementEnded));
-    }
-
-    public void endEngagement() {
-        gliaCore.getCurrentEngagement().ifPresent(engagement -> engagement.end(e -> {
-            if (e != null) {
-                Logger.e(TAG, "Ending engagement error: " + e);
-            }
-        }));
     }
 
     public void listenForOmnicoreEngagement(Consumer<OmnicoreEngagement> engagementConsumer) {

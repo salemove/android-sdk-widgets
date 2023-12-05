@@ -29,7 +29,6 @@ import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDi
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase;
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase;
 import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase;
@@ -52,6 +51,7 @@ import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException;
 import com.glia.widgets.core.visitor.VisitorMediaUpdatesListener;
 import com.glia.widgets.core.visitor.domain.AddVisitorMediaStateListenerUseCase;
 import com.glia.widgets.core.visitor.domain.RemoveVisitorMediaStateListenerUseCase;
+import com.glia.widgets.engagement.EndEngagementUseCase;
 import com.glia.widgets.helper.CommonExtensionsKt;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -84,7 +84,7 @@ public class CallController
     private final AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase;
     private final RemoveOperatorMediaStateListenerUseCase removeOperatorMediaStateListenerUseCase;
     private final GliaOnEngagementEndUseCase onEngagementEndUseCase;
-    private final GliaEndEngagementUseCase endEngagementUseCase;
+    private final EndEngagementUseCase endEngagementUseCase;
     private final ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase;
     private final IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase;
     private final HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase;
@@ -132,7 +132,7 @@ public class CallController
         AddOperatorMediaStateListenerUseCase addOperatorMediaStateListenerUseCase,
         RemoveOperatorMediaStateListenerUseCase removeOperatorMediaStateListenerUseCase,
         GliaOnEngagementEndUseCase onEngagementEndUseCase,
-        GliaEndEngagementUseCase endEngagementUseCase,
+        EndEngagementUseCase endEngagementUseCase,
         ShouldShowMediaEngagementViewUseCase shouldShowMediaEngagementViewUseCase,
         IsShowOverlayPermissionRequestDialogUseCase isShowOverlayPermissionRequestDialogUseCase,
         HasCallNotificationChannelEnabledUseCase hasCallNotificationChannelEnabledUseCase,
@@ -740,7 +740,7 @@ public class CallController
                     throwable -> Logger.e(TAG, "cancelQueueTicketUseCase error: " + throwable.getMessage())
                 )
         );
-        endEngagementUseCase.invoke();
+        endEngagementUseCase.invoke(false);
         mediaUpgradeOfferRepository.stopAll();
         emitViewState(callState.stop());
     }

@@ -112,7 +112,7 @@ public class ControllerFactory {
                 useCaseFactory.createGliaSendMessageUseCase(),
                 useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
                 useCaseFactory.createCancelQueueTicketUseCase(),
-                useCaseFactory.createEndEngagementUseCase(),
+                useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createAddFileAttachmentsObserverUseCase(),
                 useCaseFactory.createRemoveFileAttachmentObserverUseCase(),
@@ -170,7 +170,7 @@ public class ControllerFactory {
                 useCaseFactory.createAddOperatorMediaStateListenerUseCase(),
                 useCaseFactory.createRemoveOperatorMediaStateListenerUseCase(),
                 useCaseFactory.createOnEngagementEndUseCase(),
-                useCaseFactory.createEndEngagementUseCase(),
+                useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
@@ -405,7 +405,8 @@ public class ControllerFactory {
         if (engagementCompletionController == null) {
             engagementCompletionController = new EngagementCompletionControllerImpl(
                 useCaseFactory.getSurveyUseCase(),
-                useCaseFactory.getEngagementStateUseCase()
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getReleaseResourcesUseCase()
             );
         }
         return engagementCompletionController;

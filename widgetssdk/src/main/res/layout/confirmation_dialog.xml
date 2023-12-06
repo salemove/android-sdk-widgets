@@ -49,13 +49,14 @@
         android:id="@+id/link1_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginTop="@dimen/glia_large"
         tools:text="@string/engagement_confirm_link1_text"
         android:textAllCaps="false"
+        android:textAppearance="?attr/textAppearanceBody1"
         app:layout_constraintEnd_toStartOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/dialog_message_view"
-        app:layout_goneMarginTop="@dimen/glia_medium" />
+        app:layout_goneMarginTop="@dimen/glia_large" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/link2_button"
@@ -63,15 +64,16 @@
         android:layout_height="wrap_content"
         tools:text="@string/engagement_confirm_link2_text"
         android:textAllCaps="false"
+        android:textAppearance="?attr/textAppearanceBody1"
         app:layout_constraintEnd_toStartOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
         app:layout_constraintTop_toBottomOf="@id/link1_button"
-        app:layout_goneMarginTop="@dimen/glia_medium" />
+        app:layout_goneMarginTop="@dimen/glia_large" />
 
     <Space
         android:id="@+id/additional_buttons_space"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/glia_large"
+        android:layout_height="@dimen/glia_medium"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@id/end_guideline"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
@@ -81,7 +83,7 @@
         android:id="@+id/decline_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginTop="@dimen/glia_large"
         android:layout_marginEnd="@dimen/glia_small"
         tools:text="@string/general_decline"
         app:layout_constraintEnd_toStartOf="@id/accept_button"
@@ -93,7 +95,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/glia_small"
-        android:layout_marginTop="@dimen/glia_medium"
+        android:layout_marginTop="@dimen/glia_large"
         tools:text="@string/general_accept"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
         app:layout_constraintStart_toEndOf="@id/decline_button"

@@ -22,9 +22,14 @@ public class GliaVisitorMediaRepository {
         setVideoOnHoldListener();
     }
 
-    public void onHoldChanged(boolean isOnHold) {
+    public void onAudioHoldChanged(boolean isOnHold) {
         notifyOnHoldStateChange(isOnHold);
-        visitorMediaStatusOnHold(isOnHold);
+        visitorAudioMediaStatusOnHold(isOnHold);
+    }
+
+    public void onVideoHoldChanged(boolean isOnHold) {
+        notifyOnHoldStateChange(isOnHold);
+        visitorVideoMediaStatusOnHold(isOnHold);
     }
 
     public void onEngagementStarted(Engagement engagement) {
@@ -91,21 +96,31 @@ public class GliaVisitorMediaRepository {
 
     private void setVideoOnHoldListener() {
         if (hasVisitorVideoMedia().blockingGet()) {
-            currentMediaState.getVideo().setOnHoldHandler(this::onHoldChanged);
+            currentMediaState.getVideo().setOnHoldHandler(this::onVideoHoldChanged);
         }
     }
 
     private void setAudioOnHoldListener() {
         if (hasVisitorAudioMedia().blockingGet()) {
-            currentMediaState.getAudio().setOnHoldHandler(this::onHoldChanged);
+            currentMediaState.getAudio().setOnHoldHandler(this::onAudioHoldChanged);
         }
     }
 
-    private void visitorMediaStatusOnHold(boolean isOnHold) {
+    private void visitorVideoMediaStatusOnHold(boolean isOnHold) {
         if (isOnHold) {
-            saveVisitorMediaStatus();
+            saveVisitorVideoStatus();
+            pauseVisitorVideo();
         } else {
-            restoreVisitorMediaStatus();
+            restoreVisitorVideoStatus();
+        }
+    }
+
+    private void visitorAudioMediaStatusOnHold(boolean isOnHold) {
+        if (isOnHold) {
+            saveVisitorAudioStatus();
+            muteVisitorAudio();
+        } else {
+            restoreVisitorAudioStatus();
         }
     }
 
@@ -121,24 +136,10 @@ public class GliaVisitorMediaRepository {
         visitorMediaUpdatesListeners.forEach(listener -> listener.onHoldChanged(isOnHold));
     }
 
-    private void saveVisitorMediaStatus() {
-        if (currentMediaState.getVideo() != null) {
-            saveVisitorVideoStatus();
-            pauseVisitorVideo();
-        }
-        if (currentMediaState.getAudio() != null) {
-            saveVisitorAudioStatus();
-            muteVisitorAudio();
-        }
-    }
-
-    private void restoreVisitorMediaStatus() {
-        restoreVisitorVideoStatus();
-        restoreVisitorAudioStatus();
-    }
-
     private void saveVisitorVideoStatus() {
-        savedVideoStatus = currentMediaState.getVideo().getStatus();
+        if (currentMediaState.getVideo() != null) {
+            savedVideoStatus = currentMediaState.getVideo().getStatus();
+        }
     }
 
     private void restoreVisitorVideoStatus() {
@@ -157,7 +158,9 @@ public class GliaVisitorMediaRepository {
     }
 
     private void saveVisitorAudioStatus() {
-        savedAudioStatus = currentMediaState.getAudio().getStatus();
+        if (currentMediaState.getAudio() != null) {
+            savedAudioStatus = currentMediaState.getAudio().getStatus();
+        }
     }
 
     private void restoreVisitorAudioStatus() {

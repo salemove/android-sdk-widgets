@@ -71,7 +71,7 @@ public class DialogController {
     }
 
     public void showUpgradeVideoDialog1Way(MediaUpgradeOffer mediaUpgradeOffer, String operatorName) {
-        Logger.i(TAG, "Show Upgrade 1WayVide Dialog");
+        Logger.i(TAG, "Show Upgrade 1WayVideo Dialog");
         dialogManager.addAndEmit(new DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, DialogState.MediaUpgrade.MODE_VIDEO_ONE_WAY));
     }
 

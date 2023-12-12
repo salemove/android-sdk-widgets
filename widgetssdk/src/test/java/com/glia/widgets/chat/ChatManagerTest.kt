@@ -20,6 +20,7 @@ import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -42,7 +43,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
@@ -63,16 +63,19 @@ class ChatManagerTest {
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
+    private lateinit var isOngoingEngagementUseCase: IsOngoingEngagementUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
     private lateinit var compositeDisposable: CompositeDisposable
     private lateinit var stateProcessor: BehaviorProcessor<ChatManager.State>
     private lateinit var quickReplies: BehaviorProcessor<List<GvaButton>>
     private lateinit var action: BehaviorProcessor<ChatManager.Action>
+    private lateinit var historyLoaded: BehaviorProcessor<Boolean>
 
     @Before
     fun setUp() {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+        state = spy(ChatManager.State())
         onMessageUseCase = mock()
         loadHistoryUseCase = mock()
         addNewMessagesDividerUseCase = mock()
@@ -82,10 +85,12 @@ class ChatManagerTest {
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
         isAuthenticatedUseCase = mock()
+        isOngoingEngagementUseCase = mock()
         compositeDisposable = spy()
-        stateProcessor = spy(BehaviorProcessor.create())
+        stateProcessor = spy(BehaviorProcessor.createDefault(state))
         quickReplies = BehaviorProcessor.create()
         action = BehaviorProcessor.create()
+        historyLoaded = BehaviorProcessor.createDefault(false)
 
         subjectUnderTest = spy(
             ChatManager(
@@ -98,13 +103,14 @@ class ChatManagerTest {
                 sendUnsentMessagesUseCase,
                 handleCustomCardClickUseCase,
                 isAuthenticatedUseCase,
+                isOngoingEngagementUseCase,
                 compositeDisposable,
                 stateProcessor,
                 quickReplies,
-                action
+                action,
+                historyLoaded
             )
         )
-        state = spy(ChatManager.State())
     }
 
     @Test
@@ -471,7 +477,7 @@ class ChatManagerTest {
         whenever(addNewMessagesDividerUseCase(any(), any())) doReturn true
         whenever(markMessagesReadWithDelayUseCase()) doReturn Completable.complete()
 
-        val newState = subjectUnderTest.mapChatHistory(chatHistoryResponse)
+        val newState = subjectUnderTest.mapChatHistory(chatHistoryResponse, state)
 
         verify(appendHistoryChatMessageUseCase).invoke(any(), any(), eq(true))
         verify(appendHistoryChatMessageUseCase).invoke(any(), any(), eq(false))
@@ -544,11 +550,61 @@ class ChatManagerTest {
     }
 
     @Test
-    fun `loadHistory triggers mapChatHistory when history response receives`() {
+    fun `loadHistory loads history when authenticated`() {
+        whenever(isAuthenticatedUseCase()) doReturn true
+        whenever(isOngoingEngagementUseCase()) doReturn false
+
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
-        val testFlowable = subjectUnderTest.loadHistory { }.test()
-        verify(subjectUnderTest).mapChatHistory(any(), isNull())
+
+        val historyLoadedTest = historyLoaded.test()
+
+        val loadHistoryCallback: (Boolean) -> Unit = mock()
+
+        val testFlowable = subjectUnderTest.loadHistory(loadHistoryCallback).test()
+
+        verify(subjectUnderTest).mapChatHistory(any(), any())
+
         assertTrue(testFlowable.valueCount() == 1)
+        historyLoadedTest.assertValues(false, true)
+    }
+
+    @Test
+    fun `loadHistory loads history when engagement is ongoing`() {
+        whenever(isAuthenticatedUseCase()) doReturn false
+        whenever(isOngoingEngagementUseCase()) doReturn true
+
+        whenever(loadHistoryUseCase()) doReturn Single.just(mock())
+
+        val historyLoadedTest = historyLoaded.test()
+
+        val loadHistoryCallback: (Boolean) -> Unit = mock()
+
+        val testFlowable = subjectUnderTest.loadHistory(loadHistoryCallback).test()
+
+        verify(subjectUnderTest).mapChatHistory(any(), any())
+
+        assertTrue(testFlowable.valueCount() == 1)
+        historyLoadedTest.assertValues(false, true)
+    }
+
+    @Test
+    fun `loadHistory skips history when there is no ongoing engagement and not authenticated`() {
+        whenever(isAuthenticatedUseCase()) doReturn false
+        whenever(isOngoingEngagementUseCase()) doReturn false
+
+        whenever(loadHistoryUseCase()) doReturn Single.just(mock())
+
+        val historyLoadedTest = historyLoaded.test()
+
+        val loadHistoryCallback: (Boolean) -> Unit = mock()
+
+        val testFlowable = subjectUnderTest.loadHistory(loadHistoryCallback).test()
+
+        verify(subjectUnderTest, never()).mapChatHistory(any(), any())
+        verify(loadHistoryCallback).invoke(false)
+
+        assertTrue(testFlowable.valueCount() == 1)
+        historyLoadedTest.assertValue(false)
     }
 
     @Test
@@ -577,12 +633,14 @@ class ChatManagerTest {
     fun `reset clears state`() {
         stateProcessor.onNext(ChatManager.State(addedMessagesCount = 10))
         quickReplies.onNext(listOf(mock()))
+        historyLoaded.onNext(true)
 
         subjectUnderTest.reset()
 
         verify(compositeDisposable).clear()
         assertEquals(stateProcessor.value, ChatManager.State())
         assertEquals(quickReplies.value, emptyList<GvaButton>())
+        assertEquals(historyLoaded.value, false)
     }
 
     @Test
@@ -616,23 +674,22 @@ class ChatManagerTest {
             verify(this).subscribeToState(onHistoryLoaded, onOperatorMessageReceived)
             verify(this).subscribeToQuickReplies(onQuickReplyReceived)
 
-            verify(this, atLeastOnce()).updateQuickReplies(any())
-
             stateProcessor.onNext(state)
-            verify(state).immutableChatItems
+
+            verify(this, atLeastOnce()).updateQuickReplies(any())
+            verify(state, atLeastOnce()).immutableChatItems
         }
     }
 
     @Test
-    fun `reloadHistoryIfNeeded does nothing when authenticated`() {
-        whenever(isAuthenticatedUseCase()) doReturn true
+    fun `reloadHistoryIfNeeded does nothing when history is already loaded`() {
+        historyLoaded.onNext(true)
         subjectUnderTest.reloadHistoryIfNeeded()
         verify(loadHistoryUseCase, never()).invoke()
     }
 
     @Test
-    fun `reloadHistoryIfNeeded reloads history when not authenticated`() {
-        whenever(isAuthenticatedUseCase()) doReturn false
+    fun `reloadHistoryIfNeeded reloads history when history is not loaded previously`() {
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
         subjectUnderTest.reloadHistoryIfNeeded()
         verify(loadHistoryUseCase).invoke()

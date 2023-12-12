@@ -14,6 +14,7 @@ import java.util.Optional;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.processors.BehaviorProcessor;
+import io.reactivex.processors.ReplayProcessor;
 
 public class GliaEngagementStateRepository {
     private final EngagementStateEventVisitor<Operator> visitor = new EngagementStateEventVisitor.OperatorVisitor();
@@ -27,9 +28,7 @@ public class GliaEngagementStateRepository {
 
     private final BehaviorProcessor<Optional<EngagementState>> engagementStateProcessor = BehaviorProcessor.createDefault(Optional.empty());
 
-    private final BehaviorProcessor<EngagementStateEvent> engagementStateEventProcessor = BehaviorProcessor.createDefault(
-        new EngagementStateEvent.NoEngagementEvent()
-    );
+    private final ReplayProcessor<EngagementStateEvent> engagementStateEventProcessor = ReplayProcessor.createWithSize(20);
     private final Flowable<EngagementStateEvent> engagementStateEventFlowable = engagementStateEventProcessor.onBackpressureLatest();
     private final GliaOperatorRepository operatorRepository;
     private CompositeDisposable disposable = new CompositeDisposable();

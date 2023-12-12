@@ -22,6 +22,7 @@ import com.glia.widgets.chat.model.OperatorChatItem
 import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.Unsent
+import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
@@ -46,10 +47,12 @@ internal class ChatManager(
     private val sendUnsentMessagesUseCase: SendUnsentMessagesUseCase,
     private val handleCustomCardClickUseCase: HandleCustomCardClickUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
+    private val isOngoingEngagementUseCase: IsOngoingEngagementUseCase,
     private val compositeDisposable: CompositeDisposable = CompositeDisposable(),
     private val state: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State()),
     private val quickReplies: BehaviorProcessor<List<GvaButton>> = BehaviorProcessor.create(),
-    private val action: BehaviorProcessor<Action> = BehaviorProcessor.create()
+    private val action: BehaviorProcessor<Action> = BehaviorProcessor.create(),
+    private val historyLoaded: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
 ) {
     fun initialize(
         onHistoryLoaded: (hasHistory: Boolean) -> Unit,
@@ -57,7 +60,11 @@ internal class ChatManager(
         onOperatorMessageReceived: (count: Int) -> Unit
     ): Flowable<List<ChatItem>> {
         subscribe(onHistoryLoaded, onOperatorMessageReceived, onQuickReplyReceived)
-        return state.doOnNext(::updateQuickReplies).map(State::immutableChatItems).onBackpressureLatest().share()
+        return state
+            .doOnNext(::updateQuickReplies)
+            .map(State::immutableChatItems)
+            .onBackpressureLatest()
+            .share()
     }
 
     @VisibleForTesting
@@ -75,6 +82,7 @@ internal class ChatManager(
         quickReplies.onNext(emptyList())
         compositeDisposable.clear()
         action.onNext(Action.None)
+        historyLoaded.onNext(false)
     }
 
     fun onChatAction(action: Action) {
@@ -92,10 +100,19 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit): Flowable<State> = loadHistoryUseCase()
-        .map { mapChatHistory(it) }
-        .doOnSuccess { onHistoryLoaded(it.chatItems.isNotEmpty()) }
-        .toFlowable()
+    fun loadHistory(onHistoryLoaded: (hasHistory: Boolean) -> Unit): Flowable<State> {
+        val historyEvent = if (isAuthenticatedUseCase() || isOngoingEngagementUseCase()) {
+            loadHistoryUseCase()
+                .doOnSuccess { historyLoaded.onNext(true) }
+                .zipWith(state.firstOrError(), ::mapChatHistory)
+                .doOnSuccess { onHistoryLoaded(it.chatItems.isNotEmpty()) }
+        } else {
+            onHistoryLoaded(false)
+            state.firstOrError()
+        }
+
+        return historyEvent.toFlowable()
+    }
 
     @VisibleForTesting
     fun subscribeToMessages(onOperatorMessageReceived: (count: Int) -> Unit): Flowable<State> = Flowable.merge(onMessage(), onAction())
@@ -133,8 +150,7 @@ internal class ChatManager(
     }
 
     @VisibleForTesting
-    fun mapChatHistory(historyResponse: ChatHistoryResponse, currentState: State? = null): State {
-        val state: State = currentState ?: State()
+    fun mapChatHistory(historyResponse: ChatHistoryResponse, state: State): State {
         if (historyResponse.items.isEmpty()) return state
         val chatItems: MutableList<ChatItem> = mutableListOf()
         val rawItems = historyResponse.items
@@ -359,10 +375,9 @@ internal class ChatManager(
     @VisibleForTesting
     fun markMessagesReadWithDelay() {
         val disposable = markMessagesReadWithDelayUseCase()
-            .toSingleDefault(Unit)
-            .toFlowable()
-            .withLatestFrom(state) { _, messagesState: State -> removeNewMessagesDivider(messagesState) }
-            .subscribe(state::onNext) { it.printStackTrace() }
+            .andThen(state.firstOrError())
+            .map(::removeNewMessagesDivider)
+            .subscribe(state::onNext, Throwable::printStackTrace)
         compositeDisposable.add(disposable)
     }
 
@@ -372,12 +387,13 @@ internal class ChatManager(
     }
 
     fun reloadHistoryIfNeeded() {
-        if (isAuthenticatedUseCase()) return
+        val loadHistory = historyLoaded.firstElement()
+            .filter { !it }
+            .flatMap { loadHistoryUseCase().toMaybe() }
+            .zipWith(state.firstElement(), ::mapChatHistory)
+            .subscribe(state::onNext, { Logger.e(TAG, "Chat reload failed", it) }, { Logger.i(TAG, "Chat history is already loaded") })
 
-        compositeDisposable.add(
-            loadHistoryUseCase().map { mapChatHistory(it, state.value) }
-                .subscribe({ state.onNext(it) }) { Logger.e(TAG, "Chat reload failed", it) }
-        )
+        compositeDisposable.add(loadHistory)
     }
 
     internal data class State(

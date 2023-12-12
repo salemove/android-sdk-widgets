@@ -17,7 +17,6 @@ import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
-import com.glia.widgets.R
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
@@ -679,6 +678,8 @@ internal class ChatController(
     }
 
     private fun viewInitPreQueueing() {
+        if (isOngoingEngagementUseCase()) return
+
         Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
         confirmationDialogUseCase{ shouldShow ->

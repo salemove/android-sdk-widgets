@@ -99,15 +99,23 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher, never()).engagementStarted()
         verify(spyController, never()).addScreenSharingCallback(activity)
         verify(spyController, never()).setupScreenSharingViewCallback()
+        verify(screenSharingController).onResume(eq(activity), notNull())
 
-        val kArgumentCaptor: KArgumentCaptor<(OmnibrowseEngagement) -> Unit> = argumentCaptor<(OmnibrowseEngagement) -> Unit>()
+        val engagementStartCaptor: KArgumentCaptor<(OmnibrowseEngagement) -> Unit> = argumentCaptor<(OmnibrowseEngagement) -> Unit>()
 
-        verify(callVisualizerController).setOnEngagementStartListener(kArgumentCaptor.capture())
+        verify(callVisualizerController).setOnEngagementStartListener(engagementStartCaptor.capture())
+
+        val engagementEndCaptor: KArgumentCaptor<() -> Unit> = argumentCaptor<() -> Unit>()
+        verify(callVisualizerController).setOnEngagementEndedCallback(engagementEndCaptor.capture())
 
         val mockEngagement: OmnibrowseEngagement = mock()
-        kArgumentCaptor.lastValue.invoke(mockEngagement)
+        engagementStartCaptor.lastValue.invoke(mockEngagement)
 
         verify(watcher).engagementStarted()
+
+        engagementEndCaptor.lastValue.invoke()
+        verify(watcher).removeDialogFromStack()
+        verify(screenSharingController).removeViewCallback(anyOrNull())
 
         resetMocks()
     }
@@ -157,11 +165,11 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     }
 
     @Test
-    fun `addScreenSharingCallback start screen sharing when ScreenSharingController calls requestScreenSharingCallback`() {
+    fun `onActivityResumed start screen sharing when ScreenSharingController calls requestScreenSharingCallback`() {
         whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
-        controller.addScreenSharingCallback(nonCallVisualizerSupportActivity)
+        controller.onActivityResumed(nonCallVisualizerSupportActivity)
 
         val argumentCaptor = argumentCaptor<Function0<Unit>>()
         verify(screenSharingController).onResume(eq(nonCallVisualizerSupportActivity), argumentCaptor.capture())
@@ -179,7 +187,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).removeDialogCallback()
         verify(callVisualizerController).removeOnEngagementEndedCallback()
         verify(callVisualizerController).removeOnEngagementStartListener()
-        verify(screenSharingController).removeViewCallback(anyOrNull())
+        verify(screenSharingController, never()).removeViewCallback(anyOrNull())
     }
 
     @Test
@@ -238,11 +246,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked decline is sent and dialog is dismissed when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(
-            DialogState(
-                MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
-            )
-        )
+        controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).isWebBrowserActivityOpen()
@@ -412,12 +416,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onMediaUpgradeAccept does not destroy support activity when error occurs`() {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
-        controller.onMediaUpgradeAccept(
-            GliaException(
-                "message",
-                GliaException.Cause.INTERNAL_ERROR
-            )
-        )
+        controller.onMediaUpgradeAccept(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
     }
 
     @Test
@@ -438,12 +437,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onMediaUpgradeDecline does not destroy support activity when error occurs`() {
         controller.onMediaUpgradeReceived(mediaUpgradeOffer)
         resetMocks()
-        controller.onMediaUpgradeDecline(
-            GliaException(
-                "message",
-                GliaException.Cause.INTERNAL_ERROR
-            )
-        )
+        controller.onMediaUpgradeDecline(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
     }
 
     @Test

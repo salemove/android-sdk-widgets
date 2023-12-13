@@ -9,7 +9,6 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
-import com.glia.widgets.R
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
@@ -23,12 +22,10 @@ import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
 import com.glia.widgets.core.dialog.Dialog.Mode
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
-import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.screensharing.ScreenSharingController
-import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
@@ -59,7 +56,7 @@ internal class ActivityWatcherForCallVisualizerController(
     override fun onActivityResumed(activity: Activity) {
         Logger.d(TAG, "onActivityResumed(root)")
         addDialogCallback(activity)
-        callVisualizerController.setOnEngagementEndedCallback(::addEngagementEndedCallback)
+        callVisualizerController.setOnEngagementEndedCallback(::onEngagementEnded)
         callVisualizerController.setOnEngagementStartListener { watcher.engagementStarted() }
         if (activity is CallVisualizerSupportActivity) {
             when (activity.intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)) {
@@ -69,11 +66,16 @@ internal class ActivityWatcherForCallVisualizerController(
                 }
             }
         }
+        screenSharingController.onResume(activity) {
+            startScreenSharing(activity)
+        }
     }
 
-    private fun addEngagementEndedCallback() {
+    private fun onEngagementEnded() {
         watcher.removeDialogFromStack()
         currentDialogMode = MODE_NONE
+
+        removeScreenSharingCallback()
     }
 
     override fun onActivityPaused() {
@@ -82,7 +84,6 @@ internal class ActivityWatcherForCallVisualizerController(
         watcher.removeDialogCallback()
         callVisualizerController.removeOnEngagementEndedCallback()
         callVisualizerController.removeOnEngagementStartListener()
-        removeScreenSharingCallback()
     }
 
     override fun isCallOrChatActive(activity: Activity): Boolean {
@@ -200,9 +201,6 @@ internal class ActivityWatcherForCallVisualizerController(
         if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
-        screenSharingController.onResume(activity) {
-            startScreenSharing(activity)
-        }
     }
 
     private fun removeScreenSharingCallback() {

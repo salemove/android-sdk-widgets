@@ -615,12 +615,18 @@ public class UseCaseFactory {
 
     @NonNull
     public IsShowVideoUseCase createIsShowVideoUseCase() {
-        return new IsShowVideoUseCase(schedulers);
+        return new IsShowVideoUseCase(
+            schedulers,
+            repositoryFactory.getGliaVisitorMediaRepository()
+        );
     }
 
     @NonNull
     public IsShowOnHoldUseCase createIsShowOnHoldUseCase() {
-        return new IsShowOnHoldUseCase(schedulers);
+        return new IsShowOnHoldUseCase(
+            schedulers,
+            repositoryFactory.getGliaVisitorMediaRepository()
+        );
     }
 
     @NonNull

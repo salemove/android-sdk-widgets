@@ -14,20 +14,20 @@ public class IsShowVideoUseCase {
         this.schedulers = schedulers;
     }
 
-    public Single<Boolean> execute(VisitorMediaState visitorMediaState) {
-        return Single.just(hasVideoAvailable(visitorMediaState))
+    public Single<Boolean> execute(VisitorMediaState visitorMediaState, boolean isOnHold) {
+        return Single.just(hasVideoAvailable(visitorMediaState, isOnHold))
                 .subscribeOn(schedulers.getComputationScheduler())
                 .observeOn(schedulers.getMainScheduler());
     }
 
-    private boolean hasVideoAvailable(VisitorMediaState visitorMediaState) {
+    private boolean hasVideoAvailable(VisitorMediaState visitorMediaState, boolean isOnHold) {
         return visitorMediaState != null &&
                 visitorMediaState.getVideo() != null &&
-                isVideoFeedActiveStatus(visitorMediaState.getVideo());
+                isVideoFeedActiveStatus(visitorMediaState.getVideo(), isOnHold);
     }
 
-    private boolean isVideoFeedActiveStatus(Video video) {
+    private boolean isVideoFeedActiveStatus(Video video, boolean isOnHold) {
         return video.getStatus() == Media.Status.PLAYING ||
-                video.getStatus() == Media.Status.PAUSED;
+            (video.getStatus() == Media.Status.PAUSED && isOnHold);
     }
 }

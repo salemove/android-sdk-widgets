@@ -16,6 +16,8 @@ public class FloatingVisitorVideoController
     private final IsShowVideoUseCase isShowVideoUseCase;
     private final IsShowOnHoldUseCase isShowOnHoldUseCase;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private VisitorMediaState visitorMediaState = null;
+    private boolean isOnHold = false;
 
     private FloatingVisitorVideoContract.View view;
 
@@ -53,9 +55,10 @@ public class FloatingVisitorVideoController
 
     @Override
     public void onNewVisitorMediaState(VisitorMediaState visitorMediaState) {
+        this.visitorMediaState = visitorMediaState;
         disposables.add(
                 isShowVideoUseCase
-                        .execute(visitorMediaState)
+                        .execute(visitorMediaState, isOnHold)
                         .subscribe(
                                 isShow -> showVisitorVideo(isShow, visitorMediaState),
                                 error -> { // no-op
@@ -74,6 +77,16 @@ public class FloatingVisitorVideoController
 
     @Override
     public void onHoldChanged(boolean isOnHold) {
+        this.isOnHold = isOnHold;
+        disposables.add(
+            isShowVideoUseCase
+                .execute(visitorMediaState, isOnHold)
+                .subscribe(
+                    isShow -> showVisitorVideo(isShow, null),
+                    error -> { // no-op
+                    }
+                )
+        );
         disposables.add(
                 isShowOnHoldUseCase
                         .execute(isOnHold)

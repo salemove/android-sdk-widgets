@@ -44,7 +44,7 @@ public class FloatingVisitorVideoContainer extends ConstraintLayout
 
     @Override
     public void show(VisitorMediaState state) {
-        if (!floatingVisitorVideoView.hasVideo()) {
+        if (!floatingVisitorVideoView.hasVideo() && state != null) {
             floatingVisitorVideoView.showVisitorVideo(
                     state.getVideo().createVideoView(ContextExtensionsKt.asActivity(getContext()))
             );

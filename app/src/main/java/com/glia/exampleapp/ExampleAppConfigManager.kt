@@ -132,7 +132,7 @@ object ExampleAppConfigManager {
         val bounded = context.getString(R.string.screen_sharing_mode_app_bounded)
         val unbounded = context.getString(R.string.screen_sharing_mode_unbounded)
         val screenSharingMode = if (
-            preferences.getString(context.getString(R.string.pref_screen_sharing_mode), unbounded) == bounded
+            preferences.getString(context.getString(R.string.pref_screen_sharing_mode), bounded) == bounded
         ) {
             ScreenSharing.Mode.APP_BOUNDED
         } else {

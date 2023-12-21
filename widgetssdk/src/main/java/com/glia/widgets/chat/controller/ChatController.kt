@@ -1,6 +1,5 @@
 package com.glia.widgets.chat.controller
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.view.View
 import com.glia.androidsdk.GliaException
@@ -41,7 +40,6 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
@@ -52,10 +50,6 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
-import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
-import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
@@ -63,8 +57,9 @@ import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.EndEngagementUseCase
 import com.glia.widgets.engagement.EngagementStateUseCase
 import com.glia.widgets.engagement.EngagementUpdateState
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
+import com.glia.widgets.engagement.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.OperatorMediaUseCase
 import com.glia.widgets.engagement.OperatorTypingUseCase
@@ -78,6 +73,7 @@ import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.isValid
+import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -92,11 +88,9 @@ internal class ChatController(
     private val dialogController: DialogController,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
     private val callNotificationUseCase: CallNotificationUseCase,
-    private val queueForChatEngagementUseCase: GliaQueueForChatEngagementUseCase,
     private val onOperatorTypingUseCase: OperatorTypingUseCase,
     private val sendMessagePreviewUseCase: GliaSendMessagePreviewUseCase,
     private val sendMessageUseCase: GliaSendMessageUseCase,
-    private val cancelQueueTicketUseCase: GliaCancelQueueTicketUseCase,
     private val endEngagementUseCase: EndEngagementUseCase,
     private val addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase,
     private val addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase,
@@ -110,13 +104,10 @@ internal class ChatController(
     private val siteInfoUseCase: SiteInfoUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
-    private val isQueueingEngagementUseCase: IsQueueingEngagementUseCase,
     private val isSecureEngagementUseCase: IsSecureEngagementUseCase,
-    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
     private val engagementConfigUseCase: SetEngagementConfigUseCase,
     private val isSecureEngagementAvailableUseCase: IsSecureConversationsChatAvailableUseCase,
-    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer,
+    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase,
     private val determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase,
     private val isAuthenticatedUseCase: IsAuthenticatedUseCase,
@@ -128,7 +119,9 @@ internal class ChatController(
     private val operatorMediaUseCase: OperatorMediaUseCase,
     private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
-    private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
+    private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase
 ) {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var viewCallback: ChatViewCallback? = null
@@ -180,7 +173,7 @@ internal class ChatController(
 
     private val isSecureEngagement get() = isSecureEngagementUseCase()
 
-    private val isQueueingOrOngoingEngagement get() = isQueueingEngagementUseCase() || hasOngoingEngagementUseCase()
+    private val isQueueingOrOngoingEngagement get() = isQueueingOrEngagementUseCase()
 
     init {
         Logger.d(TAG, "constructor")
@@ -212,11 +205,10 @@ internal class ChatController(
         initChatManager()
     }
 
-    @SuppressLint("CheckResult")
     private fun subscribeToEngagement() {
-        engagementStateUseCase().subscribe({ onEngagementStateChanged(it) }) { throwable -> throwable.message?.let { Logger.e(TAG, it) } }
-        operatorMediaUseCase().subscribe { onNewOperatorMediaState(it) }
-        onOperatorTypingUseCase().subscribe(::onOperatorTyping)
+        engagementStateUseCase().unSafeSubscribe(::onEngagementStateChanged)
+        operatorMediaUseCase().unSafeSubscribe(::onNewOperatorMediaState)
+        onOperatorTypingUseCase().unSafeSubscribe(::onOperatorTyping)
     }
 
     private fun ensureSecureMessagingAvailable() {
@@ -246,7 +238,7 @@ internal class ChatController(
     }
 
     fun onEngagementConfirmationDialogRequested() {
-        if (hasOngoingEngagementUseCase()) return
+        if (isQueueingOrEngagementUseCase()) return
         viewCallback?.showEngagementConfirmationDialog()
     }
 
@@ -260,7 +252,7 @@ internal class ChatController(
     fun onLiveObservationDialogAllowed() {
         Logger.d(TAG, "onLiveObservationDialogAllowed")
         dialogController.dismissCurrentDialog()
-        queueForEngagement()
+        enqueueForEngagement()
     }
 
     fun onLiveObservationDialogRejected() {
@@ -269,12 +261,8 @@ internal class ChatController(
         dialogController.dismissDialogs()
     }
 
-    private fun queueForEngagement() {
-        disposable.add(
-            queueForChatEngagementUseCase
-                .execute(chatState.queueId, chatState.visitorContextAssetId)
-                .subscribe({ queueForEngagementStarted() }) { queueForEngagementError(it) }
-        )
+    private fun enqueueForEngagement() {
+        enqueueForEngagementUseCase(queueId = chatState.queueId!!, visitorContextAssetId = chatState.visitorContextAssetId)
     }
 
     @Synchronized
@@ -424,7 +412,7 @@ internal class ChatController(
 
     fun onXButtonClicked() {
         Logger.d(TAG, "onXButtonClicked")
-        if (isQueueingEngagementUseCase()) {
+        if (isQueueingOrOngoingEngagement) {
             dialogController.showExitQueueDialog()
         } else {
             Dependencies.destroyControllers()
@@ -520,13 +508,16 @@ internal class ChatController(
     private fun onEngagementStateChanged(state: State) {
         when (state) {
             State.FinishedCallVisualizer, State.FinishedOmniCore -> {
-                if (!hasOngoingEngagementUseCase.invoke()) {
+                if (!isQueueingOrOngoingEngagement) {
                     dialogController.dismissDialogs()
                 }
             }
 
             State.StartedOmniCore -> newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
+            is State.PreQueuing, is State.Queuing -> queueForEngagementStarted()
+            is State.QueueUnstaffed, is State.UnexpectedErrorHappened, is State.QueueingCanceled -> emitViewState { chatState.stop() }
+
             else -> {
                 // no op
             }
@@ -596,7 +587,7 @@ internal class ChatController(
     }
 
     private fun viewInitPreQueueing() {
-        if (hasOngoingEngagementUseCase()) return
+        if (isQueueingOrOngoingEngagement) return
 
         Logger.d(TAG, "viewInitPreQueueing")
         chatManager.onChatAction(ChatManager.Action.QueuingStarted(chatState.companyName.orEmpty()))
@@ -604,7 +595,7 @@ internal class ChatController(
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
             } else {
-                queueForEngagement()
+                enqueueForEngagement()
             }
         }
     }
@@ -643,12 +634,6 @@ internal class ChatController(
     private fun stop() {
         chatManager.reset()
         Logger.d(TAG, "Stop, engagement ended")
-        disposable.add(
-            cancelQueueTicketUseCase.execute()
-                .subscribe({ queueForEngagementStopped() }) {
-                    it.message?.let { errorMessage -> Logger.e(TAG, "cancelQueueTicketUseCase error: $errorMessage") }
-                }
-        )
         endEngagementUseCase()
         mediaUpgradeDisposable.clear()
         emitViewState { chatState.stop() }
@@ -802,25 +787,8 @@ internal class ChatController(
         if (chatState.isOperatorOnline) {
             return
         }
-        observeQueueTicketState()
+
         viewInitQueueing()
-    }
-
-    private fun queueForEngagementStopped() {
-        Logger.i(TAG, "Queue for engagement stopped due to error or empty queue")
-    }
-
-    private fun queueForEngagementError(exception: Throwable?) {
-        (exception as? GliaException)?.also {
-            Logger.e(TAG, it.toString())
-            when (it.cause) {
-                GliaException.Cause.QUEUE_CLOSED, GliaException.Cause.QUEUE_FULL -> dialogController.showNoMoreOperatorsAvailableDialog()
-                else -> dialogController.showUnexpectedErrorDialog()
-            }
-            emitViewState { chatState.stop() }
-        } ?: (exception as? QueueingOngoingException)?.also {
-            queueForEngagementStarted()
-        }
     }
 
     fun onRemoveAttachment(attachment: FileAttachment) {
@@ -881,18 +849,8 @@ internal class ChatController(
         }
     }
 
-    private fun observeQueueTicketState() {
-        Logger.d(TAG, "observeQueueTicketState")
-        disposable.add(
-            ticketStateChangeToUnstaffedUseCase.execute()
-                .subscribe({ dialogController.showNoMoreOperatorsAvailableDialog() }) {
-                    Logger.e(TAG, "Error happened while observing queue state : $it")
-                }
-        )
-    }
-
     fun isCallVisualizerOngoing(): Boolean {
-        return isCurrentEngagementCallVisualizer()
+        return isCurrentEngagementCallVisualizerUseCase()
     }
 
     fun onGvaButtonClicked(button: GvaButton) {

@@ -1,21 +1,16 @@
 package com.glia.widgets.core.engagement.domain;
 
-import com.glia.widgets.core.queue.GliaQueueRepository;
-import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.engagement.EngagementTypeUseCase;
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
 
 public class ShouldShowMediaEngagementViewUseCase {
-    private final HasOngoingEngagementUseCase hasOngoingEngagementUseCase;
-    private final GliaQueueRepository queueRepository;
+    private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
     private final EngagementTypeUseCase engagementTypeUseCase;
 
     public ShouldShowMediaEngagementViewUseCase(
-        HasOngoingEngagementUseCase hasOngoingEngagementUseCase,
-        GliaQueueRepository queueRepository,
+        IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase,
         EngagementTypeUseCase engagementTypeUseCase) {
-        this.hasOngoingEngagementUseCase = hasOngoingEngagementUseCase;
-        this.queueRepository = queueRepository;
+        this.isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase;
         this.engagementTypeUseCase = engagementTypeUseCase;
     }
 
@@ -27,22 +22,15 @@ public class ShouldShowMediaEngagementViewUseCase {
     }
 
     private boolean hasNoQueueingAndEngagementOngoing() {
-        return hasNoQueueingOngoing() && hasNoOngoingEngagement();
-    }
-
-    private boolean hasNoQueueingOngoing() {
-        return queueRepository.getQueueingState() instanceof GliaQueueingState.None;
+        return !isQueueingOrEngagementUseCase.invoke();
     }
 
     private boolean hasMediaQueueingOngoing() {
-        return queueRepository.getQueueingState() instanceof GliaQueueingState.Media;
+        return isQueueingOrEngagementUseCase.isQueueingForMedia();
     }
 
     private boolean hasOngoingMediaEngagement() {
         return engagementTypeUseCase.isMediaEngagement();
     }
 
-    private boolean hasNoOngoingEngagement() {
-        return !hasOngoingEngagementUseCase.invoke();
-    }
 }

@@ -208,7 +208,7 @@ class ChatControllerTest {
             isQueueingEngagementUseCase = isQueueingEngagementUseCase,
             hasPendingSurveyUseCase = hasPendingSurveyUseCase,
             setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
-            isCurrentEngagementCallVisualizer = isCallVisualizerUseCase,
+            isCurrentEngagementCallVisualizerUseCase = isCallVisualizerUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,

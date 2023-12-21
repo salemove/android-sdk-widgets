@@ -11,6 +11,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.SimpleActivityLifecycleCallbacks
+import com.glia.widgets.engagement.completion.EngagementCompletionController.State
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isGlia
@@ -30,16 +31,13 @@ internal class EngagementCompletionActivityWatcher @JvmOverloads constructor(
     init {
         controller.state.unSafeSubscribe {
             when (it) {
-                is EngagementCompletionController.State.LaunchDialogHolderActivity -> launchDialogHolderActivity(it.activity)
-                EngagementCompletionController.State.ReleaseUi -> finishActivities()
-                is EngagementCompletionController.State.ShowOperatorEndedEngagementDialog -> showDialog(
-                    it.themedContext,
-                    it.uiTheme,
-                    it.onHandledCallback
-                )
-
-                is EngagementCompletionController.State.ShowSurvey -> showSurvey(it.activity, it.survey, it.uiTheme)
-                EngagementCompletionController.State.Ignore -> Logger.d(TAG, "New Activity is attached. Skipping event...")
+                is State.LaunchDialogHolderActivity -> launchDialogHolderActivity(it.activity)
+                State.ReleaseUi -> finishActivities()
+                is State.ShowOperatorEndedEngagementDialog -> showOperatorEndedEngagementDialog(it.themedContext, it.uiTheme, it.onHandledCallback)
+                is State.ShowQueueUnstaffedDialog -> showQueueUnstaffedDialog(it.themedContext, it.uiTheme, it.onHandledCallback)
+                is State.ShowUnexpectedDialog -> showUnexpectedErrorDialog(it.themedContext, it.uiTheme, it.onHandledCallback)
+                is State.ShowSurvey -> showSurvey(it.activity, it.survey, it.uiTheme)
+                State.Ignore -> Logger.d(TAG, "New Activity is attached. Skipping event...")
             }
         }
     }
@@ -58,8 +56,24 @@ internal class EngagementCompletionActivityWatcher @JvmOverloads constructor(
         }
     }
 
-    private fun showDialog(context: Context, theme: UiTheme, onHandledCallback: () -> Unit) {
+    private fun showOperatorEndedEngagementDialog(context: Context, theme: UiTheme, onHandledCallback: () -> Unit) {
         alertDialog = Dialogs.showOperatorEndedEngagementDialog(context = context, theme = theme) {
+            dismissDialog()
+            finishActivities()
+            onHandledCallback()
+        }
+    }
+
+    private fun showQueueUnstaffedDialog(context: Context, theme: UiTheme, onHandledCallback: () -> Unit) {
+        alertDialog = Dialogs.showNoMoreOperatorsAvailableDialog(context = context, uiTheme = theme) {
+            dismissDialog()
+            finishActivities()
+            onHandledCallback()
+        }
+    }
+
+    private fun showUnexpectedErrorDialog(context: Context, theme: UiTheme, onHandledCallback: () -> Unit) {
+        alertDialog = Dialogs.showUnexpectedErrorDialog(context = context, uiTheme = theme) {
             dismissDialog()
             finishActivities()
             onHandledCallback()

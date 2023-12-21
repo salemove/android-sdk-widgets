@@ -1,10 +1,12 @@
 package com.glia.widgets.engagement
 
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
+import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -13,13 +15,18 @@ import com.glia.widgets.core.permissions.PermissionManager
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.hasMedia
 import io.reactivex.Flowable
 
 internal class EndEngagementUseCase(private val engagementRepository: EngagementRepository) {
-    operator fun invoke(silently: Boolean = false) = engagementRepository.endEngagement(silently)
+    operator fun invoke(silently: Boolean = false) {
+        if (engagementRepository.isQueueing) {
+            engagementRepository.cancelQueuing()
+        } else {
+            engagementRepository.endEngagement(silently)
+        }
+    }
 }
 
 internal class EngagementRequestUseCase(private val engagementRepository: EngagementRepository) {
@@ -29,20 +36,33 @@ internal class EngagementRequestUseCase(private val engagementRepository: Engage
     fun decline() = engagementRepository.declineCurrentEngagementRequest()
 }
 
-internal class HasOngoingEngagementUseCase(private val engagementRepository: EngagementRepository) {
-    operator fun invoke(): Boolean = engagementRepository.hasOngoingEngagement
+internal class IsQueueingOrEngagementUseCase(private val engagementRepository: EngagementRepository) {
+    val hasOngoingEngagement: Boolean get() = engagementRepository.hasOngoingEngagement
+    val isQueueingForMedia: Boolean get() = engagementRepository.isQueueingForMedia
+    val isQueueingForChat: Boolean get() = engagementRepository.isQueueing && !isQueueingForMedia
+    operator fun invoke(): Boolean = engagementRepository.isQueueingOrEngagement
 }
 
-internal class IsCurrentEngagementCallVisualizer(private val engagementRepository: EngagementRepository) {
+internal class IsCurrentEngagementCallVisualizerUseCase(private val engagementRepository: EngagementRepository) {
     operator fun invoke(): Boolean = engagementRepository.isCallVisualizerEngagement
 }
 
 internal class SurveyUseCase(private val engagementRepository: EngagementRepository) {
-    operator fun invoke(): Flowable<OneTimeEvent<SurveyState>> = engagementRepository.survey.map(::OneTimeEvent)
+    operator fun invoke(): Flowable<SurveyState> = engagementRepository.survey
 }
 
 internal class EngagementStateUseCase(private val engagementRepository: EngagementRepository) {
     operator fun invoke(): Flowable<State> = engagementRepository.engagementState
+}
+
+internal class EnqueueForEngagementUseCase(private val engagementRepository: EngagementRepository) {
+    operator fun invoke(queueId: String, mediaType: Engagement.MediaType? = null, visitorContextAssetId: String? = null) {
+        if (mediaType == null) {
+            engagementRepository.queueForChatEngagement(queueId, visitorContextAssetId)
+        } else {
+            engagementRepository.queueForMediaEngagement(queueId, mediaType, visitorContextAssetId)
+        }
+    }
 }
 
 internal class OperatorTypingUseCase(private val engagementRepository: EngagementRepository) {
@@ -71,6 +91,8 @@ internal class AcceptMediaUpgradeOfferUseCase(
     val result: Flowable<MediaUpgradeOffer> = engagementRepository.mediaUpgradeOfferAcceptResult
         .filter { it.isSuccess }
         .map { it.getOrThrow() }
+
+    val resultForCallVisualizer: Flowable<MediaUpgradeOffer> = result.filter { engagementRepository.isCallVisualizerEngagement }
 
     operator fun invoke(offer: MediaUpgradeOffer) = permissionManager.apply {
         val permissions = getPermissionsForMediaUpgradeOffer(offer)
@@ -130,20 +152,17 @@ internal class ToggleVisitorVideoMediaStateUseCase(private val repository: Engag
 }
 
 internal class EngagementTypeUseCase(
-    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
-    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer,
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val operatorMediaUseCase: OperatorMediaUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase,
     private val isOperatorPresentUseCase: IsOperatorPresentUseCase
 ) {
-    val isMediaEngagement: Boolean get() = hasOngoingEngagementUseCase() && isOperatorPresentUseCase() && hasAnyMedia
-
-    val isChatEngagement: Boolean
-        get() = hasOngoingEngagementUseCase() && !isCurrentEngagementCallVisualizer() && isOperatorPresentUseCase() && !hasAnyMedia
-
+    private val hasOngoingEngagement get() = isQueueingOrEngagementUseCase.hasOngoingEngagement
+    val isMediaEngagement: Boolean get() = hasOngoingEngagement && isOperatorPresentUseCase() && hasAnyMedia
+    val isChatEngagement: Boolean get() = hasOngoingEngagement && !isCurrentEngagementCallVisualizerUseCase() && isOperatorPresentUseCase() && !hasAnyMedia
     private val hasAnyMedia: Boolean get() = visitorMediaUseCase.hasMedia || operatorMediaUseCase.hasMedia
-
-    val isCallVisualizerScreenSharing: Boolean get() = isCurrentEngagementCallVisualizer.invoke() && !hasAnyMedia
+    val isCallVisualizerScreenSharing: Boolean get() = isCurrentEngagementCallVisualizerUseCase.invoke() && !hasAnyMedia
 }
 
 internal class ReleaseResourcesUseCase(
@@ -152,8 +171,10 @@ internal class ReleaseResourcesUseCase(
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val gliaEngagementConfigRepository: GliaEngagementConfigRepository,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
+    private val dialogController: DialogController
 ) {
     operator fun invoke() {
+        dialogController.dismissDialogs()
         fileAttachmentRepository.clearObservers()
         fileAttachmentRepository.detachAllFiles()
         removeScreenSharingNotificationUseCase()

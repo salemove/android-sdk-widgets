@@ -2,7 +2,9 @@ package com.glia.widgets.engagement
 
 import android.annotation.SuppressLint
 import com.glia.androidsdk.Engagement
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Glia
+import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.chat.Chat
@@ -16,12 +18,13 @@ import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
+import com.glia.androidsdk.queuing.QueueTicket
 import com.glia.widgets.core.engagement.GliaOperatorRepository
-import com.glia.widgets.core.queue.GliaQueueRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.view.unifiedui.unsafeMerge
+import com.glia.widgets.helper.isQueueUnavailable
+import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.processors.BehaviorProcessor
@@ -29,12 +32,9 @@ import io.reactivex.processors.PublishProcessor
 import java.util.function.Consumer
 
 private const val TAG = "EngagementRepository"
+private const val MEDIA_PERMISSION_REQUEST_CODE = 1001
 
-internal class EngagementRepositoryImpl(
-    private val core: GliaCore,
-    private val queueRepository: GliaQueueRepository,
-    private val operatorRepository: GliaOperatorRepository
-) : EngagementRepository {
+internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
 
     private val omniCoreEngagementCallback = Consumer<OmnicoreEngagement>(::handleOmniCoreEngagement)
@@ -46,6 +46,8 @@ internal class EngagementRepositoryImpl(
 
     private val _engagementRequest: BehaviorProcessor<IncomingEngagementRequest> = BehaviorProcessor.create()
     override val engagementRequest: Flowable<IncomingEngagementRequest> = _engagementRequest.onBackpressureLatest()
+
+    private val queueTicketCallback = Consumer<QueueTicket>(::handleQueueTicket)
 
     private val _engagementState: BehaviorProcessor<State> = BehaviorProcessor.createDefault(State.NoEngagement)
     override val engagementState: Flowable<State> = _engagementState.onBackpressureBuffer()
@@ -73,7 +75,7 @@ internal class EngagementRepositoryImpl(
     override val visitorMediaState: Flowable<Data<MediaState>> = _visitorMediaState
     override val visitorCurrentMediaState: MediaState? get() = _visitorMediaState.value?.let { it as? Data.Value }?.result
 
-    private val _onHoldState: BehaviorProcessor<Boolean> = BehaviorProcessor.create()
+    private val _onHoldState: BehaviorProcessor<Boolean> = BehaviorProcessor.createDefault(false)
     override val onHoldState: Flowable<Boolean> = _onHoldState
 
     private val _operatorMediaState: BehaviorProcessor<Data<MediaState>> = BehaviorProcessor.createDefault(Data.Empty)
@@ -86,14 +88,25 @@ internal class EngagementRepositoryImpl(
     private val _operatorTypingStatus: PublishProcessor<Boolean> = PublishProcessor.create()
     override val operatorTypingStatus: Flowable<Boolean> = _operatorTypingStatus.distinctUntilChanged()
 
+    private val currentState: State? get() = _engagementState.value
+
     override val hasOngoingEngagement: Boolean
         get() = currentEngagement != null
+
+    override val isQueueing: Boolean
+        get() = currentState is State.Queuing || currentState is State.PreQueuing
+    override val isQueueingForMedia: Boolean
+        get() = (currentState as? State.Queuing)?.mediaType != null || (currentState as? State.PreQueuing)?.mediaType != null
 
     override val isCallVisualizerEngagement: Boolean
         get() = currentEngagement is OmnibrowseEngagement
 
+    override val isQueueingOrEngagement: Boolean
+        get() = isQueueing || hasOngoingEngagement
+
     override fun initialize() {
         core.on(Glia.Events.ENGAGEMENT, omniCoreEngagementCallback)
+        core.on(Glia.Events.QUEUE_TICKET, queueTicketCallback)
         core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT, callVisualizerEngagementCallback)
         core.callVisualizer.on(Omnibrowse.Events.ENGAGEMENT_REQUEST, engagementRequestCallback)
     }
@@ -107,6 +120,8 @@ internal class EngagementRepositoryImpl(
         _operatorMediaState.onNext(Data.Empty)
         _visitorMediaState.onNext(Data.Empty)
         _currentOperator.onNext(Data.Empty)
+        _onHoldState.onNext(false)
+        currentEngagement = null
     }
 
     override fun endEngagement(silently: Boolean) {
@@ -126,13 +141,55 @@ internal class EngagementRepositoryImpl(
             _operatorMediaState.onNext(Data.Empty)
             _visitorMediaState.onNext(Data.Empty)
             _currentOperator.onNext(Data.Empty)
+            _onHoldState.onNext(false)
+        }
+    }
+
+    override fun queueForChatEngagement(queueId: String, visitorContextAssetId: String?) {
+        if (isQueueingOrEngagement) return
+
+        Logger.i(TAG, "Start queueing for chat engagement")
+        core.queueForEngagement(queueId, visitorContextAssetId) {
+            handleQueueingResponse(it, queueId)
+        }
+    }
+
+    override fun queueForMediaEngagement(queueId: String, mediaType: MediaType, visitorContextAssetId: String?) {
+        if (isQueueingOrEngagement) return
+
+        Logger.i(TAG, "Start queueing for media engagement")
+        core.queueForEngagement(queueId, mediaType, visitorContextAssetId, null, MEDIA_PERMISSION_REQUEST_CODE) {
+            handleQueueingResponse(it, queueId, mediaType)
+        }
+    }
+
+    override fun cancelQueuing() {
+        (_engagementState.value as? State.PreQueuing)?.apply {
+            _engagementState.onNext(State.QueueingCanceled)
+            return
+        }
+        (_engagementState.value as? State.Queuing)?.apply {
+            cancelQueueTicket(queueTicketId)
+        }
+    }
+
+    private fun cancelQueueTicket(id: String) {
+        Logger.i(TAG, "Cancel queue ticket")
+        core.cancelQueueTicket(id) {
+            if (it == null) {
+                Logger.d(TAG, "cancelQueueTicketSuccess")
+                _engagementState.onNext(State.QueueingCanceled)
+            } else {
+                Logger.e(TAG, "cancelQueueTicketError: $it")
+            }
+            _engagementState.onNext(State.NoEngagement)
         }
     }
 
     override fun acceptCurrentEngagementRequest(visitorContextAssetId: String) {
-        _engagementRequest.firstOrError().flatMapCompletable { accept(it, visitorContextAssetId) }.unsafeMerge({
+        _engagementRequest.firstOrError().flatMapCompletable { accept(it, visitorContextAssetId) }.unSafeSubscribe {
             Logger.i(TAG, "Incoming Call Visualizer engagement was accepted")
-        })
+        }
     }
 
     private fun accept(request: IncomingEngagementRequest, visitorContextAssetId: String): Completable = Completable.create { emitter ->
@@ -204,12 +261,50 @@ internal class EngagementRepositoryImpl(
         _engagementRequest.onNext(engagementRequest)
     }
 
+    private fun handleQueueTicket(ticket: QueueTicket) {
+        val currentState = _engagementState.value
+
+        if (currentState is State.QueueingCanceled) {
+            cancelQueueTicket(ticket.id)
+            return
+        }
+
+        if (currentState is State.PreQueuing) {
+            _engagementState.onNext(State.Queuing(currentState.queueId, ticket.id, currentState.mediaType))
+            trackQueueTicketUpdates(ticket)
+        }
+    }
+
+    private fun trackQueueTicketUpdates(ticket: QueueTicket) {
+        core.subscribeToQueueTicketUpdates(ticket.id) { t, _ ->
+            if (t.state == QueueTicket.State.UNSTAFFED) {
+                _engagementState.onNext(State.QueueUnstaffed)
+                _engagementState.onNext(State.NoEngagement)
+            }
+        }
+    }
+
+    private fun handleQueueingResponse(exception: GliaException?, queueId: String, mediaType: MediaType? = null) {
+        when {
+            exception == null || exception.cause == GliaException.Cause.ALREADY_QUEUED ->
+                _engagementState.onNext(State.PreQueuing(queueId, mediaType))
+
+            exception.isQueueUnavailable -> {
+                _engagementState.onNext(State.QueueUnstaffed)
+                _engagementState.onNext(State.NoEngagement)
+            }
+            else -> {
+                _engagementState.onNext(State.UnexpectedErrorHappened)
+                _engagementState.onNext(State.NoEngagement)
+            }
+        }
+    }
+
     private fun handleOmniCoreEngagement(engagement: OmnicoreEngagement) {
         Logger.i(TAG, "Omnicore Engagement started")
         currentEngagement = engagement
         operatorRepository.emit(engagement.state.operator)
         _engagementState.onNext(State.StartedOmniCore)
-        queueRepository.onEngagementStarted()
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -221,7 +316,6 @@ internal class EngagementRepositoryImpl(
         currentEngagement = engagement
         operatorRepository.emit(engagement.state.operator)
         _engagementState.onNext(State.StartedCallVisualizer)
-        queueRepository.onEngagementStarted()
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
@@ -293,6 +387,7 @@ internal class EngagementRepositoryImpl(
             _operatorMediaState.onNext(Data.Empty)
             _visitorMediaState.onNext(Data.Empty)
             _currentOperator.onNext(Data.Empty)
+            _onHoldState.onNext(false)
         }
     }
 

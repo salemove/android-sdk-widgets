@@ -251,12 +251,10 @@ internal class CallView(
             if (updateDialogState(it)) {
                 when (it.mode) {
                     Dialog.MODE_NONE -> resetDialogStateAndDismiss()
-                    Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
                     Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
                     Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
                     Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog() }
                     Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
-                    Dialog.MODE_NO_MORE_OPERATORS -> post { showNoMoreOperatorsAvailableDialog() }
                     Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
                     Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog(it as OperatorName) }
                     Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
@@ -690,23 +688,6 @@ internal class CallView(
             callController?.noMoreOperatorsAvailableDismissed()
             onEndListener?.onEnd()
             callEnded()
-        }
-    }
-
-    private fun showNoMoreOperatorsAvailableDialog() = showDialog {
-        Dialogs.showNoMoreOperatorsAvailableDialog(context, theme) {
-            resetDialogStateAndDismiss()
-            callController?.noMoreOperatorsAvailableDismissed()
-            onEndListener?.onEnd()
-            callEnded()
-        }
-    }
-
-    private fun showUnexpectedErrorDialog() = showDialog {
-        Dialogs.showUnexpectedErrorDialog(context, theme) {
-            resetDialogStateAndDismiss()
-            callController?.unexpectedErrorDialogDismissed()
-            onEndListener?.onEnd()
         }
     }
 

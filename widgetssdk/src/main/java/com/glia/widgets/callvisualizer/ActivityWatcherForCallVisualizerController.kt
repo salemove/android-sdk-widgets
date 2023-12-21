@@ -30,6 +30,7 @@ import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.unSafeSubscribe
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizerController(
@@ -57,9 +58,9 @@ internal class ActivityWatcherForCallVisualizerController(
 
     init {
         callVisualizerController.apply {
-            engagementStartFlow.subscribe { watcher.engagementStarted() }
-            engagementEndFlow.subscribe { onEngagementEnded() }
-            acceptMediaUpgradeOfferResult.subscribe { onMediaUpgradeAccept(it) }
+            engagementStartFlow.unSafeSubscribe { watcher.engagementStarted() }
+            engagementEndFlow.unSafeSubscribe { onEngagementEnded() }
+            acceptMediaUpgradeOfferResult.unSafeSubscribe { onMediaUpgradeAccept(it) }
         }
     }
 

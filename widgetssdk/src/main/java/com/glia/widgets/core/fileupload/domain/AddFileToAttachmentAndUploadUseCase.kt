@@ -9,10 +9,10 @@ import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingExcepti
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException
 import com.glia.widgets.core.fileupload.model.FileAttachment
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
 
 internal class AddFileToAttachmentAndUploadUseCase(
-    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val engagementConfigRepository: GliaEngagementConfigRepository
 ) {
@@ -20,7 +20,7 @@ internal class AddFileToAttachmentAndUploadUseCase(
         get() = fileAttachmentRepository.attachedFilesCount > SupportedFileCountCheckUseCase.SUPPORTED_FILE_COUNT
 
     private val hasNoOngoingEngagement: Boolean
-        get() = !hasOngoingEngagementUseCase()
+        get() = !isQueueingOrEngagementUseCase.hasOngoingEngagement
 
     private val isNotSecureEngagement: Boolean
         get() = engagementConfigRepository.chatType != ChatType.SECURE_MESSAGING

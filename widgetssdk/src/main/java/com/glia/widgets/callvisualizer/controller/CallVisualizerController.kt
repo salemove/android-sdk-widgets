@@ -34,7 +34,7 @@ internal class CallVisualizerController(
     val engagementStartFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.StartedCallVisualizer }
     val engagementEndFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.FinishedCallVisualizer }
 
-    val acceptMediaUpgradeOfferResult = acceptMediaUpgradeOfferUseCase.result
+    val acceptMediaUpgradeOfferResult = acceptMediaUpgradeOfferUseCase.resultForCallVisualizer
 
     private var visitorContextAssetId: String? = null
 

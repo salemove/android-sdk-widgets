@@ -12,7 +12,7 @@ import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadLayoutContract
-import io.reactivex.disposables.CompositeDisposable
+import com.glia.widgets.engagement.State as EngagementState
 
 internal class ApplicationChatHeadLayoutController(
     private val isDisplayApplicationChatHeadUseCase: IsDisplayApplicationChatHeadUseCase,
@@ -23,7 +23,6 @@ internal class ApplicationChatHeadLayoutController(
     private val currentOperatorUseCase: CurrentOperatorUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase
 ) : ChatHeadLayoutContract.Controller {
-    private val engagementDisposables = CompositeDisposable()
     private var chatHeadLayout: ChatHeadLayoutContract.View? = null
     private var state = State.ENDED
     private var operatorProfileImgUrl: String? = null
@@ -39,6 +38,35 @@ internal class ApplicationChatHeadLayoutController(
      */
     private var resumedViewName: String? = null
 
+    init {
+        subscribeToEvents()
+    }
+
+    private fun subscribeToEvents() {
+        messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
+        engagementStateUseCase().unSafeSubscribe {
+            when (it) {
+                is EngagementState.FinishedCallVisualizer,
+                is EngagementState.FinishedOmniCore,
+                is EngagementState.QueueUnstaffed,
+                is EngagementState.UnexpectedErrorHappened,
+                is EngagementState.QueueingCanceled -> engagementEnded()
+
+                EngagementState.StartedCallVisualizer,
+                EngagementState.StartedOmniCore -> onNewEngagementLoaded()
+
+                is EngagementState.Queuing,
+                is EngagementState.PreQueuing -> onQueuingStarted()
+
+                else -> {
+                    //no-op
+                }
+            }
+        }
+        visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
+        currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
+    }
+
     override fun onChatHeadClicked() {
         val destination = navigationDestinationUseCase.execute() ?: return
         when (destination) {
@@ -50,12 +78,12 @@ internal class ApplicationChatHeadLayoutController(
 
     override fun setView(view: ChatHeadLayoutContract.View) {
         chatHeadLayout = view
-        init()
+        updateChatHeadView()
     }
 
     override fun onDestroy() {
         chatHeadLayout?.hide()
-        messagesNotSeenHandler.removeListener { count: Int -> onUnreadMessageCountChange(count) }
+        messagesNotSeenHandler.removeListener(::onUnreadMessageCountChange)
     }
 
     private fun onHoldChanged(isOnHold: Boolean) {
@@ -73,23 +101,9 @@ internal class ApplicationChatHeadLayoutController(
         return isDisplayApplicationChatHeadUseCase(gliaOrRootViewName)
     }
 
-    private fun init() {
-        messagesNotSeenHandler.addListener(::onUnreadMessageCountChange)
-        engagementStateUseCase()
-            .unSafeSubscribe {
-                when (it) {
-                    com.glia.widgets.engagement.State.FinishedCallVisualizer, com.glia.widgets.engagement.State.FinishedOmniCore -> engagementEnded()
-                    com.glia.widgets.engagement.State.StartedCallVisualizer, com.glia.widgets.engagement.State.StartedOmniCore -> onNewEngagementLoaded()
-                    else -> {
-                        //no-op
-                    }
-                }
-            }
-        visitorMediaUseCase.onHoldState.unSafeSubscribe(::onHoldChanged)
-    }
-
     override fun onResume(viewName: String) {
         setResumedViewName(viewName)
+        updateChatHeadView()
     }
 
     fun onPause(viewName: String) {
@@ -116,7 +130,6 @@ internal class ApplicationChatHeadLayoutController(
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0
-        engagementDisposables.clear()
         updateChatHeadView()
     }
 
@@ -158,7 +171,11 @@ internal class ApplicationChatHeadLayoutController(
 
     private fun onNewEngagementLoaded() {
         state = State.ENGAGEMENT
-        engagementDisposables.add(currentOperatorUseCase().subscribe(::operatorDataLoaded))
+        updateChatHeadView()
+    }
+
+    private fun onQueuingStarted() {
+        state = State.QUEUEING
         updateChatHeadView()
     }
 

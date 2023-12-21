@@ -19,8 +19,10 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
 import com.glia.widgets.view.unifiedui.deepMerge
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.functions.Action
 import kotlin.jvm.optionals.getOrNull
 
 internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTint(this, color)
@@ -67,9 +69,15 @@ internal val GliaException.isQueueUnavailable: Boolean
 
 @SuppressLint("CheckResult")
 internal fun <T> Flowable<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
-    subscribe({ onNextCallback(it) }) { Logger.e("Observable<T>.unSafeSubscribe", "Unexpected Local exception happened", it) }
+    subscribe({ onNextCallback(it) }) { Logger.e("Observable<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
+
 @SuppressLint("CheckResult")
 internal fun <T> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
-    subscribe({ onNextCallback(it) }) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected Local exception happened", it) }
+    subscribe({ onNextCallback(it) }) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
+}
+
+@SuppressLint("CheckResult")
+internal fun Completable.unSafeSubscribe(onComplete: Action) {
+    subscribe(onComplete) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }

@@ -6,7 +6,7 @@ import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.State
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -18,7 +18,7 @@ internal class ActivityWatcherForChatHeadController(
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer
+    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
 ) : ActivityWatcherForChatHeadContract.Controller {
 
     private lateinit var watcher: ActivityWatcherForChatHeadContract.Watcher
@@ -60,7 +60,7 @@ internal class ActivityWatcherForChatHeadController(
         }
 
         setupScreenSharingViewCallback()
-        if (isCurrentEngagementCallVisualizer()) {
+        if (isCurrentEngagementCallVisualizerUseCase()) {
             screenSharingController.setViewCallback(screenSharingViewCallback)
         } else {
             // Show screen sharing requests for any screen (not only Chat and Call) for Call Visualizer only.

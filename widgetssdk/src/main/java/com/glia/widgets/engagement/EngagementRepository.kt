@@ -1,5 +1,6 @@
 package com.glia.widgets.engagement
 
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.MediaState
@@ -21,13 +22,19 @@ internal interface EngagementRepository {
     val operatorMediaState: Flowable<Data<MediaState>>
     val operatorCurrentMediaState: MediaState?
 
+    val isQueueingOrEngagement: Boolean
     val hasOngoingEngagement: Boolean
+    val isQueueing: Boolean
+    val isQueueingForMedia: Boolean
     val isCallVisualizerEngagement: Boolean
     val isOperatorPresent: Boolean
 
     fun initialize()
     fun reset()
     fun endEngagement(silently: Boolean)
+    fun queueForChatEngagement(queueId: String, visitorContextAssetId: String?)
+    fun queueForMediaEngagement(queueId: String, mediaType: MediaType, visitorContextAssetId: String?)
+    fun cancelQueuing()
     fun acceptCurrentEngagementRequest(visitorContextAssetId: String)
     fun declineCurrentEngagementRequest()
     fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer)

@@ -2,7 +2,6 @@ package com.glia.widgets.call
 
 import android.text.format.DateUtils
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
@@ -25,17 +24,14 @@ import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
-import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
-import com.glia.widgets.core.queue.domain.exception.QueueingOngoingException
 import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.EndEngagementUseCase
 import com.glia.widgets.engagement.EngagementStateUseCase
 import com.glia.widgets.engagement.EngagementUpdateState
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
+import com.glia.widgets.engagement.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.OperatorMediaUseCase
 import com.glia.widgets.engagement.State
@@ -45,13 +41,11 @@ import com.glia.widgets.engagement.ToggleVisitorAudioMediaStateUseCase
 import com.glia.widgets.engagement.ToggleVisitorVideoMediaStateUseCase
 import com.glia.widgets.engagement.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
-import com.glia.widgets.helper.Logger.e
 import com.glia.widgets.helper.Logger.i
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.TimeCounter.RawTimerStatusListener
 import com.glia.widgets.helper.imageUrl
-import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MessagesNotSeenHandler.MessagesNotSeenHandlerListener
@@ -74,17 +68,13 @@ internal class CallController(
     private val dialogController: DialogController,
     private val messagesNotSeenHandler: MessagesNotSeenHandler,
     private val callNotificationUseCase: CallNotificationUseCase,
-    private val gliaQueueForMediaEngagementUseCase: GliaQueueForMediaEngagementUseCase,
-    private val cancelQueueTicketUseCase: GliaCancelQueueTicketUseCase,
     private val endEngagementUseCase: EndEngagementUseCase,
     private val shouldShowMediaEngagementViewUseCase: ShouldShowMediaEngagementViewUseCase,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val hasCallNotificationChannelEnabledUseCase: HasCallNotificationChannelEnabledUseCase,
     private val isShowEnableCallNotificationChannelDialogUseCase: IsShowEnableCallNotificationChannelDialogUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase,
-    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer,
-    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
+    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val turnSpeakerphoneUseCase: TurnSpeakerphoneUseCase,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase,
@@ -96,7 +86,9 @@ internal class CallController(
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase,
     private val toggleVisitorAudioMediaStateUseCase: ToggleVisitorAudioMediaStateUseCase,
-    private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase
+    private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase,
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase
 ) {
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
@@ -105,13 +97,13 @@ internal class CallController(
     private var connectingTimerStatusListener: RawTimerStatusListener? = null
 
     @Volatile
-    private var callState: CallState = CallState.initial(isCurrentEngagementCallVisualizer())
+    private var callState: CallState = CallState.initial(isCurrentEngagementCallVisualizerUseCase())
     private var messagesNotSeenHandlerListener: MessagesNotSeenHandlerListener? = null
 
     init {
         d(TAG, "constructor")
 
-        if (isCurrentEngagementCallVisualizer()) {
+        if (isCurrentEngagementCallVisualizerUseCase()) {
             shouldShowMediaEngagementView(true)
         }
 
@@ -193,19 +185,19 @@ internal class CallController(
     }
 
     private fun tryToQueueForEngagement(queueId: String?, visitorContextAssetId: String?, mediaType: Engagement.MediaType) {
-        if (!hasOngoingEngagementUseCase.invoke()) {
+        if (!isQueueingOrEngagementUseCase() && queueId != null) {
             confirmationDialogUseCase { shouldShow: Boolean ->
                 if (shouldShow) {
                     dialogController.showEngagementConfirmationDialog()
                 } else {
-                    queueForEngagement(queueId, visitorContextAssetId, mediaType)
+                    enqueueForEngagement(queueId, visitorContextAssetId, mediaType)
                 }
             }
         }
     }
 
     fun onLiveObservationDialogRequested() {
-        if (hasOngoingEngagementUseCase.invoke()) return
+        if (isQueueingOrEngagementUseCase()) return
         viewCallback!!.showEngagementConfirmationDialog()
     }
 
@@ -220,7 +212,7 @@ internal class CallController(
     fun onLiveObservationDialogAllowed() {
         d(TAG, "onLiveObservationDialogAllowed")
         dialogController.dismissCurrentDialog()
-        queueForEngagement(callState.queueId, callState.visitorContextAssetId, callState.requestedMediaType)
+        enqueueForEngagement(callState.queueId, callState.visitorContextAssetId, callState.requestedMediaType)
     }
 
     fun onLiveObservationDialogRejected() {
@@ -229,12 +221,8 @@ internal class CallController(
         dialogController.dismissDialogs()
     }
 
-    private fun queueForEngagement(queueId: String?, visitorContextAssetId: String?, mediaType: Engagement.MediaType) {
-        disposable.add(
-            gliaQueueForMediaEngagementUseCase
-                .execute(queueId, visitorContextAssetId, mediaType)
-                .subscribe({ queueForEngagementStarted() }) { queueForEngagementError(it) }
-        )
+    private fun enqueueForEngagement(queueId: String, visitorContextAssetId: String?, mediaType: Engagement.MediaType) {
+        enqueueForEngagementUseCase(queueId, mediaType, visitorContextAssetId)
     }
 
     fun onDestroy(retain: Boolean) {
@@ -403,6 +391,7 @@ internal class CallController(
     }
 
     private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
+        if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
         d(TAG, "newOperatorMediaState: $operatorMediaState, timertaskrunning: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
             if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
@@ -427,34 +416,6 @@ internal class CallController(
         d(TAG, "onSpeakerButtonPressed, new value: $newValue")
         emitViewState(callState.speakerValueChanged(newValue))
         turnSpeakerphoneUseCase.invoke(newValue)
-    }
-
-    private fun queueForEngagementStarted() {
-        observeQueueTicketState()
-    }
-
-    private fun queueForEngagementStopped() {
-        i(TAG, "Queue for engagement stopped due to error or empty queue")
-    }
-
-    private fun queueForEngagementError(exception: Throwable?) {
-        if (exception == null) return
-
-        e(TAG, exception.toString())
-
-        when (exception) {
-            is GliaException -> {
-                if (exception.isQueueUnavailable) {
-                    dialogController.showNoMoreOperatorsAvailableDialog()
-                } else {
-                    dialogController.showUnexpectedErrorDialog()
-                }
-                emitViewState(callState.changeVisibility(false))
-            }
-
-            is QueueingOngoingException -> queueForEngagementStarted()
-        }
-
     }
 
     fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean): Boolean {
@@ -560,11 +521,7 @@ internal class CallController(
 
     private fun stop() {
         d(TAG, "Stop, engagement ended")
-        disposable.add(
-            cancelQueueTicketUseCase.execute()
-                .subscribe({ queueForEngagementStopped() }) { it?.apply { e(TAG, "cancelQueueTicketUseCase error: $message") } }
-        )
-        endEngagementUseCase.invoke(false)
+        endEngagementUseCase()
         mediaUpgradeDisposable.clear()
         emitViewState(callState.stop())
     }
@@ -604,6 +561,10 @@ internal class CallController(
         when (state) {
             StartedCallVisualizer, StartedOmniCore -> newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
+            is State.QueueUnstaffed , is State.UnexpectedErrorHappened -> {
+                emitViewState(callState.changeVisibility(false))
+            }
+
             else -> {
                 //no op
             }
@@ -688,14 +649,5 @@ internal class CallController(
 
     private fun minimizeView() {
         viewCallback?.minimizeView()
-    }
-
-    private fun observeQueueTicketState() {
-        d(TAG, "observeQueueTicketState")
-        disposable.add(
-            ticketStateChangeToUnstaffedUseCase.execute().subscribe({ dialogController.showNoMoreOperatorsAvailableDialog() }) {
-                e(TAG, "Error happened while observing queue state : $it")
-            }
-        )
     }
 }

@@ -1,25 +1,20 @@
 package com.glia.widgets.core.chathead.domain;
 
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
-import com.glia.widgets.core.queue.GliaQueueRepository;
-import com.glia.widgets.core.queue.model.GliaQueueingState;
 import com.glia.widgets.engagement.EngagementTypeUseCase;
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
 
 public class ResolveChatHeadNavigationUseCase {
-    private final HasOngoingEngagementUseCase hasOngoingEngagementUseCase;
-    private final GliaQueueRepository queueRepository;
+    private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
     private final EngagementTypeUseCase engagementTypeUseCase;
     private final IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase;
 
     public ResolveChatHeadNavigationUseCase(
-        HasOngoingEngagementUseCase hasOngoingEngagementUseCase,
-        GliaQueueRepository queueRepository,
+        IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase,
         EngagementTypeUseCase engagementTypeUseCase,
         IsCallVisualizerScreenSharingUseCase isCallVisualizerScreenSharingUseCase
     ) {
-        this.hasOngoingEngagementUseCase = hasOngoingEngagementUseCase;
-        this.queueRepository = queueRepository;
+        this.isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase;
         this.engagementTypeUseCase = engagementTypeUseCase;
         this.isCallVisualizerScreenSharingUseCase = isCallVisualizerScreenSharingUseCase;
     }
@@ -41,11 +36,11 @@ public class ResolveChatHeadNavigationUseCase {
     }
 
     private boolean isMediaQueueingOngoing() {
-        return queueRepository.getQueueingState() instanceof GliaQueueingState.Media;
+        return isQueueingOrEngagementUseCase.isQueueingForMedia();
     }
 
     private boolean isMediaEngagementOngoing() {
-        return hasOngoingEngagementUseCase.invoke() && engagementTypeUseCase.isMediaEngagement();
+        return isQueueingOrEngagementUseCase.getHasOngoingEngagement() && engagementTypeUseCase.isMediaEngagement();
     }
 
     private boolean isSharingScreen() {

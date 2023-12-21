@@ -5,25 +5,22 @@ import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.core.queue.GliaQueueRepository
-import com.glia.widgets.core.queue.model.GliaQueueingState
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.engagement.EngagementTypeUseCase
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
 import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayChatHeadUseCase(
-    private val hasOngoingEngagementUseCase: HasOngoingEngagementUseCase,
-    private val isCurrentEngagementCallVisualizer: IsCurrentEngagementCallVisualizer,
-    private val queueRepository: GliaQueueRepository,
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
+    private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
     private val screenSharingRepository: GliaScreenSharingRepository,
     val permissionManager: PermissionManager,
     private val configurationManager: GliaSdkConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase
 ) {
-
+    private val hasOngoingEngagement: Boolean get() = isQueueingOrEngagementUseCase.hasOngoingEngagement
     abstract fun isDisplayBasedOnPermission(): Boolean
 
     open operator fun invoke(viewName: String?): Boolean {
@@ -40,15 +37,15 @@ internal abstract class IsDisplayChatHeadUseCase(
     }
 
     private fun isCallVisualizerScreenSharing(viewName: String?): Boolean {
-        return isCurrentEngagementCallVisualizer() && screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
+        return isCurrentEngagementCallVisualizerUseCase() && screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
     }
 
     private fun isShowForMediaEngagement(viewName: String?): Boolean {
-        return isMediaEngagementOrQueueingOngoing() && isNotInListOfGliaViewsExceptChat(viewName)
+        return isMediaEngagementOrQueueingOngoing && isNotInListOfGliaViewsExceptChat(viewName)
     }
 
     private fun isShowForChatEngagement(viewName: String?): Boolean {
-        return isChatEngagementOrQueueingOngoing() && isNotInListOfGliaViews(viewName)
+        return isChatEngagementOrQueueingOngoing && isNotInListOfGliaViews(viewName)
     }
 
     private fun isNotInListOfGliaViewsExceptChat(viewName: String?): Boolean {
@@ -62,28 +59,10 @@ internal abstract class IsDisplayChatHeadUseCase(
         return viewName != ChatView::class.java.simpleName && isNotInListOfGliaViewsExceptChat(viewName)
     }
 
-    private fun isChatEngagementOrQueueingOngoing(): Boolean {
-        return isChatEngagementOngoing() || isChatQueueingOngoing()
-    }
-
-    private fun isMediaEngagementOrQueueingOngoing(): Boolean {
-        return isMediaEngagementOngoing() || isMediaQueueingOngoing()
-    }
-
-    private fun isMediaQueueingOngoing(): Boolean {
-        val state = queueRepository.queueingState
-        return state is GliaQueueingState.Media
-    }
-
-    private fun isMediaEngagementOngoing(): Boolean {
-        return hasOngoingEngagementUseCase() && engagementTypeUseCase.isMediaEngagement
-    }
-
-    private fun isChatQueueingOngoing(): Boolean {
-        return queueRepository.queueingState is GliaQueueingState.Chat
-    }
-
-    private fun isChatEngagementOngoing(): Boolean {
-        return hasOngoingEngagementUseCase() && engagementTypeUseCase.isChatEngagement
-    }
+    private val isChatEngagementOrQueueingOngoing: Boolean get() = isChatEngagementOngoing || isChatQueueingOngoing
+    private val isMediaEngagementOrQueueingOngoing: Boolean get() = isMediaEngagementOngoing || isMediaQueueingOngoing
+    private val isMediaQueueingOngoing: Boolean get() = isQueueingOrEngagementUseCase.isQueueingForMedia
+    private val isMediaEngagementOngoing: Boolean get() = engagementTypeUseCase.isMediaEngagement
+    private val isChatQueueingOngoing: Boolean get() = isQueueingOrEngagementUseCase.isQueueingForChat
+    private val isChatEngagementOngoing: Boolean get() = engagementTypeUseCase.isChatEngagement
 }

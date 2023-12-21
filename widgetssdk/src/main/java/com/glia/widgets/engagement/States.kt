@@ -1,11 +1,17 @@
 package com.glia.widgets.engagement
 
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.engagement.EngagementState
 import com.glia.androidsdk.engagement.Survey
 
 internal sealed interface State {
     object NoEngagement : State
+    data class PreQueuing(val queueId: String, val mediaType: MediaType? = null) : State
+    data class Queuing(val queueId: String, val queueTicketId: String, val mediaType: MediaType? = null) : State
+    object QueueUnstaffed : State
+    object UnexpectedErrorHappened : State
+    object QueueingCanceled: State
     object StartedOmniCore : State
     object StartedCallVisualizer : State
     object FinishedOmniCore : State

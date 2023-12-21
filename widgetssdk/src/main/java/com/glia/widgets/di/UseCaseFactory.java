@@ -61,6 +61,7 @@ import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
+import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
@@ -69,7 +70,6 @@ import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialo
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
-import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase;
 import com.glia.widgets.core.engagement.domain.ShouldShowMediaEngagementViewUseCase;
@@ -87,10 +87,6 @@ import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUs
 import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.core.permissions.domain.HasCallNotificationChannelEnabledUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase;
-import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase;
-import com.glia.widgets.core.queue.domain.GliaQueueForMediaEngagementUseCase;
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase;
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase;
 import com.glia.widgets.core.secureconversations.domain.GetSecureFileAttachmentsUseCase;
@@ -113,9 +109,10 @@ import com.glia.widgets.engagement.EndEngagementUseCase;
 import com.glia.widgets.engagement.EngagementRequestUseCase;
 import com.glia.widgets.engagement.EngagementStateUseCase;
 import com.glia.widgets.engagement.EngagementTypeUseCase;
-import com.glia.widgets.engagement.HasOngoingEngagementUseCase;
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer;
+import com.glia.widgets.engagement.EnqueueForEngagementUseCase;
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase;
 import com.glia.widgets.engagement.IsOperatorPresentUseCase;
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
 import com.glia.widgets.engagement.MediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.OperatorMediaUseCase;
 import com.glia.widgets.engagement.OperatorTypingUseCase;
@@ -124,6 +121,7 @@ import com.glia.widgets.engagement.SurveyUseCase;
 import com.glia.widgets.engagement.ToggleVisitorAudioMediaStateUseCase;
 import com.glia.widgets.engagement.ToggleVisitorVideoMediaStateUseCase;
 import com.glia.widgets.engagement.VisitorMediaUseCase;
+import com.glia.widgets.engagement.completion.EngagementCompletionUseCase;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -145,8 +143,6 @@ public class UseCaseFactory {
     private static IsDisplayApplicationChatHeadUseCase isDisplayApplicationChatHeadUseCase;
     private static ResolveChatHeadNavigationUseCase resolveChatHeadNavigationUseCase;
     private static VisitorCodeViewBuilderUseCase visitorCodeViewBuilderUseCase;
-    private static GliaQueueForChatEngagementUseCase gliaQueueForChatEngagementUseCase;
-    private static GliaQueueForMediaEngagementUseCase gliaQueueForMediaEngagementUseCase;
     private final RepositoryFactory repositoryFactory;
     private final PermissionManager permissionManager;
     private final PermissionDialogManager permissionDialogManager;
@@ -210,9 +206,8 @@ public class UseCaseFactory {
     public ToggleChatHeadServiceUseCase getToggleChatHeadServiceUseCase() {
         if (toggleChatHeadServiceUseCase == null) {
             toggleChatHeadServiceUseCase = new ToggleChatHeadServiceUseCase(
-                getHasOngoingEngagementUseCase(),
+                getIsQueueingOrEngagementUseCase(),
                 getIsCurrentEngagementCallVisualizer(),
-                repositoryFactory.getGliaQueueRepository(),
                 repositoryFactory.getGliaScreenSharingRepository(),
                 chatHeadManager,
                 permissionManager,
@@ -227,9 +222,8 @@ public class UseCaseFactory {
     public IsDisplayApplicationChatHeadUseCase getIsDisplayApplicationChatHeadUseCase() {
         if (isDisplayApplicationChatHeadUseCase == null) {
             isDisplayApplicationChatHeadUseCase = new IsDisplayApplicationChatHeadUseCase(
-                getHasOngoingEngagementUseCase(),
+                getIsQueueingOrEngagementUseCase(),
                 getIsCurrentEngagementCallVisualizer(),
-                repositoryFactory.getGliaQueueRepository(),
                 repositoryFactory.getGliaScreenSharingRepository(),
                 permissionManager,
                 gliaSdkConfigurationManager,
@@ -243,8 +237,7 @@ public class UseCaseFactory {
     public ResolveChatHeadNavigationUseCase getResolveChatHeadNavigationUseCase() {
         if (resolveChatHeadNavigationUseCase == null) {
             resolveChatHeadNavigationUseCase = new ResolveChatHeadNavigationUseCase(
-                getHasOngoingEngagementUseCase(),
-                repositoryFactory.getGliaQueueRepository(),
+                getIsQueueingOrEngagementUseCase(),
                 getEngagementTypeUseCase(),
                 createIsCallVisualizerScreenSharingUseCase()
             );
@@ -298,38 +291,6 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public GliaQueueForChatEngagementUseCase createQueueForChatEngagementUseCase() {
-        if (gliaQueueForChatEngagementUseCase == null) {
-            gliaQueueForChatEngagementUseCase = new GliaQueueForChatEngagementUseCase(
-                schedulers,
-                repositoryFactory.getGliaQueueRepository(),
-                getHasOngoingEngagementUseCase()
-            );
-        }
-        return gliaQueueForChatEngagementUseCase;
-    }
-
-    @NonNull
-    public GliaQueueForMediaEngagementUseCase createQueueForMediaEngagementUseCase() {
-        if (gliaQueueForMediaEngagementUseCase == null) {
-            gliaQueueForMediaEngagementUseCase = new GliaQueueForMediaEngagementUseCase(
-                schedulers,
-                repositoryFactory.getGliaQueueRepository(),
-                getHasOngoingEngagementUseCase()
-            );
-        }
-        return gliaQueueForMediaEngagementUseCase;
-    }
-
-    @NonNull
-    public GliaCancelQueueTicketUseCase createCancelQueueTicketUseCase() {
-        return new GliaCancelQueueTicketUseCase(
-            schedulers,
-            repositoryFactory.getGliaQueueRepository()
-        );
-    }
-
-    @NonNull
     public GliaOnMessageUseCase createGliaOnMessageUseCase() {
         return new GliaOnMessageUseCase(
             repositoryFactory.getGliaMessageRepository(),
@@ -357,8 +318,7 @@ public class UseCaseFactory {
     @NonNull
     public ShouldShowMediaEngagementViewUseCase createShouldShowMediaEngagementViewUseCase() {
         return new ShouldShowMediaEngagementViewUseCase(
-            getHasOngoingEngagementUseCase(),
-            repositoryFactory.getGliaQueueRepository(),
+            getIsQueueingOrEngagementUseCase(),
             getEngagementTypeUseCase()
         );
     }
@@ -371,7 +331,7 @@ public class UseCaseFactory {
     @NonNull
     public AddFileToAttachmentAndUploadUseCase createAddFileToAttachmentAndUploadUseCase() {
         return new AddFileToAttachmentAndUploadUseCase(
-            getHasOngoingEngagementUseCase(),
+            getIsQueueingOrEngagementUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             repositoryFactory.getEngagementConfigRepository()
         );
@@ -400,7 +360,7 @@ public class UseCaseFactory {
     @NonNull
     public IsShowSendButtonUseCase createIsShowSendButtonUseCase() {
         return new IsShowSendButtonUseCase(
-            getHasOngoingEngagementUseCase(),
+            getIsQueueingOrEngagementUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             createIsSecureEngagementUseCase()
         );
@@ -547,11 +507,6 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public QueueTicketStateChangeToUnstaffedUseCase createQueueTicketStateChangeToUnstaffedUseCase() {
-        return new QueueTicketStateChangeToUnstaffedUseCase(repositoryFactory.getGliaQueueRepository());
-    }
-
-    @NonNull
     public IsCallOrChatScreenActiveUseCase createIsCallOrChatScreenActiveUseCase() {
         return new IsCallOrChatScreenActiveUseCase();
     }
@@ -569,7 +524,7 @@ public class UseCaseFactory {
             repositoryFactory.getSecureConversationsRepository(),
             repositoryFactory.getSecureFileAttachmentRepository(),
             repositoryFactory.getGliaMessageRepository(),
-            getHasOngoingEngagementUseCase()
+            getIsQueueingOrEngagementUseCase()
         );
     }
 
@@ -605,8 +560,7 @@ public class UseCaseFactory {
     public IsSecureEngagementUseCase createIsSecureEngagementUseCase() {
         return new IsSecureEngagementUseCase(
             repositoryFactory.getEngagementConfigRepository(),
-            getHasOngoingEngagementUseCase(),
-            repositoryFactory.getGliaQueueRepository()
+            getIsQueueingOrEngagementUseCase()
         );
     }
 
@@ -621,11 +575,6 @@ public class UseCaseFactory {
             repositoryFactory.getEngagementConfigRepository(),
             repositoryFactory.getEngagementRepository()
         );
-    }
-
-    @NonNull
-    public IsQueueingEngagementUseCase createIsQueueingEngagementUseCase() {
-        return new IsQueueingEngagementUseCase(repositoryFactory.getGliaQueueRepository());
     }
 
     @NonNull
@@ -891,13 +840,13 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public HasOngoingEngagementUseCase getHasOngoingEngagementUseCase() {
-        return new HasOngoingEngagementUseCase(repositoryFactory.getEngagementRepository());
+    public IsQueueingOrEngagementUseCase getIsQueueingOrEngagementUseCase() {
+        return new IsQueueingOrEngagementUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
-    public IsCurrentEngagementCallVisualizer getIsCurrentEngagementCallVisualizer() {
-        return new IsCurrentEngagementCallVisualizer(repositoryFactory.getEngagementRepository());
+    public IsCurrentEngagementCallVisualizerUseCase getIsCurrentEngagementCallVisualizer() {
+        return new IsCurrentEngagementCallVisualizerUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
@@ -911,13 +860,14 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public ReleaseResourcesUseCase getReleaseResourcesUseCase() {
+    public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogController dialogController) {
         return new ReleaseResourcesUseCase(
             createRemoveScreenSharingNotificationUseCase(),
             createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
             repositoryFactory.getEngagementConfigRepository(),
-            createUpdateFromCallScreenUseCase()
+            createUpdateFromCallScreenUseCase(),
+            dialogController
         );
     }
 
@@ -939,7 +889,7 @@ public class UseCaseFactory {
     @NonNull
     public EngagementTypeUseCase getEngagementTypeUseCase() {
         return new EngagementTypeUseCase(
-            getHasOngoingEngagementUseCase(),
+            getIsQueueingOrEngagementUseCase(),
             getIsCurrentEngagementCallVisualizer(),
             getOperatorMediaUseCase(),
             getVisitorMediaUseCase(),
@@ -985,6 +935,16 @@ public class UseCaseFactory {
     @NonNull
     public ToggleVisitorVideoMediaStateUseCase getToggleVisitorVideoMediaStateUseCase() {
         return new ToggleVisitorVideoMediaStateUseCase(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public EnqueueForEngagementUseCase getQueueForEngagementUseCase() {
+        return new EnqueueForEngagementUseCase(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public EngagementCompletionUseCase getEngagementCompletionUseCase() {
+        return new EngagementCompletionUseCase(getEngagementStateUseCase(), getSurveyUseCase());
     }
 
 }

@@ -101,11 +101,9 @@ public class ControllerFactory {
                 dialogController,
                 messagesNotSeenHandler,
                 useCaseFactory.createCallNotificationUseCase(),
-                useCaseFactory.createQueueForChatEngagementUseCase(),
                 useCaseFactory.operatorTypingUseCase(),
                 useCaseFactory.createGliaSendMessagePreviewUseCase(),
                 useCaseFactory.createGliaSendMessageUseCase(),
-                useCaseFactory.createCancelQueueTicketUseCase(),
                 useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createAddFileToAttachmentAndUploadUseCase(),
                 useCaseFactory.createAddFileAttachmentsObserverUseCase(),
@@ -119,10 +117,7 @@ public class ControllerFactory {
                 useCaseFactory.createSiteInfoUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
-                useCaseFactory.createIsQueueingEngagementUseCase(),
                 useCaseFactory.createIsSecureEngagementUseCase(),
-                useCaseFactory.getHasOngoingEngagementUseCase(),
                 useCaseFactory.createSetEngagementConfigUseCase(),
                 useCaseFactory.createIsSecureConversationsChatAvailableUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
@@ -137,7 +132,9 @@ public class ControllerFactory {
                 useCaseFactory.getOperatorMediaUseCase(),
                 useCaseFactory.getMediaUpgradeOfferUseCase(),
                 useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
-                useCaseFactory.getDeclineMediaUpgradeOfferUseCase()
+                useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
+                useCaseFactory.getIsQueueingOrEngagementUseCase(),
+                useCaseFactory.getQueueForEngagementUseCase()
             );
         } else {
             Logger.d(TAG, "retained chat controller");
@@ -159,17 +156,13 @@ public class ControllerFactory {
                 dialogController,
                 messagesNotSeenHandler,
                 useCaseFactory.createCallNotificationUseCase(),
-                useCaseFactory.createQueueForMediaEngagementUseCase(),
-                useCaseFactory.createCancelQueueTicketUseCase(),
                 useCaseFactory.getEndEngagementUseCase(),
                 useCaseFactory.createShouldShowMediaEngagementViewUseCase(),
                 useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
                 useCaseFactory.createHasCallNotificationChannelEnabledUseCase(),
                 useCaseFactory.createIsShowEnableCallNotificationChannelDialogUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
-                useCaseFactory.createQueueTicketStateChangeToUnstaffedUseCase(),
                 useCaseFactory.getIsCurrentEngagementCallVisualizer(),
-                useCaseFactory.getHasOngoingEngagementUseCase(),
                 useCaseFactory.createTurnSpeakerphoneUseCase(),
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createConfirmationDialogLinksUseCase(),
@@ -181,7 +174,9 @@ public class ControllerFactory {
                 useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
                 useCaseFactory.getToggleVisitorAudioMediaStateUseCase(),
-                useCaseFactory.getToggleVisitorVideoMediaStateUseCase()
+                useCaseFactory.getToggleVisitorVideoMediaStateUseCase(),
+                useCaseFactory.getIsQueueingOrEngagementUseCase(),
+                useCaseFactory.getQueueForEngagementUseCase()
             );
         } else {
             Logger.d(TAG, "retained call controller");
@@ -343,7 +338,7 @@ public class ControllerFactory {
             dialogController,
             repositoryFactory.getVisitorCodeRepository(),
             useCaseFactory.getEngagementStateUseCase(),
-            useCaseFactory.getHasOngoingEngagementUseCase()
+            useCaseFactory.getIsQueueingOrEngagementUseCase()
         );
     }
 
@@ -393,9 +388,8 @@ public class ControllerFactory {
     public EngagementCompletionController getEndEngagementController() {
         if (engagementCompletionController == null) {
             engagementCompletionController = new EngagementCompletionControllerImpl(
-                useCaseFactory.getSurveyUseCase(),
-                useCaseFactory.getEngagementStateUseCase(),
-                useCaseFactory.getReleaseResourcesUseCase()
+                useCaseFactory.getEngagementCompletionUseCase(),
+                useCaseFactory.getReleaseResourcesUseCase(dialogController)
             );
         }
         return engagementCompletionController;

@@ -12,10 +12,6 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.CurrentOperatorUseCase
 import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.State.FinishedCallVisualizer
-import com.glia.widgets.engagement.State.FinishedOmniCore
-import com.glia.widgets.engagement.State.StartedCallVisualizer
-import com.glia.widgets.engagement.State.StartedOmniCore
 import com.glia.widgets.engagement.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
 import com.glia.widgets.helper.TAG
@@ -24,6 +20,7 @@ import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadPosition
+import com.glia.widgets.engagement.State as EngagementState
 
 internal class ServiceChatHeadController(
     private val toggleChatHeadServiceUseCase: ToggleChatHeadServiceUseCase,
@@ -107,10 +104,28 @@ internal class ServiceChatHeadController(
     }
 
     private fun handleEngagementState(state: com.glia.widgets.engagement.State) {
-        if (state is StartedOmniCore || state is StartedCallVisualizer) {
-            newEngagementLoaded()
-        } else if (state is FinishedCallVisualizer || state is FinishedOmniCore) {
-            engagementEnded()
+        when (state) {
+            is EngagementState.StartedOmniCore,
+            is EngagementState.StartedCallVisualizer -> {
+                newEngagementLoaded()
+            }
+
+            is EngagementState.FinishedCallVisualizer,
+            is EngagementState.FinishedOmniCore,
+            is EngagementState.QueueUnstaffed,
+            is EngagementState.UnexpectedErrorHappened,
+            is EngagementState.QueueingCanceled -> {
+                engagementEnded()
+            }
+
+            is EngagementState.Queuing,
+            is EngagementState.PreQueuing -> {
+                queueingStarted()
+            }
+
+            else -> {
+                //no op
+            }
         }
     }
 
@@ -138,6 +153,15 @@ internal class ServiceChatHeadController(
 
     private fun newEngagementLoaded() {
         state = State.ENGAGEMENT
+        toggleChatHeadServiceUseCase.invoke(resumedViewName)
+        if (sdkConfiguration == null) setSdkConfiguration(
+            Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
+        )
+        updateChatHeadView()
+    }
+
+    private fun queueingStarted() {
+        state = State.QUEUEING
         toggleChatHeadServiceUseCase.invoke(resumedViewName)
         if (sdkConfiguration == null) setSdkConfiguration(
             Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()

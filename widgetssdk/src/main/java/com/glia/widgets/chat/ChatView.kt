@@ -600,7 +600,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
                     Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog() }
                     Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
-                    Dialog.MODE_NO_MORE_OPERATORS -> post { showNoMoreOperatorsAvailableDialog() }
                     Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
                     Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
                     Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
@@ -990,15 +989,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     private fun showEngagementEndedDialog() = showDialog {
         Dialogs.showOperatorEndedEngagementDialog(context, theme) {
-            resetDialogStateAndDismiss()
-            controller?.noMoreOperatorsAvailableDismissed()
-            onEndListener?.onEnd()
-            chatEnded()
-        }
-    }
-
-    private fun showNoMoreOperatorsAvailableDialog() = showDialog {
-        Dialogs.showNoMoreOperatorsAvailableDialog(context, theme) {
             resetDialogStateAndDismiss()
             controller?.noMoreOperatorsAvailableDismissed()
             onEndListener?.onEnd()

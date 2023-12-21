@@ -24,7 +24,7 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizer
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
@@ -66,7 +66,7 @@ class ChatHeadView @JvmOverloads constructor(
     @Suppress("JoinDeclarationAndAssignment")
     private var serviceChatHeadController: ServiceChatHeadController
     private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
-    private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizer
+    private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
     private var theme: UiTheme? = null
 
     init {

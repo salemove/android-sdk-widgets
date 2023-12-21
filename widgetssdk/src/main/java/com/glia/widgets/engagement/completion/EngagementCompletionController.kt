@@ -9,18 +9,17 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.EngagementStateUseCase
 import com.glia.widgets.engagement.ReleaseResourcesUseCase
-import com.glia.widgets.engagement.State
-import com.glia.widgets.engagement.SurveyState
-import com.glia.widgets.engagement.SurveyUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.isGlia
+import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import io.reactivex.Flowable
 import io.reactivex.processors.PublishProcessor
 import java.lang.ref.WeakReference
+import com.glia.widgets.engagement.completion.EngagementCompletionController.State as ControllerState
+import com.glia.widgets.engagement.completion.EngagementCompletionUseCase.State as UseCaseState
 
 internal interface EngagementCompletionController {
 
@@ -40,7 +39,13 @@ internal interface EngagementCompletionController {
         data class ShowSurvey(val survey: Survey, val activity: Activity, val uiTheme: UiTheme) : State
 
         /* This state should show a Dialog that indicates engagement end by the operator */
-        data class ShowOperatorEndedEngagementDialog(val themedContext: Context, val uiTheme: UiTheme, val onHandledCallback: ()-> Unit) : State
+        data class ShowOperatorEndedEngagementDialog(val themedContext: Context, val uiTheme: UiTheme, val onHandledCallback: () -> Unit) : State
+
+        /* This state should show a Dialog that indicates that the queue is unstaffed */
+        data class ShowQueueUnstaffedDialog(val themedContext: Context, val uiTheme: UiTheme, val onHandledCallback: () -> Unit) : State
+
+        /* This state should show a Dialog that indicates an unexpected error */
+        data class ShowUnexpectedDialog(val themedContext: Context, val uiTheme: UiTheme, val onHandledCallback: () -> Unit) : State
 
         /* This state should launch DialogHolderActivity to show Dialogs that require Material Theme support */
         data class LaunchDialogHolderActivity(val activity: Activity) : State
@@ -48,8 +53,7 @@ internal interface EngagementCompletionController {
 }
 
 internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
-    private val surveyUseCase: SurveyUseCase,
-    private val engagementStateUseCase: EngagementStateUseCase,
+    private val engagementCompletionUseCase: EngagementCompletionUseCase,
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
     private val resumedActivity: PublishProcessor<WeakReference<Activity>> = PublishProcessor.create()
 ) : EngagementCompletionController {
@@ -66,15 +70,7 @@ internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
 
     @SuppressLint("CheckResult")
     private fun initObservables() {
-        engagementStateUseCase()
-            .filter { it is State.FinishedOmniCore || it is State.FinishedCallVisualizer }
-            .subscribe({
-                submitState(EngagementCompletionController.State.ReleaseUi)
-                releaseResourcesUseCase()
-            }, {})
-        Flowable.combineLatest(surveyUseCase(), resumedActivity, ::produceState).subscribe(::submitState) {
-            //no op, this should not happen
-        }
+        Flowable.combineLatest(engagementCompletionUseCase(), resumedActivity, ::produceState).unSafeSubscribe(::submitState)
     }
 
     private fun submitState(state: EngagementCompletionController.State) {
@@ -82,41 +78,45 @@ internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
     }
 
     private fun produceState(
-        surveyEvent: OneTimeEvent<SurveyState>,
+        event: OneTimeEvent<EngagementCompletionUseCase.State>,
         activityRef: WeakReference<Activity>
     ): EngagementCompletionController.State {
         val activity = activityRef.get()
-        val surveyState = surveyEvent.view()
+        val state = event.view()
 
         return when {
-            activity == null || activity.isFinishing || surveyState == null -> EngagementCompletionController.State.Ignore
-            surveyState is SurveyState.EmptyFromOperatorRequest && !activity.isGlia ->
-                EngagementCompletionController.State.LaunchDialogHolderActivity(activity)
-
-            surveyState is SurveyState.Empty -> {
-                surveyEvent.markConsumed()
-                EngagementCompletionController.State.Ignore
+            //No matter activity is null or finishing, we must release all resources since queueing canceled or engagement ended,
+            //so this case should always be the first
+            state is UseCaseState.QueuingOrEngagementEnded -> {
+                event.markConsumed()
+                releaseResourcesUseCase()
+                EngagementCompletionController.State.ReleaseUi
             }
 
-            surveyState is SurveyState.Value -> {
-                surveyEvent.markConsumed()
-                EngagementCompletionController.State.ShowSurvey(
-                    surveyState.survey,
-                    activity,
-                    currentTheme
-                )
+            activity == null || activity.isFinishing || state == null -> EngagementCompletionController.State.Ignore
+
+            (state is UseCaseState.UnexpectedErrorHappened || state is UseCaseState.QueueUnstaffed || state is UseCaseState.OperatorEndedEngagement)
+                && !activity.isGlia -> ControllerState.LaunchDialogHolderActivity(activity)
+
+            state is UseCaseState.SurveyLoaded -> {
+                event.markConsumed()
+                ControllerState.ShowSurvey(state.survey, activity, currentTheme)
             }
 
-            surveyState is SurveyState.EmptyFromOperatorRequest -> {
-                EngagementCompletionController.State.ShowOperatorEndedEngagementDialog(
-                    activity.wrapWithMaterialThemeOverlay(),
-                    currentTheme,
-                    surveyEvent::markConsumed
-                )
+            state is UseCaseState.OperatorEndedEngagement -> {
+                ControllerState.ShowOperatorEndedEngagementDialog(activity.wrapWithMaterialThemeOverlay(), currentTheme, event::markConsumed)
+            }
+
+            state is UseCaseState.QueueUnstaffed -> {
+                ControllerState.ShowQueueUnstaffedDialog(activity.wrapWithMaterialThemeOverlay(), currentTheme, event::markConsumed)
+            }
+
+            state is UseCaseState.UnexpectedErrorHappened -> {
+                ControllerState.ShowUnexpectedDialog(activity.wrapWithMaterialThemeOverlay(), currentTheme, event::markConsumed)
             }
 
             else -> {
-                surveyEvent.markConsumed()
+                event.markConsumed()
                 EngagementCompletionController.State.Ignore
             }
         }

@@ -13,7 +13,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.preference.PreferenceManager;
 
-import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.chat.ChatView;
 
@@ -58,11 +57,5 @@ public class ChatFragment extends Fragment {
         onEndListener = null;
         chatView.onDestroyView();
         super.onDestroyView();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

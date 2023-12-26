@@ -159,16 +159,6 @@ class MainFragment : Fragment() {
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        GliaWidgets.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     private fun setupAuthButtonsVisibility() {
         if (activity == null || containerView == null) return
         if (!Glia.isInitialized()) {

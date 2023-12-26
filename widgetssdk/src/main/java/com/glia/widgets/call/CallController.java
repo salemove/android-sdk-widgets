@@ -18,7 +18,6 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.widgets.Constants;
-import com.glia.widgets.StringProvider;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorAudioMediaMuteUseCase;
 import com.glia.widgets.call.domain.ToggleVisitorVideoUseCase;

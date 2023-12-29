@@ -1,14 +1,16 @@
 package com.glia.widgets.callvisualizer.controller
 
-import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
 import com.glia.widgets.core.dialog.DialogController
-import com.glia.widgets.core.engagement.GliaEngagementRepository
+import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.State
 import io.reactivex.Observable
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
+import io.reactivex.processors.PublishProcessor
 import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
@@ -17,17 +19,19 @@ import org.mockito.Mockito.reset
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.verifyNoMoreInteractions
-import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.whenever
-import java.util.function.Consumer
 
 internal class VisitorCodeControllerTest {
+    private val engagementState = PublishProcessor.create<State>()
 
+    private val engagementStateUseCase: EngagementStateUseCase = org.mockito.kotlin.mock {
+        on { invoke() } doReturn engagementState
+    }
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = org.mockito.kotlin.mock()
     private val dialogController = mock(DialogController::class.java)
     private val visitorCodeRepository = mock(VisitorCodeRepository::class.java)
-    private val engagementRepository = mock(GliaEngagementRepository::class.java)
-    private val controller =
-        VisitorCodeController(dialogController, visitorCodeRepository, engagementRepository)
+    private val controller = VisitorCodeController(dialogController, visitorCodeRepository, engagementStateUseCase, isQueueingOrEngagementUseCase)
     private val view = mock(VisitorCodeContract.View::class.java)
     private val refreshTime = 1000L
 
@@ -87,13 +91,10 @@ internal class VisitorCodeControllerTest {
 
     @Test
     fun `auto close is triggered when engagement starts`() {
-        val mockEngagement = mock(OmnibrowseEngagement::class.java)
-        val callbackCaptor = argumentCaptor<Consumer<OmnibrowseEngagement>>()
-        verify(engagementRepository).listenForCallVisualizerEngagement(callbackCaptor.capture())
-
-        callbackCaptor.firstValue.accept(mockEngagement)
+        engagementState.onNext(State.StartedCallVisualizer)
 
         verify(dialogController).dismissVisitorCodeDialog()
+        verify(view).destroyTimer()
     }
 
     @Test

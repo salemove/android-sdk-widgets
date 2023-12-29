@@ -33,7 +33,7 @@ public class ScreenSharingControllerTest {
     private ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
     private HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase;
-    private ScreenSharingController subjectUnderTest;
+    private ScreenSharingControllerImpl subjectUnderTest;
 
     @Before
     public void setUp() {
@@ -47,7 +47,7 @@ public class ScreenSharingControllerTest {
         hasScreenSharingNotificationChannelEnabledUseCase =
                 mock(HasScreenSharingNotificationChannelEnabledUseCase.class);
 
-        subjectUnderTest = new ScreenSharingController(
+        subjectUnderTest = new ScreenSharingControllerImpl(
                 gliaScreenSharingRepository,
                 dialogController,
                 showScreenSharingNotificationUseCase,
@@ -67,7 +67,7 @@ public class ScreenSharingControllerTest {
     @Test
     public void onScreenSharingRequest_showsEnableNotificationsDialog_whenNotificationChannelDisabled() {
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke()).thenReturn(false);
-        subjectUnderTest.setViewCallback(mock(ScreenSharingController.ViewCallback.class));
+        subjectUnderTest.setViewCallback(mock(ScreenSharingControllerImpl.ViewCallback.class));
 
         subjectUnderTest.onScreenSharingRequest();
 
@@ -77,7 +77,7 @@ public class ScreenSharingControllerTest {
     @Test
     public void onScreenSharingRequest_showsStartScreenSharingDialog_whenNotificationChannelEnabled() {
         when(hasScreenSharingNotificationChannelEnabledUseCase.invoke()).thenReturn(true);
-        subjectUnderTest.setViewCallback(mock(ScreenSharingController.ViewCallback.class));
+        subjectUnderTest.setViewCallback(mock(ScreenSharingControllerImpl.ViewCallback.class));
 
         subjectUnderTest.onScreenSharingRequest();
 
@@ -86,7 +86,7 @@ public class ScreenSharingControllerTest {
 
     @Test
     public void onScreenSharingRequestError_removesNotificationCallsOnScreenSharingRequestError() {
-        ScreenSharingController.ViewCallback viewCallback = mock(ScreenSharingController.ViewCallback.class);
+        ScreenSharingControllerImpl.ViewCallback viewCallback = mock(ScreenSharingControllerImpl.ViewCallback.class);
         subjectUnderTest.setViewCallback(viewCallback);
         GliaException exception = mock(GliaException.class);
 

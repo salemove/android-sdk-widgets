@@ -20,10 +20,10 @@ import com.glia.widgets.chat.model.OperatorMessageItem
 import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.chat.model.SendMessagePayload
 import com.glia.widgets.chat.model.Unsent
-import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -63,7 +63,7 @@ class ChatManagerTest {
     private lateinit var sendUnsentMessagesUseCase: SendUnsentMessagesUseCase
     private lateinit var handleCustomCardClickUseCase: HandleCustomCardClickUseCase
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
-    private lateinit var isOngoingEngagementUseCase: IsOngoingEngagementUseCase
+    private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
     private lateinit var subjectUnderTest: ChatManager
     private lateinit var state: ChatManager.State
     private lateinit var compositeDisposable: CompositeDisposable
@@ -85,7 +85,7 @@ class ChatManagerTest {
         sendUnsentMessagesUseCase = mock()
         handleCustomCardClickUseCase = mock()
         isAuthenticatedUseCase = mock()
-        isOngoingEngagementUseCase = mock()
+        isQueueingOrEngagementUseCase = mock()
         compositeDisposable = spy()
         stateProcessor = spy(BehaviorProcessor.createDefault(state))
         quickReplies = BehaviorProcessor.create()
@@ -103,7 +103,7 @@ class ChatManagerTest {
                 sendUnsentMessagesUseCase,
                 handleCustomCardClickUseCase,
                 isAuthenticatedUseCase,
-                isOngoingEngagementUseCase,
+                isQueueingOrEngagementUseCase,
                 compositeDisposable,
                 stateProcessor,
                 quickReplies,
@@ -555,7 +555,7 @@ class ChatManagerTest {
     @Test
     fun `loadHistory loads history when authenticated`() {
         whenever(isAuthenticatedUseCase()) doReturn true
-        whenever(isOngoingEngagementUseCase()) doReturn false
+        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn false
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
 
@@ -574,7 +574,7 @@ class ChatManagerTest {
     @Test
     fun `loadHistory loads history when engagement is ongoing`() {
         whenever(isAuthenticatedUseCase()) doReturn false
-        whenever(isOngoingEngagementUseCase()) doReturn true
+        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn true
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
 
@@ -593,7 +593,7 @@ class ChatManagerTest {
     @Test
     fun `loadHistory skips history when there is no ongoing engagement and not authenticated`() {
         whenever(isAuthenticatedUseCase()) doReturn false
-        whenever(isOngoingEngagementUseCase()) doReturn false
+        whenever(isQueueingOrEngagementUseCase.hasOngoingEngagement) doReturn false
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
 

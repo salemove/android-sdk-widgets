@@ -305,12 +305,14 @@ internal class ActivityWatcherForCallVisualizerController(
         shouldWaitMediaProjectionResult = isWaiting
     }
 
-    private fun acceptMediaUpgradeRequest() {
+    @VisibleForTesting
+    fun acceptMediaUpgradeRequest() {
         mediaUpgradeOffer?.also(callVisualizerController::acceptMediaUpgradeRequest)
         resetMediaUpgradeState()
     }
 
-    private fun declineMediaUpgradeRequest() {
+    @VisibleForTesting
+    fun declineMediaUpgradeRequest() {
         mediaUpgradeOffer?.also(callVisualizerController::declineMediaUpgradeRequest)
         resetMediaUpgradeState()
     }

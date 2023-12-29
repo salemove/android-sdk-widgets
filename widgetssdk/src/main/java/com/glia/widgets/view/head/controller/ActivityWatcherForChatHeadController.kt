@@ -10,9 +10,10 @@ import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.State
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.view.head.ChatHeadContract
 
 internal class ActivityWatcherForChatHeadController(
-    private var serviceChatHeadController: ServiceChatHeadController,
+    private var serviceChatHeadController: ChatHeadContract.Controller,
     private var applicationChatHeadController: ApplicationChatHeadLayoutController,
     private val screenSharingController: ScreenSharingController,
     private val engagementStateUseCase: EngagementStateUseCase,
@@ -84,8 +85,7 @@ internal class ActivityWatcherForChatHeadController(
 
     private fun showBubble() {
         val gliaOrRootView = watcher.fetchGliaOrRootView()
-        val viewName: String =
-            if (gliaOrRootView != null) gliaOrRootView::class.java.simpleName else ""
+        val viewName: String = if (gliaOrRootView != null) gliaOrRootView::class.java.simpleName else ""
         serviceChatHeadController.onResume(gliaOrRootView)
         applicationChatHeadController.onResume(viewName)
         if (applicationChatHeadController.shouldShow(viewName)) {

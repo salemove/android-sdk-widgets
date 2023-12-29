@@ -53,6 +53,12 @@ android {
     buildConfig true
   }
 
+  packagingOptions {
+    //After adding `Mockk` dependency to the instrumentation tests it started to fail builds with message that
+    // there are 6 files in project with these two Licences. Since all of them were related to Junit, it is safe to merge them.
+    merges += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
+  }
+
   testOptions {
     unitTests {
       includeAndroidResources true
@@ -98,8 +104,7 @@ dependencies {
   testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
   testImplementation "org.robolectric:robolectric:$robolectricVersion"
   testImplementation "io.mockk:mockk-android:${mockkVersion}"
-  testImplementation "io.mockk:mockk-agent:${mockkVersion}"
-  androidTestImplementation "org.mockito:mockito-android:$mockitoAndroidTestVersion"
+  androidTestImplementation "io.mockk:mockk-android:${mockkVersion}"
   androidTestImplementation "androidx.test.ext:junit:$androidXTestVersion"
   androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
   androidTestImplementation "androidx.test:rules:$testRulesVersion"

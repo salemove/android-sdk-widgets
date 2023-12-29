@@ -4,7 +4,6 @@ import android.net.Uri
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatViewCallback
-import com.glia.widgets.chat.domain.GliaOnOperatorTypingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
@@ -16,17 +15,10 @@ import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.core.engagement.domain.GetEngagementStateFlowableUseCase
-import com.glia.widgets.core.engagement.domain.GliaEndEngagementUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementUseCase
-import com.glia.widgets.core.engagement.domain.IsOngoingEngagementUseCase
-import com.glia.widgets.core.engagement.domain.IsQueueingEngagementUseCase
 import com.glia.widgets.core.engagement.domain.SetEngagementConfigUseCase
 import com.glia.widgets.core.engagement.domain.UpdateOperatorDefaultImageUrlUseCase
 import com.glia.widgets.core.fileupload.domain.AddFileAttachmentsObserverUseCase
@@ -35,21 +27,24 @@ import com.glia.widgets.core.fileupload.domain.GetFileAttachmentsUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentObserverUseCase
 import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
-import com.glia.widgets.core.mediaupgradeoffer.MediaUpgradeOfferRepository
-import com.glia.widgets.core.mediaupgradeoffer.domain.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.core.mediaupgradeoffer.domain.AddMediaUpgradeOfferCallbackUseCase
-import com.glia.widgets.core.mediaupgradeoffer.domain.RemoveMediaUpgradeOfferCallbackUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
-import com.glia.widgets.core.operator.domain.AddOperatorMediaStateListenerUseCase
-import com.glia.widgets.core.queue.domain.GliaCancelQueueTicketUseCase
-import com.glia.widgets.core.queue.domain.GliaQueueForChatEngagementUseCase
-import com.glia.widgets.core.queue.domain.QueueTicketStateChangeToUnstaffedUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
+import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.EndEngagementUseCase
+import com.glia.widgets.engagement.EngagementStateUseCase
+import com.glia.widgets.engagement.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.OperatorMediaUseCase
+import com.glia.widgets.engagement.OperatorTypingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
+import io.reactivex.Flowable
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -64,21 +59,13 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class ChatControllerTest {
     private lateinit var chatViewCallback: ChatViewCallback
-    private lateinit var mediaUpgradeOfferRepository: MediaUpgradeOfferRepository
     private lateinit var callTimer: TimeCounter
     private lateinit var minimizeHandler: MinimizeHandler
     private lateinit var dialogController: DialogController
     private lateinit var messagesNotSeenHandler: MessagesNotSeenHandler
     private lateinit var callNotificationUseCase: CallNotificationUseCase
-    private lateinit var queueForChatEngagementUseCase: GliaQueueForChatEngagementUseCase
-    private lateinit var getEngagementUseCase: GliaOnEngagementUseCase
-    private lateinit var engagementEndUseCase: GliaOnEngagementEndUseCase
-    private lateinit var onOperatorTypingUseCase: GliaOnOperatorTypingUseCase
     private lateinit var sendMessagePreviewUseCase: GliaSendMessagePreviewUseCase
     private lateinit var sendMessageUseCase: GliaSendMessageUseCase
-    private lateinit var addOperatorMediaStateListenerUseCase: AddOperatorMediaStateListenerUseCase
-    private lateinit var cancelQueueTicketUseCase: GliaCancelQueueTicketUseCase
-    private lateinit var endEngagementUseCase: GliaEndEngagementUseCase
     private lateinit var addFileToAttachmentAndUploadUseCase: AddFileToAttachmentAndUploadUseCase
     private lateinit var addFileAttachmentsObserverUseCase: AddFileAttachmentsObserverUseCase
     private lateinit var removeFileAttachmentObserverUseCase: RemoveFileAttachmentObserverUseCase
@@ -89,27 +76,26 @@ class ChatControllerTest {
     private lateinit var isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase
     private lateinit var downloadFileUseCase: DownloadFileUseCase
     private lateinit var siteInfoUseCase: SiteInfoUseCase
-    private lateinit var surveyUseCase: GliaSurveyUseCase
-    private lateinit var getGliaEngagementStateFlowableUseCase: GetEngagementStateFlowableUseCase
     private lateinit var isFromCallScreenUseCase: IsFromCallScreenUseCase
     private lateinit var updateFromCallScreenUseCase: UpdateFromCallScreenUseCase
-    private lateinit var ticketStateChangeToUnstaffedUseCase: QueueTicketStateChangeToUnstaffedUseCase
-    private lateinit var addMediaUpgradeOfferCallbackUseCase: AddMediaUpgradeOfferCallbackUseCase
-    private lateinit var removeMediaUpgradeOfferCallbackUseCase: RemoveMediaUpgradeOfferCallbackUseCase
-    private lateinit var isOngoingEngagementUseCase: IsOngoingEngagementUseCase
     private lateinit var isSecureEngagementUseCase: IsSecureEngagementUseCase
     private lateinit var engagementConfigUseCase: SetEngagementConfigUseCase
     private lateinit var isSecureConversationsChatAvailableUseCase: IsSecureConversationsChatAvailableUseCase
-    private lateinit var isQueueingEngagementUseCase: IsQueueingEngagementUseCase
-    private lateinit var hasPendingSurveyUseCase: HasPendingSurveyUseCase
-    private lateinit var setPendingSurveyUsedUseCase: SetPendingSurveyUsedUseCase
-    private lateinit var isCallVisualizerUseCase: IsCallVisualizerUseCase
     private lateinit var isFileReadyForPreviewUseCase: IsFileReadyForPreviewUseCase
-    private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var determineGvaButtonTypeUseCase: DetermineGvaButtonTypeUseCase
     private lateinit var updateOperatorDefaultImageUrlUseCase: UpdateOperatorDefaultImageUrlUseCase
     private lateinit var confirmationDialogUseCase: ConfirmationDialogUseCase
     private lateinit var confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
+    private lateinit var operatorTypingUseCase: OperatorTypingUseCase
+    private lateinit var endEngagementUseCase: EndEngagementUseCase
+    private lateinit var isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
+    private lateinit var engagementStateUseCase: EngagementStateUseCase
+    private lateinit var operatorMediaUseCase: OperatorMediaUseCase
+    private lateinit var mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase
+    private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
+    private lateinit var declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
+    private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
+    private lateinit var enqueueForEngagementUseCase: EnqueueForEngagementUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -118,21 +104,13 @@ class ChatControllerTest {
     @Before
     fun setUp() {
         chatViewCallback = mock()
-        mediaUpgradeOfferRepository = mock()
         callTimer = mock()
         minimizeHandler = mock()
         dialogController = mock()
         messagesNotSeenHandler = mock()
         callNotificationUseCase = mock()
-        queueForChatEngagementUseCase = mock()
-        getEngagementUseCase = mock()
-        engagementEndUseCase = mock()
-        onOperatorTypingUseCase = mock()
         sendMessagePreviewUseCase = mock()
         sendMessageUseCase = mock()
-        addOperatorMediaStateListenerUseCase = mock()
-        cancelQueueTicketUseCase = mock()
-        endEngagementUseCase = mock()
         addFileToAttachmentAndUploadUseCase = mock()
         addFileAttachmentsObserverUseCase = mock()
         removeFileAttachmentObserverUseCase = mock()
@@ -143,47 +121,45 @@ class ChatControllerTest {
         isShowOverlayPermissionRequestDialogUseCase = mock()
         downloadFileUseCase = mock()
         siteInfoUseCase = mock()
-        surveyUseCase = mock()
-        getGliaEngagementStateFlowableUseCase = mock()
         isFromCallScreenUseCase = mock()
         updateFromCallScreenUseCase = mock()
-        ticketStateChangeToUnstaffedUseCase = mock()
-        addMediaUpgradeOfferCallbackUseCase = mock()
-        removeMediaUpgradeOfferCallbackUseCase = mock()
-        isOngoingEngagementUseCase = mock()
         isSecureEngagementUseCase = mock()
         engagementConfigUseCase = mock()
         isSecureConversationsChatAvailableUseCase = mock()
-        isQueueingEngagementUseCase = mock()
-        hasPendingSurveyUseCase = mock()
-        setPendingSurveyUsedUseCase = mock()
-        isCallVisualizerUseCase = mock()
         isFileReadyForPreviewUseCase = mock()
-        acceptMediaUpgradeOfferUseCase = mock()
         determineGvaButtonTypeUseCase = mock()
         isAuthenticatedUseCase = mock()
         updateOperatorDefaultImageUrlUseCase = mock()
         confirmationDialogUseCase = mock()
         confirmationDialogLinksUseCase = mock()
         chatManager = mock()
+        operatorTypingUseCase = mock {
+            on { invoke() } doReturn Flowable.empty()
+        }
+        endEngagementUseCase = mock()
+        isCurrentEngagementCallVisualizerUseCase = mock()
+        engagementStateUseCase = mock {
+            on { invoke() } doReturn Flowable.empty()
+        }
+        operatorMediaUseCase = mock {
+            on { invoke() } doReturn Flowable.empty()
+        }
+        mediaUpgradeOfferUseCase = mock()
+        acceptMediaUpgradeOfferUseCase = mock()
+        declineMediaUpgradeOfferUseCase = mock()
+        isQueueingOrEngagementUseCase = mock()
+        enqueueForEngagementUseCase = mock()
+
 
         chatController = ChatController(
             chatViewCallback = chatViewCallback,
-            mediaUpgradeOfferRepository = mediaUpgradeOfferRepository,
             callTimer = callTimer,
             minimizeHandler = minimizeHandler,
             dialogController = dialogController,
             messagesNotSeenHandler = messagesNotSeenHandler,
             callNotificationUseCase = callNotificationUseCase,
-            queueForChatEngagementUseCase = queueForChatEngagementUseCase,
-            getEngagementUseCase = getEngagementUseCase,
-            engagementEndUseCase = engagementEndUseCase,
-            onOperatorTypingUseCase = onOperatorTypingUseCase,
             sendMessagePreviewUseCase = sendMessagePreviewUseCase,
             sendMessageUseCase = sendMessageUseCase,
-            addOperatorMediaStateListenerUseCase = addOperatorMediaStateListenerUseCase,
-            cancelQueueTicketUseCase = cancelQueueTicketUseCase,
-            endEngagementUseCase = endEngagementUseCase,
             addFileToAttachmentAndUploadUseCase = addFileToAttachmentAndUploadUseCase,
             addFileAttachmentsObserverUseCase = addFileAttachmentsObserverUseCase,
             removeFileAttachmentObserverUseCase = removeFileAttachmentObserverUseCase,
@@ -194,29 +170,29 @@ class ChatControllerTest {
             isShowOverlayPermissionRequestDialogUseCase = isShowOverlayPermissionRequestDialogUseCase,
             downloadFileUseCase = downloadFileUseCase,
             siteInfoUseCase = siteInfoUseCase,
-            surveyUseCase = surveyUseCase,
-            getGliaEngagementStateFlowableUseCase = getGliaEngagementStateFlowableUseCase,
             isFromCallScreenUseCase = isFromCallScreenUseCase,
             updateFromCallScreenUseCase = updateFromCallScreenUseCase,
-            ticketStateChangeToUnstaffedUseCase = ticketStateChangeToUnstaffedUseCase,
-            hasOngoingEngagementUseCase = isOngoingEngagementUseCase,
             isSecureEngagementUseCase = isSecureEngagementUseCase,
             engagementConfigUseCase = engagementConfigUseCase,
-            addMediaUpgradeCallbackUseCase = addMediaUpgradeOfferCallbackUseCase,
-            removeMediaUpgradeCallbackUseCase = removeMediaUpgradeOfferCallbackUseCase,
             isSecureEngagementAvailableUseCase = isSecureConversationsChatAvailableUseCase,
-            isQueueingEngagementUseCase = isQueueingEngagementUseCase,
-            hasPendingSurveyUseCase = hasPendingSurveyUseCase,
-            setPendingSurveyUsedUseCase = setPendingSurveyUsedUseCase,
-            isCurrentEngagementCallVisualizerUseCase = isCallVisualizerUseCase,
             isFileReadyForPreviewUseCase = isFileReadyForPreviewUseCase,
-            acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
             determineGvaButtonTypeUseCase = determineGvaButtonTypeUseCase,
             isAuthenticatedUseCase = isAuthenticatedUseCase,
             updateOperatorDefaultImageUrlUseCase = updateOperatorDefaultImageUrlUseCase,
             confirmationDialogUseCase = confirmationDialogUseCase,
             confirmationDialogLinksUseCase = confirmationDialogLinksUseCase,
-            chatManager = chatManager
+            chatManager = chatManager,
+            onOperatorTypingUseCase = operatorTypingUseCase,
+            endEngagementUseCase = endEngagementUseCase,
+            isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
+            engagementStateUseCase = engagementStateUseCase,
+            operatorMediaUseCase = operatorMediaUseCase,
+            mediaUpgradeOfferUseCase = mediaUpgradeOfferUseCase,
+            acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
+            declineMediaUpgradeOfferUseCase = declineMediaUpgradeOfferUseCase,
+            isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
+            enqueueForEngagementUseCase = enqueueForEngagementUseCase,
+
         )
     }
 

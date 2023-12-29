@@ -30,7 +30,7 @@ import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.helper.rx.Schedulers;
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
-import com.glia.widgets.view.head.controller.ServiceChatHeadController;
+import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservation;
 import com.glia.widgets.view.unifiedui.theme.UnifiedThemeManager;
 
@@ -181,6 +181,11 @@ public class Dependencies {
         Dependencies.controllerFactory = controllerFactory;
     }
 
+    @VisibleForTesting
+    public static void setRepositoryFactory(RepositoryFactory repositoryFactory) {
+        Dependencies.repositoryFactory = repositoryFactory;
+    }
+
     public static GliaCore glia() {
         return gliaCore;
     }
@@ -209,7 +214,7 @@ public class Dependencies {
 
     private static void initApplicationLifecycleObserver(
         ApplicationLifecycleManager lifecycleManager,
-        ServiceChatHeadController chatBubbleController
+        ChatHeadContract.Controller chatBubbleController
     ) {
         lifecycleManager.addObserver((source, event) -> {
             if (event == Lifecycle.Event.ON_STOP) {

@@ -32,7 +32,6 @@ import com.glia.widgets.helper.getColorStateListCompat
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.load
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
@@ -64,7 +63,7 @@ class ChatHeadView @JvmOverloads constructor(
         }
 
     @Suppress("JoinDeclarationAndAssignment")
-    private var serviceChatHeadController: ServiceChatHeadController
+    private var serviceChatHeadController: ChatHeadContract.Controller
     private var isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase
     private var isCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
     private var theme: UiTheme? = null

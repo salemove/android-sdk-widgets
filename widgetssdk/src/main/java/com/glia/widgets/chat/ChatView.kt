@@ -87,7 +87,7 @@ import com.glia.widgets.view.Dialogs
 import com.glia.widgets.view.SingleChoiceCardView.OnOptionClickedListener
 import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
+import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyLayerTheme
@@ -136,7 +136,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
     }
     private var screenSharingController: ScreenSharingController? = null
-    private var serviceChatHeadController: ServiceChatHeadController? = null
+    private var serviceChatHeadController: ChatHeadContract.Controller? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
     private var adapter by Delegates.notNull<ChatAdapter>()
@@ -639,6 +639,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             ChatInputMode.ENABLED_NO_ENGAGEMENT -> binding.chatEditText.hint = stringProvider.getRemoteString(
                 R.string.chat_message_start_engagement_placeholder
             )
+
             else -> binding.chatEditText.hint = stringProvider.getRemoteString(R.string.chat_input_placeholder)
         }
         binding.chatEditText.isEnabled = chatState.chatInputMode.isEnabled

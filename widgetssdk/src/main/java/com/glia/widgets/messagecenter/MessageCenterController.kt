@@ -26,11 +26,11 @@ import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
+import com.glia.widgets.view.head.ChatHeadContract
 import io.reactivex.disposables.CompositeDisposable
 
 internal class MessageCenterController(
-    private var serviceChatHeadController: ServiceChatHeadController,
+    private var serviceChatHeadController: ChatHeadContract.Controller,
     private val sendSecureMessageUseCase: SendSecureMessageUseCase,
     private val isMessageCenterAvailableUseCase: IsMessageCenterAvailableUseCase,
     private val addFileAttachmentsObserverUseCase: AddSecureFileAttachmentsObserverUseCase,

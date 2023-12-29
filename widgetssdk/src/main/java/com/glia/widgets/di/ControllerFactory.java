@@ -3,6 +3,7 @@ package com.glia.widgets.di;
 import androidx.annotation.NonNull;
 
 import com.glia.widgets.call.CallController;
+import com.glia.widgets.call.CallControllerImpl;
 import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerContract;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerController;
@@ -16,6 +17,7 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
+import com.glia.widgets.core.screensharing.ScreenSharingControllerImpl;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.engagement.completion.EngagementCompletionControllerImpl;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
@@ -31,6 +33,7 @@ import com.glia.widgets.view.MessagesNotSeenHandler;
 import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
+import com.glia.widgets.view.head.ChatHeadContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
@@ -42,7 +45,7 @@ import com.glia.widgets.view.snackbar.ActivityWatcherForLiveObservationControlle
 public class ControllerFactory {
 
     private static final String TAG = "ControllerFactory";
-    private static ServiceChatHeadController serviceChatHeadController;
+    private static ChatHeadContract.Controller serviceChatHeadController;
     private static ApplicationChatHeadLayoutController applicationChatHeadController;
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
@@ -146,7 +149,7 @@ public class ControllerFactory {
     public CallController getCallController(CallViewCallback callViewCallback) {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
-            retainedCallController = new CallController(
+            retainedCallController = new CallControllerImpl(
                 sdkConfigurationManager,
                 sharedTimer,
                 callViewCallback,
@@ -188,7 +191,7 @@ public class ControllerFactory {
     public ScreenSharingController getScreenSharingController() {
         if (retainedScreenSharingController == null) {
             Logger.d(TAG, "new screen sharing controller");
-            retainedScreenSharingController = new ScreenSharingController(
+            retainedScreenSharingController = new ScreenSharingControllerImpl(
                 repositoryFactory.getGliaScreenSharingRepository(),
                 dialogController,
                 useCaseFactory.createShowScreenSharingNotificationUseCase(),
@@ -246,7 +249,7 @@ public class ControllerFactory {
         return filePreviewController;
     }
 
-    public ServiceChatHeadController getChatHeadController() {
+    public ChatHeadContract.Controller getChatHeadController() {
         if (serviceChatHeadController == null) {
             serviceChatHeadController = new ServiceChatHeadController(
                 useCaseFactory.getToggleChatHeadServiceUseCase(),

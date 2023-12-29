@@ -64,7 +64,7 @@ internal class ServiceChatHeadController(
         toggleChatHeadServiceUseCase.invoke(view?.javaClass?.simpleName)
     }
 
-    fun onPause(view: View?) {
+    override fun onPause(view: View?) {
         clearResumedViewName(view)
     }
 
@@ -99,7 +99,7 @@ internal class ServiceChatHeadController(
         updateChatHeadView()
     }
 
-    fun setSdkConfiguration(configuration: GliaSdkConfiguration?) {
+    override fun setSdkConfiguration(configuration: GliaSdkConfiguration?) {
         sdkConfiguration = configuration
     }
 
@@ -129,7 +129,7 @@ internal class ServiceChatHeadController(
         }
     }
 
-    fun updateChatHeadView() {
+    override fun updateChatHeadView() {
         if (chatHeadView != null && buildTimeTheme != null) {
             updateChatHeadViewState()
             updateOnHold()
@@ -138,7 +138,7 @@ internal class ServiceChatHeadController(
         }
     }
 
-    fun setBuildTimeTheme(theme: UiTheme?) {
+    override fun setBuildTimeTheme(theme: UiTheme?) {
         buildTimeTheme = theme
     }
 

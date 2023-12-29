@@ -7,6 +7,8 @@ import com.glia.widgets.base.BaseController;
 import com.glia.widgets.base.BaseView;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 
+import org.jetbrains.annotations.Nullable;
+
 public interface ChatHeadContract {
     interface Controller extends BaseController {
         void onChatHeadClicked();
@@ -20,6 +22,14 @@ public interface ChatHeadContract {
         void onChatHeadPositionChanged(int x, int y);
 
         Pair<Integer, Integer> getChatHeadPosition();
+
+        void setBuildTimeTheme(@Nullable UiTheme uiTheme);
+
+        void setSdkConfiguration(@Nullable GliaSdkConfiguration configuration);
+
+        void onPause(@Nullable android.view.View gliaOrRootView);
+
+        void updateChatHeadView();
     }
 
     interface View extends BaseView<Controller> {

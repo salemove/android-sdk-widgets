@@ -60,7 +60,7 @@ import com.glia.widgets.view.dialog.base.DialogDelegate
 import com.glia.widgets.view.dialog.base.DialogDelegateImpl
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContainer
 import com.glia.widgets.view.head.BadgeTextView
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
+import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.header.AppBarView
 import com.glia.widgets.view.unifiedui.applyBarButtonStatesTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
@@ -139,7 +139,7 @@ internal class CallView(
 
     private var callController: CallController? = null
     private var screenSharingController: ScreenSharingController? = null
-    private var serviceChatHeadController: ServiceChatHeadController? = null
+    private var serviceChatHeadController: ChatHeadContract.Controller? = null
     private var dialogCallback: DialogController.Callback? = null
     private var dialogController: DialogController? = null
 

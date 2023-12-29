@@ -20,9 +20,9 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.ViewHelpers
+import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
-import com.glia.widgets.view.head.controller.ServiceChatHeadController
 import kotlin.math.roundToInt
 
 class ChatHeadService : Service() {
@@ -96,7 +96,7 @@ class ChatHeadService : Service() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initChatHeadView(
-        controller: ServiceChatHeadController,
+        controller: ChatHeadContract.Controller,
         windowManager: WindowManager,
         layoutParams: WindowManager.LayoutParams
     ) {

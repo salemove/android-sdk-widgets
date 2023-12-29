@@ -1,6 +1,6 @@
 buildscript {
   ext {
-    kotlin_version = '1.8.20'
+    kotlin_version = '1.8.22'
   }
   repositories {
     google()
@@ -76,10 +76,9 @@ ext {
   junitVersion = '4.13.2'
   testLibraryVersion = '1.1.5'
   androidXTestVersion = '1.1.5'
-  mockitoVersion = '5.1.1'
-  mockitoKotlinVersion = '4.1.0'
-  mockitoAndroidTestVersion = '4.3.1'
-  mockkVersion = '1.13.7'
+  mockitoKotlinVersion = '5.2.1'
+  mockitoAndroidTestVersion = '5.8.0'
+  mockkVersion = '1.13.8'
   archCoreVersion = '2.1.0'
   testRulesVersion = '1.5.0'
   robolectricVersion = '4.9.2'

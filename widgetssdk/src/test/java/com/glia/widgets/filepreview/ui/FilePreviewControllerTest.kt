@@ -1,7 +1,6 @@
 package com.glia.widgets.filepreview.ui
 
 import android.graphics.Bitmap
-import com.glia.widgets.core.engagement.domain.GliaOnEngagementEndUseCase
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
@@ -31,7 +30,6 @@ class FilePreviewControllerTest {
     private lateinit var getImageFileFromDownloadsUseCase: GetImageFileFromDownloadsUseCase
     private lateinit var getImageFileFromCacheUseCase: GetImageFileFromCacheUseCase
     private lateinit var putImageFileToDownloadsUseCase: PutImageFileToDownloadsUseCase
-    private lateinit var onEngagementEndUseCase: GliaOnEngagementEndUseCase
     private lateinit var filePreviewController: FilePreviewController
     private lateinit var state: State
 
@@ -41,14 +39,12 @@ class FilePreviewControllerTest {
         getImageFileFromDownloadsUseCase = mock()
         getImageFileFromCacheUseCase = mock()
         putImageFileToDownloadsUseCase = mock()
-        onEngagementEndUseCase = mock()
         state = mock()
         mockState()
         filePreviewController = FilePreviewController(
             getImageFileFromDownloadsUseCase,
             getImageFileFromCacheUseCase,
             putImageFileToDownloadsUseCase,
-            onEngagementEndUseCase,
             state,
             mock()
         )
@@ -58,11 +54,6 @@ class FilePreviewControllerTest {
     @After
     fun tearDown() {
         Mockito.reset(state)
-    }
-
-    @Test
-    fun setView_endsEngagement() {
-        verify(onEngagementEndUseCase).execute(filePreviewController)
     }
 
     @Test
@@ -174,18 +165,6 @@ class FilePreviewControllerTest {
         whenever(putImageFileToDownloadsUseCase(any(), any())) doReturn Completable.error(EXCEPTION)
         filePreviewController.onDownloadPressed()
         verify(view).showOnImageSaveFailed()
-    }
-
-    @Test
-    fun onDestroy_endsEngagement() {
-        filePreviewController.onDestroy()
-        verify(onEngagementEndUseCase).unregisterListener(any())
-    }
-
-    @Test
-    fun engagementEnded_callsEngagementEnded() {
-        filePreviewController.engagementEnded()
-        Mockito.verify(view).engagementEnded()
     }
 
     private fun mockState() {

@@ -30,9 +30,9 @@ class ConfirmationDialogLinksUseCaseTest {
         val links = useCase()
         assertNotNull(links.link1)
         assertEquals("Title1", links.link1!!.title)
-        assertEquals("https://link1", links.link1.url)
+        assertEquals("https://link1", links.link1!!.url)
         assertEquals("Title2", links.link2!!.title)
-        assertEquals("https://link2", links.link2.url)
+        assertEquals("https://link2", links.link2!!.url)
     }
 
     @Test
@@ -45,7 +45,7 @@ class ConfirmationDialogLinksUseCaseTest {
         val links = useCase()
         assertNotNull(links.link1)
         assertEquals("Title1", links.link1!!.title)
-        assertEquals("https://link1", links.link1.url)
+        assertEquals("https://link1", links.link1!!.url)
         assertNull(links.link2)
     }
 
@@ -60,7 +60,7 @@ class ConfirmationDialogLinksUseCaseTest {
         assertNull(links.link1)
         assertNotNull(links.link2)
         assertEquals("Title2", links.link2!!.title)
-        assertEquals("https://link2", links.link2.url)
+        assertEquals("https://link2", links.link2!!.url)
     }
 
     @Test

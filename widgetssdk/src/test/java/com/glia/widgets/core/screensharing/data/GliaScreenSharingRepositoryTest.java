@@ -16,7 +16,7 @@ import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement;
 import com.glia.androidsdk.omnicore.OmnicoreEngagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.screensharing.ScreenSharingRequest;
-import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.GliaCore;
 
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class GliaScreenSharingRepositoryTest {
     @SuppressWarnings("unchecked")
     public void init_callsOnScreenSharingRequestForOmnicore_whenRequested() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
-        GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
+        ScreenSharingController screenSharingCallback = mock(ScreenSharingController.class);
         OmnicoreEngagement engagement = mock(OmnicoreEngagement.class);
         ScreenSharing screenSharing = mock(ScreenSharing.class);
         ScreenSharingRequest request = mock(ScreenSharingRequest.class);
@@ -57,7 +57,7 @@ public class GliaScreenSharingRepositoryTest {
     @SuppressWarnings("unchecked")
     public void onScreenSharingAcceptedForOmnicore_callsOnScreenSharingRequestSuccess_whenNoException() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
-        GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
+        ScreenSharingController screenSharingCallback = mock(ScreenSharingController.class);
         OmnicoreEngagement engagement = mock(OmnicoreEngagement.class);
         ScreenSharing screenSharing = mock(ScreenSharing.class);
         ScreenSharingRequest request = mock(ScreenSharingRequest.class);
@@ -88,7 +88,7 @@ public class GliaScreenSharingRepositoryTest {
     @SuppressWarnings("unchecked")
     public void onScreenSharingAcceptedForOmnicore_callsOnScreenSharingRequestError_whenException() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
-        GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
+        ScreenSharingController screenSharingCallback = mock(ScreenSharingController.class);
         OmnicoreEngagement engagement = mock(OmnicoreEngagement.class);
         ScreenSharing screenSharing = mock(ScreenSharing.class);
         ScreenSharingRequest request = mock(ScreenSharingRequest.class);
@@ -127,7 +127,7 @@ public class GliaScreenSharingRepositoryTest {
     @SuppressWarnings("unchecked")
     public void init_callsOnScreenSharingRequestForOmnibrowse_whenRequested() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
-        GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
+        ScreenSharingController screenSharingCallback = mock(ScreenSharingController.class);
         OmnibrowseEngagement engagement = mock(OmnibrowseEngagement.class);
         ScreenSharing screenSharing = mock(ScreenSharing.class);
         ScreenSharingRequest request = mock(ScreenSharingRequest.class);
@@ -152,7 +152,7 @@ public class GliaScreenSharingRepositoryTest {
     @SuppressWarnings("unchecked")
     public void onScreenSharingAcceptedForOmnibrowse_callsOnScreenSharingRequestError_whenException() {
         GliaScreenSharingRepository subjectUnderTest = new GliaScreenSharingRepository(GLIA_CORE);
-        GliaScreenSharingCallback screenSharingCallback = mock(GliaScreenSharingCallback.class);
+        ScreenSharingController screenSharingCallback = mock(ScreenSharingController.class);
         OmnibrowseEngagement engagement = mock(OmnibrowseEngagement.class);
         ScreenSharing screenSharing = mock(ScreenSharing.class);
         ScreenSharingRequest request = mock(ScreenSharingRequest.class);

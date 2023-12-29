@@ -57,8 +57,49 @@ private const val MAX_IDLE_TIME = 3200
 private const val INACTIVITY_TIMER_TICKER_VALUE = 400
 private const val INACTIVITY_TIMER_DELAY_VALUE = 0
 private const val TAG = "CallController"
+internal interface CallController {
+    val confirmationDialogLinks: ConfirmationDialogLinks
 
-internal class CallController(
+    fun onBackClicked()
+    fun leaveChatClicked()
+    fun leaveChatQueueClicked()
+    fun chatButtonClicked()
+    fun onSpeakerButtonPressed()
+    fun minimizeButtonClicked()
+    fun muteButtonClicked()
+    fun videoButtonClicked()
+    fun startCall(
+        companyName: String,
+        queueId: String?,
+        visitorContextAssetId: String?,
+        mediaType: Engagement.MediaType,
+        useOverlays: Boolean,
+        screenSharingMode: ScreenSharing.Mode,
+        upgradeToCall: Boolean
+    )
+
+    fun onResume()
+    fun onPause()
+    fun setViewCallback(callViewCallback: CallViewCallback?)
+    fun onLiveObservationDialogRequested()
+    fun endEngagementDialogYesClicked()
+    fun endEngagementDialogDismissed()
+    fun notificationsDialogDismissed()
+    fun acceptUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer)
+    fun declineUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer)
+    fun noMoreOperatorsAvailableDismissed()
+    fun unexpectedErrorDialogDismissed()
+    fun onLiveObservationDialogAllowed()
+    fun onLiveObservationDialogRejected()
+    fun onLinkClicked(link: Link)
+    fun overlayPermissionsDialogDismissed()
+    fun onUserInteraction()
+    fun shouldShowMediaEngagementView(upgradeToCall: Boolean): Boolean
+    fun onDestroy(retained: Boolean)
+
+}
+
+internal class CallControllerImpl(
     private val sdkConfigurationManager: GliaSdkConfigurationManager,
     private val callTimer: TimeCounter,
     private var viewCallback: CallViewCallback?,
@@ -89,7 +130,7 @@ internal class CallController(
     private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase
-) {
+): CallController {
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
     private var callTimerStatusListener: FormattedTimerStatusListener? = null
@@ -132,7 +173,7 @@ internal class CallController(
         emitViewState(callState.engagementStarted())
     }
 
-    fun startCall(
+    override fun startCall(
         companyName: String,
         queueId: String?,
         visitorContextAssetId: String?,
@@ -196,26 +237,26 @@ internal class CallController(
         }
     }
 
-    fun onLiveObservationDialogRequested() {
+    override fun onLiveObservationDialogRequested() {
         if (isQueueingOrEngagementUseCase()) return
         viewCallback!!.showEngagementConfirmationDialog()
     }
 
-    val confirmationDialogLinks: ConfirmationDialogLinks
+    override val confirmationDialogLinks: ConfirmationDialogLinks
         get() = confirmationDialogLinksUseCase.invoke()
 
-    fun onLinkClicked(link: Link) {
+    override fun onLinkClicked(link: Link) {
         d(TAG, "onLinkClicked")
         viewCallback?.navigateToWebBrowserActivity(link.title, link.url)
     }
 
-    fun onLiveObservationDialogAllowed() {
+    override fun onLiveObservationDialogAllowed() {
         d(TAG, "onLiveObservationDialogAllowed")
         dialogController.dismissCurrentDialog()
         enqueueForEngagement(callState.queueId, callState.visitorContextAssetId, callState.requestedMediaType)
     }
 
-    fun onLiveObservationDialogRejected() {
+    override fun onLiveObservationDialogRejected() {
         d(TAG, "onLiveObservationDialogRejected")
         stop()
         dialogController.dismissDialogs()
@@ -225,7 +266,7 @@ internal class CallController(
         enqueueForEngagementUseCase(queueId, mediaType, visitorContextAssetId)
     }
 
-    fun onDestroy(retain: Boolean) {
+    override fun onDestroy(retain: Boolean) {
         d(TAG, "onDestroy, retain: $retain")
         viewCallback?.also {
             d(TAG, "destroyingView")
@@ -250,55 +291,55 @@ internal class CallController(
         }
     }
 
-    fun onPause() {
+    override fun onPause() {
         mediaUpgradeDisposable.clear()
     }
 
-    fun leaveChatClicked() {
+    override fun leaveChatClicked() {
         d(TAG, "leaveChatClicked")
         showExitChatDialog()
     }
 
-    fun setViewCallback(callViewCallback: CallViewCallback?) {
+    override fun setViewCallback(callViewCallback: CallViewCallback?) {
         d(TAG, "setViewCallback")
         viewCallback = callViewCallback
         viewCallback?.emitState(callState)
     }
 
-    fun endEngagementDialogYesClicked() {
+    override fun endEngagementDialogYesClicked() {
         d(TAG, "endEngagementDialogYesClicked")
         stop()
         dialogController.dismissDialogs()
     }
 
-    fun endEngagementDialogDismissed() {
+    override fun endEngagementDialogDismissed() {
         d(TAG, "endEngagementDialogDismissed")
         dialogController.dismissCurrentDialog()
     }
 
-    fun noMoreOperatorsAvailableDismissed() {
+    override fun noMoreOperatorsAvailableDismissed() {
         d(TAG, "noMoreOperatorsAvailableDismissed")
         stop()
         dialogController.dismissDialogs()
     }
 
-    fun unexpectedErrorDialogDismissed() {
+    override fun unexpectedErrorDialogDismissed() {
         d(TAG, "unexpectedErrorDialogDismissed")
         stop()
         dialogController.dismissDialogs()
     }
 
-    fun overlayPermissionsDialogDismissed() {
+    override fun overlayPermissionsDialogDismissed() {
         d(TAG, "overlayPermissionsDialogDismissed")
         dialogController.dismissCurrentDialog()
     }
 
-    fun leaveChatQueueClicked() {
+    override fun leaveChatQueueClicked() {
         d(TAG, "leaveChatQueueClicked")
         dialogController.showExitQueueDialog()
     }
 
-    fun onResume() {
+    override fun onResume() {
         d(TAG, "onResume\n")
         onResumeSetup()
     }
@@ -346,7 +387,7 @@ internal class CallController(
         }
     }
 
-    fun chatButtonClicked() {
+    override fun chatButtonClicked() {
         d(TAG, "chatButtonClicked")
         updateFromCallScreenUseCase.updateFromCallScreen(true)
         viewCallback?.navigateToChat()
@@ -354,39 +395,39 @@ internal class CallController(
         messagesNotSeenHandler.callChatButtonClicked()
     }
 
-    fun acceptUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer) {
+    override fun acceptUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer) {
         i(TAG, "Upgrade offer accepted by visitor")
         acceptMediaUpgradeOfferUseCase(mediaUpgradeOffer)
         dialogController.dismissCurrentDialog()
     }
 
-    fun declineUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer) {
+    override fun declineUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer) {
         i(TAG, "Upgrade offer declined by visitor")
         declineMediaUpgradeOfferUseCase(mediaUpgradeOffer)
         dialogController.dismissCurrentDialog()
     }
 
-    fun onUserInteraction() {
+    override fun onUserInteraction() {
         if (viewCallback == null) {
             return
         }
         showLandscapeControls()
     }
 
-    fun minimizeButtonClicked() {
+    override fun minimizeButtonClicked() {
         d(TAG, "minimizeButtonClicked")
         minimizeHandler.minimize()
     }
 
-    fun muteButtonClicked() {
+    override fun muteButtonClicked() {
         toggleVisitorAudioMediaStateUseCase()
     }
 
-    fun videoButtonClicked() {
+    override fun videoButtonClicked() {
         toggleVisitorVideoMediaStateUseCase()
     }
 
-    fun notificationsDialogDismissed() {
+    override fun notificationsDialogDismissed() {
         dialogController.dismissCurrentDialog()
     }
 
@@ -411,18 +452,18 @@ internal class CallController(
         }
     }
 
-    fun onSpeakerButtonPressed() {
+    override fun onSpeakerButtonPressed() {
         val newValue = !callState.isSpeakerOn
         d(TAG, "onSpeakerButtonPressed, new value: $newValue")
         emitViewState(callState.speakerValueChanged(newValue))
         turnSpeakerphoneUseCase.invoke(newValue)
     }
 
-    fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean): Boolean {
+    override fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean): Boolean {
         return shouldShowMediaEngagementViewUseCase.execute(isUpgradeToCall)
     }
 
-    fun onBackClicked() {
+    override fun onBackClicked() {
         updateFromCallScreenUseCase.updateFromCallScreen(false)
     }
 
@@ -561,7 +602,7 @@ internal class CallController(
         when (state) {
             StartedCallVisualizer, StartedOmniCore -> newEngagementLoaded()
             is State.Update -> handleEngagementStateUpdate(state.updateState)
-            is State.QueueUnstaffed , is State.UnexpectedErrorHappened -> {
+            is State.QueueUnstaffed, is State.UnexpectedErrorHappened -> {
                 emitViewState(callState.changeVisibility(false))
             }
 

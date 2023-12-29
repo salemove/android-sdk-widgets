@@ -13,31 +13,32 @@ import android.net.Uri;
 
 import com.glia.widgets.chat.ChatType;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
-import com.glia.widgets.core.engagement.GliaEngagementRepository;
 import com.glia.widgets.core.engagement.exception.EngagementMissingException;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingException;
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException;
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
+import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class AddFileToAttachmentAndUploadUseCaseTest {
 
-    private GliaEngagementRepository gliaEngagementRepository;
     private FileAttachmentRepository fileAttachmentRepository;
     private AddFileToAttachmentAndUploadUseCase subjectUnderTest;
     private GliaEngagementConfigRepository gliaEngagementConfigRepository;
 
+    private IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
+
     @Before
     public void setUp() {
-        gliaEngagementRepository = mock(GliaEngagementRepository.class);
+        isQueueingOrEngagementUseCase = mock(IsQueueingOrEngagementUseCase.class);
         fileAttachmentRepository = mock(FileAttachmentRepository.class);
         gliaEngagementConfigRepository = mock(GliaEngagementConfigRepository.class);
         subjectUnderTest = new AddFileToAttachmentAndUploadUseCase(
-                gliaEngagementRepository,
+                isQueueingOrEngagementUseCase,
                 fileAttachmentRepository,
                 gliaEngagementConfigRepository
         );
@@ -65,7 +66,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(false);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(false);
 
         subjectUnderTest.execute(fileAttachment, listener);
 
@@ -81,7 +82,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(SUPPORTED_FILE_COUNT + 1);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
 
         subjectUnderTest.execute(fileAttachment, listener);
 
@@ -97,7 +98,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
         when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE);
 
         subjectUnderTest.execute(fileAttachment, listener);
@@ -114,7 +115,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
         when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);
 
         subjectUnderTest.execute(fileAttachment, listener);
@@ -128,7 +129,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
 
         subjectUnderTest.execute(null, listener);
     }
@@ -138,7 +139,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         FileAttachment fileAttachment = mock(FileAttachment.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(true);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(true);
 
         subjectUnderTest.execute(fileAttachment, null);
     }
@@ -151,7 +152,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(false);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(false);
 
         subjectUnderTest.execute(fileAttachment, listener);
 
@@ -166,7 +167,7 @@ public class AddFileToAttachmentAndUploadUseCaseTest {
         AddFileToAttachmentAndUploadUseCase.Listener listener =
                 mock(AddFileToAttachmentAndUploadUseCase.Listener.class);
         when(fileAttachmentRepository.isFileAttached(any())).thenReturn(false);
-        when(gliaEngagementRepository.hasOngoingEngagement()).thenReturn(false);
+        when(isQueueingOrEngagementUseCase.getHasOngoingEngagement()).thenReturn(false);
         when(gliaEngagementConfigRepository.getChatType()).thenReturn(ChatType.SECURE_MESSAGING);
         when(fileAttachmentRepository.getAttachedFilesCount()).thenReturn(1L);
         when(fileAttachment.getSize()).thenReturn(SUPPORTED_FILE_SIZE - 1);

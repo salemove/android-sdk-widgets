@@ -15,7 +15,7 @@ import com.glia.androidsdk.screensharing.LocalScreen;
 import com.glia.androidsdk.screensharing.ScreenSharing;
 import com.glia.androidsdk.screensharing.ScreenSharingRequest;
 import com.glia.androidsdk.screensharing.VisitorScreenSharingState;
-import com.glia.widgets.core.screensharing.GliaScreenSharingCallback;
+import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.di.GliaCore;
 import com.glia.widgets.helper.Logger;
 
@@ -23,58 +23,58 @@ import java.util.function.Consumer;
 
 public class GliaScreenSharingRepository {
 
+    public static final int SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995;
+    private static final String TAG = GliaScreenSharingRepository.class.getSimpleName();
+    private static final int UNIQUE_RESULT_CODE = 0x1994;
     private final GliaCore gliaCore;
-    private GliaScreenSharingCallback callback = null;
-
+    private ScreenSharingController screenSharingController = null;
+    private final Consumer<GliaException> exceptionConsumer = this::onScreenSharingRequestHandled;
+    private LocalScreen currentScreen = null;
+    private ScreenSharingRequest screenSharingRequest = null;
+    private final Consumer<ScreenSharingRequest> screenSharingRequestConsumer = this::onScreenSharingRequest;
+    private ScreenSharing.Status screenSharingStatus = NOT_SHARING;
+    private final Consumer<VisitorScreenSharingState> visitorScreenSharingStateConsumer = this::onVisitorScreenSharingStateChanged;
     // Consumers
     private final Consumer<OmnicoreEngagement> omnicoreEngagementConsumer = this::onEngagement;
     private final Consumer<OmnibrowseEngagement> omnibrowseEngagementConsumer = this::onEngagement;
-    private final Consumer<ScreenSharingRequest> screenSharingRequestConsumer = this::onScreenSharingRequest;
-    private final Consumer<VisitorScreenSharingState> visitorScreenSharingStateConsumer = this::onVisitorScreenSharingStateChanged;
-    private final Consumer<GliaException> exceptionConsumer = this::onScreenSharingRequestHandled;
-
-    private LocalScreen currentScreen = null;
-    private ScreenSharingRequest screenSharingRequest = null;
-    private ScreenSharing.Status screenSharingStatus = NOT_SHARING;
-
-    public static final int SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995;
 
     public GliaScreenSharingRepository(GliaCore gliaCore) {
         this.gliaCore = gliaCore;
     }
 
-    public void init(GliaScreenSharingCallback gliaScreenSharingCallback) {
+    public void init(ScreenSharingController screenSharingController) {
         Logger.d(TAG, "init screen sharing repository");
 
-        this.callback = gliaScreenSharingCallback;
+        this.screenSharingController = screenSharingController;
+        //TODO move this to engagement repository
         gliaCore.on(Glia.Events.ENGAGEMENT, omnicoreEngagementConsumer);
         gliaCore.getCallVisualizer().on(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagementConsumer);
     }
 
     public void onScreenSharingAccepted(
-            Activity activity,
-            ScreenSharing.Mode screenSharingMode
+        Activity activity,
+        ScreenSharing.Mode screenSharingMode
     ) {
         Logger.i(TAG, "Screen sharing accepted by visitor");
         screenSharingRequest.accept(
-                screenSharingMode,
-                activity,
-                UNIQUE_RESULT_CODE,
-                exceptionConsumer
+            screenSharingMode,
+            activity,
+            UNIQUE_RESULT_CODE,
+            exceptionConsumer
         );
     }
 
     public void onScreenSharingAcceptedAndPermissionAsked(
-            Activity activity,
-            ScreenSharing.Mode screenSharingMode
+        Activity activity,
+        ScreenSharing.Mode screenSharingMode
     ) {
         Logger.i(TAG, "Screen sharing accepted by visitor, permission asked");
 
         screenSharingRequest.accept(
-                screenSharingMode,
-                activity,
-                SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE,
-                exceptionConsumer
+            screenSharingMode,
+            activity,
+            SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE,
+            exceptionConsumer
         );
     }
 
@@ -103,21 +103,21 @@ public class GliaScreenSharingRepository {
     }
 
     public void onDestroy() {
-        gliaCore.getCurrentEngagement().ifPresent(engagement -> {
+        gliaCore.getCurrentEngagement().ifPresent(engagement -> {//TODO move this to engagement repository
             engagement.getScreenSharing().off(
-                    ScreenSharing.Events.SCREEN_SHARING_REQUEST,
-                    screenSharingRequestConsumer
+                ScreenSharing.Events.SCREEN_SHARING_REQUEST,
+                screenSharingRequestConsumer
             );
             engagement.getScreenSharing().off(
-                    ScreenSharing.Events.VISITOR_STATE,
-                    visitorScreenSharingStateConsumer
+                ScreenSharing.Events.VISITOR_STATE,
+                visitorScreenSharingStateConsumer
             );
         });
     }
 
     private void onEngagement(Engagement engagement) {
         Logger.d(TAG, "init screen sharing");
-
+//TODO move this to engagement repository
         engagement.getScreenSharing().on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, screenSharingRequestConsumer);
         engagement.getScreenSharing().on(ScreenSharing.Events.VISITOR_STATE, visitorScreenSharingStateConsumer);
     }
@@ -126,19 +126,19 @@ public class GliaScreenSharingRepository {
         Logger.d(TAG, "screen sharing requested event");
 
         screenSharingRequest = currentScreenSharingRequest;
-        callback.onScreenSharingRequest();
+        screenSharingController.onScreenSharingRequest();
     }
 
     private void onVisitorScreenSharingStateChanged(VisitorScreenSharingState state) {
         Logger.d(TAG, "onVisitorScreenSharingStateChanged " + state.getStatus());
 
         if (state.getStatus() == SHARING &&
-                screenSharingStatus != SHARING) {
+            screenSharingStatus != SHARING) {
             onScreenSharingStarted(state.getLocalScreen());
         }
 
         if (state.getStatus() == NOT_SHARING &&
-                screenSharingStatus != NOT_SHARING) {
+            screenSharingStatus != NOT_SHARING) {
             onScreenSharingEnded();
         }
 
@@ -149,14 +149,14 @@ public class GliaScreenSharingRepository {
         Logger.i(TAG, "Screen sharing started");
 
         currentScreen = screen;
-        callback.onScreenSharingStarted();
+        screenSharingController.onScreenSharingStarted();
     }
 
     private void onScreenSharingEnded() {
         Logger.i(TAG, "Screen sharing ended");
 
         currentScreen = null;
-        callback.onScreenSharingEnded();
+        screenSharingController.onScreenSharingEnded();
     }
 
     private void onScreenSharingRequestHandled(GliaException error) {
@@ -165,12 +165,9 @@ public class GliaScreenSharingRepository {
         if (error != null) {
             Logger.e(TAG, error.debugMessage);
 
-            callback.onScreenSharingRequestError(error);
+            screenSharingController.onScreenSharingRequestError(error);
         } else {
-            callback.onScreenSharingRequestSuccess();
+            screenSharingController.onScreenSharingRequestSuccess();
         }
     }
-
-    private static final String TAG = GliaScreenSharingRepository.class.getSimpleName();
-    private static final int UNIQUE_RESULT_CODE = 0x1994;
 }

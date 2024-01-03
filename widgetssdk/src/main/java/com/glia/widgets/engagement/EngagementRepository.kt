@@ -1,10 +1,13 @@
 package com.glia.widgets.engagement
 
+import android.app.Activity
+import android.content.Intent
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.IncomingEngagementRequest
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.screensharing.ScreenSharing.Mode
 import com.glia.widgets.helper.Data
 import io.reactivex.Flowable
 
@@ -21,6 +24,7 @@ internal interface EngagementRepository {
     val onHoldState: Flowable<Boolean>
     val operatorMediaState: Flowable<Data<MediaState>>
     val operatorCurrentMediaState: MediaState?
+    val screenSharingState: Flowable<ScreenSharingState>
 
     val isQueueingOrEngagement: Boolean
     val hasOngoingEngagement: Boolean
@@ -28,6 +32,7 @@ internal interface EngagementRepository {
     val isQueueingForMedia: Boolean
     val isCallVisualizerEngagement: Boolean
     val isOperatorPresent: Boolean
+    val isSharingScreen: Boolean
 
     fun initialize()
     fun reset()
@@ -43,4 +48,10 @@ internal interface EngagementRepository {
     fun unMuteVisitorAudio()
     fun pauseVisitorVideo()
     fun resumeVisitorVideo()
+    fun endScreenSharing()
+    fun declineScreenSharingRequest()
+    fun acceptScreenSharingRequest(activity: Activity, mode: Mode)
+    fun acceptScreenSharingWithAskedPermission(activity: Activity, mode: Mode)
+    fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?)
+    fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?)
 }

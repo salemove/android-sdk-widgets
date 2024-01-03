@@ -149,7 +149,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         cleanup()
         resetMocks()
 
-        controller.screenSharingViewCallback?.onScreenSharingRequestError(GliaException("message", GliaException.Cause.INTERNAL_ERROR))
+        controller.screenSharingViewCallback?.onScreenSharingRequestError("message")
         verify(watcher).showToast("message")
     }
 

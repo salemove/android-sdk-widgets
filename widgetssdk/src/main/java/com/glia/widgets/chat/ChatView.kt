@@ -32,7 +32,6 @@ import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
@@ -127,9 +126,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var dialogCallback: DialogController.Callback? = null
     private var dialogController: DialogController? = null
     private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-        override fun onScreenSharingRequestError(ex: GliaException) {
-            showToast(ex.debugMessage)
-        }
+        override fun onScreenSharingRequestError(message: String) = showToast(message)
 
         override fun onScreenSharingRequestSuccess() {
             Handler(Looper.getMainLooper()).post { binding.appBarView.showEndScreenSharingButton() }

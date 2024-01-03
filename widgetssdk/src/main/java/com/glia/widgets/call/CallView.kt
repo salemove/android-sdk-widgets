@@ -21,7 +21,6 @@ import androidx.core.view.isVisible
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.engagement.Survey
@@ -89,9 +88,7 @@ internal class CallView(
     }
 
     private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-        override fun onScreenSharingRequestError(ex: GliaException) {
-            showToast(ex.debugMessage)
-        }
+        override fun onScreenSharingRequestError(message: String) = showToast(message)
 
         override fun onScreenSharingRequestSuccess() {
             post { appBar.showEndScreenSharingButton() }

@@ -195,7 +195,7 @@ public class GliaWidgets {
      */
     public static void onActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.d(TAG, "onActivityResult");
-        Dependencies.glia().getCurrentEngagement().ifPresent(engagement -> engagement.onActivityResult(requestCode, resultCode, data));
+        Dependencies.getRepositoryFactory().getEngagementRepository().onActivityResult(requestCode, resultCode, data);
     }
 
     /**

@@ -117,6 +117,7 @@ import com.glia.widgets.engagement.MediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.OperatorMediaUseCase;
 import com.glia.widgets.engagement.OperatorTypingUseCase;
 import com.glia.widgets.engagement.ReleaseResourcesUseCase;
+import com.glia.widgets.engagement.ScreenSharingUseCase;
 import com.glia.widgets.engagement.SurveyUseCase;
 import com.glia.widgets.engagement.ToggleVisitorAudioMediaStateUseCase;
 import com.glia.widgets.engagement.ToggleVisitorVideoMediaStateUseCase;
@@ -208,7 +209,7 @@ public class UseCaseFactory {
             toggleChatHeadServiceUseCase = new ToggleChatHeadServiceUseCase(
                 getIsQueueingOrEngagementUseCase(),
                 getIsCurrentEngagementCallVisualizer(),
-                repositoryFactory.getGliaScreenSharingRepository(),
+                getScreenSharingUseCase(),
                 chatHeadManager,
                 permissionManager,
                 gliaSdkConfigurationManager,
@@ -224,7 +225,7 @@ public class UseCaseFactory {
             isDisplayApplicationChatHeadUseCase = new IsDisplayApplicationChatHeadUseCase(
                 getIsQueueingOrEngagementUseCase(),
                 getIsCurrentEngagementCallVisualizer(),
-                repositoryFactory.getGliaScreenSharingRepository(),
+                getScreenSharingUseCase(),
                 permissionManager,
                 gliaSdkConfigurationManager,
                 getEngagementTypeUseCase()
@@ -945,6 +946,11 @@ public class UseCaseFactory {
     @NonNull
     public EngagementCompletionUseCase getEngagementCompletionUseCase() {
         return new EngagementCompletionUseCase(getEngagementStateUseCase(), getSurveyUseCase());
+    }
+
+    @NonNull
+    public ScreenSharingUseCase getScreenSharingUseCase() {
+        return new ScreenSharingUseCase(repositoryFactory.getEngagementRepository());
     }
 
 }

@@ -18,7 +18,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import com.glia.androidsdk.Glia
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseActivityWatcher
@@ -28,7 +27,6 @@ import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.P
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.openNotificationChannelScreen
-import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
@@ -166,13 +164,7 @@ internal class ActivityWatcherForCallVisualizer(
             Logger.d(TAG, "Acquire a media projection token: result received")
             if (result.resultCode == RESULT_OK && result.data != null) {
                 Logger.d(TAG, "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK")
-                Glia.getCurrentEngagement().ifPresent { engagement ->
-                    engagement.onActivityResult( // Requires MediaProjectionService running already
-                        GliaScreenSharingRepository.SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE,
-                        result.resultCode,
-                        result.data
-                    )
-                }
+                controller.mediaProjectionOnActivityResultSkipPermissionRequest(result.resultCode, result.data) // Requires MediaProjectionService running already
             } else if (result.resultCode == RESULT_CANCELED) {
                 Logger.d(TAG, "Acquire a media projection token: RESULT_CANCELED")
                 // Visitor rejected system permission required for screen sharing

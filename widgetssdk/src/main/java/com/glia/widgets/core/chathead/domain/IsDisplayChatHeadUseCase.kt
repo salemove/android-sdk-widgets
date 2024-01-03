@@ -5,17 +5,17 @@ import com.glia.widgets.callvisualizer.EndScreenSharingView
 import com.glia.widgets.chat.ChatView
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.engagement.EngagementTypeUseCase
 import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.ScreenSharingUseCase
 import com.glia.widgets.filepreview.ui.FilePreviewView
 import com.glia.widgets.messagecenter.MessageCenterView
 
 internal abstract class IsDisplayChatHeadUseCase(
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
-    private val screenSharingRepository: GliaScreenSharingRepository,
+    private val screenSharingUseCase: ScreenSharingUseCase,
     val permissionManager: PermissionManager,
     private val configurationManager: GliaSdkConfigurationManager,
     private val engagementTypeUseCase: EngagementTypeUseCase
@@ -37,7 +37,7 @@ internal abstract class IsDisplayChatHeadUseCase(
     }
 
     private fun isCallVisualizerScreenSharing(viewName: String?): Boolean {
-        return isCurrentEngagementCallVisualizerUseCase() && screenSharingRepository.isSharingScreen && isNotInListOfGliaViews(viewName)
+        return isCurrentEngagementCallVisualizerUseCase() && screenSharingUseCase.isSharing && isNotInListOfGliaViews(viewName)
     }
 
     private fun isShowForMediaEngagement(viewName: String?): Boolean {

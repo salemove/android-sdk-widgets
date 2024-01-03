@@ -1,6 +1,5 @@
 package com.glia.widgets.callvisualizer.controller
 
-import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
@@ -17,6 +16,7 @@ import com.glia.widgets.engagement.State
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.formattedName
+import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.Flowable
 
 internal class CallVisualizerController(
@@ -38,16 +38,12 @@ internal class CallVisualizerController(
 
     private var visitorContextAssetId: String? = null
 
-    fun init() {
-        Logger.d(TAG, "CallVisualizerController initialized")
+    init {
         registerCallVisualizerListeners()
     }
 
-    @SuppressLint("CheckResult")
     private fun registerCallVisualizerListeners() {
-        mediaUpgradeOfferUseCase().withLatestFrom(currentOperatorUseCase()) { offer, operator ->
-            offer to operator.formattedName
-        }.subscribe {
+        mediaUpgradeOfferUseCase().withLatestFrom(currentOperatorUseCase()) { offer, operator -> offer to operator.formattedName }.unSafeSubscribe {
             Logger.d(TAG, "upgradeOfferConsumer, offer: ${it.first}")
             if (it.first.video == MediaDirection.TWO_WAY) {
                 onTwoWayMediaUpgradeRequest(it.first, it.second)
@@ -55,7 +51,7 @@ internal class CallVisualizerController(
                 onOneWayMediaUpgradeRequest(it.first, it.second)
             }
         }
-        engagementRequestUseCase().subscribe { onEngagementRequested() }
+        engagementRequestUseCase().unSafeSubscribe { onEngagementRequested() }
     }
 
     fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer) {

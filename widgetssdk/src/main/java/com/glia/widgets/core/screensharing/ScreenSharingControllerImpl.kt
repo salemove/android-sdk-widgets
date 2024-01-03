@@ -1,19 +1,21 @@
 package com.glia.widgets.core.screensharing
 
 import android.app.Activity
+import android.content.Intent
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.GliaException
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
-import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
+import com.glia.widgets.engagement.ScreenSharingState
+import com.glia.widgets.engagement.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.unSafeSubscribe
 
 internal class ScreenSharingControllerImpl(
-    private val repository: GliaScreenSharingRepository,
+    private val screenSharingUseCase: ScreenSharingUseCase,
     private val dialogController: DialogController,
     private val showScreenSharingNotificationUseCase: ShowScreenSharingNotificationUseCase,
     private val removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase,
@@ -27,14 +29,22 @@ internal class ScreenSharingControllerImpl(
     @VisibleForTesting
     var hasPendingScreenSharingRequest = false
 
-    override fun init() {
-        repository.init(this)
+    init {
+        screenSharingUseCase().unSafeSubscribe {
+            when (it) {
+                ScreenSharingState.Ended -> onScreenSharingEnded()
+                is ScreenSharingState.FailedToAcceptRequest -> onScreenSharingRequestError(it.message)
+                ScreenSharingState.RequestAccepted -> onScreenSharingRequestSuccess()
+                ScreenSharingState.Requested -> onScreenSharingRequest()
+                ScreenSharingState.Started -> onScreenSharingStarted()
+                ScreenSharingState.RequestDeclined -> Logger.d(TAG, "Screen sharing request declined")
+            }
+        }
     }
 
-    override fun onScreenSharingRequest() {
-        Logger.d(TAG, "on screen sharing request")
+    fun onScreenSharingRequest() {
         if (viewCallbacks.isNotEmpty()) {
-            if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
+            if (!hasScreenSharingNotificationChannelEnabledUseCase()) {
                 hasPendingScreenSharingRequest = true
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
@@ -43,31 +53,27 @@ internal class ScreenSharingControllerImpl(
         }
     }
 
-    override fun onScreenSharingStarted() {
-        Logger.d(TAG, "screen sharing started")
+    private fun onScreenSharingStarted() {
         viewCallbacks.forEach { it.onScreenSharingStarted() }
     }
 
-    override fun onScreenSharingEnded() {
-        Logger.d(TAG, "screen sharing ended")
+    private fun onScreenSharingEnded() {
         viewCallbacks.forEach { it.onScreenSharingEnded() }
     }
 
-    override fun onScreenSharingRequestError(exception: GliaException) {
-        Logger.e(TAG, "screen sharing request error: " + exception.message)
-        viewCallbacks.forEach { it.onScreenSharingRequestError(exception) }
+    fun onScreenSharingRequestError(message: String) {
+        viewCallbacks.forEach { it.onScreenSharingRequestError(message) }
         hideScreenSharingEnabledNotification()
     }
 
-    override fun onScreenSharingRequestSuccess() {
-        Logger.d(TAG, "screen sharing request success")
+    private fun onScreenSharingRequestSuccess() {
         viewCallbacks.forEach { it.onScreenSharingRequestSuccess() }
     }
 
     override fun onResume(activity: Activity, requestScreenSharingCallback: (() -> Unit)?) {
         // spam all the time otherwise no way to end screen sharing
         if (hasPendingScreenSharingRequest) {
-            if (!hasScreenSharingNotificationChannelEnabledUseCase.invoke()) {
+            if (!hasScreenSharingNotificationChannelEnabledUseCase()) {
                 if (dialogController.isEnableScreenSharingNotificationsAndStartSharingDialogShown) {
                     // Do not need to request dialog again if this dialog is already shown.
                     //
@@ -86,22 +92,14 @@ internal class ScreenSharingControllerImpl(
         }
     }
 
-    fun onDestroy() {
-        Logger.d(TAG, "onDestroy")
-        repository.onDestroy()
-    }
-
     override val isSharingScreen: Boolean
-        get() = repository.isSharingScreen
+        get() = screenSharingUseCase.isSharing
 
     override fun onScreenSharingAccepted(activity: Activity) {
         Logger.d(TAG, "onScreenSharingAccepted")
         dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
-        repository.onScreenSharingAccepted(
-            activity,
-            gliaSdkConfigurationManager.screenSharingMode
-        )
+        screenSharingUseCase.acceptRequest(activity, gliaSdkConfigurationManager.screenSharingMode)
         hasPendingScreenSharingRequest = false
     }
 
@@ -109,28 +107,29 @@ internal class ScreenSharingControllerImpl(
         Logger.d(TAG, "onScreenSharingAcceptedAndPermissionAsked")
         dialogController.dismissCurrentDialog()
         showScreenSharingEnabledNotification()
-        repository.onScreenSharingAcceptedAndPermissionAsked(
-            activity,
-            gliaSdkConfigurationManager.screenSharingMode
-        )
+        screenSharingUseCase.acceptRequestWithAskedPermission(activity, gliaSdkConfigurationManager.screenSharingMode)
         hasPendingScreenSharingRequest = false
     }
 
     override fun onScreenSharingDeclined() {
         Logger.d(TAG, "onScreenSharingDeclined")
         dialogController.dismissCurrentDialog()
-        repository.onScreenSharingDeclined()
+        screenSharingUseCase.declineRequest()
         hasPendingScreenSharingRequest = false
         hideScreenSharingEnabledNotification()
     }
 
     override fun onScreenSharingNotificationEndPressed() {
         hideScreenSharingEnabledNotification()
-        repository.onEndScreenSharing()
+        screenSharingUseCase.end()
+    }
+
+    override fun onActivityResultSkipPermissionRequest(resultCode: Int, data: Intent?) {
+        screenSharingUseCase.onActivityResultSkipPermissionRequest(resultCode, data)
     }
 
     override fun setViewCallback(callback: ScreenSharingController.ViewCallback?) {
-        callback?.run { viewCallbacks.add(this) }
+        callback?.run(viewCallbacks::add)
     }
 
     override fun removeViewCallback(callback: ScreenSharingController.ViewCallback?) {
@@ -146,7 +145,7 @@ internal class ScreenSharingControllerImpl(
     }
 
     override fun onForceStopScreenSharing() {
-        repository.forceEndScreenSharing()
+        screenSharingUseCase.end()
         removeScreenSharingNotificationUseCase()
     }
 }

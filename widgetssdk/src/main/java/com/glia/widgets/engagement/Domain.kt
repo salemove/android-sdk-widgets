@@ -1,10 +1,13 @@
 package com.glia.widgets.engagement
 
+import android.app.Activity
+import android.content.Intent
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Operator
 import com.glia.androidsdk.comms.Media
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
@@ -149,6 +152,18 @@ internal class ToggleVisitorVideoMediaStateUseCase(private val repository: Engag
             Media.Status.DISCONNECTED -> Logger.d(TAG, "Visitor Video is disconnected")
         }
     }
+}
+
+internal class ScreenSharingUseCase(private val engagementRepository: EngagementRepository) {
+    val isSharing: Boolean get() = engagementRepository.isSharingScreen
+    operator fun invoke(): Flowable<ScreenSharingState> = engagementRepository.screenSharingState
+
+    fun end() = engagementRepository.endScreenSharing()
+    fun declineRequest() = engagementRepository.declineScreenSharingRequest()
+    fun acceptRequest(activity: Activity, mode: ScreenSharing.Mode) = engagementRepository.acceptScreenSharingRequest(activity, mode)
+    fun acceptRequestWithAskedPermission(activity: Activity, mode: ScreenSharing.Mode) =
+        engagementRepository.acceptScreenSharingWithAskedPermission(activity, mode)
+    fun onActivityResultSkipPermissionRequest(resultCode: Int, intent: Intent?) = engagementRepository.onActivityResultSkipScreenSharingPermissionRequest(resultCode, intent)
 }
 
 internal class EngagementTypeUseCase(

@@ -1,18 +1,12 @@
 package com.glia.widgets.core.screensharing
 
 import android.app.Activity
-import com.glia.androidsdk.GliaException
+import android.content.Intent
 
 internal interface ScreenSharingController {
     val isSharingScreen: Boolean
-    fun onScreenSharingRequest()
-    fun onScreenSharingStarted()
-    fun onScreenSharingEnded()
-    fun onScreenSharingRequestError(exception: GliaException)
-    fun onScreenSharingRequestSuccess()
     fun onForceStopScreenSharing()
     fun hideScreenSharingEnabledNotification()
-    fun init()
     fun onResume(activity: Activity, requestScreenSharingCallback: (() -> Unit)? = null)
     fun onScreenSharingDeclined()
     fun setViewCallback(screenSharingViewCallback: ViewCallback?)
@@ -20,9 +14,10 @@ internal interface ScreenSharingController {
     fun onScreenSharingAcceptedAndPermissionAsked(activity: Activity)
     fun onScreenSharingAccepted(activity: Activity)
     fun onScreenSharingNotificationEndPressed()
+    fun onActivityResultSkipPermissionRequest(resultCode: Int, data: Intent?)
 
     interface ViewCallback {
-        fun onScreenSharingRequestError(ex: GliaException) {
+        fun onScreenSharingRequestError(message: String) {
             /* The function is an intentionally-blank to make it optional for implementation */
         }
 

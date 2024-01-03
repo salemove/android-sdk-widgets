@@ -3,17 +3,17 @@ package com.glia.widgets.core.chathead.domain
 import com.glia.widgets.core.chathead.ChatHeadManager
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.engagement.EngagementTypeUseCase
 import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
 internal class ToggleChatHeadServiceUseCase(
     isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase,
-    screenSharingRepository: GliaScreenSharingRepository,
+    screenSharingUseCase: ScreenSharingUseCase,
     private val chatHeadManager: ChatHeadManager,
     permissionManager: PermissionManager,
     configurationManager: GliaSdkConfigurationManager,
@@ -21,7 +21,7 @@ internal class ToggleChatHeadServiceUseCase(
 ) : IsDisplayChatHeadUseCase(
     isQueueingOrEngagementUseCase,
     isCurrentEngagementCallVisualizerUseCase,
-    screenSharingRepository,
+    screenSharingUseCase,
     permissionManager,
     configurationManager,
     engagementTypeUseCase

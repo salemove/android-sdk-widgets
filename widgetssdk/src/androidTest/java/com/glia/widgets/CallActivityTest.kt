@@ -18,10 +18,8 @@ import com.glia.widgets.call.CallStatus
 import com.glia.widgets.call.CallViewCallback
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.screensharing.ScreenSharingController
-import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.di.RepositoryFactory
 import com.glia.widgets.helper.ResourceProvider
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import com.glia.widgets.view.head.ChatHeadContract
@@ -89,15 +87,6 @@ class CallActivityTest {
         // set up StringProvider
         val stringProvider: StringProvider = AndroidTestStringProvider(appContext)
         Dependencies.setStringProvider(stringProvider)
-
-        val screenSharingRepository: GliaScreenSharingRepository = mockk(relaxed = true) {
-            every { isSharingScreen } returns true
-        }
-        val repositoryFactory: RepositoryFactory = mockk(relaxed = true) {
-            every { gliaScreenSharingRepository } returns screenSharingRepository
-        }
-
-        Dependencies.setRepositoryFactory(repositoryFactory)
 
         callStatus = mockk(relaxed = true)
         every { callStatus.formattedOperatorName } answers { "FormattedOperatorName" }

@@ -7,7 +7,6 @@ import android.media.projection.MediaProjectionManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
@@ -198,6 +197,10 @@ internal class ActivityWatcherForCallVisualizerController(
         screenSharingController.setViewCallback(screenSharingViewCallback)
     }
 
+    override fun mediaProjectionOnActivityResultSkipPermissionRequest(resultCode: Int, data: Intent?) {
+        screenSharingController.onActivityResultSkipPermissionRequest(resultCode, data)
+    }
+
     private fun removeScreenSharingCallback() {
         screenSharingController.removeViewCallback(screenSharingViewCallback)
     }
@@ -227,9 +230,7 @@ internal class ActivityWatcherForCallVisualizerController(
     @VisibleForTesting
     internal fun setupScreenSharingViewCallback() {
         screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
-            override fun onScreenSharingRequestError(ex: GliaException) {
-                watcher.showToast(ex.debugMessage)
-            }
+            override fun onScreenSharingRequestError(message: String) = watcher.showToast(message)
 
             override fun onScreenSharingStarted() {
                 if (isShowOverlayPermissionRequestDialogUseCase.execute()) {

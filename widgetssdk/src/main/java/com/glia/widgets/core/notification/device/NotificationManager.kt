@@ -7,14 +7,12 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.glia.widgets.R
-import com.glia.widgets.StringProvider
 import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.NotificationRemovalService
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.core.screensharing.MediaProjectionService
 
-internal class NotificationManager(private val applicationContext: Application, private val stringProvider: StringProvider) :
-    INotificationManager {
+internal class NotificationManager(private val applicationContext: Application) : INotificationManager {
     private val notificationManager: NotificationManager by lazy {
         applicationContext.getSystemService(NotificationManager::class.java)
     }
@@ -77,16 +75,12 @@ internal class NotificationManager(private val applicationContext: Application, 
     }
 
     private fun startNotificationRemovalService() {
-        applicationContext.startService(
-            Intent(applicationContext, NotificationRemovalService::class.java)
-        )
+        applicationContext.startService(Intent(applicationContext, NotificationRemovalService::class.java))
     }
 
     override fun removeCallNotification() {
         notificationManager.cancel(NotificationFactory.CALL_NOTIFICATION_ID)
-        applicationContext.stopService(
-            Intent(applicationContext, NotificationRemovalService::class.java)
-        )
+        applicationContext.stopService(Intent(applicationContext, NotificationRemovalService::class.java))
     }
 
     /**
@@ -94,9 +88,7 @@ internal class NotificationManager(private val applicationContext: Application, 
      */
     override fun showScreenSharingNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            applicationContext.startForegroundService(
-                Intent(applicationContext, MediaProjectionService::class.java)
-            )
+            applicationContext.startForegroundService(Intent(applicationContext, MediaProjectionService::class.java))
         } else {
             notificationManager.notify(
                 NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID,
@@ -107,17 +99,11 @@ internal class NotificationManager(private val applicationContext: Application, 
 
     override fun removeScreenSharingNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            applicationContext.stopService(
-                Intent(
-                    applicationContext,
-                    MediaProjectionService::class.java
-                )
-            )
+            applicationContext.stopService(Intent(applicationContext, MediaProjectionService::class.java))
         } else {
             notificationManager.cancel(NotificationFactory.SCREEN_SHARING_NOTIFICATION_ID)
         }
     }
 
-    private fun areNotificationsEnabledForChannel(id: String) =
-        applicationContext.areNotificationsEnabledForChannel(id)
+    private fun areNotificationsEnabledForChannel(id: String) = applicationContext.areNotificationsEnabledForChannel(id)
 }

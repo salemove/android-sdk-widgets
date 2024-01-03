@@ -192,7 +192,7 @@ public class ControllerFactory {
         if (retainedScreenSharingController == null) {
             Logger.d(TAG, "new screen sharing controller");
             retainedScreenSharingController = new ScreenSharingControllerImpl(
-                repositoryFactory.getGliaScreenSharingRepository(),
+                useCaseFactory.getScreenSharingUseCase(),
                 dialogController,
                 useCaseFactory.createShowScreenSharingNotificationUseCase(),
                 useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
@@ -240,8 +240,6 @@ public class ControllerFactory {
 
     public void init() {
         messagesNotSeenHandler.init();
-        getCallVisualizerController().init();
-        getScreenSharingController().init();
         getActivityWatcherForChatHeadController().init();
     }
 

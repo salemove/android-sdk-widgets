@@ -6,8 +6,8 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.dialog.model.Link
 
 internal class ActivityWatcherForCallVisualizerContract {
 
@@ -31,6 +31,7 @@ internal class ActivityWatcherForCallVisualizerContract {
         fun isWaitingMediaProjectionResult(): Boolean
         fun setIsWaitingMediaProjectionResult(isWaiting: Boolean)
         fun addScreenSharingCallback(activity: Activity)
+        fun mediaProjectionOnActivityResultSkipPermissionRequest(resultCode: Int, data: Intent?)
     }
 
     interface Watcher {

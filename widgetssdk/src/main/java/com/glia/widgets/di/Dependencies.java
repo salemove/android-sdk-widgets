@@ -54,7 +54,7 @@ public class Dependencies {
         schedulers = new GliaWidgetsSchedulers();
         resourceProvider = new ResourceProvider(application.getBaseContext());
         stringProvider = new StringProviderImpl(resourceProvider);
-        notificationManager = new NotificationManager(application, stringProvider);
+        notificationManager = new NotificationManager(application);
         DownloadsFolderDataSource downloadsFolderDataSource = new DownloadsFolderDataSource(application);
         repositoryFactory = new RepositoryFactory(gliaCore, downloadsFolderDataSource);
 

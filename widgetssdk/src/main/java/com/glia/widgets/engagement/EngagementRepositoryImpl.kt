@@ -1,6 +1,8 @@
 package com.glia.widgets.engagement
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Glia
@@ -19,6 +21,10 @@ import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.omnibrowse.OmnibrowseEngagement
 import com.glia.androidsdk.omnicore.OmnicoreEngagement
 import com.glia.androidsdk.queuing.QueueTicket
+import com.glia.androidsdk.screensharing.LocalScreen
+import com.glia.androidsdk.screensharing.ScreenSharing
+import com.glia.androidsdk.screensharing.ScreenSharingRequest
+import com.glia.androidsdk.screensharing.VisitorScreenSharingState
 import com.glia.widgets.core.engagement.GliaOperatorRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
@@ -32,7 +38,9 @@ import io.reactivex.processors.PublishProcessor
 import java.util.function.Consumer
 
 private const val TAG = "EngagementRepository"
-private const val MEDIA_PERMISSION_REQUEST_CODE = 1001
+private const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
+private const val UNIQUE_RESULT_CODE = 0x1994
+private const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
 internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
@@ -59,6 +67,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest()
     private val currentOperatorValue: Operator? get() = with(_currentOperator.value as? Data.Value) { this?.result }
     override val isOperatorPresent: Boolean get() = currentOperatorValue != null
+    private val currentState: State? get() = _engagementState.value
 
     //--Media--
     private val mediaUpgradeOfferCallback: Consumer<MediaUpgradeOffer> = Consumer(::handleMediaUpgradeOffer)
@@ -88,7 +97,16 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private val _operatorTypingStatus: PublishProcessor<Boolean> = PublishProcessor.create()
     override val operatorTypingStatus: Flowable<Boolean> = _operatorTypingStatus.distinctUntilChanged()
 
-    private val currentState: State? get() = _engagementState.value
+    //--Screen Sharing--
+    private val screenSharingRequestCallback = Consumer<ScreenSharingRequest>(::handleScreenSharingRequest)
+    private val screenSharingRequestResponseCallback = Consumer<GliaException>(::handleScreenSharingRequestResponse)
+    private val screenSharingStateCallback = Consumer<VisitorScreenSharingState>(::handleScreenSharingState)
+
+    private val _screenSharingState: BehaviorProcessor<ScreenSharingState> = BehaviorProcessor.create()
+    override val screenSharingState: Flowable<ScreenSharingState> = _screenSharingState.onBackpressureLatest()
+
+    private var currentScreenSharingRequest: ScreenSharingRequest? = null
+    private var currentScreenSharingScreen: LocalScreen? = null
 
     override val hasOngoingEngagement: Boolean
         get() = currentEngagement != null
@@ -104,6 +122,9 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     override val isQueueingOrEngagement: Boolean
         get() = isQueueing || hasOngoingEngagement
 
+    override val isSharingScreen: Boolean
+        get() = currentEngagement != null && _screenSharingState.value == ScreenSharingState.Started
+
     override fun initialize() {
         core.on(Glia.Events.ENGAGEMENT, omniCoreEngagementCallback)
         core.on(Glia.Events.QUEUE_TICKET, queueTicketCallback)
@@ -117,6 +138,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         currentEngagement?.also(::unsubscribeFromEngagementEvents)
         currentEngagement?.media?.also(::unsubscribeFromEngagementMediaEvents)
         currentEngagement?.chat?.also(::unsubscribeFromEngagementChatEvents)
+        currentEngagement?.screenSharing?.also(::unSubscribeFromScreenSharingEvents)
         _operatorMediaState.onNext(Data.Empty)
         _visitorMediaState.onNext(Data.Empty)
         _currentOperator.onNext(Data.Empty)
@@ -131,6 +153,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
             unsubscribeFromEngagementEvents(it)
             unsubscribeFromEngagementMediaEvents(it.media)
             unsubscribeFromEngagementChatEvents(it.chat)
+            unSubscribeFromScreenSharingEvents(it.screenSharing)
             notifyEngagementEnded(it)
             it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
             if (silently || it is OmnibrowseEngagement) {
@@ -293,6 +316,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
                 _engagementState.onNext(State.QueueUnstaffed)
                 _engagementState.onNext(State.NoEngagement)
             }
+
             else -> {
                 _engagementState.onNext(State.UnexpectedErrorHappened)
                 _engagementState.onNext(State.NoEngagement)
@@ -309,6 +333,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
         subscribeToEngagementChatEvents(engagement.chat)
+        subscribeToScreenSharingEvents(engagement.screenSharing)
     }
 
     private fun handleCallVisualizerEngagement(engagement: OmnibrowseEngagement) {
@@ -319,6 +344,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
         subscribeToEngagementEvents(engagement)
         subscribeToEngagementMediaEvents(engagement.media)
+        subscribeToScreenSharingEvents(engagement.screenSharing)
         //No need for chat events here
     }
 
@@ -350,6 +376,16 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private fun unsubscribeFromEngagementChatEvents(chat: Chat) {
         chat.off(Chat.Events.OPERATOR_TYPING_STATUS, operatorTypingCallback)
+    }
+
+    private fun subscribeToScreenSharingEvents(screenSharing: ScreenSharing) {
+        screenSharing.on(ScreenSharing.Events.SCREEN_SHARING_REQUEST, screenSharingRequestCallback)
+        screenSharing.on(ScreenSharing.Events.VISITOR_STATE, screenSharingStateCallback)
+    }
+
+    private fun unSubscribeFromScreenSharingEvents(screenSharing: ScreenSharing) {
+        screenSharing.off(ScreenSharing.Events.SCREEN_SHARING_REQUEST, screenSharingRequestCallback)
+        screenSharing.off(ScreenSharing.Events.VISITOR_STATE, screenSharingStateCallback)
     }
 
     private fun handleEngagementState(state: EngagementState) {
@@ -461,4 +497,78 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         _operatorTypingStatus.onNext(operatorTypingStatus.isTyping)
     }
 
+    //--Screen Sharing--
+    private fun handleScreenSharingRequest(request: ScreenSharingRequest) {
+        Logger.d(TAG, "Received screen sharing request")
+        currentScreenSharingRequest = request
+        _screenSharingState.onNext(ScreenSharingState.Requested)
+    }
+
+    private fun handleScreenSharingState(state: VisitorScreenSharingState) {
+        when (state.status) {
+            ScreenSharing.Status.SHARING -> onScreenSharingStarted(state.localScreen ?: return)
+            ScreenSharing.Status.NOT_SHARING -> onScreenSharingEnded()
+        }
+    }
+
+    private fun handleScreenSharingRequestResponse(ex: GliaException?) {
+        currentScreenSharingRequest = null
+        if (ex == null) {
+            _screenSharingState.onNext(ScreenSharingState.RequestAccepted)
+            return
+        }
+
+        Logger.e(TAG, "Failed to accept screen sharing request", ex)
+        _screenSharingState.onNext(ScreenSharingState.FailedToAcceptRequest(ex.debugMessage))
+    }
+
+    private fun onScreenSharingStarted(localScreen: LocalScreen) {
+        if (_screenSharingState.value is ScreenSharingState.Started) return
+
+        Logger.i(TAG, "Screen sharing started")
+        _screenSharingState.onNext(ScreenSharingState.Started)
+        currentScreenSharingScreen = localScreen
+    }
+
+    private fun onScreenSharingEnded() {
+        Logger.i(TAG, "Screen sharing ended")
+        _screenSharingState.onNext(ScreenSharingState.Ended)
+        currentScreenSharingScreen = null
+    }
+
+    override fun endScreenSharing() {
+        Logger.i(TAG, "Screen sharing ended by visitor")
+        currentScreenSharingScreen?.stopSharing()
+        currentScreenSharingScreen = null
+        _screenSharingState.onNext(ScreenSharingState.Ended)
+    }
+
+    override fun declineScreenSharingRequest() {
+        Logger.i(TAG, "Screen sharing declined by visitor")
+        // Pass RESULT_CANCELED to Core SDK to stop waiting for a permission result.
+        // Otherwise, subsequent screen sharing requests won't be shown to the visitor.
+        // Also see related bug ticket: MOB-2102
+        onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, Activity.RESULT_CANCELED, null)
+        currentScreenSharingRequest?.decline()
+        currentScreenSharingRequest = null
+        _screenSharingState.onNext(ScreenSharingState.RequestDeclined)
+    }
+
+    override fun acceptScreenSharingRequest(activity: Activity, mode: ScreenSharing.Mode) {
+        Logger.i(TAG, "Screen sharing accepted by visitor")
+        currentScreenSharingRequest?.accept(mode, activity, UNIQUE_RESULT_CODE, screenSharingRequestResponseCallback)
+    }
+
+    override fun acceptScreenSharingWithAskedPermission(activity: Activity, mode: ScreenSharing.Mode) {
+        Logger.i(TAG, "Screen sharing accepted by visitor, permission asked")
+        currentScreenSharingRequest?.accept(mode, activity, SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, screenSharingRequestResponseCallback)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        currentEngagement?.onActivityResult(requestCode, resultCode, intent)
+    }
+
+    override fun onActivityResultSkipScreenSharingPermissionRequest(resultCode: Int, intent: Intent?) {
+        onActivityResult(SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE, resultCode, intent)
+    }
 }

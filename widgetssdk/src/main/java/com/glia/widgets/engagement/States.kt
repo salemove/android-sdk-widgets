@@ -11,7 +11,7 @@ internal sealed interface State {
     data class Queuing(val queueId: String, val queueTicketId: String, val mediaType: MediaType? = null) : State
     object QueueUnstaffed : State
     object UnexpectedErrorHappened : State
-    object QueueingCanceled: State
+    object QueueingCanceled : State
     object StartedOmniCore : State
     object StartedCallVisualizer : State
     object FinishedOmniCore : State
@@ -30,4 +30,13 @@ internal sealed interface SurveyState {
     object Empty : SurveyState
     object EmptyFromOperatorRequest : SurveyState
     data class Value(val survey: Survey) : SurveyState
+}
+
+internal sealed interface ScreenSharingState {
+    object Requested : ScreenSharingState
+    object Started : ScreenSharingState
+    object RequestAccepted : ScreenSharingState
+    object RequestDeclined : ScreenSharingState
+    data class FailedToAcceptRequest(val message: String) : ScreenSharingState
+    object Ended : ScreenSharingState
 }

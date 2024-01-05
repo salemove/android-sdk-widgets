@@ -6,4 +6,5 @@ interface INotificationManager {
     fun removeCallNotification()
     fun showScreenSharingNotification()
     fun removeScreenSharingNotification()
+    fun startNotificationRemovalService()
 }

@@ -62,7 +62,6 @@ internal class NotificationManager(private val applicationContext: Application, 
                 NotificationFactory.CALL_NOTIFICATION_ID,
                 NotificationFactory.createAudioCallNotification(applicationContext)
             )
-            startNotificationRemovalService()
         }
     }
 
@@ -72,11 +71,12 @@ internal class NotificationManager(private val applicationContext: Application, 
                 NotificationFactory.CALL_NOTIFICATION_ID,
                 NotificationFactory.createVideoCallNotification(applicationContext, isTwoWayVideo, hasAudio)
             )
-            startNotificationRemovalService()
         }
     }
 
-    private fun startNotificationRemovalService() {
+    override fun startNotificationRemovalService() {
+        // If this service is not already running, it will be instantiated and started (creating a process for it if needed);
+        // if it is running then it remains running.
         applicationContext.startService(
             Intent(applicationContext, NotificationRemovalService::class.java)
         )

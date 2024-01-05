@@ -204,6 +204,7 @@ public class Dependencies {
         lifecycleManager.addObserver((source, event) -> {
             if (event == Lifecycle.Event.ON_STOP) {
                 chatBubbleController.onApplicationStop();
+                notificationManager.startNotificationRemovalService();
             } else if (event == Lifecycle.Event.ON_DESTROY) {
                 chatBubbleController.onDestroy();
             }

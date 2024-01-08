@@ -9,7 +9,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.ReleaseResourcesUseCase
+import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.isGlia

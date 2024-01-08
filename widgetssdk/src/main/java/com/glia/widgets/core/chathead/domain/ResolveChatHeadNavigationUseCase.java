@@ -1,8 +1,8 @@
 package com.glia.widgets.core.chathead.domain;
 
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
-import com.glia.widgets.engagement.EngagementTypeUseCase;
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 
 public class ResolveChatHeadNavigationUseCase {
     private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;

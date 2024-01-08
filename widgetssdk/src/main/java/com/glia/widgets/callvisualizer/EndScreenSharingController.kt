@@ -2,7 +2,7 @@ package com.glia.widgets.callvisualizer
 
 import com.glia.widgets.GliaWidgets
 
-class EndScreenSharingController : EndScreenSharingContract.Controller {
+internal class EndScreenSharingController : EndScreenSharingContract.Controller {
 
     private var view: EndScreenSharingContract.View? = null
 

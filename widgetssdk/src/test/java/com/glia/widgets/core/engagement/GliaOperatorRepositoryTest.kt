@@ -24,7 +24,7 @@ import org.mockito.kotlin.whenever
 import java.util.Optional
 
 class GliaOperatorRepositoryTest {
-    private lateinit var repository: GliaOperatorRepository
+    private lateinit var repository: GliaOperatorRepositoryImpl
     private lateinit var core: GliaCore
     private lateinit var localOperator: LocalOperator
     private lateinit var operator: Operator
@@ -32,7 +32,7 @@ class GliaOperatorRepositoryTest {
     @Before
     fun setUp() {
         core = Mockito.mock(GliaCore::class.java)
-        repository = spy(GliaOperatorRepository(core))
+        repository = spy(GliaOperatorRepositoryImpl(core))
         localOperator = LocalOperator("id", "name", "imageUrl")
         operator = mock()
     }

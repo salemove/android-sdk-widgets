@@ -24,7 +24,7 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.databinding.ChatHeadViewBinding
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.addColorFilter
 import com.glia.widgets.helper.getColorCompat
@@ -39,7 +39,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
-class ChatHeadView @JvmOverloads constructor(
+internal class ChatHeadView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.gliaChatStyle,

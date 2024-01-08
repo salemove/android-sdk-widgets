@@ -7,7 +7,7 @@ import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotification
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
 import com.glia.widgets.engagement.ScreenSharingState
-import com.glia.widgets.engagement.ScreenSharingUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import io.reactivex.processors.PublishProcessor
 import org.junit.Before
 import org.junit.Test
@@ -72,8 +72,9 @@ class ScreenSharingControllerTest {
         verify(viewCallback).onScreenSharingRequestSuccess()
 
         whenever(hasScreenSharingNotificationChannelEnabledUseCase()) doReturn true
-        screenSharingState.onNext(ScreenSharingState.Requested)
-        verify(dialogController).showStartScreenSharingDialog()
+        val operatorName = "Operator"
+        screenSharingState.onNext(ScreenSharingState.Requested(operatorName))
+        verify(dialogController).showStartScreenSharingDialog(eq(operatorName))
 
         screenSharingState.onNext(ScreenSharingState.Started)
         verify(viewCallback).onScreenSharingStarted()
@@ -85,24 +86,27 @@ class ScreenSharingControllerTest {
 
     @Test
     fun onScreenSharingRequest_noInteractions_whenNoViewCallbacksAdded() {
-        subjectUnderTest.onScreenSharingRequest()
+        val operatorName = "Operator"
+        subjectUnderTest.onScreenSharingRequest(operatorName)
         verifyNoInteractions(dialogController)
     }
 
     @Test
     fun onScreenSharingRequest_showsEnableNotificationsDialog_whenNotificationChannelDisabled() {
+        val operatorName = "Operator"
         whenever(hasScreenSharingNotificationChannelEnabledUseCase()).thenReturn(false)
         subjectUnderTest.setViewCallback(mock())
-        subjectUnderTest.onScreenSharingRequest()
+        subjectUnderTest.onScreenSharingRequest(operatorName)
         verify(dialogController).showEnableScreenSharingNotificationsAndStartSharingDialog()
     }
 
     @Test
     fun onScreenSharingRequest_showsStartScreenSharingDialog_whenNotificationChannelEnabled() {
+        val operatorName = "Operator"
         whenever(hasScreenSharingNotificationChannelEnabledUseCase()).thenReturn(true)
         subjectUnderTest.setViewCallback(mock())
-        subjectUnderTest.onScreenSharingRequest()
-        verify(dialogController).showStartScreenSharingDialog()
+        subjectUnderTest.onScreenSharingRequest(operatorName)
+        verify(dialogController).showStartScreenSharingDialog(eq(operatorName))
     }
 
     @Test

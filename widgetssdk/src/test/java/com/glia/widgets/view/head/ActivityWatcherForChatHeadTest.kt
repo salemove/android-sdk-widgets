@@ -6,8 +6,8 @@ import android.view.Window
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
-import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController
 import com.glia.widgets.view.head.controller.ApplicationChatHeadLayoutController

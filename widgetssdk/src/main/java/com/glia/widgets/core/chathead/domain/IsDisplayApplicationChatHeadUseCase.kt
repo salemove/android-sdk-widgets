@@ -2,10 +2,10 @@ package com.glia.widgets.core.chathead.domain
 
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.engagement.EngagementTypeUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
-import com.glia.widgets.engagement.ScreenSharingUseCase
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 
 internal class IsDisplayApplicationChatHeadUseCase(
     isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,

@@ -6,6 +6,7 @@ import com.glia.widgets.chat.data.GliaChatRepository;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository;
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository;
 import com.glia.widgets.core.engagement.GliaOperatorRepository;
+import com.glia.widgets.core.engagement.GliaOperatorRepositoryImpl;
 import com.glia.widgets.core.fileupload.FileAttachmentRepository;
 import com.glia.widgets.core.fileupload.SecureFileAttachmentRepository;
 import com.glia.widgets.core.queue.GliaQueueRepository;
@@ -90,7 +91,7 @@ public class RepositoryFactory {
 
     public GliaOperatorRepository getOperatorRepository() {
         if (operatorRepository == null) {
-            operatorRepository = new GliaOperatorRepository(gliaCore);
+            operatorRepository = new GliaOperatorRepositoryImpl(gliaCore);
         }
 
         return operatorRepository;

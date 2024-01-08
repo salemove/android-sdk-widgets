@@ -93,7 +93,7 @@ internal class ActivityWatcherForCallVisualizerController(
     }
 
     override fun isCallOrChatActive(activity: Activity): Boolean {
-        return callVisualizerController.isCallOrChatScreenActiveUseCase(activity)
+        return callVisualizerController.isCallOrChatScreenActive(activity)
     }
 
     override fun removeMediaProjectionLaunchers(activityName: String?) {
@@ -106,7 +106,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     private fun addDialogCallback(activity: Activity) {
         // There are separate dialog callbacks for incoming media requests on Call and Chat screens.
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
+        if (callVisualizerController.isCallOrChatScreenActive(activity)) return
 
         watcher.setupDialogCallback()
     }
@@ -192,7 +192,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     override fun addScreenSharingCallback(activity: Activity) {
         // Call and Chat screens process screen sharing requests on their own.
-        if (callVisualizerController.isCallOrChatScreenActiveUseCase(activity)) return
+        if (callVisualizerController.isCallOrChatScreenActive(activity)) return
         setupScreenSharingViewCallback()
         screenSharingController.setViewCallback(screenSharingViewCallback)
     }

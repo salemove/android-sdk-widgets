@@ -2,7 +2,7 @@ package com.glia.widgets.call.domain
 
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.core.permissions.PermissionManager
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 
 internal class HandleCallPermissionsUseCase(

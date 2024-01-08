@@ -4,7 +4,7 @@ import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
-interface VisitorCodeContract {
+internal interface VisitorCodeContract {
     interface Controller : BaseController {
         fun setView(view: View)
         fun onCloseButtonClicked()

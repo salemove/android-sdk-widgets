@@ -8,7 +8,14 @@ import com.glia.widgets.core.engagement.data.LocalOperator
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.imageUrl
 
-internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
+internal interface GliaOperatorRepository {
+    fun getOperatorById(operatorId: String, callback: Consumer<LocalOperator?>)
+    fun emit(operator: Operator)
+    fun updateOperatorDefaultImageUrl(imageUrl: String?)
+    fun setIsAlwaysUseDefaultOperatorPicture(isAlwaysUseDefaultOperatorPicture: Boolean?)
+}
+
+internal class GliaOperatorRepositoryImpl(private val gliaCore: GliaCore) : GliaOperatorRepository {
     private val cachedOperators = SimpleArrayMap<String, LocalOperator>()
 
     @VisibleForTesting
@@ -17,7 +24,7 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
     @VisibleForTesting
     var isAlwaysUseDefaultOperatorPicture: Boolean = false
 
-    fun getOperatorById(operatorId: String, callback: Consumer<LocalOperator?>) {
+    override fun getOperatorById(operatorId: String, callback: Consumer<LocalOperator?>) {
         val cachedOperator = cachedOperators[operatorId]
         if (cachedOperator != null) {
             callback.accept(cachedOperator)
@@ -28,7 +35,7 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
         }
     }
 
-    fun emit(operator: Operator) = putOperator(mapOperator(operator))
+    override fun emit(operator: Operator) = putOperator(mapOperator(operator))
 
     @VisibleForTesting
     fun mapOperator(operator: Operator): LocalOperator = operator.run { LocalOperator(id, name, getOperatorImage(operator.imageUrl)) }
@@ -45,11 +52,11 @@ internal class GliaOperatorRepository(private val gliaCore: GliaCore) {
         operator.apply { cachedOperators.put(id, this) }
     }
 
-    fun updateOperatorDefaultImageUrl(imageUrl: String?) {
+    override fun updateOperatorDefaultImageUrl(imageUrl: String?) {
         operatorDefaultImageUrl = imageUrl
     }
 
-    fun setIsAlwaysUseDefaultOperatorPicture(isAlwaysUseDefaultOperatorPicture: Boolean?) {
+    override fun setIsAlwaysUseDefaultOperatorPicture(isAlwaysUseDefaultOperatorPicture: Boolean?) {
         this.isAlwaysUseDefaultOperatorPicture = isAlwaysUseDefaultOperatorPicture ?: false
     }
 }

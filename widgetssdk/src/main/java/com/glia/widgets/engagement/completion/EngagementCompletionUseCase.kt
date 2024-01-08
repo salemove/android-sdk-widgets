@@ -1,9 +1,9 @@
 package com.glia.widgets.engagement.completion
 
 import com.glia.androidsdk.engagement.Survey
-import com.glia.widgets.engagement.EngagementStateUseCase
 import com.glia.widgets.engagement.SurveyState
-import com.glia.widgets.engagement.SurveyUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.SurveyUseCase
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.Flowable

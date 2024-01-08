@@ -1,8 +1,8 @@
 package com.glia.widgets.core.audio.domain
 
 import com.glia.androidsdk.comms.MediaState
-import com.glia.widgets.engagement.OperatorMediaUseCase
-import com.glia.widgets.engagement.VisitorMediaUseCase
+import com.glia.widgets.engagement.domain.OperatorMediaUseCase
+import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.hasAudio
 import io.reactivex.Flowable
 

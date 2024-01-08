@@ -21,6 +21,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.ViewHelpers
 import com.glia.widgets.view.head.ChatHeadContract
+import com.glia.widgets.view.head.ChatHeadPosition
 import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
 import kotlin.math.roundToInt
@@ -116,11 +117,11 @@ class ChatHeadService : Service() {
 
     private fun initChatHeadPosition(
         params: WindowManager.LayoutParams,
-        chatHeadPosition: Pair<Int, Int>
+        chatHeadPosition: ChatHeadPosition
     ) {
         val display = displaySize
-        params.x = chatHeadPosition.first ?: getDefaultXPosition(display.width)
-        params.y = chatHeadPosition.second ?: getDefaultYPosition(display.height)
+        params.x = chatHeadPosition.posX ?: getDefaultXPosition(display.width)
+        params.y = chatHeadPosition.posY ?: getDefaultYPosition(display.height)
     }
 
     private fun getDefaultXPosition(screenWidth: Int): Int = screenWidth - chatHeadSize - chatHeadMargin

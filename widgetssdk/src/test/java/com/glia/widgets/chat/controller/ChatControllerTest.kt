@@ -29,16 +29,16 @@ import com.glia.widgets.core.fileupload.domain.RemoveFileAttachmentUseCase
 import com.glia.widgets.core.fileupload.domain.SupportedFileCountCheckUseCase
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.EndEngagementUseCase
-import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.EnqueueForEngagementUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
-import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.OperatorMediaUseCase
-import com.glia.widgets.engagement.OperatorTypingUseCase
+import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.EndEngagementUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.OperatorMediaUseCase
+import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
@@ -151,7 +151,7 @@ class ChatControllerTest {
         enqueueForEngagementUseCase = mock()
 
 
-        chatController = ChatController(
+        chatController = ChatControllerImpl(
             chatViewCallback = chatViewCallback,
             callTimer = callTimer,
             minimizeHandler = minimizeHandler,

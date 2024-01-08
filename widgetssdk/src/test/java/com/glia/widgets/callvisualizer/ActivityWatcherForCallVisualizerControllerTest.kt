@@ -11,7 +11,6 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
 import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
 import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
@@ -61,7 +60,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         on { acceptMediaUpgradeOfferResult } doReturn Flowable.empty()
     }
     private val screenSharingController = mock(ScreenSharingControllerImpl::class.java)
-    private val isCallOrChatActiveUseCase = mock(IsCallOrChatScreenActiveUseCase::class.java)
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
     private val isShowOverlayPermissionRequestDialogUseCase = mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
     private val confirmationDialogLinksUseCase = mock(ConfirmationDialogLinksUseCase::class.java)
@@ -91,8 +89,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `addScreenSharingCallback screen sharing skipped when call or chat is active`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
-        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
+        whenever(callVisualizerController.isCallOrChatScreenActive(activity)).thenReturn(true)
         val spyController = spy(controller)
         spyController.addScreenSharingCallback(activity)
         verify(spyController, never()).setupScreenSharingViewCallback()
@@ -103,8 +100,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onActivityResumed will trigger dialog callback when not call or chat screen`() {
         val spyController = spy(controller)
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
-        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        whenever(callVisualizerController.isCallOrChatScreenActive(activity)).thenReturn(false)
         spyController.onActivityResumed(activity)
         verify(watcher, never()).engagementStarted()
         verify(spyController, never()).addScreenSharingCallback(activity)
@@ -133,15 +129,14 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `addScreenSharingCallback error is shown when onScreenSharingError`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
-        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        whenever(callVisualizerController.isCallOrChatScreenActive(activity)).thenReturn(false)
         val intent = mock(Intent::class.java)
         whenever(supportActivity.intent).thenReturn(intent)
         whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(ScreenSharing)
         controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
         controller.onActivityResumed(activity)
         controller.addScreenSharingCallback(activity)
-        verify(callVisualizerController, times(2)).isCallOrChatScreenActiveUseCase
+        verify(callVisualizerController, times(2)).isCallOrChatScreenActive(any())
 
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(screenSharingController).onResume(eq(activity), notNull())
@@ -156,7 +151,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onActivityResumed does not call permissions when not CallVisualizerSupportActivity`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
         controller.onActivityResumed(nonCallVisualizerSupportActivity)
         resetMocks()
@@ -166,8 +160,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onActivityResumed start screen sharing when ScreenSharingController calls requestScreenSharingCallback`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
-        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(false)
+        whenever(callVisualizerController.isCallOrChatScreenActive(activity)).thenReturn(false)
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
         controller.onActivityResumed(nonCallVisualizerSupportActivity)
 
@@ -190,10 +183,9 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `isCallOrChatActive returns mocked value when called`() {
-        whenever(callVisualizerController.isCallOrChatScreenActiveUseCase).thenReturn(isCallOrChatActiveUseCase)
-        whenever(isCallOrChatActiveUseCase(activity)).thenReturn(true)
+        whenever(callVisualizerController.isCallOrChatScreenActive(activity)).thenReturn(true)
         assertTrue(controller.isCallOrChatActive(activity))
-        verify(callVisualizerController).isCallOrChatScreenActiveUseCase
+        verify(callVisualizerController).isCallOrChatScreenActive(any())
     }
 
     @Test

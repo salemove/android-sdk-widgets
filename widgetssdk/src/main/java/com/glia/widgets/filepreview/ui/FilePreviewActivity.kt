@@ -45,7 +45,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
     private var showDownloadIcon = false
     private var showShareIcon = false
 
-    private var filePreviewController: FilePreviewController? = null
+    private var filePreviewController: FilePreviewContract.Controller? = null
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(newBase)
@@ -155,7 +155,7 @@ internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.Vi
         binding.filePreviewView.setImageBitmap(loadedImage)
     }
 
-    override fun setController(controller: FilePreviewController) {
+    override fun setController(controller: FilePreviewContract.Controller) {
         filePreviewController = controller
         controller.setView(this)
     }

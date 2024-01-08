@@ -25,7 +25,7 @@ import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isValid
@@ -353,6 +353,7 @@ internal class ChatManager(
         }
 
         state.chatItems += operatorStatusItem
+        state.resetOperator()
 
         return state
     }

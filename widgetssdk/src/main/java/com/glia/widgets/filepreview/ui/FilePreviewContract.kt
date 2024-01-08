@@ -9,9 +9,10 @@ internal interface FilePreviewContract {
         fun onDownloadPressed()
         fun onImageRequested()
         fun onImageDataReceived(bitmapId: String, bitmapName: String)
+        fun setView(view: View)
     }
 
-    interface View : BaseView<FilePreviewController> {
+    interface View : BaseView<Controller> {
         fun onStateUpdated(state: State)
         fun shareImageFile(fileName: String)
         fun showOnImageSaveSuccess()

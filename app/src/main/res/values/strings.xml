@@ -81,6 +81,7 @@
     <string name="main_start_audio_call">Start new audio call</string>
     <string name="main_start_video_call">Start new video call</string>
     <string name="main_end_engagement">End engagement</string>
+    <string name="visitor_info">Visitor info</string>
     <string name="main_init_glia">Init Glia Widgets SDK</string>
     <string name="main_authenticate">Authenticate</string>
     <string name="main_deauthenticate">De-authenticate</string>
@@ -93,5 +94,21 @@
     <string name="authentication_dialog_authenticate_button">Authenticate</string>
     <string name="authentication_dialog_clear_button">Clear</string>
     <string name="authentication_dialog_cancel_button">Cancel</string>
+
+    <string name="visitor_info_name">Name</string>
+    <string name="visitor_info_email">Email</string>
+    <string name="visitor_info_phone">Phone</string>
+    <string name="visitor_info_note">Note</string>
+    <string name="visitor_info_save">Save</string>
+    <string name="visitor_info_note_save_mode">Note save mode:</string>
+    <string name="visitor_info_custom_attributes">Custom attributes:</string>
+    <string name="visitor_info_key">Key</string>
+    <string name="visitor_info_value">Value</string>
+    <string name="visitor_info_delete">Delete</string>
+    <string name="visitor_info_replace">Replace</string>
+    <string name="visitor_info_merge">Merge</string>
+    <string name="visitor_info_append">Append</string>
+    <string name="visitor_info_saving">Saving…</string>
+    <string name="visitor_info_loading">Loading…</string>
 
 </resources>

@@ -384,9 +384,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun setupChatStateCallback() {
         callback = object : ChatViewCallback {
             override fun clearTempFile() {
-                controller?.photoCaptureFileUri?.let {
-                    context.contentResolver.delete(it, null, null)
-                }
+                controller?.photoCaptureFileUri?.let { context.contentResolver.delete(it, null, null) }
             }
 
             override fun emitUploadAttachments(attachments: List<FileAttachment>) {

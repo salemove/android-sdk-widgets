@@ -1,7 +1,7 @@
 package com.glia.widgets.core.engagement.domain;
 
-import com.glia.widgets.engagement.EngagementTypeUseCase;
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 
 public class ShouldShowMediaEngagementViewUseCase {
     private final IsQueueingOrEngagementUseCase isQueueingOrEngagementUseCase;
@@ -16,9 +16,9 @@ public class ShouldShowMediaEngagementViewUseCase {
 
     public boolean execute(boolean isUpgradeToCall) {
         return hasNoQueueingAndEngagementOngoing() ||
-                hasMediaQueueingOngoing() ||
-                hasOngoingMediaEngagement() ||
-                isUpgradeToCall;
+            hasMediaQueueingOngoing() ||
+            hasOngoingMediaEngagement() ||
+            isUpgradeToCall;
     }
 
     private boolean hasNoQueueingAndEngagementOngoing() {

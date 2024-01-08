@@ -2,7 +2,7 @@ package com.glia.widgets.chat.domain
 
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before

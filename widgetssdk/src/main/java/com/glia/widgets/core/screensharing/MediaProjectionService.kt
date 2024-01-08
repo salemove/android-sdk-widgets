@@ -7,8 +7,8 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import com.glia.widgets.core.notification.NotificationFactory.createScreenSharingNotification
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.EngagementStateUseCase
 import com.glia.widgets.engagement.State
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import io.reactivex.disposables.CompositeDisposable
 
 private const val SERVICE_ID = 123

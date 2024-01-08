@@ -3,7 +3,7 @@ package com.glia.widgets.callvisualizer
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
-interface EndScreenSharingContract {
+internal interface EndScreenSharingContract {
 
     interface Controller : BaseController {
         fun setView(view: View)

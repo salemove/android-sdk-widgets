@@ -19,7 +19,7 @@ import com.glia.widgets.view.ViewHelpers
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
-class ChatHeadLayout @JvmOverloads constructor(
+internal class ChatHeadLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.gliaChatStyle,

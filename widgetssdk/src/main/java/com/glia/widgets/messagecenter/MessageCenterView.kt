@@ -48,7 +48,7 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlinx.parcelize.Parcelize
 import kotlin.properties.Delegates
 
-class MessageCenterView(
+internal class MessageCenterView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,
@@ -245,9 +245,9 @@ class MessageCenterView(
         }
     }
 
-    override fun setController(controller: MessageCenterContract.Controller?) {
+    override fun setController(controller: MessageCenterContract.Controller) {
         this.controller = controller
-        controller?.setView(this)
+        controller.setView(this)
     }
 
     override fun finish() {

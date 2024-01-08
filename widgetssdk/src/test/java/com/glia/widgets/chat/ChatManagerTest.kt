@@ -23,7 +23,7 @@ import com.glia.widgets.chat.model.Unsent
 import com.glia.widgets.core.engagement.domain.model.ChatHistoryResponse
 import com.glia.widgets.core.engagement.domain.model.ChatMessageInternal
 import com.glia.widgets.core.secureconversations.domain.MarkMessagesReadWithDelayUseCase
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -160,6 +160,7 @@ class ChatManagerTest {
         val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
         subjectUnderTest.mapOperatorConnected(action, state)
         verify(subjectUnderTest).checkUnsentMessages(any())
+        verify(state).resetOperator()
         val newItem = state.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
         assertEquals(newItem.companyName, action.companyName)

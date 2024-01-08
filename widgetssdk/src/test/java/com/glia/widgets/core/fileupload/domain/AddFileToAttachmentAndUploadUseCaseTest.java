@@ -19,7 +19,7 @@ import com.glia.widgets.core.fileupload.exception.RemoveBeforeReUploadingExcepti
 import com.glia.widgets.core.fileupload.exception.SupportedFileCountExceededException;
 import com.glia.widgets.core.fileupload.exception.SupportedFileSizeExceededException;
 import com.glia.widgets.core.fileupload.model.FileAttachment;
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 
 import org.junit.Before;
 import org.junit.Test;

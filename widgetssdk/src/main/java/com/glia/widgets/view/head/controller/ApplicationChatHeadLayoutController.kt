@@ -5,9 +5,9 @@ import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharing
 import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.Destinations
-import com.glia.widgets.engagement.CurrentOperatorUseCase
-import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.VisitorMediaUseCase
+import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.imageUrl
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.MessagesNotSeenHandler
@@ -91,13 +91,13 @@ internal class ApplicationChatHeadLayoutController(
         updateChatHeadView()
     }
 
-    fun updateChatHeadView() {
+    override fun updateChatHeadView() {
         updateChatHeadViewState(chatHeadLayout)
         updateOnHold()
         chatHeadLayout?.showUnreadMessageCount(unreadMessagesCount)
     }
 
-    fun shouldShow(gliaOrRootViewName: String?): Boolean {
+    override fun shouldShow(gliaOrRootViewName: String?): Boolean {
         return isDisplayApplicationChatHeadUseCase(gliaOrRootViewName)
     }
 
@@ -106,7 +106,7 @@ internal class ApplicationChatHeadLayoutController(
         updateChatHeadView()
     }
 
-    fun onPause(viewName: String) {
+    override fun onPause(viewName: String) {
         clearResumedViewName(viewName)
     }
 
@@ -145,20 +145,19 @@ internal class ApplicationChatHeadLayoutController(
 
     private fun updateChatHeadViewState(view: ChatHeadLayoutContract.View?) {
         when (state) {
-            State.ENGAGEMENT -> decideOnEngagementBubbleDesign(view)
+            State.ENGAGEMENT -> decideOnEngagementBubbleDesign(view ?: return)
             State.QUEUEING -> view?.showQueueing()
             State.ENDED -> view?.showPlaceholder()
         }
     }
 
-    private fun decideOnEngagementBubbleDesign(view: ChatHeadLayoutContract.View?) {
+    private fun decideOnEngagementBubbleDesign(view: ChatHeadLayoutContract.View) {
         if (isCallVisualizerScreenSharingUseCase()) {
-            view?.showScreenSharing()
-        } else if (operatorProfileImgUrl != null) {
-            view?.showOperatorImage(operatorProfileImgUrl)
-        } else {
-            view?.showPlaceholder()
+            view.showScreenSharing()
+            return
         }
+
+        operatorProfileImgUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
     }
 
     private fun updateOnHold() {

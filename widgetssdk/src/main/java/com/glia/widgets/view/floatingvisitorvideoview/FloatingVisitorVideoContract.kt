@@ -4,7 +4,7 @@ import com.glia.androidsdk.comms.MediaState
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 
-interface FloatingVisitorVideoContract {
+internal interface FloatingVisitorVideoContract {
     interface Controller : BaseController {
         fun setView(view: View)
     }

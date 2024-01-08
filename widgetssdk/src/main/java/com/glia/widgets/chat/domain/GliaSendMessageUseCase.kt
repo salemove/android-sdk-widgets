@@ -11,7 +11,7 @@ import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.SecureConversationsRepository
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
-import com.glia.widgets.engagement.IsOperatorPresentUseCase
+import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase
 
 internal class GliaSendMessageUseCase(
     private val chatRepository: GliaChatRepository,

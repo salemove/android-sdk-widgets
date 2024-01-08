@@ -1,40 +1,53 @@
 package com.glia.widgets.callvisualizer.controller
 
-import androidx.annotation.VisibleForTesting
+import android.app.Activity
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
-import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.CurrentOperatorUseCase
-import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.EngagementRequestUseCase
-import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.MediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.State
+import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
+import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
+import com.glia.widgets.engagement.domain.EngagementRequestUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.Flowable
 
-internal class CallVisualizerController(
+internal interface CallVisualizerController {
+
+    val engagementStartFlow: Flowable<State>
+    val engagementEndFlow: Flowable<State>
+    val acceptMediaUpgradeOfferResult: Flowable<MediaUpgradeOffer>
+    fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer)
+    fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer)
+    fun onEngagementConfirmationDialogAllowed()
+    fun onEngagementConfirmationDialogDeclined()
+    fun saveVisitorContextAssetId(visitorContextAssetId: String)
+    fun isCallOrChatScreenActive(resumedActivity: Activity?): Boolean
+}
+
+internal class CallVisualizerControllerImpl(
     private val dialogController: DialogController,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
-    @get:VisibleForTesting val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase,
+    private val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase,
     private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val engagementRequestUseCase: EngagementRequestUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
     private val engagementStateUseCase: EngagementStateUseCase
-) {
+) : CallVisualizerController {
 
-    val engagementStartFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.StartedCallVisualizer }
-    val engagementEndFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.FinishedCallVisualizer }
+    override val engagementStartFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.StartedCallVisualizer }
+    override val engagementEndFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.FinishedCallVisualizer }
 
-    val acceptMediaUpgradeOfferResult = acceptMediaUpgradeOfferUseCase.resultForCallVisualizer
+    override val acceptMediaUpgradeOfferResult = acceptMediaUpgradeOfferUseCase.resultForCallVisualizer
 
     private var visitorContextAssetId: String? = null
 
@@ -54,11 +67,13 @@ internal class CallVisualizerController(
         engagementRequestUseCase().unSafeSubscribe { onEngagementRequested() }
     }
 
-    fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer) {
+    override fun isCallOrChatScreenActive(resumedActivity: Activity?): Boolean = isCallOrChatScreenActiveUseCase(resumedActivity)
+
+    override fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer) {
         acceptMediaUpgradeOfferUseCase(offer)
     }
 
-    fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer) {
+    override fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer) {
         declineMediaUpgradeOfferUseCase(offer)
     }
 
@@ -82,15 +97,15 @@ internal class CallVisualizerController(
         }
     }
 
-    fun onEngagementConfirmationDialogAllowed() {
+    override fun onEngagementConfirmationDialogAllowed() {
         engagementRequestUseCase.accept(visitorContextAssetId.orEmpty())
     }
 
-    fun onEngagementConfirmationDialogDeclined() {
+    override fun onEngagementConfirmationDialogDeclined() {
         engagementRequestUseCase.decline()
     }
 
-    fun saveVisitorContextAssetId(visitorContextAssetId: String) {
+    override fun saveVisitorContextAssetId(visitorContextAssetId: String) {
         this.visitorContextAssetId = visitorContextAssetId
     }
 }

@@ -5,16 +5,17 @@ import com.glia.androidsdk.Glia
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.screensharing.ScreenSharingController
-import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.State
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.head.ChatHeadContract
+import com.glia.widgets.view.head.ChatHeadLayoutContract
 
 internal class ActivityWatcherForChatHeadController(
     private var serviceChatHeadController: ChatHeadContract.Controller,
-    private var applicationChatHeadController: ApplicationChatHeadLayoutController,
+    private var applicationChatHeadController: ChatHeadLayoutContract.Controller,
     private val screenSharingController: ScreenSharingController,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,

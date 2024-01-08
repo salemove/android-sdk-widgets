@@ -102,27 +102,47 @@ import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUs
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.engagement.AcceptMediaUpgradeOfferUseCase;
-import com.glia.widgets.engagement.CurrentOperatorUseCase;
-import com.glia.widgets.engagement.DeclineMediaUpgradeOfferUseCase;
-import com.glia.widgets.engagement.EndEngagementUseCase;
-import com.glia.widgets.engagement.EngagementRequestUseCase;
-import com.glia.widgets.engagement.EngagementStateUseCase;
-import com.glia.widgets.engagement.EngagementTypeUseCase;
-import com.glia.widgets.engagement.EnqueueForEngagementUseCase;
-import com.glia.widgets.engagement.IsCurrentEngagementCallVisualizerUseCase;
-import com.glia.widgets.engagement.IsOperatorPresentUseCase;
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase;
-import com.glia.widgets.engagement.MediaUpgradeOfferUseCase;
-import com.glia.widgets.engagement.OperatorMediaUseCase;
-import com.glia.widgets.engagement.OperatorTypingUseCase;
-import com.glia.widgets.engagement.ReleaseResourcesUseCase;
-import com.glia.widgets.engagement.ScreenSharingUseCase;
-import com.glia.widgets.engagement.SurveyUseCase;
-import com.glia.widgets.engagement.ToggleVisitorAudioMediaStateUseCase;
-import com.glia.widgets.engagement.ToggleVisitorVideoMediaStateUseCase;
-import com.glia.widgets.engagement.VisitorMediaUseCase;
 import com.glia.widgets.engagement.completion.EngagementCompletionUseCase;
+import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
+import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
+import com.glia.widgets.engagement.domain.CurrentOperatorUseCase;
+import com.glia.widgets.engagement.domain.CurrentOperatorUseCaseImpl;
+import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase;
+import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCaseImpl;
+import com.glia.widgets.engagement.domain.EndEngagementUseCase;
+import com.glia.widgets.engagement.domain.EndEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.EngagementRequestUseCase;
+import com.glia.widgets.engagement.domain.EngagementRequestUseCaseImpl;
+import com.glia.widgets.engagement.domain.EngagementStateUseCase;
+import com.glia.widgets.engagement.domain.EngagementStateUseCaseImpl;
+import com.glia.widgets.engagement.domain.EngagementTypeUseCase;
+import com.glia.widgets.engagement.domain.EngagementTypeUseCaseImpl;
+import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase;
+import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase;
+import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCaseImpl;
+import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
+import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase;
+import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCaseImpl;
+import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
+import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
+import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
+import com.glia.widgets.engagement.domain.OperatorTypingUseCaseImpl;
+import com.glia.widgets.engagement.domain.ReleaseResourcesUseCase;
+import com.glia.widgets.engagement.domain.ReleaseResourcesUseCaseImpl;
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase;
+import com.glia.widgets.engagement.domain.ScreenSharingUseCaseImpl;
+import com.glia.widgets.engagement.domain.SurveyUseCase;
+import com.glia.widgets.engagement.domain.SurveyUseCaseImpl;
+import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase;
+import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCaseImpl;
+import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase;
+import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCaseImpl;
+import com.glia.widgets.engagement.domain.VisitorMediaUseCase;
+import com.glia.widgets.engagement.domain.VisitorMediaUseCaseImpl;
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase;
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase;
@@ -837,32 +857,32 @@ public class UseCaseFactory {
 
     @NonNull
     public EndEngagementUseCase getEndEngagementUseCase() {
-        return new EndEngagementUseCase(repositoryFactory.getEngagementRepository());
+        return new EndEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public IsQueueingOrEngagementUseCase getIsQueueingOrEngagementUseCase() {
-        return new IsQueueingOrEngagementUseCase(repositoryFactory.getEngagementRepository());
+        return new IsQueueingOrEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public IsCurrentEngagementCallVisualizerUseCase getIsCurrentEngagementCallVisualizer() {
-        return new IsCurrentEngagementCallVisualizerUseCase(repositoryFactory.getEngagementRepository());
+        return new IsCurrentEngagementCallVisualizerUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public SurveyUseCase getSurveyUseCase() {
-        return new SurveyUseCase(repositoryFactory.getEngagementRepository());
+        return new SurveyUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public EngagementStateUseCase getEngagementStateUseCase() {
-        return new EngagementStateUseCase(repositoryFactory.getEngagementRepository());
+        return new EngagementStateUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogController dialogController) {
-        return new ReleaseResourcesUseCase(
+        return new ReleaseResourcesUseCaseImpl(
             createRemoveScreenSharingNotificationUseCase(),
             createCallNotificationUseCase(),
             repositoryFactory.getGliaFileAttachmentRepository(),
@@ -874,22 +894,22 @@ public class UseCaseFactory {
 
     @NonNull
     public OperatorTypingUseCase operatorTypingUseCase() {
-        return new OperatorTypingUseCase(repositoryFactory.getEngagementRepository());
+        return new OperatorTypingUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public OperatorMediaUseCase getOperatorMediaUseCase() {
-        return new OperatorMediaUseCase(repositoryFactory.getEngagementRepository());
+        return new OperatorMediaUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public VisitorMediaUseCase getVisitorMediaUseCase() {
-        return new VisitorMediaUseCase(repositoryFactory.getEngagementRepository());
+        return new VisitorMediaUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public EngagementTypeUseCase getEngagementTypeUseCase() {
-        return new EngagementTypeUseCase(
+        return new EngagementTypeUseCaseImpl(
             getIsQueueingOrEngagementUseCase(),
             getIsCurrentEngagementCallVisualizer(),
             getOperatorMediaUseCase(),
@@ -900,47 +920,47 @@ public class UseCaseFactory {
 
     @NonNull
     public CurrentOperatorUseCase getCurrentOperatorUseCase() {
-        return new CurrentOperatorUseCase(repositoryFactory.getEngagementRepository());
+        return new CurrentOperatorUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public IsOperatorPresentUseCase getIsOperatorPresentUseCase() {
-        return new IsOperatorPresentUseCase(repositoryFactory.getEngagementRepository());
+        return new IsOperatorPresentUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public MediaUpgradeOfferUseCase getMediaUpgradeOfferUseCase() {
-        return new MediaUpgradeOfferUseCase(repositoryFactory.getEngagementRepository());
+        return new MediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public AcceptMediaUpgradeOfferUseCase getAcceptMediaUpgradeOfferUseCase() {
-        return new AcceptMediaUpgradeOfferUseCase(repositoryFactory.getEngagementRepository(), permissionManager);
+        return new AcceptMediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository(), permissionManager);
     }
 
     @NonNull
     public DeclineMediaUpgradeOfferUseCase getDeclineMediaUpgradeOfferUseCase() {
-        return new DeclineMediaUpgradeOfferUseCase(repositoryFactory.getEngagementRepository());
+        return new DeclineMediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public EngagementRequestUseCase getEngagementRequestUseCase() {
-        return new EngagementRequestUseCase(repositoryFactory.getEngagementRepository());
+        return new EngagementRequestUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public ToggleVisitorAudioMediaStateUseCase getToggleVisitorAudioMediaStateUseCase() {
-        return new ToggleVisitorAudioMediaStateUseCase(repositoryFactory.getEngagementRepository());
+        return new ToggleVisitorAudioMediaStateUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public ToggleVisitorVideoMediaStateUseCase getToggleVisitorVideoMediaStateUseCase() {
-        return new ToggleVisitorVideoMediaStateUseCase(repositoryFactory.getEngagementRepository());
+        return new ToggleVisitorVideoMediaStateUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
     public EnqueueForEngagementUseCase getQueueForEngagementUseCase() {
-        return new EnqueueForEngagementUseCase(repositoryFactory.getEngagementRepository());
+        return new EnqueueForEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
@@ -950,7 +970,7 @@ public class UseCaseFactory {
 
     @NonNull
     public ScreenSharingUseCase getScreenSharingUseCase() {
-        return new ScreenSharingUseCase(repositoryFactory.getEngagementRepository());
+        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
 }

@@ -63,11 +63,15 @@ internal class GliaFileRepositoryImpl(
     private fun fetchFileMaybe(attachmentFile: AttachmentFile): Maybe<InputStream> =
         Maybe.create { emitter ->
             fetchFile(attachmentFile) { response, exception ->
-                exception?.also { emitter.onError(it) } ?: emitter.onSuccess(response)
+                when {
+                    exception != null -> emitter.onError(exception)
+                    response != null -> emitter.onSuccess(response)
+                    else -> emitter.onError(RuntimeException("Fetching file failed"))
+                }
             }
         }
 
-    private fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream>) {
+    private fun fetchFile(attachmentFile: AttachmentFile, callback: RequestCallback<InputStream?>) {
         val engagement = gliaCore.currentEngagement.getOrNull()
         if (engagement == null && engagementConfigRepository.chatType == ChatType.SECURE_MESSAGING) {
             secureConversations.fetchFile(attachmentFile.id, callback)

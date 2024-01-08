@@ -9,7 +9,7 @@ import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotification
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
 import com.glia.widgets.engagement.ScreenSharingState
-import com.glia.widgets.engagement.ScreenSharingUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
@@ -35,20 +35,20 @@ internal class ScreenSharingControllerImpl(
                 ScreenSharingState.Ended -> onScreenSharingEnded()
                 is ScreenSharingState.FailedToAcceptRequest -> onScreenSharingRequestError(it.message)
                 ScreenSharingState.RequestAccepted -> onScreenSharingRequestSuccess()
-                ScreenSharingState.Requested -> onScreenSharingRequest()
+                is ScreenSharingState.Requested -> onScreenSharingRequest(it.operatorName)
                 ScreenSharingState.Started -> onScreenSharingStarted()
                 ScreenSharingState.RequestDeclined -> Logger.d(TAG, "Screen sharing request declined")
             }
         }
     }
 
-    fun onScreenSharingRequest() {
+    fun onScreenSharingRequest(operatorName: String) {
         if (viewCallbacks.isNotEmpty()) {
             if (!hasScreenSharingNotificationChannelEnabledUseCase()) {
                 hasPendingScreenSharingRequest = true
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
-                dialogController.showStartScreenSharingDialog()
+                dialogController.showStartScreenSharingDialog(operatorName)
             }
         }
     }

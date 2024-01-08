@@ -1,7 +1,7 @@
 package com.glia.widgets.view.floatingvisitorvideoview
 
 import com.glia.androidsdk.comms.MediaState
-import com.glia.widgets.engagement.VisitorMediaUseCase
+import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowOnHoldUseCase
 import com.glia.widgets.view.floatingvisitorvideoview.domain.IsShowVideoUseCase

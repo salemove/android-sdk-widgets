@@ -2,7 +2,7 @@ package com.glia.widgets.core.secureconversations.domain
 
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
-import com.glia.widgets.engagement.IsQueueingOrEngagementUseCase
+import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 
 internal class IsSecureEngagementUseCase(
     private val engagementConfigRepository: GliaEngagementConfigRepository,

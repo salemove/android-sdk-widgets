@@ -1,7 +1,6 @@
 package com.glia.widgets.view.head.controller
 
 import android.view.View
-import androidx.core.util.Pair
 import com.glia.androidsdk.Operator
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase
@@ -10,9 +9,9 @@ import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase.De
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.engagement.CurrentOperatorUseCase
-import com.glia.widgets.engagement.EngagementStateUseCase
-import com.glia.widgets.engagement.VisitorMediaUseCase
+import com.glia.widgets.engagement.domain.CurrentOperatorUseCase
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
+import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.imageUrl
@@ -26,7 +25,7 @@ internal class ServiceChatHeadController(
     private val toggleChatHeadServiceUseCase: ToggleChatHeadServiceUseCase,
     private val resolveChatHeadNavigationUseCase: ResolveChatHeadNavigationUseCase,
     messagesNotSeenHandler: MessagesNotSeenHandler,
-    private val chatHeadPosition: ChatHeadPosition,
+    private var _chatHeadPosition: ChatHeadPosition,
     private val isCallVisualizerScreenSharingUseCase: IsCallVisualizerScreenSharingUseCase,
     engagementStateUseCase: EngagementStateUseCase,
     currentOperatorUseCase: CurrentOperatorUseCase,
@@ -49,6 +48,8 @@ internal class ServiceChatHeadController(
      */
     private var resumedViewName: String? = null
 
+    override val chatHeadPosition: ChatHeadPosition get() = _chatHeadPosition
+
     init {
         engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
         currentOperatorUseCase().unSafeSubscribe(::operatorDataLoaded)
@@ -64,8 +65,8 @@ internal class ServiceChatHeadController(
         toggleChatHeadServiceUseCase.invoke(view?.javaClass?.simpleName)
     }
 
-    override fun onPause(view: View?) {
-        clearResumedViewName(view)
+    override fun onPause(gliaOrRootView: View?) {
+        clearResumedViewName(gliaOrRootView)
     }
 
     override fun onSetChatHeadView(view: ChatHeadContract.View) {
@@ -78,11 +79,7 @@ internal class ServiceChatHeadController(
     }
 
     override fun onChatHeadPositionChanged(x: Int, y: Int) {
-        chatHeadPosition[x] = y
-    }
-
-    override fun getChatHeadPosition(): Pair<Int, Int> {
-        return chatHeadPosition.get()
+        _chatHeadPosition = ChatHeadPosition(x, y)
     }
 
     override fun onChatHeadClicked() {
@@ -134,12 +131,12 @@ internal class ServiceChatHeadController(
             updateChatHeadViewState()
             updateOnHold()
             chatHeadView!!.showUnreadMessageCount(unreadMessagesCount)
-            chatHeadView!!.updateConfiguration(buildTimeTheme, sdkConfiguration)
+            chatHeadView!!.updateConfiguration(buildTimeTheme!!, sdkConfiguration)
         }
     }
 
-    override fun setBuildTimeTheme(theme: UiTheme?) {
-        buildTimeTheme = theme
+    override fun setBuildTimeTheme(uiTheme: UiTheme?) {
+        buildTimeTheme = uiTheme
     }
 
     private fun engagementEnded() {
@@ -188,13 +185,14 @@ internal class ServiceChatHeadController(
     }
 
     private fun decideOnBubbleDesign() {
-        if (isCallVisualizerScreenSharingUseCase.invoke()) {
-            chatHeadView?.showScreenSharing()
-        } else if (operatorProfileImgUrl != null) {
-            chatHeadView?.showOperatorImage(operatorProfileImgUrl)
-        } else {
-            chatHeadView?.showPlaceholder()
+        val view = chatHeadView ?: return
+
+        if (isCallVisualizerScreenSharingUseCase()) {
+            view.showScreenSharing()
+            return
         }
+
+        operatorProfileImgUrl?.also(view::showOperatorImage) ?: view.showPlaceholder()
     }
 
     private fun setResumedViewName(view: View?) {

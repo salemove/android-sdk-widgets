@@ -16,9 +16,10 @@ import org.junit.ClassRule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -48,7 +49,7 @@ class GliaWidgetsTest {
     fun onAppCreate_setApplicationToGliaCore_whenCalled() {
         val application = RuntimeEnvironment.getApplication()
         GliaWidgets.onAppCreate(application)
-        Mockito.verify(gliaCore).onAppCreate(application)
+        Mockito.verify(gliaCore).onAppCreate(eq(application))
     }
 
     @Test
@@ -69,9 +70,9 @@ class GliaWidgetsTest {
         whenever(controllerFactory.callVisualizerController).thenReturn(callVisualizerController)
         whenever(repositoryFactory.engagementRepository) doReturn mock()
         GliaWidgets.init(widgetsConfig)
-        val captor = ArgumentCaptor.forClass(GliaConfig::class.java)
+        val captor = argumentCaptor<GliaConfig>()
         Mockito.verify(gliaCore).init(captor.capture())
-        val gliaConfig = captor.value
+        val gliaConfig = captor.lastValue
         Assert.assertEquals(siteApiKey, gliaConfig.siteApiKey)
         Assert.assertEquals(siteId, gliaConfig.siteId)
         Assert.assertEquals(region, gliaConfig.region)

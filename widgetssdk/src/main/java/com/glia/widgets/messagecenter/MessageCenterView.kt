@@ -3,6 +3,7 @@ package com.glia.widgets.messagecenter
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Color
+import android.net.Uri
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.Window
@@ -236,6 +237,12 @@ class MessageCenterView(
 
     override fun hideSoftKeyboard() {
         insetsController?.hideKeyboard()
+    }
+
+    override fun clearTemporaryFile(uri: Uri?) {
+        uri?.let {
+            context.contentResolver.delete(it, null, null)
+        }
     }
 
     override fun setController(controller: MessageCenterContract.Controller?) {

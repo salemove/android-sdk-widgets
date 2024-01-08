@@ -27,7 +27,7 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
-class EndScreenSharingView(
+internal class EndScreenSharingView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,
@@ -98,9 +98,9 @@ class EndScreenSharingView(
         screenSharingController?.onForceStopScreenSharing()
     }
 
-    override fun setController(controller: EndScreenSharingContract.Controller?) {
+    override fun setController(controller: EndScreenSharingContract.Controller) {
         this.controller = controller
-        controller?.setView(this)
+        controller.setView(this)
         screenSharingController = Dependencies.getControllerFactory().screenSharingController
     }
 

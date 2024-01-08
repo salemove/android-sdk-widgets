@@ -87,6 +87,8 @@ class MainFragment : Fragment() {
             .setOnClickListener { navigateToMessageCenter() }
         view.findViewById<View>(R.id.end_engagement_button)
             .setOnClickListener { GliaWidgets.endEngagement() }
+        view.findViewById<View>(R.id.visitor_info_button)
+            .setOnClickListener { navController.navigate(R.id.visitor_info) }
         view.findViewById<View>(R.id.initGliaWidgetsButton).setOnClickListener {
             thread { initGliaWidgets() }
         }
@@ -166,12 +168,14 @@ class MainFragment : Fragment() {
                 containerView!!.findViewById<View>(R.id.initGliaWidgetsButton).visibility = View.VISIBLE
                 containerView!!.findViewById<View>(R.id.authenticationButton).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.deauthenticationButton).visibility = View.GONE
+                containerView!!.findViewById<View>(R.id.visitor_info_button).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.visitor_code_button).visibility = View.GONE
                 containerView!!.findViewById<View>(R.id.visitor_code_switch_container).visibility = View.GONE
             }
             return
         }
         requireActivity().runOnUiThread {
+            containerView!!.findViewById<View>(R.id.visitor_info_button).visibility = View.VISIBLE
             containerView!!.findViewById<View>(R.id.visitor_code_button).visibility = View.VISIBLE
             containerView!!.findViewById<View>(R.id.visitor_code_switch_container).visibility = View.VISIBLE
         }

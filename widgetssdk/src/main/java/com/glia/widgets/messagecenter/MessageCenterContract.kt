@@ -8,7 +8,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.fileupload.model.FileAttachment
 
-interface MessageCenterContract {
+internal interface MessageCenterContract {
     interface Controller : BaseController {
         var photoCaptureFileUri: Uri?
         fun setConfiguration(uiTheme: UiTheme?, configuration: GliaSdkConfiguration?)

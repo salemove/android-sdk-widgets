@@ -11,15 +11,18 @@ import com.glia.widgets.callvisualizer.EndScreenSharingContract;
 import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.VisitorCodeContract;
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
+import com.glia.widgets.callvisualizer.controller.CallVisualizerControllerImpl;
 import com.glia.widgets.callvisualizer.controller.VisitorCodeController;
 import com.glia.widgets.chat.ChatViewCallback;
 import com.glia.widgets.chat.controller.ChatController;
+import com.glia.widgets.chat.controller.ChatControllerImpl;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.core.screensharing.ScreenSharingControllerImpl;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.engagement.completion.EngagementCompletionControllerImpl;
+import com.glia.widgets.filepreview.ui.FilePreviewContract;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
@@ -34,6 +37,7 @@ import com.glia.widgets.view.MinimizeHandler;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract;
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoController;
 import com.glia.widgets.view.head.ChatHeadContract;
+import com.glia.widgets.view.head.ChatHeadLayoutContract;
 import com.glia.widgets.view.head.ChatHeadPosition;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract;
 import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadController;
@@ -54,10 +58,8 @@ public class ControllerFactory {
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
     private final GliaSdkConfigurationManager sdkConfigurationManager;
-    private final FilePreviewController filePreviewController;
-    private final ChatHeadPosition chatHeadPosition;
+    private final FilePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
-
     private EngagementCompletionController engagementCompletionController;
     private ChatController retainedChatController;
     private CallController retainedCallController;
@@ -89,7 +91,6 @@ public class ControllerFactory {
             useCaseFactory.createGetImageFileFromCacheUseCase(),
             useCaseFactory.createPutImageFileToDownloadsUseCase()
         );
-        this.chatHeadPosition = ChatHeadPosition.getInstance();
         this.sdkConfigurationManager = sdkConfigurationManager;
         this.managerFactory = managerFactory;
     }
@@ -97,7 +98,7 @@ public class ControllerFactory {
     public ChatController getChatController(ChatViewCallback chatViewCallback) {
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
-            retainedChatController = new ChatController(
+            retainedChatController = new ChatControllerImpl(
                 chatViewCallback,
                 sharedTimer,
                 minimizeHandler,
@@ -243,7 +244,7 @@ public class ControllerFactory {
         getActivityWatcherForChatHeadController().init();
     }
 
-    public FilePreviewController getImagePreviewController() {
+    public FilePreviewContract.Controller getImagePreviewController() {
         return filePreviewController;
     }
 
@@ -253,7 +254,7 @@ public class ControllerFactory {
                 useCaseFactory.getToggleChatHeadServiceUseCase(),
                 useCaseFactory.getResolveChatHeadNavigationUseCase(),
                 messagesNotSeenHandler,
-                chatHeadPosition,
+                new ChatHeadPosition(),
                 useCaseFactory.createIsCallVisualizerScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getCurrentOperatorUseCase(),
@@ -263,7 +264,7 @@ public class ControllerFactory {
         return serviceChatHeadController;
     }
 
-    public ApplicationChatHeadLayoutController getChatHeadLayoutController() {
+    public ChatHeadLayoutContract.Controller getChatHeadLayoutController() {
         if (applicationChatHeadController == null) {
             applicationChatHeadController = new ApplicationChatHeadLayoutController(
                 useCaseFactory.getIsDisplayApplicationChatHeadUseCase(),
@@ -289,7 +290,7 @@ public class ControllerFactory {
 
     public CallVisualizerController getCallVisualizerController() {
         if (callVisualizerController == null) {
-            callVisualizerController = new CallVisualizerController(
+            callVisualizerController = new CallVisualizerControllerImpl(
                 dialogController,
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createIsCallOrChatScreenActiveUseCase(),

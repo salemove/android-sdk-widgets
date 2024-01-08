@@ -1,8 +1,8 @@
 package com.glia.widgets.view.snackbar
 
 import android.annotation.SuppressLint
-import com.glia.widgets.engagement.EngagementStateUseCase
 import com.glia.widgets.engagement.State
+import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import kotlin.properties.Delegates
 
 @SuppressLint("CheckResult")

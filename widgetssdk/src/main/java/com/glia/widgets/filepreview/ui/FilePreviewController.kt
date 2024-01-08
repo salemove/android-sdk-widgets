@@ -14,7 +14,7 @@ internal class FilePreviewController @JvmOverloads constructor(
 ) : FilePreviewContract.Controller {
     private var view: FilePreviewContract.View? = null
 
-    fun setView(view: FilePreviewContract.View) {
+    override fun setView(view: FilePreviewContract.View) {
         this.view = view
         state.reset()
     }

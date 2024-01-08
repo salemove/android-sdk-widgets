@@ -7,7 +7,7 @@ import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotification
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
 import com.glia.widgets.engagement.ScreenSharingState
-import com.glia.widgets.engagement.ScreenSharingUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import io.reactivex.processors.PublishProcessor
 import org.junit.Before
 import org.junit.Test

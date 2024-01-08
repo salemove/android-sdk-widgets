@@ -4,14 +4,18 @@ import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.di.GliaCore
 import io.reactivex.Single
 
-class GliaQueueRepository(private val gliaCore: GliaCore) {
+internal class GliaQueueRepository(private val gliaCore: GliaCore) {
     /**
      * Emits a list of all Queues
      */
     val queues: Single<Array<Queue>>
-        get() = Single.create {
+        get() = Single.create { emitter ->
             gliaCore.getQueues { queues, exception ->
-                exception?.apply { it.onError(this) } ?: it.onSuccess(queues)
+                when {
+                    exception != null -> emitter.onError(exception)
+                    queues != null -> emitter.onSuccess(queues)
+                    else -> emitter.onError(RuntimeException("Fetching file failed"))
+                }
             }
         }
 }

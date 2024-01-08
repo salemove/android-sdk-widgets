@@ -48,7 +48,7 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay
  *  neither programmatically nor inside your XML layouts.
  * Use [CallVisualizer.createVisitorCodeView] to create an instance of this view.
  */
-class VisitorCodeView internal constructor(
+internal class VisitorCodeView internal constructor(
     context: Context
 ) : FrameLayout(MaterialThemeOverlay.wrap(context, null, 0, R.style.Application_Glia_Chat), null, 0), VisitorCodeContract.View {
     private lateinit var controller: VisitorCodeContract.Controller

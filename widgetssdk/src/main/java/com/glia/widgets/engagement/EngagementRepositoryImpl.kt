@@ -123,7 +123,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         get() = isQueueing || hasOngoingEngagement
 
     override val isSharingScreen: Boolean
-        get() = currentEngagement != null && _screenSharingState.value == ScreenSharingState.Started
+        get() = currentEngagement != null && _screenSharingState.run { value == ScreenSharingState.Started || value == ScreenSharingState.RequestAccepted }
 
     override fun initialize() {
         core.on(Glia.Events.ENGAGEMENT, omniCoreEngagementCallback)
@@ -133,17 +133,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     override fun reset() {
-        _survey.onNext(SurveyState.Empty)
-        _engagementState.onNext(State.NoEngagement)
-        currentEngagement?.also(::unsubscribeFromEngagementEvents)
-        currentEngagement?.media?.also(::unsubscribeFromEngagementMediaEvents)
-        currentEngagement?.chat?.also(::unsubscribeFromEngagementChatEvents)
-        currentEngagement?.screenSharing?.also(::unSubscribeFromScreenSharingEvents)
-        _operatorMediaState.onNext(Data.Empty)
-        _visitorMediaState.onNext(Data.Empty)
-        _currentOperator.onNext(Data.Empty)
-        _onHoldState.onNext(false)
-        currentEngagement = null
+        currentEngagement?.let { endEngagement(true) } ?: cancelQueuing()
     }
 
     override fun endEngagement(silently: Boolean) {
@@ -299,8 +289,8 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     private fun trackQueueTicketUpdates(ticket: QueueTicket) {
-        core.subscribeToQueueTicketUpdates(ticket.id) { t, _ ->
-            if (t.state == QueueTicket.State.UNSTAFFED) {
+        core.subscribeToQueueTicketUpdates(ticket.id) { queueTicket, _ ->
+            if (queueTicket?.state == QueueTicket.State.UNSTAFFED) {
                 _engagementState.onNext(State.QueueUnstaffed)
                 _engagementState.onNext(State.NoEngagement)
             }
@@ -505,7 +495,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     }
 
     private fun handleScreenSharingState(state: VisitorScreenSharingState) {
-        when (state.status) {
+        when (state.status ?: return) {
             ScreenSharing.Status.SHARING -> onScreenSharingStarted(state.localScreen ?: return)
             ScreenSharing.Status.NOT_SHARING -> onScreenSharingEnded()
         }

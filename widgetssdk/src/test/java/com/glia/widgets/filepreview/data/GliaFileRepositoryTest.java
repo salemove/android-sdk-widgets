@@ -43,12 +43,7 @@ public class GliaFileRepositoryTest {
         engagementConfigRepository = mock(GliaEngagementConfigRepository.class);
         secureConversations = mock(SecureConversations.class);
         when(gliaCore.getSecureConversations()).thenReturn(secureConversations);
-        gliaFileRepository = new GliaFileRepositoryImpl(
-                bitmapCache,
-                downloadsFolderDataSource,
-                gliaCore,
-                engagementConfigRepository
-        );
+        gliaFileRepository = new GliaFileRepositoryImpl(bitmapCache, downloadsFolderDataSource, gliaCore, engagementConfigRepository);
     }
 
     @Test
@@ -89,8 +84,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertError(GLIA_EXCEPTION);
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE).test().assertError(GLIA_EXCEPTION);
     }
 
 
@@ -103,8 +97,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(secureConversations).fetchFile(any(), any());
-        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertResult(INPUT_STREAM);
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE).test().assertResult(INPUT_STREAM);
     }
 
     @Test
@@ -115,8 +108,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(secureConversations).fetchFile(any(), any());
-        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertError(GLIA_EXCEPTION);
+        gliaFileRepository.loadImageFileFromNetwork(ATTACHMENT_FILE).test().assertError(GLIA_EXCEPTION);
     }
 
     @Test
@@ -128,8 +120,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertComplete();
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE).test().assertComplete();
     }
 
     @Test
@@ -139,8 +130,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(gliaCore).fetchFile(any(), any());
-        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertError(GLIA_EXCEPTION.getClass());
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE).test().assertError(GLIA_EXCEPTION.getClass());
     }
 
     @Test
@@ -153,8 +143,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, null);
             return null;
         }).when(secureConversations).fetchFile(any(), any());
-        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertComplete();
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE).test().assertComplete();
     }
 
     @Test
@@ -165,8 +154,7 @@ public class GliaFileRepositoryTest {
             callback.onResult(INPUT_STREAM, GLIA_EXCEPTION);
             return null;
         }).when(secureConversations).fetchFile(any(), any());
-        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE)
-                .test().assertError(GLIA_EXCEPTION.getClass());
+        gliaFileRepository.downloadFileFromNetwork(ATTACHMENT_FILE).test().assertError(GLIA_EXCEPTION.getClass());
     }
 
     private static final String FILENAME = "FILENAME";

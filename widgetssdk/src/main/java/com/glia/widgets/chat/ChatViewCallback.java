@@ -58,4 +58,6 @@ public interface ChatViewCallback {
     void showEngagementConfirmationDialog();
 
     void navigateToWebBrowserActivity(String title, String url);
+
+    void clearTempFile();
 }

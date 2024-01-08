@@ -206,6 +206,8 @@ internal class MessageCenterController(
             object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
                     Logger.d(TAG, "fileUploadFinished")
+                    view?.clearTemporaryFile(photoCaptureFileUri)
+                    photoCaptureFileUri = null
                 }
 
                 override fun onStarted() {
@@ -214,6 +216,8 @@ internal class MessageCenterController(
 
                 override fun onError(ex: Exception) {
                     Logger.e(TAG, "Upload file failed: " + ex.message)
+                    view?.clearTemporaryFile(photoCaptureFileUri)
+                    photoCaptureFileUri = null
                 }
 
                 override fun onSecurityCheckStarted() {

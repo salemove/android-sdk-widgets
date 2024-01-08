@@ -971,6 +971,7 @@ internal class ChatController(
             object : AddFileToAttachmentAndUploadUseCase.Listener {
                 override fun onFinished() {
                     Logger.d(TAG, "fileUploadFinished")
+                    viewCallback?.clearTempFile()
                 }
 
                 override fun onStarted() {
@@ -979,6 +980,7 @@ internal class ChatController(
 
                 override fun onError(ex: Exception) {
                     Logger.e(TAG, "Upload file failed: " + ex.message)
+                    viewCallback?.clearTempFile()
                 }
 
                 override fun onSecurityCheckStarted() {

@@ -56,6 +56,7 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
+import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
@@ -609,7 +610,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
                     Dialog.MODE_NO_MORE_OPERATORS -> post { showNoMoreOperatorsAvailableDialog() }
                     Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
-                    Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog() }
+                    Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog(it as OperatorName) }
                     Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
                     Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
                         showAllowScreenSharingNotificationsAndStartSharingDialog()
@@ -716,10 +717,11 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         )
     }
 
-    private fun showScreenSharingDialog() = showDialog {
+    private fun showScreenSharingDialog(dialogState: OperatorName) = showDialog {
         Dialogs.showScreenSharingDialog(
             context = context,
             theme = theme,
+            dialogState = dialogState,
             positiveButtonClickListener = {
                 screenSharingController?.onScreenSharingAccepted(context.requireActivity())
             },

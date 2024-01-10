@@ -33,6 +33,7 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -367,7 +368,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onPositiveDialogButtonClicked openSupportActivity called when isSupportActivityOpen false and MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(false)
         controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
-        verify(watcher, never()).showScreenSharingDialog()
+        verify(watcher, never()).showScreenSharingDialog(any())
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isWebBrowserActivityOpen()
@@ -379,8 +380,8 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
-        verify(watcher).showScreenSharingDialog()
+        controller.onDialogControllerCallback(DialogState.OperatorName(MODE_START_SCREEN_SHARING, "OperatorName"))
+        verify(watcher).showScreenSharingDialog(argThat{ state -> state.operatorName == "OperatorName" })
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isWebBrowserActivityOpen()
@@ -391,8 +392,8 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
-        verify(watcher).showScreenSharingDialog()
+        controller.onDialogControllerCallback(DialogState.OperatorName(MODE_START_SCREEN_SHARING, "OperatorName"))
+        verify(watcher).showScreenSharingDialog(argThat{ state -> state.operatorName == "OperatorName" })
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()

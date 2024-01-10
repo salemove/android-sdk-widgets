@@ -57,7 +57,8 @@
     <string name="message_center_unavailable_title">@string/glia_dialog_message_center_unavailable_title</string>
     <string name="message_center_unavailable_message">@string/glia_dialog_message_center_unavailable_message</string>
     <string name="message_center_not_authenticated_message">@string/glia_dialog_message_center_unauthorized_message</string>
-    <string name="screen_sharing_visitor_screen_disclaimer_title">@string/glia_dialog_screen_sharing_offer_title</string>
+    <string name="alert_screen_sharing_start_header">@string/glia_dialog_screen_sharing_offer_title</string>
+    <string name="alert_screen_sharing_start_message">@string/glia_dialog_screen_sharing_offer_message</string>
     <string name="media_upgrade_audio_title">@string/glia_dialog_upgrade_audio_title</string>
     <string name="media_upgrade_video_one_way_title">@string/glia_dialog_upgrade_video_1_way_title</string>
     <string name="media_upgrade_video_two_way_title">@string/glia_dialog_upgrade_video_2_way_title</string>
@@ -187,9 +188,6 @@
     <string name="general_browse">@string/glia_chat_attachment_upload_menu_browse</string>
     <string name="general_open">@string/glia_chat_attachment_open_button_label</string>
     <string name="general_retry">Retry</string>
-
-    <!-- Screen sharing -->
-    <string name="screen_sharing_visitor_screen_disclaimer_info">@string/glia_dialog_screen_sharing_offer_message</string>
 
     <!-- NEW REFERENCES -->
     <string name="engagement_default_operator">Operator</string> <!-- TODO NEW TO ANDROID -->

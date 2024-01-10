@@ -43,7 +43,7 @@ public class GliaEngagementStateRepository {
         disposable.add(
             engagementStateProcessor
                 .onBackpressureLatest()
-                .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getOperator()))
+                .map(state -> mapToEngagementStateChangeEvent(state.orElse(null), getCurrentOperator()))
                 .doOnNext(this::notifyEngagementStateEventUpdate)
                 .doOnNext(this::updateOperatorOnEngagementStateChanged)
                 .subscribe()
@@ -89,8 +89,8 @@ public class GliaEngagementStateRepository {
         engagementStateEventProcessor.onNext(engagementStateEvent);
     }
 
-    private @Nullable
-    Operator getOperator() {
+    @Nullable
+    public Operator getCurrentOperator() {
         return operatorProcessor
             .getValue()
             .orElse(null);

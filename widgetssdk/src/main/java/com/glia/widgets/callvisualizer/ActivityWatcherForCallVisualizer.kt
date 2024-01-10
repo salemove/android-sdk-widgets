@@ -303,11 +303,12 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    override fun showScreenSharingDialog() {
+    override fun showScreenSharingDialog(dialogState: DialogState.OperatorName) {
         showAlertDialogOnUiThreadWithStyledContext("Show screen sharing dialog") { context, uiTheme, activity ->
             Dialogs.showScreenSharingDialog(
                 context = context,
                 theme = uiTheme,
+                dialogState = dialogState,
                 positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked(activity)
                 },

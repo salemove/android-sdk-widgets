@@ -17,6 +17,7 @@ import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
+import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.view.dialog.base.DialogPayload
@@ -265,12 +266,13 @@ internal object Dialogs {
     fun showScreenSharingDialog(
         context: Context,
         theme: UiTheme,
+        dialogState: OperatorName,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.ScreenSharing(
-            title = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_title),
-            message = stringProvider.getRemoteString(R.string.screen_sharing_visitor_screen_disclaimer_info),
+            title = stringProvider.getRemoteString(R.string.alert_screen_sharing_start_header),
+            message = stringProvider.getRemoteString(R.string.alert_screen_sharing_start_message, StringKeyPair(StringKey.OPERATOR_NAME, dialogState.operatorName)),
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,

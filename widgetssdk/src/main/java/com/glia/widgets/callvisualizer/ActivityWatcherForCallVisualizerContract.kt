@@ -40,7 +40,7 @@ internal class ActivityWatcherForCallVisualizerContract {
         fun dismissAlertDialog()
         fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade)
         fun showOverlayPermissionsDialog()
-        fun showScreenSharingDialog()
+        fun showScreenSharingDialog(dialogState: DialogState.OperatorName)
         fun showAllowNotificationsDialog()
         fun showAllowScreenSharingNotificationsAndStartSharingDialog()
         fun showVisitorCodeDialog()

@@ -3,14 +3,18 @@ package com.glia.widgets.core.screensharing
 import android.app.Activity
 import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.GliaException
+import com.glia.widgets.R
+import com.glia.widgets.StringProvider
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.engagement.GliaEngagementStateRepository
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
 import com.glia.widgets.core.screensharing.data.GliaScreenSharingRepository
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.formattedName
 import java.util.function.Consumer
 
 internal class ScreenSharingController(
@@ -19,7 +23,9 @@ internal class ScreenSharingController(
     private val showScreenSharingNotificationUseCase: ShowScreenSharingNotificationUseCase,
     private val removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase,
     private val hasScreenSharingNotificationChannelEnabledUseCase: HasScreenSharingNotificationChannelEnabledUseCase,
-    private val gliaSdkConfigurationManager: GliaSdkConfigurationManager
+    private val gliaSdkConfigurationManager: GliaSdkConfigurationManager,
+    private val engagementStateRepository: GliaEngagementStateRepository,
+    private val stringProvider: StringProvider
 ) : GliaScreenSharingCallback {
     private val viewCallbacks: MutableSet<ViewCallback> = HashSet()
 
@@ -38,7 +44,8 @@ internal class ScreenSharingController(
                 hasPendingScreenSharingRequest = true
                 dialogController.showEnableScreenSharingNotificationsAndStartSharingDialog()
             } else {
-                dialogController.showStartScreenSharingDialog()
+                val operatorName = engagementStateRepository.currentOperator?.formattedName ?: stringProvider.getRemoteString(R.string.engagement_default_operator)
+                dialogController.showStartScreenSharingDialog(operatorName)
             }
         }
     }

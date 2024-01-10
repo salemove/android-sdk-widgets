@@ -10,8 +10,10 @@ import static org.mockito.Mockito.when;
 import android.app.Activity;
 
 import com.glia.androidsdk.GliaException;
+import com.glia.widgets.StringProvider;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.engagement.GliaEngagementStateRepository;
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase;
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase;
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase;
@@ -33,6 +35,8 @@ public class ScreenSharingControllerTest {
     private ShowScreenSharingNotificationUseCase showScreenSharingNotificationUseCase;
     private RemoveScreenSharingNotificationUseCase removeScreenSharingNotificationUseCase;
     private HasScreenSharingNotificationChannelEnabledUseCase hasScreenSharingNotificationChannelEnabledUseCase;
+    private GliaEngagementStateRepository engagementStateRepository;
+    private StringProvider stringProvider;
     private ScreenSharingController subjectUnderTest;
 
     @Before
@@ -46,6 +50,9 @@ public class ScreenSharingControllerTest {
                 mock(RemoveScreenSharingNotificationUseCase.class);
         hasScreenSharingNotificationChannelEnabledUseCase =
                 mock(HasScreenSharingNotificationChannelEnabledUseCase.class);
+        engagementStateRepository =
+                mock(GliaEngagementStateRepository.class);
+        stringProvider = mock(StringProvider.class);
 
         subjectUnderTest = new ScreenSharingController(
                 gliaScreenSharingRepository,
@@ -53,7 +60,9 @@ public class ScreenSharingControllerTest {
                 showScreenSharingNotificationUseCase,
                 removeScreenSharingNotificationUseCase,
                 hasScreenSharingNotificationChannelEnabledUseCase,
-                mock(GliaSdkConfigurationManager.class)
+                mock(GliaSdkConfigurationManager.class),
+                engagementStateRepository,
+                stringProvider
         );
     }
 
@@ -81,7 +90,7 @@ public class ScreenSharingControllerTest {
 
         subjectUnderTest.onScreenSharingRequest();
 
-        verify(dialogController).showStartScreenSharingDialog();
+        verify(dialogController).showStartScreenSharingDialog(any());
     }
 
     @Test

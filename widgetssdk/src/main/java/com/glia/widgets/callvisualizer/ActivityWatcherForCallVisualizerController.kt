@@ -24,6 +24,7 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
+import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
@@ -133,7 +134,7 @@ internal class ActivityWatcherForCallVisualizerController(
             MODE_ENABLE_NOTIFICATION_CHANNEL -> watcher.showAllowNotificationsDialog()
             MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.showAllowScreenSharingNotificationsAndStartSharingDialog()
             MODE_VISITOR_CODE -> watcher.showVisitorCodeDialog()
-            MODE_START_SCREEN_SHARING -> watcher.showScreenSharingDialog()
+            MODE_START_SCREEN_SHARING -> watcher.showScreenSharingDialog(state as OperatorName)
             MODE_LIVE_OBSERVATION_OPT_IN -> watcher.showEngagementConfirmationDialog()
             else -> {
                 Logger.d(TAG, "Unexpected dialog mode received - ${state.mode}")

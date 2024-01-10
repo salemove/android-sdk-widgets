@@ -1,5 +1,7 @@
 package com.glia.widgets.core.dialog;
 
+import androidx.annotation.NonNull;
+
 import com.glia.androidsdk.comms.MediaUpgradeOffer;
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
@@ -125,9 +127,9 @@ public class DialogController {
         dialogManager.remove(new DialogState(Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE));
     }
 
-    public void showStartScreenSharingDialog() {
+    public void showStartScreenSharingDialog(@NonNull String operatorName) {
         Logger.i(TAG, "Show Start Screen Sharing Dialog");
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_START_SCREEN_SHARING));
+        dialogManager.addAndEmit(new DialogState.OperatorName(Dialog.MODE_START_SCREEN_SHARING, operatorName));
     }
 
     public void showEnableCallNotificationChannelDialog() {

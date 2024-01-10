@@ -43,7 +43,8 @@
     <string name="message_center_screen_title">Messaging</string>
     <string name="glia_dialog_end_engagement_title">End Engagement?</string>
     <string name="glia_chat_visitor_status_transferring">Transferring</string>
-    <string name="glia_dialog_screen_sharing_offer_title">You are about to share your screen</string>
+    <string name="glia_dialog_screen_sharing_offer_title">Start Screen Sharing</string>
+    <string name="glia_dialog_screen_sharing_offer_message">%1$s has asked you to share your screen.</string>
     <string name="glia_dialog_unexpected_error_message">Please try again.</string>
     <string name="glia_dialog_end_engagement_message">Are you sure you want to end engagement?</string>
     <string name="glia_dialog_engagement_ended_message">This engagement has ended.\nThank you!</string>
@@ -116,7 +117,6 @@
     <string name="glia_screensharing_dialog_icon_content_description">Screen sharing icon</string>
     <string name="glia_dialog_allow_notifications_title">Allow Notifications?</string>
     <string name="glia_dialog_allow_notifications_message">We would like to show you notifications in the status bar. Please enable notifications in Settings.</string>
-    <string name="glia_dialog_screen_sharing_offer_message">Depending on your selection, your entire screen might be shared with the operator, not just the application window.</string>
     <string name="glia_dialog_overlay_permissions_title">Screen Overlay Permissions Required</string>
     <string name="glia_dialog_overlay_permissions_message">Allow screen overlay for the proper functioning of the app</string>
     <string name="glia_dialog_permission_error_title">Additional Permissions Required</string>

@@ -207,7 +207,9 @@ public class ControllerFactory {
                 useCaseFactory.createShowScreenSharingNotificationUseCase(),
                 useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
                 useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
-                sdkConfigurationManager
+                sdkConfigurationManager,
+                repositoryFactory.getGliaEngagementStateRepository(),
+                Dependencies.getStringProvider()
             );
         }
         return retainedScreenSharingController;

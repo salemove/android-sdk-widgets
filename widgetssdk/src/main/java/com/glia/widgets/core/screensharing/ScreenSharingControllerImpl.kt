@@ -42,7 +42,8 @@ internal class ScreenSharingControllerImpl(
         }
     }
 
-    fun onScreenSharingRequest(operatorName: String) {
+    @VisibleForTesting
+    fun onScreenSharingRequest(operatorName: String?) {
         if (viewCallbacks.isNotEmpty()) {
             if (!hasScreenSharingNotificationChannelEnabledUseCase()) {
                 hasPendingScreenSharingRequest = true

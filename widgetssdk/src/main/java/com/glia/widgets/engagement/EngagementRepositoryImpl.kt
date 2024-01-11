@@ -492,7 +492,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private fun handleScreenSharingRequest(request: ScreenSharingRequest) {
         Logger.d(TAG, "Received screen sharing request")
         currentScreenSharingRequest = request
-        _screenSharingState.onNext(ScreenSharingState.Requested(currentOperatorValue?.formattedName.orEmpty()))
+        _screenSharingState.onNext(ScreenSharingState.Requested(currentOperatorValue?.formattedName))
     }
 
     private fun handleScreenSharingState(state: VisitorScreenSharingState) {

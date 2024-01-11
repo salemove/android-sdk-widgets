@@ -19,7 +19,7 @@ internal class DialogDelegateImpl : DialogDelegate {
     }
 
     override fun updateDialogState(dialogState: DialogState): Boolean {
-        if (this.dialogState?.mode == dialogState.mode) return false
+        if (this.dialogState == dialogState) return false
 
         this.dialogState = dialogState
 

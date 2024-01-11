@@ -130,27 +130,26 @@ internal class ChatControllerImpl(
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
 
-    private val sendMessageCallback: GliaSendMessageUseCase.Listener =
-        object : GliaSendMessageUseCase.Listener {
-            override fun messageSent(message: VisitorMessage?) {
-                Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
-                message?.takeIf { it.isValid() }?.also { chatManager.onChatAction(ChatManager.Action.MessageSent(it)) }
-                scrollChatToBottom()
-            }
-
-            override fun onMessageValidated() {
-                viewCallback?.clearMessageInput()
-                emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
-            }
-
-            override fun errorOperatorNotOnline(message: Unsent) {
-                onSendMessageOperatorOffline(message)
-            }
-
-            override fun error(ex: GliaException, message: Unsent) {
-                onMessageSendError(ex, message)
-            }
+    private val sendMessageCallback: GliaSendMessageUseCase.Listener = object : GliaSendMessageUseCase.Listener {
+        override fun messageSent(message: VisitorMessage?) {
+            Logger.d(TAG, "messageSent: $message, id: ${message?.id}")
+            message?.takeIf { it.isValid() }?.also { chatManager.onChatAction(ChatManager.Action.MessageSent(it)) }
+            scrollChatToBottom()
         }
+
+        override fun onMessageValidated() {
+            viewCallback?.clearMessageInput()
+            emitViewState { chatState.setLastTypedText("").setShowSendButton(isShowSendButtonUseCase("")) }
+        }
+
+        override fun errorOperatorNotOnline(message: Unsent) {
+            onSendMessageOperatorOffline(message)
+        }
+
+        override fun error(ex: GliaException, message: Unsent) {
+            onMessageSendError(ex, message)
+        }
+    }
 
 
     @Volatile
@@ -196,7 +195,7 @@ internal class ChatControllerImpl(
 
         ensureSecureMessagingAvailable()
 
-        if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+        if (chatState.integratorChatStarted || dialogController.isShowingUnexpectedErrorDialog) {
             if (isSecureEngagement) {
                 emitViewState { chatState.setSecureMessagingState() }
             }
@@ -333,8 +332,8 @@ internal class ChatControllerImpl(
         sendMessagePreview("")
     }
 
-    private fun onMessageSendError(ignore: GliaException, message: Unsent) {
-        Logger.i(TAG, "Message send exception")
+    private fun onMessageSendError(ex: GliaException, message: Unsent) {
+        Logger.e(TAG, "Message send exception", ex)
 
         chatManager.onChatAction(ChatManager.Action.MessageSendError(message))
         scrollChatToBottom()
@@ -410,7 +409,7 @@ internal class ChatControllerImpl(
 
     override fun leaveChatClicked() {
         Logger.d(TAG, "leaveChatClicked")
-        if (chatState.isOperatorOnline) dialogController.showExitChatDialog(chatState.formattedOperatorName)
+        if (chatState.isOperatorOnline) dialogController.showExitChatDialog()
     }
 
     override fun onXButtonClicked() {
@@ -612,9 +611,7 @@ internal class ChatControllerImpl(
     private fun operatorConnected(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
             ChatManager.Action.OperatorConnected(
-                chatState.companyName.orEmpty(),
-                formattedOperatorName,
-                profileImgUrl
+                chatState.companyName.orEmpty(), formattedOperatorName, profileImgUrl
             )
         )
         emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl).setLiveChatState() }
@@ -623,9 +620,7 @@ internal class ChatControllerImpl(
     private fun operatorChanged(formattedOperatorName: String, profileImgUrl: String?) {
         chatManager.onChatAction(
             ChatManager.Action.OperatorJoined(
-                chatState.companyName.orEmpty(),
-                formattedOperatorName,
-                profileImgUrl
+                chatState.companyName.orEmpty(), formattedOperatorName, profileImgUrl
             )
         )
         emitViewState { chatState.operatorConnected(formattedOperatorName, profileImgUrl) }
@@ -677,8 +672,7 @@ internal class ChatControllerImpl(
     }
 
     override fun singleChoiceOptionClicked(
-        item: OperatorMessageItem.ResponseCard,
-        selectedOption: SingleChoiceOption
+        item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption
     ) {
         Logger.d(TAG, "singleChoiceOptionClicked, id: ${item.id}")
         sendMessageUseCase.execute(selectedOption.asSingleChoiceResponse(), sendMessageCallback)
@@ -718,8 +712,7 @@ internal class ChatControllerImpl(
     }
 
     private fun initChatManager() {
-        chatManager.initialize(::onHistoryLoaded, ::addQuickReplyButtons, ::updateUnSeenMessagesCount)
-            .subscribe(::emitItems, ::error)
+        chatManager.initialize(::onHistoryLoaded, ::addQuickReplyButtons, ::updateUnSeenMessagesCount).subscribe(::emitItems, ::error)
             .also(disposable::add)
     }
 
@@ -760,7 +753,7 @@ internal class ChatControllerImpl(
             upgradeMediaItemToVideo()
         } else if (!chatState.isMediaUpgradeStarted) {
             addMediaUpgradeItemToChatItems(operatorMediaState)
-            if (!callTimer.isRunning) {
+            if (chatState.isOperatorOnline && !callTimer.isRunning && timerStatusListener != null) {
                 startTimer()
             }
         }
@@ -796,41 +789,34 @@ internal class ChatControllerImpl(
     }
 
     override fun onAttachmentReceived(file: FileAttachment) {
-        addFileToAttachmentAndUploadUseCase.execute(
-            file,
-            object : AddFileToAttachmentAndUploadUseCase.Listener {
-                override fun onFinished() {
-                    Logger.d(TAG, "fileUploadFinished")
-                    viewCallback?.clearTempFile()
-                }
-
-                override fun onStarted() {
-                    Logger.d(TAG, "fileUploadStarted")
-                }
-
-                override fun onError(ex: Exception) {
-                    Logger.e(TAG, "Upload file failed: " + ex.message)
-                    viewCallback?.clearTempFile()
-                }
-
-                override fun onSecurityCheckStarted() {
-                    Logger.d(TAG, "fileUploadSecurityCheckStarted")
-                }
-
-                override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
-                    Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
-                }
+        addFileToAttachmentAndUploadUseCase.execute(file, object : AddFileToAttachmentAndUploadUseCase.Listener {
+            override fun onFinished() {
+                Logger.d(TAG, "fileUploadFinished")
+                viewCallback?.clearTempFile()
             }
-        )
+
+            override fun onStarted() {
+                Logger.d(TAG, "fileUploadStarted")
+            }
+
+            override fun onError(ex: Exception) {
+                Logger.e(TAG, "Upload file failed: " + ex.message)
+                viewCallback?.clearTempFile()
+            }
+
+            override fun onSecurityCheckStarted() {
+                Logger.d(TAG, "fileUploadSecurityCheckStarted")
+            }
+
+            override fun onSecurityCheckFinished(scanResult: EngagementFile.ScanResult?) {
+                Logger.d(TAG, "fileUploadSecurityCheckFinished result=$scanResult")
+            }
+        })
     }
 
     override fun onFileDownloadClicked(attachmentFile: AttachmentFile) {
-        disposable.add(
-            downloadFileUseCase(attachmentFile)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ fileDownloadSuccess(attachmentFile) }) { fileDownloadError(attachmentFile, it) }
-        )
+        disposable.add(downloadFileUseCase(attachmentFile).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ fileDownloadSuccess(attachmentFile) }) { fileDownloadError(attachmentFile, it) })
     }
 
     private fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {

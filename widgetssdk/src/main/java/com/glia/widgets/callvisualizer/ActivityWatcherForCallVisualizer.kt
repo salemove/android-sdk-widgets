@@ -242,9 +242,6 @@ internal class ActivityWatcherForCallVisualizer(
                 },
                 negativeButtonClickListener = {
                     controller.onNegativeDialogButtonClicked()
-                },
-                onCancelListener = {
-                    controller.onNegativeDialogButtonClicked()
                 }
             )
         }
@@ -267,10 +264,6 @@ internal class ActivityWatcherForCallVisualizer(
                 },
                 negativeButtonClickListener = {
                     controller.onNegativeDialogButtonClicked()
-                },
-                onCancelListener = {
-                    it.dismiss()
-                    controller.onNegativeDialogButtonClicked()
                 }
             )
         }
@@ -286,21 +279,17 @@ internal class ActivityWatcherForCallVisualizer(
                 },
                 negativeButtonClickListener = {
                     controller.onNegativeDialogButtonClicked()
-                },
-                onCancelListener = {
-                    it.dismiss()
-                    controller.onNegativeDialogButtonClicked()
                 }
             )
         }
     }
 
-    override fun showScreenSharingDialog(dialogState: DialogState.OperatorName) {
+    override fun showScreenSharingDialog(operatorName: String?) {
         showAlertDialogOnUiThreadWithStyledContext("Show screen sharing dialog") { context, uiTheme, activity ->
             Dialogs.showScreenSharingDialog(
                 context = context,
                 theme = uiTheme,
-                dialogState = dialogState,
+                operatorName = operatorName,
                 positiveButtonClickListener = {
                     controller.onPositiveDialogButtonClicked(activity)
                 },
@@ -311,10 +300,10 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    override fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade) {
+    override fun showUpgradeDialog(mediaUpgradeState: DialogState.MediaUpgrade) {
         showAlertDialogOnUiThreadWithStyledContext("Show upgrade dialog") { context, uiTheme, _ ->
-            Dialogs.showUpgradeDialog(context, uiTheme, mediaUpgrade, {
-                controller.onMediaUpgradeReceived(mediaUpgrade.mediaUpgradeOffer)
+            Dialogs.showUpgradeDialog(context, uiTheme, mediaUpgradeState, {
+                controller.onMediaUpgradeReceived(mediaUpgradeState.mediaUpgradeOffer)
                 dialogController.dismissCurrentDialog()
             }) {
                 controller.onNegativeDialogButtonClicked()

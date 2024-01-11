@@ -17,7 +17,6 @@ import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -278,11 +277,11 @@ internal class MessageCenterView(
 
     private fun onDialogState(state: DialogState) {
         if (updateDialogState(state)) {
-            when (state.mode) {
-                Dialog.MODE_NONE -> resetDialogStateAndDismiss()
-                Dialog.MODE_UNEXPECTED_ERROR -> showUnexpectedErrorDialog()
-                Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> showMessageCenterUnavailableDialog()
-                Dialog.MODE_UNAUTHENTICATED -> showUnAuthenticatedDialog()
+            when (state) {
+                DialogState.None -> resetDialogStateAndDismiss()
+                DialogState.UnexpectedError -> showUnexpectedErrorDialog()
+                DialogState.MessageCenterUnavailable -> showMessageCenterUnavailableDialog()
+                DialogState.Unauthenticated -> showUnAuthenticatedDialog()
                 else -> throw UnsupportedOperationException("Unexpected dialog type for Message Center screen")
             }
         }

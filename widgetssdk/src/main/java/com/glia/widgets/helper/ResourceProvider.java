@@ -14,14 +14,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.util.List;
 
 interface IResourceProvider {
 
     String getString(@StringRes int id);
 
-    String getString(@StringRes int id, @Nullable String... formatArgs);
+    String getString(@StringRes int id, @Nullable Object... formatArgs);
 
     @ColorInt
     Integer getColor(@ColorRes int id);
@@ -54,7 +52,7 @@ public class ResourceProvider implements IResourceProvider {
     }
 
     @Override
-    public String getString(int id, @Nullable String... formatArgs) {
+    public String getString(int id, @Nullable Object... formatArgs) {
         return (weakContext.get()).getResources().getString(id, formatArgs);
     }
 

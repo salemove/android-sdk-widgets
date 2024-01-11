@@ -16,6 +16,9 @@ import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.fileupload.model.FileAttachment
 
 internal interface ChatController {
+    val isChatVisible: Boolean
+    var photoCaptureFileUri: Uri?
+
     fun setViewCallback(chatViewCallback: ChatViewCallback)
     fun onDestroy(retain: Boolean)
     fun onMessageClicked(messageId: String)
@@ -52,7 +55,4 @@ internal interface ChatController {
     fun show()
     fun onPause()
     fun onResume()
-
-    val isChatVisible: Boolean
-    var photoCaptureFileUri: Uri?
 }

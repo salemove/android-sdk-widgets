@@ -18,7 +18,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
-class SendMessageButtonStateUseCaseTest {
+class SendMessageButtonDialogStateUseCaseTest {
     private lateinit var sendMessageRepository: SendMessageRepository
     private lateinit var fileAttachmentRepository: SecureFileAttachmentRepository
     private lateinit var secureConversationsRepository: SecureConversationsRepository

@@ -11,20 +11,9 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
-import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
-import com.glia.widgets.core.dialog.Dialog.MODE_LIVE_OBSERVATION_OPT_IN
-import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
-import com.glia.widgets.core.dialog.Dialog.MODE_NONE
-import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
-import com.glia.widgets.core.dialog.Dialog.MODE_START_SCREEN_SHARING
-import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
-import com.glia.widgets.core.dialog.Dialog.Mode
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
-import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.helper.Logger
@@ -42,8 +31,7 @@ internal class ActivityWatcherForCallVisualizerController(
     @VisibleForTesting
     internal var mediaUpgradeOffer: MediaUpgradeOffer? = null
 
-    @Mode
-    private var currentDialogMode: Int = MODE_NONE
+    private var currentDialogState: DialogState = DialogState.None
     private var shouldWaitMediaProjectionResult: Boolean = false
 
     private lateinit var watcher: ActivityWatcherForCallVisualizerContract.Watcher
@@ -81,7 +69,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     private fun onEngagementEnded() {
         watcher.removeDialogFromStack()
-        currentDialogMode = MODE_NONE
+        currentDialogState = DialogState.None
 
         removeScreenSharingCallback()
     }
@@ -113,15 +101,15 @@ internal class ActivityWatcherForCallVisualizerController(
 
     override fun onDialogControllerCallback(state: DialogState) {
         // This ensures that dialog state is set to MODE_NONE only by dismissing the dialog properly
-        if (state.mode != MODE_NONE) {
-            currentDialogMode = state.mode
+        if (state != DialogState.None) {
+            currentDialogState = state
         }
         if (watcher.isWebBrowserActivityOpen()) {
             // Prevent opening the support activity and show the dialog.
             // We need this if the user opens the links from the engagement confirmation dialog.
             return
         }
-        if (state.mode != MODE_NONE && !watcher.isSupportActivityOpen()) {
+        if (state != DialogState.None && !watcher.isSupportActivityOpen()) {
             // This function is executed twice
             // First call opens CallVisualizerSupportActivity and exits the function.
             // After that, this function is called again when CallVisualizerSupportActivity is started.
@@ -129,17 +117,17 @@ internal class ActivityWatcherForCallVisualizerController(
             watcher.openSupportActivity(None)
             return
         }
-        when (state.mode) {
-            MODE_NONE -> watcher.dismissAlertDialog()
-            MODE_MEDIA_UPGRADE -> watcher.showUpgradeDialog(state as MediaUpgrade)
-            MODE_OVERLAY_PERMISSION -> watcher.showOverlayPermissionsDialog()
-            MODE_ENABLE_NOTIFICATION_CHANNEL -> watcher.showAllowNotificationsDialog()
-            MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.showAllowScreenSharingNotificationsAndStartSharingDialog()
-            MODE_VISITOR_CODE -> watcher.showVisitorCodeDialog()
-            MODE_START_SCREEN_SHARING -> watcher.showScreenSharingDialog(state as OperatorName)
-            MODE_LIVE_OBSERVATION_OPT_IN -> watcher.showEngagementConfirmationDialog()
+        when (state) {
+            DialogState.None -> watcher.dismissAlertDialog()
+            is DialogState.MediaUpgrade -> watcher.showUpgradeDialog(state)
+            DialogState.OverlayPermission -> watcher.showOverlayPermissionsDialog()
+            DialogState.EnableNotificationChannel -> watcher.showAllowNotificationsDialog()
+            DialogState.EnableScreenSharingNotificationsAndStartSharing -> watcher.showAllowScreenSharingNotificationsAndStartSharingDialog()
+            DialogState.VisitorCode -> watcher.showVisitorCodeDialog()
+            is DialogState.StartScreenSharing -> watcher.showScreenSharingDialog(state.operatorName)
+            DialogState.Confirmation -> watcher.showEngagementConfirmationDialog()
             else -> {
-                Logger.d(TAG, "Unexpected dialog mode received - ${state.mode}")
+                Logger.d(TAG, "Unexpected dialog mode received - $state")
             }
         }
     }
@@ -152,42 +140,40 @@ internal class ActivityWatcherForCallVisualizerController(
     }
 
     override fun onPositiveDialogButtonClicked(activity: Activity?) {
-        Logger.d(TAG, "onPositiveButtonDialogButtonClicked() - $currentDialogMode")
-        when (currentDialogMode) {
-            MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
-            MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> watcher.openNotificationChannelScreen()
-            MODE_START_SCREEN_SHARING -> activity?.run { startScreenSharing(this) }
-            MODE_MEDIA_UPGRADE -> watcher.openCallActivity()
-            MODE_ENABLE_NOTIFICATION_CHANNEL -> watcher.openNotificationChannelScreen()
-            MODE_OVERLAY_PERMISSION -> {
+        Logger.d(TAG, "onPositiveButtonDialogButtonClicked() - $currentDialogState")
+        when (currentDialogState) {
+            DialogState.None -> Logger.e(TAG, "$currentDialogState should not have a dialog to click")
+            DialogState.EnableScreenSharingNotificationsAndStartSharing -> watcher.openNotificationChannelScreen()
+            is DialogState.StartScreenSharing -> activity?.run { startScreenSharing(this) }
+            is DialogState.MediaUpgrade -> watcher.openCallActivity()
+            DialogState.EnableNotificationChannel -> watcher.openNotificationChannelScreen()
+            DialogState.OverlayPermission -> {
                 watcher.dismissOverlayDialog()
                 watcher.openOverlayPermissionView()
             }
 
-            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onEngagementConfirmationDialogAllowed()
+            DialogState.Confirmation -> callVisualizerController.onEngagementConfirmationDialogAllowed()
             else -> Logger.d(TAG, "Not relevant")
         }
         watcher.removeDialogFromStack()
-        currentDialogMode = MODE_NONE
+        currentDialogState = DialogState.None
         watcher.destroySupportActivityIfExists()
     }
 
     override fun onNegativeDialogButtonClicked() {
-        Logger.d(TAG, "onNegativeButtonDialogButtonClicked() - $currentDialogMode")
-        when (currentDialogMode) {
-            MODE_NONE -> Logger.e(TAG, "$currentDialogMode should not have a dialog to click")
-            MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING,
-            MODE_START_SCREEN_SHARING -> screenSharingController.onScreenSharingDeclined()
-
-            MODE_OVERLAY_PERMISSION -> watcher.dismissOverlayDialog()
-
-            MODE_MEDIA_UPGRADE -> declineMediaUpgradeRequest()
-
-            MODE_LIVE_OBSERVATION_OPT_IN -> callVisualizerController.onEngagementConfirmationDialogDeclined()
-            MODE_VISITOR_CODE, MODE_ENABLE_NOTIFICATION_CHANNEL -> Logger.d(TAG, "$currentDialogMode no operation")
+        Logger.d(TAG, "onNegativeButtonDialogButtonClicked() - $currentDialogState")
+        when (currentDialogState) {
+            DialogState.None -> Logger.e(TAG, "$currentDialogState should not have a dialog to click")
+            DialogState.EnableScreenSharingNotificationsAndStartSharing,
+            is DialogState.StartScreenSharing -> screenSharingController.onScreenSharingDeclined()
+            DialogState.OverlayPermission -> watcher.dismissOverlayDialog()
+            is DialogState.MediaUpgrade -> declineMediaUpgradeRequest()
+            DialogState.Confirmation -> callVisualizerController.onEngagementConfirmationDialogDeclined()
+            DialogState.VisitorCode, DialogState.EnableNotificationChannel -> Logger.d(TAG, "$currentDialogState no operation")
+            else -> Logger.d(TAG, "Not relevant")
         }
         watcher.removeDialogFromStack()
-        currentDialogMode = MODE_NONE
+        currentDialogState = DialogState.None
     }
 
     override fun addScreenSharingCallback(activity: Activity) {
@@ -234,7 +220,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
             override fun onScreenSharingStarted() {
                 if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
-                    currentDialogMode = MODE_OVERLAY_PERMISSION
+                    currentDialogState = DialogState.OverlayPermission
                     watcher.callOverlayDialog()
                 }
             }
@@ -287,7 +273,7 @@ internal class ActivityWatcherForCallVisualizerController(
     }
 
     private fun resetMediaUpgradeState() {
-        currentDialogMode = MODE_NONE
+        currentDialogState = DialogState.None
         mediaUpgradeOffer = null
     }
 

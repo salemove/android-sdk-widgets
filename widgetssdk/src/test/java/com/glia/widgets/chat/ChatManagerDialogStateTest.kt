@@ -15,7 +15,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class ChatManagerStateTest {
+class ChatManagerDialogStateTest {
     private lateinit var state: ChatManager.State
 
     @Before

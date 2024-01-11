@@ -1,7 +1,6 @@
 package com.glia.widgets.view
 
 import android.content.Context
-import android.content.DialogInterface
 import android.view.Gravity
 import android.view.View
 import android.view.Window
@@ -14,10 +13,10 @@ import com.glia.widgets.StringKeyPair
 import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
-import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
-import com.glia.widgets.core.dialog.model.DialogState.OperatorName
+import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.dialog.model.Link
+import com.glia.widgets.core.dialog.model.MediaUpgradeMode
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.view.dialog.base.DialogPayload
@@ -39,6 +38,7 @@ internal object Dialogs {
     private val cancel: String by lazy { stringProvider.getRemoteString(R.string.general_cancel) }
     private val accept: String by lazy { stringProvider.getRemoteString(R.string.general_accept) }
     private val decline: String by lazy { stringProvider.getRemoteString(R.string.general_decline) }
+    private val backingOperatorName: String by lazy { stringProvider.getRemoteString(R.string.engagement_default_operator) }
 
     fun showNoMoreOperatorsAvailableDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
         val payload = DialogPayload.AlertDialog(
@@ -78,8 +78,7 @@ internal object Dialogs {
         context: Context,
         uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener,
-        onCancelListener: DialogInterface.OnCancelListener
+        negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
             title = stringProvider.getRemoteString(R.string.android_overlay_permission_title),
@@ -92,17 +91,14 @@ internal object Dialogs {
 
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload)) {
-            setOnCancelListener(onCancelListener)
-        }
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
     }
 
     fun showEndEngagementDialog(
         context: Context,
         uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener,
-        onCancelListener: DialogInterface.OnCancelListener
+        negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
             title = stringProvider.getRemoteString(R.string.engagement_end_confirmation_header),
@@ -114,17 +110,14 @@ internal object Dialogs {
             negativeButtonClickListener = negativeButtonClickListener
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload)) {
-            setOnCancelListener(onCancelListener)
-        }
+        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload))
     }
 
     fun showExitQueueDialog(
         context: Context,
         uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener,
-        onCancelListener: DialogInterface.OnCancelListener
+        negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
             title = stringProvider.getRemoteString(R.string.engagement_queue_leave_header),
@@ -137,17 +130,14 @@ internal object Dialogs {
 
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload)) {
-            setOnCancelListener(onCancelListener)
-        }
+        return dialogService.showDialog(context, uiTheme, DialogType.ReversedOption(payload))
     }
 
     fun showAllowScreenSharingNotificationsAndStartSharingDialog(
         context: Context,
         uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener,
-        onCancelListener: DialogInterface.OnCancelListener
+        negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
             title = stringProvider.getRemoteString(R.string.android_screen_sharing_offer_with_notifications_title),
@@ -159,17 +149,14 @@ internal object Dialogs {
             negativeButtonClickListener = negativeButtonClickListener
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload)) {
-            setOnCancelListener(onCancelListener)
-        }
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
     }
 
     fun showAllowNotificationsDialog(
         context: Context,
         uiTheme: UiTheme,
         positiveButtonClickListener: View.OnClickListener,
-        negativeButtonClickListener: View.OnClickListener,
-        onCancelListener: DialogInterface.OnCancelListener
+        negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.Option(
             title = stringProvider.getRemoteString(R.string.android_notification_allow_notifications_title),
@@ -182,9 +169,7 @@ internal object Dialogs {
 
         )
 
-        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload)) {
-            setOnCancelListener(onCancelListener)
-        }
+        return dialogService.showDialog(context, uiTheme, DialogType.Option(payload))
     }
 
     fun showUnAuthenticatedDialog(context: Context, uiTheme: UiTheme, buttonClickListener: View.OnClickListener): AlertDialog {
@@ -237,20 +222,21 @@ internal object Dialogs {
     fun showUpgradeDialog(
         context: Context,
         theme: UiTheme,
-        mediaUpgrade: MediaUpgrade,
+        dialogState: DialogState.MediaUpgrade,
         onAcceptOfferClickListener: View.OnClickListener,
         onCloseClickListener: View.OnClickListener
     ): AlertDialog {
-        val titleIconResPair = when (mediaUpgrade.mediaUpgradeMode) {
-            MediaUpgrade.MODE_AUDIO -> R.string.media_upgrade_audio_title to (theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
-            MediaUpgrade.MODE_VIDEO_ONE_WAY -> R.string.media_upgrade_video_one_way_title to (theme.iconUpgradeVideoDialog
+        val titleIconResPair = when (dialogState.mode) {
+            MediaUpgradeMode.AUDIO -> R.string.media_upgrade_audio_title to (theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
+            MediaUpgradeMode.VIDEO_ONE_WAY -> R.string.media_upgrade_video_one_way_title to (theme.iconUpgradeVideoDialog
                 ?: R.drawable.ic_baseline_videocam)
 
-            else -> R.string.media_upgrade_video_two_way_title to (theme.iconUpgradeVideoDialog ?: R.drawable.ic_baseline_videocam)
+            MediaUpgradeMode.VIDEO_TWO_WAY -> R.string.media_upgrade_video_two_way_title to (theme.iconUpgradeVideoDialog
+                ?: R.drawable.ic_baseline_videocam)
         }
 
         val payload = DialogPayload.Upgrade(
-            title = stringProvider.getRemoteString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, mediaUpgrade.operatorName)),
+            title = stringProvider.getRemoteString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, dialogState.operatorName ?: backingOperatorName)),
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,
@@ -266,13 +252,16 @@ internal object Dialogs {
     fun showScreenSharingDialog(
         context: Context,
         theme: UiTheme,
-        dialogState: OperatorName,
+        operatorName: String?,
         positiveButtonClickListener: View.OnClickListener,
         negativeButtonClickListener: View.OnClickListener
     ): AlertDialog {
         val payload = DialogPayload.ScreenSharing(
             title = stringProvider.getRemoteString(R.string.alert_screen_sharing_start_header),
-            message = stringProvider.getRemoteString(R.string.alert_screen_sharing_start_message, StringKeyPair(StringKey.OPERATOR_NAME, dialogState.operatorName)),
+            message = stringProvider.getRemoteString(
+                R.string.alert_screen_sharing_start_message,
+                StringKeyPair(StringKey.OPERATOR_NAME, operatorName ?: backingOperatorName)
+            ),
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,

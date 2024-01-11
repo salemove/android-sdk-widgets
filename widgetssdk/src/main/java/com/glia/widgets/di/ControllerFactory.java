@@ -18,6 +18,7 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.chat.controller.ChatControllerImpl;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.dialog.DialogControllerImpl;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.core.screensharing.ScreenSharingControllerImpl;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
@@ -82,7 +83,7 @@ public class ControllerFactory {
         );
 
         this.useCaseFactory = useCaseFactory;
-        this.dialogController = new DialogController(
+        this.dialogController = new DialogControllerImpl(
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
         );
@@ -233,7 +234,7 @@ public class ControllerFactory {
     }
 
     public DialogController createDialogController() {
-        return new DialogController(
+        return new DialogControllerImpl(
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
         );

@@ -196,7 +196,7 @@ internal class ChatControllerImpl(
 
         ensureSecureMessagingAvailable()
 
-        if (chatState.integratorChatStarted || dialogController.isShowingChatEnderDialog) {
+        if (chatState.integratorChatStarted || dialogController.isShowingUnexpectedErrorDialog) {
             if (isSecureEngagement) {
                 emitViewState { chatState.setSecureMessagingState() }
             }
@@ -333,8 +333,8 @@ internal class ChatControllerImpl(
         sendMessagePreview("")
     }
 
-    private fun onMessageSendError(ignore: GliaException, message: Unsent) {
-        Logger.i(TAG, "Message send exception")
+    private fun onMessageSendError(ex: GliaException, message: Unsent) {
+        Logger.e(TAG, "Message send exception", ex)
 
         chatManager.onChatAction(ChatManager.Action.MessageSendError(message))
         scrollChatToBottom()
@@ -410,7 +410,7 @@ internal class ChatControllerImpl(
 
     override fun leaveChatClicked() {
         Logger.d(TAG, "leaveChatClicked")
-        if (chatState.isOperatorOnline) dialogController.showExitChatDialog(chatState.formattedOperatorName)
+        if (chatState.isOperatorOnline) dialogController.showExitChatDialog()
     }
 
     override fun onXButtonClicked() {

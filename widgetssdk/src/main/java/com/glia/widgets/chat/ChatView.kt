@@ -52,10 +52,9 @@ import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.Dialog
 import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
-import com.glia.widgets.core.dialog.model.DialogState.OperatorName
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingController
@@ -261,7 +260,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     ) {
         Dependencies.getSdkConfigurationManager().isUseOverlay = useOverlays
         Dependencies.getSdkConfigurationManager().screenSharingMode = screenSharingMode
-        dialogController?.addCallback(dialogCallback)
+        dialogCallback?.also { dialogController?.addCallback(it) }
         controller?.initChat(companyName, queueId, visitorContextAssetId, chatType)
     }
 
@@ -336,13 +335,13 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         controller?.onResume()
         screenSharingController?.setViewCallback(screenSharingViewCallback)
         screenSharingController?.onResume(context.requireActivity())
-        dialogController?.addCallback(dialogCallback)
+        dialogCallback?.also { dialogController?.addCallback(it) }
     }
 
     fun onPause() {
         controller?.onPause()
         screenSharingController?.removeViewCallback(screenSharingViewCallback)
-        dialogController?.removeCallback(dialogCallback)
+        dialogCallback?.also { dialogController?.removeCallback(it) }
     }
 
     /**
@@ -594,27 +593,26 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private fun setupDialogCallback() {
         dialogCallback = DialogController.Callback {
             if (updateDialogState(it)) {
-                when (it.mode) {
-                    Dialog.MODE_NONE -> resetDialogStateAndDismiss()
-                    Dialog.MODE_MESSAGE_CENTER_UNAVAILABLE -> post { showChatUnavailableView() }
-                    Dialog.MODE_UNEXPECTED_ERROR -> post { showUnexpectedErrorDialog() }
-                    Dialog.MODE_EXIT_QUEUE -> post { showExitQueueDialog() }
-                    Dialog.MODE_OVERLAY_PERMISSION -> post { showOverlayPermissionsDialog() }
-                    Dialog.MODE_END_ENGAGEMENT -> post { showEndEngagementDialog() }
-                    Dialog.MODE_MEDIA_UPGRADE -> post { showUpgradeDialog(it as MediaUpgrade) }
-                    Dialog.MODE_ENGAGEMENT_ENDED -> post { showEngagementEndedDialog() }
-                    Dialog.MODE_START_SCREEN_SHARING -> post { showScreenSharingDialog(it as OperatorName) }
-                    Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL -> post { showAllowNotificationsDialog() }
-                    Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
-                        showAllowScreenSharingNotificationsAndStartSharingDialog()
+                when (it) {
+                    DialogState.None -> resetDialogStateAndDismiss()
+                    DialogState.MessageCenterUnavailable -> post { showChatUnavailableView() }
+                    DialogState.UnexpectedError -> post { showUnexpectedErrorDialog() }
+                    DialogState.ExitQueue -> post { showExitQueueDialog() }
+                    DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
+                    DialogState.EndEngagement -> post { showEndEngagementDialog() }
+                    is MediaUpgrade -> post { showUpgradeDialog(it) }
+                    is DialogState.StartScreenSharing -> post { showScreenSharingDialog(it.operatorName) }
+                    DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
+                    DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
+                    showAllowScreenSharingNotificationsAndStartSharingDialog()
                     }
 
-                    Dialog.MODE_LIVE_OBSERVATION_OPT_IN -> post { controller?.onEngagementConfirmationDialogRequested() }
+                    DialogState.Confirmation -> post { controller?.onEngagementConfirmationDialogRequested() }
 
-                    Dialog.MODE_VISITOR_CODE -> {
+                    DialogState.VisitorCode -> {
                         Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
                     } // Should never happen inside ChatView
-                    else -> Logger.d(TAG, "Dialog mode ${it.mode} not handled.")
+                    else -> Logger.d(TAG, "Dialog mode $it not handled.")
                 }
             }
         }
@@ -682,11 +680,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 resetDialogStateAndDismiss()
                 controller?.notificationDialogDismissed()
                 screenSharingController?.onScreenSharingDeclined()
-            },
-            onCancelListener = {
-                resetDialogStateAndDismiss()
-                controller?.notificationDialogDismissed()
-                screenSharingController?.onScreenSharingDeclined()
             }
         )
     }
@@ -703,19 +696,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()
                 controller?.notificationDialogDismissed()
-            },
-            onCancelListener = {
-                resetDialogStateAndDismiss()
-                controller?.notificationDialogDismissed()
             }
         )
     }
 
-    private fun showScreenSharingDialog(dialogState: OperatorName) = showDialog {
+    private fun showScreenSharingDialog(operatorName: String?) = showDialog {
         Dialogs.showScreenSharingDialog(
             context = context,
             theme = theme,
-            dialogState = dialogState,
+            operatorName = operatorName,
             positiveButtonClickListener = {
                 screenSharingController?.onScreenSharingAccepted(context.requireActivity())
             },
@@ -964,10 +953,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()
                 controller?.endEngagementDialogDismissed()
-            },
-            onCancelListener = {
-                resetDialogStateAndDismiss()
-                controller?.endEngagementDialogDismissed()
             }
         )
     }
@@ -983,21 +968,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()
                 controller?.endEngagementDialogDismissed()
-            },
-            onCancelListener = {
-                resetDialogStateAndDismiss()
-                controller?.endEngagementDialogDismissed()
             }
         )
-    }
-
-    private fun showEngagementEndedDialog() = showDialog {
-        Dialogs.showOperatorEndedEngagementDialog(context, theme) {
-            resetDialogStateAndDismiss()
-            controller?.noMoreOperatorsAvailableDismissed()
-            onEndListener?.onEnd()
-            chatEnded()
-        }
     }
 
     private fun showUpgradeDialog(mediaUpgrade: MediaUpgrade) = showDialog {
@@ -1031,10 +1003,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 this.context.startActivity(overlayIntent)
             },
             negativeButtonClickListener = {
-                controller?.overlayPermissionsDialogDismissed()
-                resetDialogStateAndDismiss()
-            },
-            onCancelListener = {
                 controller?.overlayPermissionsDialogDismissed()
                 resetDialogStateAndDismiss()
             }

@@ -3,6 +3,8 @@ package com.glia.widgets.core.visitor;
 import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.comms.Media;
 import com.glia.androidsdk.comms.VisitorMediaState;
+import com.glia.widgets.helper.Logger;
+
 import java.util.HashSet;
 import java.util.Set;
 import io.reactivex.Completable;
@@ -118,7 +120,6 @@ public class GliaVisitorMediaRepository {
     private void visitorAudioMediaStatusOnHold(boolean isOnHold) {
         if (isOnHold) {
             saveVisitorAudioStatus();
-            muteVisitorAudio();
         } else {
             restoreVisitorAudioStatus();
         }

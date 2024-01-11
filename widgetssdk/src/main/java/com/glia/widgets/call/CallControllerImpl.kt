@@ -139,9 +139,9 @@ internal class CallControllerImpl(
         mediaType: Engagement.MediaType,
         useOverlays: Boolean,
         screenSharingMode: ScreenSharing.Mode,
-        isUpgradeToCall: Boolean
+        upgradeToCall: Boolean
     ) {
-        if (isUpgradeToCall) {
+        if (upgradeToCall) {
             initCall(companyName, queueId, visitorContextAssetId, mediaType, useOverlays, screenSharingMode)
             return
         }
@@ -170,7 +170,7 @@ internal class CallControllerImpl(
             dialogController.showOverlayPermissionsDialog()
         }
         messagesNotSeenHandler.onNavigatedToCall()
-        if (callState.integratorCallStarted || dialogController.isShowingChatEnderDialog) {
+        if (callState.integratorCallStarted || dialogController.isShowingUnexpectedErrorDialog) {
             return
         }
         emitViewState(callState.initCall(companyName, queueId, visitorContextAssetId, mediaType))
@@ -225,15 +225,15 @@ internal class CallControllerImpl(
         enqueueForEngagementUseCase(queueId, mediaType, visitorContextAssetId)
     }
 
-    override fun onDestroy(retain: Boolean) {
-        d(TAG, "onDestroy, retain: $retain")
+    override fun onDestroy(retained: Boolean) {
+        d(TAG, "onDestroy, retain: $retained")
         viewCallback?.also {
             d(TAG, "destroyingView")
             it.destroyView()
             viewCallback = null
         }
 
-        if (!retain) {
+        if (!retained) {
             disposable.clear()
             callTimerStatusListener?.also {
                 callTimer.removeFormattedValueListener(it)
@@ -418,8 +418,8 @@ internal class CallControllerImpl(
         turnSpeakerphoneUseCase.invoke(newValue)
     }
 
-    override fun shouldShowMediaEngagementView(isUpgradeToCall: Boolean): Boolean {
-        return shouldShowMediaEngagementViewUseCase.execute(isUpgradeToCall)
+    override fun shouldShowMediaEngagementView(upgradeToCall: Boolean): Boolean {
+        return shouldShowMediaEngagementViewUseCase.execute(upgradeToCall)
     }
 
     override fun onBackClicked() {
@@ -494,7 +494,7 @@ internal class CallControllerImpl(
 
     private fun showExitChatDialog() {
         if (callState.isMediaEngagementStarted) {
-            dialogController.showExitChatDialog(callState.callStatus.formattedOperatorName)
+            dialogController.showExitChatDialog()
         }
     }
 

@@ -11,16 +11,10 @@ import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
-import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_NOTIFICATION_CHANNEL
-import com.glia.widgets.core.dialog.Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
-import com.glia.widgets.core.dialog.Dialog.MODE_MEDIA_UPGRADE
-import com.glia.widgets.core.dialog.Dialog.MODE_NONE
-import com.glia.widgets.core.dialog.Dialog.MODE_OVERLAY_PERMISSION
-import com.glia.widgets.core.dialog.Dialog.MODE_START_SCREEN_SHARING
-import com.glia.widgets.core.dialog.Dialog.MODE_VISITOR_CODE
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
+import com.glia.widgets.core.dialog.model.MediaUpgradeMode
 import com.glia.widgets.core.screensharing.ScreenSharingControllerImpl
 import com.glia.widgets.engagement.State
 import io.reactivex.Flowable
@@ -34,7 +28,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -190,7 +183,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed and permission view is opened when MODE_OVERLAY_PERMISSION`() {
-        controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
+        controller.onDialogControllerCallback(DialogState.OverlayPermission)
         resetMocks()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -201,7 +194,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_OVERLAY_PERMISSION`() {
-        controller.onDialogControllerCallback(DialogState(MODE_NONE))
+        controller.onDialogControllerCallback(DialogState.None)
         resetMocks()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -210,7 +203,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_NONE`() {
-        controller.onDialogControllerCallback(DialogState(MODE_NONE))
+        controller.onDialogControllerCallback(DialogState.None)
         resetMocks()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -219,11 +212,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked notification channel dialog is shown when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(
-            DialogState(
-                MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING
-            )
-        )
+        controller.onDialogControllerCallback(DialogState.EnableScreenSharingNotificationsAndStartSharing)
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -236,7 +225,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked decline is sent and dialog is dismissed when MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING))
+        controller.onDialogControllerCallback(DialogState.EnableScreenSharingNotificationsAndStartSharing)
         verify(watcher).showAllowScreenSharingNotificationsAndStartSharingDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).isWebBrowserActivityOpen()
@@ -270,7 +259,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked overlay permissions are called when MODE_OVERLAY_PERMISSIONS`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
+        controller.onDialogControllerCallback(DialogState.OverlayPermission)
         verify(watcher).showOverlayPermissionsDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).dismissOverlayDialog()
@@ -284,7 +273,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_OVERLAY_PERMISSIONS`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_OVERLAY_PERMISSION))
+        controller.onDialogControllerCallback(DialogState.OverlayPermission)
         verify(watcher).showOverlayPermissionsDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -296,7 +285,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked notification channel is shown when MODE_ENABLE_NOTIFICAIONTS_CHANNEL`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_ENABLE_NOTIFICATION_CHANNEL))
+        controller.onDialogControllerCallback(DialogState.EnableNotificationChannel)
         verify(watcher).showAllowNotificationsDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -309,7 +298,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_ENABLE_NOTIFICATIONS_CHANNEL`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_ENABLE_NOTIFICATION_CHANNEL))
+        controller.onDialogControllerCallback(DialogState.EnableNotificationChannel)
         verify(watcher).showAllowNotificationsDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -320,7 +309,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked openSupportActivity called when isSupportActivityOpen false and MODE_VISITOR_CODE`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(false)
-        controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
+        controller.onDialogControllerCallback(DialogState.VisitorCode)
         verify(watcher, never()).showVisitorCodeDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -333,7 +322,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_VISITOR_CODE`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
+        controller.onDialogControllerCallback(DialogState.VisitorCode)
         verify(watcher).showVisitorCodeDialog()
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -345,7 +334,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_VISITOR_CODE`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState(MODE_VISITOR_CODE))
+        controller.onDialogControllerCallback(DialogState.VisitorCode)
         verify(watcher).showVisitorCodeDialog()
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -356,7 +345,8 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked openSupportActivity called when isSupportActivityOpen false and MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(false)
-        controller.onDialogControllerCallback(DialogState(MODE_START_SCREEN_SHARING))
+        val operatorName = "Operator"
+        controller.onDialogControllerCallback(DialogState.StartScreenSharing(operatorName))
         verify(watcher, never()).showScreenSharingDialog(any())
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -369,8 +359,9 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState.OperatorName(MODE_START_SCREEN_SHARING, "OperatorName"))
-        verify(watcher).showScreenSharingDialog(argThat{ state -> state.operatorName == "OperatorName" })
+        val operatorName = "Operator"
+        controller.onDialogControllerCallback(DialogState.StartScreenSharing(operatorName))
+        verify(watcher).showScreenSharingDialog(eq(operatorName))
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(watcher).isWebBrowserActivityOpen()
@@ -381,8 +372,9 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        controller.onDialogControllerCallback(DialogState.OperatorName(MODE_START_SCREEN_SHARING, "OperatorName"))
-        verify(watcher).showScreenSharingDialog(argThat{ state -> state.operatorName == "OperatorName" })
+        val operatorName = "Operator"
+        controller.onDialogControllerCallback(DialogState.StartScreenSharing(operatorName))
+        verify(watcher).showScreenSharingDialog(eq(operatorName))
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
@@ -492,7 +484,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
 
     private fun prepareMediaUpgradeApplicationState() {
         val offer = mock(MediaUpgradeOffer::class.java)
-        val state = DialogState.MediaUpgrade(offer, "name", MODE_MEDIA_UPGRADE)
+        val state = DialogState.MediaUpgrade(offer, "name", MediaUpgradeMode.AUDIO)
         controller.onDialogControllerCallback(state)
         verify(watcher).showUpgradeDialog(state)
     }

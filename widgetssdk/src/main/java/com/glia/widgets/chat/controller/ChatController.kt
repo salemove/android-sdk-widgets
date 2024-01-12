@@ -913,7 +913,7 @@ internal class ChatController(
             upgradeMediaItemToVideo()
         } else if (!chatState.isMediaUpgradeStarted) {
             addMediaUpgradeItemToChatItems(operatorMediaState)
-            if (!callTimer.isRunning) {
+            if (chatState.isOperatorOnline && !callTimer.isRunning && timerStatusListener != null) {
                 startTimer()
             }
         }

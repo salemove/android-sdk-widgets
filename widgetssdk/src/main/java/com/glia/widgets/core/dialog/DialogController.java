@@ -21,8 +21,8 @@ public class DialogController {
     private final DialogManager dialogManager;
 
     public DialogController(
-            SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase,
-            SetEnableCallNotificationChannelDialogShownUseCase setEnableCallNotificationChannelDialogShownUseCase
+        SetOverlayPermissionRequestDialogShownUseCase setOverlayPermissionRequestDialogShownUseCase,
+        SetEnableCallNotificationChannelDialogShownUseCase setEnableCallNotificationChannelDialogShownUseCase
     ) {
         this.setOverlayPermissionRequestDialogShownUseCase = setOverlayPermissionRequestDialogShownUseCase;
         this.setEnableCallNotificationChannelDialogShownUseCase = setEnableCallNotificationChannelDialogShownUseCase;
@@ -155,7 +155,11 @@ public class DialogController {
 
     public void showEngagementConfirmationDialog() {
         Logger.d(TAG, "Show Live Observation Opt In Dialog");
-        dialogManager.addAndEmit(new DialogState(Dialog.MODE_LIVE_OBSERVATION_OPT_IN));
+        if (isOverlayDialogShown() || isExitQueueDialogShown()) {
+            dialogManager.add(new DialogState(Dialog.MODE_LIVE_OBSERVATION_OPT_IN));
+        } else {
+            dialogManager.addAndEmit(new DialogState(Dialog.MODE_LIVE_OBSERVATION_OPT_IN));
+        }
     }
 
     public void addCallback(Callback callback) {

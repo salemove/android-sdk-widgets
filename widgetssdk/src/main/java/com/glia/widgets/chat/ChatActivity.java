@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
@@ -18,7 +17,8 @@ import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.survey.SurveyActivity;
+
+import java.util.Objects;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = ChatActivity.class.getSimpleName();
@@ -28,39 +28,41 @@ public class ChatActivity extends AppCompatActivity {
 
     /**
      * Creates and fills out Intent for starting ChatActivity
-     * @param context - Context object
+     *
+     * @param context   - Context object
      * @param contextId - Context asset ID
-     * @param queueId - Queue ID
+     * @param queueId   - Queue ID
      * @return - Intent for Starting ChatActivity
      */
     public static Intent getIntent(
-            Context context,
-            String contextId,
-            String queueId
+        Context context,
+        String contextId,
+        String queueId
     ) {
         return new Intent(context, ChatActivity.class)
-                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
-                .putExtra(GliaWidgets.QUEUE_ID, queueId);
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
+            .putExtra(GliaWidgets.QUEUE_ID, queueId);
     }
 
     /**
      * Creates and fills out Intent for starting ChatActivity
-     * @param context - Context object
+     *
+     * @param context   - Context object
      * @param contextId - Context asset ID
-     * @param queueId - Queue ID
-     * @param chatType - Type of chat screen
+     * @param queueId   - Queue ID
+     * @param chatType  - Type of chat screen
      * @return - Intent for Starting ChatActivity
      */
     public static Intent getIntent(
-            Context context,
-            String contextId,
-            String queueId,
-            ChatType chatType
+        Context context,
+        String contextId,
+        String queueId,
+        ChatType chatType
     ) {
         return new Intent(context, ChatActivity.class)
-                .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
-                .putExtra(GliaWidgets.QUEUE_ID, queueId)
-                .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
+            .putExtra(GliaWidgets.QUEUE_ID, queueId)
+            .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
     }
 
     @Override
@@ -90,14 +92,13 @@ public class ChatActivity extends AppCompatActivity {
 
         chatView.setOnMinimizeListener(this::finish);
         chatView.setOnNavigateToCallListener(this::startCallScreen);
-        chatView.setOnNavigateToSurveyListener(this::navigateToSurvey);
         chatView.startChat(
-                configuration.getCompanyName(),
-                configuration.getQueueId(),
-                configuration.getContextAssetId(),
-                configuration.getUseOverlay(),
-                configuration.getScreenSharingMode(),
-                configuration.getChatType()
+            configuration.getCompanyName(),
+            configuration.getQueueId(),
+            configuration.getContextAssetId(),
+            configuration.getUseOverlay(),
+            configuration.getScreenSharingMode(),
+            Objects.requireNonNull(configuration.getChatType())
         );
     }
 
@@ -141,18 +142,18 @@ public class ChatActivity extends AppCompatActivity {
 
     private GliaSdkConfiguration createConfiguration(Intent intent) {
         return new GliaSdkConfiguration.Builder()
-                .intent(intent)
-                .build();
+            .intent(intent)
+            .build();
     }
 
     private void startCallScreen(UiTheme theme, String mediaType) {
         startActivity(
-                CallActivity.getIntent(
-                        getApplicationContext(),
-                        getConfigurationBuilder().setMediaType(Utils.toMediaType(mediaType))
-                                .setIsUpgradeToCall(true)
-                                .build()
-                )
+            CallActivity.getIntent(
+                getApplicationContext(),
+                getConfigurationBuilder().setMediaType(Utils.toMediaType(mediaType))
+                    .setIsUpgradeToCall(true)
+                    .build()
+            )
         );
         finish();
     }
@@ -164,13 +165,5 @@ public class ChatActivity extends AppCompatActivity {
 
     private Configuration.Builder getConfigurationBuilder() {
         return new Configuration.Builder().setWidgetsConfiguration(configuration);
-    }
-
-    private void navigateToSurvey(UiTheme theme, Survey survey) {
-        Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class);
-        newIntent.putExtra(GliaWidgets.UI_THEME, theme);
-        newIntent.putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
-        startActivity(newIntent);
-        finish();
     }
 }

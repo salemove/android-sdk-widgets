@@ -1,7 +1,7 @@
 package com.glia.widgets.engagement.domain
 
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.GliaEngagementConfigRepository
 import com.glia.widgets.core.fileupload.FileAttachmentRepository
 import com.glia.widgets.core.notification.domain.CallNotificationUseCase
@@ -18,7 +18,7 @@ internal class ReleaseResourcesUseCaseImpl(
     private val fileAttachmentRepository: FileAttachmentRepository,
     private val gliaEngagementConfigRepository: GliaEngagementConfigRepository,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
-    private val dialogController: DialogController
+    private val dialogController: DialogContract.Controller
 ) : ReleaseResourcesUseCase {
     override fun invoke() {
         dialogController.dismissDialogs()

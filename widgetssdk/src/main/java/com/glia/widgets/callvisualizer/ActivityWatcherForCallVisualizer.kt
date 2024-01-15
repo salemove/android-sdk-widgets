@@ -24,7 +24,7 @@ import com.glia.widgets.base.BaseActivityWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.di.Dependencies
@@ -39,7 +39,7 @@ import com.glia.widgets.webbrowser.WebBrowserActivity
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizer(
-    private val dialogController: DialogController,
+    private val dialogController: DialogContract.Controller,
     val controller: ActivityWatcherForCallVisualizerContract.Controller
 ) : BaseActivityWatcher(), ActivityWatcherForCallVisualizerContract.Watcher {
 
@@ -52,7 +52,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     private var alertDialog: AlertDialog? = null
-    private val dialogCallback: DialogController.Callback = DialogController.Callback {
+    private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback {
         controller.onDialogControllerCallback(it)
     }
     private var cameraPermissionLauncher: ActivityResultLauncher<String>? = null

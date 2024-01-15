@@ -5,7 +5,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileToAttachmentAndUploadUseCase
@@ -45,7 +45,7 @@ internal class MessageCenterControllerTest {
     private lateinit var sendMessageButtonStateUseCase: SendMessageButtonStateUseCase
     private lateinit var showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase
     private lateinit var resetMessageCenterUseCase: ResetMessageCenterUseCase
-    private lateinit var dialogController: DialogController
+    private lateinit var dialogController: DialogContract.Controller
 
     @Before
     fun setUp() {

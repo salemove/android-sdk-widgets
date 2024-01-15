@@ -11,7 +11,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 
 class LiveObservationPopupUseCaseTest {
 
@@ -21,15 +20,15 @@ class LiveObservationPopupUseCaseTest {
 
     @Before
     fun setUp() {
-        siteInfoUseCase = mock() {
-            on { execute(any()) } doAnswer {
+        siteInfoUseCase = mock {
+            on { invoke(any()) } doAnswer {
                 val callback: RequestCallback<SiteInfo> = it.getArgument(0)
                 siteInfoEmitter
                     .firstOrError()
-                    .doOnSuccess{ siteInfo -> callback.onResult(siteInfo, null) }
-                    .doOnError{ error -> callback.onResult(null, GliaException.from(error)) }
+                    .doOnSuccess { siteInfo -> callback.onResult(siteInfo, null) }
+                    .doOnError { error -> callback.onResult(null, GliaException.from(error)) }
                     .subscribe()
-                return@doAnswer;
+                return@doAnswer
             }
         }
         useCase = LiveObservationPopupUseCase(siteInfoUseCase)
@@ -37,68 +36,62 @@ class LiveObservationPopupUseCaseTest {
 
     @Test
     fun `invoke returns true when LO is enable and indication is enabled`() {
-        val callback: (Boolean) -> Unit = mock()
-        val siteInfo: SiteInfo = mock() {
+        val siteInfo: SiteInfo = mock {
             on { isLiveObservationEnabled } doReturn true
             on { isObservationIndicationEnabled } doReturn true
         }
 
-        useCase.invoke(callback)
+        val testResultObserver = useCase.invoke().test()
         emitSiteInfoResult(siteInfo)
 
-        verify(callback).invoke(true)
+        testResultObserver.assertValue(true)
     }
 
     @Test
     fun `invoke returns true when LO is enabled and indication is null`() {
-        val callback: (Boolean) -> Unit = mock()
-        val siteInfo: SiteInfo = mock() {
+        val siteInfo: SiteInfo = mock {
             on { isLiveObservationEnabled } doReturn true
             on { isObservationIndicationEnabled } doReturn null
         }
 
-        useCase.invoke(callback)
+        val testResultObserver = useCase.invoke().test()
         emitSiteInfoResult(siteInfo)
 
-        verify(callback).invoke(true)
+        testResultObserver.assertValue(true)
     }
 
     @Test
     fun `invoke returns false when LO is disabled and indication is enabled`() {
-        val callback: (Boolean) -> Unit = mock()
-        val siteInfo: SiteInfo = mock() {
+        val siteInfo: SiteInfo = mock {
             on { isLiveObservationEnabled } doReturn false
             on { isObservationIndicationEnabled } doReturn true
         }
 
-        useCase.invoke(callback)
+        val testResultObserver = useCase.invoke().test()
         emitSiteInfoResult(siteInfo)
 
-        verify(callback).invoke(false)
+        testResultObserver.assertValue(false)
     }
 
     @Test
     fun `invoke returns false when LO is enabled and indication is disabled`() {
-        val callback: (Boolean) -> Unit = mock()
-        val siteInfo: SiteInfo = mock() {
+        val siteInfo: SiteInfo = mock {
             on { isLiveObservationEnabled } doReturn true
             on { isObservationIndicationEnabled } doReturn false
         }
 
-        useCase.invoke(callback)
+        val testResultObserver = useCase.invoke().test()
         emitSiteInfoResult(siteInfo)
 
-        verify(callback).invoke(false)
+        testResultObserver.assertValue(false)
     }
 
     @Test
     fun `invoke returns true when site info failed to load`() {
-        val callback: (Boolean) -> Unit = mock()
-
-        useCase.invoke(callback)
+        val testResultObserver = useCase.invoke().test()
         emitSiteInfoError(GliaException("Something-something", GliaException.Cause.INTERNAL_ERROR))
 
-        verify(callback).invoke(true)
+        testResultObserver.assertValue(true)
     }
 
     private fun emitSiteInfoResult(siteInfo: SiteInfo) {

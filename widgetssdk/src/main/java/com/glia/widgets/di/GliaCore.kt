@@ -61,5 +61,5 @@ interface GliaCore {
     fun clearVisitorSession()
     fun getSiteInfo(callback: RequestCallback<SiteInfo?>)
     fun getOperator(operatorId: String, callback: RequestCallback<Operator?>)
-    fun getAuthentication(behavior: Authentication.Behavior): Authentication?
+    fun getAuthentication(behavior: Authentication.Behavior): Authentication
 }

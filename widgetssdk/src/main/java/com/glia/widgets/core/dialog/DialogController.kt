@@ -9,42 +9,43 @@ import com.glia.widgets.helper.Logger
 
 private const val TAG = "DialogController"
 
-internal interface DialogController {
-    val isShowingUnexpectedErrorDialog: Boolean
-    val isEnableScreenSharingNotificationsAndStartSharingDialogShown: Boolean
+internal interface DialogContract {
+    interface Controller {
+        val isShowingUnexpectedErrorDialog: Boolean
+        val isEnableScreenSharingNotificationsAndStartSharingDialogShown: Boolean
 
-    fun dismissCurrentDialog()
-    fun dismissDialogs()
-    fun showExitQueueDialog()
-    fun showExitChatDialog()
-    fun showUpgradeAudioDialog(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
-    fun showUpgradeVideoDialog2Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
-    fun showUpgradeVideoDialog1Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
-    fun showVisitorCodeDialog()
-    fun dismissVisitorCodeDialog()
-    fun showUnexpectedErrorDialog()
-    fun showOverlayPermissionsDialog()
-    fun dismissOverlayPermissionsDialog()
-    fun dismissMessageCenterUnavailableDialog()
-    fun showStartScreenSharingDialog(operatorName: String?)
-    fun showEnableCallNotificationChannelDialog()
-    fun showEnableScreenSharingNotificationsAndStartSharingDialog()
-    fun showMessageCenterUnavailableDialog()
-    fun showUnauthenticatedDialog()
-    fun showEngagementConfirmationDialog()
-    fun addCallback(callback: Callback)
-    fun removeCallback(callback: Callback)
-    fun interface Callback {
-        fun emitDialogState(dialogState: DialogState)
+        fun dismissCurrentDialog()
+        fun dismissDialogs()
+        fun showExitQueueDialog()
+        fun showExitChatDialog()
+        fun showUpgradeAudioDialog(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
+        fun showUpgradeVideoDialog2Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
+        fun showUpgradeVideoDialog1Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
+        fun showVisitorCodeDialog()
+        fun dismissVisitorCodeDialog()
+        fun showUnexpectedErrorDialog()
+        fun showOverlayPermissionsDialog()
+        fun dismissOverlayPermissionsDialog()
+        fun dismissMessageCenterUnavailableDialog()
+        fun showStartScreenSharingDialog(operatorName: String?)
+        fun showEnableCallNotificationChannelDialog()
+        fun showEnableScreenSharingNotificationsAndStartSharingDialog()
+        fun showMessageCenterUnavailableDialog()
+        fun showUnauthenticatedDialog()
+        fun showEngagementConfirmationDialog()
+        fun addCallback(callback: Callback)
+        fun removeCallback(callback: Callback)
+        fun interface Callback {
+            fun emitDialogState(dialogState: DialogState)
+        }
     }
-
 }
 
-internal class DialogControllerImpl(
+internal class DialogController(
     private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase,
     private val setEnableCallNotificationChannelDialogShownUseCase: SetEnableCallNotificationChannelDialogShownUseCase
-) : DialogController {
-    private val viewCallbacks: MutableSet<DialogController.Callback> = HashSet()
+) : DialogContract.Controller {
+    private val viewCallbacks: MutableSet<DialogContract.Controller.Callback> = HashSet()
     private val dialogManager: DialogManager by lazy { DialogManager(::emitDialogState) }
     override val isShowingUnexpectedErrorDialog: Boolean
         get() = dialogManager.currentDialogState is DialogState.UnexpectedError
@@ -109,7 +110,7 @@ internal class DialogControllerImpl(
     }
 
     override fun showUnexpectedErrorDialog() {
-        // PRIORITISE THIS ERROR AS IT IS ENGAGEMENT FATAL ERROR INDICATOR
+        // Prioritise this error as it is engagement fatal error indicator
         // (e.g., GliaException:{"details":"Queue is closed","error":"Unprocessable entity"}) for example
         Logger.i(TAG, "Show Unexpected error Dialog")
         dialogManager.addAndEmit(DialogState.UnexpectedError)
@@ -166,7 +167,7 @@ internal class DialogControllerImpl(
         }
     }
 
-    override fun addCallback(callback: DialogController.Callback) {
+    override fun addCallback(callback: DialogContract.Controller.Callback) {
         Logger.d(TAG, "addCallback")
         viewCallbacks.add(callback)
         if (viewCallbacks.size == 1) {
@@ -174,7 +175,7 @@ internal class DialogControllerImpl(
         }
     }
 
-    override fun removeCallback(callback: DialogController.Callback) {
+    override fun removeCallback(callback: DialogContract.Controller.Callback) {
         Logger.d(TAG, "removeCallback")
         viewCallbacks.remove(callback)
     }

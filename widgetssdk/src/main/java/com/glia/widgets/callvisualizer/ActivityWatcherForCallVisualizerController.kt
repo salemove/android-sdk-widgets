@@ -10,20 +10,20 @@ import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
-import com.glia.widgets.callvisualizer.controller.CallVisualizerController
+import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.Link
-import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
 
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForCallVisualizerController(
-    private val callVisualizerController: CallVisualizerController,
-    private val screenSharingController: ScreenSharingController,
+    private val callVisualizerController: CallVisualizerContract.Controller,
+    private val screenSharingController: ScreenSharingContract.Controller,
     private val isShowOverlayPermissionRequestDialogUseCase: IsShowOverlayPermissionRequestDialogUseCase,
     private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
 ) : ActivityWatcherForCallVisualizerContract.Controller {
@@ -40,7 +40,7 @@ internal class ActivityWatcherForCallVisualizerController(
         this.watcher = watcher
     }
 
-    internal var screenSharingViewCallback: ScreenSharingController.ViewCallback? = null
+    internal var screenSharingViewCallback: ScreenSharingContract.ViewCallback? = null
     internal val startMediaProjectionLaunchers = mutableMapOf<String, ActivityResultLauncher<Intent>?>()
 
     init {
@@ -215,7 +215,7 @@ internal class ActivityWatcherForCallVisualizerController(
 
     @VisibleForTesting
     internal fun setupScreenSharingViewCallback() {
-        screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
+        screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
             override fun onScreenSharingRequestError(message: String) = watcher.showToast(message)
 
             override fun onScreenSharingStarted() {

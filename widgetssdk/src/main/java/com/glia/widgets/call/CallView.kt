@@ -23,7 +23,6 @@ import androidx.transition.TransitionSet
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.comms.VideoView
-import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.R
@@ -33,10 +32,10 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.UiTheme.UiThemeBuilder
 import com.glia.widgets.call.CallState.ViewState
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.openNotificationChannelScreen
-import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
@@ -80,13 +79,13 @@ internal class CallView(
     attrs,
     defStyleAttr,
     defStyleRes
-), CallViewCallback, DialogDelegate by DialogDelegateImpl() {
+), CallContract.View, DialogDelegate by DialogDelegateImpl() {
 
     private val callTheme: CallTheme? by lazy {
         Dependencies.getGliaThemeManager().theme?.callTheme
     }
 
-    private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
+    private val screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
         override fun onScreenSharingRequestError(message: String) = showToast(message)
 
         override fun onScreenSharingRequestSuccess() {
@@ -133,17 +132,16 @@ internal class CallView(
 
     private var theme: UiTheme by Delegates.notNull()
 
-    private var callController: CallController? = null
-    private var screenSharingController: ScreenSharingController? = null
+    private var callController: CallContract.Controller? = null
+    private var screenSharingController: ScreenSharingContract.Controller? = null
     private var serviceChatHeadController: ChatHeadContract.Controller? = null
-    private var dialogCallback: DialogController.Callback? = null
-    private var dialogController: DialogController? = null
+    private var dialogCallback: DialogContract.Controller.Callback? = null
+    private var dialogController: DialogContract.Controller? = null
 
     private var onBackClickedListener: OnBackClickedListener? = null
     private var onEndListener: OnEndListener? = null
     private var onMinimizeListener: OnMinimizeListener? = null
     private var onNavigateToChatListener: OnNavigateToChatListener? = null
-    private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onNavigateToWebBrowserListener: OnNavigateToWebBrowserListener? = null
     private var onTitleUpdatedListener: OnTitleUpdatedListener? = null
     private var defaultStatusBarColor: Int? = null
@@ -208,7 +206,6 @@ internal class CallView(
         onEndListener = null
         onBackClickedListener = null
         onNavigateToChatListener = null
-        onNavigateToSurveyListener = null
         onNavigateToWebBrowserListener = null
         destroyControllers()
     }
@@ -234,15 +231,14 @@ internal class CallView(
     }
 
     private fun destroyControllers() {
-        callController?.setViewCallback(null)
         callController = null
         screenSharingController = null
         dialogController = null
     }
 
     private fun setupControllers() {
-        callController = Dependencies.getControllerFactory().getCallController(this)
-        dialogCallback = DialogController.Callback {
+        setController(Dependencies.getControllerFactory().callController)
+        dialogCallback = DialogContract.Controller.Callback {
             if (updateDialogState(it)) {
                 when (it) {
                     DialogState.None -> resetDialogStateAndDismiss()
@@ -255,6 +251,7 @@ internal class CallView(
                     DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
                         showAllowScreenSharingNotificationsAndStartSharingDialog()
                     }
+
                     DialogState.Confirmation -> post { callController?.onLiveObservationDialogRequested() }
                     else -> Logger.e(TAG, "DialogController callback in CallView with $it")
                 }
@@ -263,6 +260,11 @@ internal class CallView(
         dialogController = Dependencies.getControllerFactory().dialogController
         screenSharingController = Dependencies.getControllerFactory().screenSharingController
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
+    }
+
+    override fun setController(controller: CallContract.Controller) {
+        callController = controller
+        controller.setView(this)
     }
 
     private fun setTitle(title: String) {
@@ -592,10 +594,6 @@ internal class CallView(
         this.onNavigateToChatListener = onNavigateToChatListener
     }
 
-    fun setOnNavigateToSurveyListener(onNavigateToSurveyListener: OnNavigateToSurveyListener) {
-        this.onNavigateToSurveyListener = onNavigateToSurveyListener
-    }
-
     fun setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener: OnNavigateToWebBrowserListener) {
         this.onNavigateToWebBrowserListener = onNavigateToWebBrowserListener
     }
@@ -770,10 +768,6 @@ internal class CallView(
 
     fun interface OnNavigateToChatListener {
         fun call()
-    }
-
-    fun interface OnNavigateToSurveyListener {
-        fun onSurvey(survey: Survey)
     }
 
     fun interface OnNavigateToWebBrowserListener {
@@ -982,10 +976,6 @@ internal class CallView(
 
     override fun navigateToChat() {
         onNavigateToChatListener?.call()
-    }
-
-    override fun navigateToSurvey(survey: Survey) {
-        onNavigateToSurveyListener?.onSurvey(survey)
     }
 
     override fun navigateToWebBrowserActivity(title: String, url: String) {

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import com.glia.androidsdk.Glia
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
@@ -16,7 +16,7 @@ import com.glia.widgets.view.head.ChatHeadLayoutContract
 internal class ActivityWatcherForChatHeadController(
     private var serviceChatHeadController: ChatHeadContract.Controller,
     private var applicationChatHeadController: ChatHeadLayoutContract.Controller,
-    private val screenSharingController: ScreenSharingController,
+    private val screenSharingController: ScreenSharingContract.Controller,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
@@ -29,7 +29,7 @@ internal class ActivityWatcherForChatHeadController(
         this.watcher = watcher
     }
 
-    internal var screenSharingViewCallback: ScreenSharingController.ViewCallback? = null
+    internal var screenSharingViewCallback: ScreenSharingContract.ViewCallback? = null
 
     @SuppressLint("CheckResult")
     override fun init() {
@@ -96,7 +96,7 @@ internal class ActivityWatcherForChatHeadController(
     }
 
     private fun setupScreenSharingViewCallback() {
-        screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
+        screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
             override fun onScreenSharingRequestSuccess() {
                 showBubble()
             }

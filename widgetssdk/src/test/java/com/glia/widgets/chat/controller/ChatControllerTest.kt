@@ -2,8 +2,8 @@ package com.glia.widgets.chat.controller
 
 import android.net.Uri
 import com.glia.androidsdk.chat.SingleChoiceAttachment
+import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
-import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
@@ -15,7 +15,7 @@ import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.chat.domain.gva.DetermineGvaButtonTypeUseCase
 import com.glia.widgets.chat.model.Gva
 import com.glia.widgets.chat.model.GvaButton
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
@@ -58,10 +58,9 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class ChatControllerTest {
-    private lateinit var chatViewCallback: ChatViewCallback
     private lateinit var callTimer: TimeCounter
     private lateinit var minimizeHandler: MinimizeHandler
-    private lateinit var dialogController: DialogController
+    private lateinit var dialogController: DialogContract.Controller
     private lateinit var messagesNotSeenHandler: MessagesNotSeenHandler
     private lateinit var callNotificationUseCase: CallNotificationUseCase
     private lateinit var sendMessagePreviewUseCase: GliaSendMessagePreviewUseCase
@@ -101,9 +100,10 @@ class ChatControllerTest {
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
     private lateinit var chatManager: ChatManager
 
+    private lateinit var chatView: ChatContract.View
+
     @Before
     fun setUp() {
-        chatViewCallback = mock()
         callTimer = mock()
         minimizeHandler = mock()
         dialogController = mock()
@@ -149,10 +149,9 @@ class ChatControllerTest {
         declineMediaUpgradeOfferUseCase = mock()
         isQueueingOrEngagementUseCase = mock()
         enqueueForEngagementUseCase = mock()
+        chatView = mock()
 
-
-        chatController = ChatControllerImpl(
-            chatViewCallback = chatViewCallback,
+        chatController = ChatController(
             callTimer = callTimer,
             minimizeHandler = minimizeHandler,
             dialogController = dialogController,
@@ -192,8 +191,8 @@ class ChatControllerTest {
             declineMediaUpgradeOfferUseCase = declineMediaUpgradeOfferUseCase,
             isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
-
         )
+        chatController.setView(chatView)
     }
 
     @Test
@@ -201,7 +200,7 @@ class ChatControllerTest {
         val gvaButton: GvaButton = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.BroadcastEvent
         chatController.onGvaButtonClicked(gvaButton)
-        verify(chatViewCallback).showBroadcastNotSupportedToast()
+        verify(chatView).showBroadcastNotSupportedToast()
     }
 
     @Test
@@ -210,7 +209,7 @@ class ChatControllerTest {
         val uri: Uri = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Url(uri)
         chatController.onGvaButtonClicked(gvaButton)
-        verify(chatViewCallback).requestOpenUri(uri)
+        verify(chatView).requestOpenUri(uri)
     }
 
     @Test
@@ -219,7 +218,7 @@ class ChatControllerTest {
         val uri: Uri = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Phone(uri)
         chatController.onGvaButtonClicked(gvaButton)
-        verify(chatViewCallback).requestOpenDialer(uri)
+        verify(chatView).requestOpenDialer(uri)
     }
 
     @Test
@@ -228,7 +227,7 @@ class ChatControllerTest {
         val uri: Uri = mock()
         whenever(determineGvaButtonTypeUseCase(any())) doReturn Gva.ButtonType.Email(uri)
         chatController.onGvaButtonClicked(gvaButton)
-        verify(chatViewCallback).requestOpenEmailClient(uri)
+        verify(chatView).requestOpenEmailClient(uri)
     }
 
     @Test

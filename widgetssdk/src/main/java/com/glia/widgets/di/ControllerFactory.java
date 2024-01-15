@@ -2,27 +2,25 @@ package com.glia.widgets.di;
 
 import androidx.annotation.NonNull;
 
+import com.glia.widgets.call.CallContract;
 import com.glia.widgets.call.CallController;
-import com.glia.widgets.call.CallControllerImpl;
-import com.glia.widgets.call.CallViewCallback;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerContract;
 import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerController;
 import com.glia.widgets.callvisualizer.EndScreenSharingContract;
 import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.VisitorCodeContract;
+import com.glia.widgets.callvisualizer.controller.CallVisualizerContract;
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController;
-import com.glia.widgets.callvisualizer.controller.CallVisualizerControllerImpl;
 import com.glia.widgets.callvisualizer.controller.VisitorCodeController;
-import com.glia.widgets.chat.ChatViewCallback;
+import com.glia.widgets.chat.ChatContract;
 import com.glia.widgets.chat.controller.ChatController;
-import com.glia.widgets.chat.controller.ChatControllerImpl;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
+import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.core.dialog.DialogControllerImpl;
+import com.glia.widgets.core.screensharing.ScreenSharingContract;
 import com.glia.widgets.core.screensharing.ScreenSharingController;
-import com.glia.widgets.core.screensharing.ScreenSharingControllerImpl;
+import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
-import com.glia.widgets.engagement.completion.EngagementCompletionControllerImpl;
 import com.glia.widgets.filepreview.ui.FilePreviewContract;
 import com.glia.widgets.filepreview.ui.FilePreviewController;
 import com.glia.widgets.helper.Logger;
@@ -51,22 +49,22 @@ public class ControllerFactory {
 
     private static final String TAG = "ControllerFactory";
     private static ChatHeadContract.Controller serviceChatHeadController;
-    private static ApplicationChatHeadLayoutController applicationChatHeadController;
+    private static ChatHeadLayoutContract.Controller applicationChatHeadController;
     private final RepositoryFactory repositoryFactory;
     private final TimeCounter sharedTimer = new TimeCounter();
     private final MinimizeHandler minimizeHandler = new MinimizeHandler();
-    private final DialogController dialogController;
+    private final DialogContract.Controller dialogController;
     private final MessagesNotSeenHandler messagesNotSeenHandler;
     private final UseCaseFactory useCaseFactory;
     private final GliaSdkConfigurationManager sdkConfigurationManager;
     private final FilePreviewContract.Controller filePreviewController;
     private final ManagerFactory managerFactory;
-    private EngagementCompletionController engagementCompletionController;
-    private ChatController retainedChatController;
-    private CallController retainedCallController;
-    private ScreenSharingController retainedScreenSharingController;
+    private EngagementCompletionContract.Controller engagementCompletionController;
+    private ChatContract.Controller retainedChatController;
+    private CallContract.Controller retainedCallController;
+    private ScreenSharingContract.Controller retainedScreenSharingController;
     private SurveyController surveyController;
-    private CallVisualizerController callVisualizerController;
+    private CallVisualizerContract.Controller callVisualizerController;
     private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
@@ -83,7 +81,7 @@ public class ControllerFactory {
         );
 
         this.useCaseFactory = useCaseFactory;
-        this.dialogController = new DialogControllerImpl(
+        this.dialogController = new DialogController(
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
         );
@@ -96,11 +94,10 @@ public class ControllerFactory {
         this.managerFactory = managerFactory;
     }
 
-    public ChatController getChatController(ChatViewCallback chatViewCallback) {
+    public ChatContract.Controller getChatController() {
         if (retainedChatController == null) {
             Logger.d(TAG, "new for chat activity");
-            retainedChatController = new ChatControllerImpl(
-                chatViewCallback,
+            retainedChatController = new ChatController(
                 sharedTimer,
                 minimizeHandler,
                 dialogController,
@@ -141,20 +138,17 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase()
             );
-        } else {
-            Logger.d(TAG, "retained chat controller");
-            retainedChatController.setViewCallback(chatViewCallback);
         }
+
         return retainedChatController;
     }
 
-    public CallController getCallController(CallViewCallback callViewCallback) {
+    public CallContract.Controller getCallController() {
         if (retainedCallController == null) {
             Logger.d(TAG, "new call controller");
-            retainedCallController = new CallControllerImpl(
+            retainedCallController = new CallController(
                 sdkConfigurationManager,
                 sharedTimer,
-                callViewCallback,
                 new TimeCounter(),
                 new TimeCounter(),
                 minimizeHandler,
@@ -183,17 +177,15 @@ public class ControllerFactory {
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase()
             );
-        } else {
-            Logger.d(TAG, "retained call controller");
-            retainedCallController.setViewCallback(callViewCallback);
         }
+
         return retainedCallController;
     }
 
-    public ScreenSharingController getScreenSharingController() {
+    public ScreenSharingContract.Controller getScreenSharingController() {
         if (retainedScreenSharingController == null) {
             Logger.d(TAG, "new screen sharing controller");
-            retainedScreenSharingController = new ScreenSharingControllerImpl(
+            retainedScreenSharingController = new ScreenSharingController(
                 useCaseFactory.getScreenSharingUseCase(),
                 dialogController,
                 useCaseFactory.createShowScreenSharingNotificationUseCase(),
@@ -229,12 +221,12 @@ public class ControllerFactory {
         }
     }
 
-    public DialogController getDialogController() {
+    public DialogContract.Controller getDialogController() {
         return dialogController;
     }
 
-    public DialogController createDialogController() {
-        return new DialogControllerImpl(
+    public DialogContract.Controller createDialogController() {
+        return new DialogController(
             useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
             useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
         );
@@ -289,9 +281,9 @@ public class ControllerFactory {
         return surveyController;
     }
 
-    public CallVisualizerController getCallVisualizerController() {
+    public CallVisualizerContract.Controller getCallVisualizerController() {
         if (callVisualizerController == null) {
-            callVisualizerController = new CallVisualizerControllerImpl(
+            callVisualizerController = new CallVisualizerController(
                 dialogController,
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
@@ -388,9 +380,9 @@ public class ControllerFactory {
     }
 
     @NonNull
-    public EngagementCompletionController getEndEngagementController() {
+    public EngagementCompletionContract.Controller getEndEngagementController() {
         if (engagementCompletionController == null) {
-            engagementCompletionController = new EngagementCompletionControllerImpl(
+            engagementCompletionController = new EngagementCompletionController(
                 useCaseFactory.getEngagementCompletionUseCase(),
                 useCaseFactory.getReleaseResourcesUseCase(dialogController)
             );

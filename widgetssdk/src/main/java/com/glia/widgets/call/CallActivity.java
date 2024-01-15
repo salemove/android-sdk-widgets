@@ -3,14 +3,12 @@ package com.glia.widgets.call;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.glia.androidsdk.engagement.Survey;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.ChatActivity;
@@ -18,8 +16,9 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
-import com.glia.widgets.survey.SurveyActivity;
 import com.glia.widgets.webbrowser.WebBrowserActivity;
+
+import java.util.Objects;
 
 public class CallActivity extends AppCompatActivity {
     private static final String TAG = CallActivity.class.getSimpleName();
@@ -30,10 +29,6 @@ public class CallActivity extends AppCompatActivity {
     private CallView.OnBackClickedListener onBackClickedListener = this::finish;
     private CallView.OnNavigateToChatListener onNavigateToChatListener = () -> {
         navigateToChat();
-        finish();
-    };
-    private final CallView.OnNavigateToSurveyListener onNavigateToSurveyListener = (Survey survey) -> {
-        navigateToSurvey(survey);
         finish();
     };
     private final CallView.OnNavigateToWebBrowserListener onNavigateToWebBrowserListener = this::navigateToWebBrowser;
@@ -67,7 +62,6 @@ public class CallActivity extends AppCompatActivity {
 
         callView.setOnMinimizeListener(this::finish);
         callView.setOnNavigateToChatListener(onNavigateToChatListener);
-        callView.setOnNavigateToSurveyListener(onNavigateToSurveyListener);
         callView.setOnNavigateToWebBrowserListener(onNavigateToWebBrowserListener);
 
         if (savedInstanceState == null) {
@@ -130,13 +124,13 @@ public class CallActivity extends AppCompatActivity {
     private void startCall() {
         GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
         callView.startCall(
-                sdkConfiguration.getCompanyName(),
-                sdkConfiguration.getQueueId(),
-                sdkConfiguration.getContextAssetId(),
-                sdkConfiguration.getUseOverlay(),
-                sdkConfiguration.getScreenSharingMode(),
-                configuration.getIsUpgradeToCall(),
-                configuration.getMediaType()
+            Objects.requireNonNull(sdkConfiguration.getCompanyName()),
+            sdkConfiguration.getQueueId(),
+            sdkConfiguration.getContextAssetId(),
+            sdkConfiguration.getUseOverlay(),
+            Objects.requireNonNull(sdkConfiguration.getScreenSharingMode()),
+            configuration.getIsUpgradeToCall(),
+            configuration.getMediaType()
         );
     }
 
@@ -149,13 +143,6 @@ public class CallActivity extends AppCompatActivity {
                 .putExtra(GliaWidgets.UI_THEME, sdkConfiguration.getRunTimeTheme())
                 .putExtra(GliaWidgets.USE_OVERLAY, sdkConfiguration.getUseOverlay())
                 .putExtra(GliaWidgets.SCREEN_SHARING_MODE, sdkConfiguration.getScreenSharingMode());
-        startActivity(newIntent);
-    }
-
-    private void navigateToSurvey(Survey survey) {
-        Intent newIntent = new Intent(getApplicationContext(), SurveyActivity.class)
-                .putExtra(GliaWidgets.UI_THEME, configuration.getSdkConfiguration().getRunTimeTheme())
-                .putExtra(GliaWidgets.SURVEY, (Parcelable) survey);
         startActivity(newIntent);
     }
 

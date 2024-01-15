@@ -17,7 +17,7 @@ import com.glia.widgets.Constants
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.databinding.MessageCenterViewBinding
@@ -80,7 +80,7 @@ internal class MessageCenterView(
 
     private val window: Window? by lazy { context.asActivity()?.window }
 
-    private val dialogCallback: DialogController.Callback = DialogController.Callback {
+    private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback {
         onDialogState(it)
     }
     private val stringProvider = Dependencies.getStringProvider()

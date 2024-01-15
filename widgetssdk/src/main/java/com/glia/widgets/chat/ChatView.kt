@@ -33,7 +33,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.glia.androidsdk.chat.AttachmentFile
-import com.glia.androidsdk.engagement.Survey
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.Constants
 import com.glia.widgets.GliaWidgets
@@ -45,19 +44,18 @@ import com.glia.widgets.chat.adapter.ChatAdapter.OnFileItemClickListener
 import com.glia.widgets.chat.adapter.ChatAdapter.OnImageItemClickListener
 import com.glia.widgets.chat.adapter.ChatItemHeightManager
 import com.glia.widgets.chat.adapter.UploadAttachmentAdapter
-import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.AttachmentItem
 import com.glia.widgets.chat.model.ChatInputMode
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
 import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.openNotificationChannelScreen
-import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewActivity
@@ -103,36 +101,26 @@ import java.io.IOException
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
-class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-    ConstraintLayout(
-        MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes),
-        attrs,
-        defStyleAttr,
-        defStyleRes
-    ),
-    OnFileItemClickListener,
-    OnImageItemClickListener,
-    DialogDelegate by DialogDelegateImpl() {
+internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : ConstraintLayout(
+    MaterialThemeOverlay.wrap(context, attrs, defStyleAttr, defStyleRes), attrs, defStyleAttr, defStyleRes
+), OnFileItemClickListener, OnImageItemClickListener, ChatContract.View, DialogDelegate by DialogDelegateImpl() {
 
     @JvmOverloads
     constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = R.attr.gliaChatStyle
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = R.attr.gliaChatStyle
     ) : this(context, attrs, defStyleAttr, R.style.Application_Glia_Chat)
 
-    private var callback: ChatViewCallback? = null
-    private var controller: ChatController? = null
-    private var dialogCallback: DialogController.Callback? = null
-    private var dialogController: DialogController? = null
-    private val screenSharingViewCallback = object : ScreenSharingController.ViewCallback {
+    private var controller: ChatContract.Controller? = null
+    private var dialogCallback: DialogContract.Controller.Callback? = null
+    private var dialogController: DialogContract.Controller? = null
+    private val screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
         override fun onScreenSharingRequestError(message: String) = showToast(message)
 
         override fun onScreenSharingRequestSuccess() {
             Handler(Looper.getMainLooper()).post { binding.appBarView.showEndScreenSharingButton() }
         }
     }
-    private var screenSharingController: ScreenSharingController? = null
+    private var screenSharingController: ScreenSharingContract.Controller? = null
     private var serviceChatHeadController: ChatHeadContract.Controller? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
@@ -150,7 +138,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var onEndListener: OnEndListener? = null
     private var onMinimizeListener: OnMinimizeListener? = null
     private var onNavigateToCallListener: OnNavigateToCallListener? = null
-    private var onNavigateToSurveyListener: OnNavigateToSurveyListener? = null
     private var onBackToCallListener: OnBackToCallListener? = null
     private val onMessageClickListener = ChatAdapter.OnMessageClickListener { messageId: String ->
         controller?.onMessageClicked(messageId)
@@ -159,24 +146,22 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         Logger.d(TAG, "singleChoiceCardClicked")
         controller?.singleChoiceOptionClicked(item, selectedOption)
     }
-    private val onScrollListener: RecyclerView.OnScrollListener =
-        object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                controller?.onRecyclerviewPositionChanged(!recyclerView.canScrollVertically(1))
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                // hide the keyboard on chat scroll
-                insetsController?.hideKeyboard()
-            }
+    private val onScrollListener: RecyclerView.OnScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            controller?.onRecyclerviewPositionChanged(!recyclerView.canScrollVertically(1))
         }
-    private val onCustomCardResponse =
-        OnCustomCardResponse { customCard: CustomCardChatItem, text: String, value: String ->
-            controller?.sendCustomCardResponse(customCard, text, value)
+
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+
+            // hide the keyboard on chat scroll
+            insetsController?.hideKeyboard()
         }
+    }
+    private val onCustomCardResponse = OnCustomCardResponse { customCard: CustomCardChatItem, text: String, value: String ->
+        controller?.sendCustomCardResponse(customCard, text, value)
+    }
     private val dataObserver: AdapterDataObserver = object : AdapterDataObserver() {
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             super.onItemRangeInserted(positionStart, itemCount)
@@ -189,8 +174,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     // WebView needs time for calculating the height.
                     // So to scroll to the bottom, we need to do it with delay.
                     postDelayed(
-                        { binding.chatRecyclerView.scrollToPosition(lastIndex) },
-                        WEB_VIEW_INITIALIZATION_DELAY.toLong()
+                        { binding.chatRecyclerView.scrollToPosition(lastIndex) }, WEB_VIEW_INITIALIZATION_DELAY.toLong()
                     )
                 } else {
                     binding.chatRecyclerView.scrollToPosition(lastIndex)
@@ -207,8 +191,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     private var binding by Delegates.notNull<ChatViewBinding>()
     private val attachmentPopup by lazy {
         AttachmentPopup(
-            binding.chatMessageLayout,
-            Dependencies.getGliaThemeManager().theme?.chatTheme?.attachmentsPopup
+            binding.chatMessageLayout, Dependencies.getGliaThemeManager().theme?.chatTheme?.attachmentsPopup
         )
     }
 
@@ -319,10 +302,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         this.onNavigateToCallListener = onNavigateToCallListener
     }
 
-    fun setOnNavigateToSurveyListener(onNavigateToSurveyListener: OnNavigateToSurveyListener?) {
-        this.onNavigateToSurveyListener = onNavigateToSurveyListener
-    }
-
     fun setOnBackToCallListener(onBackToCallListener: OnBackToCallListener?) {
         this.onBackToCallListener = onBackToCallListener
     }
@@ -353,9 +332,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
         onEndListener = null
         onNavigateToCallListener = null
-        onNavigateToSurveyListener = null
         destroyController()
-        callback = null
         adapter.unregisterAdapterDataObserver(dataObserver)
         binding.chatRecyclerView.adapter = null
         binding.chatRecyclerView.removeOnScrollListener(onScrollListener)
@@ -363,172 +340,128 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         dialogController = null
     }
 
-    fun shouldShow(): Boolean {
-        return controller?.let { !it.isCallVisualizerOngoing() }
-            ?: run {
-                Logger.e(TAG, "ChatController is unexpectedly null")
-                false
-            }
+    fun shouldShow(): Boolean = controller?.let { !it.isCallVisualizerOngoing() } ?: run {
+        Logger.e(TAG, "ChatController is unexpectedly null")
+        false
     }
 
     private fun setupControllers() {
-        setupChatStateCallback()
-        controller = Dependencies.getControllerFactory().getChatController(callback)
+        setController(Dependencies.getControllerFactory().chatController)
         setupDialogCallback()
         dialogController = Dependencies.getControllerFactory().dialogController
         screenSharingController = Dependencies.getControllerFactory().screenSharingController
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
     }
 
-    private fun setupChatStateCallback() {
-        callback = object : ChatViewCallback {
-            override fun clearTempFile() {
-                controller?.photoCaptureFileUri?.let { context.contentResolver.delete(it, null, null) }
+    override fun setController(controller: ChatContract.Controller) {
+        this.controller = controller
+        controller.setView(this)
+    }
+
+    override fun clearTempFile() {
+        controller?.photoCaptureFileUri?.let { context.contentResolver.delete(it, null, null) }
+    }
+
+    override fun emitUploadAttachments(attachments: List<FileAttachment>) {
+        post { uploadAttachmentAdapter.submitList(attachments) }
+    }
+
+    override fun emitState(chatState: ChatState) {
+        // some state updates on core-sdk are coming from the computation thread
+        // need to update state on uiThread
+        post {
+            updateShowSendButton(chatState)
+            updateChatEditText(chatState)
+            updateAppBar(chatState)
+            binding.newMessagesIndicatorLayout.isVisible = chatState.showMessagesUnseenIndicator
+            updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl)
+            isInBottom = chatState.isChatInBottom
+            binding.chatRecyclerView.setInBottom(isInBottom)
+            binding.newMessagesBadgeView.text = chatState.messagesNotSeen.toString()
+            if (chatState.isVisible) {
+                showChat()
+            } else {
+                hideChat()
             }
 
-            override fun emitUploadAttachments(attachments: List<FileAttachment>) {
-                post { uploadAttachmentAdapter.submitList(attachments) }
-            }
+            binding.operatorTypingAnimationView.isVisible = chatState.isOperatorTyping
+            updateAttachmentButton(chatState)
+            updateQuickRepliesState(chatState)
+        }
+    }
 
-            override fun emitState(chatState: ChatState) {
-                // some state updates on core-sdk are coming from the computation thread
-                // need to update state on uiThread
-                post {
-                    updateShowSendButton(chatState)
-                    updateChatEditText(chatState)
-                    updateAppBar(chatState)
-                    binding.newMessagesIndicatorLayout.isVisible = chatState.showMessagesUnseenIndicator
-                    updateNewMessageOperatorStatusView(chatState.operatorProfileImgUrl)
-                    isInBottom = chatState.isChatInBottom
-                    binding.chatRecyclerView.setInBottom(isInBottom)
-                    binding.newMessagesBadgeView.text = chatState.messagesNotSeen.toString()
-                    if (chatState.isVisible) {
-                        showChat()
-                    } else {
-                        hideChat()
-                    }
+    override fun emitItems(items: List<ChatItem>) {
+        val updatedItems = items.asSequence().map { chatItem: ChatItem -> updateIsFileDownloaded(chatItem) }.toList()
+        post { adapter.submitList(updatedItems) }
+    }
 
-                    binding.operatorTypingAnimationView.isVisible = chatState.isOperatorTyping
-                    updateAttachmentButton(chatState)
-                    updateQuickRepliesState(chatState)
-                }
-            }
+    override fun navigateToCall(mediaType: String) {
+        onNavigateToCallListener?.call(theme, mediaType)
+    }
 
-            override fun emitItems(items: List<ChatItem>) {
-                val updatedItems = items
-                    .asSequence()
-                    .map { chatItem: ChatItem -> updateIsFileDownloaded(chatItem) }
-                    .toList()
-                post { adapter.submitList(updatedItems) }
-            }
+    override fun backToCall() {
+        onBackToCallListener?.onBackToCall()
+    }
 
-            override fun navigateToCall(mediaType: String) {
-                onNavigateToCallListener?.call(theme, mediaType)
-            }
+    override fun minimizeView() {
+        onMinimizeListener?.onMinimize()
+    }
 
-            override fun backToCall() {
-                onBackToCallListener?.onBackToCall()
-            }
+    override fun smoothScrollToBottom() {
+        if (adapter.itemCount < 1) return
+        post { binding.chatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1) }
+    }
 
-            override fun navigateToSurvey(survey: Survey) {
-                onNavigateToSurveyListener?.onSurvey(theme, survey)
-            }
+    override fun scrollToBottomImmediate() {
+        if (adapter.itemCount < 1) return
+        post { binding.chatRecyclerView.scrollToPosition(adapter.itemCount - 1) }
+    }
 
-            override fun destroyView() {
-                onEndListener?.onEnd()
-            }
-
-            override fun minimizeView() {
-                onMinimizeListener?.onMinimize()
-            }
-
-            override fun smoothScrollToBottom() {
-                if (adapter.itemCount < 1) return
-                post { binding.chatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1) }
-            }
-
-            override fun scrollToBottomImmediate() {
-                if (adapter.itemCount < 1) return
-                post { binding.chatRecyclerView.scrollToPosition(adapter.itemCount - 1) }
-            }
-
-            override fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
-                fileDownloadFailed(attachmentFile)
-            }
-
-            override fun fileDownloadSuccess(attachmentFile: AttachmentFile) {
-                fileDownloadCompleted(attachmentFile)
-            }
-
-            override fun clearMessageInput() {
-                post {
-                    binding.chatEditText.apply {
-                        removeTextChangedListener(textWatcher)
-                        text.clear()
-                        addTextChangedListener(textWatcher)
-                    }
-                }
-            }
-
-            override fun navigateToPreview(
-                attachmentFile: AttachmentFile,
-                view: View
-            ) {
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                    context.requireActivity(),
-                    view,
-                    context.getString(R.string.glia_file_preview_transition_name) // Not translatable
-                )
-
-                context.startActivity(
-                    FilePreviewActivity.intent(context, attachmentFile),
-                    options.toBundle()
-                )
-            }
-
-            override fun fileIsNotReadyForPreview() {
-                showToast(stringProvider.getRemoteString(R.string.android_file_not_ready_for_preview))
-            }
-
-            override fun showBroadcastNotSupportedToast() {
-                showToast(stringProvider.getRemoteString(R.string.gva_unsupported_action_error))
-            }
-
-            override fun requestOpenUri(uri: Uri) {
-                this@ChatView.requestOpenUri(uri)
-            }
-
-            override fun requestOpenDialer(uri: Uri) {
-                this@ChatView.requestOpenDialer(uri)
-            }
-
-            override fun requestOpenEmailClient(uri: Uri) {
-                this@ChatView.requestOpenEmailClient(uri)
-            }
-
-            override fun showEngagementConfirmationDialog() {
-                this@ChatView.showEngagementConfirmationDialog()
-            }
-
-            override fun navigateToWebBrowserActivity(title: String, url: String) {
-                context.startActivity(
-                    WebBrowserActivity.intent(context, title, url)
-                )
+    override fun clearMessageInput() {
+        post {
+            binding.chatEditText.apply {
+                removeTextChangedListener(textWatcher)
+                text.clear()
+                addTextChangedListener(textWatcher)
             }
         }
     }
 
-    private fun showEngagementConfirmationDialog() {
+    override fun navigateToPreview(
+        attachmentFile: AttachmentFile, view: View
+    ) {
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            context.requireActivity(), view, context.getString(R.string.glia_file_preview_transition_name) // Not translatable
+        )
+
+        context.startActivity(
+            FilePreviewActivity.intent(context, attachmentFile), options.toBundle()
+        )
+    }
+
+    override fun fileIsNotReadyForPreview() {
+        showToast(stringProvider.getRemoteString(R.string.android_file_not_ready_for_preview))
+    }
+
+    override fun showBroadcastNotSupportedToast() {
+        showToast(stringProvider.getRemoteString(R.string.gva_unsupported_action_error))
+    }
+
+    override fun navigateToWebBrowserActivity(title: String, url: String) {
+        context.startActivity(
+            WebBrowserActivity.intent(context, title, url)
+        )
+    }
+
+    override fun showEngagementConfirmationDialog() {
         controller?.getConfirmationDialogLinks()?.let { links ->
             showDialog {
-                Dialogs.showEngagementConfirmationDialog(
-                    context = context,
+                Dialogs.showEngagementConfirmationDialog(context = context,
                     theme = theme,
                     links = links,
                     positiveButtonClickListener = { onEngagementConfirmationDialogAllowed() },
                     negativeButtonClickListener = { onEngagementConfirmationDialogDismissed() },
-                    linkClickListener = { controller?.onLinkClicked(it) }
-                )
+                    linkClickListener = { controller?.onLinkClicked(it) })
             }
         }
     }
@@ -545,9 +478,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         chatEnded()
     }
 
-    private fun requestOpenEmailClient(uri: Uri) {
-        val intent = Intent(Intent.ACTION_SENDTO)
-            .setData(Uri.parse("mailto:")) // This step makes sure that only email apps handle this.
+    override fun requestOpenEmailClient(uri: Uri) {
+        val intent = Intent(Intent.ACTION_SENDTO).setData(Uri.parse("mailto:")) // This step makes sure that only email apps handle this.
             .putExtra(Intent.EXTRA_EMAIL, arrayOf(uri.schemeSpecificPart))
 
         if (intent.resolveActivity(context.packageManager) != null) {
@@ -558,7 +490,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
     }
 
-    private fun requestOpenDialer(uri: Uri) {
+    override fun requestOpenDialer(uri: Uri) {
         val intent = Intent(Intent.ACTION_DIAL).setData(uri)
 
         if (intent.resolveActivity(context.packageManager) != null) {
@@ -569,7 +501,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
     }
 
-    private fun requestOpenUri(uri: Uri) {
+    override fun requestOpenUri(uri: Uri) {
         Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE).also {
             if (it.resolveActivity(context.packageManager) != null) {
                 context.startActivity(it)
@@ -591,7 +523,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun setupDialogCallback() {
-        dialogCallback = DialogController.Callback {
+        dialogCallback = DialogContract.Controller.Callback {
             if (updateDialogState(it)) {
                 when (it) {
                     DialogState.None -> resetDialogStateAndDismiss()
@@ -604,7 +536,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     is DialogState.StartScreenSharing -> post { showScreenSharingDialog(it.operatorName) }
                     DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
                     DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
-                    showAllowScreenSharingNotificationsAndStartSharingDialog()
+                        showAllowScreenSharingNotificationsAndStartSharingDialog()
                     }
 
                     DialogState.Confirmation -> post { controller?.onEngagementConfirmationDialogRequested() }
@@ -669,49 +601,33 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showAllowScreenSharingNotificationsAndStartSharingDialog() = showDialog {
-        Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                resetDialogStateAndDismiss()
-                this.context.openNotificationChannelScreen()
-            },
-            negativeButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.notificationDialogDismissed()
-                screenSharingController?.onScreenSharingDeclined()
-            }
-        )
+        Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+            resetDialogStateAndDismiss()
+            this.context.openNotificationChannelScreen()
+        }, negativeButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.notificationDialogDismissed()
+            screenSharingController?.onScreenSharingDeclined()
+        })
     }
 
     private fun showAllowNotificationsDialog() = showDialog {
-        Dialogs.showAllowNotificationsDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.notificationDialogDismissed()
-                this.context.openNotificationChannelScreen()
-            },
-            negativeButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.notificationDialogDismissed()
-            }
-        )
+        Dialogs.showAllowNotificationsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.notificationDialogDismissed()
+            this.context.openNotificationChannelScreen()
+        }, negativeButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.notificationDialogDismissed()
+        })
     }
 
     private fun showScreenSharingDialog(operatorName: String?) = showDialog {
-        Dialogs.showScreenSharingDialog(
-            context = context,
-            theme = theme,
-            operatorName = operatorName,
-            positiveButtonClickListener = {
-                screenSharingController?.onScreenSharingAccepted(context.requireActivity())
-            },
-            negativeButtonClickListener = {
-                screenSharingController?.onScreenSharingDeclined()
-            }
-        )
+        Dialogs.showScreenSharingDialog(context = context, theme = theme, operatorName = operatorName, positiveButtonClickListener = {
+            screenSharingController?.onScreenSharingAccepted(context.requireActivity())
+        }, negativeButtonClickListener = {
+            screenSharingController?.onScreenSharingDeclined()
+        })
     }
 
     private fun showChat() {
@@ -799,10 +715,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
 
         // new messages indicator shape
-        val shapeAppearanceModel = binding.newMessagesIndicatorCard.shapeAppearanceModel
-            .toBuilder()
-            .setBottomEdge(MarkerEdgeTreatment(resources.getDimension(R.dimen.glia_chat_new_messages_bottom_edge_radius)))
-            .build()
+        val shapeAppearanceModel = binding.newMessagesIndicatorCard.shapeAppearanceModel.toBuilder()
+            .setBottomEdge(MarkerEdgeTreatment(resources.getDimension(R.dimen.glia_chat_new_messages_bottom_edge_radius))).build()
 
         binding.newMessagesIndicatorImage.setShowRippleAnimation(false)
         binding.newMessagesIndicatorImage.setTheme(theme)
@@ -810,8 +724,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
             binding.newMessagesBadgeView.backgroundTintList = it
         }
-        theme.baseLightColor?.let(::getColorCompat)
-            ?.also(binding.newMessagesBadgeView::setTextColor)
+        theme.baseLightColor?.let(::getColorCompat)?.also(binding.newMessagesBadgeView::setTextColor)
 
         // colors
         theme.baseShadeColor?.let(::getColorCompat)?.also(binding.dividerView::setBackgroundColor)
@@ -819,8 +732,7 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         theme.brandPrimaryColor?.let(::getColorStateListCompat)?.also {
             binding.newMessagesBadgeView.backgroundTintList = it
         }
-        binding.sendButton.imageTintList =
-            theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)
+        binding.sendButton.imageTintList = theme.sendMessageButtonTintColor?.let(::getColorStateListCompat)
 
         theme.baseDarkColor?.let(::getColorCompat)?.also(binding.chatEditText::setTextColor)
         theme.baseNormalColor?.let(::getColorCompat)?.also(binding.chatEditText::setHintTextColor)
@@ -883,22 +795,18 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
                 context.asActivity()?.startActivityForResult(
                     Intent.createChooser(
-                        intent,
-                        stringProvider.getRemoteString(R.string.android_file_select_picture_title)
-                    ),
-                    OPEN_DOCUMENT_ACTION_REQUEST
+                        intent, stringProvider.getRemoteString(R.string.android_file_select_picture_title)
+                    ), OPEN_DOCUMENT_ACTION_REQUEST
                 )
             }, {
                 if (ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.CAMERA
+                        context, Manifest.permission.CAMERA
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
                     dispatchImageCapture()
                 } else {
                     context.asActivity()?.requestPermissions(
-                        arrayOf(Manifest.permission.CAMERA),
-                        CAMERA_PERMISSION_REQUEST
+                        arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST
                     )
                 }
             }, {
@@ -907,10 +815,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 intent.action = Intent.ACTION_OPEN_DOCUMENT
                 context.asActivity()?.startActivityForResult(
                     Intent.createChooser(
-                        intent,
-                        stringProvider.getRemoteString(R.string.android_file_select_file_title)
-                    ),
-                    OPEN_DOCUMENT_ACTION_REQUEST
+                        intent, stringProvider.getRemoteString(R.string.android_file_select_file_title)
+                    ), OPEN_DOCUMENT_ACTION_REQUEST
                 )
             })
         }
@@ -926,50 +832,37 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         }
         if (photoFile != null) {
             controller?.photoCaptureFileUri = FileProvider.getUriForFile(
-                context,
-                context.fileProviderAuthority,
-                photoFile
+                context, context.fileProviderAuthority, photoFile
             )
             if (controller?.photoCaptureFileUri != null) {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, controller!!.photoCaptureFileUri)
                 context.asActivity()?.startActivityForResult(
-                    intent,
-                    CAPTURE_IMAGE_ACTION_REQUEST
+                    intent, CAPTURE_IMAGE_ACTION_REQUEST
                 )
             }
         }
     }
 
     private fun showExitQueueDialog() = showDialog {
-        Dialogs.showExitQueueDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.endEngagementDialogYesClicked()
-                onEndListener?.onEnd()
-                chatEnded()
-            },
-            negativeButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.endEngagementDialogDismissed()
-            }
-        )
+        Dialogs.showExitQueueDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.endEngagementDialogYesClicked()
+            onEndListener?.onEnd()
+            chatEnded()
+        }, negativeButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.endEngagementDialogDismissed()
+        })
     }
 
     private fun showEndEngagementDialog() = showDialog {
-        Dialogs.showEndEngagementDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.endEngagementDialogYesClicked()
-            },
-            negativeButtonClickListener = {
-                resetDialogStateAndDismiss()
-                controller?.endEngagementDialogDismissed()
-            }
-        )
+        Dialogs.showEndEngagementDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.endEngagementDialogYesClicked()
+        }, negativeButtonClickListener = {
+            resetDialogStateAndDismiss()
+            controller?.endEngagementDialogDismissed()
+        })
     }
 
     private fun showUpgradeDialog(mediaUpgrade: MediaUpgrade) = showDialog {
@@ -989,24 +882,18 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
     }
 
     private fun showOverlayPermissionsDialog() = showDialog {
-        Dialogs.showOverlayPermissionsDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                controller?.overlayPermissionsDialogDismissed()
-                resetDialogStateAndDismiss()
-                val overlayIntent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + this.context.packageName)
-                )
-                overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                this.context.startActivity(overlayIntent)
-            },
-            negativeButtonClickListener = {
-                controller?.overlayPermissionsDialogDismissed()
-                resetDialogStateAndDismiss()
-            }
-        )
+        Dialogs.showOverlayPermissionsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
+            controller?.overlayPermissionsDialogDismissed()
+            resetDialogStateAndDismiss()
+            val overlayIntent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + this.context.packageName)
+            )
+            overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            this.context.startActivity(overlayIntent)
+        }, negativeButtonClickListener = {
+            controller?.overlayPermissionsDialogDismissed()
+            resetDialogStateAndDismiss()
+        })
     }
 
     private fun chatEnded() {
@@ -1040,18 +927,15 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     override fun onFileDownloadClick(file: AttachmentFile) {
         if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                context, Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             onFileDownload(file)
         } else {
             context.asActivity()?.requestPermissions(
                 arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ),
-                WRITE_PERMISSION_REQUEST
+                    Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ), WRITE_PERMISSION_REQUEST
             )
             downloadFileHolder = file
         }
@@ -1062,40 +946,34 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
         controller?.onFileDownloadClicked(attachmentFile)
     }
 
-    fun fileDownloadFailed(file: AttachmentFile) {
-        submitUpdatedItems(file, isDownloading = false, isFileExists = false)
+    override fun fileDownloadError(attachmentFile: AttachmentFile, error: Throwable) {
+        submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = false)
         showToast(stringProvider.getRemoteString(R.string.chat_download_failed))
     }
 
-    fun fileDownloadCompleted(file: AttachmentFile) {
-        submitUpdatedItems(file, isDownloading = false, isFileExists = true)
+    override fun fileDownloadSuccess(attachmentFile: AttachmentFile) {
+        submitUpdatedItems(attachmentFile, isDownloading = false, isFileExists = true)
         showToast(
-            stringProvider.getRemoteString(R.string.android_chat_download_complete),
-            Toast.LENGTH_LONG
+            stringProvider.getRemoteString(R.string.android_chat_download_complete), Toast.LENGTH_LONG
         )
     }
 
     private fun submitUpdatedItems(
-        attachmentFile: AttachmentFile,
-        isDownloading: Boolean,
-        isFileExists: Boolean
+        attachmentFile: AttachmentFile, isDownloading: Boolean, isFileExists: Boolean
     ) {
-        val updatedItems = adapter.currentList
-            .asSequence()
-            .map { updatedDownloadingItemState(attachmentFile, it, isDownloading, isFileExists) }
-            .toList()
+        val updatedItems =
+            adapter.currentList.asSequence().map { updatedDownloadingItemState(attachmentFile, it, isDownloading, isFileExists) }.toList()
 
         adapter.submitList(updatedItems)
     }
 
     private fun updatedDownloadingItemState(
-        attachmentFile: AttachmentFile,
-        currentChatItem: ChatItem,
-        isDownloading: Boolean,
-        isFileExists: Boolean
+        attachmentFile: AttachmentFile, currentChatItem: ChatItem, isDownloading: Boolean, isFileExists: Boolean
     ): ChatItem = when {
-        currentChatItem is AttachmentItem && currentChatItem.attachmentId == attachmentFile.id ->
-            currentChatItem.updateWith(isFileExists, isDownloading)
+        currentChatItem is AttachmentItem && currentChatItem.attachmentId == attachmentFile.id -> currentChatItem.updateWith(
+            isFileExists,
+            isDownloading
+        )
 
         else -> currentChatItem
     }
@@ -1166,10 +1044,6 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
 
     fun interface OnBackToCallListener {
         fun onBackToCall()
-    }
-
-    fun interface OnNavigateToSurveyListener {
-        fun onSurvey(theme: UiTheme?, survey: Survey)
     }
 
     fun interface OnTitleUpdatedListener {

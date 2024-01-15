@@ -7,8 +7,8 @@ import android.view.Window
 import androidx.core.graphics.toColorInt
 import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
+import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatView
-import com.glia.widgets.chat.ChatViewCallback
 import com.glia.widgets.chat.controller.ChatController
 import com.glia.widgets.chat.model.ChatItem
 import com.glia.widgets.chat.model.ChatState
@@ -27,9 +27,11 @@ import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.reactivex.schedulers.TestScheduler
-import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.KArgumentCaptor
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
@@ -51,8 +53,6 @@ internal interface SnapshotChatView : SnapshotContent {
         lateinit var getImageFileFromDownloadsUseCaseMock: GetImageFileFromDownloadsUseCase
         lateinit var getImageFileFromNetworkUseCaseMock: GetImageFileFromNetworkUseCase
 
-        lateinit var chatViewCallbackCaptor: ArgumentCaptor<ChatViewCallback>
-
         fun setUp(statusBarColor: Int = "#123456".toColorInt()) {
             activityMock = mock()
             windowMock = mock()
@@ -61,10 +61,9 @@ internal interface SnapshotChatView : SnapshotContent {
             mockkStatic("com.glia.widgets.helper.ContextExtensionsKt")
             every { any<Context>().requireActivity() } returns activityMock
 
-            chatViewCallbackCaptor = ArgumentCaptor.forClass(ChatViewCallback::class.java)
             chatControllerMock = mock()
             controllerFactoryMock = mock()
-            whenever(controllerFactoryMock.getChatController(chatViewCallbackCaptor.capture())).thenReturn(chatControllerMock)
+            whenever(controllerFactoryMock.chatController).thenReturn(chatControllerMock)
 
             getImageFileFromCacheUseCaseMock = mock()
             getImageFileFromDownloadsUseCaseMock = mock()
@@ -104,24 +103,24 @@ internal interface SnapshotChatView : SnapshotContent {
         fileAttachments: List<FileAttachment>? = null,
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme? = null,
-        callback: ((ChatViewCallback) -> Unit)? = null
+        uiTheme: UiTheme? = null
     ): ViewData {
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        val chatViewCaptor: KArgumentCaptor<ChatContract.View> = argumentCaptor()
 
         val chatActivityBinding = ChatActivityBinding.inflate(layoutInflater)
         val root = chatActivityBinding.root
         val chatView = chatActivityBinding.chatView
+        verify(chatViewMock.chatControllerMock).setView(chatViewCaptor.capture())
 
         chatView.setUiTheme(uiTheme)
 
         chatView.executor = executor
 
-        val chatViewCallback = chatViewMock.chatViewCallbackCaptor.value
+        val chatViewCallback = chatViewCaptor.lastValue
         chatState?.let { chatViewCallback.emitState(it) }
         chatItems?.let { chatViewCallback.emitItems(it) }
         fileAttachments?.let { chatViewCallback.emitUploadAttachments(it) }
-        callback?.invoke(chatViewCallback)
 
         return ViewData(root, chatView)
     }

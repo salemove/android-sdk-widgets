@@ -15,7 +15,7 @@ import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.MediaUpgradeMode
-import com.glia.widgets.core.screensharing.ScreenSharingControllerImpl
+import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.engagement.State
 import io.reactivex.Flowable
 import io.reactivex.processors.PublishProcessor
@@ -52,7 +52,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         on { engagementEndFlow } doReturn engagementEndFlow
         on { acceptMediaUpgradeOfferResult } doReturn Flowable.empty()
     }
-    private val screenSharingController = mock(ScreenSharingControllerImpl::class.java)
+    private val screenSharingController = mock(ScreenSharingController::class.java)
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
     private val isShowOverlayPermissionRequestDialogUseCase = mock(IsShowOverlayPermissionRequestDialogUseCase::class.java)
     private val confirmationDialogLinksUseCase = mock(ConfirmationDialogLinksUseCase::class.java)

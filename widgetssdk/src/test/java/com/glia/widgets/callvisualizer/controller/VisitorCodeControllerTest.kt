@@ -3,7 +3,7 @@ package com.glia.widgets.callvisualizer.controller
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
@@ -28,11 +28,11 @@ internal class VisitorCodeControllerTest {
     private val engagementStateUseCase: EngagementStateUseCase = org.mockito.kotlin.mock {
         on { invoke() } doReturn engagementState
     }
-    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = org.mockito.kotlin.mock()
-    private val dialogController = mock(DialogController::class.java)
-    private val visitorCodeRepository = mock(VisitorCodeRepository::class.java)
+    private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mock()
+    private val dialogController: DialogContract.Controller = mock()
+    private val visitorCodeRepository: VisitorCodeRepository = mock()
     private val controller = VisitorCodeController(dialogController, visitorCodeRepository, engagementStateUseCase, isQueueingOrEngagementUseCase)
-    private val view = mock(VisitorCodeContract.View::class.java)
+    private val view: VisitorCodeContract.View = mock()
     private val refreshTime = 1000L
 
     @Before

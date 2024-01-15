@@ -61,7 +61,7 @@ import com.glia.widgets.core.chathead.domain.IsDisplayApplicationChatHeadUseCase
 import com.glia.widgets.core.chathead.domain.ResolveChatHeadNavigationUseCase;
 import com.glia.widgets.core.chathead.domain.ToggleChatHeadServiceUseCase;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
-import com.glia.widgets.core.dialog.DialogController;
+import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
@@ -881,7 +881,7 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogController dialogController) {
+    public ReleaseResourcesUseCase getReleaseResourcesUseCase(DialogContract.Controller dialogController) {
         return new ReleaseResourcesUseCaseImpl(
             createRemoveScreenSharingNotificationUseCase(),
             createCallNotificationUseCase(),

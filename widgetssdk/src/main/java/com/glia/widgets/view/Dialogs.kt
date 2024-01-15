@@ -6,7 +6,6 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.StringKey
 import com.glia.widgets.StringKeyPair
@@ -236,7 +235,10 @@ internal object Dialogs {
         }
 
         val payload = DialogPayload.Upgrade(
-            title = stringProvider.getRemoteString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, dialogState.operatorName ?: backingOperatorName)),
+            title = stringProvider.getRemoteString(
+                titleIconResPair.first,
+                StringKeyPair(StringKey.OPERATOR_NAME, dialogState.operatorName ?: backingOperatorName)
+            ),
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,
@@ -293,9 +295,7 @@ internal object Dialogs {
     fun showVisitorCodeDialog(
         context: Context
     ): AlertDialog {
-        val view = GliaWidgets.getCallVisualizer().createVisitorCodeView(context).apply {
-            setClosable(true)
-        }
+        val view = Dependencies.getUseCaseFactory().visitorCodeViewBuilderUseCase(context, true)
 
         return MaterialAlertDialogBuilder(context)
             .setView(view)

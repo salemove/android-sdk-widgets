@@ -11,7 +11,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
 import com.glia.widgets.chat.domain.SiteInfoUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.fileupload.domain.AddFileToAttachmentAndUploadUseCase
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.secureconversations.domain.AddSecureFileAttachmentsObserverUseCase
@@ -43,7 +43,7 @@ internal class MessageCenterController(
     private val sendMessageButtonStateUseCase: SendMessageButtonStateUseCase,
     private val showMessageLimitErrorUseCase: ShowMessageLimitErrorUseCase,
     private val resetMessageCenterUseCase: ResetMessageCenterUseCase,
-    private val dialogController: DialogController
+    private val dialogController: DialogContract.Controller
 ) : MessageCenterContract.Controller {
     private var view: MessageCenterContract.View? = null
     private val disposables = CompositeDisposable()
@@ -247,11 +247,11 @@ internal class MessageCenterController(
         resetMessageCenterUseCase()
     }
 
-    override fun addCallback(dialogCallback: DialogController.Callback) {
+    override fun addCallback(dialogCallback: DialogContract.Controller.Callback) {
         dialogController.addCallback(dialogCallback)
     }
 
-    override fun removeCallback(dialogCallback: DialogController.Callback) {
+    override fun removeCallback(dialogCallback: DialogContract.Controller.Callback) {
         dialogController.removeCallback(dialogCallback)
     }
 

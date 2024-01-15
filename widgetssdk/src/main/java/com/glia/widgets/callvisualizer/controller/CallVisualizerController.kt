@@ -4,7 +4,7 @@ import android.app.Activity
 import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
@@ -19,21 +19,22 @@ import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.Flowable
 
-internal interface CallVisualizerController {
-
-    val engagementStartFlow: Flowable<State>
-    val engagementEndFlow: Flowable<State>
-    val acceptMediaUpgradeOfferResult: Flowable<MediaUpgradeOffer>
-    fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer)
-    fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer)
-    fun onEngagementConfirmationDialogAllowed()
-    fun onEngagementConfirmationDialogDeclined()
-    fun saveVisitorContextAssetId(visitorContextAssetId: String)
-    fun isCallOrChatScreenActive(resumedActivity: Activity?): Boolean
+internal interface CallVisualizerContract {
+    interface Controller {
+        val engagementStartFlow: Flowable<State>
+        val engagementEndFlow: Flowable<State>
+        val acceptMediaUpgradeOfferResult: Flowable<MediaUpgradeOffer>
+        fun acceptMediaUpgradeRequest(offer: MediaUpgradeOffer)
+        fun declineMediaUpgradeRequest(offer: MediaUpgradeOffer)
+        fun onEngagementConfirmationDialogAllowed()
+        fun onEngagementConfirmationDialogDeclined()
+        fun saveVisitorContextAssetId(visitorContextAssetId: String)
+        fun isCallOrChatScreenActive(resumedActivity: Activity?): Boolean
+    }
 }
 
-internal class CallVisualizerControllerImpl(
-    private val dialogController: DialogController,
+internal class CallVisualizerController(
+    private val dialogController: DialogContract.Controller,
     private val confirmationDialogUseCase: ConfirmationDialogUseCase,
     private val isCallOrChatScreenActiveUseCase: IsCallOrChatScreenActiveUseCase,
     private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
@@ -42,7 +43,7 @@ internal class CallVisualizerControllerImpl(
     private val engagementRequestUseCase: EngagementRequestUseCase,
     private val currentOperatorUseCase: CurrentOperatorUseCase,
     private val engagementStateUseCase: EngagementStateUseCase
-) : CallVisualizerController {
+) : CallVisualizerContract.Controller {
 
     override val engagementStartFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.StartedCallVisualizer }
     override val engagementEndFlow: Flowable<State> get() = engagementStateUseCase().filter { it is State.FinishedCallVisualizer }

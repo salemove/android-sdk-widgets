@@ -18,16 +18,10 @@ import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import io.reactivex.Flowable
 import io.reactivex.processors.PublishProcessor
 import java.lang.ref.WeakReference
-import com.glia.widgets.engagement.completion.EngagementCompletionController.State as ControllerState
+import com.glia.widgets.engagement.completion.EngagementCompletionContract.State as ControllerState
 import com.glia.widgets.engagement.completion.EngagementCompletionUseCase.State as UseCaseState
 
-internal interface EngagementCompletionController {
-
-    val state: Flowable<State>
-    fun captureTheme(activity: Activity)
-    fun onActivityResumed(activity: Activity)
-    fun onActivityPaused()
-
+internal interface EngagementCompletionContract {
     sealed interface State {
         /* This state should be used when we don't expect any input from the UI layer, e.g., waiting for DialogHolderActivity to launch */
         object Ignore : State
@@ -50,19 +44,26 @@ internal interface EngagementCompletionController {
         /* This state should launch DialogHolderActivity to show Dialogs that require Material Theme support */
         data class LaunchDialogHolderActivity(val activity: Activity) : State
     }
+
+    interface Controller {
+        val state: Flowable<State>
+        fun captureTheme(activity: Activity)
+        fun onActivityResumed(activity: Activity)
+        fun onActivityPaused()
+    }
 }
 
-internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
+internal class EngagementCompletionController @JvmOverloads constructor(
     private val engagementCompletionUseCase: EngagementCompletionUseCase,
     private val releaseResourcesUseCase: ReleaseResourcesUseCase,
     private val resumedActivity: PublishProcessor<WeakReference<Activity>> = PublishProcessor.create()
-) : EngagementCompletionController {
+) : EngagementCompletionContract.Controller {
     private var _currentUiTheme: UiTheme? = null
     private val currentTheme: UiTheme
         get() = _currentUiTheme ?: UiTheme()
 
-    private val _state: PublishProcessor<EngagementCompletionController.State> = PublishProcessor.create()
-    override val state: Flowable<EngagementCompletionController.State> = _state.filter { it !is EngagementCompletionController.State.Ignore }
+    private val _state: PublishProcessor<EngagementCompletionContract.State> = PublishProcessor.create()
+    override val state: Flowable<EngagementCompletionContract.State> = _state.filter { it !is EngagementCompletionContract.State.Ignore }
 
     init {
         initObservables()
@@ -73,14 +74,14 @@ internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
         Flowable.combineLatest(engagementCompletionUseCase(), resumedActivity, ::produceState).unSafeSubscribe(::submitState)
     }
 
-    private fun submitState(state: EngagementCompletionController.State) {
+    private fun submitState(state: EngagementCompletionContract.State) {
         _state.onNext(state)
     }
 
     private fun produceState(
         event: OneTimeEvent<EngagementCompletionUseCase.State>,
         activityRef: WeakReference<Activity>
-    ): EngagementCompletionController.State {
+    ): EngagementCompletionContract.State {
         val activity = activityRef.get()
         val state = event.view()
 
@@ -90,10 +91,10 @@ internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
             state is UseCaseState.QueuingOrEngagementEnded -> {
                 event.markConsumed()
                 releaseResourcesUseCase()
-                EngagementCompletionController.State.ReleaseUi
+                EngagementCompletionContract.State.ReleaseUi
             }
 
-            activity == null || activity.isFinishing || state == null -> EngagementCompletionController.State.Ignore
+            activity == null || activity.isFinishing || state == null -> EngagementCompletionContract.State.Ignore
 
             (state is UseCaseState.UnexpectedErrorHappened || state is UseCaseState.QueueUnstaffed || state is UseCaseState.OperatorEndedEngagement)
                 && !activity.isGlia -> ControllerState.LaunchDialogHolderActivity(activity)
@@ -117,7 +118,7 @@ internal class EngagementCompletionControllerImpl @JvmOverloads constructor(
 
             else -> {
                 event.markConsumed()
-                EngagementCompletionController.State.Ignore
+                EngagementCompletionContract.State.Ignore
             }
         }
     }

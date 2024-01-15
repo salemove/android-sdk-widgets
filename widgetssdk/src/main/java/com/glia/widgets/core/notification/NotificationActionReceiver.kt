@@ -3,13 +3,13 @@ package com.glia.widgets.core.notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.glia.widgets.core.screensharing.ScreenSharingController
+import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
 class NotificationActionReceiver : BroadcastReceiver() {
-    private val controller: ScreenSharingController by lazy {
+    private val controller: ScreenSharingContract.Controller by lazy {
         Dependencies.getControllerFactory().screenSharingController
     }
 

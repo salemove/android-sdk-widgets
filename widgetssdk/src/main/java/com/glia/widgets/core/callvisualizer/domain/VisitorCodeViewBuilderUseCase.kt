@@ -4,7 +4,5 @@ import android.content.Context
 import com.glia.widgets.view.VisitorCodeView
 
 internal class VisitorCodeViewBuilderUseCase {
-    operator fun invoke(context: Context, closable: Boolean): VisitorCodeView {
-        return VisitorCodeView(context = context).apply { setClosable(closable) }
-    }
+    operator fun invoke(context: Context, closable: Boolean): VisitorCodeView = VisitorCodeView(context = context).apply { setClosable(closable) }
 }

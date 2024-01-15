@@ -3,7 +3,7 @@ package com.glia.widgets.callvisualizer.controller
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
@@ -12,7 +12,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 internal class VisitorCodeController(
-    private val dialogController: DialogController,
+    private val dialogController: DialogContract.Controller,
     private val visitorCodeRepository: VisitorCodeRepository,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase

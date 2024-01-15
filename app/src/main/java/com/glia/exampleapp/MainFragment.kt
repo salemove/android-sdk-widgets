@@ -95,7 +95,7 @@ class MainFragment : Fragment() {
         view.findViewById<View>(R.id.authenticationButton)
             .setOnClickListener { showAuthenticationDialog(null) }
         view.findViewById<View>(R.id.deauthenticationButton)
-            .setOnClickListener { deauthenticate() }
+            .setOnClickListener { deAuthenticate() }
         view.findViewById<View>(R.id.clear_session_button)
             .setOnClickListener { clearSession() }
         view.findViewById<View>(R.id.visitor_code_button).setOnClickListener {
@@ -437,7 +437,7 @@ class MainFragment : Fragment() {
         saveAuthToken(jwt)
     }
 
-    private fun deauthenticate() {
+    private fun deAuthenticate() {
         if (activity == null || containerView == null) return
         authentication!!.deauthenticate { _, exception: GliaException? ->
             if (exception == null && !authentication!!.isAuthenticated) {
@@ -457,15 +457,15 @@ class MainFragment : Fragment() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val visitorContext = getContextAssetIdFromPrefs(sharedPreferences)
         val cv = GliaWidgets.getCallVisualizer()
-        if (!visitorContext?.trim { it <= ' ' }.isNullOrBlank()) {
+        if (!visitorContext.isNullOrBlank()) {
             cv.addVisitorContext(visitorContext)
         }
-        cv.showVisitorCodeDialog(context)
+        cv.showVisitorCodeDialog(requireContext())
     }
 
     // For testing the integrated Visitor Code solution
     private fun showVisitorCodeInADedicatedView() {
-        val visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(context)
+        val visitorCodeView = GliaWidgets.getCallVisualizer().createVisitorCodeView(requireContext())
         val cv = containerView!!.findViewById<CardView>(R.id.container)
         cv.removeAllViews()
         cv.addView(visitorCodeView)

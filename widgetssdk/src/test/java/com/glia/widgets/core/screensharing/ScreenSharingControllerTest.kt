@@ -2,7 +2,7 @@ package com.glia.widgets.core.screensharing
 
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
-import com.glia.widgets.core.dialog.DialogController
+import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.notification.domain.RemoveScreenSharingNotificationUseCase
 import com.glia.widgets.core.notification.domain.ShowScreenSharingNotificationUseCase
 import com.glia.widgets.core.permissions.domain.HasScreenSharingNotificationChannelEnabledUseCase
@@ -25,12 +25,12 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class ScreenSharingControllerTest {
-    private lateinit var dialogController: DialogController
+    private lateinit var dialogController: DialogContract.Controller
     private lateinit var showScreenSharingNotificationUseCase: ShowScreenSharingNotificationUseCase
     private lateinit var removeScreenSharingNotificationUseCase: RemoveScreenSharingNotificationUseCase
     private lateinit var hasScreenSharingNotificationChannelEnabledUseCase: HasScreenSharingNotificationChannelEnabledUseCase
     private lateinit var screenSharingUseCase: ScreenSharingUseCase
-    private lateinit var subjectUnderTest: ScreenSharingControllerImpl
+    private lateinit var subjectUnderTest: ScreenSharingController
     private lateinit var configurationManager: GliaSdkConfigurationManager
     private val screenSharingState: PublishProcessor<ScreenSharingState> = PublishProcessor.create()
 
@@ -46,7 +46,7 @@ class ScreenSharingControllerTest {
         screenSharingUseCase = mock {
             on { invoke() } doReturn screenSharingState
         }
-        subjectUnderTest = ScreenSharingControllerImpl(
+        subjectUnderTest = ScreenSharingController(
             screenSharingUseCase,
             dialogController,
             showScreenSharingNotificationUseCase,
@@ -59,7 +59,7 @@ class ScreenSharingControllerTest {
 
     @Test
     fun appropriate_methods_should_be_triggered_when_screen_sharing_state_receives() {
-        val viewCallback: ScreenSharingController.ViewCallback = mock()
+        val viewCallback: ScreenSharingContract.ViewCallback = mock()
         subjectUnderTest.setViewCallback(viewCallback)
 
         screenSharingState.onNext(ScreenSharingState.Ended)
@@ -111,7 +111,7 @@ class ScreenSharingControllerTest {
 
     @Test
     fun onScreenSharingRequestError_removesNotificationCallsOnScreenSharingRequestError() {
-        val viewCallback: ScreenSharingController.ViewCallback = mock()
+        val viewCallback: ScreenSharingContract.ViewCallback = mock()
         subjectUnderTest.setViewCallback(viewCallback)
         val message = "Error Message"
         subjectUnderTest.onScreenSharingRequestError(message)

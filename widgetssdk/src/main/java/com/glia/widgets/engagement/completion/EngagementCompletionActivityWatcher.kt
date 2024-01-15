@@ -11,7 +11,7 @@ import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.SimpleActivityLifecycleCallbacks
-import com.glia.widgets.engagement.completion.EngagementCompletionController.State
+import com.glia.widgets.engagement.completion.EngagementCompletionContract.State
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isGlia
@@ -23,7 +23,7 @@ import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import java.lang.ref.WeakReference
 
 internal class EngagementCompletionActivityWatcher @JvmOverloads constructor(
-    private val controller: EngagementCompletionController,
+    private val controller: EngagementCompletionContract.Controller,
     private val activities: ArrayMap<String, WeakReference<Activity>> = ArrayMap()
 ) : SimpleActivityLifecycleCallbacks() {
     private var alertDialog: AlertDialog? = null

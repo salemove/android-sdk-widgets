@@ -40,6 +40,7 @@ import com.glia.widgets.view.unifiedui.applyProgressColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
+import java.util.concurrent.Executor
 
 /**
  * A view for displaying the visitor code to the visitor.
@@ -49,7 +50,8 @@ import com.google.android.material.theme.overlay.MaterialThemeOverlay
  * Use [CallVisualizer.createVisitorCodeView] to create an instance of this view.
  */
 class VisitorCodeView internal constructor(
-    context: Context
+    context: Context,
+    private val uiThreadExecutor: Executor? = null
 ) : FrameLayout(MaterialThemeOverlay.wrap(context, null, 0, R.style.Application_Glia_Chat), null, 0), VisitorCodeContract.View {
     private lateinit var controller: VisitorCodeContract.Controller
     private var theme: UiTheme? = null
@@ -189,12 +191,16 @@ class VisitorCodeView internal constructor(
             progressBar.visibility = View.VISIBLE
         } else {
             progressBar.visibility = View.GONE
-            charCodeView.animate().alpha(1f).duration = 200
+            charCodeView.animate().apply {
+                alpha(1f)
+                duration = 200
+                start()
+            }
         }
     }
 
     private fun runOnUi(function: () -> Unit) {
-        post(function)
+        uiThreadExecutor?.execute(function) ?: post(function)
     }
 
     private fun applyRemoteThemeConfig(theme: UnifiedTheme?) {

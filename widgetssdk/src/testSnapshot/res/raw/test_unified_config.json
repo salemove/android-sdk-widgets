@@ -1059,5 +1059,121 @@
         "#04728c"
       ]
     }
+  },
+  "callVisualizer": {
+    "visitorCode": {
+      "actionButton": {
+        "background": {
+          "color": {
+            "type": "gradient",
+            "value": ["#ffd03b", "#e76810"]
+          },
+          "border": {
+            "type": "fill",
+            "value": ["#a20013"]
+          },
+          "borderWidth": 6,
+          "cornerRadius": 26
+        },
+        "shadow": {
+          "color": {
+            "type": "fill",
+            "value": ["#ff3ff0"]
+          },
+          "offset": 0,
+          "opacity": 1,
+          "radius": 8
+        },
+        "text": {
+          "alignment": "trailing",
+          "background": {
+            "type": "gradient",
+            "value": ["#edff00", "#ff6a1e"]
+          },
+          "font": {
+            "size": 24,
+            "style": "bold"
+          },
+          "foreground": {
+            "type": "gradient",
+            "value": ["#2e54ff", "#70ffe7"]
+          }
+        },
+        "tintColor": {
+          "type": "fill",
+          "value": ["#24ff11"]
+        }
+      },
+      "background": {
+        "color": {
+          "type": "gradient",
+          "value": ["#c2ff38", "#ede0cd"]
+        },
+        "border": {
+          "type": "fill",
+          "value": ["#00abe7"]
+        },
+        "borderWidth": 6,
+        "cornerRadius": 26
+      },
+      "closeButtonColor": {
+        "type": "gradient",
+        "value": ["#25e72c", "#4f82e7"]
+      },
+      "numberSlotBackground": {
+        "color": {
+          "type": "gradient",
+          "value": ["#3c0039", "#073c3a"]
+        },
+        "border": {
+          "type": "fill",
+          "value": ["#e7677e"]
+        },
+        "borderWidth": 6,
+        "cornerRadius": 26
+      },
+      "numberSlotText": {
+        "alignment": "trailing",
+        "background": {
+          "type": "fill",
+          "value": [
+            "#3c3722"
+          ]
+        },
+        "font": {
+          "size": 26,
+          "style": "bold_italic"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#f6ff68"
+          ]
+        }
+      },
+      "loadingProgressColor": {
+        "type": "gradient",
+        "value": ["#d300e7", "#e7b111"]
+      },
+      "title": {
+        "alignment": "trailing",
+        "background": {
+          "type": "fill",
+          "value": [
+            "#acff7d"
+          ]
+        },
+        "font": {
+          "size": 13,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "fill",
+          "value": [
+            "#7f27d8"
+          ]
+        }
+      }
+    }
   }
 }

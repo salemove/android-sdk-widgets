@@ -625,9 +625,9 @@ internal class ChatController(
     }
 
     private fun stop() {
-        chatManager.reset()
         Logger.d(TAG, "Stop, engagement ended")
         endEngagementUseCase()
+        chatManager.reset()
         mediaUpgradeDisposable.clear()
         emitViewState { chatState.stop() }
     }

@@ -140,11 +140,11 @@ internal class ServiceChatHeadController(
     }
 
     private fun engagementEnded() {
+        toggleChatHeadServiceUseCase.onDestroy()
         state = State.ENDED
         operatorProfileImgUrl = null
         unreadMessagesCount = 0
         resumedViewName = null
-        toggleChatHeadServiceUseCase.onDestroy()
         updateChatHeadView()
     }
 

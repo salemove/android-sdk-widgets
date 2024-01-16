@@ -2,6 +2,7 @@ package com.glia.widgets.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -82,6 +83,7 @@ class CharCodeView @JvmOverloads constructor(
         charView.isFocusable = false
         charView.text = character.toString()
         charView.textAlignment = TEXT_ALIGNMENT_CENTER
+        charView.gravity = Gravity.CENTER
         charView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
 
         applyRuntimeTheme(runtimeTheme, charView)

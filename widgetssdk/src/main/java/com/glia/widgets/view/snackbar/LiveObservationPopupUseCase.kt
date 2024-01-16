@@ -7,7 +7,7 @@ internal class LiveObservationPopupUseCase(
 ) {
     operator fun invoke(callback: (shouldShow: Boolean) -> Unit) {
         siteInfoUseCase.execute { siteInfo, _ ->
-            callback(siteInfo?.isObservationIndicationEnabled ?: true)
+            callback(siteInfo?.isObservationIndicationEnabled ?: true && siteInfo?.isLiveObservationEnabled ?: true)
         }
     }
 }

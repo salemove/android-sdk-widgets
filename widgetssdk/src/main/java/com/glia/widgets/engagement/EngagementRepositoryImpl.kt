@@ -189,10 +189,10 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private fun cancelQueueTicket(id: String) {
         Logger.i(TAG, "Cancel queue ticket")
+        _engagementState.onNext(State.QueueingCanceled)
         core.cancelQueueTicket(id) {
             if (it == null) {
                 Logger.d(TAG, "cancelQueueTicketSuccess")
-                _engagementState.onNext(State.QueueingCanceled)
             } else {
                 Logger.e(TAG, "cancelQueueTicketError: $it")
             }

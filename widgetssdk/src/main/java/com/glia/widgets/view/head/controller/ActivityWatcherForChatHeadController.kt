@@ -1,6 +1,5 @@
 package com.glia.widgets.view.head.controller
 
-import android.annotation.SuppressLint
 import com.glia.androidsdk.Glia
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
@@ -10,6 +9,7 @@ import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.head.ChatHeadContract
 import com.glia.widgets.view.head.ChatHeadLayoutContract
 
@@ -31,11 +31,37 @@ internal class ActivityWatcherForChatHeadController(
 
     internal var screenSharingViewCallback: ScreenSharingContract.ViewCallback? = null
 
-    @SuppressLint("CheckResult")
     override fun init() {
-        engagementStateUseCase()
-            .filter { it is State.StartedOmniCore || it is State.Update }
-            .subscribe { showBubble() }
+        engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
+    }
+
+    private fun handleEngagementState(state: State) {
+        when (state) {
+            is State.StartedOmniCore,
+            is State.StartedCallVisualizer,
+            is State.Queuing,
+            is State.PreQueuing -> onEngagementOrQueueingStarted()
+
+            is State.FinishedCallVisualizer,
+            is State.FinishedOmniCore,
+            is State.QueueUnstaffed,
+            is State.UnexpectedErrorHappened,
+            is State.QueueingCanceled -> onEngagementOrQueueingEnded()
+
+            else -> {
+                //no op
+            }
+        }
+    }
+
+    private fun onEngagementOrQueueingEnded() {
+        watcher.removeChatHeadLayoutIfPresent()
+    }
+
+    private fun onEngagementOrQueueingStarted() {
+        if (shouldShowBubble(watcher.fetchGliaOrRootView()?.javaClass?.simpleName.orEmpty())) {
+            showBubble()
+        }
     }
 
     override fun shouldShowBubble(gliaOrRootView: String?): Boolean {

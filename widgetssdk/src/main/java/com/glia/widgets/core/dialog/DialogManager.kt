@@ -1,21 +1,19 @@
 package com.glia.widgets.core.dialog
 
-import androidx.annotation.VisibleForTesting
 import com.glia.widgets.core.dialog.model.DialogState
 import java.util.Deque
 import java.util.concurrent.LinkedBlockingDeque
 
 internal class DialogManager(private val callback: Callback) {
-    @VisibleForTesting
-    val dialogStateDeque: Deque<DialogState> by lazy { LinkedBlockingDeque() }
+    private val dialogStateDeque: Deque<DialogStateHolder> by lazy { LinkedBlockingDeque() }
 
-    private val current: DialogState? get() = dialogStateDeque.peekLast()
+    private val current: DialogState? get() = dialogStateDeque.peekLast()?.dialogState
     val currentDialogState: DialogState get() = current ?: DialogState.None
 
     /**
      * @return true if the queue is not empty.
      */
-    val isDialogShown: Boolean
+    private val isDialogShown: Boolean
         get() = !dialogStateDeque.isEmpty()
 
     /**
@@ -28,26 +26,29 @@ internal class DialogManager(private val callback: Callback) {
         if (isDialogShown) {
             emitNone()
         }
-        dialogStateDeque.removeLastOccurrence(dialogState)
-        dialogStateDeque.offer(dialogState)
+        val wrapped = DialogStateHolder(dialogState)
+
+        dialogStateDeque.removeLastOccurrence(wrapped)
+        dialogStateDeque.offer(wrapped)
         callback.emitDialog(dialogState)
     }
 
     /**
      * Used to add state to the queue.
      *
-     * If the current [.getCurrentMode] state is not [Dialog.MODE_NONE] it will add
+     * If the current [.getCurrentMode] state is not [DialogState.None] it will add
      * the state to the queue. The new state will emit after the [.dismissCurrent] called.
      *
-     * If the current [.getCurrentMode] state is [Dialog.MODE_NONE]
+     * If the current [.getCurrentMode] state is [DialogState.None]
      * it will emit a new state immediately.
      */
     fun add(dialogState: DialogState) {
         val isDialogShown = isDialogShown
         val currentState = remove()
-        dialogStateDeque.removeFirstOccurrence(dialogState)
-        dialogStateDeque.offer(dialogState)
-        if (currentState != null && dialogState != currentState) {
+        val wrapped = DialogStateHolder(dialogState)
+        dialogStateDeque.removeFirstOccurrence(wrapped)
+        dialogStateDeque.offer(wrapped)
+        if (currentState != null && wrapped != currentState) {
             dialogStateDeque.offer(currentState)
         }
         if (!isDialogShown) {
@@ -68,10 +69,10 @@ internal class DialogManager(private val callback: Callback) {
             dismissCurrent()
             return
         }
-        dialogStateDeque.removeFirstOccurrence(dialogState)
+        dialogStateDeque.removeFirstOccurrence(DialogStateHolder(dialogState))
     }
 
-    private fun remove(): DialogState? {
+    private fun remove(): DialogStateHolder? {
         return dialogStateDeque.pollLast()
     }
 
@@ -100,7 +101,7 @@ internal class DialogManager(private val callback: Callback) {
     }
 
     /**
-     * Used to clear the queue and emit [Dialog.MODE_NONE] state.
+     * Used to clear the queue and emit [DialogState.None] state.
      */
     fun dismissAll() {
         dialogStateDeque.clear()
@@ -109,5 +110,28 @@ internal class DialogManager(private val callback: Callback) {
 
     fun interface Callback {
         fun emitDialog(dialogState: DialogState)
+    }
+
+    /**
+     * Wrapping [DialogState] with this class will help
+     * to make all the items with the same [DialogState] type but with different payloads equal for [DialogManager]
+     *
+     * For instance, we have [DialogState.MediaUpgrade] in [dialogStateDeque], to make [LinkedBlockingDeque.removeLastOccurrence] remove that state
+     * without caring about [DialogState.MediaUpgrade] payload, we need it from [equals] to ignore the payload.
+     * This class will help to make this happen.
+     */
+    private class DialogStateHolder(val dialogState: DialogState) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as DialogStateHolder
+
+            return dialogState::class == other.dialogState::class
+        }
+
+        override fun hashCode(): Int {
+            return javaClass.hashCode()
+        }
     }
 }

@@ -14,6 +14,11 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView {
         chatViewMock.setUp()
     }
 
+    override fun tearDown() {
+        super.tearDown()
+        chatViewMock.tearDown()
+    }
+
     @Test
     fun initialState() {
         snapshot(

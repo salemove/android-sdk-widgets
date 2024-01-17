@@ -14,6 +14,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isGone
@@ -67,6 +68,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import com.google.android.material.transition.MaterialFade
 import com.google.android.material.transition.SlideDistanceProvider
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 internal class CallView(
@@ -988,5 +990,12 @@ internal class CallView(
 
     override fun minimizeView() {
         onMinimizeListener?.onMinimize()
+    }
+
+    @VisibleForTesting
+    internal var executor: Executor? = null
+
+    override fun post(action: Runnable?): Boolean {
+        return executor?.execute(action)?.let { true } ?: super.post(action)
     }
 }

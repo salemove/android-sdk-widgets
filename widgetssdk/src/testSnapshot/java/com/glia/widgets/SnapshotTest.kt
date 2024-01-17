@@ -58,6 +58,21 @@ open class SnapshotTest : SnapshotContent, SnapshotStrings, SnapshotTheme {
         _paparazzi.snapshot(viewWrapper, name, offsetMillis)
     }
 
+    /**
+     * This function is intended for views that might collapse due to [SessionParams.RenderingMode.SHRINK] mode.
+     * It will still keep snapshots compact compared to other modes.
+     */
+    fun snapshotFullSize(
+        view: View,
+        name: String? = null,
+        offsetMillis: Long = 0L,
+        width: Int = deviceConfig.screenWidth,
+        height: Int = deviceConfig.screenHeight
+    ) {
+        val viewWrapper = FrameLayout(context).apply { addView(view, LayoutParams(width, height)) }
+        snapshot(viewWrapper, name, offsetMillis)
+    }
+
     @Before
     open fun setUp() {
     }

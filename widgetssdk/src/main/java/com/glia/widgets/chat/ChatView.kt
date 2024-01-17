@@ -513,6 +513,10 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                 this@ChatView.requestOpenEmailClient(uri)
             }
 
+            override fun showAlreadyInMessagingDialog() {
+                this@ChatView.showAlreadyInMessagingDialog()
+            }
+
             override fun showEngagementConfirmationDialog() {
                 this@ChatView.showEngagementConfirmationDialog()
             }
@@ -615,8 +619,8 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
                     Dialog.MODE_ENABLE_SCREEN_SHARING_NOTIFICATIONS_AND_START_SHARING -> post {
                         showAllowScreenSharingNotificationsAndStartSharingDialog()
                     }
-
                     Dialog.MODE_LIVE_OBSERVATION_OPT_IN -> post { controller?.onEngagementConfirmationDialogRequested() }
+                    Dialog.MODE_ALREADY_IN_MESSAGING -> post { controller?.onAlreadyInMessagingDialogRequested() }
 
                     Dialog.MODE_VISITOR_CODE -> {
                         Logger.e(TAG, "DialogController callback in ChatView with MODE_VISITOR_CODE")
@@ -722,6 +726,19 @@ class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defSty
             context = context,
             theme = theme,
             dialogState = dialogState,
+            positiveButtonClickListener = {
+                screenSharingController?.onScreenSharingAccepted(context.requireActivity())
+            },
+            negativeButtonClickListener = {
+                screenSharingController?.onScreenSharingDeclined()
+            }
+        )
+    }
+
+    private fun showAlreadyInMessagingDialog() = showDialog {
+        Dialogs.showAlreadyInMessagingDialog(
+            context = context,
+            theme = theme,
             positiveButtonClickListener = {
                 screenSharingController?.onScreenSharingAccepted(context.requireActivity())
             },

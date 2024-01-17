@@ -301,6 +301,25 @@ internal object Dialogs {
         }
     }
 
+    fun showAlreadyInMessagingDialog(
+        context: Context,
+        theme: UiTheme,
+        positiveButtonClickListener: View.OnClickListener,
+        negativeButtonClickListener: View.OnClickListener
+    ): AlertDialog {
+        val payload = DialogPayload.Confirmation(  // TODO: change to dedicated DialogType
+            title = stringProvider.getRemoteString(R.string.alert_already_in_messaging_header),
+            message = stringProvider.getRemoteString(R.string.alert_already_in_messaging_message),
+            positiveButtonText = stringProvider.getRemoteString(R.string.alert_already_in_messaging_append_existing),
+            negativeButtonText = stringProvider.getRemoteString(R.string.alert_already_in_messaging_start_new),
+            poweredByText = poweredByText,
+            positiveButtonClickListener = positiveButtonClickListener,
+            negativeButtonClickListener = negativeButtonClickListener
+        )
+
+        return dialogService.showDialog(context, theme, DialogType.Confirmation(payload)) // TODO: change to dedicated DialogType
+    }
+
     fun showVisitorCodeDialog(
         context: Context
     ): AlertDialog {

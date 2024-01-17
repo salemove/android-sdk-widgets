@@ -55,6 +55,8 @@ public interface ChatViewCallback {
 
     void requestOpenEmailClient(@NotNull Uri uri);
 
+    void showAlreadyInMessagingDialog();
+
     void showEngagementConfirmationDialog();
 
     void navigateToWebBrowserActivity(String title, String url);

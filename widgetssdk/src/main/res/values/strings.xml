@@ -45,6 +45,10 @@
     <string name="glia_chat_visitor_status_transferring">Transferring</string>
     <string name="glia_dialog_screen_sharing_offer_title">Start Screen Sharing</string>
     <string name="glia_dialog_screen_sharing_offer_message">%1$s has asked you to share your screen.</string>
+    <string name="glia_dialog_already_in_messaging_title">You previously sent message that are waiting for a reply</string>
+    <string name="glia_dialog_already_in_messaging_message">You can add to your previously sent messages or start a new conversation. (If you choose to start a new conversation, your previous messages will be discarded.)</string>
+    <string name="glia_dialog_already_in_messaging_append_existing">Add Messages</string>
+    <string name="glia_dialog_already_in_messaging_start_new">Start New</string>
     <string name="glia_dialog_unexpected_error_message">Please try again.</string>
     <string name="glia_dialog_end_engagement_message">Are you sure you want to end engagement?</string>
     <string name="glia_dialog_engagement_ended_message">This engagement has ended.\nThank you!</string>

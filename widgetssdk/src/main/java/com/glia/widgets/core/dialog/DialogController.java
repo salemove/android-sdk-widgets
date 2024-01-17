@@ -153,6 +153,11 @@ public class DialogController {
         dialogManager.addAndEmit(new DialogState(Dialog.MODE_UNAUTHENTICATED));
     }
 
+    public void showAlreadyInMessagingDialog() {
+        Logger.i(TAG, "Show Already In Messaging Dialog");
+        dialogManager.addAndEmit(new DialogState(Dialog.MODE_ALREADY_IN_MESSAGING));
+    }
+
     public void showEngagementConfirmationDialog() {
         Logger.d(TAG, "Show Live Observation Opt In Dialog");
         if (isOverlayDialogShown() || isExitQueueDialogShown()) {

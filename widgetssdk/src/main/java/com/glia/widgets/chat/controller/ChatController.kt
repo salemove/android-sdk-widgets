@@ -262,6 +262,11 @@ internal class ChatController(
         updateAllowFileSendState()
     }
 
+    fun onAlreadyInMessagingDialogRequested() {
+        if (isOngoingEngagementUseCase()) return
+        viewCallback?.showAlreadyInMessagingDialog()
+    }
+
     fun onEngagementConfirmationDialogRequested() {
         if (isOngoingEngagementUseCase()) return
         viewCallback?.showEngagementConfirmationDialog()
@@ -952,6 +957,7 @@ internal class ChatController(
         (exception as? GliaException)?.also {
             Logger.e(TAG, it.toString())
             when (it.cause) {
+                GliaException.Cause.ALREADY_IN_MESSAGING -> dialogController.showAlreadyInMessagingDialog() // TODO: should somehow have button actions handled
                 GliaException.Cause.QUEUE_CLOSED, GliaException.Cause.QUEUE_FULL -> dialogController.showNoMoreOperatorsAvailableDialog()
                 else -> dialogController.showUnexpectedErrorDialog()
             }

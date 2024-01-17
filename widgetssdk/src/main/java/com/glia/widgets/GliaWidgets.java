@@ -11,20 +11,14 @@ import androidx.annotation.Nullable;
 
 import com.glia.androidsdk.GliaConfig;
 import com.glia.androidsdk.GliaException;
-import com.glia.androidsdk.RequestCallback;
 import com.glia.androidsdk.visitor.Authentication;
-import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
-import com.glia.widgets.core.visitor.GliaVisitorInfo;
-import com.glia.widgets.core.visitor.GliaWidgetException;
-import com.glia.widgets.core.visitor.VisitorInfoUpdate;
 import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -33,7 +27,6 @@ import io.reactivex.plugins.RxJavaPlugins;
  * This class is a starting point for integration with Glia Widgets SDK
  */
 public class GliaWidgets {
-    public static final String REMOTE_CONFIGURATION = "remote_configuration";
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
@@ -54,19 +47,13 @@ public class GliaWidgets {
      * as a navigation argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String QUEUE_ID = "queue_id";
-    /**
-     * Use with {@link android.os.Bundle} to pass in a context url as a navigation
-     * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
-     *
-     * @deprecated Use {@link com.glia.widgets.GliaWidgets#CONTEXT_ASSET_ID}
-     */
-    @Deprecated
-    public static final String CONTEXT_URL = "context_url";
+
     /**
      * Use with {@link android.os.Bundle} to pass in a context asset ID as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String CONTEXT_ASSET_ID = "context_asset_id";
+
     /**
      * Use with {@link android.os.Bundle} to pass in a boolean which represents if you would like to
      * use the chat head bubble as an overlay as a navigation argument when
@@ -79,6 +66,7 @@ public class GliaWidgets {
      * When this value is not passed then by default this value is true.
      */
     public static final String USE_OVERLAY = "use_overlay";
+
     /**
      * Use with {@link android.os.Bundle} to pass an input parameter to the call activity to
      * tell it which type of engagement you would like to start. Can be one of:
@@ -86,30 +74,38 @@ public class GliaWidgets {
      * If no parameter is passed then will default to {@link MEDIA_TYPE_AUDIO}
      */
     public static final String MEDIA_TYPE = "media_type";
+
     /**
      * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
      * {@link com.glia.widgets.call.CallActivity} to start an audio call media engagement.
      */
     public static final String MEDIA_TYPE_AUDIO = "media_type_audio";
+
     /**
      * Pass this parameter as an input parameter with {@link MEDIA_TYPE} as its key to
      * {@link com.glia.widgets.call.CallActivity} to start a video call media engagement.
      */
     public static final String MEDIA_TYPE_VIDEO = "media_type_video";
+
     /**
      * Pass this parameter to call activity to tell it that upgrade to audio/video call is ongoing
      * If no parameter is passed then will default to false
      */
     public static final String IS_UPGRADE_TO_CALL = "upgrade_to_call";
+
     public static final String SURVEY = "survey";
+
     /**
      * Use with {@link android.os.Bundle} to pass in
      * {@link com.glia.androidsdk.screensharing.ScreenSharing.Mode} as a navigation
      * argument when navigating to {@link com.glia.widgets.chat.ChatActivity}
      */
     public static final String SCREEN_SHARING_MODE = "screens_haring_mode";
+
     public static final String CHAT_TYPE = "chat_type";
+
     private final static String TAG = "GliaWidgets";
+
     @Nullable
     private static CustomCardAdapter customCardAdapter = new WebViewCardAdapter();
 
@@ -221,53 +217,6 @@ public class GliaWidgets {
                 Logger.e(TAG, "Ending engagement error: " + e);
             }
         }));
-    }
-
-    /**
-     * Updates the visitor's information
-     * <p>
-     * Updates the visitor's information stored on the server. This information will also be displayed to the operator.
-     *
-     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#updateVisitorInfo(VisitorInfoUpdateRequest, Consumer)}
-     */
-    @Deprecated
-    public static void updateVisitorInfo(VisitorInfoUpdate visitorInfoUpdate, Consumer<GliaWidgetException> exceptionConsumer) {
-        Logger.logDeprecatedMethodUse(TAG, "updateVisitorInfo(VisitorInfoUpdate, Consumer<GliaWidgetException>)");
-        Dependencies.glia().updateVisitorInfo(new VisitorInfoUpdateRequest.Builder()
-            .setName(visitorInfoUpdate.getName())
-            .setEmail(visitorInfoUpdate.getEmail())
-            .setPhone(visitorInfoUpdate.getPhone())
-            .setNote(visitorInfoUpdate.getNote())
-            .setCustomAttributes(visitorInfoUpdate.getCustomAttributes())
-            .setCustomAttrsUpdateMethod(visitorInfoUpdate.getCustomAttrsUpdateMethod())
-            .setNoteUpdateMethod(visitorInfoUpdate.getNoteUpdateMethod())
-            .build(), e -> {
-            if (e != null) {
-                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            } else {
-                exceptionConsumer.accept(null);
-            }
-        });
-    }
-
-    /**
-     * Fetches the visitor's information
-     * <p>
-     * If visitor is authenticated, the response will include the attributes and tokens fetched from the authentication provider.
-     *
-     * @deprecated since 1.9.0 use @see {@link com.glia.androidsdk.Glia#getVisitorInfo(RequestCallback)}
-     */
-    @Deprecated
-    public static void getVisitorInfo(Consumer<GliaVisitorInfo> visitorCallback, Consumer<GliaWidgetException> exceptionConsumer) {
-        Logger.logDeprecatedMethodUse(TAG, "getVisitorInfo(Consumer<GliaVisitorInfo>, Consumer<GliaWidgetException>)");
-        Dependencies.glia().getVisitorInfo((visitorInfo, e) -> {
-            if (visitorInfo != null) {
-                visitorCallback.accept(new GliaVisitorInfo(visitorInfo));
-            }
-            if (e != null) {
-                exceptionConsumer.accept(new GliaWidgetException(e.debugMessage, e.cause));
-            }
-        });
     }
 
     /**

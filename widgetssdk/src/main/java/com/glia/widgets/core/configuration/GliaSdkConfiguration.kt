@@ -6,8 +6,6 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.Logger.logDeprecatedMethodUse
-import com.glia.widgets.helper.TAG
 
 class GliaSdkConfiguration private constructor(builder: Builder) {
     val companyName: String?
@@ -34,12 +32,6 @@ class GliaSdkConfiguration private constructor(builder: Builder) {
         manualStringOverrideL = builder.manualLocaleOverride
     }
 
-    @Deprecated("")
-    fun getContextUrl(): String? {
-        logDeprecatedMethodUse(TAG, "getContextUrl()")
-        return contextUrl
-    }
-
     class Builder {
         var companyName: String? = null
         var queueId: String? = null
@@ -57,13 +49,6 @@ class GliaSdkConfiguration private constructor(builder: Builder) {
 
         fun queueId(queueId: String?): Builder {
             this.queueId = queueId
-            return this
-        }
-
-        @Deprecated("")
-        fun contextUrl(contextUrl: String?): Builder {
-            logDeprecatedMethodUse(TAG, "contextUrl(String)")
-            this.contextUrl = contextUrl
             return this
         }
 

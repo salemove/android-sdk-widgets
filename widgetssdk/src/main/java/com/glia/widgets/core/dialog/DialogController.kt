@@ -2,7 +2,6 @@ package com.glia.widgets.core.dialog
 
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase
-import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.MediaUpgradeMode
 import com.glia.widgets.helper.Logger
@@ -42,7 +41,6 @@ internal interface DialogContract {
 }
 
 internal class DialogController(
-    private val setOverlayPermissionRequestDialogShownUseCase: SetOverlayPermissionRequestDialogShownUseCase,
     private val setEnableCallNotificationChannelDialogShownUseCase: SetEnableCallNotificationChannelDialogShownUseCase
 ) : DialogContract.Controller {
     private val viewCallbacks: MutableSet<DialogContract.Controller.Callback> = HashSet()
@@ -118,7 +116,6 @@ internal class DialogController(
 
     override fun showOverlayPermissionsDialog() {
         Logger.i(TAG, "Show Overlay permissions Dialog")
-        setOverlayPermissionRequestDialogShownUseCase.execute()
         dialogManager.addAndEmit(DialogState.OverlayPermission)
     }
 

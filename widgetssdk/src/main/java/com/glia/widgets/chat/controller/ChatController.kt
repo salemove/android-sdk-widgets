@@ -19,6 +19,7 @@ import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.chat.ChatView
+import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
@@ -120,7 +121,8 @@ internal class ChatController(
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
-    private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase
+    private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
+    private val decideOnQueueingUseCase: DecideOnQueueingUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -180,6 +182,7 @@ internal class ChatController(
         Logger.d(TAG, "constructor")
         chatState = ChatState()
         subscribeToEngagement()
+        decideOnQueueingUseCase().unSafeSubscribe(::enqueueForEngagement)
     }
 
     override fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType) {
@@ -248,7 +251,7 @@ internal class ChatController(
     override fun onLiveObservationDialogAllowed() {
         Logger.d(TAG, "onLiveObservationDialogAllowed")
         dialogController.dismissCurrentDialog()
-        enqueueForEngagement()
+        decideOnQueueingUseCase.onQueueingRequested()
     }
 
     override fun onLiveObservationDialogRejected() {
@@ -549,6 +552,7 @@ internal class ChatController(
 
     override fun overlayPermissionsDialogDismissed() {
         Logger.d(TAG, "overlayPermissionsDialogDismissed")
+        decideOnQueueingUseCase.onOverlayDialogShown()
         dialogController.dismissCurrentDialog()
         emitViewState { chatState }
     }
@@ -592,7 +596,7 @@ internal class ChatController(
             if (shouldShow) {
                 dialogController.showEngagementConfirmationDialog()
             } else {
-                enqueueForEngagement()
+                decideOnQueueingUseCase.onQueueingRequested()
             }
         }
     }
@@ -710,7 +714,8 @@ internal class ChatController(
     }
 
     private fun initChatManager() {
-        chatManager.initialize(::onHistoryLoaded, ::addQuickReplyButtons, ::updateUnSeenMessagesCount).subscribe(::emitItems, ::error)
+        chatManager.initialize(::onHistoryLoaded, ::addQuickReplyButtons, ::updateUnSeenMessagesCount)
+            .subscribe(::emitItems, ::error)
             .also(disposable::add)
     }
 

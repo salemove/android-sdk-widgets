@@ -4,6 +4,7 @@ import android.net.Uri
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
+import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.GliaSendMessagePreviewUseCase
 import com.glia.widgets.chat.domain.GliaSendMessageUseCase
 import com.glia.widgets.chat.domain.IsAuthenticatedUseCase
@@ -44,6 +45,7 @@ import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.view.MessagesNotSeenHandler
 import com.glia.widgets.view.MinimizeHandler
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -95,6 +97,7 @@ class ChatControllerTest {
     private lateinit var declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
     private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
     private lateinit var enqueueForEngagementUseCase: EnqueueForEngagementUseCase
+    private lateinit var decideOnQueueingUseCase: DecideOnQueueingUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -150,6 +153,9 @@ class ChatControllerTest {
         isQueueingOrEngagementUseCase = mock()
         enqueueForEngagementUseCase = mock()
         chatView = mock()
+        decideOnQueueingUseCase = mock {
+            on { invoke() } doReturn Completable.complete()
+        }
 
         chatController = ChatController(
             callTimer = callTimer,
@@ -191,6 +197,7 @@ class ChatControllerTest {
             declineMediaUpgradeOfferUseCase = declineMediaUpgradeOfferUseCase,
             isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
+            decideOnQueueingUseCase = decideOnQueueingUseCase
         )
         chatController.setView(chatView)
     }

@@ -22,6 +22,8 @@ import com.glia.widgets.chat.domain.AppendSystemMessageItemUseCase;
 import com.glia.widgets.chat.domain.CustomCardAdapterTypeUseCase;
 import com.glia.widgets.chat.domain.CustomCardShouldShowUseCase;
 import com.glia.widgets.chat.domain.CustomCardTypeUseCase;
+import com.glia.widgets.chat.domain.DecideOnQueueingUseCase;
+import com.glia.widgets.chat.domain.DecideOnQueueingUseCaseImpl;
 import com.glia.widgets.chat.domain.DecodeSampledBitmapFromInputStreamUseCase;
 import com.glia.widgets.chat.domain.FindNewMessagesDividerIndexUseCase;
 import com.glia.widgets.chat.domain.GliaLoadHistoryUseCase;
@@ -971,6 +973,11 @@ public class UseCaseFactory {
     @NonNull
     public ScreenSharingUseCase getScreenSharingUseCase() {
         return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public DecideOnQueueingUseCase getDecideOnQueueingUseCase() {
+        return new DecideOnQueueingUseCaseImpl(createIsShowOverlayPermissionRequestDialogUseCase(), createSetOverlayPermissionRequestDialogShownUseCase());
     }
 
 }

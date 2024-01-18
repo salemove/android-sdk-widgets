@@ -81,10 +81,7 @@ public class ControllerFactory {
         );
 
         this.useCaseFactory = useCaseFactory;
-        this.dialogController = new DialogController(
-            useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
-            useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
-        );
+        this.dialogController = new DialogController(useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase());
         this.filePreviewController = new FilePreviewController(
             useCaseFactory.createGetImageFileFromDownloadsUseCase(),
             useCaseFactory.createGetImageFileFromCacheUseCase(),
@@ -136,7 +133,8 @@ public class ControllerFactory {
                 useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
                 useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
-                useCaseFactory.getQueueForEngagementUseCase()
+                useCaseFactory.getQueueForEngagementUseCase(),
+                useCaseFactory.getDecideOnQueueingUseCase()
             );
         }
 
@@ -175,7 +173,8 @@ public class ControllerFactory {
                 useCaseFactory.getToggleVisitorAudioMediaStateUseCase(),
                 useCaseFactory.getToggleVisitorVideoMediaStateUseCase(),
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
-                useCaseFactory.getQueueForEngagementUseCase()
+                useCaseFactory.getQueueForEngagementUseCase(),
+                useCaseFactory.getDecideOnQueueingUseCase()
             );
         }
 
@@ -226,10 +225,7 @@ public class ControllerFactory {
     }
 
     public DialogContract.Controller createDialogController() {
-        return new DialogController(
-            useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
-            useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase()
-        );
+        return new DialogController(useCaseFactory.createSetEnableCallNotificationChannelDialogShownUseCase());
     }
 
     public void init() {

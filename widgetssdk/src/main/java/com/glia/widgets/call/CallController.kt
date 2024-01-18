@@ -11,6 +11,7 @@ import com.glia.widgets.Constants
 import com.glia.widgets.call.CallStatus.EngagementOngoingAudioCallStarted
 import com.glia.widgets.call.CallStatus.EngagementOngoingVideoCallStarted
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase
+import com.glia.widgets.chat.domain.DecideOnQueueingUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
@@ -87,7 +88,8 @@ internal class CallController(
     private val toggleVisitorAudioMediaStateUseCase: ToggleVisitorAudioMediaStateUseCase,
     private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
-    private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase
+    private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
+    private val decideOnQueueingUseCase: DecideOnQueueingUseCase
 ) : CallContract.Controller {
     private val disposable = CompositeDisposable()
     private val mediaUpgradeDisposable = CompositeDisposable()
@@ -109,6 +111,7 @@ internal class CallController(
         }
 
         subscribeToEngagement()
+        decideOnQueueingUseCase().unSafeSubscribe(::enqueueForEngagement)
     }
 
     private fun subscribeToEngagement() {
@@ -176,20 +179,20 @@ internal class CallController(
         createNewTimerStatusCallback()
         initControllerCallbacks()
         initMessagesNotSeenCallback()
-        tryToQueueForEngagement(queueId, visitorContextAssetId, mediaType)
+        tryToQueueForEngagement(queueId)
         inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener)
         connectingTimerCounter.addRawValueListener(connectingTimerStatusListener)
         minimizeHandler.addListener { minimizeView() }
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener)
     }
 
-    private fun tryToQueueForEngagement(queueId: String?, visitorContextAssetId: String?, mediaType: Engagement.MediaType) {
+    private fun tryToQueueForEngagement(queueId: String?) {
         if (!isQueueingOrEngagementUseCase() && queueId != null) {
             confirmationDialogUseCase { shouldShow: Boolean ->
                 if (shouldShow) {
                     dialogController.showEngagementConfirmationDialog()
                 } else {
-                    enqueueForEngagement(queueId, visitorContextAssetId, mediaType)
+                    decideOnQueueingUseCase.onQueueingRequested()
                 }
             }
         }
@@ -211,7 +214,7 @@ internal class CallController(
     override fun onLiveObservationDialogAllowed() {
         d(TAG, "onLiveObservationDialogAllowed")
         dialogController.dismissCurrentDialog()
-        enqueueForEngagement(callState.queueId, callState.visitorContextAssetId, callState.requestedMediaType)
+        decideOnQueueingUseCase.onQueueingRequested()
     }
 
     override fun onLiveObservationDialogRejected() {
@@ -220,8 +223,8 @@ internal class CallController(
         dialogController.dismissDialogs()
     }
 
-    private fun enqueueForEngagement(queueId: String, visitorContextAssetId: String?, mediaType: Engagement.MediaType) {
-        enqueueForEngagementUseCase(queueId, mediaType, visitorContextAssetId)
+    private fun enqueueForEngagement() {
+        enqueueForEngagementUseCase(callState.queueId, callState.requestedMediaType, callState.visitorContextAssetId)
     }
 
     override fun onDestroy(retained: Boolean) {
@@ -293,6 +296,7 @@ internal class CallController(
 
     override fun overlayPermissionsDialogDismissed() {
         d(TAG, "overlayPermissionsDialogDismissed")
+        decideOnQueueingUseCase.onOverlayDialogShown()
         dialogController.dismissCurrentDialog()
     }
 

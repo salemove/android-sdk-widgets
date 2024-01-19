@@ -107,6 +107,8 @@ internal class ServiceChatHeadController(
                 newEngagementLoaded()
             }
 
+            is EngagementState.Update -> toggleChatHead()
+
             is EngagementState.FinishedCallVisualizer,
             is EngagementState.FinishedOmniCore,
             is EngagementState.QueueUnstaffed,
@@ -124,6 +126,10 @@ internal class ServiceChatHeadController(
                 //no op
             }
         }
+    }
+
+    private fun toggleChatHead() {
+        toggleChatHeadServiceUseCase.invoke(resumedViewName)
     }
 
     override fun updateChatHeadView() {

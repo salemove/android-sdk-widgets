@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
-        android:textColor="@color/glia_transparent_black_bg"
+        android:textColor="@color/glia_base_dark_color"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/remove_item_button"

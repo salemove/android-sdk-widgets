@@ -12,8 +12,13 @@
     <color name="glia_system_negative_color">#D11149</color>
     <color name="glia_system_agent_bubble_color">#F3F3F3</color>
 
-    <color name="glia_transparent_black_bg">#B3000000</color>
+    <!-- { @deprecated Use glia_call_view_background_color instead.} -->
+    <color name="glia_transparent_black_bg">#232323</color>
+    <color name="glia_call_view_background_color">@color/glia_transparent_black_bg</color>
+
+    <!-- {@deprecated Use glia_call_control_buttons_color instead.} -->
     <color name="glia_transparent_black_buttons_bg">@color/glia_black_color</color>
+    <color name="glia_call_control_buttons_color">@color/glia_transparent_black_buttons_bg</color>
 
     <color name="glia_stroke_light">#F3F3F3</color>
     <color name="glia_stroke_gray">#4D6C7683</color>

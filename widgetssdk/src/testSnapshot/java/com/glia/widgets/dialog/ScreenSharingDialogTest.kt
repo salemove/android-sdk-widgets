@@ -6,7 +6,9 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-class ScreenSharingDialogTest : SnapshotTest(), SnapshotDialog {
+class ScreenSharingDialogTest : SnapshotTest(
+    renderingMode = fullWidthRenderMode
+), SnapshotDialog {
 
     private val dialogType: DialogType = DialogType.ScreenSharing(
         DialogPayload.ScreenSharing(
@@ -24,24 +26,24 @@ class ScreenSharingDialogTest : SnapshotTest(), SnapshotDialog {
     @Test
     fun withDefaultTheme() {
         val view = inflateView(context = context, dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
     fun withUiTheme() {
         val view = inflateView(context = context, uiTheme = uiTheme(), dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
     fun withUnifiedTheme() {
         val view = inflateView(context = context, uiTheme = uiTheme(whiteLabel = false), unifiedTheme(), dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
     fun withGlobalColors() {
         val view = inflateView(context = context, uiTheme = uiTheme(), unifiedThemeWithGlobalColors(), dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 }

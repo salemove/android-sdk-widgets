@@ -1,9 +1,12 @@
 package com.glia.widgets.call
 
+import com.android.ide.common.rendering.api.SessionParams
 import com.glia.widgets.SnapshotTest
 import org.junit.Test
 
-internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
+internal class CallViewAudioSnapshotTest : SnapshotTest(
+    renderingMode = SessionParams.RenderingMode.NORMAL
+), SnapshotCallView {
 
     override val callViewMock = SnapshotCallView.Mock(this)
 
@@ -23,7 +26,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState()
             ).root
@@ -32,7 +35,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 uiTheme = uiTheme()
@@ -42,7 +45,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -52,7 +55,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 unifiedTheme = unifiedTheme()
@@ -62,7 +65,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 unifiedTheme = unifiedThemeWithoutCall()
@@ -77,7 +80,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnected() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState()
             ).root
@@ -86,7 +89,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 uiTheme = uiTheme()
@@ -96,7 +99,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -106,7 +109,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 unifiedTheme = unifiedTheme()
@@ -116,7 +119,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 unifiedTheme = unifiedThemeWithoutCall()
@@ -135,7 +138,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun audioCallStarted() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = audioCallStartedState()
             ).root
@@ -144,7 +147,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun audioCallStartedWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = audioCallStartedState(),
                 uiTheme = uiTheme()
@@ -154,7 +157,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun audioCallStartedWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = audioCallStartedState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -164,7 +167,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun audioCallStartedWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = audioCallStartedState(),
                 unifiedTheme = unifiedTheme()
@@ -174,7 +177,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun audioCallStartedWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = audioCallStartedState(),
                 unifiedTheme = unifiedThemeWithoutCall()
@@ -189,7 +192,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHold() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState()
             ).root
@@ -198,7 +201,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 uiTheme = uiTheme()
@@ -208,7 +211,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -218,7 +221,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 unifiedTheme = unifiedTheme()
@@ -228,7 +231,7 @@ internal class CallViewAudioSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 unifiedTheme = unifiedThemeWithoutCall()

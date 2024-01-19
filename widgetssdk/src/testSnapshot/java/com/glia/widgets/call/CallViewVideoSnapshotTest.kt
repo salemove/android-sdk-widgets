@@ -1,10 +1,13 @@
 package com.glia.widgets.call
 
+import com.android.ide.common.rendering.api.SessionParams
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.SnapshotTest
 import org.junit.Test
 
-internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
+internal class CallViewVideoSnapshotTest : SnapshotTest(
+    renderingMode = SessionParams.RenderingMode.NORMAL
+), SnapshotCallView {
 
     override val callViewMock = SnapshotCallView.Mock(this)
 
@@ -25,7 +28,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState()
             ).root
@@ -34,7 +37,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 uiTheme = uiTheme()
@@ -44,7 +47,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -54,7 +57,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 unifiedTheme = unifiedTheme()
@@ -64,7 +67,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initCallWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = initCallState(),
                 unifiedTheme = unifiedThemeWithoutCall()
@@ -79,7 +82,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnected() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState()
             ).root
@@ -88,7 +91,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 uiTheme = uiTheme()
@@ -98,7 +101,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -108,7 +111,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 unifiedTheme = unifiedTheme()
@@ -118,7 +121,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun operatorConnectedWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = operatorConnectedState(),
                 unifiedTheme = unifiedThemeWithoutCall()
@@ -137,7 +140,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video1WayCallStarted() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video1WayCallStartedState()
             ).root
@@ -146,7 +149,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video1WayCallStartedWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video1WayCallStartedState(),
                 uiTheme = uiTheme()
@@ -156,7 +159,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video1WayCallStartedWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video1WayCallStartedState(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
@@ -166,7 +169,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video1WayCallStartedWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video1WayCallStartedState(),
                 unifiedTheme = unifiedTheme()
@@ -176,7 +179,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video1WayCallStartedWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video1WayCallStartedState(),
                 unifiedTheme = unifiedThemeWithoutCall()
@@ -195,7 +198,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video2WayCallStarted() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -208,7 +211,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video2WayCallStartedWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -222,7 +225,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video2WayCallStartedWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -236,7 +239,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video2WayCallStartedWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -250,7 +253,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun video2WayCallStartedWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = video2WayCallStartedState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -269,7 +272,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHold() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -282,7 +285,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithUiTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -296,7 +299,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithGlobalColors() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -310,7 +313,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithUnifiedTheme() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 floatingVisitorVideoViewCallback = { view, state ->
@@ -324,7 +327,7 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun onHoldWithUnifiedThemeWithoutCall() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = onHoldState(),
                 floatingVisitorVideoViewCallback = { view, state ->

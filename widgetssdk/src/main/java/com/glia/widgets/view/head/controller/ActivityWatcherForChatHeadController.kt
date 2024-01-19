@@ -42,6 +42,8 @@ internal class ActivityWatcherForChatHeadController(
             is State.Queuing,
             is State.PreQueuing -> onEngagementOrQueueingStarted()
 
+            is State.Update -> updateBubble()
+
             is State.FinishedCallVisualizer,
             is State.FinishedOmniCore,
             is State.QueueUnstaffed,
@@ -59,6 +61,10 @@ internal class ActivityWatcherForChatHeadController(
     }
 
     private fun onEngagementOrQueueingStarted() {
+        updateBubble()
+    }
+
+    private fun updateBubble() {
         if (shouldShowBubble(watcher.fetchGliaOrRootView()?.javaClass?.simpleName.orEmpty())) {
             showBubble()
         }

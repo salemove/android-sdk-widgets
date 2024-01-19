@@ -63,7 +63,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="12dp"
             tools:text="@string/glia_chat_attachment_download_button_label"
-            android:textColor="@color/glia_transparent_black_bg"
+            android:textColor="@color/glia_base_dark_color"
             android:textSize="14sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"

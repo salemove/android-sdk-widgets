@@ -7,10 +7,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
+import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
@@ -19,7 +19,7 @@ import com.glia.widgets.webbrowser.WebBrowserActivity;
 
 import java.util.Objects;
 
-public class CallActivity extends AppCompatActivity {
+public class CallActivity extends FadeTransitionActivity {
     private static final String TAG = CallActivity.class.getSimpleName();
 
     private Configuration configuration;

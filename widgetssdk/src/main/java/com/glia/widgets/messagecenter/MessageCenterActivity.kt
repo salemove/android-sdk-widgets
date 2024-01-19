@@ -10,10 +10,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.TakePicture
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.glia.widgets.GliaWidgets.CHAT_TYPE
+import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
@@ -28,7 +28,7 @@ import com.glia.widgets.helper.mapUriToFileAttachment
 import java.io.IOException
 
 class MessageCenterActivity :
-    AppCompatActivity(),
+    FadeTransitionActivity(),
     MessageCenterView.OnFinishListener,
     MessageCenterView.OnNavigateToMessagingListener,
     MessageCenterView.OnAttachFileListener {
@@ -144,7 +144,7 @@ class MessageCenterActivity :
         finish()
     }
 
-    private fun createConfiguration(intent: Intent): GliaSdkConfiguration? {
+    private fun createConfiguration(intent: Intent): GliaSdkConfiguration {
         return GliaSdkConfiguration.Builder()
             .intent(intent)
             .build()

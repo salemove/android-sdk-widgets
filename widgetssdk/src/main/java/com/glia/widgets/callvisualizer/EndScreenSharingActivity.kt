@@ -1,13 +1,13 @@
 package com.glia.widgets.callvisualizer
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.databinding.EndScreenSharingActivityBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
-class EndScreenSharingActivity : AppCompatActivity(), EndScreenSharingView.OnFinishListener {
+class EndScreenSharingActivity : FadeTransitionActivity(), EndScreenSharingView.OnFinishListener {
 
     private lateinit var binding: EndScreenSharingActivityBinding
 

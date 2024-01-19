@@ -6,8 +6,12 @@
     </style>
 
     <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
-        <item name="android:forceDarkAllowed">false</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

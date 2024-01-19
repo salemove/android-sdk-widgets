@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.collection.ArrayMap
 import com.glia.androidsdk.engagement.Survey
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.SimpleActivityLifecycleCallbacks
 import com.glia.widgets.engagement.completion.EngagementCompletionContract.State
@@ -51,7 +52,8 @@ internal class EngagementCompletionActivityWatcher @JvmOverloads constructor(
             val newIntent: Intent = Intent(this, SurveyActivity::class.java)
                 .putExtra(GliaWidgets.UI_THEME, theme)
                 .putExtra(GliaWidgets.SURVEY, survey as Parcelable)
-                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+
+            overridePendingTransition(R.anim.slide_up, 0)
             startActivity(newIntent)
         }
     }

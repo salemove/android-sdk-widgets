@@ -7,11 +7,11 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.UiTheme;
+import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
@@ -21,7 +21,7 @@ import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends FadeTransitionActivity {
     private static final String TAG = ChatActivity.class.getSimpleName();
     private ChatView chatView;
 

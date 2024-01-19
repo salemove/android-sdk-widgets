@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.databinding.WebBrowserAvtivityBinding
 
 
 internal class WebBrowserActivity :
-    AppCompatActivity(),
+    FadeTransitionActivity(),
     WebBrowserView.OnFinishListener,
     WebBrowserView.OnLinkClickListener {
 

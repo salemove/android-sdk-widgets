@@ -96,8 +96,12 @@
     </style>
 
     <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
-        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="ThemeOverlay.Glia.Chat" parent="">

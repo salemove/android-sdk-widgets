@@ -45,6 +45,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
+// TODO: move to com.glia.widgets.snapshotutils after CallState refactored
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 internal interface SnapshotCallView : SnapshotContent, SnapshotTheme {
     val callViewMock: Mock

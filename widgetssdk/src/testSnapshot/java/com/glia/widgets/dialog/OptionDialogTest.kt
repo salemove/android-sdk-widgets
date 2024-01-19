@@ -6,7 +6,9 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-class OptionDialogTest : SnapshotTest(), SnapshotDialog {
+class OptionDialogTest : SnapshotTest(
+    renderingMode = fullWidthRenderMode
+), SnapshotDialog {
 
     private val dialogType: DialogType = DialogType.Option(
         DialogPayload.Option(
@@ -24,24 +26,24 @@ class OptionDialogTest : SnapshotTest(), SnapshotDialog {
     @Test
     fun withDefaultTheme() {
         val view = inflateView(context = context, dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
     fun withUiTheme() {
         val view = inflateView(context = context, uiTheme = uiTheme(), dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
     fun withUnifiedTheme() {
         val view = inflateView(context = context, uiTheme = uiTheme(whiteLabel = false), unifiedTheme(), dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
     fun withGlobalColors() {
         val view = inflateView(context = context, uiTheme = uiTheme(), unifiedThemeWithGlobalColors(), dialogType = dialogType)
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 }

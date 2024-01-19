@@ -4,30 +4,40 @@ import android.content.Context
 import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.FrameLayout.LayoutParams
 import androidx.annotation.RawRes
 import app.cash.paparazzi.DeviceConfig
+import app.cash.paparazzi.InstantAnimationsRule
 import app.cash.paparazzi.Paparazzi
-import com.android.ide.common.rendering.api.SessionParams
+import com.android.ide.common.rendering.api.SessionParams.RenderingMode
 import com.glia.widgets.snapshotutils.SnapshotContent
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.snapshotutils.SnapshotTheme
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import org.junit.rules.TestRule
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.BufferedReader
 
-open class SnapshotTest : SnapshotContent, SnapshotStrings, SnapshotTheme {
-    private val deviceConfig = DeviceConfig.PIXEL_4A
+@Suppress("MemberVisibilityCanBePrivate")
+open class SnapshotTest(
+    val deviceConfig: DeviceConfig = DeviceConfig.PIXEL_4A,
+    val renderingMode: RenderingMode = RenderingMode.SHRINK,
+    val showSystemUi: Boolean = false,
+    val theme: String = "ThemeOverlay_Glia_Chat_Material",
+    val maxPercentDifference: Double = 0.01,
+    @get:Rule var animationsRule: TestRule = InstantAnimationsRule()
+) : SnapshotContent, SnapshotStrings, SnapshotTheme {
 
     @Suppress("PropertyName")
     @get:Rule
     val _paparazzi = Paparazzi(
         deviceConfig = deviceConfig,
-        renderingMode = SessionParams.RenderingMode.SHRINK,
-        showSystemUi = false,
-        theme = "ThemeOverlay_Glia_Chat_Material"
+        renderingMode = renderingMode,
+        showSystemUi = showSystemUi,
+        theme = theme,
+        maxPercentDifference = maxPercentDifference
     )
 
     override val context: Context
@@ -45,32 +55,18 @@ open class SnapshotTest : SnapshotContent, SnapshotStrings, SnapshotTheme {
         }
     }
 
-    fun snapshot(view: View, name: String? = null, offsetMillis: Long = 0L) {
-        _paparazzi.snapshot(view, name, offsetMillis)
-    }
-
-    /**
-     * This function is intended for views that might collapse due to [SessionParams.RenderingMode.SHRINK] mode.
-     * It will still keep snapshots compact compared to other modes.
-     */
-    fun snapshotFullWidth(view: View, name: String? = null, offsetMillis: Long = 0L) {
-        val viewWrapper = FrameLayout(context).apply { addView(view, LayoutParams(deviceConfig.screenWidth, LayoutParams.WRAP_CONTENT)) }
-        _paparazzi.snapshot(viewWrapper, name, offsetMillis)
-    }
-
-    /**
-     * This function is intended for views that might collapse due to [SessionParams.RenderingMode.SHRINK] mode.
-     * It will still keep snapshots compact compared to other modes.
-     */
-    fun snapshotFullSize(
+    fun snapshot(
         view: View,
         name: String? = null,
         offsetMillis: Long = 0L,
-        width: Int = deviceConfig.screenWidth,
-        height: Int = deviceConfig.screenHeight
+        deviceConfig: DeviceConfig? = null,
+        theme: String? = null,
+        renderingMode: RenderingMode? = null
     ) {
-        val viewWrapper = FrameLayout(context).apply { addView(view, LayoutParams(width, height)) }
-        snapshot(viewWrapper, name, offsetMillis)
+        if (deviceConfig != null || theme != null || renderingMode != null) {
+            _paparazzi.unsafeUpdateConfig(deviceConfig, theme, renderingMode)
+        }
+        _paparazzi.snapshot(view, name, offsetMillis)
     }
 
     @Before
@@ -79,5 +75,21 @@ open class SnapshotTest : SnapshotContent, SnapshotStrings, SnapshotTheme {
 
     @After
     open fun tearDown() {
+    }
+
+    companion object {
+        /**
+         * Useful for the view that needed to be tested on full-width size.
+         * It keeps the height compact compared to other [RenderingMode] modes.
+         */
+        val fullWidthRenderMode = mock<RenderingMode>().also {
+            whenever(it.horizAction).thenReturn(RenderingMode.SizeAction.KEEP)
+            whenever(it.vertAction).thenReturn(RenderingMode.SizeAction.SHRINK)
+        }
+
+        /**
+         * It can be used as an [SnapshotTest.animationsRule] or other rules to disable them.
+         */
+        val dummyRule = TestRule { base, _ -> base }
     }
 }

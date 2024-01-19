@@ -1,9 +1,12 @@
 package com.glia.widgets.call
 
+import com.android.ide.common.rendering.api.SessionParams
 import com.glia.widgets.SnapshotTest
 import org.junit.Test
 
-internal class CallViewSnapshotTest : SnapshotTest(), SnapshotCallView {
+internal class CallViewSnapshotTest : SnapshotTest(
+    renderingMode = SessionParams.RenderingMode.NORMAL
+), SnapshotCallView {
 
     override val callViewMock = SnapshotCallView.Mock(this)
 
@@ -19,7 +22,7 @@ internal class CallViewSnapshotTest : SnapshotTest(), SnapshotCallView {
 
     @Test
     fun initialState() {
-        snapshotFullSize(
+        snapshot(
             setupView(
                 callState = callState()
             ).root

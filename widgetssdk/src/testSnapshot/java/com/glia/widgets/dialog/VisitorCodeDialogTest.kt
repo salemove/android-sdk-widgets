@@ -18,7 +18,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-class VisitorCodeDialogTest : SnapshotTest() {
+class VisitorCodeDialogTest : SnapshotTest(
+    renderingMode = fullWidthRenderMode
+) {
 
     override fun tearDown() {
         super.tearDown()
@@ -26,9 +28,11 @@ class VisitorCodeDialogTest : SnapshotTest() {
         Dependencies.getGliaThemeManager().theme = null
     }
 
+    // MARK: Show visitor code
+
     @Test
     fun visitorCode() {
-        snapshotFullWidth(
+        snapshot(
             setupView().apply {
                 startLoading()
                 showVisitorCode(code())
@@ -39,7 +43,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun visitorCodeWithUiTheme() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 uiTheme = uiTheme()
             ).apply {
@@ -52,7 +56,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun visitorCodeWithGlobalColors() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).apply {
@@ -65,7 +69,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun visitorCodeWithUnifiedTheme() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 unifiedTheme = unifiedTheme()
             ).apply {
@@ -78,7 +82,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun visitorCodeWithUnifiedThemeWithoutVisitorCode() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 unifiedTheme = unifiedThemeWithoutVisitorCode()
             ).apply {
@@ -89,9 +93,11 @@ class VisitorCodeDialogTest : SnapshotTest() {
         )
     }
 
+    // MARK: Error
+
     @Test
     fun error() {
-        snapshotFullWidth(
+        snapshot(
             setupView().apply {
                 setClosable(true)
                 startLoading()
@@ -103,7 +109,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun errorWithUiTheme() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 uiTheme = uiTheme()
             ).apply {
@@ -117,7 +123,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun errorWithGlobalColors() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).apply {
@@ -131,7 +137,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun errorWithUnifiedTheme() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 unifiedTheme = unifiedTheme()
             ).apply {
@@ -145,7 +151,7 @@ class VisitorCodeDialogTest : SnapshotTest() {
 
     @Test
     fun errorWithUnifiedThemeWithoutVisitorCode() {
-        snapshotFullWidth(
+        snapshot(
             setupView(
                 unifiedTheme = unifiedThemeWithoutVisitorCode()
             ).apply {
@@ -157,12 +163,62 @@ class VisitorCodeDialogTest : SnapshotTest() {
         )
     }
 
+    // MARK: Loading
+
     @Test
     fun loading() {
-        snapshotFullWidth(
+        snapshot(
             setupView().apply {
                 setClosable(true)
-                startLoading() // Unfortunately, the progress bar is not snapped
+                startLoading()
+            }
+        )
+    }
+
+    @Test
+    fun loadingWithUiTheme() {
+        snapshot(
+            setupView(
+                uiTheme = uiTheme()
+            ).apply {
+                setClosable(true)
+                startLoading()
+            }
+        )
+    }
+
+    @Test
+    fun loadingWithGlobalColors() {
+        snapshot(
+            setupView(
+                unifiedTheme = unifiedThemeWithGlobalColors()
+            ).apply {
+                setClosable(true)
+                startLoading()
+            }
+        )
+    }
+
+    @Test
+    fun loadingWithUnifiedTheme() {
+        snapshot(
+            setupView(
+                unifiedTheme = unifiedTheme()
+            ).apply {
+                setClosable(true)
+                startLoading()
+            }
+        )
+    }
+
+    @Test
+    fun loadingWithUnifiedThemeWithoutVisitorCode() {
+        snapshot(
+            setupView(
+                unifiedTheme = unifiedThemeWithoutVisitorCode()
+            ).apply {
+                setClosable(true)
+                startLoading()
             }
         )
     }

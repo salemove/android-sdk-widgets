@@ -556,7 +556,7 @@ internal class CallView(
 
     private fun initConfigurations() {
         visibility = INVISIBLE
-        setBackgroundColor(getColorCompat(R.color.glia_transparent_black_bg))
+        setBackgroundColor(getColorCompat(R.color.glia_call_view_background_color))
         // needed to overlap existing app bar in existing view with this view's app bar.
         elevation = Constants.WIDGETS_SDK_LAYER_ELEVATION
     }
@@ -620,7 +620,7 @@ internal class CallView(
         val activity = context.requireActivity()
         if (defaultStatusBarColor == null) {
             defaultStatusBarColor = activity.window.statusBarColor
-            changeStatusBarColor(getColorCompat(R.color.glia_transparent_black_bg))
+            changeStatusBarColor(getColorCompat(R.color.glia_call_view_background_color))
         }
     }
 
@@ -875,7 +875,7 @@ internal class CallView(
                 callState.isVideoCall
             ) {
                 appBar.backgroundTintList =
-                    getColorStateListCompat(R.color.glia_transparent_black_bg)
+                    getColorStateListCompat(R.color.glia_call_view_background_color)
             } else {
                 appBar.backgroundTintList = getColorStateListCompat(android.R.color.transparent)
             }

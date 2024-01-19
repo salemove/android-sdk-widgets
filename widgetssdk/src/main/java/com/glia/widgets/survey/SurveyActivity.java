@@ -56,9 +56,8 @@ public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFi
 
     @Override
     public void finishAndRemoveTask() {
+        overridePendingTransition(0, R.anim.slide_down);
         super.finishAndRemoveTask();
-
-        overridePendingTransition(0, 0);
     }
 
     private void hideSoftKeyboard() {

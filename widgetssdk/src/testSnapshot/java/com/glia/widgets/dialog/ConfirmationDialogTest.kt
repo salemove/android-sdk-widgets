@@ -6,7 +6,9 @@ import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogType
 import org.junit.Test
 
-class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
+class ConfirmationDialogTest : SnapshotTest(
+    renderingMode = fullWidthRenderMode
+), SnapshotDialog {
 
     private fun dialogType(
         link1Text: String? = this.link1Text,
@@ -35,7 +37,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             context = context,
             dialogType = dialogType()
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -44,7 +46,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             uiTheme = uiTheme(),
             dialogType = dialogType()
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -55,7 +57,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             unifiedTheme = unifiedTheme(),
             dialogType = dialogType()
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -66,7 +68,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             unifiedTheme = unifiedThemeWithoutDialogLinkButton(),
             dialogType = dialogType()
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -77,7 +79,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             unifiedTheme = unifiedThemeWithGlobalColors(),
             dialogType = dialogType()
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     // MARK: tests with first link
@@ -88,7 +90,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             context = context,
             dialogType = dialogType(link2Text = null)
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -98,7 +100,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             unifiedTheme = unifiedThemeWithGlobalColors(),
             dialogType = dialogType(link2Text = null)
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     // MARK: tests with second link
@@ -109,7 +111,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             context = context,
             dialogType = dialogType(link1Text = null)
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -119,7 +121,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             unifiedTheme = unifiedThemeWithGlobalColors(),
             dialogType = dialogType(link1Text = null)
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     // MARK: tests without links
@@ -130,7 +132,7 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             context = context,
             dialogType = dialogType(null, null)
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 
     @Test
@@ -140,6 +142,6 @@ class ConfirmationDialogTest : SnapshotTest(), SnapshotDialog {
             unifiedTheme = unifiedThemeWithGlobalColors(),
             dialogType = dialogType(null, null)
         )
-        snapshotFullWidth(view)
+        snapshot(view)
     }
 }

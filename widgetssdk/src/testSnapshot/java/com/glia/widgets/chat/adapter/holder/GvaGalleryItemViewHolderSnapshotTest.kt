@@ -1,6 +1,7 @@
 package com.glia.widgets.chat.adapter.holder
 
 import android.view.View
+import android.widget.LinearLayout.LayoutParams
 import androidx.annotation.RawRes
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
@@ -193,17 +194,15 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
 
     private fun longSubtitleCard() = GvaGalleryCard(
         title = "Title",
-        subtitle = gvaLongSubtitle(),
-        options = listOf(
-            GvaButton()
-        )
+        subtitle = gvaLongSubtitle()
     )
 
     @Test
     fun longSubtitle() {
         snapshot(
             setupView(
-                longSubtitleCard()
+                longSubtitleCard(),
+                height = 700
             ).viewHolder.itemView
         )
     }
@@ -213,7 +212,8 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         snapshot(
             setupView(
                 longSubtitleCard(),
-                uiTheme = uiTheme()
+                uiTheme = uiTheme(),
+                height = 740
             ).viewHolder.itemView
         )
     }
@@ -223,7 +223,8 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         snapshot(
             setupView(
                 longSubtitleCard(),
-                unifiedTheme = unifiedThemeWithGlobalColors()
+                unifiedTheme = unifiedThemeWithGlobalColors(),
+                height = 700
             ).viewHolder.itemView
         )
     }
@@ -233,7 +234,8 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         snapshot(
             setupView(
                 longSubtitleCard(),
-                unifiedTheme = unifiedTheme()
+                unifiedTheme = unifiedTheme(),
+                height = 500
             ).viewHolder.itemView
         )
     }
@@ -243,7 +245,8 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         snapshot(
             setupView(
                 longSubtitleCard(),
-                unifiedTheme = unifiedThemeWithoutGva()
+                unifiedTheme = unifiedThemeWithoutGva(),
+                height = 600
             ).viewHolder.itemView
         )
     }
@@ -321,7 +324,8 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         card: GvaGalleryCard,
         @RawRes imageRes: Int? = null,
         unifiedTheme: UnifiedTheme? = null,
-        uiTheme: UiTheme = UiTheme()
+        uiTheme: UiTheme = UiTheme(),
+        height: Int? = null
     ): ViewData {
         val binding = ChatGvaGalleryItemBinding.inflate(layoutInflater)
         val viewHolder = GvaGalleryItemViewHolder(binding, {}, uiTheme, unifiedTheme)
@@ -332,6 +336,10 @@ class GvaGalleryItemViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
             // Set image without Picasso
             binding.image.setImageResource(it)
             binding.image.visibility = View.VISIBLE
+        }
+
+        height?.also {
+            viewHolder.itemView.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, it)
         }
 
         return ViewData(binding, viewHolder)

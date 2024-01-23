@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Space
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.isInvisible
@@ -35,6 +36,7 @@ import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsWelcomeScreenTheme
 import com.google.android.material.button.MaterialButton
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 class MessageView(
@@ -233,12 +235,20 @@ class MessageView(
         )
     }
 
-    private fun showSendMessageGroup() {
+    private fun showSendMessageGroup(state: MessageCenterState) {
         sendMessageGroup.isVisible = true
+
+        if (state.addAttachmentButtonVisible) {
+            addAttachmentButton.visibility = VISIBLE
+            addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
+        } else {
+            addAttachmentButton.visibility = GONE
+        }
     }
 
     private fun hideSendMessageGroup() {
         sendMessageGroup.isInvisible = true
+        addAttachmentButton.visibility = GONE
     }
 
     fun setOnCheckMessageButtonClickListener(listener: OnClickListener) {
@@ -265,17 +275,7 @@ class MessageView(
         updateSendButtonState(state.sendMessageButtonState)
         updateSendMessageError(state.showMessageLimitError)
         updateMessageEditText(state.messageEditTextEnabled, state.showMessageLimitError)
-        if (state.showSendMessageGroup) {
-            showSendMessageGroup()
-            if (state.addAttachmentButtonVisible) {
-                addAttachmentButton.visibility = VISIBLE
-                addAttachmentButton.isEnabled = state.addAttachmentButtonEnabled
-            } else {
-                addAttachmentButton.visibility = GONE
-            }
-        } else {
-            hideSendMessageGroup()
-        }
+        updateSendMessageGroup(state)
     }
 
     fun emitUploadAttachments(attachments: List<FileAttachment>) {
@@ -286,6 +286,14 @@ class MessageView(
             } else {
                 bottomSpace.visibility = GONE
             }
+        }
+    }
+
+    private fun updateSendMessageGroup(state: MessageCenterState) {
+        if (state.showSendMessageGroup) {
+            showSendMessageGroup(state)
+        } else {
+            hideSendMessageGroup()
         }
     }
 
@@ -308,5 +316,12 @@ class MessageView(
             MessageCenterState.ButtonState.NORMAL -> sendMessageButton.isEnabled = true
             MessageCenterState.ButtonState.DISABLE -> sendMessageButton.isEnabled = false
         }
+    }
+
+    @VisibleForTesting
+    internal var executor: Executor? = null
+
+    override fun post(action: Runnable?): Boolean {
+        return executor?.execute(action)?.let { true } ?: super.post(action)
     }
 }

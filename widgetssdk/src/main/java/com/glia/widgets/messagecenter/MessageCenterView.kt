@@ -8,6 +8,7 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.Window
 import android.widget.LinearLayout
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
@@ -45,6 +46,7 @@ import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.DefaultHeader
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlinx.parcelize.Parcelize
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 internal class MessageCenterView(
@@ -347,5 +349,12 @@ internal class MessageCenterView(
 
         super.onRestoreInstanceState(state.superState)
         if (state.isConfirmationScreen) showConfirmationScreen()
+    }
+
+    @VisibleForTesting
+    internal var executor: Executor? = null
+
+    override fun post(action: Runnable?): Boolean {
+        return executor?.execute(action)?.let { true } ?: super.post(action)
     }
 }

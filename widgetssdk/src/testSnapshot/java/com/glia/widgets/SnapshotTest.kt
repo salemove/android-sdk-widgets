@@ -9,9 +9,11 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.InstantAnimationsRule
 import app.cash.paparazzi.Paparazzi
 import com.android.ide.common.rendering.api.SessionParams.RenderingMode
+import com.glia.widgets.snapshotutils.OnTestEnded
 import com.glia.widgets.snapshotutils.SnapshotContent
 import com.glia.widgets.snapshotutils.SnapshotStrings
 import com.glia.widgets.snapshotutils.SnapshotTheme
+import com.glia.widgets.snapshotutils.SnapshotTestLifecycle
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -28,7 +30,7 @@ open class SnapshotTest(
     val theme: String = "ThemeOverlay_Glia_Chat_Material",
     val maxPercentDifference: Double = 0.01,
     @get:Rule var animationsRule: TestRule = InstantAnimationsRule()
-) : SnapshotContent, SnapshotStrings, SnapshotTheme {
+) : SnapshotTestLifecycle, SnapshotContent, SnapshotStrings, SnapshotTheme {
 
     @Suppress("PropertyName")
     @get:Rule
@@ -70,11 +72,17 @@ open class SnapshotTest(
     }
 
     @Before
-    open fun setUp() {
-    }
+    open fun setUp() {}
 
     @After
     open fun tearDown() {
+        onEndListeners.forEach { it() }
+        onEndListeners.clear()
+    }
+
+    private val onEndListeners: MutableList<OnTestEnded> = mutableListOf()
+    override fun setOnEndListener(listener: OnTestEnded) {
+        onEndListeners.add(listener)
     }
 
     companion object {

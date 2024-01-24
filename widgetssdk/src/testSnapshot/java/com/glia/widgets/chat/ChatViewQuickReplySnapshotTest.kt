@@ -9,18 +9,6 @@ import org.junit.Test
 
 internal class ChatViewQuickReplySnapshotTest : SnapshotTest(), SnapshotChatView, SnapshotGva {
 
-    override val chatViewMock = SnapshotChatView.Mock(this)
-
-    override fun setUp() {
-        super.setUp()
-        chatViewMock.setUp()
-    }
-
-    override fun tearDown() {
-        chatViewMock.tearDown()
-        super.tearDown()
-    }
-
     private fun gvaButtons() = shortLengthTexts().map { GvaButton(it) }
 
     private fun chatState() = ChatState()

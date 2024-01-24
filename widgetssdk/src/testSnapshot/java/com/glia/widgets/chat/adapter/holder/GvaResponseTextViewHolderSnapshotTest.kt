@@ -6,10 +6,11 @@ import com.glia.widgets.chat.model.GvaResponseText
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.databinding.ChatReceiveMessageContentBinding
 import com.glia.widgets.snapshotutils.SnapshotGva
+import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
+class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun gvaResponseText(showChatHead: Boolean = false) = GvaResponseText(
         content = gvaLongSubtitle(),
@@ -119,6 +120,8 @@ class GvaResponseTextViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
+        stringProviderMock()
+
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
         val gvaPersistentButtonsContentBinding = ChatReceiveMessageContentBinding.inflate(
             layoutInflater,

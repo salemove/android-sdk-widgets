@@ -2,34 +2,30 @@ package com.glia.widgets.liveobservation
 
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.call.CallActivity
+import com.glia.widgets.snapshotutils.SnapshotSnackBar
 import org.junit.Test
 
-class CallActivitySnackBarTest : SnapshotTest() {
-    private val helper: SnackBarTestHelper<CallActivity> by lazy {
-        SnackBarTestHelper(context, CallActivity::class)
-    }
-
-    override fun setUp() {
-        helper.setUp()
-    }
-
-    override fun tearDown() {
-        helper.tearDown()
-    }
+class CallActivitySnackBarTest : SnapshotTest(), SnapshotSnackBar {
 
     @Test
     fun withDefaultTheme() {
-        snapshot(helper.getView(null))
+        snapshot(
+            setupView(CallActivity::class)
+        )
     }
 
     @Test
     fun withUnifiedTheme() {
-        snapshot(helper.getView(unifiedTheme()))
+        snapshot(
+            setupView(CallActivity::class, unifiedTheme())
+        )
     }
 
     @Test
     fun withGlobalColors() {
-        snapshot(helper.getView(unifiedThemeWithGlobalColors()))
+        snapshot(
+            setupView(CallActivity::class, unifiedThemeWithGlobalColors())
+        )
     }
 
 }

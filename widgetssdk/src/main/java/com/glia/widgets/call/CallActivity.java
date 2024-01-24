@@ -16,7 +16,6 @@ import com.glia.widgets.R;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
 import com.glia.widgets.helper.Logger;
-import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
 import com.glia.widgets.webbrowser.WebBrowserActivity;
 
@@ -157,29 +156,6 @@ public class CallActivity extends AppCompatActivity {
     private void navigateToWebBrowser(String title, String url) {
         Intent newIntent = WebBrowserActivity.Companion.intent(this, title, url);
         startActivity(newIntent);
-    }
-
-    /**
-     * Creates and fills out Intent for starting CallActivity
-     * @deprecated use {@link #getIntent(Context, Configuration)} since 1.8.2
-     * @param applicationContext - application context
-     * @param sdkConfiguration - widgets sdk configuration
-     * @param mediaType - media type that should be started (in case media engagement not ongoing)
-     * @return Intent for starting CallActivity
-     */
-    @Deprecated
-    public static Intent getIntent(
-            Context applicationContext,
-            GliaSdkConfiguration sdkConfiguration,
-            String mediaType
-    ) {
-        Logger.logDeprecatedMethodUse(TAG, "getIntent(Context, GliaSdkConfiguration, String)");
-        return getIntent(applicationContext,
-                new Configuration.Builder()
-                        .setWidgetsConfiguration(sdkConfiguration)
-                        .setMediaType(Utils.toMediaType(mediaType))
-                        .build()
-        );
     }
 
     /**

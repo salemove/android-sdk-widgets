@@ -3,13 +3,11 @@ package com.glia.widgets.dialog
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.ResourceProvider
-import com.glia.widgets.snapshotutils.SnapshotStringProvider
+import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.VisitorCodeView
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import com.google.gson.JsonObject
@@ -20,13 +18,7 @@ import java.util.concurrent.Executor
 
 class VisitorCodeDialogTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
-) {
-
-    override fun tearDown() {
-        super.tearDown()
-
-        Dependencies.getGliaThemeManager().theme = null
-    }
+), SnapshotProviders {
 
     // MARK: Show visitor code
 
@@ -228,6 +220,9 @@ class VisitorCodeDialogTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         executor: Executor? = Executor(Runnable::run)
     ): VisitorCodeView {
+        stringProviderMock()
+        resourceProviderMock()
+
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
         val configurationManager = GliaSdkConfigurationManager().also {
             it.uiTheme = uiTheme
@@ -235,12 +230,14 @@ class VisitorCodeDialogTest : SnapshotTest(
         val controllerFactoryMock: ControllerFactory = mock<ControllerFactory>().also {
             whenever(it.visitorCodeController).thenReturn(mock())
         }
-        val rp = ResourceProvider(context)
-        val sp: StringProvider = SnapshotStringProvider(context)
         Dependencies.setSdkConfigurationManager(configurationManager)
         Dependencies.setControllerFactory(controllerFactoryMock)
-        Dependencies.setResourceProvider(rp)
-        Dependencies.setStringProvider(sp)
+
+        setOnEndListener {
+            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.setSdkConfigurationManager(GliaSdkConfigurationManager())
+            Dependencies.setControllerFactory(null)
+        }
 
         return VisitorCodeView(context, executor).apply {
             notifySetupComplete()

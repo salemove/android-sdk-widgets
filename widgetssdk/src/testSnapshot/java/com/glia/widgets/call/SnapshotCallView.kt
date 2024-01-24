@@ -1,14 +1,9 @@
 package com.glia.widgets.call
 
-import android.app.Activity
-import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
-import android.view.Window
 import android.widget.TextView
-import androidx.core.graphics.toColorInt
-import androidx.core.view.WindowInsetsControllerCompat
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.Audio
 import com.glia.androidsdk.comms.Media
@@ -17,29 +12,20 @@ import com.glia.androidsdk.comms.Video
 import com.glia.androidsdk.comms.VideoView
 import com.glia.androidsdk.comms.VisitorMediaState
 import com.glia.widgets.R
-import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
-import com.glia.widgets.snapshotutils.SnapshotStringProvider
 import com.glia.widgets.databinding.CallActivityBinding
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
-import com.glia.widgets.helper.ResourceProvider
-import com.glia.widgets.helper.asActivity
-import com.glia.widgets.helper.hideKeyboard
-import com.glia.widgets.helper.requireActivity
-import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.snapshotutils.SnapshotActivityWindow
 import com.glia.widgets.snapshotutils.SnapshotContent
+import com.glia.widgets.snapshotutils.SnapshotProviders
+import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.snapshotutils.SnapshotTheme
 import com.glia.widgets.view.floatingvisitorvideoview.FloatingVisitorVideoContract
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.reactivex.schedulers.TestScheduler
 import org.mockito.kotlin.KArgumentCaptor
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -47,71 +33,56 @@ import java.util.concurrent.Executor
 
 // TODO: move to com.glia.widgets.snapshotutils after CallState refactored
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-internal interface SnapshotCallView : SnapshotContent, SnapshotTheme {
-    val callViewMock: Mock
+internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow, SnapshotProviders, SnapshotSchedulers {
 
-    class Mock(private val snapshotContent: SnapshotContent) {
-        val computationScheduler = TestScheduler()
-        val mainScheduler = TestScheduler()
+    data class Mock(
+        val activityMock: SnapshotActivityWindow.Mock,
+        val schedulersMock: SnapshotSchedulers.Mock,
+        val controllerFactoryMock: ControllerFactory,
+        val callControllerMock: CallContract.Controller,
+        val floatingVisitorVideoController: FloatingVisitorVideoContract.Controller
+    )
 
-        lateinit var activityMock: Activity
-        lateinit var windowMock: Window
+    fun callViewMock(): Mock {
+        val activityMock = activityWindowMock()
+        val schedulersMock = schedulersMock()
 
-        lateinit var controllerFactoryMock: ControllerFactory
-        lateinit var callControllerMock: CallController
-        lateinit var floatingVisitorVideoController: FloatingVisitorVideoContract.Controller
+        stringProviderMock()
+        resourceProviderMock()
 
-        fun setUp(statusBarColor: Int = "#123456".toColorInt()) {
-            activityMock = mock()
-            windowMock = mock()
-            whenever(activityMock.window).thenReturn(windowMock)
-            whenever(windowMock.statusBarColor).thenReturn(statusBarColor)
-            mockkStatic("com.glia.widgets.helper.ContextExtensionsKt")
-            every { any<Context>().requireActivity() } returns activityMock
-            every { any<Context>().asActivity() } returns activityMock
-            mockkStatic("com.glia.widgets.helper.InsetsKt")
-            every { any<WindowInsetsControllerCompat>().hideKeyboard() } returns Unit
+        val controllerFactoryMock = mock<ControllerFactory>()
+        val callControllerMock = mock<CallContract.Controller>()
+        val floatingVisitorVideoController = mock<FloatingVisitorVideoContract.Controller>()
+        whenever(controllerFactoryMock.callController).thenReturn(callControllerMock)
+        whenever(controllerFactoryMock.floatingVisitorVideoController).thenReturn(floatingVisitorVideoController)
+        Dependencies.setControllerFactory(controllerFactoryMock)
 
-            callControllerMock = mock()
-            floatingVisitorVideoController = mock()
-            controllerFactoryMock = mock()
-            whenever(controllerFactoryMock.callController).thenReturn(callControllerMock)
-            whenever(controllerFactoryMock.floatingVisitorVideoController).thenReturn(floatingVisitorVideoController)
-
-            val rp = ResourceProvider(snapshotContent.context)
-            val sp: StringProvider = SnapshotStringProvider(snapshotContent.context)
-            Dependencies.setControllerFactory(controllerFactoryMock)
-            Dependencies.setResourceProvider(rp)
-            Dependencies.setStringProvider(sp)
-
-            val schedulers = mock<Schedulers>()
-            whenever(schedulers.computationScheduler) doReturn computationScheduler
-            whenever(schedulers.mainScheduler) doReturn mainScheduler
-            Dependencies.setSchedulers(schedulers)
-
-            Dependencies.getSdkConfigurationManager().companyName = "SnapshotCall Tests"
+        setOnEndListener {
+            Dependencies.setControllerFactory(null)
         }
 
-        fun tearDown() {
-            Dependencies.getGliaThemeManager().theme = null
-            Dependencies.setSdkConfigurationManager(GliaSdkConfigurationManager())
-        }
+        return Mock(activityMock, schedulersMock, controllerFactoryMock, callControllerMock, floatingVisitorVideoController)
     }
 
     data class ViewData(
         val root: View,
-        val callView: CallView
+        val callView: CallView,
+        val mock: Mock
     )
 
     fun setupView(
         callState: CallState? = null,
+        companyName: String? = "SnapshotCall Tests",
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme? = null,
         callViewCallback: ((CallContract.View, callState: CallState?) -> Unit)? = null,
         floatingVisitorVideoViewCallback: ((FloatingVisitorVideoContract.View, callState: CallState?) -> Unit)? = null
     ): ViewData {
+        val mock = callViewMock()
+
         unifiedTheme?.let { Dependencies.getGliaThemeManager().theme = it }
+        Dependencies.getSdkConfigurationManager().companyName = companyName
 
         val callViewCaptor: KArgumentCaptor<CallContract.View> = argumentCaptor()
         val floatingVisitorVideoViewCaptor: KArgumentCaptor<FloatingVisitorVideoContract.View> = argumentCaptor()
@@ -119,8 +90,8 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme {
         val callActivityBinding = CallActivityBinding.inflate(layoutInflater)
         val root = callActivityBinding.root
         val callView = callActivityBinding.callView
-        verify(callViewMock.callControllerMock).setView(callViewCaptor.capture())
-        verify(callViewMock.floatingVisitorVideoController).setView(floatingVisitorVideoViewCaptor.capture())
+        verify(mock.callControllerMock).setView(callViewCaptor.capture())
+        verify(mock.floatingVisitorVideoController).setView(floatingVisitorVideoViewCaptor.capture())
 
         callView.setUiTheme(uiTheme)
 
@@ -134,7 +105,12 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme {
             it(floatingVisitorVideoViewCaptor.lastValue, callState)
         }
 
-        return ViewData(root, callView)
+        setOnEndListener {
+            Dependencies.getGliaThemeManager().theme = null
+            Dependencies.getSdkConfigurationManager().companyName = null
+        }
+
+        return ViewData(root, callView, mock)
     }
 
     fun callState(

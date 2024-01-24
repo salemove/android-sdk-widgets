@@ -1,55 +1,21 @@
 package com.glia.widgets.chat.adapter.holder
 
-import android.graphics.BitmapFactory
-import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
-import com.glia.widgets.snapshotutils.SnapshotStringProvider
 import com.glia.widgets.chat.adapter.holder.imageattachment.VisitorImageAttachmentViewHolder
-import com.glia.widgets.chat.model.Attachment
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.databinding.ChatAttachmentVisitorImageLayoutBinding
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
-import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
-import com.glia.widgets.helper.rx.Schedulers
+import com.glia.widgets.snapshotutils.SnapshotAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
+import com.glia.widgets.snapshotutils.SnapshotGetImageFile
+import com.glia.widgets.snapshotutils.SnapshotProviders
+import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import io.reactivex.Maybe
-import io.reactivex.schedulers.TestScheduler
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
-class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen {
-
-    private fun remoteAttachment() = Attachment.Remote(
-        object : AttachmentFile {
-            override fun getId(): String = "imageId"
-
-            override fun getSize(): Long = 12345
-
-            override fun getContentType(): String = "image"
-
-            override fun isDeleted(): Boolean = false
-
-            override fun getName(): String ="tricky_plan.jpg"
-        }
-    )
-
-    private fun image(
-        attachment: Attachment = remoteAttachment(),
-        showDelivered: Boolean = false,
-        showError: Boolean = false
-    ) = VisitorAttachmentItem.Image(
-        id = "id",
-        attachment = attachment,
-        showDelivered = showDelivered,
-        showError = showError
-    )
+class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotAttachment,
+    SnapshotGetImageFile, SnapshotSchedulers, SnapshotProviders {
 
     // MARK: without labels
 
@@ -57,7 +23,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun withoutLabels() {
         snapshot(
             setupView(
-                image()
+                visitorAttachmentItemImage()
             ).viewHolder.itemView
         )
     }
@@ -66,7 +32,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun withoutLabelsWithUiTheme() {
         snapshot(
             setupView(
-                image(),
+                visitorAttachmentItemImage(),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -76,7 +42,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun withoutLabelsWithGlobalColors() {
         snapshot(
             setupView(
-                image(),
+                visitorAttachmentItemImage(),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -86,7 +52,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun withoutLabelsWithUnifiedTheme() {
         snapshot(
             setupView(
-                image(),
+                visitorAttachmentItemImage(),
                 unifiedTheme = unifiedTheme()
             ).viewHolder.itemView
         )
@@ -96,7 +62,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun withoutLabelsWithUnifiedThemeWithoutVisitorMessage() {
         snapshot(
             setupView(
-                image(),
+                visitorAttachmentItemImage(),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )
@@ -108,7 +74,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun deliveredLabel() {
         snapshot(
             setupView(
-                image(showDelivered = true)
+                visitorAttachmentItemImage(showDelivered = true)
             ).viewHolder.itemView
         )
     }
@@ -117,7 +83,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun deliveredLabelWithUiTheme() {
         snapshot(
             setupView(
-                image(showDelivered = true),
+                visitorAttachmentItemImage(showDelivered = true),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -127,7 +93,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun deliveredLabelWithGlobalColors() {
         snapshot(
             setupView(
-                image(showDelivered = true),
+                visitorAttachmentItemImage(showDelivered = true),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -137,7 +103,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun deliveredLabelWithUnifiedTheme() {
         snapshot(
             setupView(
-                image(showDelivered = true),
+                visitorAttachmentItemImage(showDelivered = true),
                 unifiedTheme = unifiedTheme()
             ).viewHolder.itemView
         )
@@ -147,7 +113,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun deliveredLabelWithUnifiedThemeWithoutVisitorMessage() {
         snapshot(
             setupView(
-                image(showDelivered = true),
+                visitorAttachmentItemImage(showDelivered = true),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )
@@ -159,7 +125,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun errorLabel() {
         snapshot(
             setupView(
-                image(showError = true)
+                visitorAttachmentItemImage(showError = true)
             ).viewHolder.itemView
         )
     }
@@ -168,7 +134,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun errorLabelWithUiTheme() {
         snapshot(
             setupView(
-                image(showError = true),
+                visitorAttachmentItemImage(showError = true),
                 uiTheme = uiTheme()
             ).viewHolder.itemView
         )
@@ -178,7 +144,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun errorLabelWithGlobalColors() {
         snapshot(
             setupView(
-                image(showError = true),
+                visitorAttachmentItemImage(showError = true),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).viewHolder.itemView
         )
@@ -188,7 +154,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun errorLabelWithUnifiedTheme() {
         snapshot(
             setupView(
-                image(showError = true),
+                visitorAttachmentItemImage(showError = true),
                 unifiedTheme = unifiedTheme()
             ).viewHolder.itemView
         )
@@ -198,7 +164,7 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
     fun errorLabelWithUnifiedThemeWithoutVisitorMessage() {
         snapshot(
             setupView(
-                image(showError = true),
+                visitorAttachmentItemImage(showError = true),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).viewHolder.itemView
         )
@@ -213,32 +179,19 @@ class VisitorImageAttachmentViewHolderSnapshotTest : SnapshotTest(), SnapshotCha
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
+        val imageFileMock = getImageFileMock(R.drawable.test_banner)
+        val schedulersMock = schedulersMock()
+
         val binding = ChatAttachmentVisitorImageLayoutBinding.inflate(layoutInflater)
 
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.test_banner)
-
-        val getImageFileFromCacheUseCase = mock<GetImageFileFromCacheUseCase>()
-        whenever(getImageFileFromCacheUseCase.invoke(any())) doReturn Maybe.just(bitmap)
-
-        val getImageFileFromDownloadsUseCase = mock<GetImageFileFromDownloadsUseCase>()
-        whenever(getImageFileFromDownloadsUseCase.invoke(any())) doReturn Maybe.just(bitmap)
-
-        val getImageFileFromNetworkUseCase = mock<GetImageFileFromNetworkUseCase>()
-        whenever(getImageFileFromNetworkUseCase.invoke(any())) doReturn Maybe.just(bitmap)
-
-        val testScheduler = TestScheduler()
-        val schedulers = mock<Schedulers>()
-        whenever(schedulers.computationScheduler) doReturn testScheduler
-        whenever(schedulers.mainScheduler) doReturn testScheduler
-
         val viewHolder = VisitorImageAttachmentViewHolder(
-            binding, getImageFileFromCacheUseCase, getImageFileFromDownloadsUseCase,
-            getImageFileFromNetworkUseCase, schedulers, uiTheme, unifiedTheme, SnapshotStringProvider(context)
+            binding, imageFileMock.getImageFileFromCacheUseCaseMock, imageFileMock.getImageFileFromDownloadsUseCaseMock,
+            imageFileMock.getImageFileFromNetworkUseCaseMock, schedulersMock.schedulers, uiTheme, unifiedTheme, stringProviderMock()
         )
 
         viewHolder.bind(item, { _, _ -> }) {}
 
-        testScheduler.triggerActions()
+        schedulersMock.triggerActions()
 
         return ViewData(viewHolder)
     }

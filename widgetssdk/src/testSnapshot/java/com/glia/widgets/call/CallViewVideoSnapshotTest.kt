@@ -9,18 +9,6 @@ internal class CallViewVideoSnapshotTest : SnapshotTest(
     renderingMode = SessionParams.RenderingMode.NORMAL
 ), SnapshotCallView {
 
-    override val callViewMock = SnapshotCallView.Mock(this)
-
-    override fun setUp() {
-        super.setUp()
-        callViewMock.setUp()
-    }
-
-    override fun tearDown() {
-        super.tearDown()
-        callViewMock.tearDown()
-    }
-
     // MARK: Init call
 
     private fun initCallState() = callState()

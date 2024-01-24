@@ -1,6 +1,7 @@
 package com.glia.widgets.snapshotutils
 
 import android.widget.EditText
+import androidx.annotation.DrawableRes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.core.fileupload.model.FileAttachment
@@ -18,7 +19,7 @@ import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
 internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotContent,
-    SnapshotActivityWindow, SnapshotProviders, SnapshotSchedulers, SnapshotAttachment, SnapshotPicasso, SnapshotTheme {
+    SnapshotActivityWindow, SnapshotProviders, SnapshotAttachment, SnapshotPicasso, SnapshotTheme {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -37,6 +38,10 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
         whenever(controllerFactoryMock.getMessageCenterController(any())).thenReturn(messageCenterControllerMock)
         Dependencies.setControllerFactory(controllerFactoryMock)
 
+        setOnEndListener {
+            Dependencies.setControllerFactory(null)
+        }
+
         return Mock(activityMock, controllerFactoryMock, messageCenterControllerMock)
     }
 
@@ -48,7 +53,7 @@ internal interface SnapshotMessageCenterView : SnapshotTestLifecycle, SnapshotCo
     fun setupView(
         state: MessageCenterState = MessageCenterState(),
         fileAttachments: List<FileAttachment>? = null,
-        imageResources: List<Int>? = null,
+        @DrawableRes imageResources: List<Int>? = null,
         message: String? = null,
         executor: Executor? = Executor(Runnable::run),
         unifiedTheme: UnifiedTheme? = null,

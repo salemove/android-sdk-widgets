@@ -8,10 +8,11 @@ import com.glia.widgets.chat.model.GvaGalleryCard
 import com.glia.widgets.chat.model.GvaGalleryCards
 import com.glia.widgets.databinding.ChatGvaGalleryLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotGva
+import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
+class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun galleryCardList() = listOf(
         GvaGalleryCard(
@@ -164,6 +165,8 @@ class GvaGalleryViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
+        stringProviderMock()
+
         val heightManager = ChatItemHeightManager(uiTheme, layoutInflater, resources, unifiedTheme)
         heightManager.measureHeight(listOf(galleryCards))
 

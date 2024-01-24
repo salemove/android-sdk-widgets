@@ -1,52 +1,13 @@
 package com.glia.widgets.chat
 
-import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.SnapshotTest
-import com.glia.widgets.chat.model.Attachment
 import com.glia.widgets.chat.model.ChatState
-import com.glia.widgets.chat.model.VisitorAttachmentItem
+import com.glia.widgets.snapshotutils.SnapshotAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
 import org.junit.Test
 
-internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), SnapshotChatView, SnapshotChatScreen {
-
-    override val chatViewMock = SnapshotChatView.Mock(this)
-
-    override fun setUp() {
-        super.setUp()
-        chatViewMock.setUp()
-    }
-
-    override fun tearDown() {
-        chatViewMock.tearDown()
-        super.tearDown()
-    }
-
-    private fun remoteAttachment() = Attachment.Remote(
-        object : AttachmentFile {
-            override fun getId(): String = "fileId"
-
-            override fun getSize(): Long = 1234567890
-
-            override fun getContentType(): String = "pdf"
-
-            override fun isDeleted(): Boolean = false
-
-            override fun getName(): String ="File Name.pdf"
-        }
-    )
-
-    private fun file(
-        attachment: Attachment = remoteAttachment(),
-        showDelivered: Boolean = false,
-        showError: Boolean = false
-    ) = VisitorAttachmentItem.File(
-        id = "fileId",
-        attachment = attachment,
-        showDelivered = showDelivered,
-        showError = showError
-    )
+internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), SnapshotChatView, SnapshotChatScreen, SnapshotAttachment {
 
     private fun chatState() = ChatState()
         .changeVisibility(true)
@@ -58,7 +19,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file())
+                chatItems = listOf(visitorAttachmentItemFile())
             ).root
         )
     }
@@ -68,7 +29,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file()),
+                chatItems = listOf(visitorAttachmentItemFile()),
                 uiTheme = uiTheme()
             ).root
         )
@@ -79,7 +40,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file()),
+                chatItems = listOf(visitorAttachmentItemFile()),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).root
         )
@@ -90,7 +51,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file()),
+                chatItems = listOf(visitorAttachmentItemFile()),
                 unifiedTheme = unifiedTheme()
             ).root
         )
@@ -101,7 +62,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file()),
+                chatItems = listOf(visitorAttachmentItemFile()),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).root
         )
@@ -114,7 +75,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showDelivered = true))
+                chatItems = listOf(visitorAttachmentItemFile(showDelivered = true))
             ).root
         )
     }
@@ -124,7 +85,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showDelivered = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showDelivered = true)),
                 uiTheme = uiTheme()
             ).root
         )
@@ -135,7 +96,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showDelivered = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showDelivered = true)),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).root
         )
@@ -146,7 +107,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showDelivered = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showDelivered = true)),
                 unifiedTheme = unifiedTheme()
             ).root
         )
@@ -157,7 +118,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showDelivered = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showDelivered = true)),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).root
         )
@@ -170,7 +131,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showError = true))
+                chatItems = listOf(visitorAttachmentItemFile(showError = true))
             ).root
         )
     }
@@ -180,7 +141,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showError = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showError = true)),
                 uiTheme = uiTheme()
             ).root
         )
@@ -191,7 +152,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showError = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showError = true)),
                 unifiedTheme = unifiedThemeWithGlobalColors()
             ).root
         )
@@ -202,7 +163,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showError = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showError = true)),
                 unifiedTheme = unifiedTheme()
             ).root
         )
@@ -213,7 +174,7 @@ internal class VisitorFileAttachmentChatItemsSnapshotTest : SnapshotTest(), Snap
         snapshot(
             setupView(
                 chatState = chatState(),
-                chatItems = listOf(file(showError = true)),
+                chatItems = listOf(visitorAttachmentItemFile(showError = true)),
                 unifiedTheme = unifiedThemeWithoutVisitorMessage()
             ).root
         )

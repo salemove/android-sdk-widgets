@@ -7,10 +7,11 @@ import com.glia.widgets.chat.model.GvaPersistentButtons
 import com.glia.widgets.databinding.ChatGvaPersistentButtonsContentBinding
 import com.glia.widgets.databinding.ChatOperatorMessageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotGva
+import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
+class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva, SnapshotProviders {
 
     private fun gvaPersistentButtons(showChatHead: Boolean = false) = GvaPersistentButtons(
         content = gvaLongSubtitle(),
@@ -143,6 +144,8 @@ class GvaPersistentButtonsViewHolderSnapshotTest : SnapshotTest(), SnapshotGva {
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
+        stringProviderMock()
+
         val chatOperatorMessageLayoutBinding = ChatOperatorMessageLayoutBinding.inflate(layoutInflater)
         val gvaPersistentButtonsContentBinding = ChatGvaPersistentButtonsContentBinding.inflate(
             layoutInflater,

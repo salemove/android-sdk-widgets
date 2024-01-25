@@ -19,6 +19,8 @@ import com.glia.widgets.permissions.PermissionsGrantedCallback
 import com.glia.widgets.permissions.PermissionsRequestRepository
 import com.glia.widgets.permissions.PermissionsRequestResult
 
+internal typealias CheckSelfPermission = (context: Context, permission: String) -> Int
+
 internal class PermissionManager(
     private val applicationContext: Context,
     private val checkSelfPermission: CheckSelfPermission,
@@ -130,5 +132,3 @@ internal class PermissionManager(
         permissionsRequestRepository.requestPermissions(permissions, callback)
     }
 }
-
-typealias CheckSelfPermission = (context: Context, permission: String) -> Int

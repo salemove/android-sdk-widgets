@@ -26,7 +26,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.transition.MaterialFade
 
-class ProgressButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+internal class ProgressButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs) {
 
     private val adapterCallback: StatefulWidgetAdapterCallback<State, ButtonTheme> =

@@ -24,7 +24,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.squareup.picasso.Picasso
 import kotlin.properties.Delegates
 
-class OperatorStatusView @JvmOverloads constructor(
+internal class OperatorStatusView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

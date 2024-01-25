@@ -3,7 +3,7 @@ package com.glia.widgets.helper
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
-class WeakReferenceDelegate<T>(initializer: () -> T? = { null }) {
+internal class WeakReferenceDelegate<T>(initializer: () -> T? = { null }) {
 
     private var weakReference: WeakReference<T> = WeakReference(initializer())
 

@@ -33,7 +33,7 @@ import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.appbar.AppBarLayout
 
-class AppBarView @JvmOverloads constructor(
+internal class AppBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.gliaChatStyle

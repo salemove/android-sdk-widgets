@@ -133,7 +133,7 @@ internal fun getContentUriCompat(fileName: String, context: Context): Uri =
     }
 
 @Throws(IOException::class)
-fun createTempPhotoFile(context: Context): File {
+internal fun createTempPhotoFile(context: Context): File {
     val directoryStorage = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     directoryStorage?.deleteOnExit()
     return File.createTempFile(generatePhotoFileName(), ".jpg", directoryStorage)
@@ -144,7 +144,7 @@ private fun generatePhotoFileName(): String =
         "IMG_${format(Date())}"
     }
 
-fun mapUriToFileAttachment(contentResolver: ContentResolver, uri: Uri): FileAttachment? =
+internal fun mapUriToFileAttachment(contentResolver: ContentResolver, uri: Uri): FileAttachment? =
     contentResolver.query(uri, null, null, null, null)?.use {
         if (it.count == 0) return@use null
 

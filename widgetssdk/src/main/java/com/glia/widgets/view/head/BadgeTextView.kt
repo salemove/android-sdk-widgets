@@ -17,7 +17,7 @@ import com.google.android.material.textview.MaterialTextView
 import kotlin.math.max
 import com.google.android.material.R as Material_R
 
-class BadgeTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+internal class BadgeTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     MaterialTextView(context, attrs) {
 
     init {

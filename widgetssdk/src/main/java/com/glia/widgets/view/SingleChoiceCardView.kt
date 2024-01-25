@@ -29,7 +29,7 @@ import com.glia.widgets.view.unifiedui.theme.chat.ResponseCardTheme
 import com.google.android.material.button.MaterialButton
 import kotlin.properties.Delegates
 
-class SingleChoiceCardView @JvmOverloads constructor(
+internal class SingleChoiceCardView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

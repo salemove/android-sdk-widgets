@@ -24,7 +24,7 @@ import java.io.InputStream
 import java.util.Optional
 import java.util.function.Consumer
 
-interface GliaCore {
+internal interface GliaCore {
     val isInitialized: Boolean
     val pushNotifications: PushNotifications
     val currentEngagement: Optional<Engagement>

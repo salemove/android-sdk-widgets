@@ -4,7 +4,7 @@ import com.glia.androidsdk.chat.FilesAttachment
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.widgets.core.fileupload.model.FileAttachment
 
-class SendMessagePayload private constructor(
+internal class SendMessagePayload private constructor(
     val content: String,
     val fileAttachments: List<FileAttachment>?,
     val payload: com.glia.androidsdk.chat.SendMessagePayload

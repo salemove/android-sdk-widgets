@@ -6,7 +6,7 @@ import com.glia.widgets.StringProvider
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 
-class ConfirmationDialogLinksUseCase(
+internal class ConfirmationDialogLinksUseCase(
     private val stringProvider: StringProvider
 ) {
 

@@ -1,6 +1,6 @@
 package com.glia.widgets.permissions
 
-class PermissionsRequestContract {
+internal class PermissionsRequestContract {
     interface Controller {
         fun setWatcher(watcher: Watcher)
         fun onActivityResumed()

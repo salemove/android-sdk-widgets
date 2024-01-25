@@ -5,7 +5,7 @@ import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.di.GliaCore
 import io.reactivex.Observable
 
-class VisitorCodeRepository(private val gliaCore: GliaCore) {
+internal class VisitorCodeRepository(private val gliaCore: GliaCore) {
 
     fun getVisitorCode(): Observable<VisitorCode> {
         if (!gliaCore.isInitialized) {

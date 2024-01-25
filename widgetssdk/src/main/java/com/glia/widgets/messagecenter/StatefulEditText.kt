@@ -15,7 +15,7 @@ import com.glia.widgets.view.unifiedui.theme.base.LayerTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextInputTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 
-class StatefulEditText @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+internal class StatefulEditText @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     AppCompatEditText(context, attrs) {
     private val adapterCallback: StatefulWidgetAdapterCallback<State, TextInputTheme> =
         StatefulWidgetAdapterCallback { updateTheme(it) }

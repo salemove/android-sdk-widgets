@@ -1,6 +1,6 @@
 package com.glia.widgets.messagecenter
 
-data class MessageCenterState(
+internal data class MessageCenterState(
     val addAttachmentButtonVisible: Boolean = false,
     val addAttachmentButtonEnabled: Boolean = true,
     val messageEditTextEnabled: Boolean = true,

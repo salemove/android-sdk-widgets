@@ -3,7 +3,7 @@ package com.glia.widgets.core.secureconversations
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
-class SendMessageRepository {
+internal class SendMessageRepository {
     private val _observable = BehaviorSubject.createDefault("")
 
     val observable: Observable<String> = _observable

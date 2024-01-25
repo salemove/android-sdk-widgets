@@ -24,7 +24,7 @@ import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.OptionButtonTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyInputQuestionTheme
 
-class InputQuestionViewHolder(
+internal class InputQuestionViewHolder(
     val binding: SurveyInputQuestionItemBinding,
     val style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {

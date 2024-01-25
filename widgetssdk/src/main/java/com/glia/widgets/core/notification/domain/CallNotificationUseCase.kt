@@ -6,7 +6,7 @@ import com.glia.widgets.core.notification.device.INotificationManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
-class CallNotificationUseCase(
+internal class CallNotificationUseCase(
     private val notificationManager: INotificationManager
 ) {
     operator fun invoke(visitorMedia: MediaState? = null, operatorMedia: MediaState? = null) {

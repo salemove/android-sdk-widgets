@@ -7,7 +7,7 @@ import android.widget.TextView
 import com.glia.widgets.databinding.AlertDialogBinding
 import com.glia.widgets.view.dialog.base.DialogViewBinding
 
-class AlertDialogViewBinding(layoutInflater: LayoutInflater) : DialogViewBinding<AlertDialogBinding> {
+internal class AlertDialogViewBinding(layoutInflater: LayoutInflater) : DialogViewBinding<AlertDialogBinding> {
     override val binding: AlertDialogBinding = AlertDialogBinding.inflate(layoutInflater)
     override val root: View
         get() = binding.root

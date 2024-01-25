@@ -3,7 +3,7 @@ package com.glia.widgets.filepreview.ui
 import android.graphics.Bitmap
 import com.glia.widgets.helper.toFileName
 
-data class State(
+internal data class State(
     val imageLoadingState: ImageLoadingState = ImageLoadingState.INITIAL,
     val isShowShareButton: Boolean = false,
     val isShowDownloadButton: Boolean = false,

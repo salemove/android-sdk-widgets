@@ -23,7 +23,7 @@ import com.glia.widgets.view.unifiedui.theme.survey.SurveySingleQuestionTheme
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
-class SingleQuestionViewHolder(
+internal class SingleQuestionViewHolder(
     private val binding: SurveySingleQuestionItemBinding,
     var style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {

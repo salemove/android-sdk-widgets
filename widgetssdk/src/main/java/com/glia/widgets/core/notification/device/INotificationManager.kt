@@ -1,6 +1,6 @@
 package com.glia.widgets.core.notification.device
 
-interface INotificationManager {
+internal interface INotificationManager {
     fun showAudioCallNotification()
     fun showVideoCallNotification(isTwoWayVideo: Boolean, hasAudio: Boolean)
     fun removeCallNotification()

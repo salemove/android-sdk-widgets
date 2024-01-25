@@ -38,7 +38,7 @@ import com.google.android.material.R as Material_R
 /**
  * [DiffUtil.ItemCallback] for [FileAttachment] type
  */
-class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachment>() {
+internal class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachment>() {
     override fun areItemsTheSame(oldItem: FileAttachment, newItem: FileAttachment): Boolean =
         oldItem.uri == newItem.uri
 
@@ -49,7 +49,7 @@ class UploadAttachmentItemCallback : DiffUtil.ItemCallback<FileAttachment>() {
 /**
  * Upload File Attachment Adapter
  */
-class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
+internal class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
     ListAdapter<FileAttachment, ViewHolder>(UploadAttachmentItemCallback()) {
     private var callback: ItemCallback? = null
     private val stringProvider = Dependencies.getStringProvider()
@@ -74,7 +74,7 @@ class UploadAttachmentAdapter(private val isMessageCenter: Boolean = false) :
 /**
  * ViewHolder
  */
-class ViewHolder(
+internal class ViewHolder(
     private val binding: ChatAttachmentUploadedItemBinding,
     isMessageCenter: Boolean
 ) : RecyclerView.ViewHolder(binding.root) {

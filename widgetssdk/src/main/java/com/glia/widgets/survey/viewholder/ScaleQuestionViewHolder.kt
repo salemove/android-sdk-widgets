@@ -12,7 +12,7 @@ import com.glia.widgets.view.unifiedui.applyOptionButtonTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyScaleQuestionTheme
 
-class ScaleQuestionViewHolder(
+internal class ScaleQuestionViewHolder(
     private val binding: SurveyScaleQuestionItemBinding,
     private var style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {

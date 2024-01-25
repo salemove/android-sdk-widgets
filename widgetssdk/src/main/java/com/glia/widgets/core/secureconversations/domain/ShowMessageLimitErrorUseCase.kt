@@ -4,7 +4,7 @@ import com.glia.widgets.core.secureconversations.SendMessageRepository
 import com.glia.widgets.helper.rx.Schedulers
 import io.reactivex.Observable
 
-class ShowMessageLimitErrorUseCase(
+internal class ShowMessageLimitErrorUseCase(
     private val sendMessageRepository: SendMessageRepository,
     private val schedulers: Schedulers
 ) {

@@ -37,7 +37,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import kotlin.properties.Delegates
 
-class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
+internal class SurveyView(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
     FrameLayout(
         context.wrapWithMaterialThemeOverlay(attrs, defStyleAttr, defStyleRes),
         attrs,

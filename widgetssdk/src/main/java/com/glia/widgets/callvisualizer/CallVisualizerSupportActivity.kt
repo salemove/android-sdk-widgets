@@ -12,7 +12,7 @@ class CallVisualizerSupportActivity : AppCompatActivity() {
 }
 
 @Parcelize
-sealed class PermissionType : Parcelable
-object ScreenSharing : PermissionType()
-object Camera : PermissionType()
-object None : PermissionType()
+internal sealed class PermissionType : Parcelable
+internal object ScreenSharing : PermissionType()
+internal object Camera : PermissionType()
+internal object None : PermissionType()

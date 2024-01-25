@@ -14,7 +14,7 @@ import com.glia.widgets.view.unifiedui.applyOptionButtonTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.survey.SurveyBooleanQuestionTheme
 
-class BooleanQuestionViewHolder(
+internal class BooleanQuestionViewHolder(
     private val binding: SurveyBooleanQuestionItemBinding,
     style: SurveyStyle
 ) : SurveyViewHolder(binding.root, binding.tvTitle, binding.requiredError) {

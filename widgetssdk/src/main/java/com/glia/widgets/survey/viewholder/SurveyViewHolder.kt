@@ -13,7 +13,7 @@ import com.glia.widgets.survey.QuestionItem
 import com.glia.widgets.survey.SurveyAdapter
 import com.glia.widgets.survey.SurveyController
 
-abstract class SurveyViewHolder(
+internal abstract class SurveyViewHolder(
     itemView: View,
     val title: TextView,
     private val requiredError: View

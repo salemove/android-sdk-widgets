@@ -16,7 +16,7 @@ private const val TAG = "GetUnreadMessagesCountUseCase"
  * @see [GetUnreadMessagesCountWithTimeoutUseCase.invoke]
  */
 @VisibleForTesting
-const val TIMEOUT_SEC = 3L
+internal const val TIMEOUT_SEC = 3L
 
 internal const val NO_UNREAD_MESSAGES = 0
 

@@ -39,7 +39,7 @@ import com.google.android.material.button.MaterialButton
 import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
-class MessageView(
+internal class MessageView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,

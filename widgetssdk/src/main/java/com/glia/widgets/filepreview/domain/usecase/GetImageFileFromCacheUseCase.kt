@@ -5,7 +5,7 @@ import com.glia.widgets.filepreview.data.GliaFileRepository
 import com.glia.widgets.filepreview.domain.exception.FileNameMissingException
 import io.reactivex.Maybe
 
-class GetImageFileFromCacheUseCase(private val gliaFileRepository: GliaFileRepository) {
+internal class GetImageFileFromCacheUseCase(private val gliaFileRepository: GliaFileRepository) {
     operator fun invoke(fileName: String?): Maybe<Bitmap> {
         return if (fileName.isNullOrEmpty()) {
             Maybe.error(FileNameMissingException())

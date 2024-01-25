@@ -28,7 +28,7 @@ import com.glia.widgets.view.unifiedui.theme.base.HeaderTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import kotlin.properties.Delegates
 
-class WebBrowserView(
+internal class WebBrowserView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,

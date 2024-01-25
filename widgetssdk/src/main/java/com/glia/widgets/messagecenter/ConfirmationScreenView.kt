@@ -23,7 +23,7 @@ import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.secureconversations.SecureConversationsConfirmationScreenTheme
 import com.google.android.material.transition.MaterialFadeThrough
 
-class ConfirmationScreenView(
+internal class ConfirmationScreenView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,

@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.call.BarButtonStatesTheme
 
-class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+internal class CallButtonLabelView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ThemedStateText(context, attrs) {
 
     private var barButtonStatesTheme: BarButtonStatesTheme? = null

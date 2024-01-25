@@ -16,7 +16,7 @@ import com.glia.widgets.survey.viewholder.SingleQuestionViewHolder
 import com.glia.widgets.survey.viewholder.SurveyViewHolder
 import com.glia.widgets.view.configuration.survey.SurveyStyle
 
-class SurveyAdapter(private val listener: SurveyAdapterListener) :
+internal class SurveyAdapter(private val listener: SurveyAdapterListener) :
     RecyclerView.Adapter<SurveyViewHolder>() {
     interface SurveyAdapterListener {
         fun onAnswer(answer: Survey.Answer)

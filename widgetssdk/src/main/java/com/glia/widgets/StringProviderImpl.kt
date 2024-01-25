@@ -6,7 +6,7 @@ import com.glia.androidsdk.GliaException
 import com.glia.widgets.helper.Logger
 import java.lang.Exception
 
-class StringProviderImpl(private val resourceProvider: ResourceProvider) : StringProvider {
+internal class StringProviderImpl(private val resourceProvider: ResourceProvider) : StringProvider {
 
     private val regex = "(\\{[a-zA-Z\\d]*\\})".toRegex()
     private var shouldLog = true

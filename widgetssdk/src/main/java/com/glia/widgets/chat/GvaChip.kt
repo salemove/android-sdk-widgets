@@ -20,7 +20,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.transition.MaterialFadeThrough
 
-class GvaChip @JvmOverloads constructor(
+internal class GvaChip @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.chipStyle
@@ -64,7 +64,7 @@ class GvaChip @JvmOverloads constructor(
     }
 }
 
-class GvaChipGroup @JvmOverloads constructor(
+internal class GvaChipGroup @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.chipGroupStyle

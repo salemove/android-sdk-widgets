@@ -150,7 +150,7 @@ public class ChatActivity extends FadeTransitionActivity {
         startActivity(
             CallActivity.getIntent(
                 getApplicationContext(),
-                getConfigurationBuilder().setMediaType(Utils.toMediaType(mediaType))
+                getConfigurationBuilder().setMediaType(mediaType)
                     .setIsUpgradeToCall(true)
                     .build()
             )

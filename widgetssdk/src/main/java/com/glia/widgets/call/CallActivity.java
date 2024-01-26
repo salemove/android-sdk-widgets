@@ -38,16 +38,16 @@ public class CallActivity extends FadeTransitionActivity {
         Logger.i(TAG, "Create Call screen");
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
-        configuration = CallIntentReader.from(this).getConfiguration();
+        configuration = CallActivityIntentHelper.readConfiguration(this);
 
-        if (!callView.shouldShowMediaEngagementView(configuration.getIsUpgradeToCall())) {
+        if (!callView.shouldShowMediaEngagementView(configuration.isUpgradeToCall)) {
             finishAndRemoveTask();
             return;
         }
 
         callView.setOnTitleUpdatedListener(this::setTitle);
-        callView.setConfiguration(configuration.getSdkConfiguration());
-        callView.setUiTheme(configuration.getSdkConfiguration().getRunTimeTheme());
+        callView.setConfiguration(configuration.sdkConfiguration);
+        callView.setUiTheme(configuration.sdkConfiguration.getRunTimeTheme());
         callView.setOnBackClickedListener(onBackClickedListener);
 
         // In case the engagement ends, Activity is removed from the device's Recents menu
@@ -68,7 +68,7 @@ public class CallActivity extends FadeTransitionActivity {
 
     @StringRes
     private int getTitleText() {
-        switch (configuration.getMediaType()) {
+        switch (configuration.mediaType) {
             case VIDEO:
                 return R.string.engagement_video_title;
             case AUDIO:
@@ -117,21 +117,21 @@ public class CallActivity extends FadeTransitionActivity {
     }
 
     private void startCall() {
-        GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
+        GliaSdkConfiguration sdkConfiguration = configuration.sdkConfiguration;
         callView.startCall(
             Objects.requireNonNull(sdkConfiguration.getCompanyName()),
             sdkConfiguration.getQueueId(),
             sdkConfiguration.getContextAssetId(),
             sdkConfiguration.getUseOverlay(),
             Objects.requireNonNull(sdkConfiguration.getScreenSharingMode()),
-            configuration.getIsUpgradeToCall(),
-            configuration.getMediaType()
+            configuration.isUpgradeToCall,
+            configuration.mediaType
         );
     }
 
     private void navigateToChat() {
         Logger.d(TAG, "navigateToChat");
-        GliaSdkConfiguration sdkConfiguration = configuration.getSdkConfiguration();
+        GliaSdkConfiguration sdkConfiguration = configuration.sdkConfiguration;
         Intent newIntent = new Intent(getApplicationContext(), ChatActivity.class)
                 .putExtra(GliaWidgets.QUEUE_ID, sdkConfiguration.getQueueId())
                 .putExtra(GliaWidgets.CONTEXT_ASSET_ID, sdkConfiguration.getContextAssetId())
@@ -179,9 +179,6 @@ public class CallActivity extends FadeTransitionActivity {
             Context context,
             Configuration configuration
     ) {
-        return CallIntentBuilder
-                .from(context)
-                .setConfiguration(configuration)
-                .getIntent();
+        return CallActivityIntentHelper.createIntent(context, configuration);
     }
 }

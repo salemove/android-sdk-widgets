@@ -21,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
+import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.fcm.GliaPushMessage
@@ -28,12 +29,12 @@ import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.GliaWidgetsConfig
 import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.chat.ChatType
-import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.messagecenter.MessageCenterActivity
 import com.google.android.material.appbar.MaterialToolbar
 import kotlin.concurrent.thread
@@ -41,19 +42,6 @@ import kotlin.concurrent.thread
 class MainFragment : Fragment() {
     private var containerView: ConstraintLayout? = null
     private var authentication: Authentication? = null
-
-    private val configuration: GliaSdkConfiguration
-        get() {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            return GliaSdkConfiguration.Builder()
-                .companyName(getCompanyNameFromPrefs(sharedPreferences))
-                .contextAssetId(getContextAssetIdFromPrefs(sharedPreferences))
-                .queueId(getQueueIdFromPrefs(sharedPreferences))
-                .runTimeTheme(getRuntimeThemeFromPrefs(sharedPreferences))
-                .screenSharingMode(getScreenSharingModeFromPrefs(sharedPreferences))
-                .useOverlay(getUseOverlay(sharedPreferences))
-                .build()
-        }
 
     private val authToken: String
         get() {
@@ -219,13 +207,15 @@ class MainFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun navigateToCall(mediaType: String?) {
-        val configBuilder = Configuration.Builder.builder()
-            .setWidgetsConfiguration(configuration)
-        if (!TextUtils.isEmpty(mediaType)) {
-            configBuilder.setMediaType(mediaType)
-        }
-        val intent = CallActivity.getIntent(requireContext(), configBuilder.build())
+    private fun navigateToCall(mediaType: String) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val intent = Intent(context, CallActivity::class.java)
+            .putExtra(GliaWidgets.QUEUE_ID, getQueueIdFromPrefs(sharedPreferences))
+            .putExtra(GliaWidgets.CONTEXT_ASSET_ID, getContextAssetIdFromPrefs(sharedPreferences))
+            .putExtra(GliaWidgets.UI_THEME, getRuntimeThemeFromPrefs(sharedPreferences))
+            .putExtra(GliaWidgets.USE_OVERLAY, getUseOverlay(sharedPreferences))
+            .putExtra(GliaWidgets.SCREEN_SHARING_MODE, getScreenSharingModeFromPrefs(sharedPreferences))
+            .putExtra(GliaWidgets.MEDIA_TYPE, Utils.toMediaType(mediaType))
         startActivity(intent)
     }
 

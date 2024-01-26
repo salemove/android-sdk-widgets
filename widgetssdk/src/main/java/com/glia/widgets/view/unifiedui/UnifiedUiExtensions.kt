@@ -123,6 +123,7 @@ internal fun TextView.applyTextColorTheme(color: ColorTheme?) {
             Shader.TileMode.CLAMP
         )
     } else {
+        paint.shader = null
         setTextColor(color.primaryColor)
     }
 }

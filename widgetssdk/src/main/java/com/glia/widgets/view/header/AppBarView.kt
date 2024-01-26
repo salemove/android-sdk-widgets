@@ -10,6 +10,7 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.databinding.AppBarBinding
@@ -202,6 +203,14 @@ internal class AppBarView @JvmOverloads constructor(
     fun hideLeaveButtons() {
         binding.endButton.isGone = true
         leaveQueueIcon.isVisible = false
+    }
+
+    internal fun resetTheme() {
+        val textAttrs = intArrayOf(com.google.android.material.R.attr.textAppearanceHeadline2)
+        context.obtainStyledAttributes(textAttrs).apply {
+            toolbarTitleText?.also { TextViewCompat.setTextAppearance(it, getResourceId(0, 0)) }
+            recycle()
+        }
     }
 
     internal fun applyHeaderTheme(headerTheme: HeaderTheme?) {

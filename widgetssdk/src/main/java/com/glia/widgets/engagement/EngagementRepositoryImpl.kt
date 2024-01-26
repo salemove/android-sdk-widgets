@@ -3,6 +3,7 @@ package com.glia.widgets.engagement
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
 import com.glia.androidsdk.Glia
@@ -39,9 +40,15 @@ import io.reactivex.processors.PublishProcessor
 import java.util.function.Consumer
 
 private const val TAG = "EngagementRepository"
-private const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
-private const val UNIQUE_RESULT_CODE = 0x1994
-private const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
+
+@VisibleForTesting
+internal const val MEDIA_PERMISSION_REQUEST_CODE = 0x3E9
+
+@VisibleForTesting
+internal const val UNIQUE_RESULT_CODE = 0x1994
+
+@VisibleForTesting
+internal const val SKIP_ASKING_SCREEN_SHARING_PERMISSION_RESULT_CODE = 0x1995
 
 internal class EngagementRepositoryImpl(private val core: GliaCore, private val operatorRepository: GliaOperatorRepository) : EngagementRepository {
     private val engagementRequestCallback = Consumer<IncomingEngagementRequest>(::handleIncomingEngagementRequest)
@@ -141,10 +148,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         currentEngagement?.also {
             currentEngagement = null
             Logger.i(TAG, "Engagement ended locally, silently:$silently")
-            unsubscribeFromEngagementEvents(it)
-            unsubscribeFromEngagementMediaEvents(it.media)
-            unsubscribeFromEngagementChatEvents(it.chat)
-            unSubscribeFromScreenSharingEvents(it.screenSharing)
+            unsubscribeFromEvents(it)
             notifyEngagementEnded(it)
             it.end { ex -> ex?.also { Logger.d(TAG, "Ending engagement failed") } }
             if (silently || it is OmnibrowseEngagement) {
@@ -379,6 +383,13 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         screenSharing.off(ScreenSharing.Events.VISITOR_STATE, screenSharingStateCallback)
     }
 
+    private fun unsubscribeFromEvents(engagement: Engagement) {
+        unsubscribeFromEngagementEvents(engagement)
+        unsubscribeFromEngagementMediaEvents(engagement.media)
+        unsubscribeFromEngagementChatEvents(engagement.chat)
+        unSubscribeFromScreenSharingEvents(engagement.screenSharing)
+    }
+
     private fun handleEngagementState(state: EngagementState) {
         operatorRepository.emit(state.operator)
 
@@ -409,12 +420,18 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
         Logger.i(TAG, "Engagement ended by Operator")
         currentEngagement?.also {
             currentEngagement = null
+            unsubscribeFromEvents(it)
             notifyEngagementEnded(it)
-            fetchSurvey(it as? OmnicoreEngagement ?: return, true)
             _operatorMediaState.onNext(Data.Empty)
             _visitorMediaState.onNext(Data.Empty)
             _currentOperator.onNext(Data.Empty)
             _onHoldState.onNext(false)
+
+            if (it is OmnicoreEngagement) {
+                fetchSurvey(it, true)
+            } else {
+                _survey.onNext(SurveyState.Empty)
+            }
         }
     }
 

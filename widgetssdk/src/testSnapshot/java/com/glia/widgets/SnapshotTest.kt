@@ -28,7 +28,7 @@ open class SnapshotTest(
     val renderingMode: RenderingMode = RenderingMode.SHRINK,
     val showSystemUi: Boolean = false,
     val theme: String = "ThemeOverlay_Glia_Chat_Material",
-    val maxPercentDifference: Double = 0.01,
+    val maxPercentDifference: Double = 0.001,
     @get:Rule var animationsRule: TestRule = InstantAnimationsRule()
 ) : SnapshotTestLifecycle, SnapshotContent, SnapshotStrings, SnapshotTheme {
 

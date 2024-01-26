@@ -121,12 +121,16 @@ class GliaWidgetsConfig private constructor(builder: Builder) {
             private set
         var uiJsonRemoteConfig: String? = null
             private set
-
         var companyName: String? = null
+            private set
         var screenSharingMode: ScreenSharing.Mode? = null
+            private set
         var useOverlay: Boolean? = null
+            private set
         var uiTheme: UiTheme? = null
+            private set
         var manualLocaleOverride: String? = null
+            private set
 
         /**
          * @param siteId - your site ID

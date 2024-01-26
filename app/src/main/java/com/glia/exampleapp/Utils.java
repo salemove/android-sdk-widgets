@@ -5,11 +5,14 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
+import com.glia.androidsdk.Engagement;
 import com.glia.androidsdk.screensharing.ScreenSharing;
+import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.UiTheme;
 import com.glia.widgets.view.configuration.ButtonConfiguration;
 import com.glia.widgets.view.configuration.ChatHeadConfiguration;
@@ -17,6 +20,8 @@ import com.glia.widgets.view.configuration.TextConfiguration;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.security.InvalidParameterException;
 
 class Utils {
 
@@ -300,6 +305,17 @@ class Utils {
             return ScreenSharing.Mode.APP_BOUNDED;
         } else {
             return ScreenSharing.Mode.UNBOUNDED;
+        }
+    }
+
+    public static Engagement.MediaType toMediaType(@NonNull String mediaType) {
+        switch (mediaType) {
+            case GliaWidgets.MEDIA_TYPE_VIDEO:
+                return Engagement.MediaType.VIDEO;
+            case GliaWidgets.MEDIA_TYPE_AUDIO:
+                return Engagement.MediaType.AUDIO;
+            default:
+                throw new InvalidParameterException("Invalid Media Type");
         }
     }
 }

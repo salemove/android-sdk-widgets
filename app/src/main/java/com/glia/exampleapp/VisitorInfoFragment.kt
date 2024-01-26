@@ -17,7 +17,6 @@ import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.visitor.VisitorInfo
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest
-import com.glia.widgets.helper.SimpleTextWatcher
 import java.util.UUID
 
 class VisitorInfoFragment : Fragment() {
@@ -173,7 +172,15 @@ private class CustomAttributesAdapter: RecyclerView.Adapter<CustomAttributesAdap
         private var onTextChanged: (() -> Unit)? = null
 
         init {
-            val textWatcher: TextWatcher = object : SimpleTextWatcher() {
+            val textWatcher: TextWatcher = object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    // Nothing to do
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    // Nothing to do
+                }
+
                 override fun afterTextChanged(editable: Editable) {
                     onTextChanged?.let { it() }
                 }

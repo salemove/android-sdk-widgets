@@ -233,6 +233,7 @@ internal class MessageCenterView(
             null
         ) deepMerge unifiedTheme?.secureConversationsConfirmationScreenTheme?.headerTheme
 
+        appBar?.resetTheme()
         setupAppBarUnifiedTheme(appBarTheme)
     }
 

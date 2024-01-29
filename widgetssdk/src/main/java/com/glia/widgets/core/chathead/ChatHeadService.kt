@@ -26,6 +26,13 @@ import com.glia.widgets.view.head.ChatHeadView
 import com.glia.widgets.view.head.ChatHeadView.Companion.getInstance
 import kotlin.math.roundToInt
 
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This service is used to display the Glia chat head (chat bubble) outside of the integrator's app.
+ */
 class ChatHeadService : Service() {
     private val windowManager: WindowManager by lazy { getSystemService()!! }
 

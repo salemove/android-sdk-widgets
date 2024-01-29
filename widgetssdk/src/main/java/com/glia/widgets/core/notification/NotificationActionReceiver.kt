@@ -8,6 +8,13 @@ import com.glia.widgets.engagement.domain.EndScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This receiver is used to listen to push notification actions (e.g. button clicks).
+ */
 class NotificationActionReceiver : BroadcastReceiver() {
     private val endScreenSharingUseCase: EndScreenSharingUseCase by lazy {
         Dependencies.getUseCaseFactory().endScreenSharingUseCase

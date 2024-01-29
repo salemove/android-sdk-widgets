@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.chat.model.Attachment
+import com.glia.widgets.chat.model.OperatorAttachmentItem
 import com.glia.widgets.chat.model.VisitorAttachmentItem
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import org.mockito.kotlin.mock
@@ -52,6 +53,19 @@ internal interface SnapshotAttachment {
         attachment = attachment,
         showDelivered = showDelivered,
         showError = showError
+    )
+
+    fun operatorAttachmentItemImage(
+        isFileExists: Boolean = false,
+        isDownloading: Boolean = false,
+        attachment: Attachment = remoteAttachment(),
+        id: String = "operatorImageId",
+        timestamp: Long = 1706534848,
+        showChatHead: Boolean = false,
+        operatorProfileImgUrl: String? = null,
+        operatorId: String? = "operatorId"
+    ) = OperatorAttachmentItem.Image(
+        isFileExists, isDownloading, attachment, id, timestamp, showChatHead, operatorProfileImgUrl, operatorId
     )
 
     fun fileAttachment(

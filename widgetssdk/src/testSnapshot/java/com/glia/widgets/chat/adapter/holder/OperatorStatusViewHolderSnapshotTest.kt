@@ -7,6 +7,7 @@ import com.glia.widgets.databinding.ChatOperatorStatusLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
+import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotPicasso
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
@@ -14,7 +15,7 @@ import org.junit.Test
 
 class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
     renderingMode = fullWidthRenderMode
-), SnapshotChatScreen, SnapshotChatView, SnapshotProviders, SnapshotPicasso {
+), SnapshotChatScreen, SnapshotChatView, SnapshotProviders, SnapshotPicasso, SnapshotLottie {
 
     // MARK: Connected
 
@@ -258,6 +259,7 @@ class OperatorStatusViewHolderSnapshotTest : SnapshotTest(
         unifiedTheme: UnifiedTheme? = null,
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
+        lottieMock()
         stringProviderMock()
         picassoMock(imageLoadError = imageLoadError)
 

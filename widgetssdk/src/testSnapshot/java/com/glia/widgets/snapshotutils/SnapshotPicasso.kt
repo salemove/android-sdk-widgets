@@ -54,9 +54,8 @@ interface SnapshotPicasso: SnapshotTestLifecycle {
         val loadAnswer: (invocation: InvocationOnMock) -> Unit = { invocation ->
             val imageView = invocation.getArgument<ImageView>(0)
             val imageResource = getImageResource(imageResources, index)
-            if (loadCallback != null && invocation.arguments.size > 1) {
-                val callback = invocation.getArgument<Callback>(1)
-                loadCallback(imageResource, object : Callback {
+            invocation.arguments.getOrNull(1)?.let { it as Callback }?.let { callback ->
+                loadCallback?.invoke(imageResource, object : Callback {
                     override fun onSuccess() {
                         callback.onSuccess()
                         imageView.setImageResource(imageResource)
@@ -65,8 +64,11 @@ interface SnapshotPicasso: SnapshotTestLifecycle {
                     override fun onError(e: Exception) {
                         callback.onError(e)
                     }
-                })
-            } else {
+                }) ?: run {
+                    callback.onSuccess()
+                    imageView.setImageResource(imageResource)
+                }
+            } ?: run {
                 imageView.setImageResource(imageResource)
             }
 

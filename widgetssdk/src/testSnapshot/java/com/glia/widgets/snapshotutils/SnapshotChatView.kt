@@ -23,8 +23,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 
-internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow,
-    SnapshotProviders, SnapshotGetImageFile, SnapshotSchedulers, SnapshotAttachment, SnapshotPicasso {
+internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow, SnapshotProviders,
+    SnapshotGetImageFile, SnapshotSchedulers, SnapshotAttachment, SnapshotPicasso, SnapshotLottie {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -39,6 +39,7 @@ internal interface SnapshotChatView : SnapshotContent, SnapshotTheme, SnapshotAc
         val imageFileMock = getImageFileMock()
         val schedulersMock = schedulersMock()
 
+        lottieMock()
         stringProviderMock()
         resourceProviderMock()
 

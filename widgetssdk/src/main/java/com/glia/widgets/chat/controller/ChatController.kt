@@ -418,7 +418,7 @@ internal class ChatController(
         if (isQueueingOrOngoingEngagement) {
             dialogController.showExitQueueDialog()
         } else {
-            Dependencies.destroyControllers()
+            navigateBack()
         }
     }
 

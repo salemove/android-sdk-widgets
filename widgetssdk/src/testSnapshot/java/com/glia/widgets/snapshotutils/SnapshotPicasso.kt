@@ -14,6 +14,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.lang.Exception
 
 interface SnapshotPicasso: SnapshotTestLifecycle {
 
@@ -22,6 +23,19 @@ interface SnapshotPicasso: SnapshotTestLifecycle {
         val picasso: Picasso,
         val requestCreator: RequestCreator
     )
+
+    fun picassoMock(
+        @DrawableRes imageResources: List<Int> = listOf(R.drawable.test_banner),
+        imageLoadError: Boolean
+    ) {
+        picassoMock { _, callback ->
+            if (imageLoadError) {
+                callback.onError(Exception())
+            } else {
+                callback.onSuccess()
+            }
+        }
+    }
 
     fun picassoMock(
         @DrawableRes imageResources: List<Int> = listOf(R.drawable.test_banner),
@@ -38,9 +52,22 @@ interface SnapshotPicasso: SnapshotTestLifecycle {
 
         var index = 0
         val loadAnswer: (invocation: InvocationOnMock) -> Unit = { invocation ->
-            val image = fillImages(invocation.getArgument(0), imageResources, index)
+            val imageView = invocation.getArgument<ImageView>(0)
+            val imageResource = getImageResource(imageResources, index)
             if (loadCallback != null && invocation.arguments.size > 1) {
-                loadCallback(image, invocation.getArgument(1))
+                val callback = invocation.getArgument<Callback>(1)
+                loadCallback(imageResource, object : Callback {
+                    override fun onSuccess() {
+                        callback.onSuccess()
+                        imageView.setImageResource(imageResource)
+                    }
+
+                    override fun onError(e: Exception) {
+                        callback.onError(e)
+                    }
+                })
+            } else {
+                imageView.setImageResource(imageResource)
             }
 
             index += 1
@@ -57,14 +84,11 @@ interface SnapshotPicasso: SnapshotTestLifecycle {
     }
 
     @DrawableRes
-    private fun fillImages(
-        imageView: ImageView,
+    private fun getImageResource(
         imageResources: List<Int>,
         index: Int
     ): Int {
         val imageIndex = index % imageResources.size
-        val imageResource = imageResources[imageIndex]
-        imageView.setImageResource(imageResource)
-        return imageResource
+        return imageResources[imageIndex]
     }
 }

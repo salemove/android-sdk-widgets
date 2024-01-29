@@ -33,6 +33,10 @@ import io.reactivex.plugins.RxJavaPlugins;
  * This class is a starting point for integration with Glia Widgets SDK
  */
 public class GliaWidgets {
+
+    /**
+     * TODO
+     */
     public static final String REMOTE_CONFIGURATION = "remote_configuration";
     /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when

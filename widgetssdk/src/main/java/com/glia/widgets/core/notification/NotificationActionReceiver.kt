@@ -8,6 +8,13 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
+/**
+ * Glia internal class.
+ *
+ * Will be automatically added to integrator Manifest by Manifest merger during compilation.
+ *
+ * This Receiver is used to listen to push notification actions (e.g: button clicks)
+ */
 class NotificationActionReceiver : BroadcastReceiver() {
     private val controller: ScreenSharingContract.Controller by lazy {
         Dependencies.getControllerFactory().screenSharingController

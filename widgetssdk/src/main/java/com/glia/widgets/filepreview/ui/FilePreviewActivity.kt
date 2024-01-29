@@ -27,6 +27,13 @@ import com.glia.widgets.helper.fileProviderAuthority
 import com.glia.widgets.helper.showToast
 import java.io.File
 
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This activity is used to preview images shared in chat in full-screen.
+ */
 internal class FilePreviewActivity : AppCompatActivity(), FilePreviewContract.View {
     private val stringProvider = Dependencies.getStringProvider()
 

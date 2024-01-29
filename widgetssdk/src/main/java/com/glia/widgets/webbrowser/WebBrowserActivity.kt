@@ -7,7 +7,14 @@ import android.os.Bundle
 import com.glia.widgets.base.FadeTransitionActivity
 import com.glia.widgets.databinding.WebBrowserAvtivityBinding
 
-
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This activity is used to display simple web pages. For example, it can be used to display links to the
+ * client's Terms and Conditions or Privacy Policy, which can be part of the engagement confirmation dialog.
+ */
 internal class WebBrowserActivity :
     FadeTransitionActivity(),
     WebBrowserView.OnFinishListener,

@@ -13,11 +13,22 @@ internal interface SnapshotChatScreen : SnapshotTheme {
             }
         )
     }
+
     fun unifiedThemeWithoutChatConnect(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
         unifiedTheme.add(
             "chatScreen",
             (unifiedTheme.remove("chatScreen") as JsonObject).also {
                 it.remove("connect")
+            }
+        )
+    }
+
+    fun unifiedThemeWithoutOperatorMessage(): UnifiedTheme = unifiedTheme(R.raw.test_unified_config) { unifiedTheme ->
+        unifiedTheme.add(
+            "chatScreen",
+            (unifiedTheme.remove("chatScreen") as JsonObject).also {
+                it.remove("operatorMessage")
+
             }
         )
     }

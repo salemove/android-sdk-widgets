@@ -7,6 +7,14 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This activity is used only to display screen-sharing controls during
+ * ongoing Call Visualizer engagements without video.
+ */
 class EndScreenSharingActivity : FadeTransitionActivity(), EndScreenSharingView.OnFinishListener {
 
     private lateinit var binding: EndScreenSharingActivityBinding

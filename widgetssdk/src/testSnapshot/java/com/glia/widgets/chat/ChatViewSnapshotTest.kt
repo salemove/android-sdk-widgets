@@ -4,6 +4,7 @@ import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.model.ChatState
+import com.glia.widgets.chat.model.OperatorStatusItem
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
 import com.glia.widgets.snapshotutils.SnapshotChatView
@@ -247,6 +248,7 @@ internal class ChatViewSnapshotTest : SnapshotTest(), SnapshotChatView, Snapshot
         chatState = ChatState()
             .changeVisibility(true)
             .transferring(),
+        chatItems = listOf(OperatorStatusItem.Transferring),
         unifiedTheme = unifiedTheme,
         uiTheme = uiTheme
     )

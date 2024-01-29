@@ -18,6 +18,7 @@ import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotActivityWindow
 import com.glia.widgets.snapshotutils.SnapshotContent
+import com.glia.widgets.snapshotutils.SnapshotLottie
 import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.snapshotutils.SnapshotSchedulers
 import com.glia.widgets.snapshotutils.SnapshotTheme
@@ -33,7 +34,8 @@ import java.util.concurrent.Executor
 
 // TODO: move to com.glia.widgets.snapshotutils after CallState refactored
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow, SnapshotProviders, SnapshotSchedulers {
+internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotActivityWindow,
+    SnapshotProviders, SnapshotSchedulers, SnapshotLottie {
 
     data class Mock(
         val activityMock: SnapshotActivityWindow.Mock,
@@ -47,6 +49,7 @@ internal interface SnapshotCallView : SnapshotContent, SnapshotTheme, SnapshotAc
         val activityMock = activityWindowMock()
         val schedulersMock = schedulersMock()
 
+        lottieMock()
         stringProviderMock()
         resourceProviderMock()
 

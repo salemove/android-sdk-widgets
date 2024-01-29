@@ -14,6 +14,13 @@ import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.InsetsKt;
 import com.glia.widgets.helper.Logger;
 
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This activity is used to display post-engagement surveys.
+ */
 public class SurveyActivity extends AppCompatActivity implements SurveyView.OnFinishListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
 

@@ -15,8 +15,11 @@ private const val SERVICE_ID = 123
 const val ACTION_START = "EngagementMonitoringService:Start"
 
 /**
- * Apps targeting SDK version 29 or later require for screen-sharing a running foreground service.
- * This service requires declaration in the Manifest file.
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * Apps targeting SDK version 29 or later require a running foreground service for screen sharing.
  */
 @RequiresApi(api = Build.VERSION_CODES.O)
 class MediaProjectionService : Service() {

@@ -5,6 +5,13 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 
+/**
+ * Glia internal class.
+ *
+ * It will be automatically added to the integrator's manifest file by the manifest merger during compilation.
+ *
+ * This service is used to remove push notifications about ongoing video/audio calls when the application is killed.
+ */
 class NotificationRemovalService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 

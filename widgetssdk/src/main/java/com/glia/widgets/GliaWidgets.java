@@ -35,10 +35,6 @@ import io.reactivex.plugins.RxJavaPlugins;
 public class GliaWidgets {
 
     /**
-     * TODO
-     */
-    public static final String REMOTE_CONFIGURATION = "remote_configuration";
-    /**
      * Use with {@link android.os.Bundle} to pass in a {@link UiTheme} as a navigation argument when
      * navigating to {@link com.glia.widgets.chat.ChatActivity}
      */

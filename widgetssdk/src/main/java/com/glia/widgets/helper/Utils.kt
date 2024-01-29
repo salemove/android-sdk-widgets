@@ -1,471 +1,478 @@
-package com.glia.widgets.helper;
+package com.glia.widgets.helper
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Typeface;
-import android.util.TypedValue;
+import android.content.Context
+import android.content.res.TypedArray
+import android.graphics.Typeface
+import android.util.TypedValue
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleableRes
+import androidx.core.content.res.ResourcesCompat
+import com.glia.androidsdk.Engagement
+import com.glia.widgets.GliaWidgets
+import com.glia.widgets.R
+import com.glia.widgets.UiTheme
+import com.glia.widgets.UiTheme.UiThemeBuilder
+import java.security.InvalidParameterException
 
-import androidx.annotation.AttrRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StyleableRes;
-import androidx.core.content.res.ResourcesCompat;
-
-import com.glia.androidsdk.Engagement;
-import com.glia.widgets.GliaWidgets;
-import com.glia.widgets.R;
-import com.glia.widgets.UiTheme;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.security.InvalidParameterException;
-
-public class Utils {
-
-    public static Engagement.MediaType toMediaType(@NonNull String mediaType) {
-        switch (mediaType) {
-            case GliaWidgets.MEDIA_TYPE_VIDEO:
-                return Engagement.MediaType.VIDEO;
-            case GliaWidgets.MEDIA_TYPE_AUDIO:
-                return Engagement.MediaType.AUDIO;
-            default:
-                throw new InvalidParameterException("Invalid Media Type");
+internal object Utils {
+    @JvmStatic
+    fun toMediaType(mediaType: String): Engagement.MediaType {
+        return when (mediaType) {
+            GliaWidgets.MEDIA_TYPE_VIDEO -> Engagement.MediaType.VIDEO
+            GliaWidgets.MEDIA_TYPE_AUDIO -> Engagement.MediaType.AUDIO
+            else -> throw InvalidParameterException("Invalid Media Type")
         }
     }
 
-    @NotNull
-    public static UiTheme getThemeFromTypedArray(TypedArray typedArray, Context context) {
-        UiTheme.UiThemeBuilder defaultThemeBuilder = new UiTheme.UiThemeBuilder();
-        defaultThemeBuilder.setAppBarTitle(getAppBarTitleValue(typedArray));
-        defaultThemeBuilder.setBrandPrimaryColor(
+    fun getThemeFromTypedArray(typedArray: TypedArray, context: Context): UiTheme {
+        val defaultThemeBuilder = UiThemeBuilder().apply {
+            setAppBarTitle(getAppBarTitleValue(typedArray))
+            setBrandPrimaryColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_brandPrimaryColor,
-                        R.attr.gliaBrandPrimaryColor));
-        defaultThemeBuilder.setBaseLightColor(
-                getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_baseLightColor,
-                        R.attr.gliaBaseLightColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_brandPrimaryColor,
+                    R.attr.gliaBrandPrimaryColor
                 )
-        );
-        defaultThemeBuilder.setBaseDarkColor(
+            )
+            setBaseLightColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_baseDarkColor,
-                        R.attr.gliaBaseDarkColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_baseLightColor,
+                    R.attr.gliaBaseLightColor
                 )
-        );
-        defaultThemeBuilder.setBaseNormalColor(
+            )
+            setBaseDarkColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_baseNormalColor,
-                        R.attr.gliaBaseNormalColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_baseDarkColor,
+                    R.attr.gliaBaseDarkColor
                 )
-        );
-        defaultThemeBuilder.setBaseShadeColor(
+            )
+            setBaseNormalColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_baseShadeColor,
-                        R.attr.gliaBaseShadeColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_baseNormalColor,
+                    R.attr.gliaBaseNormalColor
                 )
-        );
-        defaultThemeBuilder.setSystemAgentBubbleColor(
+            )
+            setBaseShadeColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_systemAgentBubbleColor,
-                        R.attr.gliaSystemAgentBubbleColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_baseShadeColor,
+                    R.attr.gliaBaseShadeColor
                 )
-        );
-        defaultThemeBuilder.setSystemNegativeColor(
+            )
+            setSystemAgentBubbleColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_systemNegativeColor,
-                        R.attr.gliaSystemNegativeColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_systemAgentBubbleColor,
+                    R.attr.gliaSystemAgentBubbleColor
                 )
-        );
-        defaultThemeBuilder.setVisitorMessageBackgroundColor(
+            )
+            setSystemNegativeColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_visitorMessageBackgroundColor,
-                        R.attr.gliaVisitorMessageBackgroundColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_systemNegativeColor,
+                    R.attr.gliaSystemNegativeColor
                 )
-        );
-        defaultThemeBuilder.setVisitorMessageTextColor(
+            )
+            setVisitorMessageBackgroundColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_visitorMessageTextColor,
-                        R.attr.gliaVisitorMessageTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_visitorMessageBackgroundColor,
+                    R.attr.gliaVisitorMessageBackgroundColor
                 )
-        );
-        defaultThemeBuilder.setOperatorMessageBackgroundColor(
+            )
+            setVisitorMessageTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_operatorMessageBackgroundColor,
-                        R.attr.gliaOperatorMessageBackgroundColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_visitorMessageTextColor,
+                    R.attr.gliaVisitorMessageTextColor
                 )
-        );
-        defaultThemeBuilder.setOperatorMessageTextColor(
+            )
+            setOperatorMessageBackgroundColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_operatorMessageTextColor,
-                        R.attr.operatorMessageTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_operatorMessageBackgroundColor,
+                    R.attr.gliaOperatorMessageBackgroundColor
                 )
-        );
-        defaultThemeBuilder.setNewMessagesDividerColor(
-                getTypedArrayIntegerValue(typedArray, context, R.styleable.GliaView_newMessagesDividerColor, R.attr.gliaNewMessagesDividerColor)
-        );
-        defaultThemeBuilder.setNewMessagesDividerTextColor(
-                getTypedArrayIntegerValue(typedArray, context, R.styleable.GliaView_newMessagesDividerTextColor, R.attr.gliaNewMessagesDividerTextColor)
-        );
-        defaultThemeBuilder.setBotActionButtonBackgroundColor(
+            )
+            setOperatorMessageTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_botActionButtonBackgroundColor,
-                        R.attr.gliaBotActionButtonBackgroundColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_operatorMessageTextColor,
+                    R.attr.operatorMessageTextColor
                 )
-        );
-        defaultThemeBuilder.setBotActionButtonTextColor(
+            )
+            setNewMessagesDividerColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_botActionButtonTextColor,
-                        R.attr.gliaBotActionButtonTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_newMessagesDividerColor,
+                    R.attr.gliaNewMessagesDividerColor
                 )
-        );
-        defaultThemeBuilder.setBotActionButtonSelectedBackgroundColor(
+            )
+            setNewMessagesDividerTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_botActionButtonSelectedBackgroundColor,
-                        R.attr.gliaBotActionButtonSelectedBackgroundColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_newMessagesDividerTextColor,
+                    R.attr.gliaNewMessagesDividerTextColor
                 )
-        );
-        defaultThemeBuilder.setBotActionButtonSelectedTextColor(
+            )
+            setBotActionButtonBackgroundColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_botActionButtonSelectedTextColor,
-                        R.attr.gliaBotActionButtonSelectedTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_botActionButtonBackgroundColor,
+                    R.attr.gliaBotActionButtonBackgroundColor
                 )
-        );
-        defaultThemeBuilder.setSendMessageButtonTintColor(
+            )
+            setBotActionButtonTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatSendMessageButtonTintColor,
-                        R.attr.gliaSendMessageButtonTintColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_botActionButtonTextColor,
+                    R.attr.gliaBotActionButtonTextColor
                 )
-        );
-        defaultThemeBuilder.setGliaChatBackgroundColor(
+            )
+            setBotActionButtonSelectedBackgroundColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_gliaChatBackgroundColor,
-                        R.attr.gliaChatBackgroundColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_botActionButtonSelectedBackgroundColor,
+                    R.attr.gliaBotActionButtonSelectedBackgroundColor
                 )
-        );
-        defaultThemeBuilder.setGliaChatHeaderTitleTintColor(
+            )
+            setBotActionButtonSelectedTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatHeaderTitleTintColor,
-                        R.attr.gliaChatHeaderTitleTintColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_botActionButtonSelectedTextColor,
+                    R.attr.gliaBotActionButtonSelectedTextColor
                 )
-        );
-        defaultThemeBuilder.setGliaChatHeaderHomeButtonTintColor(
+            )
+            setSendMessageButtonTintColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatHeaderHomeButtonTintColor,
-                        R.attr.gliaChatHeaderHomeButtonTintColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatSendMessageButtonTintColor,
+                    R.attr.gliaSendMessageButtonTintColor
                 )
-        );
-        defaultThemeBuilder.setGliaChatHeaderExitQueueButtonTintColor(
+            )
+            setGliaChatBackgroundColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
-                        R.attr.gliaChatHeaderExitQueueButtonTintColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_gliaChatBackgroundColor,
+                    R.attr.gliaChatBackgroundColor
                 )
-        );
-        defaultThemeBuilder.setChatStartedHeadingTextColor(
+            )
+            setGliaChatHeaderTitleTintColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatStartedHeadingTextColor,
-                        R.attr.chatStartedHeadingTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatHeaderTitleTintColor,
+                    R.attr.gliaChatHeaderTitleTintColor
                 )
-        );
-        defaultThemeBuilder.setChatStartedCaptionTextColor(
+            )
+            setGliaChatHeaderHomeButtonTintColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatStartedCaptionTextColor,
-                        R.attr.chatStartedCaptionTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatHeaderHomeButtonTintColor,
+                    R.attr.gliaChatHeaderHomeButtonTintColor
                 )
-        );
-        defaultThemeBuilder.setChatStartingHeadingTextColor(
+            )
+            setGliaChatHeaderExitQueueButtonTintColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatStartingHeadingTextColor,
-                        R.attr.chatStartingHeadingTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatHeaderExitQueueButtonTintColor,
+                    R.attr.gliaChatHeaderExitQueueButtonTintColor
                 )
-        );
-        defaultThemeBuilder.setChatStartingCaptionTextColor(
+            )
+            setChatStartedHeadingTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_chatStartingCaptionTextColor,
-                        R.attr.chatStartingCaptionTextColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatStartedHeadingTextColor,
+                    R.attr.chatStartedHeadingTextColor
                 )
-        );
-        defaultThemeBuilder.setFontRes(
+            )
+            setChatStartedCaptionTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_android_fontFamily,
-                        androidx.appcompat.R.attr.fontFamily
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatStartedCaptionTextColor,
+                    R.attr.chatStartedCaptionTextColor
                 )
-        );
-        defaultThemeBuilder.setIconAppBarBack(
+            )
+            setChatStartingHeadingTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconAppBarBack,
-                        R.attr.gliaIconAppBarBack
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatStartingHeadingTextColor,
+                    R.attr.chatStartingHeadingTextColor
                 )
-        );
-        defaultThemeBuilder.setIconLeaveQueue(
+            )
+            setChatStartingCaptionTextColor(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconLeaveQueue,
-                        R.attr.gliaIconLeaveQueue
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_chatStartingCaptionTextColor,
+                    R.attr.chatStartingCaptionTextColor
                 )
-        );
-        defaultThemeBuilder.setIconSendMessage(
+            )
+            setFontRes(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconSendMessage,
-                        R.attr.gliaIconSendMessage
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_android_fontFamily,
+                    androidx.appcompat.R.attr.fontFamily
                 )
-        );
-        defaultThemeBuilder.setIconChatAudioUpgrade(
+            )
+            setIconAppBarBack(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconChatAudioUpgrade,
-                        R.attr.gliaIconChatAudioUpgrade
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconAppBarBack,
+                    R.attr.gliaIconAppBarBack
                 )
-        );
-        defaultThemeBuilder.setIconUpgradeAudioDialog(
+            )
+            setIconLeaveQueue(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconUpgradeAudioDialog,
-                        R.attr.gliaIconUpgradeAudioDialog
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconLeaveQueue,
+                    R.attr.gliaIconLeaveQueue
                 )
-        );
-        defaultThemeBuilder.setIconCallAudioOn(
+            )
+            setIconSendMessage(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallAudioOn,
-                        R.attr.gliaIconCallAudioOn
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconSendMessage,
+                    R.attr.gliaIconSendMessage
                 )
-        );
-        defaultThemeBuilder.setIconChatVideoUpgrade(
+            )
+            setIconChatAudioUpgrade(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconChatVideoUpgrade,
-                        R.attr.gliaIconChatVideoUpgrade
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconChatAudioUpgrade,
+                    R.attr.gliaIconChatAudioUpgrade
                 )
-        );
-        defaultThemeBuilder.setIconUpgradeVideoDialog(
+            )
+            setIconUpgradeAudioDialog(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconUpgradeVideoDialog,
-                        R.attr.gliaIconUpgradeVideoDialog
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconUpgradeAudioDialog,
+                    R.attr.gliaIconUpgradeAudioDialog
                 )
-        );
-        defaultThemeBuilder.setIconScreenSharingDialog(
+            )
+            setIconCallAudioOn(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconScreenSharingDialog,
-                        R.attr.gliaIconScreenSharingDialog
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallAudioOn,
+                    R.attr.gliaIconCallAudioOn
                 )
-        );
-        defaultThemeBuilder.setIconCallVideoOn(
+            )
+            setIconChatVideoUpgrade(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallVideoOn,
-                        R.attr.gliaIconCallVideoOn
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconChatVideoUpgrade,
+                    R.attr.gliaIconChatVideoUpgrade
                 )
-        );
-        defaultThemeBuilder.setIconCallAudioOff(
+            )
+            setIconUpgradeVideoDialog(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallAudioOff,
-                        R.attr.gliaIconCallAudioOff
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconUpgradeVideoDialog,
+                    R.attr.gliaIconUpgradeVideoDialog
                 )
-        );
-        defaultThemeBuilder.setIconCallVideoOff(
+            )
+            setIconScreenSharingDialog(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallVideoOff,
-                        R.attr.gliaIconCallVideoOff
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconScreenSharingDialog,
+                    R.attr.gliaIconScreenSharingDialog
                 )
-        );
-        defaultThemeBuilder.setIconCallChat(
+            )
+            setIconCallVideoOn(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallChat,
-                        R.attr.gliaIconCallChat
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallVideoOn,
+                    R.attr.gliaIconCallVideoOn
                 )
-        );
-        defaultThemeBuilder.setIconCallSpeakerOn(
+            )
+            setIconCallAudioOff(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallSpeakerOn,
-                        R.attr.gliaIconCallSpeakerOn
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallAudioOff,
+                    R.attr.gliaIconCallAudioOff
                 )
-        );
-        defaultThemeBuilder.setIconCallSpeakerOff(
+            )
+            setIconCallVideoOff(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallSpeakerOff,
-                        R.attr.gliaIconCallSpeakerOff
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallVideoOff,
+                    R.attr.gliaIconCallVideoOff
                 )
-        );
-        defaultThemeBuilder.setIconCallMinimize(
+            )
+            setIconCallChat(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconCallMinimize,
-                        R.attr.gliaIconCallMinimize
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallChat,
+                    R.attr.gliaIconCallChat
                 )
-        );
-        defaultThemeBuilder.setIconPlaceholder(
+            )
+            setIconCallSpeakerOn(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconPlaceholder,
-                        R.attr.gliaIconPlaceholder
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallSpeakerOn,
+                    R.attr.gliaIconCallSpeakerOn
                 )
-        );
-        defaultThemeBuilder.setIconOnHold(
+            )
+            setIconCallSpeakerOff(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconOnHold,
-                        R.attr.gliaIconOnHold
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallSpeakerOff,
+                    R.attr.gliaIconCallSpeakerOff
                 )
-        );
-        defaultThemeBuilder.setIconEndScreenShare(
+            )
+            setIconCallMinimize(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_iconEndScreenShare,
-                        R.attr.gliaIconEndScreenShare
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconCallMinimize,
+                    R.attr.gliaIconCallMinimize
                 )
-        );
-        defaultThemeBuilder.setEndScreenShareTintColor(
+            )
+            setIconPlaceholder(
                 getTypedArrayIntegerValue(
-                        typedArray,
-                        context,
-                        R.styleable.GliaView_endScreenShareTintColor,
-                        R.attr.gliaEndScreenShareTintColor
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconPlaceholder,
+                    R.attr.gliaIconPlaceholder
                 )
-        );
-        defaultThemeBuilder.setWhiteLabel(
+            )
+            setIconOnHold(
+                getTypedArrayIntegerValue(
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconOnHold,
+                    R.attr.gliaIconOnHold
+                )
+            )
+            setIconEndScreenShare(
+                getTypedArrayIntegerValue(
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_iconEndScreenShare,
+                    R.attr.gliaIconEndScreenShare
+                )
+            )
+            setEndScreenShareTintColor(
+                getTypedArrayIntegerValue(
+                    typedArray,
+                    context,
+                    R.styleable.GliaView_endScreenShareTintColor,
+                    R.attr.gliaEndScreenShareTintColor
+                )
+            )
+            setWhiteLabel(
                 getTypedArrayBooleanValue(
-                        typedArray,
-                        R.styleable.GliaView_whiteLabel
+                    typedArray,
+                    R.styleable.GliaView_whiteLabel
                 )
-        );
-        defaultThemeBuilder.setGliaAlertDialogButtonUseVerticalAlignment(
+            )
+            setGliaAlertDialogButtonUseVerticalAlignment(
                 getTypedArrayBooleanValue(
-                        typedArray,
-                        R.styleable.GliaView_gliaAlertDialogButtonUseVerticalAlignment
+                    typedArray,
+                    R.styleable.GliaView_gliaAlertDialogButtonUseVerticalAlignment
                 )
-        );
-        return defaultThemeBuilder.build();
+            )
+        }
+
+        return defaultThemeBuilder.build()
     }
 
-    private static Boolean getTypedArrayBooleanValue(TypedArray typedArray, int index) {
-        return typedArray.hasValue(index) && typedArray.getBoolean(index, false);
+    private fun getTypedArrayBooleanValue(typedArray: TypedArray, index: Int): Boolean {
+        return typedArray.hasValue(index) && typedArray.getBoolean(index, false)
     }
 
-    private static String getAppBarTitleValue(TypedArray typedArray) {
-        if (typedArray.hasValue(R.styleable.GliaView_appBarTitle)) {
-            return typedArray.getString(R.styleable.GliaView_appBarTitle);
+    private fun getAppBarTitleValue(typedArray: TypedArray): String? {
+        return if (typedArray.hasValue(R.styleable.GliaView_appBarTitle)) {
+            typedArray.getString(R.styleable.GliaView_appBarTitle)
         } else {
-            return null;
+            null
         }
     }
 
-    public static String getTypedArrayStringValue(TypedArray typedArray,
-                                                  @StyleableRes int index) {
-        if (typedArray.hasValue(index)) {
-            return typedArray.getString(index);
-        }
-        return null;
+    fun getTypedArrayStringValue(
+        typedArray: TypedArray,
+        @StyleableRes index: Int
+    ): String? {
+        return if (typedArray.hasValue(index)) {
+            typedArray.getString(index)
+        } else null
     }
 
-    public static Integer getTypedArrayIntegerValue(TypedArray typedArray,
-                                                    Context context,
-                                                    @StyleableRes int index,
-                                                    @AttrRes int defaultValue) {
-        if (typedArray.hasValue(index)) {
-            return typedArray.getResourceId(index, 0);
+    fun getTypedArrayIntegerValue(
+        typedArray: TypedArray,
+        context: Context,
+        @StyleableRes index: Int,
+        @AttrRes defaultValue: Int
+    ): Int {
+        return if (typedArray.hasValue(index)) {
+            typedArray.getResourceId(index, 0)
         } else {
-            return getAttrResourceId(context, defaultValue);
+            getAttrResourceId(context, defaultValue)
         }
     }
 
-    public static Integer getAttrResourceId(Context context,
-                                            @AttrRes int attrId) {
-        TypedValue typedValue = new TypedValue();
-        Resources.Theme theme = context.getTheme();
-        theme.resolveAttribute(attrId, typedValue, true);
-        return typedValue.resourceId;
+    fun getAttrResourceId(
+        context: Context,
+        @AttrRes attrId: Int
+    ): Int {
+        val typedValue = TypedValue()
+        val theme = context.theme
+        theme.resolveAttribute(attrId, typedValue, true)
+        return typedValue.resourceId
     }
 
-    @Nullable
-    public static Typeface getFont(TypedArray typedArray, Context context) {
-        int resId = getTypedArrayIntegerValue(
-                typedArray, context, R.styleable.GliaView_android_fontFamily, androidx.appcompat.R.attr.fontFamily
-        );
-
-        if (resId > 0) {
-            return ResourcesCompat.getFont(context, resId);
-        }
-
-        return null;
+    fun getFont(typedArray: TypedArray, context: Context): Typeface? {
+        val resId = getTypedArrayIntegerValue(
+            typedArray,
+            context,
+            R.styleable.GliaView_android_fontFamily,
+            androidx.appcompat.R.attr.fontFamily
+        )
+        return if (resId > 0) {
+            ResourcesCompat.getFont(context, resId)
+        } else null
     }
 }

@@ -232,7 +232,7 @@ internal class ChatController(
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         minimizeHandler.addListener { minimizeView() }
         createNewTimerCallback()
-        callTimer.addFormattedValueListener(timerStatusListener)
+        callTimer.addFormattedValueListener(timerStatusListener!!) // Listener is created one line before
         updateAllowFileSendState()
     }
 
@@ -654,11 +654,11 @@ internal class ChatController(
     private fun createNewTimerCallback() {
         timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
         timerStatusListener = object : FormattedTimerStatusListener {
-            override fun onNewFormattedTimerValue(formatedValue: String) {
+            override fun onNewFormattedTimerValue(formattedValue: String) {
                 if (chatState.isMediaUpgradeStarted) {
                     chatManager.onChatAction(
                         ChatManager.Action.OnMediaUpgradeTimerUpdated(
-                            formatedValue
+                            formattedValue
                         )
                     )
                 }

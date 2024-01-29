@@ -21,7 +21,30 @@ import com.glia.widgets.helper.Utils;
 
 import java.util.Objects;
 
-public class ChatActivity extends FadeTransitionActivity {
+/**
+ * This activity is used to handle chat engagements.
+ * <p>
+ * Main features:
+ * - Shows chat history to authenticated visitors before enqueuing for new engagements.
+ * - Requests required permissions and enqueues for new chat engagements if no ongoing engagements are found.
+ * - Provides controls for managing ongoing engagements.
+ * - Enables message exchange between the visitor and the operator during ongoing engagements.
+ * - Allows the operator to upgrade engagements.
+ * <p>
+ * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ * <p>
+ * Required data that should be passed together with the Activity intent:
+ * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
+ * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
+ * <p>
+ * Code example:
+ * <pre>
+ * Intent intent = new Intent(requireContext(), ChatActivity.class);
+ * intent.putExtra(GliaWidgets.QUEUE_ID, "CHAT_QUEUE_ID");
+ * startActivity(intent);
+ * <pre/>
+ */
+public final class ChatActivity extends FadeTransitionActivity {
     private static final String TAG = ChatActivity.class.getSimpleName();
     private ChatView chatView;
 

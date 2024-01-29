@@ -1,34 +1,27 @@
-package com.glia.widgets.helper;
+package com.glia.widgets.helper
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleEventObserver;
-import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ProcessLifecycleOwner
 
-import java.util.ArrayList;
-import java.util.List;
+class ApplicationLifecycleManager {
+    private val lifecycleEventObserverList: MutableList<LifecycleEventObserver> = ArrayList()
+    private val lifecycle: Lifecycle = ProcessLifecycleOwner.get().lifecycle
 
-public class ApplicationLifecycleManager {
-    private final List<LifecycleEventObserver> lifecycleEventObserverList = new ArrayList<>();
-    private final Lifecycle lifecycle;
-
-    public ApplicationLifecycleManager() {
-        lifecycle = ProcessLifecycleOwner.get().getLifecycle();
+    fun addObserver(observer: LifecycleEventObserver) {
+        lifecycle.addObserver(observer)
+        lifecycleEventObserverList.add(observer)
     }
 
-    public void addObserver(LifecycleEventObserver observer) {
-        lifecycle.addObserver(observer);
-        lifecycleEventObserverList.add(observer);
+    fun removeObserver(observer: LifecycleEventObserver) {
+        lifecycle.removeObserver(observer)
+        lifecycleEventObserverList.remove(observer)
     }
 
-    public void removeObserver(LifecycleEventObserver observer) {
-        lifecycle.removeObserver(observer);
-        lifecycleEventObserverList.remove(observer);
-    }
-
-    public void onDestroy() {
-        for (LifecycleEventObserver observer : lifecycleEventObserverList) {
-            lifecycle.removeObserver(observer);
+    fun onDestroy() {
+        for (observer in lifecycleEventObserverList) {
+            lifecycle.removeObserver(observer)
         }
-        lifecycleEventObserverList.clear();
+        lifecycleEventObserverList.clear()
     }
 }

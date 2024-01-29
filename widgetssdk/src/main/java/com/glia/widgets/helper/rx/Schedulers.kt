@@ -1,9 +1,8 @@
-package com.glia.widgets.helper.rx;
+package com.glia.widgets.helper.rx
 
-import io.reactivex.Scheduler;
+import io.reactivex.Scheduler
 
-public interface Schedulers {
-    Scheduler getComputationScheduler();
-
-    Scheduler getMainScheduler();
+internal interface Schedulers {
+    val computationScheduler: Scheduler?
+    val mainScheduler: Scheduler?
 }

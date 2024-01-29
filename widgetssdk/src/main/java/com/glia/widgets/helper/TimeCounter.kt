@@ -1,120 +1,100 @@
-package com.glia.widgets.helper;
+package com.glia.widgets.helper
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Timer
+import java.util.TimerTask
 
-public class TimeCounter {
-
-    private final static String TAG = "TimeCounter";
-    private final List<FormattedTimerStatusListener> formattedListeners = new ArrayList<>();
-    private final List<RawTimerStatusListener> rawListeners = new ArrayList<>();
-    private TimerTask timerTask;
-    private Timer timer;
-
-    public void startNew(int timerDelayMs, int timerIntervalMs) {
+internal class TimeCounter {
+    private val formattedListeners: MutableList<FormattedTimerStatusListener> = ArrayList()
+    private val rawListeners: MutableList<RawTimerStatusListener> = ArrayList()
+    private var timerTask: TimerTask? = null
+    private var timer: Timer? = null
+    fun startNew(timerDelayMs: Int, timerIntervalMs: Int) {
         Logger.d(TAG, "startNew! timerDelay: " + Integer.valueOf(timerDelayMs).toString() +
-                ", timerInterval: " + Integer.valueOf(timerIntervalMs).toString());
-        createNewTimerTask(timerDelayMs, timerIntervalMs);
-        createNewTimer();
-        timer.schedule(timerTask, timerDelayMs, timerIntervalMs);
+                    ", timerInterval: " + Integer.valueOf(timerIntervalMs).toString())
+        createNewTimerTask(timerDelayMs, timerIntervalMs)
+        createNewTimer()
+        timer?.schedule(timerTask, timerDelayMs.toLong(), timerIntervalMs.toLong())
     }
 
-    public void stop() {
-        Logger.d(TAG, "stop");
-        if (timerTask != null) {
-            timerTask.cancel();
-            timerTask = null;
-        }
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
+    fun stop() {
+        Logger.d(TAG, "stop")
+        timerTask?.cancel()
+        timerTask = null
+        timer?.cancel()
+        timer = null
     }
 
-    public void clear() {
-        Logger.d(TAG, "clear");
-        stop();
-        formattedListeners.clear();
-        rawListeners.clear();
+    fun clear() {
+        Logger.d(TAG, "clear")
+        stop()
+        formattedListeners.clear()
+        rawListeners.clear()
     }
 
-    public void addFormattedValueListener(FormattedTimerStatusListener listener) {
-        Logger.d(TAG, "addFormattedListener");
-        formattedListeners.add(listener);
+    fun addFormattedValueListener(listener: FormattedTimerStatusListener) {
+        Logger.d(TAG, "addFormattedListener")
+        formattedListeners.add(listener)
     }
 
-    public void removeFormattedValueListener(FormattedTimerStatusListener listener) {
-        Logger.d(TAG, "removeFormattedListener");
-        formattedListeners.remove(listener);
+    fun removeFormattedValueListener(listener: FormattedTimerStatusListener) {
+        Logger.d(TAG, "removeFormattedListener")
+        formattedListeners.remove(listener)
     }
 
-    public void addRawValueListener(RawTimerStatusListener listener) {
-        Logger.d(TAG, "addRawListener");
-        rawListeners.add(listener);
+    fun addRawValueListener(listener: RawTimerStatusListener) {
+        Logger.d(TAG, "addRawListener")
+        rawListeners.add(listener)
     }
 
-    private void createNewTimer() {
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-        timer = new Timer();
+    private fun createNewTimer() {
+        timer?.cancel()
+        timer = Timer()
     }
 
-    private void createNewTimerTask(int timerDelayMs, int timerIntervalMs) {
-        if (timerTask != null) {
-            timerTask.cancel();
-            timerTask = null;
-        }
-        timerTask = new TimerTask() {
-            int value = timerDelayMs;
+    private fun createNewTimerTask(timerDelayMs: Int, timerIntervalMs: Int) {
+        timerTask?.cancel()
+        timerTask = object : TimerTask() {
+            var value = timerDelayMs
 
-            @Override
-            public void run() {
-                Logger.d(TAG, "Timer value: " + value);
-                for (RawTimerStatusListener listener : rawListeners) {
-                    listener.onNewRawTimerValue(value);
+            override fun run() {
+                Logger.d(TAG, "Timer value: $value")
+                for (listener in rawListeners) {
+                    listener.onNewRawTimerValue(value)
                 }
 
-                if (!formattedListeners.isEmpty()) {
-                    String time = CommonExtensionsKt.formatElapsedTime(value);
-                    Logger.d(TAG, "Formatted timer: " + time);
-                    for (FormattedTimerStatusListener listener : formattedListeners) {
-                        listener.onNewFormattedTimerValue(time);
+                if (formattedListeners.isNotEmpty()) {
+                    val time = formatElapsedTime(value.toLong())
+                    Logger.d(TAG, "Formatted timer: $time")
+                    for (listener in formattedListeners) {
+                        listener.onNewFormattedTimerValue(time)
                     }
                 }
-                value = value + timerIntervalMs;
+                value += timerIntervalMs
             }
 
-            @Override
-            public boolean cancel() {
-                for (RawTimerStatusListener listener : rawListeners) {
-                    listener.onRawTimerCancelled();
+            override fun cancel(): Boolean {
+                for (listener in rawListeners) {
+                    listener.onRawTimerCancelled()
                 }
-                for (FormattedTimerStatusListener listener : formattedListeners) {
-                    listener.onFormattedTimerCancelled();
+                for (listener in formattedListeners) {
+                    listener.onFormattedTimerCancelled()
                 }
-                Logger.d(TAG, "cancel");
-                return super.cancel();
+                Logger.d(TAG, "cancel")
+                return super.cancel()
             }
-        };
+        }
     }
 
-    public boolean isRunning() {
-        return timerTask != null;
+    val isRunning: Boolean
+        get() = timerTask != null
+
+    interface FormattedTimerStatusListener {
+        fun onNewFormattedTimerValue(formattedValue: String)
+        fun onFormattedTimerCancelled()
     }
 
-    public interface FormattedTimerStatusListener {
-        void onNewFormattedTimerValue(String formatedValue);
-
-        void onFormattedTimerCancelled();
-    }
-
-    public interface RawTimerStatusListener {
-        void onNewRawTimerValue(int timerValue);
-
-        void onRawTimerCancelled();
+    interface RawTimerStatusListener {
+        fun onNewRawTimerValue(timerValue: Int)
+        fun onRawTimerCancelled()
     }
 }

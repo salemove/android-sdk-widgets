@@ -180,8 +180,8 @@ internal class CallController(
         initControllerCallbacks()
         initMessagesNotSeenCallback()
         tryToQueueForEngagement(queueId)
-        inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener)
-        connectingTimerCounter.addRawValueListener(connectingTimerStatusListener)
+        inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener!!) // Listener is created few lines before
+        connectingTimerCounter.addRawValueListener(connectingTimerStatusListener!!) // Listener is created few lines before
         minimizeHandler.addListener { minimizeView() }
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener)
     }
@@ -518,7 +518,7 @@ internal class CallController(
                     // Should only happen if engagement ends.
                 }
             }
-            callTimer.addFormattedValueListener(callTimerStatusListener)
+            callTimer.addFormattedValueListener(callTimerStatusListener!!) // Listener is created few lines before
         }
     }
 

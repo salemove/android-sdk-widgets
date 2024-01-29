@@ -177,11 +177,14 @@ internal class CallController(
         }
         emitViewState(callState.initCall(companyName, queueId, visitorContextAssetId, mediaType))
         createNewTimerStatusCallback()
-        initControllerCallbacks()
         initMessagesNotSeenCallback()
         tryToQueueForEngagement(queueId)
-        inactivityTimeCounter.addRawValueListener(inactivityTimerStatusListener!!) // Listener is created few lines before
-        connectingTimerCounter.addRawValueListener(connectingTimerStatusListener!!) // Listener is created few lines before
+        val newInactiveTimerListener = createInactivityTimerStatusListener()
+        inactivityTimeCounter.addRawValueListener(newInactiveTimerListener)
+        inactivityTimerStatusListener = newInactiveTimerListener
+        val newConnectingTimerListener = createConnectingTimerStatusListener()
+        connectingTimerCounter.addRawValueListener(newConnectingTimerListener)
+        connectingTimerStatusListener = newConnectingTimerListener
         minimizeHandler.addListener { minimizeView() }
         messagesNotSeenHandler.addListener(messagesNotSeenHandlerListener)
     }
@@ -448,8 +451,8 @@ internal class CallController(
         return true
     }
 
-    private fun initControllerCallbacks() {
-        inactivityTimerStatusListener = object : RawTimerStatusListener {
+    private fun createInactivityTimerStatusListener(): RawTimerStatusListener {
+        return object : RawTimerStatusListener {
             override fun onNewRawTimerValue(timerValue: Int) {
                 if (callState.isVideoCall) {
                     d(TAG, "inactivityTimer onNewTimerValue: $timerValue")
@@ -462,7 +465,10 @@ internal class CallController(
 
             override fun onRawTimerCancelled() {}
         }
-        connectingTimerStatusListener = object : RawTimerStatusListener {
+    }
+
+    private fun createConnectingTimerStatusListener(): RawTimerStatusListener {
+        return object : RawTimerStatusListener {
             override fun onNewRawTimerValue(timerValue: Int) {
                 if (callState.isCallOngoingAndOperatorIsConnecting) {
                     emitViewState(callState.connectingTimerValueChanged(TimeUnit.MILLISECONDS.toSeconds(timerValue.toLong()).toString()))
@@ -507,7 +513,7 @@ internal class CallController(
 
     private fun createNewTimerStatusCallback() {
         if (callTimerStatusListener == null) {
-            callTimerStatusListener = object : FormattedTimerStatusListener {
+            val newListener = object : FormattedTimerStatusListener {
                 override fun onNewFormattedTimerValue(formattedValue: String) {
                     if (callState.showCallTimerView()) {
                         emitViewState(callState.newStartedCallTimerValue(formattedValue))
@@ -518,7 +524,8 @@ internal class CallController(
                     // Should only happen if engagement ends.
                 }
             }
-            callTimer.addFormattedValueListener(callTimerStatusListener!!) // Listener is created few lines before
+            callTimer.addFormattedValueListener(newListener)
+            callTimerStatusListener = newListener
         }
     }
 

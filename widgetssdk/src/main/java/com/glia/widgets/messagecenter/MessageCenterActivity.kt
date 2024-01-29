@@ -27,6 +27,27 @@ import com.glia.widgets.helper.fixCapturedPhotoRotation
 import com.glia.widgets.helper.mapUriToFileAttachment
 import java.io.IOException
 
+/**
+ * This activity is used for displaying the welcome screen for secure conversations.
+ *
+ * Main features:
+ * - Returns an error if the visitor is not authenticated or the specified queue does not support secure conversations.
+ * - Allows sending asynchronous messages.
+ * - Offers the option to access chat history.
+ *
+ * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ *
+ * Required data that should be passed together with the Activity intent:
+ * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
+ * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
+ *
+ * Code example:
+ * ```
+ * Intent intent = new Intent(requireContext(), MessageCenterActivity.class);
+ * intent.putExtra(GliaWidgets.QUEUE_ID, "MESSAGING_QUEUE_ID");
+ * startActivity(intent);
+ * ```
+ */
 class MessageCenterActivity :
     FadeTransitionActivity(),
     MessageCenterView.OnFinishListener,

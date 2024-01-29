@@ -20,7 +20,30 @@ import com.glia.widgets.webbrowser.WebBrowserActivity;
 
 import java.util.Objects;
 
-public class CallActivity extends FadeTransitionActivity {
+/**
+ * This activity is used for engagements that include audio and/or video calls.
+ * <p>
+ * Main features:
+ * - Requests required permissions and enqueues for audio and/or video engagements if no ongoing engagements are found.
+ * - Provides video feeds from operator and visitor cameras.
+ * - Provides controls for managing ongoing engagements, including video and audio.
+ * - Allows switching between chat and call activities.
+ * <p>
+ * Before this activity is launched, make sure that Glia Widgets SDK is set up correctly.
+ * <p>
+ * Required data that should be passed together with the Activity intent:
+ * - {@link GliaWidgets#QUEUE_ID}: ID of the queue you would like to use for your engagements.
+ * For a full list of optional parameters, see the constants defined in {@link GliaWidgets}.
+ * <p>
+ * Code example:
+ * <pre>
+ * Intent intent = new Intent(requireContext(), CallActivity.class);
+ * intent.putExtra(GliaWidgets.QUEUE_ID, "AUDIO_QUEUE_ID");
+ * intent.putExtra(GliaWidgets.MEDIA_TYPE, Engagement.MediaType.VIDEO);
+ * startActivity(intent);
+ * </pre>
+ */
+public final class CallActivity extends FadeTransitionActivity {
     private static final String TAG = CallActivity.class.getSimpleName();
 
     private Configuration configuration;

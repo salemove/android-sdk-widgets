@@ -6,10 +6,11 @@ import com.glia.widgets.snapshotutils.SnapshotStringProvider
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
+import com.glia.widgets.snapshotutils.SnapshotProviders
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
 import org.junit.Test
 
-class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen {
+class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen, SnapshotProviders {
 
     // MARK: without labels
 
@@ -174,7 +175,7 @@ class VisitorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen 
         uiTheme: UiTheme = UiTheme()
     ): ViewData {
         val binding = ChatVisitorMessageLayoutBinding.inflate(layoutInflater)
-        val viewHolder = VisitorMessageViewHolder(binding, {}, uiTheme, unifiedTheme, SnapshotStringProvider(context))
+        val viewHolder = VisitorMessageViewHolder(binding, {}, uiTheme, unifiedTheme, stringProviderMock())
 
         viewHolder.bind(item)
 

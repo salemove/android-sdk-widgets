@@ -8,7 +8,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-interface SnapshotSchedulers : SnapshotTestLifecycle {
+internal interface SnapshotSchedulers : SnapshotTestLifecycle {
 
     data class Mock(
         val schedulers: Schedulers,

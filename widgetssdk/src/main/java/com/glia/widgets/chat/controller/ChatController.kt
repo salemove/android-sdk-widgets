@@ -231,8 +231,10 @@ internal class ChatController(
     private fun prepareChatComponents() {
         addFileAttachmentsObserverUseCase.execute(fileAttachmentObserver)
         minimizeHandler.addListener { minimizeView() }
-        createNewTimerCallback()
-        callTimer.addFormattedValueListener(timerStatusListener!!) // Listener is created one line before
+        timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
+        val newTimerListener = createNewTimerCallback()
+        callTimer.addFormattedValueListener(newTimerListener)
+        timerStatusListener = newTimerListener
         updateAllowFileSendState()
     }
 
@@ -651,9 +653,8 @@ internal class ChatController(
         chatManager.onChatAction(ChatManager.Action.OnMediaUpgradeToVideo)
     }
 
-    private fun createNewTimerCallback() {
-        timerStatusListener?.also { callTimer.removeFormattedValueListener(it) }
-        timerStatusListener = object : FormattedTimerStatusListener {
+    private fun createNewTimerCallback(): FormattedTimerStatusListener {
+        return object : FormattedTimerStatusListener {
             override fun onNewFormattedTimerValue(formattedValue: String) {
                 if (chatState.isMediaUpgradeStarted) {
                     chatManager.onChatAction(

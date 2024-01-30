@@ -11,3 +11,9 @@ internal interface MediaUpgradeOfferUseCase {
 internal class MediaUpgradeOfferUseCaseImpl(private val engagementRepository: EngagementRepository) : MediaUpgradeOfferUseCase {
     override fun invoke(): Flowable<MediaUpgradeOffer> = engagementRepository.mediaUpgradeOffer
 }
+
+internal class CallVisualizerMediaUpgradeOfferUseCase(private val engagementRepository: EngagementRepository) : MediaUpgradeOfferUseCase {
+    override fun invoke(): Flowable<MediaUpgradeOffer> = engagementRepository.mediaUpgradeOffer.filter {
+        engagementRepository.isCallVisualizerEngagement
+    }
+}

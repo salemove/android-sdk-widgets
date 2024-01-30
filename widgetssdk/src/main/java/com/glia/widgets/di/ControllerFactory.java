@@ -283,7 +283,7 @@ public class ControllerFactory {
                 dialogController,
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
-                useCaseFactory.getMediaUpgradeOfferUseCase(),
+                useCaseFactory.getCallVisualizerMediaUpgradeOfferUseCase(),
                 useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
                 useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
                 useCaseFactory.getEngagementRequestUseCase(),

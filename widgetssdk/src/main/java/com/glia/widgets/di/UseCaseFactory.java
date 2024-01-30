@@ -107,6 +107,7 @@ import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.engagement.completion.EngagementCompletionUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
+import com.glia.widgets.engagement.domain.CallVisualizerMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase;
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCaseImpl;
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase;
@@ -930,6 +931,11 @@ public class UseCaseFactory {
     @NonNull
     public MediaUpgradeOfferUseCase getMediaUpgradeOfferUseCase() {
         return new MediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository());
+    }
+
+    @NonNull
+    public MediaUpgradeOfferUseCase getCallVisualizerMediaUpgradeOfferUseCase() {
+        return new CallVisualizerMediaUpgradeOfferUseCase(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull

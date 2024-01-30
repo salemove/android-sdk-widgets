@@ -594,10 +594,7 @@ public class UseCaseFactory {
 
     @NonNull
     public SetEngagementConfigUseCase createSetEngagementConfigUseCase() {
-        return new SetEngagementConfigUseCase(
-            repositoryFactory.getEngagementConfigRepository(),
-            repositoryFactory.getEngagementRepository()
-        );
+        return new SetEngagementConfigUseCase(repositoryFactory.getEngagementConfigRepository());
     }
 
     @NonNull

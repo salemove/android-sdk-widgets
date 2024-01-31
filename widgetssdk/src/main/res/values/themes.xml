@@ -182,6 +182,7 @@
         </item>
 
         <item name="chatHeadStyle">@style/Application.Glia.Chat.ChatHead</item>
+        <item name="choiceCardContentTextStyle">@style/Application.Glia.ChoiceCard.ContentText</item>
 
         <item name="gliaAlertDialogButtonUseVerticalAlignment">false</item>
         <item name="whiteLabel">false</item>

@@ -2,7 +2,6 @@ package com.glia.widgets.chat.adapter.holder
 
 import com.glia.widgets.SnapshotTest
 import com.glia.widgets.UiTheme
-import com.glia.widgets.snapshotutils.SnapshotStringProvider
 import com.glia.widgets.chat.model.VisitorMessageItem
 import com.glia.widgets.databinding.ChatVisitorMessageLayoutBinding
 import com.glia.widgets.snapshotutils.SnapshotChatScreen

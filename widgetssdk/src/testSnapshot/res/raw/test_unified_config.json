@@ -1011,6 +1011,185 @@
           }
         }
       }
+    },
+    "responseCard": {
+      "background": {
+        "color": {
+          "type": "gradient",
+          "value": ["#20df75", "#f7ff4f"]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#c153bd"
+          ]
+        },
+        "borderWidth": 3,
+        "cornerRadius": 12
+      },
+      "option": {
+        "normal": {
+          "text": {
+            "alignment": "trailing",
+            "background": {
+              "type": "gradient",
+              "value": ["#9e7cef", "#a4fc47"]
+            },
+            "font": {
+              "size": 17,
+              "style": "italic"
+            },
+            "foreground": {
+              "type": "gradient",
+              "value": ["#aed75e", "#869bce"]
+            }
+          },
+          "background": {
+            "color": {
+              "type": "gradient",
+              "value": ["#ad1a7a", "#f8bcae"]
+            },
+            "border": {
+              "type": "fill",
+              "value": [
+                "#2910e2"
+              ]
+            },
+            "borderWidth": 4,
+            "cornerRadius": 3
+          },
+          "tintColor": {
+            "type": "gradient",
+            "value": ["#e4a329", "#9969a9"]
+          },
+          "shadow": {
+            "color": {
+              "type": "fill",
+              "value": ["#08ff02"]
+            },
+            "offset": 3,
+            "opacity": 4,
+            "radius": 9
+          }
+        },
+        "selected": {
+          "text": {
+            "alignment": "trailing",
+            "background": {
+              "type": "gradient",
+              "value": ["#aa693b", "#d09099"]
+            },
+            "font": {
+              "size": 19,
+              "style": "bold_italic"
+            },
+            "foreground": {
+              "type": "gradient",
+              "value": ["#654139", "#6f13b6"]
+            }
+          },
+          "background": {
+            "color": {
+              "type": "gradient",
+              "value": ["#99b220", "#9ff404"]
+            },
+            "border": {
+              "type": "fill",
+              "value": [
+                "#d4309d"
+              ]
+            },
+            "borderWidth": 7,
+            "cornerRadius": 5
+          },
+          "tintColor": {
+            "type": "gradient",
+            "value": ["#fcad98", "#814a82"]
+          },
+          "shadow": {
+            "color": {
+              "type": "fill",
+              "value": ["#4078d7"]
+            },
+            "offset": 8,
+            "opacity": 7,
+            "radius": 2
+          }
+        },
+        "disabled": {
+          "text": {
+            "alignment": "trailing",
+            "background": {
+              "type": "gradient",
+              "value": ["#2c5e54", "#2dda83"]
+            },
+            "font": {
+              "size": 15,
+              "style": "bold"
+            },
+            "foreground": {
+              "type": "gradient",
+              "value": ["#91650c", "#bc02d9"]
+            }
+          },
+          "background": {
+            "color": {
+              "type": "gradient",
+              "value": ["#873cbc", "#42041a"]
+            },
+            "border": {
+              "type": "fill",
+              "value": [
+                "#e49a91"
+              ]
+            },
+            "borderWidth": 3,
+            "cornerRadius": 7
+          },
+          "tintColor": {
+            "type": "gradient",
+            "value": ["#887529", "#37af02"]
+          },
+          "shadow": {
+            "color": {
+              "type": "fill",
+              "value": ["#d5ef20"]
+            },
+            "offset": 9,
+            "opacity": 2,
+            "radius": 7
+          }
+        }
+      },
+      "text": {
+        "alignment": "trailing",
+        "background": {
+          "type": "gradient",
+          "value": ["#a5bd34", "#1559a2"]
+        },
+        "font": {
+          "size": 15,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "gradient",
+          "value": ["#d63178", "#f838c4"]
+        }
+      },
+      "userImage": {
+        "placeholderColor": {
+          "type": "gradient",
+          "value": ["#6855d7", "#cf9cd3"]
+        },
+        "placeholderBackgroundColor": {
+          "type": "gradient",
+          "value": ["#effaad", "#14619e"]
+        },
+        "imageBackgroundColor": {
+          "type": "gradient",
+          "value": ["#579b4a", "#7c0083"]
+        }
+      }
     }
   },
   "snackBar": {

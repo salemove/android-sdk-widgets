@@ -179,6 +179,7 @@ class OperatorMessageViewHolderSnapshotTest : SnapshotTest(), SnapshotChatScreen
     }
 
     // MARK: utils for tests
+
     private fun setupView(
         item: OperatorMessageItem,
         unifiedTheme: UnifiedTheme? = null,

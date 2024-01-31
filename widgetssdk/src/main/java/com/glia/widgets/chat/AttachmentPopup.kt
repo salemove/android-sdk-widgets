@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.PopupWindow
 import com.glia.widgets.R
 import com.glia.widgets.databinding.ChatAttachmentPopupBinding
@@ -15,7 +16,11 @@ import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.chat.AttachmentsPopupTheme
 
-internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopupTheme?) {
+internal class AttachmentPopup(
+    anchor: View,
+    private val theme: AttachmentsPopupTheme?,
+    private val popupWindowFunc: (LinearLayout) -> PopupWindow = ::popupWindow
+) {
 
     private val margin by lazy { anchor.context.resources.getDimensionPixelSize(R.dimen.glia_chat_attachment_menu_margin) }
     private val binding: ChatAttachmentPopupBinding by lazy { bindLayout(anchor.context) }
@@ -24,12 +29,7 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
 
     private fun createPopupMenu(): PopupWindow {
         val popupView = binding.root
-        return PopupWindow(
-            popupView,
-            popupView.measuredWidth,
-            popupView.measuredHeight,
-            true
-        ).apply {
+        return popupWindowFunc(popupView).apply {
             animationStyle = androidx.appcompat.R.style.Animation_AppCompat_Dialog
             inputMethodMode = PopupWindow.INPUT_METHOD_NOT_NEEDED
         }
@@ -97,5 +97,14 @@ internal class AttachmentPopup(anchor: View, private val theme: AttachmentsPopup
         }
         binding.rootLayout.background = background
         return binding
+    }
+
+    companion object {
+        private fun popupWindow(view: LinearLayout) = PopupWindow(
+            view,
+            view.measuredWidth,
+            view.measuredHeight,
+            true
+        )
     }
 }

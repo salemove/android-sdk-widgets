@@ -68,6 +68,19 @@ internal interface SnapshotAttachment {
         isFileExists, isDownloading, attachment, id, timestamp, showChatHead, operatorProfileImgUrl, operatorId
     )
 
+    fun operatorAttachmentItemFile(
+        isFileExists: Boolean = false,
+        isDownloading: Boolean = false,
+        attachment: Attachment = remoteAttachment(id = "pdfId", contentType = "pdf", name = "Document.pdf"),
+        id: String = "operatorImageId",
+        timestamp: Long = 1706534848,
+        showChatHead: Boolean = false,
+        operatorProfileImgUrl: String? = null,
+        operatorId: String? = "operatorId"
+    ) = OperatorAttachmentItem.File(
+        isFileExists, isDownloading, attachment, id, timestamp, showChatHead, operatorProfileImgUrl, operatorId
+    )
+
     fun fileAttachment(
         uri: Uri = "file:///test".toUri(),
         status: FileAttachment.Status = FileAttachment.Status.UPLOADING,

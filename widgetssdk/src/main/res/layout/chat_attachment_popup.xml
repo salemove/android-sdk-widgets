@@ -108,4 +108,4 @@
             android:src="@drawable/ic_browse"
             tools:ignore="ContentDescription" />
     </androidx.appcompat.widget.LinearLayoutCompat>
-    </LinearLayout>
+</LinearLayout>

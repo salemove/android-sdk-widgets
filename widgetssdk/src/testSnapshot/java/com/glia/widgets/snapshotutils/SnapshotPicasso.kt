@@ -45,8 +45,8 @@ interface SnapshotPicasso: SnapshotTestLifecycle {
         val mockStatic = Mockito.mockStatic(Picasso::class.java)
         mockStatic.`when`<Any> { Picasso.get() }.thenReturn(picassoMock)
         val requestCreatorMock = mock<RequestCreator>()
-        whenever(picassoMock.load(any<Uri>())).thenReturn(requestCreatorMock)
-        whenever(picassoMock.load(any<String>())).thenReturn(requestCreatorMock)
+        whenever(picassoMock.load(anyOrNull<Uri>())).thenReturn(requestCreatorMock)
+        whenever(picassoMock.load(anyOrNull<String>())).thenReturn(requestCreatorMock)
         whenever(requestCreatorMock.resize(any(), any())).thenReturn(requestCreatorMock)
         whenever(requestCreatorMock.onlyScaleDown()).thenReturn(requestCreatorMock)
 

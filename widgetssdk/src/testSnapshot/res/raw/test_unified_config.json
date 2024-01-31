@@ -1309,6 +1309,84 @@
         "type": "gradient",
         "value": ["#bbe521", "#1c6b0d"]
       }
+    },
+    "attachmentSourceList": {
+      "separator": {
+        "type": "gradient",
+        "value": ["#af23df", "#8f2220"]
+      },
+      "background": {
+        "type": "gradient",
+        "value": ["#8cd3fa", "#e8ec3f"]
+      },
+      "items": [
+        {
+          "type": "photoLibrary",
+          "text": {
+            "alignment": "leading",
+            "background": {
+              "type": "gradient",
+              "value": ["#9e37ae", "#ea1da1"]
+            },
+            "font": {
+              "size": 19,
+              "style": "regular"
+            },
+            "foreground": {
+              "type": "gradient",
+              "value": ["#6a0dc5", "#509605"]
+            }
+          },
+          "tintColor": {
+            "type": "gradient",
+            "value": ["#da3db5", "#236576"]
+          }
+        },
+        {
+          "type": "takePhoto",
+          "text": {
+            "alignment": "leading",
+            "background": {
+              "type": "gradient",
+              "value": ["#7d7df4", "#d6809b"]
+            },
+            "font": {
+              "size": 17,
+              "style": "italic"
+            },
+            "foreground": {
+              "type": "gradient",
+              "value": ["#cb9f4a", "#19fb55"]
+            }
+          },
+          "tintColor": {
+            "type": "gradient",
+            "value": ["#72aba9", "#a6347e"]
+          }
+        },
+        {
+          "type": "browse",
+          "text": {
+            "alignment": "leading",
+            "background": {
+              "type": "gradient",
+              "value": ["#d94985", "#65de75"]
+            },
+            "font": {
+              "size": 15,
+              "style": "bold"
+            },
+            "foreground": {
+              "type": "gradient",
+              "value": ["#534b6a", "#d04324"]
+            }
+          },
+          "tintColor": {
+            "type": "gradient",
+            "value": ["#6cd364", "#7878ca"]
+          }
+        }
+      ]
     }
   },
   "snackBar": {

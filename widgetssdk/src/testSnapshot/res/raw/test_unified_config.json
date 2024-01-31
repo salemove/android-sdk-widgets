@@ -1290,6 +1290,25 @@
         "borderWidth": 1,
         "cornerRadius": 2
       }
+    },
+    "newMessagesDividerColor": {
+      "type": "gradient",
+      "value": ["784cea", "#3c4fb9"]
+    },
+    "newMessagesDividerText": {
+      "alignment": "center",
+      "background": {
+        "type": "gradient",
+        "value": ["#cd5d3c", "#c21ab4"]
+      },
+      "font": {
+        "size": 18,
+        "style": "italic"
+      },
+      "foreground": {
+        "type": "gradient",
+        "value": ["#bbe521", "#1c6b0d"]
+      }
     }
   },
   "snackBar": {

@@ -1190,6 +1190,106 @@
           "value": ["#579b4a", "#7c0083"]
         }
       }
+    },
+    "audioUpgrade": {
+      "text": {
+        "alignment": "trailing",
+        "background": {
+          "type": "gradient",
+          "value": ["#8b1eb3", "#16d9b8"]
+        },
+        "font": {
+          "size": 15,
+          "style": "italic"
+        },
+        "foreground": {
+          "type": "gradient",
+          "value": ["#14ae36", "#323de5"]
+        }
+      },
+      "description": {
+        "alignment": "center",
+        "background": {
+          "type": "gradient",
+          "value": ["#5d80cf", "#779e1d"]
+        },
+        "font": {
+          "size": 17,
+          "style": "bold_italic"
+        },
+        "foreground": {
+          "type": "gradient",
+          "value": ["#e3b4f7", "#a30abf"]
+        }
+      },
+      "iconColor": {
+        "type": "gradient",
+        "value": ["#ea6247", "#e66a9d"]
+      },
+      "background": {
+        "color": {
+          "type": "gradient",
+          "value": ["#19ff99", "#eb9ff1"]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#8c9205"
+          ]
+        },
+        "borderWidth": 5,
+        "cornerRadius": 15
+      }
+    },
+    "videoUpgrade": {
+      "text": {
+        "alignment": "center",
+        "background": {
+          "type": "gradient",
+          "value": ["91abb6", "#60774e"]
+        },
+        "font": {
+          "size": 18,
+          "style": "bold"
+        },
+        "foreground": {
+          "type": "gradient",
+          "value": ["#ec1233", "#ea425c"]
+        }
+      },
+      "description": {
+        "alignment": "leading",
+        "background": {
+          "type": "gradient",
+          "value": ["#1be025", "#4e70da"]
+        },
+        "font": {
+          "size": 15,
+          "style": "regular"
+        },
+        "foreground": {
+          "type": "gradient",
+          "value": ["#e35e10", "#4c1301"]
+        }
+      },
+      "iconColor": {
+        "type": "gradient",
+        "value": ["#12b399", "#6ea0b3"]
+      },
+      "background": {
+        "color": {
+          "type": "gradient",
+          "value": ["#d5ff14", "#e0c864"]
+        },
+        "border": {
+          "type": "fill",
+          "value": [
+            "#00d3d4"
+          ]
+        },
+        "borderWidth": 1,
+        "cornerRadius": 2
+      }
     }
   },
   "snackBar": {

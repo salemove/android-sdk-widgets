@@ -10,6 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GliaAndroidSDKWidgetsExample">
 
+
+        <activity
+            android:name="com.glia.exampleapp.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".Activity"
             android:exported="true">
@@ -21,10 +31,6 @@
             android:exported="true"
             android:targetActivity=".Activity">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
             <intent-filter android:label="Deep Link Runner">
                 <action android:name="android.intent.action.VIEW" />
 

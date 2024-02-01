@@ -3,9 +3,10 @@ package com.glia.widgets.helper
 internal data class OneTimeEvent<T>(private val value: T) {
     private var _isConsumed: Boolean = false
 
-    fun consume(): T? {
+    fun consume(): T {
+        val captured = checkNotNull(view()) { "value was consumed before" }
         markConsumed()
-        return view()
+        return captured
     }
 
     fun markConsumed() {

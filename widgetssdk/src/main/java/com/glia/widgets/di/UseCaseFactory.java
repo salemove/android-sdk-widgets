@@ -107,7 +107,8 @@ import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
 import com.glia.widgets.engagement.completion.EngagementCompletionUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
-import com.glia.widgets.engagement.domain.CallVisualizerMediaUpgradeOfferUseCase;
+import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase;
+import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCaseImpl;
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCase;
 import com.glia.widgets.engagement.domain.CurrentOperatorUseCaseImpl;
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase;
@@ -128,8 +129,8 @@ import com.glia.widgets.engagement.domain.IsOperatorPresentUseCase;
 import com.glia.widgets.engagement.domain.IsOperatorPresentUseCaseImpl;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase;
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCaseImpl;
-import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase;
-import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCaseImpl;
+import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase;
+import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase;
 import com.glia.widgets.engagement.domain.OperatorMediaUseCaseImpl;
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase;
@@ -929,18 +930,8 @@ public class UseCaseFactory {
     }
 
     @NonNull
-    public MediaUpgradeOfferUseCase getMediaUpgradeOfferUseCase() {
-        return new MediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository());
-    }
-
-    @NonNull
-    public MediaUpgradeOfferUseCase getCallVisualizerMediaUpgradeOfferUseCase() {
-        return new CallVisualizerMediaUpgradeOfferUseCase(repositoryFactory.getEngagementRepository());
-    }
-
-    @NonNull
     public AcceptMediaUpgradeOfferUseCase getAcceptMediaUpgradeOfferUseCase() {
-        return new AcceptMediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository(), permissionManager);
+        return new AcceptMediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository());
     }
 
     @NonNull
@@ -981,6 +972,16 @@ public class UseCaseFactory {
     @NonNull
     public DecideOnQueueingUseCase getDecideOnQueueingUseCase() {
         return new DecideOnQueueingUseCaseImpl(createIsShowOverlayPermissionRequestDialogUseCase(), createSetOverlayPermissionRequestDialogShownUseCase());
+    }
+
+    @NonNull
+    public OperatorMediaUpgradeOfferUseCase getOperatorMediaUpgradeOfferUseCase() {
+        return new OperatorMediaUpgradeOfferUseCaseImpl(repositoryFactory.getEngagementRepository(), getCurrentOperatorUseCase());
+    }
+
+    @NonNull
+    public CheckMediaUpgradePermissionsUseCase getCheckMediaUpgradePermissionsUseCase() {
+        return new CheckMediaUpgradePermissionsUseCaseImpl(permissionManager);
     }
 
 }

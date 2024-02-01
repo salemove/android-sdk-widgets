@@ -1387,6 +1387,54 @@
           }
         }
       ]
+    },
+    "bubble": {
+      "userImage": {
+        "placeholderColor": {
+          "type": "gradient",
+          "value": ["c3c923", "#c8bd3e"]
+        },
+        "placeholderBackgroundColor": {
+          "type": "gradient",
+          "value": ["e3b76f", "#932525"]
+        },
+        "imageBackgroundColor": {
+          "type": "gradient",
+          "value": ["8cca6b", "#a1a356"]
+        }
+      },
+      "badge": {
+        "font": {
+          "size": 16,
+          "style": "regular"
+        },
+        "fontColor": {
+          "type": "gradient",
+          "value": ["6c624f", "#933a6a"]
+        },
+        "background": {
+          "color": {
+            "type": "gradient",
+            "value": ["#ecec10", "#200ca800"]
+          },
+          "border": {
+            "type": "fill",
+            "value": ["#3ee9e5"]
+          },
+          "borderWidth": 1,
+          "cornerRadius": 2
+        }
+      },
+      "onHoldOverlay": {
+        "backgroundColor": {
+          "type": "gradient",
+          "value": ["d4b242", "#7dc36"]
+        },
+        "tintColor": {
+          "type": "gradient",
+          "value": ["84d9f7", "#4a6bac"]
+        }
+      }
     }
   },
   "snackBar": {

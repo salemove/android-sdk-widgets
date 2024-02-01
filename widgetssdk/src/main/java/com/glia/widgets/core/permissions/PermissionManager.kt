@@ -14,6 +14,7 @@ import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
+import com.glia.widgets.helper.isAudio
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 import com.glia.widgets.permissions.PermissionsRequestRepository
@@ -36,12 +37,17 @@ internal class PermissionManager(
     fun hasScreenSharingNotificationChannelEnabled(): Boolean =
         applicationContext.areNotificationsEnabledForChannel(NotificationFactory.NOTIFICATION_SCREEN_SHARING_CHANNEL_ID)
 
-    fun hasPermission(permission: String) = checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED
+    private fun hasPermission(permission: String) = checkSelfPermission(applicationContext, permission) == PackageManager.PERMISSION_GRANTED
 
     @SuppressLint("InlinedApi")
     fun getPermissionsForMediaUpgradeOffer(offer: MediaUpgradeOffer): Permissions {
         Logger.i(TAG, "Request permissions for media upgrade offer")
-        val requiredPermissions = emptyList<String>() // required permissions for media upgrade are handling in the Core SDK
+        val requiredPermissions = buildList {
+            add(Manifest.permission.RECORD_AUDIO)
+            if (!offer.isAudio) {
+                add(Manifest.permission.CAMERA)
+            }
+        }
         val additionalPermissions = mutableListOf<String>()
         if (sdkInt > Build.VERSION_CODES.R && offer.audio != null && offer.audio == MediaDirection.TWO_WAY) {
             additionalPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)

@@ -64,6 +64,7 @@ public class ChatActivity extends FadeTransitionActivity {
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
             .putExtra(GliaWidgets.QUEUE_ID, queueId)
             .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
+            .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
             .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
     }
 

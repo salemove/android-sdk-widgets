@@ -52,7 +52,6 @@ import com.glia.widgets.chat.model.CustomCardChatItem
 import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.core.screensharing.ScreenSharingContract
@@ -532,7 +531,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
-                    is MediaUpgrade -> post { showUpgradeDialog(it) }
                     is DialogState.StartScreenSharing -> post { showScreenSharingDialog(it.operatorName) }
                     DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
                     DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
@@ -862,14 +860,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             resetDialogStateAndDismiss()
             controller?.endEngagementDialogDismissed()
         })
-    }
-
-    private fun showUpgradeDialog(mediaUpgrade: MediaUpgrade) = showDialog {
-        Dialogs.showUpgradeDialog(context, theme, mediaUpgrade, {
-            controller?.acceptUpgradeOfferClicked(mediaUpgrade.mediaUpgradeOffer)
-        }) {
-            controller?.declineUpgradeOfferClicked(mediaUpgrade.mediaUpgradeOffer)
-        }
     }
 
     private fun showUnexpectedErrorDialog() = showDialog {

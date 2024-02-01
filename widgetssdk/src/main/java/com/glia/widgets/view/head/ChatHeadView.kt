@@ -7,6 +7,7 @@ import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.AccessibilityDelegateCompat
@@ -37,6 +38,7 @@ import com.glia.widgets.view.unifiedui.applyImageColorTheme
 import com.glia.widgets.view.unifiedui.theme.bubble.BubbleTheme
 import com.glia.widgets.view.unifiedui.theme.chat.UserImageTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
+import java.util.concurrent.Executor
 import kotlin.properties.Delegates
 
 internal class ChatHeadView @JvmOverloads constructor(
@@ -311,6 +313,13 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     private fun isDisplayUnreadMessageBadge(unreadMessageCount: Int): Boolean =
         unreadMessageCount > 0
+
+    @VisibleForTesting
+    internal var executor: Executor? = null
+
+    override fun post(action: Runnable?): Boolean {
+        return executor?.execute(action)?.let { true } ?: super.post(action)
+    }
 
     companion object {
         @JvmStatic

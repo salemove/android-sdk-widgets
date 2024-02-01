@@ -6,20 +6,15 @@ import android.view.View
 import android.view.Window
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
-import com.glia.androidsdk.GliaException
-import com.glia.androidsdk.comms.MediaDirection
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerController
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.dialog.model.MediaUpgradeMode
 import com.glia.widgets.core.screensharing.ScreenSharingController
 import com.glia.widgets.engagement.State
 import io.reactivex.Flowable
 import io.reactivex.processors.PublishProcessor
-import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before
@@ -41,7 +36,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
-import java.util.function.Consumer
 
 @RunWith(RobolectricTestRunner::class)
 internal class ActivityWatcherForCallVisualizerControllerTest {
@@ -50,7 +44,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     private val callVisualizerController: CallVisualizerController = mock {
         on { engagementStartFlow } doReturn Flowable.empty()
         on { engagementEndFlow } doReturn engagementEndFlow
-        on { acceptMediaUpgradeOfferResult } doReturn Flowable.empty()
     }
     private val screenSharingController = mock(ScreenSharingController::class.java)
     private val watcher = mock(ActivityWatcherForCallVisualizerContract.Watcher::class.java)
@@ -64,7 +57,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     )
     private val activity = mock(AppCompatActivity::class.java)
     private val supportActivity = mock(CallVisualizerSupportActivity::class.java)
-    private val mediaUpgradeOffer = mock(MediaUpgradeOffer::class.java)
 
     @Before
     fun setup() {
@@ -75,7 +67,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         controller.setWatcher(watcher)
         verify(callVisualizerController).engagementStartFlow
         verify(callVisualizerController).engagementEndFlow
-        verify(callVisualizerController).acceptMediaUpgradeOfferResult
         cleanup()
         resetMocks()
     }
@@ -126,7 +117,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         val intent = mock(Intent::class.java)
         whenever(supportActivity.intent).thenReturn(intent)
         whenever(intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)).thenReturn(ScreenSharing)
-        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
         controller.onActivityResumed(activity)
         controller.addScreenSharingCallback(activity)
         verify(callVisualizerController, times(2)).isCallOrChatScreenActive(any())
@@ -134,7 +124,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(screenSharingController).setViewCallback(anyOrNull())
         verify(screenSharingController).onResume(eq(activity), notNull())
         verify(watcher).setupDialogCallback()
-        verify(watcher).requestCameraPermission()
         cleanup()
         resetMocks()
 
@@ -147,7 +136,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         val nonCallVisualizerSupportActivity = mock(Activity::class.java)
         controller.onActivityResumed(nonCallVisualizerSupportActivity)
         resetMocks()
-        verify(watcher, never()).requestCameraPermission()
         verify(nonCallVisualizerSupportActivity, never()).getSystemService(any())
     }
 
@@ -232,28 +220,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
         verify(watcher).isSupportActivityOpen()
         verify(watcher).removeDialogFromStack()
         verify(screenSharingController).onScreenSharingDeclined()
-    }
-
-    @Test
-    fun `onPositiveDialogButtonClicked call activity is called when MODE_MEDIA_UPGRADE`() {
-        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        prepareMediaUpgradeApplicationState()
-        controller.onPositiveDialogButtonClicked()
-        verify(watcher).removeDialogFromStack()
-        verify(watcher).openCallActivity()
-        verify(watcher).isWebBrowserActivityOpen()
-        verify(watcher).isSupportActivityOpen()
-        verify(watcher).destroySupportActivityIfExists()
-    }
-
-    @Test
-    fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_MEDIA_UPGRADE`() {
-        whenever(watcher.isSupportActivityOpen()).thenReturn(true)
-        prepareMediaUpgradeApplicationState()
-        controller.onNegativeDialogButtonClicked()
-        verify(watcher).removeDialogFromStack()
-        verify(watcher).isWebBrowserActivityOpen()
-        verify(watcher).isSupportActivityOpen()
     }
 
     @Test
@@ -395,82 +361,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     }
 
     @Test
-    fun `onMediaUpgradeAccept does not destroy support activity when error occurs`() {
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
-        resetMocks()
-        controller.onMediaUpgradeAccept(mediaUpgradeOffer)
-    }
-
-    @Test
-    fun `onMediaUpgradeDecline does cleanup when decline`() {
-        controller.mediaUpgradeOffer = mediaUpgradeOffer
-        resetMocks()
-        controller.declineMediaUpgradeRequest()
-        verify(callVisualizerController).declineMediaUpgradeRequest(mediaUpgradeOffer)
-        assertNull(controller.mediaUpgradeOffer)
-    }
-
-    @Test
-    fun `onInitialCameraPermissionResult accepts offer when permission is not needed`() {
-        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.ONE_WAY)
-        controller.mediaUpgradeOffer = mediaUpgradeOffer
-        resetMocks()
-        controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
-        verify(callVisualizerController).acceptMediaUpgradeRequest(mediaUpgradeOffer)
-        assertNull(controller.mediaUpgradeOffer)
-    }
-
-    @Test
-    fun `onInitialCameraPermissionResult accepts offer when permission is granted and permissionType = CAMERA`() {
-        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
-        resetMocks()
-        controller.onInitialCameraPermissionResult(isGranted = true, isComponentActivity = true)
-        verify(callVisualizerController).acceptMediaUpgradeRequest(mediaUpgradeOffer)
-        assertNull(controller.mediaUpgradeOffer)
-    }
-
-    @Test
-    fun `onInitialCameraPermissionResult requests permission when permission is not granted and is ComponentActivity`() {
-        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
-        resetMocks()
-        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = true)
-        verify(watcher).requestCameraPermission()
-    }
-
-    @Test
-    fun `onInitialCameraPermissionResult opens ComponentActivity when permission is not granted and is not ComponentActivity`() {
-        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
-        resetMocks()
-        controller.onInitialCameraPermissionResult(isGranted = false, isComponentActivity = false)
-        verify(watcher).openSupportActivity(any())
-    }
-
-    @Test
-    fun `onRequestedCameraPermissionResult accepts when isGranted`() {
-        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
-        resetMocks()
-        controller.onRequestedCameraPermissionResult(true)
-        verify(watcher).destroySupportActivityIfExists()
-        verify(callVisualizerController).acceptMediaUpgradeRequest(mediaUpgradeOffer)
-        assertNull(controller.mediaUpgradeOffer)
-    }
-
-    @Test
-    fun `onRequestedCameraPermissionResult declines when !isGranted`() {
-        val mediaUpgradeOffer = dummyMediaVideoUpgradeOffer(videoDirection = MediaDirection.TWO_WAY)
-        controller.onMediaUpgradeReceived(mediaUpgradeOffer)
-        resetMocks()
-        controller.onRequestedCameraPermissionResult(false)
-        verify(watcher).destroySupportActivityIfExists()
-        verify(callVisualizerController).declineMediaUpgradeRequest(mediaUpgradeOffer)
-        assertNull(controller.mediaUpgradeOffer)
-    }
-
-    @Test
     fun `onMediaProjectionPermissionResult accepts screen sharing when isGranted`() {
         controller.onMediaProjectionPermissionResult(isGranted = true, activity = activity)
         verify(screenSharingController).onScreenSharingAccepted(activity)
@@ -480,29 +370,6 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onMediaProjectionPermissionResult declines screen sharing when isGranted = false`() {
         controller.onMediaProjectionPermissionResult(isGranted = false, activity = activity)
         verify(screenSharingController).onScreenSharingDeclined()
-    }
-
-    private fun prepareMediaUpgradeApplicationState() {
-        val offer = mock(MediaUpgradeOffer::class.java)
-        val state = DialogState.MediaUpgrade(offer, "name", MediaUpgradeMode.AUDIO)
-        controller.onDialogControllerCallback(state)
-        verify(watcher).showUpgradeDialog(state)
-    }
-
-    // Required because MediaUpgradeOffer has 'final' fields which Mockito can't mock
-    private fun dummyMediaVideoUpgradeOffer(
-        audioDirection: MediaDirection = MediaDirection.NONE,
-        videoDirection: MediaDirection = MediaDirection.NONE
-    ): MediaUpgradeOffer {
-        return spy(object : MediaUpgradeOffer(audioDirection, videoDirection) {
-            override fun accept(callback: Consumer<GliaException?>?) {
-                // Do nothing
-            }
-
-            override fun decline(callback: Consumer<GliaException?>?) {
-                // Do nothing
-            }
-        })
     }
 
     private fun resetMocks() {

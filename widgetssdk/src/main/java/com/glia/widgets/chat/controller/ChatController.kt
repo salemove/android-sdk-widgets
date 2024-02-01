@@ -8,13 +8,10 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.androidsdk.chat.VisitorMessage
-import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.engagement.EngagementFile
 import com.glia.androidsdk.site.SiteInfo
 import com.glia.widgets.Constants
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.chat.ChatContract
 import com.glia.widgets.chat.ChatManager
 import com.glia.widgets.chat.ChatType
@@ -56,13 +53,11 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
-import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
@@ -117,9 +112,7 @@ internal class ChatController(
     private val chatManager: ChatManager,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val operatorMediaUseCase: OperatorMediaUseCase,
-    private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
-    private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
     private val decideOnQueueingUseCase: DecideOnQueueingUseCase
@@ -436,8 +429,6 @@ internal class ChatController(
         // always start in bottom
         emitViewState { chatState.isInBottomChanged(true).changeVisibility(true) }
         view.scrollToBottomImmediate()
-
-        chatState.pendingNavigationType?.also { view.navigateToCall(it) }
     }
 
     override fun setOnBackClickedListener(finishCallback: ChatView.OnBackClickedListener?) {
@@ -461,50 +452,12 @@ internal class ChatController(
 
     private fun subscribeToMediaUpgradeEvents() {
         mediaUpgradeDisposable.addAll(
-            mediaUpgradeOfferUseCase().subscribe(::handleMediaUpgradeRequest),
-            acceptMediaUpgradeOfferUseCase.result.subscribe(::handleMediaUpgradeAcceptResult)
+            acceptMediaUpgradeOfferUseCase.result.subscribe { handleMediaUpgradeAcceptResult() }
         )
     }
 
-    private fun handleMediaUpgradeAcceptResult(it: MediaUpgradeOffer) {
-        Logger.d(TAG, "Media upgrade request accepted by visitor")
-        val requestedMediaType: String = if (it.video != null && it.video != MediaDirection.NONE) {
-            GliaWidgets.MEDIA_TYPE_VIDEO
-        } else {
-            GliaWidgets.MEDIA_TYPE_AUDIO
-        }
-        emitViewState { chatState.setPendingNavigationType(requestedMediaType) }
-        view?.apply {
-            navigateToCall(requestedMediaType)
-            Logger.d(TAG, "navigateToCall")
-        }
-    }
-
-    private fun handleMediaUpgradeRequest(it: MediaUpgradeOffer) {
-        when {
-            isChatViewPaused -> return
-            // audio call
-            it.video == MediaDirection.NONE && it.audio == MediaDirection.TWO_WAY -> {
-                Logger.d(TAG, "audioUpgradeRequested")
-                if (chatState.isOperatorOnline) {
-                    dialogController.showUpgradeAudioDialog(it, chatState.formattedOperatorName)
-                }
-            }
-            // video call
-            it.video == MediaDirection.TWO_WAY -> {
-                Logger.d(TAG, "2 way videoUpgradeRequested")
-                if (chatState.isOperatorOnline) {
-                    dialogController.showUpgradeVideoDialog2Way(it, chatState.formattedOperatorName)
-                }
-            }
-
-            it.video == MediaDirection.ONE_WAY -> {
-                Logger.d(TAG, "1 way videoUpgradeRequested")
-                if (chatState.isOperatorOnline) {
-                    dialogController.showUpgradeVideoDialog1Way(it, chatState.formattedOperatorName)
-                }
-            }
-        }
+    private fun handleMediaUpgradeAcceptResult() {
+        messagesNotSeenHandler.chatUpgradeOfferAccepted()
     }
 
     private fun onEngagementStateChanged(state: State) {
@@ -557,19 +510,6 @@ internal class ChatController(
         decideOnQueueingUseCase.onOverlayDialogShown()
         dialogController.dismissCurrentDialog()
         emitViewState { chatState }
-    }
-
-    override fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer) {
-        Logger.i(TAG, "Upgrade offer accepted by visitor")
-        messagesNotSeenHandler.chatUpgradeOfferAccepted()
-        acceptMediaUpgradeOfferUseCase(offer)
-        dialogController.dismissCurrentDialog()
-    }
-
-    override fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer) {
-        Logger.i(TAG, "Upgrade offer declined by visitor")
-        declineMediaUpgradeOfferUseCase(offer)
-        dialogController.dismissCurrentDialog()
     }
 
     @Synchronized

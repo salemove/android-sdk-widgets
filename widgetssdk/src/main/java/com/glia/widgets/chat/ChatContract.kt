@@ -3,7 +3,6 @@ package com.glia.widgets.chat
 import android.net.Uri
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
 import com.glia.widgets.chat.model.ChatItem
@@ -33,8 +32,6 @@ internal interface ChatContract {
         fun onRecyclerviewPositionChanged(isBottom: Boolean)
         fun sendCustomCardResponse(customCard: CustomCardChatItem, text: String, value: String)
         fun singleChoiceOptionClicked(item: OperatorMessageItem.ResponseCard, selectedOption: SingleChoiceOption)
-        fun declineUpgradeOfferClicked(offer: MediaUpgradeOffer)
-        fun acceptUpgradeOfferClicked(offer: MediaUpgradeOffer)
         fun overlayPermissionsDialogDismissed()
         fun setOnBackClickedListener(finishCallback: ChatView.OnBackClickedListener?)
         fun onXButtonClicked()

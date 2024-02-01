@@ -1,13 +1,11 @@
 package com.glia.widgets.callvisualizer
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -17,20 +15,15 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseActivityWatcher
-import com.glia.widgets.call.CallActivity
-import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.core.dialog.DialogContract
-import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.openNotificationChannelScreen
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.WeakReferenceDelegate
 import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.view.Dialogs
@@ -54,7 +47,6 @@ internal class ActivityWatcherForCallVisualizer(
     private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback {
         controller.onDialogControllerCallback(it)
     }
-    private var cameraPermissionLauncher: ActivityResultLauncher<String>? = null
     private var overlayPermissionLauncher: ActivityResultLauncher<String>? = null
 
     /**
@@ -70,7 +62,6 @@ internal class ActivityWatcherForCallVisualizer(
             controller.removeMediaProjectionLaunchers(activity::class.simpleName)
         } else {
             registerForMediaProjectionPermissionResult(activity)
-            registerForCameraPermissionResult(activity)
             registerForOverlayPermissionResult(activity)
         }
     }
@@ -83,24 +74,6 @@ internal class ActivityWatcherForCallVisualizer(
     override fun onActivityPaused(activity: Activity) {
         super.onActivityPaused(activity)
         controller.onActivityPaused()
-    }
-
-    override fun checkInitialCameraPermission() {
-        resumedActivity?.run {
-            controller.onInitialCameraPermissionResult(
-                isGranted = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED,
-                isComponentActivity = this is ComponentActivity
-            )
-        }
-    }
-
-    override fun requestCameraPermission() {
-        if (resumedActivity is ComponentActivity) {
-            cameraPermissionLauncher?.run {
-                controller.setIsWaitingMediaProjectionResult(true)
-                this.launch(Manifest.permission.CAMERA)
-            }
-        }
     }
 
     override fun requestOverlayPermission() {
@@ -120,15 +93,6 @@ internal class ActivityWatcherForCallVisualizer(
         )
         overlayIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         activity.startActivity(overlayIntent)
-    }
-
-    private fun registerForCameraPermissionResult(activity: Activity) {
-        (activity as? ComponentActivity?)?.let { componentActivity ->
-            cameraPermissionLauncher = componentActivity.registerForActivityResult(RequestPermission()) { isGranted: Boolean ->
-                controller.setIsWaitingMediaProjectionResult(false)
-                controller.onRequestedCameraPermissionResult(isGranted)
-            }
-        }
     }
 
     override fun callOverlayDialog() {
@@ -164,7 +128,10 @@ internal class ActivityWatcherForCallVisualizer(
             Logger.d(TAG, "Acquire a media projection token: result received")
             if (result.resultCode == RESULT_OK && result.data != null) {
                 Logger.d(TAG, "Acquire a media projection token: RESULT_OK, passing data to Glia Core SDK")
-                controller.mediaProjectionOnActivityResultSkipPermissionRequest(result.resultCode, result.data) // Requires MediaProjectionService running already
+                controller.mediaProjectionOnActivityResultSkipPermissionRequest(
+                    result.resultCode,
+                    result.data
+                ) // Requires MediaProjectionService running already
             } else if (result.resultCode == RESULT_CANCELED) {
                 Logger.d(TAG, "Acquire a media projection token: RESULT_CANCELED")
                 // Visitor rejected system permission required for screen sharing
@@ -178,31 +145,11 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    override fun openCallActivity() {
-        resumedActivity?.let {
-            val intent = CallActivity.getIntent(
-                it,
-                getConfigurationBuilder().setMediaType(Utils.toMediaType(GliaWidgets.MEDIA_TYPE_VIDEO))
-                    .setIsUpgradeToCall(true)
-                    .build()
-            )
-            it.startActivity(intent)
-            if (it is EndScreenSharingActivity) {
-                it.finish()
-            }
-        }
-    }
-
     override fun openWebBrowserActivity(title: String, url: String) {
         resumedActivity?.let {
             val intent = WebBrowserActivity.intent(it, title, url)
             it.startActivity(intent)
         }
-    }
-
-    private fun getConfigurationBuilder(): Configuration.Builder {
-        val configuration = Dependencies.getSdkConfigurationManager().createWidgetsConfiguration()
-        return Configuration.Builder().setWidgetsConfiguration(configuration)
     }
 
     override fun showToast(message: String, duration: Int) {
@@ -295,17 +242,6 @@ internal class ActivityWatcherForCallVisualizer(
                     controller.onNegativeDialogButtonClicked()
                 }
             )
-        }
-    }
-
-    override fun showUpgradeDialog(mediaUpgradeState: DialogState.MediaUpgrade) {
-        showAlertDialogOnUiThreadWithStyledContext("Show upgrade dialog") { context, uiTheme, _ ->
-            Dialogs.showUpgradeDialog(context, uiTheme, mediaUpgradeState, {
-                controller.onMediaUpgradeReceived(mediaUpgradeState.mediaUpgradeOffer)
-                dialogController.dismissCurrentDialog()
-            }) {
-                controller.onNegativeDialogButtonClicked()
-            }
         }
     }
 

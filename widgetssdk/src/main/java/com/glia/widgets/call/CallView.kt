@@ -247,7 +247,6 @@ internal class CallView(
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
-                    is DialogState.MediaUpgrade -> post { showUpgradeDialog(it) }
                     is DialogState.StartScreenSharing -> post { showScreenSharingDialog(it.operatorName) }
                     DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
                     DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
@@ -646,14 +645,6 @@ internal class CallView(
                 callController?.endEngagementDialogDismissed()
             }
         )
-    }
-
-    private fun showUpgradeDialog(dialogState: DialogState.MediaUpgrade) = showDialog {
-        Dialogs.showUpgradeDialog(this.context, theme, dialogState, {
-            callController?.acceptUpgradeOfferClicked(dialogState.mediaUpgradeOffer)
-        }) {
-            callController?.declineUpgradeOfferClicked(dialogState.mediaUpgradeOffer)
-        }
     }
 
     override fun showMissingPermissionsDialog() = showDialog {

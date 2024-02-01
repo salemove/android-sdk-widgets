@@ -37,7 +37,6 @@ import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
-import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
@@ -92,7 +91,6 @@ class ChatControllerTest {
     private lateinit var isCurrentEngagementCallVisualizerUseCase: IsCurrentEngagementCallVisualizerUseCase
     private lateinit var engagementStateUseCase: EngagementStateUseCase
     private lateinit var operatorMediaUseCase: OperatorMediaUseCase
-    private lateinit var mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase
     private lateinit var acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase
     private lateinit var declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase
     private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
@@ -147,7 +145,6 @@ class ChatControllerTest {
         operatorMediaUseCase = mock {
             on { invoke() } doReturn Flowable.empty()
         }
-        mediaUpgradeOfferUseCase = mock()
         acceptMediaUpgradeOfferUseCase = mock()
         declineMediaUpgradeOfferUseCase = mock()
         isQueueingOrEngagementUseCase = mock()
@@ -192,9 +189,7 @@ class ChatControllerTest {
             isCurrentEngagementCallVisualizerUseCase = isCurrentEngagementCallVisualizerUseCase,
             engagementStateUseCase = engagementStateUseCase,
             operatorMediaUseCase = operatorMediaUseCase,
-            mediaUpgradeOfferUseCase = mediaUpgradeOfferUseCase,
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
-            declineMediaUpgradeOfferUseCase = declineMediaUpgradeOfferUseCase,
             isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
             decideOnQueueingUseCase = decideOnQueueingUseCase

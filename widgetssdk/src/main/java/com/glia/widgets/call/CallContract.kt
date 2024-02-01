@@ -1,7 +1,6 @@
 package com.glia.widgets.call
 
 import com.glia.androidsdk.Engagement
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.widgets.base.BaseController
 import com.glia.widgets.base.BaseView
@@ -37,8 +36,6 @@ internal interface CallContract {
         fun endEngagementDialogYesClicked()
         fun endEngagementDialogDismissed()
         fun notificationsDialogDismissed()
-        fun acceptUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer)
-        fun declineUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer)
         fun noMoreOperatorsAvailableDismissed()
         fun unexpectedErrorDialogDismissed()
         fun onLiveObservationDialogAllowed()

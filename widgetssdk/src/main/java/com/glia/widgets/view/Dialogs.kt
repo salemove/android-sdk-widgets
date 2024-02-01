@@ -13,11 +13,12 @@ import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
-import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.Link
-import com.glia.widgets.core.dialog.model.MediaUpgradeMode
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.helper.asActivity
+import com.glia.widgets.helper.isOneWayVideo
+import com.glia.widgets.helper.isTwoWayVideo
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogService
 import com.glia.widgets.view.dialog.base.DialogType
@@ -221,31 +222,31 @@ internal object Dialogs {
     fun showUpgradeDialog(
         context: Context,
         theme: UiTheme,
-        dialogState: DialogState.MediaUpgrade,
+        data: MediaUpgradeOfferData,
         onAcceptOfferClickListener: View.OnClickListener,
         onCloseClickListener: View.OnClickListener
     ): AlertDialog {
-        val titleIconResPair = when (dialogState.mode) {
-            MediaUpgradeMode.AUDIO -> R.string.media_upgrade_audio_title to (theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
-            MediaUpgradeMode.VIDEO_ONE_WAY -> R.string.media_upgrade_video_one_way_title to (theme.iconUpgradeVideoDialog
-                ?: R.drawable.ic_baseline_videocam)
 
-            MediaUpgradeMode.VIDEO_TWO_WAY -> R.string.media_upgrade_video_two_way_title to (theme.iconUpgradeVideoDialog
-                ?: R.drawable.ic_baseline_videocam)
+        val titleIconResPair = data.offer.run {
+            when {
+                isOneWayVideo -> R.string.media_upgrade_video_one_way_title to (theme.iconUpgradeVideoDialog
+                    ?: R.drawable.ic_baseline_videocam)
+
+                isTwoWayVideo -> R.string.media_upgrade_video_two_way_title to (theme.iconUpgradeVideoDialog
+                    ?: R.drawable.ic_baseline_videocam)
+
+                else -> R.string.media_upgrade_audio_title to (theme.iconUpgradeAudioDialog ?: R.drawable.ic_baseline_mic)
+            }
         }
 
         val payload = DialogPayload.Upgrade(
-            title = stringProvider.getRemoteString(
-                titleIconResPair.first,
-                StringKeyPair(StringKey.OPERATOR_NAME, dialogState.operatorName ?: backingOperatorName)
-            ),
+            title = stringProvider.getRemoteString(titleIconResPair.first, StringKeyPair(StringKey.OPERATOR_NAME, data.operatorName)),
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,
             iconRes = titleIconResPair.second,
             positiveButtonClickListener = onAcceptOfferClickListener,
             negativeButtonClickListener = onCloseClickListener
-
         )
 
         return dialogService.showDialog(context, theme, DialogType.Upgrade(payload))

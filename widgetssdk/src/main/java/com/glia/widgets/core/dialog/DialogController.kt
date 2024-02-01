@@ -1,9 +1,7 @@
 package com.glia.widgets.core.dialog
 
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase
 import com.glia.widgets.core.dialog.model.DialogState
-import com.glia.widgets.core.dialog.model.MediaUpgradeMode
 import com.glia.widgets.helper.Logger
 
 private const val TAG = "DialogController"
@@ -17,9 +15,6 @@ internal interface DialogContract {
         fun dismissDialogs()
         fun showExitQueueDialog()
         fun showExitChatDialog()
-        fun showUpgradeAudioDialog(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
-        fun showUpgradeVideoDialog2Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
-        fun showUpgradeVideoDialog1Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?)
         fun showVisitorCodeDialog()
         fun dismissVisitorCodeDialog()
         fun showUnexpectedErrorDialog()
@@ -76,21 +71,6 @@ internal class DialogController(
     override fun showExitChatDialog() {
         Logger.i(TAG, "Show End Engagement Dialog")
         dialogManager.addAndEmit(DialogState.EndEngagement)
-    }
-
-    override fun showUpgradeAudioDialog(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?) {
-        Logger.i(TAG, "Show Upgrade Audio Dialog")
-        dialogManager.addAndEmit(DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, MediaUpgradeMode.AUDIO))
-    }
-
-    override fun showUpgradeVideoDialog2Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?) {
-        Logger.i(TAG, "Show Upgrade 2WayVideo Dialog")
-        dialogManager.addAndEmit(DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, MediaUpgradeMode.VIDEO_TWO_WAY))
-    }
-
-    override fun showUpgradeVideoDialog1Way(mediaUpgradeOffer: MediaUpgradeOffer, operatorName: String?) {
-        Logger.i(TAG, "Show Upgrade 1WayVideo Dialog")
-        dialogManager.addAndEmit(DialogState.MediaUpgrade(mediaUpgradeOffer, operatorName, MediaUpgradeMode.VIDEO_ONE_WAY))
     }
 
     override fun showVisitorCodeDialog() {

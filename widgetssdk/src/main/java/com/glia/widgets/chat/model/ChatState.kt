@@ -14,7 +14,6 @@ internal data class ChatState(
     val chatInputMode: ChatInputMode = ChatInputMode.ENABLED_NO_ENGAGEMENT,
     val lastTypedText: String = "",
     val engagementRequested: Boolean = false,
-    val pendingNavigationType: String? = null,
     val operatorStatusItem: OperatorStatusItem? = null,
     val showSendButton: Boolean = false,
     val isAttachmentButtonEnabled: Boolean = false,
@@ -104,8 +103,6 @@ internal data class ChatState(
     fun isInBottomChanged(isChatInBottom: Boolean): ChatState = copy(isChatInBottom = isChatInBottom)
 
     fun messagesNotSeenChanged(messagesNotSeen: Int): ChatState = copy(messagesNotSeen = messagesNotSeen)
-
-    fun setPendingNavigationType(pendingNavigationType: String?): ChatState = copy(pendingNavigationType = pendingNavigationType)
 
     fun setShowSendButton(isShow: Boolean): ChatState = copy(showSendButton = isShow)
 

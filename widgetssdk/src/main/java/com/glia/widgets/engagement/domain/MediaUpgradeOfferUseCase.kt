@@ -4,16 +4,21 @@ import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.engagement.EngagementRepository
 import io.reactivex.Flowable
 
-internal interface MediaUpgradeOfferUseCase {
-    operator fun invoke(): Flowable<MediaUpgradeOffer>
+internal interface OperatorMediaUpgradeOfferUseCase {
+    operator fun invoke(): Flowable<MediaUpgradeOfferData>
 }
 
-internal class MediaUpgradeOfferUseCaseImpl(private val engagementRepository: EngagementRepository) : MediaUpgradeOfferUseCase {
-    override fun invoke(): Flowable<MediaUpgradeOffer> = engagementRepository.mediaUpgradeOffer
-}
+internal data class MediaUpgradeOfferData(
+    val offer: MediaUpgradeOffer,
+    val operatorName: String
+)
 
-internal class CallVisualizerMediaUpgradeOfferUseCase(private val engagementRepository: EngagementRepository) : MediaUpgradeOfferUseCase {
-    override fun invoke(): Flowable<MediaUpgradeOffer> = engagementRepository.mediaUpgradeOffer.filter {
-        engagementRepository.isCallVisualizerEngagement
-    }
+internal class OperatorMediaUpgradeOfferUseCaseImpl(
+    private val engagementRepository: EngagementRepository,
+    private val currentOperatorUseCase: CurrentOperatorUseCase
+) : OperatorMediaUpgradeOfferUseCase {
+    override fun invoke(): Flowable<MediaUpgradeOfferData> = engagementRepository
+        .mediaUpgradeOffer
+        .withLatestFrom(currentOperatorUseCase.formattedName, ::MediaUpgradeOfferData)
+
 }

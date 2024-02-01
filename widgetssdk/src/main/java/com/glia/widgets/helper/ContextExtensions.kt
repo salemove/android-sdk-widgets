@@ -15,6 +15,8 @@ import com.glia.widgets.GliaWidgets
 import com.glia.widgets.BuildConfig
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
+import com.glia.widgets.di.Dependencies
+import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 internal fun Context.asActivity(): Activity? = (this as? ContextWrapper)?.let {

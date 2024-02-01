@@ -28,6 +28,7 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.helper.rx.Schedulers;
+import com.glia.widgets.operator.OperatorRequestHandlerActivityWatcher;
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.ChatHeadContract;
@@ -118,6 +119,11 @@ public class Dependencies {
             controllerFactory.getEndEngagementController()
         );
         application.registerActivityLifecycleCallbacks(engagementCompletionActivityWatcher);
+
+        OperatorRequestHandlerActivityWatcher operatorRequestHandlerActivityWatcher = new OperatorRequestHandlerActivityWatcher(
+            controllerFactory.getRequestHandlerController()
+        );
+        application.registerActivityLifecycleCallbacks(operatorRequestHandlerActivityWatcher);
     }
 
     public static Schedulers getSchedulers() {
@@ -181,11 +187,6 @@ public class Dependencies {
         Dependencies.controllerFactory = controllerFactory;
     }
 
-    @VisibleForTesting
-    public static void setRepositoryFactory(RepositoryFactory repositoryFactory) {
-        Dependencies.repositoryFactory = repositoryFactory;
-    }
-
     public static GliaCore glia() {
         return gliaCore;
     }
@@ -203,13 +204,18 @@ public class Dependencies {
         return resourceProvider;
     }
 
+    @VisibleForTesting
+    public static void setResourceProvider(ResourceProvider resourceProvider) {
+        Dependencies.resourceProvider = resourceProvider;
+    }
+
     public static RepositoryFactory getRepositoryFactory() {
         return repositoryFactory;
     }
 
     @VisibleForTesting
-    public static void setResourceProvider(ResourceProvider resourceProvider) {
-        Dependencies.resourceProvider = resourceProvider;
+    public static void setRepositoryFactory(RepositoryFactory repositoryFactory) {
+        Dependencies.repositoryFactory = repositoryFactory;
     }
 
     private static void initApplicationLifecycleObserver(

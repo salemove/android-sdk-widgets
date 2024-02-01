@@ -446,6 +446,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     //--Media
     private fun handleMediaUpgradeOffer(mediaUpgradeOffer: MediaUpgradeOffer) {
+        Logger.d(TAG, "Media upgrade requested: $mediaUpgradeOffer")
         _mediaUpgradeOffer.onNext(mediaUpgradeOffer)
     }
 

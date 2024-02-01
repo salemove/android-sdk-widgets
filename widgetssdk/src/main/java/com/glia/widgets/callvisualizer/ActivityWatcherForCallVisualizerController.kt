@@ -7,8 +7,6 @@ import android.media.projection.MediaProjectionManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.VisibleForTesting
-import com.glia.androidsdk.comms.MediaDirection
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase
@@ -28,9 +26,6 @@ internal class ActivityWatcherForCallVisualizerController(
     private val confirmationDialogLinksUseCase: ConfirmationDialogLinksUseCase
 ) : ActivityWatcherForCallVisualizerContract.Controller {
 
-    @VisibleForTesting
-    internal var mediaUpgradeOffer: MediaUpgradeOffer? = null
-
     private var currentDialogState: DialogState = DialogState.None
     private var shouldWaitMediaProjectionResult: Boolean = false
 
@@ -47,7 +42,6 @@ internal class ActivityWatcherForCallVisualizerController(
         callVisualizerController.apply {
             engagementStartFlow.unSafeSubscribe { watcher.engagementStarted() }
             engagementEndFlow.unSafeSubscribe { onEngagementEnded() }
-            acceptMediaUpgradeOfferResult.unSafeSubscribe { onMediaUpgradeAccept(it) }
         }
     }
 
@@ -57,7 +51,6 @@ internal class ActivityWatcherForCallVisualizerController(
         if (activity is CallVisualizerSupportActivity) {
             when (activity.intent.getParcelableExtra<PermissionType>(PERMISSION_TYPE_TAG)) {
                 is ScreenSharing -> acquireMediaProjectionToken(activity)
-                is Camera -> watcher.requestCameraPermission()
                 else -> { /* Shouldn't happen. No need to do anything. */
                 }
             }
@@ -119,7 +112,6 @@ internal class ActivityWatcherForCallVisualizerController(
         }
         when (state) {
             DialogState.None -> watcher.dismissAlertDialog()
-            is DialogState.MediaUpgrade -> watcher.showUpgradeDialog(state)
             DialogState.OverlayPermission -> watcher.showOverlayPermissionsDialog()
             DialogState.EnableNotificationChannel -> watcher.showAllowNotificationsDialog()
             DialogState.EnableScreenSharingNotificationsAndStartSharing -> watcher.showAllowScreenSharingNotificationsAndStartSharingDialog()
@@ -145,7 +137,6 @@ internal class ActivityWatcherForCallVisualizerController(
             DialogState.None -> Logger.e(TAG, "$currentDialogState should not have a dialog to click")
             DialogState.EnableScreenSharingNotificationsAndStartSharing -> watcher.openNotificationChannelScreen()
             is DialogState.StartScreenSharing -> activity?.run { startScreenSharing(this) }
-            is DialogState.MediaUpgrade -> watcher.openCallActivity()
             DialogState.EnableNotificationChannel -> watcher.openNotificationChannelScreen()
             DialogState.OverlayPermission -> {
                 watcher.dismissOverlayDialog()
@@ -167,7 +158,6 @@ internal class ActivityWatcherForCallVisualizerController(
             DialogState.EnableScreenSharingNotificationsAndStartSharing,
             is DialogState.StartScreenSharing -> screenSharingController.onScreenSharingDeclined()
             DialogState.OverlayPermission -> watcher.dismissOverlayDialog()
-            is DialogState.MediaUpgrade -> declineMediaUpgradeRequest()
             DialogState.Confirmation -> callVisualizerController.onEngagementConfirmationDialogDeclined()
             DialogState.VisitorCode, DialogState.EnableNotificationChannel -> Logger.d(TAG, "$currentDialogState no operation")
             else -> Logger.d(TAG, "Not relevant")
@@ -227,27 +217,6 @@ internal class ActivityWatcherForCallVisualizerController(
         }
     }
 
-    override fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean) {
-        if (!isGranted) {
-            if (isComponentActivity) {
-                watcher.requestCameraPermission()
-            } else {
-                watcher.openSupportActivity(Camera)
-            }
-        } else {
-            acceptMediaUpgradeRequest()
-        }
-    }
-
-    override fun onRequestedCameraPermissionResult(isGranted: Boolean) {
-        watcher.destroySupportActivityIfExists()
-        if (isGranted) {
-            acceptMediaUpgradeRequest()
-        } else {
-            declineMediaUpgradeRequest()
-        }
-    }
-
     override fun onMediaProjectionRejected() {
         screenSharingController.onScreenSharingDeclined()
     }
@@ -261,47 +230,9 @@ internal class ActivityWatcherForCallVisualizerController(
         }
     }
 
-    @VisibleForTesting
-    internal fun onMediaUpgradeAccept(offer: MediaUpgradeOffer) {
-        Logger.d(TAG, "Media upgrade request accepted by visitor")
-        if (offer.video != null && offer.video != MediaDirection.NONE) {
-            watcher.openCallActivity()
-        } else {
-            Logger.e(TAG, "Audio upgrade offer in call visualizer", Exception("Audio upgrade offer in call visualizer"))
-            return
-        }
-    }
-
-    private fun resetMediaUpgradeState() {
-        currentDialogState = DialogState.None
-        mediaUpgradeOffer = null
-    }
-
-    override fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer) {
-        this.mediaUpgradeOffer = mediaUpgrade
-        val isPermissionRequired = mediaUpgradeOffer?.video == MediaDirection.TWO_WAY
-        if (isPermissionRequired) {
-            watcher.checkInitialCameraPermission()
-        } else {
-            acceptMediaUpgradeRequest()
-        }
-    }
-
     override fun isWaitingMediaProjectionResult() = shouldWaitMediaProjectionResult
 
     override fun setIsWaitingMediaProjectionResult(isWaiting: Boolean) {
         shouldWaitMediaProjectionResult = isWaiting
-    }
-
-    @VisibleForTesting
-    fun acceptMediaUpgradeRequest() {
-        mediaUpgradeOffer?.also(callVisualizerController::acceptMediaUpgradeRequest)
-        resetMediaUpgradeState()
-    }
-
-    @VisibleForTesting
-    fun declineMediaUpgradeRequest() {
-        mediaUpgradeOffer?.also(callVisualizerController::declineMediaUpgradeRequest)
-        resetMediaUpgradeState()
     }
 }

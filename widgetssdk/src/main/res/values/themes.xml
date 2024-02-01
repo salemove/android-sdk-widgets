@@ -96,6 +96,8 @@
     </style>
 
     <style name="Application.Glia.Translucent.Activity" parent="Application.Glia.Activity.Style">
+<!--        <item name="android:windowAnimationStyle">@null</item>-->
+<!--        <item name="android:windowDisablePreview">true</item>-->
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowContentOverlay">@null</item>

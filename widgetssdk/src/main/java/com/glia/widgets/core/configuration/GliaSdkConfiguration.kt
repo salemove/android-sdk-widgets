@@ -9,7 +9,7 @@ import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger.logDeprecatedMethodUse
 import com.glia.widgets.helper.TAG
 
-internal class GliaSdkConfiguration private constructor(builder: Builder) {
+class GliaSdkConfiguration private constructor(builder: Builder) {
     val companyName: String?
     val queueId: String?
     val contextAssetId: String?

@@ -13,6 +13,7 @@ import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.SimpleActivityLifecycleCallbacks
 import com.glia.widgets.engagement.completion.EngagementCompletionContract.State
+import com.glia.widgets.helper.GliaTransparentActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.isGlia
@@ -20,7 +21,6 @@ import com.glia.widgets.helper.qualifiedName
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.survey.SurveyActivity
 import com.glia.widgets.view.Dialogs
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import java.lang.ref.WeakReference
 
 internal class EngagementCompletionActivityWatcher @JvmOverloads constructor(
@@ -44,7 +44,7 @@ internal class EngagementCompletionActivityWatcher @JvmOverloads constructor(
     }
 
     private fun launchDialogHolderActivity(activity: Activity) {
-        DialogHolderActivity.start(activity)
+        GliaTransparentActivity.start(activity)
     }
 
     private fun showSurvey(activity: Activity, survey: Survey, theme: UiTheme) {

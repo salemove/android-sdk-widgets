@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.glia.widgets.base.BaseActivityWatcher
+import com.glia.widgets.helper.GliaTransparentActivity
 import com.glia.widgets.helper.WeakReferenceDelegate
 
 internal class ActivityWatcherForPermissionsRequest(
@@ -74,6 +75,8 @@ internal class ActivityWatcherForPermissionsRequest(
     }
 
     override fun openSupportActivity() {
+//        currentActivity?.let { GliaTransparentActivity.start(it) }
+
         currentActivity?.run {
             val intent = Intent(this, PermissionsSupportActivity::class.java)
             startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
@@ -86,6 +89,7 @@ internal class ActivityWatcherForPermissionsRequest(
 
     private fun destroySupportActivityIfExists(activity: Activity) {
         if (activity is PermissionsSupportActivity) {
+//        if (activity is GliaTransparentActivity) {
             activity.finish()
         }
     }

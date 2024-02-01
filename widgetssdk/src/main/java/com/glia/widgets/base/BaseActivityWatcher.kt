@@ -36,7 +36,7 @@ internal open class BaseActivityWatcher : SimpleActivityLifecycleCallbacks() {
             return activityList
         }
     }
-    val resumedActivities: List<Activity> get() = _resumedActivities.getAll()
+    private val resumedActivities: List<Activity> get() = _resumedActivities.getAll()
 
     private val resumedActivitySubject: PublishSubject<List<Activity>> = PublishSubject.create()
     val topActivityObserver: Observable<Activity> = resumedActivitySubject
@@ -45,12 +45,12 @@ internal open class BaseActivityWatcher : SimpleActivityLifecycleCallbacks() {
 
     override fun onActivityResumed(activity: Activity) {
         _resumedActivities.add(activity)
-        resumedActivitySubject.onNext(_resumedActivities.getAll())
+        resumedActivitySubject.onNext(resumedActivities)
     }
 
     override fun onActivityPaused(activity: Activity) {
         _resumedActivities.remove(activity)
-        resumedActivitySubject.onNext(_resumedActivities.getAll())
+        resumedActivitySubject.onNext(resumedActivities)
     }
 }
 

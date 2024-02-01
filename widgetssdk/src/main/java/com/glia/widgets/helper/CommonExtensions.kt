@@ -15,7 +15,9 @@ import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.MessageAttachment
 import com.glia.androidsdk.chat.SingleChoiceAttachment
+import com.glia.androidsdk.comms.MediaDirection
 import com.glia.androidsdk.comms.MediaState
+import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
 import com.glia.widgets.di.Dependencies
@@ -67,6 +69,10 @@ internal fun ChatMessage.isValid(): Boolean = content.isNotBlank() || attachment
 internal val MediaState.hasAudio: Boolean get() = audio != null
 internal val MediaState.hasVideo: Boolean get() = video != null
 internal val MediaState.hasMedia: Boolean get() = hasAudio || hasVideo
+
+internal val MediaUpgradeOffer.isAudio: Boolean get() = video == MediaDirection.NONE && audio == MediaDirection.TWO_WAY
+internal val MediaUpgradeOffer.isTwoWayVideo: Boolean get() = video == MediaDirection.TWO_WAY
+internal val MediaUpgradeOffer.isOneWayVideo: Boolean get() = video == MediaDirection.ONE_WAY
 
 internal val GliaException.isQueueUnavailable: Boolean
     get() = cause == GliaException.Cause.QUEUE_CLOSED || cause == GliaException.Cause.QUEUE_FULL

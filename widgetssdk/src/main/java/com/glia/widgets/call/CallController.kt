@@ -30,19 +30,16 @@ import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.State.StartedCallVisualizer
 import com.glia.widgets.engagement.State.StartedOmniCore
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
-import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.EnqueueForEngagementUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
-import com.glia.widgets.engagement.domain.MediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorAudioMediaStateUseCase
 import com.glia.widgets.engagement.domain.ToggleVisitorVideoMediaStateUseCase
 import com.glia.widgets.engagement.domain.VisitorMediaUseCase
 import com.glia.widgets.helper.Logger.d
-import com.glia.widgets.helper.Logger.i
 import com.glia.widgets.helper.TimeCounter
 import com.glia.widgets.helper.TimeCounter.FormattedTimerStatusListener
 import com.glia.widgets.helper.TimeCounter.RawTimerStatusListener
@@ -81,9 +78,7 @@ internal class CallController(
     private val handleCallPermissionsUseCase: HandleCallPermissionsUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val operatorMediaUseCase: OperatorMediaUseCase,
-    private val mediaUpgradeOfferUseCase: MediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
-    private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val visitorMediaUseCase: VisitorMediaUseCase,
     private val toggleVisitorAudioMediaStateUseCase: ToggleVisitorAudioMediaStateUseCase,
     private val toggleVisitorVideoMediaStateUseCase: ToggleVisitorVideoMediaStateUseCase,
@@ -320,10 +315,7 @@ internal class CallController(
     }
 
     private fun subscribeToMediaUpgradeEvents() {
-        mediaUpgradeDisposable.addAll(
-            mediaUpgradeOfferUseCase().subscribe(::handleMediaUpgradeRequest),
-            acceptMediaUpgradeOfferUseCase.result.subscribe(::handleMediaUpgradeAcceptResult)
-        )
+        mediaUpgradeDisposable.addAll(acceptMediaUpgradeOfferUseCase.result.subscribe(::handleMediaUpgradeAcceptResult))
     }
 
     private fun handleMediaUpgradeAcceptResult(it: MediaUpgradeOffer) {
@@ -336,44 +328,12 @@ internal class CallController(
         emitViewState(callState.changeRequestedMediaType(mediaType))
     }
 
-    private fun handleMediaUpgradeRequest(it: MediaUpgradeOffer) {
-        when {
-            // audio call
-            it.video == MediaDirection.NONE && it.audio == MediaDirection.TWO_WAY -> {
-                d(TAG, "Audio upgrade requested")
-                showUpgradeAudioDialog(it)
-            }
-            // 2 way video call
-            it.video == MediaDirection.TWO_WAY -> {
-                d(TAG, "2 way video upgrade requested")
-                showUpgradeVideoDialog2Way(it)
-            }
-            // 1 way video call
-            it.video == MediaDirection.ONE_WAY -> {
-                d(TAG, "1 way video upgrade requested")
-                showUpgradeVideoDialog1Way(it)
-            }
-        }
-    }
-
     override fun chatButtonClicked() {
         d(TAG, "chatButtonClicked")
         updateFromCallScreenUseCase.updateFromCallScreen(true)
         view?.navigateToChat()
         onDestroy(true)
         messagesNotSeenHandler.callChatButtonClicked()
-    }
-
-    override fun acceptUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer) {
-        i(TAG, "Upgrade offer accepted by visitor")
-        acceptMediaUpgradeOfferUseCase(mediaUpgradeOffer)
-        dialogController.dismissCurrentDialog()
-    }
-
-    override fun declineUpgradeOfferClicked(mediaUpgradeOffer: MediaUpgradeOffer) {
-        i(TAG, "Upgrade offer declined by visitor")
-        declineMediaUpgradeOfferUseCase(mediaUpgradeOffer)
-        dialogController.dismissCurrentDialog()
     }
 
     override fun onUserInteraction() {
@@ -402,7 +362,7 @@ internal class CallController(
 
     private fun onNewOperatorMediaState(operatorMediaState: MediaState) {
         if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
-        d(TAG, "newOperatorMediaState: $operatorMediaState, timertaskrunning: ${callTimer.isRunning}")
+        d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
             if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
                 dialogController.showEnableCallNotificationChannelDialog()
@@ -483,26 +443,6 @@ internal class CallController(
         messagesNotSeenHandlerListener = MessagesNotSeenHandlerListener {
             emitViewState(callState.changeNumberOfMessages(it))
         }
-    }
-
-    private fun showUpgradeAudioDialog(mediaUpgradeOffer: MediaUpgradeOffer) {
-        if (callState.isMediaEngagementStarted) {
-            dialogController.showUpgradeAudioDialog(mediaUpgradeOffer, callState.callStatus.formattedOperatorName)
-        }
-    }
-
-    private fun showUpgradeVideoDialog2Way(mediaUpgradeOffer: MediaUpgradeOffer) {
-        if (callState.isMediaEngagementStarted) dialogController.showUpgradeVideoDialog2Way(
-            mediaUpgradeOffer,
-            callState.callStatus.formattedOperatorName
-        )
-    }
-
-    private fun showUpgradeVideoDialog1Way(mediaUpgradeOffer: MediaUpgradeOffer) {
-        if (callState.isMediaEngagementStarted) dialogController.showUpgradeVideoDialog1Way(
-            mediaUpgradeOffer,
-            callState.callStatus.formattedOperatorName
-        )
     }
 
     private fun showExitChatDialog() {

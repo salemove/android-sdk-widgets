@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.dialog.model.Link
@@ -23,9 +22,6 @@ internal class ActivityWatcherForCallVisualizerContract {
         fun onPositiveDialogButtonClicked(activity: Activity? = null)
         fun onNegativeDialogButtonClicked()
         fun onDialogControllerCallback(state: DialogState)
-        fun onMediaUpgradeReceived(mediaUpgrade: MediaUpgradeOffer)
-        fun onInitialCameraPermissionResult(isGranted: Boolean, isComponentActivity: Boolean = true)
-        fun onRequestedCameraPermissionResult(isGranted: Boolean)
         fun onMediaProjectionPermissionResult(isGranted: Boolean, activity: Activity)
         fun onMediaProjectionRejected()
         fun isWaitingMediaProjectionResult(): Boolean
@@ -36,10 +32,8 @@ internal class ActivityWatcherForCallVisualizerContract {
 
     interface Watcher {
         fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
-        fun openCallActivity()
         fun removeDialogFromStack()
         fun dismissAlertDialog()
-        fun showUpgradeDialog(mediaUpgradeState: DialogState.MediaUpgrade)
         fun showOverlayPermissionsDialog()
         fun showScreenSharingDialog(operatorName: String?)
         fun showAllowNotificationsDialog()
@@ -49,12 +43,10 @@ internal class ActivityWatcherForCallVisualizerContract {
         fun openOverlayPermissionView()
         fun setupDialogCallback()
         fun removeDialogCallback()
-        fun requestCameraPermission()
         fun requestOverlayPermission()
         fun openSupportActivity(permissionType: PermissionType)
         fun openWebBrowserActivity(title: String, url: String)
         fun destroySupportActivityIfExists()
-        fun checkInitialCameraPermission()
         fun callOverlayDialog()
         fun dismissOverlayDialog()
         fun isSupportActivityOpen(): Boolean

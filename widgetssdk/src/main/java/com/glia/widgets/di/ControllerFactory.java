@@ -27,6 +27,8 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
+import com.glia.widgets.operator.OperatorRequestHandlerContract;
+import com.glia.widgets.operator.OperatorRequestHandlerController;
 import com.glia.widgets.permissions.PermissionsRequestContract;
 import com.glia.widgets.permissions.controller.PermissionsRequestController;
 import com.glia.widgets.survey.SurveyContract;
@@ -129,9 +131,7 @@ public class ControllerFactory {
                 managerFactory.getChatManager(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getOperatorMediaUseCase(),
-                useCaseFactory.getMediaUpgradeOfferUseCase(),
                 useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
-                useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
                 useCaseFactory.getDecideOnQueueingUseCase()
@@ -166,9 +166,7 @@ public class ControllerFactory {
                 useCaseFactory.createHandleCallPermissionsUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.getOperatorMediaUseCase(),
-                useCaseFactory.getMediaUpgradeOfferUseCase(),
                 useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
-                useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
                 useCaseFactory.getVisitorMediaUseCase(),
                 useCaseFactory.getToggleVisitorAudioMediaStateUseCase(),
                 useCaseFactory.getToggleVisitorVideoMediaStateUseCase(),
@@ -283,11 +281,7 @@ public class ControllerFactory {
                 dialogController,
                 useCaseFactory.createConfirmationDialogUseCase(),
                 useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
-                useCaseFactory.getCallVisualizerMediaUpgradeOfferUseCase(),
-                useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
-                useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
                 useCaseFactory.getEngagementRequestUseCase(),
-                useCaseFactory.getCurrentOperatorUseCase(),
                 useCaseFactory.getEngagementStateUseCase()
             );
         }
@@ -384,5 +378,16 @@ public class ControllerFactory {
             );
         }
         return engagementCompletionController;
+    }
+
+    @NonNull
+    public OperatorRequestHandlerContract.Controller getRequestHandlerController() {
+        return new OperatorRequestHandlerController(
+            useCaseFactory.getOperatorMediaUpgradeOfferUseCase(),
+            useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
+            useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
+            useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
+            dialogController
+        );
     }
 }

@@ -5,7 +5,14 @@ import androidx.collection.ArrayMap
 import java.lang.ref.WeakReference
 import kotlin.reflect.KClass
 
-internal class GliaActivityManager {
+internal interface GliaActivityManager {
+    fun onActivityCreated(activity: Activity)
+    fun onActivityDestroyed(activity: Activity)
+    fun finishActivities()
+    fun finishActivity(kClass: KClass<out Activity>)
+}
+
+internal class GliaActivityManagerImpl : GliaActivityManager {
     private val activities: ArrayMap<String, WeakReference<Activity>> = ArrayMap()
 
     private fun insertActivity(activity: Activity) {
@@ -18,20 +25,20 @@ internal class GliaActivityManager {
         activities.remove(activity.qualifiedName)
     }
 
-    fun onActivityCreated(activity: Activity) {
+    override fun onActivityCreated(activity: Activity) {
         insertActivity(activity)
     }
 
-    fun onActivityDestroyed(activity: Activity) {
+    override fun onActivityDestroyed(activity: Activity) {
         removeActivity(activity)
     }
 
-    fun finishActivities() {
+    override fun finishActivities() {
         activities.values.mapNotNull(WeakReference<Activity>::get).forEach(Activity::finish)
         activities.clear()
     }
 
-    fun finishActivity(kClass: KClass<out Activity>) {
+    override fun finishActivity(kClass: KClass<out Activity>) {
         activities.remove(kClass.qualifiedName)?.get()?.finish()
     }
 }

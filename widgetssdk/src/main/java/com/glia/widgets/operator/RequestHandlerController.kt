@@ -3,6 +3,8 @@ package com.glia.widgets.operator
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
+import com.glia.widgets.core.dialog.DialogContract
+import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
@@ -19,15 +21,18 @@ internal class RequestHandlerController(
     operatorMediaUpgradeOfferUseCase: OperatorMediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
-    private val checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase
+    private val checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase,
+    private val dialogController: DialogContract.Controller
 ) : RequestHandlerContract.Controller {
 
     private val _state: PublishProcessor<RequestHandlerContract.State> = PublishProcessor.create()
     override val state: Flowable<OneTimeEvent<RequestHandlerContract.State>> = _state.onBackpressureLatest().map(::OneTimeEvent)
+    private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback(::handleDialogCallback)
 
     init {
         operatorMediaUpgradeOfferUseCase().unSafeSubscribe(::handleMediaUpgradeOffer)
         acceptMediaUpgradeOfferUseCase.result.unSafeSubscribe(::handleMediaUpgradeOfferAcceptResult)
+        dialogController.addCallback(dialogCallback)
     }
 
     private fun handleMediaUpgradeOfferAcceptResult(mediaUpgradeOffer: MediaUpgradeOffer) {
@@ -36,7 +41,17 @@ internal class RequestHandlerController(
     }
 
     private fun handleMediaUpgradeOffer(mediaUpgradeOfferData: MediaUpgradeOfferData) {
-        _state.onNext(RequestHandlerContract.State.RequestMediaUpgrade(mediaUpgradeOfferData))
+        dialogController.showUpgradeDialog(mediaUpgradeOfferData)
+    }
+
+    private fun handleDialogCallback(dialogState: DialogState) {
+        when (dialogState) {
+            is DialogState.MediaUpgrade -> _state.onNext(RequestHandlerContract.State.RequestMediaUpgrade(dialogState.data))
+            DialogState.None -> _state.onNext(RequestHandlerContract.State.DismissAlertDialog)
+            else -> {
+                // no need for other dialogs here
+            }
+        }
     }
 
     override fun onMediaUpgradeAccepted(offer: MediaUpgradeOffer, activity: Activity) {
@@ -68,6 +83,6 @@ internal class RequestHandlerController(
     }
 
     private fun dismissAlertDialog() {
-        _state.onNext(RequestHandlerContract.State.DismissAlertDialog)
+        dialogController.dismissCurrentDialog()
     }
 }

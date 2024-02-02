@@ -1,5 +1,7 @@
 package com.glia.widgets.core.dialog.model
 
+import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
+
 internal sealed interface DialogState {
     object None : DialogState
     object OverlayPermission : DialogState
@@ -13,4 +15,5 @@ internal sealed interface DialogState {
     object Confirmation : DialogState
     object EndEngagement : DialogState
     object UnexpectedError : DialogState
+    data class MediaUpgrade(val data: MediaUpgradeOfferData) : DialogState
 }

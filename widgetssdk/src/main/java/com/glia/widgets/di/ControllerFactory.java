@@ -386,7 +386,8 @@ public class ControllerFactory {
             useCaseFactory.getOperatorMediaUpgradeOfferUseCase(),
             useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
             useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
-            useCaseFactory.getCheckMediaUpgradePermissionsUseCase()
+            useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
+            dialogController
         );
     }
 }

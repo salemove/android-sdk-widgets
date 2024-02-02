@@ -157,7 +157,6 @@ internal class ActivityWatcherForCallVisualizerController(
             DialogState.None -> Logger.e(TAG, "$currentDialogState should not have a dialog to click")
             DialogState.EnableScreenSharingNotificationsAndStartSharing,
             is DialogState.StartScreenSharing -> screenSharingController.onScreenSharingDeclined()
-
             DialogState.OverlayPermission -> watcher.dismissOverlayDialog()
             DialogState.Confirmation -> callVisualizerController.onEngagementConfirmationDialogDeclined()
             DialogState.VisitorCode, DialogState.EnableNotificationChannel -> Logger.d(TAG, "$currentDialogState no operation")

@@ -63,7 +63,7 @@ internal class RequestHandlerActivityWatcher(private val controller: RequestHand
     }
 
     private fun showUpgradeDialog(state: RequestHandlerContract.State.RequestMediaUpgrade, activity: Activity, consumeCallback: () -> Unit) {
-        showAlertDialogOnUiThreadWithStyledContext(activity) { context, theme ->
+        showAlertDialogWithStyledContext(activity) { context, theme ->
             Dialogs.showUpgradeDialog(context, theme, state.data, {
                 consumeCallback()
                 controller.onMediaUpgradeAccepted(state.data.offer, activity)
@@ -86,11 +86,7 @@ internal class RequestHandlerActivityWatcher(private val controller: RequestHand
         }
     }
 
-    private fun showAlertDialogOnUiThreadWithStyledContext(
-        activity: Activity,
-        logMessage: String? = null,
-        callback: (Context, UiTheme) -> AlertDialog
-    ) {
+    private fun showAlertDialogWithStyledContext(activity: Activity, logMessage: String? = null, callback: (Context, UiTheme) -> AlertDialog) {
         ensureGliaActivity(activity) {
             runOnUiThread {
                 logMessage?.let { Logger.d(TAG, it) }

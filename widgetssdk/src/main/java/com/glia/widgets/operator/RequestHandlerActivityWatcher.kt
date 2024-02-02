@@ -22,8 +22,11 @@ import io.reactivex.Flowable
 
 private const val TAG = "RequestHandlerActivityWatcher"
 
-internal class RequestHandlerActivityWatcher(private val controller: RequestHandlerContract.Controller) : BaseActivityWatcher() {
-    private val gliaActivityManager: GliaActivityManager = GliaActivityManager()
+internal class RequestHandlerActivityWatcher(
+    private val controller: RequestHandlerContract.Controller,
+    private val gliaActivityManager: GliaActivityManager,
+    private val intentConfigurationHelper: IntentConfigurationHelper
+) : BaseActivityWatcher() {
     private var alertDialog: AlertDialog? = null
 
     init {
@@ -43,7 +46,11 @@ internal class RequestHandlerActivityWatcher(private val controller: RequestHand
 
         when {
             state == null || activity.isFinishing -> Logger.d(TAG, "skipping state: $state activity: $activity")
-            state is RequestHandlerContract.State.DismissAlertDialog -> dismissAlertDialogSilently()
+            state is RequestHandlerContract.State.DismissAlertDialog -> {
+                event.markConsumed()
+                dismissAlertDialogSilently()
+            }
+
             state is RequestHandlerContract.State.OpenCallActivity -> {
                 event.markConsumed()
                 openCallActivity(state.mediaType, activity)
@@ -59,7 +66,7 @@ internal class RequestHandlerActivityWatcher(private val controller: RequestHand
             activity.isGlia -> gliaActivityManager.finishActivities()
         }
 
-        activity.startActivity(IntentConfigurationHelper.createForCall(activity, mediaType))
+        activity.startActivity(intentConfigurationHelper.createForCall(activity, mediaType))
     }
 
     private fun showUpgradeDialog(state: RequestHandlerContract.State.RequestMediaUpgrade, activity: Activity, consumeCallback: () -> Unit) {
@@ -74,7 +81,7 @@ internal class RequestHandlerActivityWatcher(private val controller: RequestHand
         }
     }
 
-    private fun launchDialogHandlerActivity(activity: Activity) {
+    private fun launchDialogHolderActivity(activity: Activity) {
         DialogHolderActivity.start(activity)
     }
 
@@ -82,7 +89,7 @@ internal class RequestHandlerActivityWatcher(private val controller: RequestHand
         if (activity.isGlia) {
             callback(activity)
         } else {
-            launchDialogHandlerActivity(activity)
+            launchDialogHolderActivity(activity)
         }
     }
 

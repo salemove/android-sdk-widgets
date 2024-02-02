@@ -24,6 +24,8 @@ import com.glia.widgets.core.permissions.PermissionManager;
 import com.glia.widgets.engagement.completion.EngagementCompletionActivityWatcher;
 import com.glia.widgets.filepreview.data.source.local.DownloadsFolderDataSource;
 import com.glia.widgets.helper.ApplicationLifecycleManager;
+import com.glia.widgets.helper.GliaActivityManagerImpl;
+import com.glia.widgets.helper.IntentConfigurationHelperImpl;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
@@ -121,7 +123,9 @@ public class Dependencies {
         application.registerActivityLifecycleCallbacks(engagementCompletionActivityWatcher);
 
         RequestHandlerActivityWatcher requestHandlerActivityWatcher = new RequestHandlerActivityWatcher(
-            controllerFactory.getRequestHandlerController()
+            controllerFactory.getRequestHandlerController(),
+            new GliaActivityManagerImpl(),
+            new IntentConfigurationHelperImpl()
         );
         application.registerActivityLifecycleCallbacks(requestHandlerActivityWatcher);
     }

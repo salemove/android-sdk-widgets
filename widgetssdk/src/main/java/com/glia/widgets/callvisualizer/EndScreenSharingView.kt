@@ -3,6 +3,7 @@ package com.glia.widgets.callvisualizer
 import android.content.Context
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.withStyledAttributes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
@@ -76,6 +77,9 @@ internal class EndScreenSharingView(
         context.withStyledAttributes(attrs, R.styleable.GliaView, defStyleAttr, defStyleRes) {
             defaultStatusBarColor = context.asActivity()?.window?.statusBarColor
             var theme = Utils.getThemeFromTypedArray(this, context)
+            theme.iconEndScreenShare?.let {
+                binding.endSharingButton.icon = ResourcesCompat.getDrawable(context.resources, it, null)
+            }
             theme = theme.getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
             applyRuntimeTheme(theme)
         }

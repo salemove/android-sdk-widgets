@@ -263,7 +263,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     override fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         showAlertDialogOnUiThreadWithStyledContext(
-            "Show screen sharing and notifications dialog"
+            "Show screen sharing and notifications dialog",
         ) { context, uiTheme, _ ->
             Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
                 context = context,
@@ -283,7 +283,9 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showOverlayPermissionsDialog() {
-        showAlertDialogOnUiThreadWithStyledContext("Show overlay permissions dialog") { context, uiTheme, _ ->
+        showAlertDialogOnUiThreadWithStyledContext(
+            "Show overlay permissions dialog"
+        ) { context, uiTheme, _ ->
             Dialogs.showOverlayPermissionsDialog(
                 context = context,
                 uiTheme = uiTheme,

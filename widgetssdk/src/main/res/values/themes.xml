@@ -29,7 +29,7 @@
         <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
         <item name="iconOnHold">?attr/gliaIconOnHold</item>
         <item name="iconEndScreenShare">?attr/gliaIconEndScreenShare</item>
-
+        <item name="iconScreenSharingDialog">?attr/gliaIconScreenSharingDialog</item>
         <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
 
         <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>
@@ -128,8 +128,8 @@
         <item name="gliaIconCallMinimize">@drawable/ic_minimize</item>
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
         <item name="gliaIconOnHold">@drawable/ic_pause_circle</item>
-        <item name="gliaIconEndScreenShare">@drawable/ic_screensharing_off</item>
-
+        <item name="gliaIconEndScreenShare">@drawable/ic_person</item>
+        <item name="iconScreenSharingDialog">@drawable/ic_screensharing</item>
         <item name="gliaSendMessageButtonTintColor">?attr/gliaBrandPrimaryColor</item>
 
         <item name="gliaChatHeaderTitleTintColor">?attr/gliaBaseLightColor</item>

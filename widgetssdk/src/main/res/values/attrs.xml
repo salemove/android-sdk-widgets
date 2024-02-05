@@ -38,7 +38,7 @@
         <attr name="iconChatVideoUpgrade" format="reference" />
         <!-- The icon resId used in the header of an video upgrade dialog -->
         <attr name="iconUpgradeVideoDialog" format="reference" />
-        <!-- The icon resId used in the header of of a screen sharing upgrade dialog -->
+        <!-- The icon resId used in the header of a screen sharing upgrade dialog and in the call visualizer screen sharing bubble-->
         <attr name="iconScreenSharingDialog" format="reference" />
         <!-- The icon resId used to set the call's video on -->
         <attr name="iconCallVideoOn" format="reference" />

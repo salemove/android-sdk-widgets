@@ -16,8 +16,7 @@ import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromCacheUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromDownloadsUseCase
 import com.glia.widgets.filepreview.domain.usecase.GetImageFileFromNetworkUseCase
 import com.glia.widgets.helper.rx.Schedulers
-import com.glia.widgets.view.OperatorStatusView
-import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
+import com.glia.widgets.view.unifiedui.theme.chat.MessageBalloonTheme
 
 internal class OperatorImageAttachmentViewHolder(
     private val binding: ChatAttachmentOperatorImageLayoutBinding,
@@ -34,6 +33,9 @@ internal class OperatorImageAttachmentViewHolder(
     getImageFileFromNetworkUseCase,
     schedulers
 ) {
+    private val operatorTheme: MessageBalloonTheme? by lazy {
+        Dependencies.getGliaThemeManager().theme?.chatTheme?.operatorMessage
+    }
 
     init {
         setupOperatorStatus(uiTheme)
@@ -42,6 +44,7 @@ internal class OperatorImageAttachmentViewHolder(
     private fun setupOperatorStatus(uiTheme: UiTheme) {
         binding.chatHeadView.setTheme(uiTheme)
         binding.chatHeadView.setShowRippleAnimation(false)
+        binding.chatHeadView.applyUserImageTheme(operatorTheme?.userImage)
     }
 
     fun bind(

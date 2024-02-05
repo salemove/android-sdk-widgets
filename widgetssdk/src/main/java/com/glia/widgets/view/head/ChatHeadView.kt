@@ -148,7 +148,7 @@ internal class ChatHeadView @JvmOverloads constructor(
                 placeholderView.visibility = GONE
                 profilePictureView.setImageDrawable(null)
                 profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
-                placeholderView.setImageResource(R.drawable.ic_screensharing)
+                placeholderView.setImageResource(configuration.iconScreenSharingDialog)
                 placeholderView.visibility = VISIBLE
             }
         }
@@ -219,6 +219,7 @@ internal class ChatHeadView @JvmOverloads constructor(
             .backgroundColorRes(buildTimeTheme.brandPrimaryColor)
             .iconOnHold(buildTimeTheme.iconOnHold)
             .iconOnHoldTintList(buildTimeTheme.baseLightColor)
+            .iconScreenSharingDialog(buildTimeTheme.iconScreenSharingDialog)
             .build()
     }
 
@@ -227,7 +228,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         sdkConfiguration: GliaSdkConfiguration?
     ) {
         configuration = createBuildTimeConfiguration(buildTimeTheme)
-
         val runTimeTheme = sdkConfiguration?.runTimeTheme ?: return
 
         val builder = ChatHeadConfiguration.builder(configuration)
@@ -241,6 +241,7 @@ internal class ChatHeadView @JvmOverloads constructor(
             backgroundColorRes?.also(builder::backgroundColorRes)
             iconOnHold?.also(builder::iconOnHold)
             iconOnHoldTintList?.also(builder::iconOnHoldTintList)
+            iconScreenSharingDialog?.also(builder::iconScreenSharingDialog)
         }
         configuration = builder.build()
     }
@@ -265,7 +266,7 @@ internal class ChatHeadView @JvmOverloads constructor(
 
     private fun updatePlaceholderImageView() {
         val placeholderIcon = if (isCallVisualizerScreenSharingUseCase()) {
-            R.drawable.ic_screensharing // TODO: 14.03.2023 MOB-1942 add this icon to UiTheme the same way as operatorPlaceholderIcon
+            configuration.iconScreenSharingDialog
         } else {
             configuration.operatorPlaceholderIcon
         }

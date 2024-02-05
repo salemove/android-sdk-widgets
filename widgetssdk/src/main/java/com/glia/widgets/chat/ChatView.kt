@@ -710,7 +710,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.addAttachmentQueue.adapter = uploadAttachmentAdapter
         binding.appBarView.setTheme(theme)
         binding.appBarView.setTitle(stringProvider.getRemoteString(R.string.engagement_chat_title))
-
         // icons
         theme.iconSendMessage?.also(binding.sendButton::setImageResource)
 

@@ -1,6 +1,5 @@
 package com.glia.widgets.chat.adapter.holder
 
-import android.widget.LinearLayout
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.widgets.R
 import com.glia.widgets.SnapshotTest
@@ -8,6 +7,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.chat.adapter.ChatAdapter
 import com.glia.widgets.chat.adapter.holder.fileattachment.OperatorFileAttachmentViewHolder
 import com.glia.widgets.chat.model.OperatorAttachmentItem
+import com.glia.widgets.databinding.ChatAttachmentOperatorFileLayoutBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.snapshotutils.SnapshotAttachment
 import com.glia.widgets.snapshotutils.SnapshotChatScreen
@@ -194,11 +194,7 @@ class OperatorFileAttachmentViewHolderSnapshotTest : SnapshotTest(
         }
 
         return OperatorFileAttachmentViewHolder(
-            layoutInflater.inflate(
-                R.layout.chat_attachment_operator_file_layout,
-                LinearLayout(context),
-                false
-            ),
+            ChatAttachmentOperatorFileLayoutBinding.inflate(layoutInflater),
             uiTheme
         ).also { viewHolder ->
             viewHolder.bind(item, object : ChatAdapter.OnFileItemClickListener {

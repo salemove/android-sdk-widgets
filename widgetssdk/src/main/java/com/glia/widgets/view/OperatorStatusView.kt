@@ -163,6 +163,8 @@ internal class OperatorStatusView @JvmOverloads constructor(
         updateProfilePictureViewSize(operatorImageLargeSize)
         profilePictureView.load(profileImgUrl, onSuccess = {
             updatePlaceholderView(operatorImageLargeSize, 0, GONE)
+        }, onError = {
+            showPlaceholder()
         })
     }
 
@@ -170,6 +172,8 @@ internal class OperatorStatusView @JvmOverloads constructor(
         updateProfilePictureViewSize(operatorImageSize)
         profilePictureView.load(profileImgUrl, onSuccess = {
             updatePlaceholderView(operatorImageSize, 0, GONE)
+        }, onError = {
+            showPlaceholder()
         })
     }
 

@@ -1,5 +1,6 @@
 package com.glia.widgets.operator
 
+import android.COMMON_EXTENSIONS_CLASS_PATH
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.chat.ChatActivity
@@ -21,14 +22,14 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkStatic
 import io.mockk.verify
+import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.processors.PublishProcessor
+import io.reactivex.schedulers.Schedulers
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-private const val COMMON_EXTENSIONS_CLASS_PATH = "com.glia.widgets.helper.CommonExtensionsKt"
-
-class OperatorRequestHandlerControllerTest {
+class OperatorRequestControllerTest {
     private val mediaUpgradeRequest = PublishProcessor.create<MediaUpgradeOfferData>()
     private val acceptMediaUpgradeRequestResult = PublishProcessor.create<MediaUpgradeOffer>()
 
@@ -39,10 +40,11 @@ class OperatorRequestHandlerControllerTest {
     private lateinit var dialogController: DialogContract.Controller
     private lateinit var dialogCallbackSlot: CapturingSlot<DialogContract.Controller.Callback>
 
-    private lateinit var controller: OperatorRequestHandlerContract.Controller
+    private lateinit var controller: OperatorRequestContract.Controller
 
     @Before
     fun setUp() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         operatorMediaUpgradeOfferUseCase = mockk(relaxUnitFun = true)
         every { operatorMediaUpgradeOfferUseCase() } returns mediaUpgradeRequest
 
@@ -55,7 +57,7 @@ class OperatorRequestHandlerControllerTest {
 
         dialogCallbackSlot = slot()
 
-        controller = OperatorRequestHandlerController(
+        controller = OperatorRequestController(
             operatorMediaUpgradeOfferUseCase,
             acceptMediaUpgradeOfferUseCase,
             declineMediaUpgradeOfferUseCase,
@@ -70,6 +72,7 @@ class OperatorRequestHandlerControllerTest {
 
     @After
     fun tearDown() {
+        RxAndroidPlugins.reset()
         confirmVerified(
             operatorMediaUpgradeOfferUseCase,
             acceptMediaUpgradeOfferUseCase,
@@ -99,7 +102,7 @@ class OperatorRequestHandlerControllerTest {
         verify { offer.isAudio }
 
         confirmVerified(offer)
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestHandlerContract.State.OpenCallActivity(Engagement.MediaType.AUDIO)))
+        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.AUDIO)))
 
         unmockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
     }
@@ -117,7 +120,7 @@ class OperatorRequestHandlerControllerTest {
         verify { offer.isAudio }
 
         confirmVerified(offer)
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestHandlerContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)))
+        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)))
 
         unmockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
     }
@@ -129,7 +132,7 @@ class OperatorRequestHandlerControllerTest {
 
         dialogCallbackSlot.captured.emitDialogState(DialogState.MediaUpgrade(data))
 
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestHandlerContract.State.RequestMediaUpgrade(data)))
+        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.RequestMediaUpgrade(data)))
     }
 
     @Test
@@ -138,7 +141,7 @@ class OperatorRequestHandlerControllerTest {
 
         dialogCallbackSlot.captured.emitDialogState(DialogState.None)
 
-        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestHandlerContract.State.DismissAlertDialog))
+        state.assertNotComplete().assertValue(OneTimeEvent(OperatorRequestContract.State.DismissAlertDialog))
     }
 
     @Test

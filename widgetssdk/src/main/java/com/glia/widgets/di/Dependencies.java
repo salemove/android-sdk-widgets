@@ -30,7 +30,7 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.ResourceProvider;
 import com.glia.widgets.helper.rx.GliaWidgetsSchedulers;
 import com.glia.widgets.helper.rx.Schedulers;
-import com.glia.widgets.operator.OperatorRequestHandlerActivityWatcher;
+import com.glia.widgets.operator.OperatorRequestActivityWatcher;
 import com.glia.widgets.permissions.ActivityWatcherForPermissionsRequest;
 import com.glia.widgets.view.head.ActivityWatcherForChatHead;
 import com.glia.widgets.view.head.ChatHeadContract;
@@ -118,16 +118,17 @@ public class Dependencies {
         );
 
         EngagementCompletionActivityWatcher engagementCompletionActivityWatcher = new EngagementCompletionActivityWatcher(
-            controllerFactory.getEndEngagementController()
+            controllerFactory.getEndEngagementController(),
+            new GliaActivityManagerImpl()
         );
         application.registerActivityLifecycleCallbacks(engagementCompletionActivityWatcher);
 
-        OperatorRequestHandlerActivityWatcher operatorRequestHandlerActivityWatcher = new OperatorRequestHandlerActivityWatcher(
-            controllerFactory.getRequestHandlerController(),
-            new GliaActivityManagerImpl(),
-            new IntentConfigurationHelperImpl()
+        OperatorRequestActivityWatcher operatorRequestActivityWatcher = new OperatorRequestActivityWatcher(
+            controllerFactory.getOperatorRequestController(),
+            new IntentConfigurationHelperImpl(),
+            new GliaActivityManagerImpl()
         );
-        application.registerActivityLifecycleCallbacks(operatorRequestHandlerActivityWatcher);
+        application.registerActivityLifecycleCallbacks(operatorRequestActivityWatcher);
     }
 
     public static Schedulers getSchedulers() {

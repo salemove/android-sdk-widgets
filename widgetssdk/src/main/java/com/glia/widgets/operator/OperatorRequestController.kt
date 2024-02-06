@@ -11,22 +11,23 @@ import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase
 import com.glia.widgets.helper.OneTimeEvent
+import com.glia.widgets.helper.asOneTimeStateFlowable
 import com.glia.widgets.helper.isAudio
 import com.glia.widgets.helper.unSafeSubscribe
 import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.reactivex.Flowable
 import io.reactivex.processors.PublishProcessor
 
-internal class OperatorRequestHandlerController(
+internal class OperatorRequestController(
     operatorMediaUpgradeOfferUseCase: OperatorMediaUpgradeOfferUseCase,
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val declineMediaUpgradeOfferUseCase: DeclineMediaUpgradeOfferUseCase,
     private val checkMediaUpgradePermissionsUseCase: CheckMediaUpgradePermissionsUseCase,
     private val dialogController: DialogContract.Controller
-) : OperatorRequestHandlerContract.Controller {
+) : OperatorRequestContract.Controller {
 
-    private val _state: PublishProcessor<OperatorRequestHandlerContract.State> = PublishProcessor.create()
-    override val state: Flowable<OneTimeEvent<OperatorRequestHandlerContract.State>> = _state.onBackpressureLatest().map(::OneTimeEvent)
+    private val _state: PublishProcessor<OperatorRequestContract.State> = PublishProcessor.create()
+    override val state: Flowable<OneTimeEvent<OperatorRequestContract.State>> = _state.asOneTimeStateFlowable()
     private val dialogCallback: DialogContract.Controller.Callback = DialogContract.Controller.Callback(::handleDialogCallback)
 
     init {
@@ -37,7 +38,7 @@ internal class OperatorRequestHandlerController(
 
     private fun handleMediaUpgradeOfferAcceptResult(mediaUpgradeOffer: MediaUpgradeOffer) {
         val mediaType = if (mediaUpgradeOffer.isAudio) Engagement.MediaType.AUDIO else Engagement.MediaType.VIDEO
-        _state.onNext(OperatorRequestHandlerContract.State.OpenCallActivity(mediaType))
+        _state.onNext(OperatorRequestContract.State.OpenCallActivity(mediaType))
     }
 
     private fun handleMediaUpgradeOffer(mediaUpgradeOfferData: MediaUpgradeOfferData) {
@@ -46,8 +47,8 @@ internal class OperatorRequestHandlerController(
 
     private fun handleDialogCallback(dialogState: DialogState) {
         when (dialogState) {
-            is DialogState.MediaUpgrade -> _state.onNext(OperatorRequestHandlerContract.State.RequestMediaUpgrade(dialogState.data))
-            DialogState.None -> _state.onNext(OperatorRequestHandlerContract.State.DismissAlertDialog)
+            is DialogState.MediaUpgrade -> _state.onNext(OperatorRequestContract.State.RequestMediaUpgrade(dialogState.data))
+            DialogState.None -> _state.onNext(OperatorRequestContract.State.DismissAlertDialog)
             else -> {
                 // no need for other dialogs here
             }

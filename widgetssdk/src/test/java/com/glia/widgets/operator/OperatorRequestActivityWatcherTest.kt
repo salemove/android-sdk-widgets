@@ -1,5 +1,7 @@
 package com.glia.widgets.operator
 
+import android.COMMON_EXTENSIONS_CLASS_PATH
+import android.LOGGER_PATH
 import android.app.Activity
 import android.content.Intent
 import android.view.View
@@ -27,27 +29,25 @@ import io.mockk.slot
 import io.mockk.unmockkObject
 import io.mockk.unmockkStatic
 import io.mockk.verify
+import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.processors.PublishProcessor
+import io.reactivex.schedulers.Schedulers
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-const val DIALOG_HOLDER_ACTIVITY_PATH = "com.glia.widgets.view.dialog.holder.DialogHolderActivity"
-const val LOGGER_PATH = "com.glia.widgets.helper.Logger"
-
-@RunWith(RobolectricTestRunner::class)
-class OperatorRequestHandlerActivityWatcherTest {
-    private val controllerState: PublishProcessor<OneTimeEvent<OperatorRequestHandlerContract.State>> = PublishProcessor.create()
-    private lateinit var controller: OperatorRequestHandlerContract.Controller
+class OperatorRequestActivityWatcherTest {
+    private val controllerState: PublishProcessor<OneTimeEvent<OperatorRequestContract.State>> = PublishProcessor.create()
+    private lateinit var controller: OperatorRequestContract.Controller
     private lateinit var gliaActivityManager: GliaActivityManager
     private lateinit var intentConfigurationHelper: IntentConfigurationHelper
 
-    private lateinit var watcher: OperatorRequestHandlerActivityWatcher
+    private lateinit var watcher: OperatorRequestActivityWatcher
 
     @Before
     fun setUp() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+
         Logger.setIsDebug(false)
 
         controller = mockk(relaxUnitFun = true)
@@ -55,35 +55,17 @@ class OperatorRequestHandlerActivityWatcherTest {
         gliaActivityManager = mockk(relaxUnitFun = true)
         intentConfigurationHelper = mockk(relaxUnitFun = true)
 
-        watcher = OperatorRequestHandlerActivityWatcher(controller, gliaActivityManager, intentConfigurationHelper)
+        watcher = OperatorRequestActivityWatcher(controller, intentConfigurationHelper, gliaActivityManager)
 
         verify { controller.state }
     }
 
     @After
     fun tearDown() {
-        confirmVerified(controller, gliaActivityManager, intentConfigurationHelper)
-        unmockkStatic(DIALOG_HOLDER_ACTIVITY_PATH, LOGGER_PATH)
-    }
+        RxAndroidPlugins.reset()
 
-    @Test
-    fun `onActivityCreated adds activity to gliaManager`() {
-        val activity: CallActivity = mockk()
-        watcher.onActivityCreated(activity, null)
-        verify { gliaActivityManager.onActivityCreated(activity) }
-        verify(exactly = 0) { gliaActivityManager.onActivityDestroyed(activity) }
-
-        confirmVerified(activity)
-    }
-
-    @Test
-    fun `onActivityDestroyed remove activity from gliaManager`() {
-        val activity: CallActivity = mockk()
-        watcher.onActivityDestroyed(activity)
-        verify(exactly = 0) { gliaActivityManager.onActivityCreated(activity) }
-        verify { gliaActivityManager.onActivityDestroyed(activity) }
-
-        confirmVerified(activity)
+        confirmVerified(controller, intentConfigurationHelper)
+        unmockkStatic(LOGGER_PATH)
     }
 
     @Test
@@ -92,15 +74,17 @@ class OperatorRequestHandlerActivityWatcherTest {
         val activityFinishing: Activity = mockk(relaxed = true)
         every { activityFinishing.isFinishing } returns true
 
-        val state: OperatorRequestHandlerContract.State = OperatorRequestHandlerContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+        val state: OperatorRequestContract.State = OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
 
-        val event: OneTimeEvent<OperatorRequestHandlerContract.State> = mockk()
-        every { event.view() } returns state
+        val event: OneTimeEvent<OperatorRequestContract.State> = mockk()
+        every { event.value } returns state
+        every { event.consumed } returns false
 
         watcher.onActivityResumed(activityFinishing)
         controllerState.onNext(event)
 
-        verify { event.view() }
+        verify { event.value }
+        verify { event.consumed }
         verify { activityFinishing.isFinishing }
         verify { Logger.d(any(), any()) }
         verify { activityFinishing.toString() }
@@ -109,18 +93,20 @@ class OperatorRequestHandlerActivityWatcherTest {
     }
 
     @Test
-    fun `handleState does nothing when state is null`() {
+    fun `handleState does nothing when state is consumed`() {
         mockLogger()
         val activityFinishing: Activity = mockk(relaxed = true)
         every { activityFinishing.isFinishing } returns false
 
-        val event: OneTimeEvent<OperatorRequestHandlerContract.State> = mockk()
-        every { event.view() } returns null
+        val event: OneTimeEvent<OperatorRequestContract.State> = mockk()
+        every { event.consumed } returns true
+        every { event.value } returns mockk()
 
         watcher.onActivityResumed(activityFinishing)
         controllerState.onNext(event)
 
-        verify { event.view() }
+        verify { event.value }
+        verify { event.consumed }
         verify(exactly = 0) { activityFinishing.isFinishing }
         verify { Logger.d(any(), any()) }
         verify { activityFinishing.toString() }
@@ -136,9 +122,9 @@ class OperatorRequestHandlerActivityWatcherTest {
         fireState<ChatActivity>(
             controllerState,
             watcher,
-            OperatorRequestHandlerContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+            OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
         ) { event, activity ->
-            verify { event.markConsumed() }
+            verify { event.consume(any()) }
             verify { gliaActivityManager.finishActivities() }
             verify { intentConfigurationHelper.createForCall(any(), any(), any()) }
             verify { activity.startActivity(intent) }
@@ -155,9 +141,9 @@ class OperatorRequestHandlerActivityWatcherTest {
         fireState<Activity>(
             controllerState,
             watcher,
-            OperatorRequestHandlerContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+            OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
         ) { event, activity ->
-            verify { event.markConsumed() }
+            verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
             verify { intentConfigurationHelper.createForCall(any(), any(), any()) }
             verify { activity.startActivity(intent) }
@@ -174,9 +160,9 @@ class OperatorRequestHandlerActivityWatcherTest {
         fireState<CallActivity>(
             controllerState,
             watcher,
-            OperatorRequestHandlerContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
+            OperatorRequestContract.State.OpenCallActivity(Engagement.MediaType.VIDEO)
         ) { event, activity ->
-            verify { event.markConsumed() }
+            verify { event.consume(any()) }
             verify(exactly = 0) { gliaActivityManager.finishActivities() }
             verify(exactly = 0) { intentConfigurationHelper.createForCall(any(), any(), any()) }
             verify(exactly = 0) { activity.startActivity(intent) }
@@ -190,7 +176,7 @@ class OperatorRequestHandlerActivityWatcherTest {
         fireState<Activity>(
             controllerState,
             watcher,
-            OperatorRequestHandlerContract.State.RequestMediaUpgrade(mockk())
+            OperatorRequestContract.State.RequestMediaUpgrade(mockk())
         ) { event, activity ->
             verify(exactly = 0) { event.markConsumed() }
             verify { activity.packageName }
@@ -208,26 +194,20 @@ class OperatorRequestHandlerActivityWatcherTest {
         val offer: MediaUpgradeOffer = mockk(relaxed = true)
         val data: MediaUpgradeOfferData = mockk(relaxed = true)
         every { data.offer } returns offer
-        val state = OperatorRequestHandlerContract.State.RequestMediaUpgrade(data)
-        val uiTheme = UiTheme()
+        val state = OperatorRequestContract.State.RequestMediaUpgrade(data)
 
         fireState<ChatActivity>(
             controllerState,
             watcher,
             state
         ) { event, activity ->
-            every { activity.runtimeTheme } returns uiTheme
-
-            val uiThreadSlot = slot<Runnable>()
-            verify { activity.runOnUiThread(capture(uiThreadSlot)) }
-            uiThreadSlot.captured.run()
 
             verify(exactly = 0) { event.markConsumed() }
             verify { activity.runtimeTheme }
 
             val onAcceptSlot = slot<View.OnClickListener>()
             val onDeclineSlot = slot<View.OnClickListener>()
-            verify { Dialogs.showUpgradeDialog(activity, uiTheme, data, capture(onAcceptSlot), capture(onDeclineSlot)) }
+            verify { Dialogs.showUpgradeDialog(activity, any(), data, capture(onAcceptSlot), capture(onDeclineSlot)) }
 
             onAcceptSlot.captured.onClick(mockk())
             verify { activity.obtainStyledAttributes(any(), any(), any(), any()) }
@@ -244,31 +224,26 @@ class OperatorRequestHandlerActivityWatcherTest {
     @Test
     fun `RequestMediaUpgrade will decline offer when it dialog is declined`() {
         mockkObject(Dialogs)
+        mockkStatic(COMMON_EXTENSIONS_CLASS_PATH)
         val dialog: AlertDialog = mockk(relaxed = true)
         every { Dialogs.showUpgradeDialog(any(), any(), any(), any(), any()) } returns dialog
         val offer: MediaUpgradeOffer = mockk(relaxed = true)
         val data: MediaUpgradeOfferData = mockk(relaxed = true)
         every { data.offer } returns offer
-        val state = OperatorRequestHandlerContract.State.RequestMediaUpgrade(data)
-        val uiTheme = UiTheme()
+        val state = OperatorRequestContract.State.RequestMediaUpgrade(data)
 
         fireState<ChatActivity>(
             controllerState,
             watcher,
             state
         ) { event, activity ->
-            every { activity.runtimeTheme } returns uiTheme
-
-            val uiThreadSlot = slot<Runnable>()
-            verify { activity.runOnUiThread(capture(uiThreadSlot)) }
-            uiThreadSlot.captured.run()
 
             verify(exactly = 0) { event.markConsumed() }
             verify { activity.runtimeTheme }
 
             val onAcceptSlot = slot<View.OnClickListener>()
             val onDeclineSlot = slot<View.OnClickListener>()
-            verify { Dialogs.showUpgradeDialog(activity, uiTheme, data, capture(onAcceptSlot), capture(onDeclineSlot)) }
+            verify { Dialogs.showUpgradeDialog(activity, any(), data, capture(onAcceptSlot), capture(onDeclineSlot)) }
 
             onDeclineSlot.captured.onClick(mockk())
             verify { activity.obtainStyledAttributes(any(), any(), any(), any()) }
@@ -290,36 +265,33 @@ class OperatorRequestHandlerActivityWatcherTest {
         val offer: MediaUpgradeOffer = mockk(relaxed = true)
         val data: MediaUpgradeOfferData = mockk(relaxed = true)
         every { data.offer } returns offer
-        val state = OperatorRequestHandlerContract.State.RequestMediaUpgrade(data)
-        val uiTheme = UiTheme()
+        val state = OperatorRequestContract.State.RequestMediaUpgrade(data)
 
         fireState<ChatActivity>(
             controllerState,
             watcher,
             state
         ) { event, activity ->
-            every { activity.runtimeTheme } returns uiTheme
-
-            val uiThreadSlot = slot<Runnable>()
-            verify { activity.runOnUiThread(capture(uiThreadSlot)) }
-            uiThreadSlot.captured.run()
 
             verify(exactly = 0) { event.markConsumed() }
             verify { activity.runtimeTheme }
 
             val onAcceptSlot = slot<View.OnClickListener>()
             val onDeclineSlot = slot<View.OnClickListener>()
-            verify { Dialogs.showUpgradeDialog(activity, uiTheme, data, capture(onAcceptSlot), capture(onDeclineSlot)) }
+            verify { Dialogs.showUpgradeDialog(activity, any(), data, capture(onAcceptSlot), capture(onDeclineSlot)) }
 
             verify { activity.obtainStyledAttributes(any(), any(), any(), any()) }
 
-            val dismissEvent: OneTimeEvent<OperatorRequestHandlerContract.State> = mockk(relaxed = true)
-            every { dismissEvent.view() } returns OperatorRequestHandlerContract.State.DismissAlertDialog
+            val dismissEvent: OneTimeEvent<OperatorRequestContract.State> = mockk(relaxed = true)
+            every { dismissEvent.value } returns OperatorRequestContract.State.DismissAlertDialog
+            every { dismissEvent.consume(captureLambda()) } answers {
+                firstArg<OperatorRequestContract.State.() -> Unit>().invoke(state)
+            }
             controllerState.onNext(dismissEvent)
 
-            verify { dismissEvent.view() }
+            verify { dismissEvent.value }
             verify { activity.isFinishing }
-            verify { dismissEvent.markConsumed() }
+            verify { dismissEvent.consume(any()) }
             verify { dialog.dismiss() }
 
             confirmVerified(dialog, offer, data, event, activity)
@@ -335,22 +307,27 @@ class OperatorRequestHandlerActivityWatcherTest {
 }
 
 internal inline fun <reified T : Activity> fireState(
-    controllerState: PublishProcessor<OneTimeEvent<OperatorRequestHandlerContract.State>>,
-    watcher: OperatorRequestHandlerActivityWatcher,
-    state: OperatorRequestHandlerContract.State,
-    callback: (OneTimeEvent<OperatorRequestHandlerContract.State>, T) -> Unit
+    controllerState: PublishProcessor<OneTimeEvent<OperatorRequestContract.State>>,
+    watcher: OperatorRequestActivityWatcher,
+    state: OperatorRequestContract.State,
+    callback: (OneTimeEvent<OperatorRequestContract.State>, T) -> Unit
 ) {
     val activity = mockk<T>(relaxed = true)
     every { activity.isFinishing } returns false
+    every { activity.runtimeTheme } returns UiTheme()
 
-    val event: OneTimeEvent<OperatorRequestHandlerContract.State> = mockk(relaxUnitFun = true)
-    every { event.view() } returns state
+    val event: OneTimeEvent<OperatorRequestContract.State> = mockk(relaxed = true)
+    every { event.value } returns state
+    every { event.consume(captureLambda()) } answers {
+        firstArg<OperatorRequestContract.State.() -> Unit>().invoke(state)
+    }
 
     watcher.onActivityResumed(activity)
     controllerState.onNext(event)
 
     verify { activity.isFinishing }
-    verify { event.view() }
+    verify { event.value }
+    verify { event.consumed }
 
     callback(event, activity)
 }

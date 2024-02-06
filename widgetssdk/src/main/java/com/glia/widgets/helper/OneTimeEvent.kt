@@ -1,17 +1,16 @@
 package com.glia.widgets.helper
 
-internal data class OneTimeEvent<T>(private val value: T) {
-    private var _isConsumed: Boolean = false
-
-    fun consume(): T {
-        val captured = checkNotNull(view()) { "value was consumed before" }
-        markConsumed()
-        return captured
-    }
+internal data class OneTimeEvent<out T>(val value: T) {
+    var consumed: Boolean = false
+        private set
 
     fun markConsumed() {
-        _isConsumed = true
+        consumed = true
     }
 
-    fun view(): T? = if (_isConsumed) null else value
+    fun consume(consumeCallback: T.() -> Unit) {
+        markConsumed()
+        consumeCallback(value)
+    }
+
 }

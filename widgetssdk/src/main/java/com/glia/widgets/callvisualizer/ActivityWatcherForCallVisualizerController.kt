@@ -209,7 +209,7 @@ internal class ActivityWatcherForCallVisualizerController(
             override fun onScreenSharingRequestError(message: String) = watcher.showToast(message)
 
             override fun onScreenSharingStarted() {
-                if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
+                if (isShowOverlayPermissionRequestDialogUseCase.invoke()) {
                     currentDialogState = DialogState.OverlayPermission
                     watcher.callOverlayDialog()
                 }

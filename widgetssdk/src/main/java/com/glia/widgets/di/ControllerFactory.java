@@ -27,8 +27,8 @@ import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.TimeCounter;
 import com.glia.widgets.messagecenter.MessageCenterContract;
 import com.glia.widgets.messagecenter.MessageCenterController;
-import com.glia.widgets.operator.OperatorRequestHandlerContract;
-import com.glia.widgets.operator.OperatorRequestHandlerController;
+import com.glia.widgets.operator.OperatorRequestContract;
+import com.glia.widgets.operator.OperatorRequestController;
 import com.glia.widgets.permissions.PermissionsRequestContract;
 import com.glia.widgets.permissions.controller.PermissionsRequestController;
 import com.glia.widgets.survey.SurveyContract;
@@ -373,16 +373,17 @@ public class ControllerFactory {
     public EngagementCompletionContract.Controller getEndEngagementController() {
         if (engagementCompletionController == null) {
             engagementCompletionController = new EngagementCompletionController(
-                useCaseFactory.getEngagementCompletionUseCase(),
-                useCaseFactory.getReleaseResourcesUseCase(dialogController)
+                useCaseFactory.getReleaseResourcesUseCase(dialogController),
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.getSurveyUseCase()
             );
         }
         return engagementCompletionController;
     }
 
     @NonNull
-    public OperatorRequestHandlerContract.Controller getRequestHandlerController() {
-        return new OperatorRequestHandlerController(
+    public OperatorRequestContract.Controller getOperatorRequestController() {
+        return new OperatorRequestController(
             useCaseFactory.getOperatorMediaUpgradeOfferUseCase(),
             useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
             useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),

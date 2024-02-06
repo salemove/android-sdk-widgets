@@ -1,5 +1,6 @@
 package com.glia.widgets.chat
 
+import android.os.Looper
 import com.glia.androidsdk.chat.ChatMessage
 import com.glia.androidsdk.chat.OperatorMessage
 import com.glia.androidsdk.chat.SystemMessage
@@ -31,6 +32,7 @@ import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.processors.BehaviorProcessor
 import io.reactivex.schedulers.Schedulers
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -46,10 +48,10 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 import java.util.UUID
 
 @RunWith(RobolectricTestRunner::class)
@@ -75,7 +77,7 @@ class ChatManagerTest {
     @Before
     fun setUp() {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-        state = spy(ChatManager.State())
+        state = ChatManager.State()
         onMessageUseCase = mock()
         loadHistoryUseCase = mock()
         addNewMessagesDividerUseCase = mock()
@@ -87,30 +89,33 @@ class ChatManagerTest {
         isAuthenticatedUseCase = mock()
         isQueueingOrEngagementUseCase = mock()
         compositeDisposable = spy()
-        stateProcessor = spy(BehaviorProcessor.createDefault(state))
+        stateProcessor = BehaviorProcessor.createDefault(state)
         quickReplies = BehaviorProcessor.create()
         action = BehaviorProcessor.create()
         historyLoaded = BehaviorProcessor.createDefault(false)
 
-        subjectUnderTest = spy(
-            ChatManager(
-                onMessageUseCase,
-                loadHistoryUseCase,
-                addNewMessagesDividerUseCase,
-                markMessagesReadWithDelayUseCase,
-                appendHistoryChatMessageUseCase,
-                appendNewChatMessageUseCase,
-                sendUnsentMessagesUseCase,
-                handleCustomCardClickUseCase,
-                isAuthenticatedUseCase,
-                isQueueingOrEngagementUseCase,
-                compositeDisposable,
-                stateProcessor,
-                quickReplies,
-                action,
-                historyLoaded
-            )
+        subjectUnderTest = ChatManager(
+            onMessageUseCase,
+            loadHistoryUseCase,
+            addNewMessagesDividerUseCase,
+            markMessagesReadWithDelayUseCase,
+            appendHistoryChatMessageUseCase,
+            appendNewChatMessageUseCase,
+            sendUnsentMessagesUseCase,
+            handleCustomCardClickUseCase,
+            isAuthenticatedUseCase,
+            isQueueingOrEngagementUseCase,
+            compositeDisposable,
+            stateProcessor,
+            quickReplies,
+            action,
+            historyLoaded
         )
+    }
+
+    @After
+    fun tearDown() {
+        RxAndroidPlugins.reset()
     }
 
     @Test
@@ -127,14 +132,16 @@ class ChatManagerTest {
             add(NewMessagesDividerItem)
             add(mock())
         }
-        stateProcessor.onNext(state)
+        val stateProcessorSpy = spy(stateProcessor)
+        stateProcessorSpy.onNext(state)
         whenever(markMessagesReadWithDelayUseCase()) doReturn Completable.complete()
-        assertTrue(stateProcessor.value!!.chatItems.contains(NewMessagesDividerItem))
-        subjectUnderTest.markMessagesReadWithDelay()
-        verify(subjectUnderTest).removeNewMessagesDivider(any())
-        assertFalse(stateProcessor.value!!.chatItems.contains(NewMessagesDividerItem))
+        assertTrue(stateProcessorSpy.value!!.chatItems.contains(NewMessagesDividerItem))
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.markMessagesReadWithDelay()
+        verify(subjectUnderTestSpy).removeNewMessagesDivider(any())
+        assertFalse(stateProcessorSpy.value!!.chatItems.contains(NewMessagesDividerItem))
         verify(compositeDisposable).add(any())
-        verify(stateProcessor, times(2)).onNext(any())
+        verify(stateProcessorSpy).onNext(any())
     }
 
     @Test
@@ -158,10 +165,12 @@ class ChatManagerTest {
     @Test
     fun `mapOperatorConnected adds OperatorStatusItem_Connected when the old is null`() {
         val action = ChatManager.Action.OperatorConnected("c_name", "o_name", "o_image")
-        subjectUnderTest.mapOperatorConnected(action, state)
-        verify(subjectUnderTest).checkUnsentMessages(any())
-        verify(state).resetOperator()
-        val newItem = state.chatItems.last() as OperatorStatusItem.Connected
+        val stateSpy = spy(state)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapOperatorConnected(action, stateSpy)
+        verify(subjectUnderTestSpy).checkUnsentMessages(any())
+        verify(stateSpy).resetOperator()
+        val newItem = stateSpy.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
         assertEquals(newItem.companyName, action.companyName)
         assertEquals(newItem.profileImgUrl, action.operatorImageUrl)
@@ -176,8 +185,9 @@ class ChatManagerTest {
             chatItems.add(mock())
             chatItems.add(OperatorStatusItem.Transferring)
         }
-        val newState = subjectUnderTest.mapOperatorConnected(action, state)
-        verify(subjectUnderTest).checkUnsentMessages(any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val newState = subjectUnderTestSpy.mapOperatorConnected(action, state)
+        verify(subjectUnderTestSpy).checkUnsentMessages(any())
         val newItem = newState.chatItems.last() as OperatorStatusItem.Connected
         assertEquals(newItem.operatorName, action.operatorFormattedName)
         assertEquals(newItem.companyName, action.companyName)
@@ -298,8 +308,9 @@ class ChatManagerTest {
             on { message } doReturn visitorMessage
         }
 
-        subjectUnderTest.mapMessageSent(action.message, state)
-        verify(subjectUnderTest).mapNewMessage(any(), eq(state))
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapMessageSent(action.message, state)
+        verify(subjectUnderTestSpy).mapNewMessage(any(), eq(state))
     }
 
     @Test
@@ -319,8 +330,9 @@ class ChatManagerTest {
             on { companyName } doReturn ""
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapInQueue(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapInQueue(any(), any())
     }
 
     @Test
@@ -330,16 +342,18 @@ class ChatManagerTest {
             on { operatorFormattedName } doReturn ""
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapOperatorConnected(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapOperatorConnected(any(), any())
     }
 
     @Test
     fun `mapAction calls mapTransferring when Action_Transferring passed`() {
         val action: ChatManager.Action.Transferring = ChatManager.Action.Transferring
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapTransferring(any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapTransferring(any())
     }
 
     @Test
@@ -349,8 +363,9 @@ class ChatManagerTest {
             on { operatorFormattedName } doReturn ""
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapOperatorJoined(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapOperatorJoined(any(), any())
     }
 
     @Test
@@ -359,8 +374,9 @@ class ChatManagerTest {
             on { message } doReturn mock()
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).addUnsentMessage(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).addUnsentMessage(any(), any())
     }
 
     @Test
@@ -370,8 +386,9 @@ class ChatManagerTest {
         }
         state.chatItems.add(action.responseCard)
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapResponseCardClicked(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapResponseCardClicked(any(), any())
     }
 
     @Test
@@ -380,24 +397,27 @@ class ChatManagerTest {
             on { isVideo } doReturn true
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapMediaUpgrade(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapMediaUpgrade(any(), any())
     }
 
     @Test
     fun `mapAction calls mapUpgradeMediaToVideo when Action_OnMediaUpgradeToVideo passed`() {
         val action: ChatManager.Action.OnMediaUpgradeToVideo = ChatManager.Action.OnMediaUpgradeToVideo
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapUpgradeMediaToVideo(any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapUpgradeMediaToVideo(any())
     }
 
     @Test
     fun `mapAction calls mapMediaUpgradeCanceled when Action_OnMediaUpgradeCanceled passed`() {
         val action: ChatManager.Action.OnMediaUpgradeCanceled = ChatManager.Action.OnMediaUpgradeCanceled
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapMediaUpgradeCanceled(any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapMediaUpgradeCanceled(any())
     }
 
     @Test
@@ -406,8 +426,9 @@ class ChatManagerTest {
             on { formattedValue } doReturn "10"
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapMediaUpgradeTimerUpdated(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapMediaUpgradeTimerUpdated(any(), any())
     }
 
     @Test
@@ -417,8 +438,9 @@ class ChatManagerTest {
             on { attachment } doReturn mock()
         }
 
-        subjectUnderTest.mapAction(action, state)
-        verify(subjectUnderTest).mapCustomCardClicked(any(), any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapAction(action, state)
+        verify(subjectUnderTestSpy).mapCustomCardClicked(any(), any())
     }
 
     @Test
@@ -439,34 +461,41 @@ class ChatManagerTest {
     @Test
     fun `mapNewMessage does nothing when message is not new`() {
         val chatMessageInternal = mockChatMessage<OperatorMessage>()
-        doReturn(false).whenever(state).isNew(chatMessageInternal)
+        val stateSpy = spy(state)
+        doReturn(false).whenever(stateSpy).isNew(chatMessageInternal)
 
-        subjectUnderTest.mapNewMessage(chatMessageInternal, state)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapNewMessage(chatMessageInternal, stateSpy)
 
         verify(appendNewChatMessageUseCase, never()).invoke(any(), any())
-        verify(subjectUnderTest, never()).checkUnsentMessages(any())
+        verify(subjectUnderTestSpy, never()).checkUnsentMessages(any())
     }
 
     @Test
     fun `mapNewMessage calls appendNewChatMessageUseCase when message is new`() {
         val chatMessageInternal = mockChatMessage<OperatorMessage>()
-        doReturn(true).whenever(state).isNew(chatMessageInternal)
+        val stateSpy = spy(state)
 
-        subjectUnderTest.mapNewMessage(chatMessageInternal, state)
+        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
+
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapNewMessage(chatMessageInternal, stateSpy)
 
         verify(appendNewChatMessageUseCase).invoke(any(), any())
-        verify(subjectUnderTest, never()).checkUnsentMessages(any())
+        verify(subjectUnderTestSpy, never()).checkUnsentMessages(any())
     }
 
     @Test
     fun `mapNewMessage calls checkUnsentMessage when message is new VisitorMessage`() {
         val chatMessageInternal = mockChatMessage<VisitorMessage>()
-        doReturn(true).whenever(state).isNew(chatMessageInternal)
+        val stateSpy = spy(state)
+        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
 
-        subjectUnderTest.mapNewMessage(chatMessageInternal, state)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.mapNewMessage(chatMessageInternal, stateSpy)
 
         verify(appendNewChatMessageUseCase).invoke(any(), any())
-        verify(subjectUnderTest).checkUnsentMessages(any())
+        verify(subjectUnderTestSpy).checkUnsentMessages(any())
     }
 
     @Test
@@ -481,13 +510,14 @@ class ChatManagerTest {
         whenever(addNewMessagesDividerUseCase(any(), any())) doReturn true
         whenever(markMessagesReadWithDelayUseCase()) doReturn Completable.complete()
 
-        val newState = subjectUnderTest.mapChatHistory(chatHistoryResponse, state)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val newState = subjectUnderTestSpy.mapChatHistory(chatHistoryResponse, state)
 
         verify(appendHistoryChatMessageUseCase).invoke(any(), any(), eq(true))
         verify(appendHistoryChatMessageUseCase).invoke(any(), any(), eq(false))
 
         assertTrue(newState.chatItemIds.count() == 2)
-        verify(subjectUnderTest).markMessagesReadWithDelay()
+        verify(subjectUnderTestSpy).markMessagesReadWithDelay()
     }
 
     @Test
@@ -500,20 +530,22 @@ class ChatManagerTest {
 
         state.unsentItems.add(unsentMessage)
 
-        subjectUnderTest.checkUnsentMessages(state)
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.checkUnsentMessages(state)
         verify(sendUnsentMessagesUseCase).invoke(any(), any(), any())
-        verify(subjectUnderTest).onChatAction(any())
+        verify(subjectUnderTestSpy).onChatAction(any())
     }
 
     @Test
     fun `onAction triggers mapAction when new action received`() {
         stateProcessor.onNext(state)
-        val onActionFlowable = subjectUnderTest.onAction().test()
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val onActionFlowable = subjectUnderTestSpy.onAction().test()
         onActionFlowable.assertNoValues()
 
         action.onNext(ChatManager.Action.ChatRestored)
         onActionFlowable.assertValue(state)
-        verify(subjectUnderTest).mapAction(any(), any())
+        verify(subjectUnderTestSpy).mapAction(any(), any())
     }
 
     @Test
@@ -522,11 +554,12 @@ class ChatManagerTest {
         val messageProcessor: BehaviorProcessor<ChatMessageInternal> = BehaviorProcessor.create()
         whenever(onMessageUseCase()) doReturn messageProcessor.share().toObservable()
 
-        val onMessageFlowable = subjectUnderTest.onMessage().test()
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val onMessageFlowable = subjectUnderTestSpy.onMessage().test()
         onMessageFlowable.assertNoValues()
 
         messageProcessor.onNext(mockChatMessage<OperatorMessage>())
-        verify(subjectUnderTest).mapNewMessage(any(), any())
+        verify(subjectUnderTestSpy).mapNewMessage(any(), any())
     }
 
     @Test
@@ -550,6 +583,8 @@ class ChatManagerTest {
         testSubscriber.assertSubscribed()
 
         quickReplies.onNext(emptyList())
+        shadowOf(Looper.getMainLooper()).idle()
+
         verify(callback).invoke(any())
     }
 
@@ -564,9 +599,10 @@ class ChatManagerTest {
 
         val loadHistoryCallback: (Boolean) -> Unit = mock()
 
-        val testFlowable = subjectUnderTest.loadHistory(loadHistoryCallback).test()
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback).test()
 
-        verify(subjectUnderTest).mapChatHistory(any(), any())
+        verify(subjectUnderTestSpy).mapChatHistory(any(), any())
 
         assertTrue(testFlowable.valueCount() == 1)
         historyLoadedTest.assertValues(false, true)
@@ -583,9 +619,10 @@ class ChatManagerTest {
 
         val loadHistoryCallback: (Boolean) -> Unit = mock()
 
-        val testFlowable = subjectUnderTest.loadHistory(loadHistoryCallback).test()
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback).test()
 
-        verify(subjectUnderTest).mapChatHistory(any(), any())
+        verify(subjectUnderTestSpy).mapChatHistory(any(), any())
 
         assertTrue(testFlowable.valueCount() == 1)
         historyLoadedTest.assertValues(false, true)
@@ -602,9 +639,10 @@ class ChatManagerTest {
 
         val loadHistoryCallback: (Boolean) -> Unit = mock()
 
-        val testFlowable = subjectUnderTest.loadHistory(loadHistoryCallback).test()
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        val testFlowable = subjectUnderTestSpy.loadHistory(loadHistoryCallback).test()
 
-        verify(subjectUnderTest, never()).mapChatHistory(any(), any())
+        verify(subjectUnderTestSpy, never()).mapChatHistory(any(), any())
         verify(loadHistoryCallback).invoke(false)
 
         assertTrue(testFlowable.valueCount() == 1)
@@ -614,16 +652,18 @@ class ChatManagerTest {
     @Test
     fun `subscribeToState subscribes to history and messages`() {
         val chatMessageInternal = mockChatMessage<SystemMessage>()
-        doReturn(true).whenever(state).isNew(chatMessageInternal)
-        doReturn(10).whenever(state).addedMessagesCount
-        stateProcessor.onNext(state)
+        val stateSpy = spy(state)
+        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
+        doReturn(10).whenever(stateSpy).addedMessagesCount
+        stateProcessor.onNext(stateSpy)
 
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
         whenever(onMessageUseCase()) doReturn Observable.just(chatMessageInternal)
 
-        subjectUnderTest.subscribeToState(mock(), mock())
-        verify(subjectUnderTest).loadHistory(any())
-        verify(subjectUnderTest).subscribeToMessages(any())
+        val subjectUnderTestSpy = spy(subjectUnderTest)
+        subjectUnderTestSpy.subscribeToState(mock(), mock())
+        verify(subjectUnderTestSpy).loadHistory(any())
+        verify(subjectUnderTestSpy).subscribeToMessages(any())
     }
 
     @Test
@@ -650,9 +690,10 @@ class ChatManagerTest {
     @Test
     fun `subscribe subscribes to state and quick replies`() {
         whenever(loadHistoryUseCase()) doReturn Single.just(mock())
-        whenever(onMessageUseCase()) doReturn Observable.just(mock())
+        val mockChatMessage = mockChatMessage<ChatMessage>()
+        whenever(onMessageUseCase()) doReturn Observable.just(mockChatMessage)
 
-        subjectUnderTest.apply {
+        spy(subjectUnderTest).apply {
             subscribe({ }, { }, { })
             verify(this).subscribeToState(any(), any())
             verify(this).subscribeToQuickReplies(any())
@@ -662,12 +703,13 @@ class ChatManagerTest {
     @Test
     fun `initialize subscribes to state and quick replies`() {
         val chatMessageInternal = mockChatMessage<SystemMessage>()
-        doReturn(true).whenever(state).isNew(chatMessageInternal)
+        val stateSpy = spy(state)
+        doReturn(true).whenever(stateSpy).isNew(chatMessageInternal)
 
         whenever(loadHistoryUseCase()) doReturn Single.just(ChatHistoryResponse(emptyList()))
         whenever(onMessageUseCase()) doReturn Observable.just(chatMessageInternal)
 
-        subjectUnderTest.apply {
+        spy(subjectUnderTest).apply {
             val onHistoryLoaded = mock<(hasHistory: Boolean) -> Unit>()
             val onQuickReplyReceived = mock<(List<GvaButton>) -> Unit>()
             val onOperatorMessageReceived = mock<(count: Int) -> Unit>()
@@ -678,10 +720,10 @@ class ChatManagerTest {
             verify(this).subscribeToState(onHistoryLoaded, onOperatorMessageReceived)
             verify(this).subscribeToQuickReplies(onQuickReplyReceived)
 
-            stateProcessor.onNext(state)
+            stateProcessor.onNext(stateSpy)
 
             verify(this, atLeastOnce()).updateQuickReplies(any())
-            verify(state, atLeastOnce()).immutableChatItems
+            verify(stateSpy, atLeastOnce()).immutableChatItems
         }
     }
 

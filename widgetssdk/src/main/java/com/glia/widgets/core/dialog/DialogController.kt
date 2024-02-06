@@ -118,7 +118,7 @@ internal class DialogController(
 
     override fun showEnableCallNotificationChannelDialog() {
         Logger.i(TAG, "Show Enable Call Notification Channel Dialog")
-        setEnableCallNotificationChannelDialogShownUseCase.execute()
+        setEnableCallNotificationChannelDialogShownUseCase.invoke()
         dialogManager.addAndEmit(DialogState.EnableNotificationChannel)
     }
 

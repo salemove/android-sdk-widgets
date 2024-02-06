@@ -163,7 +163,7 @@ internal class CallController(
     ) {
         sdkConfigurationManager.isUseOverlay = useOverlays
         sdkConfigurationManager.screenSharingMode = screenSharingMode
-        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
+        if (isShowOverlayPermissionRequestDialogUseCase.invoke()) {
             dialogController.showOverlayPermissionsDialog()
         }
         messagesNotSeenHandler.onNavigatedToCall()
@@ -364,12 +364,12 @@ internal class CallController(
         if (!isQueueingOrEngagementUseCase.hasOngoingEngagement) return
         d(TAG, "newOperatorMediaState: $operatorMediaState, timer task running: ${callTimer.isRunning}")
         if (operatorMediaState.video != null) {
-            if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
+            if (isShowEnableCallNotificationChannelDialogUseCase()) {
                 dialogController.showEnableCallNotificationChannelDialog()
             }
             onOperatorMediaStateVideo(operatorMediaState)
         } else if (operatorMediaState.audio != null) {
-            if (isShowEnableCallNotificationChannelDialogUseCase.execute()) {
+            if (isShowEnableCallNotificationChannelDialogUseCase()) {
                 dialogController.showEnableCallNotificationChannelDialog()
             }
             onOperatorMediaStateAudio(operatorMediaState)

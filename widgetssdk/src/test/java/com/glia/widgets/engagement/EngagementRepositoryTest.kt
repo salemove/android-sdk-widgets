@@ -1,5 +1,6 @@
 package com.glia.widgets.engagement
 
+import android.LOGGER_PATH
 import android.app.Activity
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Engagement.MediaType
@@ -115,7 +116,7 @@ class EngagementRepositoryTest {
 
     private fun mockLogger() {
         Logger.setIsDebug(false)
-        mockkStatic("com.glia.widgets.helper.Logger")
+        mockkStatic(LOGGER_PATH)
         every { Logger.i(any(), any()) } just Runs
         every { Logger.i(any(), any(), any()) } just Runs
 
@@ -376,7 +377,7 @@ class EngagementRepositoryTest {
     @After
     fun tearDown() {
         confirmVerified(core, operatorRepository, callVisualizer)
-        unmockkStatic("com.glia.widgets.helper.Logger")
+        unmockkStatic(LOGGER_PATH)
     }
 
     @Test

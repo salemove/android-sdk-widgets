@@ -6,12 +6,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.glia.widgets.base.BaseActivityWatcher
+import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.helper.WeakReferenceDelegate
 
 internal class ActivityWatcherForPermissionsRequest(
     private val controller: PermissionsRequestContract.Controller
-) : BaseActivityWatcher(), PermissionsRequestContract.Watcher {
+) : BaseActivityStackWatcher(), PermissionsRequestContract.Watcher {
 
     init {
         controller.setWatcher(this)

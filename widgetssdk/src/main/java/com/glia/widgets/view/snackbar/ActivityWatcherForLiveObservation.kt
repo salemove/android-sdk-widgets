@@ -3,7 +3,7 @@ package com.glia.widgets.view.snackbar
 import android.annotation.SuppressLint
 import android.app.Activity
 import com.glia.widgets.StringProvider
-import com.glia.widgets.base.BaseActivityWatcher
+import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.WeakReferenceDelegate
@@ -14,7 +14,7 @@ internal class ActivityWatcherForLiveObservation(
     private val stringProvider: StringProvider,
     private val themeManager: UnifiedThemeManager,
     controller: ActivityWatcherForLiveObservationContract.Controller
-) : BaseActivityWatcher(), ActivityWatcherForLiveObservationContract.Watcher {
+) : BaseActivityStackWatcher(), ActivityWatcherForLiveObservationContract.Watcher {
     private var resumedActivity: Activity? by WeakReferenceDelegate()
 
     init {

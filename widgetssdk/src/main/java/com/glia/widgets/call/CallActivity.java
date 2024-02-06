@@ -15,6 +15,7 @@ import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.R;
 import com.glia.widgets.chat.ChatActivity;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 import com.glia.widgets.survey.SurveyActivity;
@@ -43,6 +44,10 @@ public class CallActivity extends AppCompatActivity {
         Logger.i(TAG, "Create Call screen");
         setContentView(R.layout.call_activity);
         callView = findViewById(R.id.call_view);
+
+        // Legacy company name support
+        Dependencies.getSdkConfigurationManager().setLegacyCompanyName(getIntent().getStringExtra(GliaWidgets.COMPANY_NAME));
+
         configuration = CallIntentReader.from(this).getConfiguration();
 
         if (!callView.shouldShowMediaEngagementView(configuration.getIsUpgradeToCall())) {

@@ -17,7 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.UiTheme
-import com.glia.widgets.base.BaseActivityWatcher
+import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity.Companion.PERMISSION_TYPE_TAG
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.notification.openNotificationChannelScreen
@@ -33,7 +33,7 @@ import com.glia.widgets.webbrowser.WebBrowserActivity
 internal class ActivityWatcherForCallVisualizer(
     private val dialogController: DialogContract.Controller,
     val controller: ActivityWatcherForCallVisualizerContract.Controller
-) : BaseActivityWatcher(), ActivityWatcherForCallVisualizerContract.Watcher {
+) : BaseActivityStackWatcher(), ActivityWatcherForCallVisualizerContract.Watcher {
 
     init {
         topActivityObserver.subscribe(

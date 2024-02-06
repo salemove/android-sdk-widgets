@@ -25,7 +25,9 @@ import com.glia.widgets.view.unifiedui.deepMerge
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Action
+import io.reactivex.processors.FlowableProcessor
 import kotlin.jvm.optionals.getOrNull
 
 internal fun Drawable.setTintCompat(@ColorInt color: Int) = DrawableCompat.setTint(this, color)
@@ -91,3 +93,7 @@ internal fun <T> Single<out T>.unSafeSubscribe(onNextCallback: (T) -> Unit) {
 internal fun Completable.unSafeSubscribe(onComplete: Action) {
     subscribe(onComplete) { Logger.e("Single<T>.unSafeSubscribe", "Unexpected local exception happened", it) }
 }
+
+internal fun <T> FlowableProcessor<T>.asStateFlowable(): Flowable<T> = onBackpressureBuffer().observeOn(AndroidSchedulers.mainThread())
+internal fun <T> FlowableProcessor<T>.asOneTimeStateFlowable(): Flowable<OneTimeEvent<T & Any>> =
+    onBackpressureBuffer().map(::OneTimeEvent).observeOn(AndroidSchedulers.mainThread())

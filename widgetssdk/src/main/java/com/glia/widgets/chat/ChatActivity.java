@@ -62,7 +62,8 @@ public class ChatActivity extends FadeTransitionActivity {
         return new Intent(context, ChatActivity.class)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
             .putExtra(GliaWidgets.QUEUE_ID, queueId)
-            .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
+            .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType)
+            .putExtra(GliaWidgets.COMPANY_NAME, "Karl's company");
     }
 
     @Override

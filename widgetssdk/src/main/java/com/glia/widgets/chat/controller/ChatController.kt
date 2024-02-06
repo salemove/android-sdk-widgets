@@ -445,7 +445,7 @@ internal class ChatController(
         isChatViewPaused = false
         messagesNotSeenHandler.callChatButtonClicked()
 
-        if (isShowOverlayPermissionRequestDialogUseCase.execute()) {
+        if (isShowOverlayPermissionRequestDialogUseCase.invoke()) {
             dialogController.showOverlayPermissionsDialog()
         }
     }

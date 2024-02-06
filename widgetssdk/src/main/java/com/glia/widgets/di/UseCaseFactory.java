@@ -67,9 +67,13 @@ import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.PermissionDialogManager;
 import com.glia.widgets.core.dialog.domain.ConfirmationDialogLinksUseCase;
 import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowEnableCallNotificationChannelDialogUseCaseImpl;
 import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCase;
+import com.glia.widgets.core.dialog.domain.IsShowOverlayPermissionRequestDialogUseCaseImpl;
 import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCase;
+import com.glia.widgets.core.dialog.domain.SetEnableCallNotificationChannelDialogShownUseCaseImpl;
 import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCase;
+import com.glia.widgets.core.dialog.domain.SetOverlayPermissionRequestDialogShownUseCaseImpl;
 import com.glia.widgets.core.engagement.domain.ConfirmationDialogUseCase;
 import com.glia.widgets.core.engagement.domain.GetOperatorUseCase;
 import com.glia.widgets.core.engagement.domain.MapOperatorUseCase;
@@ -104,7 +108,6 @@ import com.glia.widgets.core.secureconversations.domain.SendMessageButtonStateUs
 import com.glia.widgets.core.secureconversations.domain.SendSecureMessageUseCase;
 import com.glia.widgets.core.secureconversations.domain.ShowMessageLimitErrorUseCase;
 import com.glia.widgets.core.survey.domain.GliaSurveyAnswerUseCase;
-import com.glia.widgets.engagement.completion.EngagementCompletionUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.CheckMediaUpgradePermissionsUseCase;
@@ -398,7 +401,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsShowOverlayPermissionRequestDialogUseCase createIsShowOverlayPermissionRequestDialogUseCase() {
-        return new IsShowOverlayPermissionRequestDialogUseCase(permissionManager, permissionDialogManager, gliaSdkConfigurationManager);
+        return new IsShowOverlayPermissionRequestDialogUseCaseImpl(permissionManager, permissionDialogManager, gliaSdkConfigurationManager);
     }
 
     @NonNull
@@ -408,17 +411,17 @@ public class UseCaseFactory {
 
     @NonNull
     public IsShowEnableCallNotificationChannelDialogUseCase createIsShowEnableCallNotificationChannelDialogUseCase() {
-        return new IsShowEnableCallNotificationChannelDialogUseCase(permissionManager, permissionDialogManager);
+        return new IsShowEnableCallNotificationChannelDialogUseCaseImpl(permissionManager, permissionDialogManager);
     }
 
     @NonNull
     public SetOverlayPermissionRequestDialogShownUseCase createSetOverlayPermissionRequestDialogShownUseCase() {
-        return new SetOverlayPermissionRequestDialogShownUseCase(permissionDialogManager);
+        return new SetOverlayPermissionRequestDialogShownUseCaseImpl(permissionDialogManager);
     }
 
     @NonNull
     public SetEnableCallNotificationChannelDialogShownUseCase createSetEnableCallNotificationChannelDialogShownUseCase() {
-        return new SetEnableCallNotificationChannelDialogShownUseCase(permissionDialogManager);
+        return new SetEnableCallNotificationChannelDialogShownUseCaseImpl(permissionDialogManager);
     }
 
     @NonNull
@@ -957,11 +960,6 @@ public class UseCaseFactory {
     @NonNull
     public EnqueueForEngagementUseCase getQueueForEngagementUseCase() {
         return new EnqueueForEngagementUseCaseImpl(repositoryFactory.getEngagementRepository());
-    }
-
-    @NonNull
-    public EngagementCompletionUseCase getEngagementCompletionUseCase() {
-        return new EngagementCompletionUseCase(getEngagementStateUseCase(), getSurveyUseCase());
     }
 
     @NonNull

@@ -11,7 +11,7 @@ import androidx.core.util.Pair
 import androidx.core.view.contains
 import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
-import com.glia.widgets.base.BaseActivityWatcher
+import com.glia.widgets.base.BaseActivityStackWatcher
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.call.Configuration
 import com.glia.widgets.callvisualizer.EndScreenSharingActivity
@@ -31,7 +31,7 @@ import com.glia.widgets.view.head.controller.ActivityWatcherForChatHeadContract
 @SuppressLint("CheckResult")
 internal class ActivityWatcherForChatHead(
     val controller: ActivityWatcherForChatHeadContract.Controller
-) : BaseActivityWatcher(), ActivityWatcherForChatHeadContract.Watcher {
+) : BaseActivityStackWatcher(), ActivityWatcherForChatHeadContract.Watcher {
 
     init {
         topActivityObserver.subscribe(

@@ -105,9 +105,9 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     @Test
     fun `onScreenSharingStarted calls for a overlay dialog when isShowOverlayPermissionRequestDialogUseCase returns true`() {
         controller.setupScreenSharingViewCallback()
-        whenever(isShowOverlayPermissionRequestDialogUseCase.execute()).thenReturn(true)
+        whenever(isShowOverlayPermissionRequestDialogUseCase.invoke()).thenReturn(true)
         controller.screenSharingViewCallback?.onScreenSharingStarted()
-        verify(isShowOverlayPermissionRequestDialogUseCase).execute()
+        verify(isShowOverlayPermissionRequestDialogUseCase).invoke()
         verify(watcher).callOverlayDialog()
     }
 

@@ -2,12 +2,26 @@ package com.glia.widgets.base
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.os.Bundle
+import androidx.annotation.CallSuper
+import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AlertDialog
+import com.glia.widgets.UiTheme
+import com.glia.widgets.helper.GliaActivityManager
+import com.glia.widgets.helper.asStateFlowable
+import com.glia.widgets.helper.isGlia
+import com.glia.widgets.helper.runtimeTheme
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.view.dialog.holder.DialogHolderActivity
+import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.processors.PublishProcessor
 import io.reactivex.subjects.PublishSubject
 import java.lang.ref.WeakReference
+import kotlin.reflect.KClass
 
-internal open class BaseActivityWatcher : SimpleActivityLifecycleCallbacks() {
+internal open class BaseActivityStackWatcher : SimpleActivityLifecycleCallbacks() {
 
     private val _resumedActivities = object : ArrayList<WeakReference<Activity>>(1) {
         fun add(activity: Activity) {
@@ -39,9 +53,7 @@ internal open class BaseActivityWatcher : SimpleActivityLifecycleCallbacks() {
     private val resumedActivities: List<Activity> get() = _resumedActivities.getAll()
 
     private val resumedActivitySubject: PublishSubject<List<Activity>> = PublishSubject.create()
-    val topActivityObserver: Observable<Activity> = resumedActivitySubject
-        .filter { list -> list.isNotEmpty() }
-        .map { list -> list.last() }
+    val topActivityObserver: Observable<Activity> = resumedActivitySubject.filter { list -> list.isNotEmpty() }.map { list -> list.last() }
 
     override fun onActivityResumed(activity: Activity) {
         _resumedActivities.add(activity)
@@ -51,6 +63,71 @@ internal open class BaseActivityWatcher : SimpleActivityLifecycleCallbacks() {
     override fun onActivityPaused(activity: Activity) {
         _resumedActivities.remove(activity)
         resumedActivitySubject.onNext(resumedActivities)
+    }
+}
+
+/**
+ * This class will help in cases when only the resumed activity is needed instead of the top activity of the stack.
+ *
+ * Example: When the user navigates to the `Notifications` settings screen, the resumed activity will be null,
+ * so we can properly handle the return from that screen.
+ */
+internal open class BaseSingleActivityWatcher(private val gliaActivityManager: GliaActivityManager) : SimpleActivityLifecycleCallbacks() {
+    private val _resumedActivity: PublishProcessor<WeakReference<Activity>> = PublishProcessor.create()
+    val resumedActivity: Flowable<WeakReference<Activity>> = _resumedActivity.asStateFlowable()
+
+    private var alertDialog: AlertDialog? = null
+
+    /* @CallSuper is added in case someone wants to open this function and override it */
+    @CallSuper
+    final override fun onActivityResumed(activity: Activity) {
+        _resumedActivity.onNext(WeakReference(activity))
+    }
+
+    @CallSuper
+    final override fun onActivityPaused(activity: Activity) {
+        _resumedActivity.onNext(WeakReference(null))
+    }
+
+    @CallSuper
+    final override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        gliaActivityManager.onActivityCreated(activity)
+    }
+
+    @CallSuper
+    final override fun onActivityDestroyed(activity: Activity) {
+        gliaActivityManager.onActivityDestroyed(activity)
+    }
+
+    fun finishActivities() = gliaActivityManager.finishActivities()
+
+    fun finishActivity(kClass: KClass<out Activity>) = gliaActivityManager.finishActivity(kClass)
+
+
+    private fun launchDialogHolderActivity(activity: Activity) {
+        DialogHolderActivity.start(activity)
+    }
+
+    private fun ensureGliaActivity(activity: Activity, callback: Activity.() -> Unit) {
+        if (activity.isGlia) {
+            callback(activity)
+        } else {
+            launchDialogHolderActivity(activity)
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    fun showAlertDialogWithStyledContext(activity: Activity, callback: (Context, UiTheme) -> AlertDialog) {
+        ensureGliaActivity(activity) {
+            dismissAlertDialogSilently()
+            alertDialog = callback(wrapWithMaterialThemeOverlay(), runtimeTheme)
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    fun dismissAlertDialogSilently() {
+        alertDialog?.dismiss()
+        alertDialog = null
     }
 }
 

@@ -17,6 +17,7 @@ public class GliaSdkConfigurationManager {
     private boolean useOverlay = false;
     private ScreenSharing.Mode screenSharingMode = null;
     private String companyName = null;
+    private String legacyCompanyName = null;
 
     private String manualLocaleOverride = null;
 
@@ -30,6 +31,10 @@ public class GliaSdkConfigurationManager {
         this.useOverlay = enabled;
     }
 
+    public void setLegacyCompanyName(String companyName) {
+        this.legacyCompanyName = companyName;
+    }
+
     /** @noinspection StatementWithEmptyBody*/
     public String getCompanyName() {
         String remoteCompanyName = fetchRemoteCompanyName();
@@ -40,6 +45,9 @@ public class GliaSdkConfigurationManager {
             companyName = remoteCompanyName;
         } else if (isCompanyNameSetFromWidgetsConfig()){
             // No need to replace company name. Continue using it.
+        } else if (legacyCompanyName != null) {
+            // Legacy company name configuration method used before local default
+            companyName = legacyCompanyName;
         } else {
             // Company name was not set neither from Glia Hub nor from GliaWidgetsConfig.
             // Apply local default company name.

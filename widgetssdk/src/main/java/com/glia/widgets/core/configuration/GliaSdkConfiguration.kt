@@ -93,7 +93,7 @@ internal class GliaSdkConfiguration private constructor(builder: Builder) {
         }
 
         fun intent(intent: Intent): Builder {
-            companyName = Dependencies.getSdkConfigurationManager().getCompanyName(intent.getStringExtra(GliaWidgets.COMPANY_NAME))
+            companyName = Dependencies.getSdkConfigurationManager().companyName
             queueId = intent.getStringExtra(GliaWidgets.QUEUE_ID)
             val tempTheme = intent.getParcelableExtra<UiTheme>(GliaWidgets.UI_THEME)
             runTimeTheme = tempTheme ?: Dependencies.getSdkConfigurationManager().uiTheme

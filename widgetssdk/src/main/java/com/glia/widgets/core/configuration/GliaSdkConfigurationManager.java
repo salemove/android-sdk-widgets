@@ -17,6 +17,7 @@ public class GliaSdkConfigurationManager {
     private boolean useOverlay = false;
     private ScreenSharing.Mode screenSharingMode = null;
     private String companyName = null;
+    private String legacyCompanyName = null;
 
     private String manualLocaleOverride = null;
 
@@ -30,10 +31,17 @@ public class GliaSdkConfigurationManager {
         this.useOverlay = enabled;
     }
 
+    public void setLegacyCompanyName(String companyName) {
+        this.legacyCompanyName = companyName;
+    }
+
     /** @noinspection StatementWithEmptyBody*/
-    public String getCompanyName(@Nullable String legacyCompanyName) {
+    public String getCompanyName() {
         String remoteCompanyName = fetchRemoteCompanyName();
         boolean isCompanyNameSetFromGliaHub = remoteCompanyName != null && !remoteCompanyName.trim().isEmpty();
+
+        Logger.d("CONFIGURATION", "companyName =" + companyName);
+        Logger.d("CONFIGURATION", "legacyCompanyName =" + legacyCompanyName);
 
         if (isCompanyNameSetFromGliaHub) {
             // Apply company name from Glia Hub

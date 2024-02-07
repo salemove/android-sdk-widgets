@@ -297,7 +297,7 @@ internal class CallView(
             operatorStatusView.showTransferring()
             operatorNameView.text = (stringProvider.getRemoteString(R.string.engagement_queue_transferring))
         } else {
-            operatorNameView.text = Dependencies.getSdkConfigurationManager().getCompanyName(context)
+            operatorNameView.text = Dependencies.getSdkConfigurationManager().companyName
             operatorNameView.hint = stringProvider.getRemoteString(R.string.chat_operator_name_accessibility_label)
             handleOperatorStatusViewOperatorImage(state)
         }
@@ -522,7 +522,7 @@ internal class CallView(
         chatButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_chat_title)
         speakerButtonLabel.text = stringProvider.getRemoteString(R.string.call_speaker_button)
         minimizeButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_minimize_video_button)
-        companyNameView.text = Dependencies.getSdkConfigurationManager().companyName()
+        companyNameView.text = Dependencies.getSdkConfigurationManager().companyName
         videoButtonLabel.text = stringProvider.getRemoteString(R.string.engagement_video_title)
         callTheme?.topText.also(onHoldTextView::applyThemeAsDefault)
         callTheme?.duration.also(callTimerView::applyThemeAsDefault)

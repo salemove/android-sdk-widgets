@@ -15,6 +15,7 @@ import com.glia.widgets.base.FadeTransitionActivity;
 import com.glia.widgets.call.CallActivity;
 import com.glia.widgets.call.Configuration;
 import com.glia.widgets.core.configuration.GliaSdkConfiguration;
+import com.glia.widgets.di.Dependencies;
 import com.glia.widgets.helper.Logger;
 import com.glia.widgets.helper.Utils;
 
@@ -62,8 +63,8 @@ public class ChatActivity extends FadeTransitionActivity {
         return new Intent(context, ChatActivity.class)
             .putExtra(GliaWidgets.CONTEXT_ASSET_ID, contextId)
             .putExtra(GliaWidgets.QUEUE_ID, queueId)
-            .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType)
-            .putExtra(GliaWidgets.COMPANY_NAME, "Karl's company");
+            .putExtra(GliaWidgets.COMPANY_NAME, "Legacy company")
+            .putExtra(GliaWidgets.CHAT_TYPE, (Parcelable) chatType);
     }
 
     @Override
@@ -72,6 +73,9 @@ public class ChatActivity extends FadeTransitionActivity {
         Logger.i(TAG, "Create Chat screen");
         setContentView(R.layout.chat_activity);
         chatView = findViewById(R.id.chat_view);
+
+        // Legacy company name support
+        Dependencies.getSdkConfigurationManager().setLegacyCompanyName(getIntent().getStringExtra(GliaWidgets.COMPANY_NAME));
 
         chatView.setOnTitleUpdatedListener(this::setTitle);
         configuration = createConfiguration(getIntent());

@@ -141,13 +141,13 @@ workflows:
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - variant: $DEBUG_VARIANT
     - android-unit-test@1:
         title: Unit Test for APP
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - variant: $DEBUG_VARIANT
     - browserstack-upload@0:
         title: Upload APP to BrowserStack
         inputs:
@@ -205,7 +205,7 @@ workflows:
     - android-unit-test@1:
         inputs:
         - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - variant: $DEBUG_VARIANT
         - project_location: $PROJECT_LOCATION
     - script@1:
         title: Publish Android SDK to Nexus Repository Manager (Staging)
@@ -308,13 +308,13 @@ workflows:
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - variant: $DEBUG_VARIANT
     - android-unit-test@1:
         title: Unit Test for APP
         inputs:
         - project_location: $PROJECT_LOCATION
         - module: $EXAMPLE_APP_MODULE
-        - variant: $INTEGRATOR_VARIANT
+        - variant: $DEBUG_VARIANT
     - gradle-runner@2:
         title: Assemble SDK for instrumentation tests
         inputs:
@@ -412,7 +412,10 @@ app:
     ANDROID_CORTEX_BANKING_APP_SLUG: 0376f45568cb22dd
   - opts:
       is_expand: false
-    INTEGRATOR_VARIANT: debug
+    DEBUG_VARIANT: debug
+  - opts:
+      is_expand: false
+    INTEGRATOR_VARIANT: release
   - opts:
       is_expand: false
     GIT_AUTHOR_NAME: BitriseBot

@@ -78,6 +78,10 @@ android {
   }
 }
 
+tasks.register('publishToLocalMaven') {
+  dependsOn ':widgetssdk:publishSnapshotPublicationToMavenLocal'
+}
+
 dependencies {
   implementation "androidx.appcompat:appcompat:$appCompatVersion"
   implementation "com.google.android.material:material:$materialVersion"

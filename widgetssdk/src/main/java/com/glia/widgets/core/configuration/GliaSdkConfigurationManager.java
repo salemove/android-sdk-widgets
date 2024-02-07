@@ -40,9 +40,6 @@ public class GliaSdkConfigurationManager {
         String remoteCompanyName = fetchRemoteCompanyName();
         boolean isCompanyNameSetFromGliaHub = remoteCompanyName != null && !remoteCompanyName.trim().isEmpty();
 
-        Logger.d("CONFIGURATION", "companyName =" + companyName);
-        Logger.d("CONFIGURATION", "legacyCompanyName =" + legacyCompanyName);
-
         if (isCompanyNameSetFromGliaHub) {
             // Apply company name from Glia Hub
             companyName = remoteCompanyName;

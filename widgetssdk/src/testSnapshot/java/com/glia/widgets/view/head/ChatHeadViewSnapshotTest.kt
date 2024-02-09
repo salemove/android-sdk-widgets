@@ -353,6 +353,7 @@ class ChatHeadViewSnapshotTest : SnapshotTest(
         .backgroundColorRes(R.color.glia_system_negative_color)
         .iconOnHold(R.drawable.ic_pause_circle)
         .iconOnHoldTintList(R.color.call_fab_icon_color_states)
+        .iconScreenSharingDialog(R.drawable.ic_screensharing)
         .build()
 
 }

@@ -18,6 +18,7 @@ import com.glia.androidsdk.chat.SingleChoiceAttachment
 import com.glia.androidsdk.comms.MediaState
 import com.glia.androidsdk.queuing.Queue
 import com.glia.widgets.UiTheme
+import com.glia.widgets.di.Dependencies
 import com.glia.widgets.view.unifiedui.deepMerge
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -48,6 +49,9 @@ internal val Operator.imageUrl: String? get() = picture?.url?.getOrNull()
 internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?.gliaAlertDialogButtonUseVerticalAlignment ?: false
 
 internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = deepMerge(newTheme) ?: UiTheme.UiThemeBuilder().build()
+
+internal val UiTheme?.withConfigurationTheme: UiTheme
+    get() = Dependencies.getSdkConfigurationManager().uiTheme.getFullHybridTheme(this)
 
 /**
  * Returns styled text from the provided HTML string. Replaces \n to <br> regardless of the operating system where the string was created.

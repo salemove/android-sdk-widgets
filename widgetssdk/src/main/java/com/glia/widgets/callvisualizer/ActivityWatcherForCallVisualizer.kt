@@ -252,7 +252,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     override fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         showAlertDialogOnUiThreadWithStyledContext(
-            "Show screen sharing and notifications dialog",
+            "Show screen sharing and notifications dialog"
         ) { context, uiTheme, _ ->
             Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
                 context = context,
@@ -268,9 +268,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showOverlayPermissionsDialog() {
-        showAlertDialogOnUiThreadWithStyledContext(
-            "Show overlay permissions dialog"
-        ) { context, uiTheme, _ ->
+        showAlertDialogOnUiThreadWithStyledContext("Show overlay permissions dialog") { context, uiTheme, _ ->
             Dialogs.showOverlayPermissionsDialog(
                 context = context,
                 uiTheme = uiTheme,
@@ -300,10 +298,10 @@ internal class ActivityWatcherForCallVisualizer(
         }
     }
 
-    override fun showUpgradeDialog(mediaUpgradeState: DialogState.MediaUpgrade) {
+    override fun showUpgradeDialog(mediaUpgrade: DialogState.MediaUpgrade) {
         showAlertDialogOnUiThreadWithStyledContext("Show upgrade dialog") { context, uiTheme, _ ->
-            Dialogs.showUpgradeDialog(context, uiTheme, mediaUpgradeState, {
-                controller.onMediaUpgradeReceived(mediaUpgradeState.mediaUpgradeOffer)
+            Dialogs.showUpgradeDialog(context, uiTheme, mediaUpgrade, {
+                controller.onMediaUpgradeReceived(mediaUpgrade.mediaUpgradeOffer)
                 dialogController.dismissCurrentDialog()
             }) {
                 controller.onNegativeDialogButtonClicked()

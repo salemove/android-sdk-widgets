@@ -32,6 +32,7 @@ import com.glia.widgets.helper.getFontCompat
 import com.glia.widgets.helper.getFullHybridTheme
 import com.glia.widgets.helper.layoutInflater
 import com.glia.widgets.helper.separateStringWithSymbol
+import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
 import com.glia.widgets.view.button.GliaPositiveButton
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyImageColorTheme
@@ -39,7 +40,6 @@ import com.glia.widgets.view.unifiedui.applyLayerTheme
 import com.glia.widgets.view.unifiedui.applyProgressColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
 import com.glia.widgets.view.unifiedui.theme.UnifiedTheme
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 import java.util.concurrent.Executor
 
 /**
@@ -52,7 +52,7 @@ import java.util.concurrent.Executor
 internal class VisitorCodeView internal constructor(
     context: Context,
     private val uiThreadExecutor: Executor? = null
-) : FrameLayout(MaterialThemeOverlay.wrap(context, null, 0, R.style.Application_Glia_Chat), null, 0), VisitorCodeContract.View {
+) : FrameLayout(context.wrapWithMaterialThemeOverlay(), null, 0), VisitorCodeContract.View {
     private lateinit var controller: VisitorCodeContract.Controller
     private var theme: UiTheme? = null
 

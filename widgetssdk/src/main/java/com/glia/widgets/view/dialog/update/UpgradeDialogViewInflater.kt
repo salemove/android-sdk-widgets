@@ -15,7 +15,7 @@ internal open class BaseUpgradeDialogViewInflater<T : BaseUpgradeDialogViewBindi
     final override fun setup(binding: T, themeWrapper: AlertThemeWrapper, payload: DialogPayload.Upgrade) {
         val theme = themeWrapper.theme
 
-        binding.logoContainer.isGone = themeWrapper.whiteLabel ?: false
+        binding.logoContainer.isGone = payload.whiteLabel ?: false
         binding.poweredByTv.text = payload.poweredByText
 
         setupButton(binding.positiveBtn, payload.positiveButtonText, theme.positiveButton, themeWrapper.typeface, payload.positiveButtonClickListener)

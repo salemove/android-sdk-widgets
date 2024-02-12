@@ -442,9 +442,7 @@ data class UiTheme(
 
     internal fun alertTheme(context: Context): AlertThemeWrapper = AlertThemeWrapper(
         AlertTheme(toColorPallet(context)).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment()),
-        fontRes?.let { ResourcesCompat.getFont(context, it) },
-        whiteLabel,
-        iconLeaveQueue
+        fontRes?.let { ResourcesCompat.getFont(context, it) }
     )
 
     class UiThemeBuilder {

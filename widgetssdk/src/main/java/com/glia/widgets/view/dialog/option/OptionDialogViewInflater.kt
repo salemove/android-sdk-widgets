@@ -14,7 +14,7 @@ internal abstract class BaseOptionDialogViewInflater<T : BaseOptionDialogViewBin
     override fun setup(binding: T, themeWrapper: AlertThemeWrapper, payload: DialogPayload.Option) {
         val theme = themeWrapper.theme
 
-        binding.logoContainer.isGone = themeWrapper.whiteLabel ?: false
+        binding.logoContainer.isGone = payload.whiteLabel ?: false
         binding.poweredByTv.text = payload.poweredByText
 
         setupText(binding.messageTv, payload.message, theme.message, themeWrapper.typeface)

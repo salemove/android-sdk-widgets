@@ -24,6 +24,6 @@ internal class AlertDialogViewInflater(
         binding.closeBtn.isVisible = payload.buttonVisible
         payload.buttonClickListener?.also(binding.closeBtn::setOnClickListener)
         payload.buttonDescription?.also { binding.closeBtn.contentDescription = it }
-        themeWrapper.iconLeaveQueue?.also { binding.closeBtn.setImageResource(it) }
+        payload.iconLeaveQueue?.also { binding.closeBtn.setImageResource(it) }
     }
 }

@@ -10,7 +10,10 @@ import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
 import androidx.annotation.StyleRes
+import androidx.core.content.withStyledAttributes
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
+import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 internal fun Context.asActivity(): Activity? = (this as? ContextWrapper)?.let {
@@ -47,3 +50,13 @@ internal fun Context.showToast(
 
 internal val Activity.rootView: View
     get() = findViewById(android.R.id.content) ?: window.decorView.findViewById(android.R.id.content)
+
+internal fun Activity.withRuntimeTheme(callback: (themedContext: Context, uiTheme: UiTheme) -> Unit) {
+    val themedContext = wrapWithMaterialThemeOverlay()
+
+    intent.getParcelableExtra<UiTheme>(GliaWidgets.UI_THEME)?.also {
+        callback(themedContext, it.withConfigurationTheme)
+    } ?: themedContext.withStyledAttributes(R.style.Application_Glia_Chat, R.styleable.GliaView) {
+        callback(themedContext, Utils.getThemeFromTypedArray(this, themedContext).withConfigurationTheme)
+    }
+}

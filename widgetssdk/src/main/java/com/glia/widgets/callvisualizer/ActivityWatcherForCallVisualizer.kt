@@ -34,8 +34,7 @@ import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.Utils
 import com.glia.widgets.helper.WeakReferenceDelegate
-import com.glia.widgets.helper.getFullHybridTheme
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.view.Dialogs
 import com.glia.widgets.webbrowser.WebBrowserActivity
 
@@ -241,7 +240,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showAllowNotificationsDialog() {
-        showAlertDialogOnUiThreadWithStyledContext("Show allow notifications dialog", UiTheme.UiThemeBuilder().build()) { context, uiTheme, _ ->
+        showAlertDialogOnUiThreadWithStyledContext("Show allow notifications dialog") { context, uiTheme, _ ->
             Dialogs.showAllowNotificationsDialog(
                 context = context,
                 uiTheme = uiTheme,
@@ -264,8 +263,7 @@ internal class ActivityWatcherForCallVisualizer(
 
     override fun showAllowScreenSharingNotificationsAndStartSharingDialog() {
         showAlertDialogOnUiThreadWithStyledContext(
-            "Show screen sharing and notifications dialog",
-            UiTheme.UiThemeBuilder().build()
+            "Show screen sharing and notifications dialog"
         ) { context, uiTheme, _ ->
             Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
                 context = context,
@@ -285,7 +283,7 @@ internal class ActivityWatcherForCallVisualizer(
     }
 
     override fun showOverlayPermissionsDialog() {
-        showAlertDialogOnUiThreadWithStyledContext("Show overlay permissions dialog", UiTheme.UiThemeBuilder().build()) { context, uiTheme, _ ->
+        showAlertDialogOnUiThreadWithStyledContext("Show overlay permissions dialog") { context, uiTheme, _ ->
             Dialogs.showOverlayPermissionsDialog(
                 context = context,
                 uiTheme = uiTheme,
@@ -332,14 +330,15 @@ internal class ActivityWatcherForCallVisualizer(
 
     private fun showAlertDialogOnUiThreadWithStyledContext(
         logMessage: String? = null,
-        uiTheme: UiTheme? = null,
         callback: (Context, UiTheme, Activity) -> AlertDialog
     ) {
         resumedActivity?.apply {
             runOnUiThread {
                 logMessage?.let { Logger.d(TAG, it) }
                 dismissAlertDialogSilently()
-                alertDialog = callback(wrapWithMaterialThemeOverlay(), uiTheme ?: getRuntimeTheme(this), this)
+                withRuntimeTheme { themedContext, uiTheme ->
+                    alertDialog = callback(themedContext, uiTheme, this)
+                }
             }
         }
     }
@@ -373,12 +372,6 @@ internal class ActivityWatcherForCallVisualizer(
         showAlertDialogOnUiThreadWithStyledContext("Show visitor code dialog") { context, _, _ ->
             Dialogs.showVisitorCodeDialog(context)
         }
-    }
-
-    private fun getRuntimeTheme(activity: Activity): UiTheme {
-        val themeFromIntent: UiTheme? = activity.intent?.getParcelableExtra(GliaWidgets.UI_THEME)
-        val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager().uiTheme
-        return themeFromGlobalSetting.getFullHybridTheme(themeFromIntent)
     }
 
     override fun isSupportActivityOpen(): Boolean {

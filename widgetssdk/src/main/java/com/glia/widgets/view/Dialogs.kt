@@ -14,10 +14,10 @@ import com.glia.widgets.StringKeyPair
 import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
 import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
-import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.DialogState.MediaUpgrade
 import com.glia.widgets.core.dialog.model.DialogState.OperatorName
+import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.asActivity
 import com.glia.widgets.view.dialog.base.DialogPayload
@@ -46,6 +46,7 @@ internal object Dialogs {
             message = stringProvider.getRemoteString(R.string.engagement_queue_closed_message),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
+            iconLeaveQueue = uiTheme.iconLeaveQueue,
             buttonClickListener = buttonClickListener
         )
 
@@ -58,6 +59,7 @@ internal object Dialogs {
             message = stringProvider.getRemoteString(R.string.engagement_queue_reconnection_failed),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
+            iconLeaveQueue = uiTheme.iconLeaveQueue,
             buttonClickListener = buttonClickListener
         )
         return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
@@ -69,6 +71,7 @@ internal object Dialogs {
             message = stringProvider.getRemoteString(R.string.android_permissions_message),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
+            iconLeaveQueue = uiTheme.iconLeaveQueue,
             buttonClickListener = buttonClickListener
         )
         return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
@@ -87,6 +90,7 @@ internal object Dialogs {
             positiveButtonText = ok,
             negativeButtonText = no,
             poweredByText = poweredByText,
+            whiteLabel = uiTheme.whiteLabel,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
 
@@ -110,6 +114,7 @@ internal object Dialogs {
             positiveButtonText = yes,
             negativeButtonText = no,
             poweredByText = poweredByText,
+            whiteLabel = uiTheme.whiteLabel,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
         )
@@ -132,6 +137,7 @@ internal object Dialogs {
             positiveButtonText = yes,
             negativeButtonText = no,
             poweredByText = poweredByText,
+            whiteLabel = uiTheme.whiteLabel,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
 
@@ -155,6 +161,7 @@ internal object Dialogs {
             positiveButtonText = yes,
             negativeButtonText = no,
             poweredByText = poweredByText,
+            whiteLabel = uiTheme.whiteLabel,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
         )
@@ -177,6 +184,7 @@ internal object Dialogs {
             positiveButtonText = yes,
             negativeButtonText = no,
             poweredByText = poweredByText,
+            whiteLabel = uiTheme.whiteLabel,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
 
@@ -193,6 +201,7 @@ internal object Dialogs {
             message = stringProvider.getRemoteString(R.string.message_center_not_authenticated_message),
             buttonVisible = true,
             buttonDescription = closeBtnAccessibility,
+            iconLeaveQueue = uiTheme.iconLeaveQueue,
             buttonClickListener = buttonClickListener
         )
         return dialogService.showDialog(context, uiTheme, DialogType.AlertDialog(payload))
@@ -214,6 +223,7 @@ internal object Dialogs {
             positiveButtonText = allow,
             negativeButtonText = cancel,
             poweredByText = poweredByText,
+            whiteLabel = theme.whiteLabel,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener,
             link1ClickListener = { links.link1?.let { linkClickListener(it) } },
@@ -255,6 +265,7 @@ internal object Dialogs {
             negativeButtonText = decline,
             poweredByText = poweredByText,
             iconRes = titleIconResPair.second,
+            whiteLabel = theme.whiteLabel,
             positiveButtonClickListener = onAcceptOfferClickListener,
             negativeButtonClickListener = onCloseClickListener
 
@@ -276,6 +287,8 @@ internal object Dialogs {
             positiveButtonText = accept,
             negativeButtonText = decline,
             poweredByText = poweredByText,
+            whiteLabel = theme.whiteLabel,
+            iconScreenSharingDialog = theme.iconScreenSharingDialog,
             positiveButtonClickListener = positiveButtonClickListener,
             negativeButtonClickListener = negativeButtonClickListener
         )
@@ -290,7 +303,8 @@ internal object Dialogs {
     ): AlertDialog {
         val payload = DialogPayload.AlertDialog(
             title = stringProvider.getRemoteString(R.string.message_center_unavailable_title),
-            message = stringProvider.getRemoteString(R.string.message_center_unavailable_message)
+            message = stringProvider.getRemoteString(R.string.message_center_unavailable_message),
+            iconLeaveQueue = theme.iconLeaveQueue,
         )
 
         return dialogService.showDialog(context, theme, DialogType.AlertDialog(payload), onShow = onShow) {

@@ -15,9 +15,10 @@ internal open class BaseScreenSharingDialogViewInflater<T : BaseScreenSharingDia
     final override fun setup(binding: T, themeWrapper: AlertThemeWrapper, payload: DialogPayload.ScreenSharing) {
         val theme = themeWrapper.theme
 
-        binding.logoContainer.isGone = themeWrapper.whiteLabel ?: false
+        binding.logoContainer.isGone = payload.whiteLabel ?: false
         binding.poweredByTv.text = payload.poweredByText
         binding.icon.applyImageColorTheme(theme.titleImageColor)
+        payload.iconScreenSharingDialog?.apply(binding.icon::setImageResource)
 
         setupText(binding.messageTv, payload.message, theme.message, themeWrapper.typeface)
         setupButton(binding.positiveBtn, payload.positiveButtonText, theme.positiveButton, themeWrapper.typeface, payload.positiveButtonClickListener)

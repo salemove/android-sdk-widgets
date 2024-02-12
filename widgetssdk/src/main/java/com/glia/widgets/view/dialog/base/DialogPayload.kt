@@ -12,6 +12,7 @@ internal sealed interface DialogPayload {
         val positiveButtonText: String,
         val negativeButtonText: String,
         val poweredByText: String,
+        val whiteLabel: Boolean?,
         val positiveButtonClickListener: View.OnClickListener,
         val negativeButtonClickListener: View.OnClickListener,
     ) : DialogPayload
@@ -22,6 +23,7 @@ internal sealed interface DialogPayload {
         val positiveButtonText: String,
         val negativeButtonText: String,
         val poweredByText: String,
+        val whiteLabel: Boolean?,
         val positiveButtonClickListener: View.OnClickListener,
         val negativeButtonClickListener: View.OnClickListener,
         val link1Text: String? = null,
@@ -36,6 +38,9 @@ internal sealed interface DialogPayload {
         val positiveButtonText: String,
         val negativeButtonText: String,
         val poweredByText: String,
+        val whiteLabel: Boolean?,
+        @DrawableRes
+        val iconScreenSharingDialog: Int?,
         val positiveButtonClickListener: View.OnClickListener,
         val negativeButtonClickListener: View.OnClickListener,
     ) : DialogPayload
@@ -47,6 +52,7 @@ internal sealed interface DialogPayload {
         val poweredByText: String,
         @DrawableRes
         val iconRes: Int,
+        val whiteLabel: Boolean?,
         val positiveButtonClickListener: View.OnClickListener,
         val negativeButtonClickListener: View.OnClickListener,
     ) : DialogPayload
@@ -63,6 +69,8 @@ internal sealed interface DialogPayload {
         val message: String,
         val buttonVisible: Boolean = false,
         val buttonDescription: String? = null,
+        @DrawableRes
+        val iconLeaveQueue: Int?,
         val buttonClickListener: View.OnClickListener? = null
     ) : DialogPayload
 }

@@ -147,6 +147,8 @@ internal class ChatHeadView @JvmOverloads constructor(
             binding.apply {
                 placeholderView.visibility = GONE
                 profilePictureView.setImageDrawable(null)
+                val a = R.drawable.ic_chat_cloud
+                val b = configuration.iconScreenSharingDialog
                 profilePictureView.backgroundTintList = getColorStateListCompat(configuration.backgroundColorRes)
                 placeholderView.setImageResource(configuration.iconScreenSharingDialog)
                 placeholderView.visibility = VISIBLE
@@ -228,7 +230,6 @@ internal class ChatHeadView @JvmOverloads constructor(
         sdkConfiguration: GliaSdkConfiguration?
     ) {
         configuration = createBuildTimeConfiguration(buildTimeTheme)
-
         val runTimeTheme = sdkConfiguration?.runTimeTheme ?: return
 
         val builder = ChatHeadConfiguration.builder(configuration)

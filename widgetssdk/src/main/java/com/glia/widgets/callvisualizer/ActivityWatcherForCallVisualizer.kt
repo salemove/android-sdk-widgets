@@ -19,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.glia.widgets.base.BaseActivityWatcher
 import com.glia.widgets.call.CallActivity
@@ -359,6 +360,9 @@ internal class ActivityWatcherForCallVisualizer(
     private fun getRuntimeTheme(activity: Activity): UiTheme {
         val themeFromIntent: UiTheme? = activity.intent?.getParcelableExtra(GliaWidgets.UI_THEME)
         val themeFromGlobalSetting = Dependencies.getSdkConfigurationManager().uiTheme
+        val a = R.drawable.ic_chat_cloud
+        val b = themeFromIntent?.iconScreenSharingDialog
+        val c = themeFromGlobalSetting?.iconScreenSharingDialog
         return themeFromGlobalSetting.getFullHybridTheme(themeFromIntent)
     }
 

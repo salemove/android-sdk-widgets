@@ -29,7 +29,7 @@
         <item name="iconPlaceholder">?attr/gliaIconPlaceholder</item>
         <item name="iconOnHold">?attr/gliaIconOnHold</item>
         <item name="iconEndScreenShare">?attr/gliaIconEndScreenShare</item>
-
+        <item name="iconScreenSharingDialog">?attr/gliaIconScreenSharingDialog</item>
         <item name="chatSendMessageButtonTintColor">?attr/gliaSendMessageButtonTintColor</item>
 
         <item name="gliaChatBackgroundColor">?attr/gliaChatBackgroundColor</item>

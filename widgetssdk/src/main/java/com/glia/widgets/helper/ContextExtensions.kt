@@ -11,8 +11,8 @@ import androidx.annotation.DimenRes
 import androidx.annotation.IntRange
 import androidx.annotation.StyleRes
 import androidx.core.content.withStyledAttributes
-import com.glia.widgets.GliaWidgets
 import com.glia.widgets.BuildConfig
+import com.glia.widgets.GliaWidgets
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
 import com.google.android.material.theme.overlay.MaterialThemeOverlay

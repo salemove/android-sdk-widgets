@@ -11,8 +11,10 @@ import com.glia.widgets.view.configuration.ButtonConfiguration
 import com.glia.widgets.view.configuration.ChatHeadConfiguration
 import com.glia.widgets.view.configuration.TextConfiguration
 import com.glia.widgets.view.configuration.survey.SurveyStyle
-import com.glia.widgets.view.unifiedui.theme.AlertThemeWrapper
+import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 import com.glia.widgets.view.unifiedui.theme.ColorPallet
+import com.glia.widgets.view.unifiedui.theme.Icons
+import com.glia.widgets.view.unifiedui.theme.Properties
 import com.glia.widgets.view.unifiedui.theme.base.ColorTheme
 import com.glia.widgets.view.unifiedui.theme.defaulttheme.AlertTheme
 import kotlinx.parcelize.Parcelize
@@ -440,12 +442,21 @@ data class UiTheme(
         )
     }
 
-    internal fun alertTheme(context: Context): AlertThemeWrapper = AlertThemeWrapper(
-        AlertTheme(toColorPallet(context)).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment()),
-        fontRes?.let { ResourcesCompat.getFont(context, it) },
-        whiteLabel,
-        iconLeaveQueue
-    )
+    internal fun alertTheme(context: Context): AlertDialogConfiguration {
+        val theme = toColorPallet(context).run(::AlertTheme).copy(isVerticalAxis = isAlertDialogButtonUseVerticalAlignment())
+
+        val properties = Properties(
+            typeface = fontRes?.let { ResourcesCompat.getFont(context, it) },
+            whiteLabel = whiteLabel
+        )
+
+        val icons = Icons(
+            iconLeaveQueue = iconLeaveQueue,
+            iconScreenSharingDialog = iconScreenSharingDialog
+        )
+
+        return AlertDialogConfiguration(theme, properties, icons)
+    }
 
     class UiThemeBuilder {
         /**

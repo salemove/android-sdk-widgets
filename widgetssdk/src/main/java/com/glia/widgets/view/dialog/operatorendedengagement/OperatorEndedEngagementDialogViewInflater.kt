@@ -3,24 +3,24 @@ package com.glia.widgets.view.dialog.operatorendedengagement
 import android.view.LayoutInflater
 import com.glia.widgets.view.dialog.base.DialogPayload
 import com.glia.widgets.view.dialog.base.DialogViewInflater
-import com.glia.widgets.view.unifiedui.theme.AlertThemeWrapper
+import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 
 internal class OperatorEndedEngagementDialogViewInflater(
     layoutInflater: LayoutInflater,
-    themeWrapper: AlertThemeWrapper,
+    themeWrapper: AlertDialogConfiguration,
     payload: DialogPayload.OperatorEndedEngagement
 ) : DialogViewInflater<OperatorEndedEngagementDialogViewBinding, DialogPayload.OperatorEndedEngagement>(
     OperatorEndedEngagementDialogViewBinding(layoutInflater), themeWrapper, payload
 ) {
     override fun setup(
         binding: OperatorEndedEngagementDialogViewBinding,
-        themeWrapper: AlertThemeWrapper,
+        configuration: AlertDialogConfiguration,
         payload: DialogPayload.OperatorEndedEngagement
     ) {
-        val theme = themeWrapper.theme
+        val theme = configuration.theme
 
-        setupText(binding.messageTv, payload.message, theme.message, themeWrapper.typeface)
-        setupButton(binding.button, payload.buttonText, theme.positiveButton, themeWrapper.typeface, payload.buttonClickListener)
+        setupText(binding.messageTv, payload.message, theme.message, configuration.properties.typeface)
+        setupButton(binding.button, payload.buttonText, theme.positiveButton, configuration.properties.typeface, payload.buttonClickListener)
     }
 
 }

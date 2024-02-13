@@ -7,14 +7,14 @@ import androidx.viewbinding.ViewBinding
 import com.glia.widgets.view.unifiedui.applyButtonTheme
 import com.glia.widgets.view.unifiedui.applyColorTheme
 import com.glia.widgets.view.unifiedui.applyTextTheme
-import com.glia.widgets.view.unifiedui.theme.AlertThemeWrapper
+import com.glia.widgets.view.unifiedui.theme.AlertDialogConfiguration
 import com.glia.widgets.view.unifiedui.theme.base.ButtonTheme
 import com.glia.widgets.view.unifiedui.theme.base.TextTheme
 import com.google.android.material.button.MaterialButton
 
 internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding>, R : DialogPayload>(
     binding: T,
-    themeWrapper: AlertThemeWrapper,
+    themeWrapper: AlertDialogConfiguration,
     payload: R
 ) {
 
@@ -24,14 +24,14 @@ internal abstract class DialogViewInflater<T : DialogViewBinding<out ViewBinding
         initialSetup(binding, themeWrapper, payload)
     }
 
-    private fun initialSetup(binding: T, themeWrapper: AlertThemeWrapper, payload: R) {
-        val alertTheme = themeWrapper.theme
+    private fun initialSetup(binding: T, configuration: AlertDialogConfiguration, payload: R) {
+        val alertTheme = configuration.theme
         view.applyColorTheme(alertTheme.backgroundColor)
-        setupText(binding.titleTv, payload.title, alertTheme.title, themeWrapper.typeface)
-        setup(binding, themeWrapper, payload)
+        setupText(binding.titleTv, payload.title, alertTheme.title, configuration.properties.typeface)
+        setup(binding, configuration, payload)
     }
 
-    abstract fun setup(binding: T, themeWrapper: AlertThemeWrapper, payload: R)
+    abstract fun setup(binding: T, configuration: AlertDialogConfiguration, payload: R)
 
     private fun setupTypeface(tv: TextView, typeface: Typeface?) {
         typeface?.also { tv.typeface = it }

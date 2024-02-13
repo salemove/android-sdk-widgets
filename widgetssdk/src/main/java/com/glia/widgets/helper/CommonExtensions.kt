@@ -44,7 +44,7 @@ internal fun UiTheme?.isAlertDialogButtonUseVerticalAlignment(): Boolean = this?
 internal fun UiTheme?.getFullHybridTheme(newTheme: UiTheme?): UiTheme = deepMerge(newTheme) ?: UiTheme.UiThemeBuilder().build()
 
 internal val UiTheme?.withConfigurationTheme: UiTheme
-    get() = Dependencies.getSdkConfigurationManager().uiTheme.getFullHybridTheme(this)
+    get() = getFullHybridTheme(Dependencies.getSdkConfigurationManager().uiTheme)
 
 /**
  * Returns styled text from the provided HTML string. Replaces \n to <br> regardless of the operating system where the string was created.

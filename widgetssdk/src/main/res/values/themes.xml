@@ -129,6 +129,7 @@
         <item name="gliaIconPlaceholder">@drawable/ic_person</item>
         <item name="gliaIconOnHold">@drawable/ic_pause_circle</item>
         <item name="gliaIconEndScreenShare">@drawable/ic_screensharing_off</item>
+        <item name="gliaIconScreenSharingDialog">@drawable/ic_screensharing</item>
 
         <item name="gliaSendMessageButtonTintColor">?attr/gliaBrandPrimaryColor</item>
 

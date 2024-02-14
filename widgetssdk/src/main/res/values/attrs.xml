@@ -200,19 +200,31 @@
     <attr name="gliaAlertDialogButtonUseVerticalAlignment" format="boolean" />
 
     <!-- Styleable components -->
+    <!-- {@deprecated For internal use only} -->
     <attr name="gliaHeaderEndButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="buttonBarPositiveButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="buttonBarNegativeButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="buttonBarNeutralButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="buttonSurveyOptionButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="choiceCardContentTextStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="chatHeadStyle" format="reference" />
 
     <!--    Gva-->
+    <!-- {@deprecated For internal use only} -->
     <attr name="gvaOptionButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="gvaQuickReplyButtonStyle" format="reference" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="gvaQuickReplyBackgroundColor" format="color" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="gvaQuickReplyStrokeColor" format="color" />
+    <!-- {@deprecated For internal use only} -->
     <attr name="gvaQuickReplyTextColor" format="color" />
 
     <declare-styleable name="OutlinedOptionView">

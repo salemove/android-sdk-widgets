@@ -38,6 +38,7 @@
         <item name="cornerSize">@dimen/glia_small</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.Button" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
         </item>
@@ -45,14 +46,17 @@
         <item name="android:textColor">?attr/gliaBaseLightColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.Button.Positive" parent="Application.Glia.Chat.Button">
         <item name="android:backgroundTint">?attr/gliaBrandPrimaryColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.Button.Negative" parent="Application.Glia.Chat.Button">
         <item name="android:backgroundTint">?attr/gliaSystemNegativeColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.Button.Neutral" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
         </item>
@@ -61,6 +65,7 @@
         <item name="android:backgroundTint">?attr/gliaSystemAgentBubbleColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.Button.SurveyOption" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
         </item>
@@ -71,6 +76,7 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.Button.Gva" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/Application.Glia.Chat.ShapeAppearance.SmallComponent
         </item>
@@ -81,6 +87,7 @@
         <item name="android:stateListAnimator">@null</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.ChatHead">
         <item name="badgeBackgroundTintList">?attr/gliaBrandPrimaryColor</item>
         <item name="badgeTextColor">?attr/baseLightColor</item>
@@ -90,6 +97,7 @@
         <item name="operatorPlaceholderIconTintList">?attr/baseLightColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Chat.GvaChip" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="android:textAppearance">?attr/textAppearanceBody1</item>
         <item name="shapeAppearanceOverlay">@style/Application.Glia.Chat.GvaChipShapeAppearance</item>
@@ -107,49 +115,58 @@
         <item name="cornerSize">10dp</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.VisitorCode" parent="TextAppearance.MaterialComponents.Headline4">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
         <item name="android:background">@drawable/bg_char_slot</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Header1" parent="TextAppearance.MaterialComponents.Headline1">
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Header2" parent="TextAppearance.MaterialComponents.Headline2">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Header3" parent="TextAppearance.MaterialComponents.Headline3">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
         <!--        font weight available from api 28 :(-->
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Body" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">?attr/gliaBaseNormalColor</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.Header2.Dialog" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
         <item name="android:textStyle">bold</item>
     </style>
 
+    <!-- {@deprecated For internal use only} -->
     <style name="Application.Glia.ChoiceCard.ContentText" parent="Application.Glia.Body">
         <item name="android:textColor">?attr/gliaBaseDarkColor</item>
     </style>

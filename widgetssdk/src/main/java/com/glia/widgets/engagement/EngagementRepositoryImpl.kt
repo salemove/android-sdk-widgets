@@ -30,7 +30,6 @@ import com.glia.widgets.core.engagement.GliaOperatorRepository
 import com.glia.widgets.di.GliaCore
 import com.glia.widgets.helper.Data
 import com.glia.widgets.helper.Logger
-import com.glia.widgets.helper.formattedName
 import com.glia.widgets.helper.isQueueUnavailable
 import com.glia.widgets.helper.unSafeSubscribe
 import io.reactivex.Completable
@@ -73,7 +72,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
 
     private val _currentOperator: BehaviorProcessor<Data<Operator>> = BehaviorProcessor.createDefault(Data.Empty)
     override val currentOperator: Flowable<Data<Operator>> = _currentOperator.onBackpressureLatest()
-    private val currentOperatorValue: Operator? get() = with(_currentOperator.value as? Data.Value) { this?.result }
+    override val currentOperatorValue: Operator? get() = with(_currentOperator.value as? Data.Value) { this?.result }
     override val isOperatorPresent: Boolean get() = currentOperatorValue != null
     private val currentState: State? get() = _engagementState.value
 
@@ -510,7 +509,7 @@ internal class EngagementRepositoryImpl(private val core: GliaCore, private val 
     private fun handleScreenSharingRequest(request: ScreenSharingRequest) {
         Logger.d(TAG, "Received screen sharing request")
         currentScreenSharingRequest = request
-        _screenSharingState.onNext(ScreenSharingState.Requested(currentOperatorValue?.formattedName))
+        _screenSharingState.onNext(ScreenSharingState.Requested)
     }
 
     private fun handleScreenSharingState(state: VisitorScreenSharingState) {

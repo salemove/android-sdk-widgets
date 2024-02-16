@@ -11,12 +11,10 @@ import com.glia.widgets.StringKey
 import com.glia.widgets.StringKeyPair
 import com.glia.widgets.StringProvider
 import com.glia.widgets.UiTheme
-import com.glia.widgets.callvisualizer.CallVisualizerSupportActivity
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
 import com.glia.widgets.core.dialog.model.Link
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
-import com.glia.widgets.helper.asActivity
 import com.glia.widgets.helper.isOneWayVideo
 import com.glia.widgets.helper.isTwoWayVideo
 import com.glia.widgets.view.dialog.base.DialogPayload
@@ -303,13 +301,8 @@ internal object Dialogs {
             .setBackgroundInsetStart(0)
             .setBackgroundInsetEnd(0)
             .setCancelable(true)
-            .setOnCancelListener {
-                Dependencies.getControllerFactory().dialogController.dismissVisitorCodeDialog()
-                context.asActivity().takeIf { it is CallVisualizerSupportActivity }?.apply {
-                    overridePendingTransition(0, 0)
-                    finish()
-                }
-            }.show()
+            .setOnCancelListener { Dependencies.getControllerFactory().callVisualizerController.dismissVisitorCodeDialog() }
+            .show()
     }
 
     private fun Window.allowOutsideTouch() {

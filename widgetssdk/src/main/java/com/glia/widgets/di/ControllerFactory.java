@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.glia.widgets.call.CallContract;
 import com.glia.widgets.call.CallController;
-import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerContract;
-import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizerController;
 import com.glia.widgets.callvisualizer.EndScreenSharingContract;
 import com.glia.widgets.callvisualizer.EndScreenSharingController;
 import com.glia.widgets.callvisualizer.VisitorCodeContract;
@@ -17,8 +15,6 @@ import com.glia.widgets.chat.controller.ChatController;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
 import com.glia.widgets.core.dialog.DialogContract;
 import com.glia.widgets.core.dialog.DialogController;
-import com.glia.widgets.core.screensharing.ScreenSharingContract;
-import com.glia.widgets.core.screensharing.ScreenSharingController;
 import com.glia.widgets.engagement.completion.EngagementCompletionContract;
 import com.glia.widgets.engagement.completion.EngagementCompletionController;
 import com.glia.widgets.filepreview.ui.FilePreviewContract;
@@ -64,10 +60,8 @@ public class ControllerFactory {
     private EngagementCompletionContract.Controller engagementCompletionController;
     private ChatContract.Controller retainedChatController;
     private CallContract.Controller retainedCallController;
-    private ScreenSharingContract.Controller retainedScreenSharingController;
     private SurveyController surveyController;
     private CallVisualizerContract.Controller callVisualizerController;
-    private ActivityWatcherForCallVisualizerController activityWatcherforCallVisualizerController;
     private ActivityWatcherForChatHeadController activityWatcherForChatHeadController;
     private ActivityWatcherForLiveObservationController activityWatcherForLiveObservationController;
 
@@ -134,7 +128,8 @@ public class ControllerFactory {
                 useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
-                useCaseFactory.getDecideOnQueueingUseCase()
+                useCaseFactory.getDecideOnQueueingUseCase(),
+                useCaseFactory.getScreenSharingUseCase()
             );
         }
 
@@ -172,26 +167,12 @@ public class ControllerFactory {
                 useCaseFactory.getToggleVisitorVideoMediaStateUseCase(),
                 useCaseFactory.getIsQueueingOrEngagementUseCase(),
                 useCaseFactory.getQueueForEngagementUseCase(),
-                useCaseFactory.getDecideOnQueueingUseCase()
+                useCaseFactory.getDecideOnQueueingUseCase(),
+                useCaseFactory.getScreenSharingUseCase()
             );
         }
 
         return retainedCallController;
-    }
-
-    public ScreenSharingContract.Controller getScreenSharingController() {
-        if (retainedScreenSharingController == null) {
-            Logger.d(TAG, "new screen sharing controller");
-            retainedScreenSharingController = new ScreenSharingController(
-                useCaseFactory.getScreenSharingUseCase(),
-                dialogController,
-                useCaseFactory.createShowScreenSharingNotificationUseCase(),
-                useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
-                useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
-                sdkConfigurationManager
-            );
-        }
-        return retainedScreenSharingController;
     }
 
     public void destroyControllers() {
@@ -280,9 +261,9 @@ public class ControllerFactory {
             callVisualizerController = new CallVisualizerController(
                 dialogController,
                 useCaseFactory.createConfirmationDialogUseCase(),
-                useCaseFactory.createIsCallOrChatScreenActiveUseCase(),
                 useCaseFactory.getEngagementRequestUseCase(),
-                useCaseFactory.getEngagementStateUseCase()
+                useCaseFactory.getEngagementStateUseCase(),
+                useCaseFactory.createConfirmationDialogLinksUseCase()
             );
         }
         return callVisualizerController;
@@ -315,28 +296,16 @@ public class ControllerFactory {
     }
 
     public EndScreenSharingContract.Controller getEndScreenSharingController() {
-        return new EndScreenSharingController();
+        return new EndScreenSharingController(useCaseFactory.getEndScreenSharingUseCase());
     }
 
     public VisitorCodeContract.Controller getVisitorCodeController() {
         return new VisitorCodeController(
-            dialogController,
+            callVisualizerController,
             repositoryFactory.getVisitorCodeRepository(),
             useCaseFactory.getEngagementStateUseCase(),
             useCaseFactory.getIsQueueingOrEngagementUseCase()
         );
-    }
-
-    public ActivityWatcherForCallVisualizerContract.Controller getActivityWatcherForCallVisualizerController() {
-        if (activityWatcherforCallVisualizerController == null) {
-            activityWatcherforCallVisualizerController = new ActivityWatcherForCallVisualizerController(
-                getCallVisualizerController(),
-                getScreenSharingController(),
-                useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
-                useCaseFactory.createConfirmationDialogLinksUseCase()
-            );
-        }
-        return activityWatcherforCallVisualizerController;
     }
 
     public ActivityWatcherForChatHeadContract.Controller getActivityWatcherForChatHeadController() {
@@ -344,7 +313,7 @@ public class ControllerFactory {
             activityWatcherForChatHeadController = new ActivityWatcherForChatHeadController(
                 serviceChatHeadController,
                 getChatHeadLayoutController(),
-                getScreenSharingController(),
+                useCaseFactory.getScreenSharingUseCase(),
                 useCaseFactory.getEngagementStateUseCase(),
                 useCaseFactory.createIsFromCallScreenUseCase(),
                 useCaseFactory.createUpdateFromCallScreenUseCase(),
@@ -388,7 +357,16 @@ public class ControllerFactory {
             useCaseFactory.getAcceptMediaUpgradeOfferUseCase(),
             useCaseFactory.getDeclineMediaUpgradeOfferUseCase(),
             useCaseFactory.getCheckMediaUpgradePermissionsUseCase(),
-            dialogController
+            useCaseFactory.getScreenSharingUseCase(),
+            useCaseFactory.createHasScreenSharingNotificationChannelEnabledUseCase(),
+            useCaseFactory.getCurrentOperatorUseCase(),
+            useCaseFactory.createShowScreenSharingNotificationUseCase(),
+            useCaseFactory.createRemoveScreenSharingNotificationUseCase(),
+            useCaseFactory.createIsShowOverlayPermissionRequestDialogUseCase(),
+            useCaseFactory.getIsCurrentEngagementCallVisualizer(),
+            useCaseFactory.createSetOverlayPermissionRequestDialogShownUseCase(),
+            dialogController,
+            sdkConfigurationManager
         );
     }
 }

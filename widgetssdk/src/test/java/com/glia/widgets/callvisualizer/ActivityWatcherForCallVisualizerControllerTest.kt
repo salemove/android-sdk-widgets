@@ -312,7 +312,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onPositiveDialogButtonClicked openSupportActivity called when isSupportActivityOpen false and MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(false)
         val operatorName = "Operator"
-        controller.onDialogControllerCallback(DialogState.StartScreenSharing(operatorName))
+        controller.onDialogControllerCallback(DialogState.StartScreenSharing)
         verify(watcher, never()).showScreenSharingDialog(any())
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -326,7 +326,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onPositiveDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         val operatorName = "Operator"
-        controller.onDialogControllerCallback(DialogState.StartScreenSharing(operatorName))
+        controller.onDialogControllerCallback(DialogState.StartScreenSharing)
         verify(watcher).showScreenSharingDialog(eq(operatorName))
         controller.onPositiveDialogButtonClicked()
         verify(watcher).removeDialogFromStack()
@@ -339,7 +339,7 @@ internal class ActivityWatcherForCallVisualizerControllerTest {
     fun `onNegativeDialogButtonClicked dialog is dismissed when MODE_SCREEN_SHARING`() {
         whenever(watcher.isSupportActivityOpen()).thenReturn(true)
         val operatorName = "Operator"
-        controller.onDialogControllerCallback(DialogState.StartScreenSharing(operatorName))
+        controller.onDialogControllerCallback(DialogState.StartScreenSharing)
         verify(watcher).showScreenSharingDialog(eq(operatorName))
         controller.onNegativeDialogButtonClicked()
         verify(watcher).removeDialogFromStack()

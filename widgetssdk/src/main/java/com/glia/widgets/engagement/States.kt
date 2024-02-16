@@ -33,7 +33,7 @@ internal sealed interface SurveyState {
 }
 
 internal sealed interface ScreenSharingState {
-    data class Requested(val operatorName: String?) : ScreenSharingState
+    object Requested : ScreenSharingState
     object Started : ScreenSharingState
     object RequestAccepted : ScreenSharingState
     object RequestDeclined : ScreenSharingState

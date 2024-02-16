@@ -6,7 +6,6 @@ import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
-import com.glia.widgets.callvisualizer.domain.IsCallOrChatScreenActiveUseCase;
 import com.glia.widgets.chat.domain.AddNewMessagesDividerUseCase;
 import com.glia.widgets.chat.domain.AppendGvaMessageItemUseCase;
 import com.glia.widgets.chat.domain.AppendHistoryChatMessageUseCase;
@@ -118,6 +117,8 @@ import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCase;
 import com.glia.widgets.engagement.domain.DeclineMediaUpgradeOfferUseCaseImpl;
 import com.glia.widgets.engagement.domain.EndEngagementUseCase;
 import com.glia.widgets.engagement.domain.EndEngagementUseCaseImpl;
+import com.glia.widgets.engagement.domain.EndScreenSharingUseCase;
+import com.glia.widgets.engagement.domain.EndScreenSharingUseCaseImpl;
 import com.glia.widgets.engagement.domain.EngagementRequestUseCase;
 import com.glia.widgets.engagement.domain.EngagementRequestUseCaseImpl;
 import com.glia.widgets.engagement.domain.EngagementStateUseCase;
@@ -532,11 +533,6 @@ public class UseCaseFactory {
     @NonNull
     public CustomCardShouldShowUseCase createCustomCardShouldShowUseCase() {
         return new CustomCardShouldShowUseCase(GliaWidgets.getCustomCardAdapter());
-    }
-
-    @NonNull
-    public IsCallOrChatScreenActiveUseCase createIsCallOrChatScreenActiveUseCase() {
-        return new IsCallOrChatScreenActiveUseCase();
     }
 
     @NonNull
@@ -964,7 +960,7 @@ public class UseCaseFactory {
 
     @NonNull
     public ScreenSharingUseCase getScreenSharingUseCase() {
-        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository());
+        return new ScreenSharingUseCaseImpl(repositoryFactory.getEngagementRepository(), createRemoveScreenSharingNotificationUseCase());
     }
 
     @NonNull
@@ -980,6 +976,11 @@ public class UseCaseFactory {
     @NonNull
     public CheckMediaUpgradePermissionsUseCase getCheckMediaUpgradePermissionsUseCase() {
         return new CheckMediaUpgradePermissionsUseCaseImpl(permissionManager);
+    }
+
+    @NonNull
+    public EndScreenSharingUseCase getEndScreenSharingUseCase() {
+        return new EndScreenSharingUseCaseImpl(getScreenSharingUseCase());
     }
 
 }

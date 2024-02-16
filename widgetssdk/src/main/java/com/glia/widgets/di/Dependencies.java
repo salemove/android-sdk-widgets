@@ -11,7 +11,7 @@ import androidx.lifecycle.Lifecycle;
 import com.glia.widgets.GliaWidgetsConfig;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.StringProviderImpl;
-import com.glia.widgets.callvisualizer.ActivityWatcherForCallVisualizer;
+import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
@@ -87,12 +87,12 @@ public class Dependencies {
         controllerFactory = new ControllerFactory(repositoryFactory, useCaseFactory, sdkConfigurationManager, managerFactory);
         initApplicationLifecycleObserver(new ApplicationLifecycleManager(), controllerFactory.getChatHeadController());
 
-        ActivityWatcherForCallVisualizer activityWatcherForCallVisualizer =
-            new ActivityWatcherForCallVisualizer(
-                getControllerFactory().getDialogController(),
-                getControllerFactory().getActivityWatcherForCallVisualizerController()
-            );
-        application.registerActivityLifecycleCallbacks(activityWatcherForCallVisualizer);
+        CallVisualizerActivityWatcher callVisualizerActivityWatcher = new CallVisualizerActivityWatcher(
+            getControllerFactory().getCallVisualizerController(),
+            new GliaActivityManagerImpl()
+        );
+
+        application.registerActivityLifecycleCallbacks(callVisualizerActivityWatcher);
 
         ActivityWatcherForChatHead activityWatcherForChatHead =
             new ActivityWatcherForChatHead(

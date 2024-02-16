@@ -3,10 +3,11 @@ package com.glia.widgets.view.head.controller
 import com.glia.androidsdk.Glia
 import com.glia.widgets.chat.domain.IsFromCallScreenUseCase
 import com.glia.widgets.chat.domain.UpdateFromCallScreenUseCase
-import com.glia.widgets.core.screensharing.ScreenSharingContract
+import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.helper.unSafeSubscribe
@@ -16,7 +17,7 @@ import com.glia.widgets.view.head.ChatHeadLayoutContract
 internal class ActivityWatcherForChatHeadController(
     private var serviceChatHeadController: ChatHeadContract.Controller,
     private var applicationChatHeadController: ChatHeadLayoutContract.Controller,
-    private val screenSharingController: ScreenSharingContract.Controller,
+    private val screenSharingUseCase: ScreenSharingUseCase,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isFromCallScreenUseCase: IsFromCallScreenUseCase,
     private val updateFromCallScreenUseCase: UpdateFromCallScreenUseCase,
@@ -29,10 +30,10 @@ internal class ActivityWatcherForChatHeadController(
         this.watcher = watcher
     }
 
-    internal var screenSharingViewCallback: ScreenSharingContract.ViewCallback? = null
-
     override fun init() {
         engagementStateUseCase().unSafeSubscribe(::handleEngagementState)
+        screenSharingUseCase().filter { it is ScreenSharingState.RequestAccepted && isCurrentEngagementCallVisualizerUseCase() }
+            .unSafeSubscribe { showBubble() }
     }
 
     private fun handleEngagementState(state: State) {
@@ -92,15 +93,6 @@ internal class ActivityWatcherForChatHeadController(
         if (Glia.isInitialized() && shouldShowAppBubble(viewName)) {
             watcher.addChatHeadLayoutIfAbsent()
         }
-
-        setupScreenSharingViewCallback()
-        if (isCurrentEngagementCallVisualizerUseCase()) {
-            screenSharingController.setViewCallback(screenSharingViewCallback)
-        } else {
-            // Show screen sharing requests for any screen (not only Chat and Call) for Call Visualizer only.
-            // For Omnicore engagement show only on Chat and Call screen.
-            screenSharingController.removeViewCallback(screenSharingViewCallback)
-        }
     }
 
     override fun onActivityPaused() {
@@ -109,7 +101,6 @@ internal class ActivityWatcherForChatHeadController(
         serviceChatHeadController.onPause(gliaOrRootView)
         val viewName: String = gliaOrRootView?.javaClass?.simpleName.orEmpty()
         applicationChatHeadController.onPause(viewName)
-        screenSharingController.removeViewCallback(screenSharingViewCallback)
     }
 
     private fun shouldShowAppBubble(gliaOrRootView: String?): Boolean {
@@ -124,14 +115,6 @@ internal class ActivityWatcherForChatHeadController(
         if (applicationChatHeadController.shouldShow(viewName)) {
             watcher.addChatHeadLayoutIfAbsent()
             applicationChatHeadController.updateChatHeadView()
-        }
-    }
-
-    private fun setupScreenSharingViewCallback() {
-        screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
-            override fun onScreenSharingRequestSuccess() {
-                showBubble()
-            }
         }
     }
 }

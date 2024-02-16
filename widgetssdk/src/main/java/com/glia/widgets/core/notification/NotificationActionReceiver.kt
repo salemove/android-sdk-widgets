@@ -3,14 +3,14 @@ package com.glia.widgets.core.notification
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.di.Dependencies
+import com.glia.widgets.engagement.domain.EndScreenSharingUseCase
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
 
 class NotificationActionReceiver : BroadcastReceiver() {
-    private val controller: ScreenSharingContract.Controller by lazy {
-        Dependencies.getControllerFactory().screenSharingController
+    private val endScreenSharingUseCase: EndScreenSharingUseCase by lazy {
+        Dependencies.getUseCaseFactory().endScreenSharingUseCase
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -21,7 +21,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
 
     private fun onScreenSharingEndPressed() {
         Logger.i(TAG, "End screen sharing tapped from notification")
-        controller.onScreenSharingNotificationEndPressed()
+        endScreenSharingUseCase()
     }
 
     companion object {

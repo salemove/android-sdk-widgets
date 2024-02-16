@@ -1,5 +1,6 @@
 package com.glia.widgets.base
 
+import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -9,12 +10,14 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.call.CallActivity
 import com.glia.widgets.chat.ChatActivity
 import com.glia.widgets.helper.GliaActivityManager
-import com.glia.widgets.helper.runtimeTheme
+import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.slot
+import io.mockk.unmockkStatic
 import io.mockk.verify
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.schedulers.Schedulers
@@ -103,10 +106,13 @@ class BaseSingleActivityWatcherTest {
 
     @Test
     fun `showAlertDialogWithStyledContext will invoke callback when activity is glia activity`() {
+        mockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
         val dialog: AlertDialog = mockk(relaxed = true)
-        val activity: ChatActivity = mockk(relaxed = true) {
-            every { runtimeTheme } returns UiTheme()
+        val activity: ChatActivity = mockk(relaxed = true)
+        every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
+            secondArg<(Context, UiTheme) -> Unit>().invoke(activity, UiTheme())
         }
+
         val callback: (Context, UiTheme) -> AlertDialog = mockk()
         every { callback.invoke(any(), any()) } returns dialog
 
@@ -116,14 +122,18 @@ class BaseSingleActivityWatcherTest {
 
         watcher.dismissAlertDialogSilently()
         verify { dialog.dismiss() }
+        unmockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
     }
 
     @Test
     fun `showAlertDialogWithStyledContext will dismiss dialog when it exists`() {
+        mockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
         val dialog: AlertDialog = mockk(relaxed = true)
-        val activity: ChatActivity = mockk(relaxed = true) {
-            every { runtimeTheme } returns UiTheme()
+        val activity: ChatActivity = mockk(relaxed = true)
+        every { any<Activity>().withRuntimeTheme(captureLambda()) } answers {
+            secondArg<(Context, UiTheme) -> Unit>().invoke(activity, UiTheme())
         }
+
         val callback: (Context, UiTheme) -> AlertDialog = mockk()
         every { callback.invoke(any(), any()) } returns dialog
 
@@ -133,6 +143,7 @@ class BaseSingleActivityWatcherTest {
 
         watcher.showAlertDialogWithStyledContext(activity, callback)
         verify { dialog.dismiss() }
+        unmockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
     }
 
 }

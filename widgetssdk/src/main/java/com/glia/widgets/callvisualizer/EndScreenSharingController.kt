@@ -1,8 +1,9 @@
 package com.glia.widgets.callvisualizer
 
 import com.glia.widgets.GliaWidgets
+import com.glia.widgets.engagement.domain.EndScreenSharingUseCase
 
-internal class EndScreenSharingController : EndScreenSharingContract.Controller {
+internal class EndScreenSharingController(private val endScreenSharingUseCase: EndScreenSharingUseCase) : EndScreenSharingContract.Controller {
 
     private var view: EndScreenSharingContract.View? = null
 
@@ -17,6 +18,10 @@ internal class EndScreenSharingController : EndScreenSharingContract.Controller 
     override fun onEndScreenSharingButtonClicked() {
         view?.stopScreenSharing()
         view?.finish()
+    }
+
+    override fun onForceStopScreenSharing() {
+        endScreenSharingUseCase()
     }
 
     override fun onActivityCreate() {

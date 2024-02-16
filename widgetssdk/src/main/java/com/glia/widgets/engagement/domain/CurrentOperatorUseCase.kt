@@ -8,16 +8,24 @@ import io.reactivex.Flowable
 
 internal interface CurrentOperatorUseCase {
     val formattedName: Flowable<String>
+    val formattedNameValue: String?
+    val currentOperatorValue: Operator?
     operator fun invoke(): Flowable<Operator>
 }
 
-internal class CurrentOperatorUseCaseImpl(engagementRepository: EngagementRepository) : CurrentOperatorUseCase {
+internal class CurrentOperatorUseCaseImpl(private val engagementRepository: EngagementRepository) : CurrentOperatorUseCase {
     private val currentOperator = engagementRepository.currentOperator
         .filter(Data<Operator>::hasValue)
         .map { it as Data.Value }
         .map(Data.Value<Operator>::result)
 
     override val formattedName: Flowable<String> = currentOperator.map(Operator::formattedName)
+
+    override val currentOperatorValue: Operator?
+        get() = engagementRepository.currentOperatorValue
+
+    override val formattedNameValue: String?
+        get() = engagementRepository.currentOperatorValue?.formattedName
 
     override fun invoke(): Flowable<Operator> = currentOperator
 }

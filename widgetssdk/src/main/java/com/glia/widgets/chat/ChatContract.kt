@@ -1,6 +1,7 @@
 package com.glia.widgets.chat
 
 import android.net.Uri
+import android.widget.Toast
 import com.glia.androidsdk.chat.AttachmentFile
 import com.glia.androidsdk.chat.SingleChoiceOption
 import com.glia.widgets.base.BaseController
@@ -53,6 +54,7 @@ internal interface ChatContract {
         fun show()
         fun onPause()
         fun onResume()
+        fun onForceStopScreenSharing()
     }
 
     interface View : BaseView<Controller> {
@@ -76,5 +78,6 @@ internal interface ChatContract {
         fun requestOpenEmailClient(uri: Uri)
         fun showEngagementConfirmationDialog()
         fun navigateToWebBrowserActivity(title: String, url: String)
+        fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT)
     }
 }

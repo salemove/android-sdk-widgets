@@ -11,8 +11,7 @@ import com.glia.widgets.UiTheme
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.isGlia
-import com.glia.widgets.helper.runtimeTheme
-import com.glia.widgets.helper.wrapWithMaterialThemeOverlay
+import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.reactivex.Flowable
 import io.reactivex.Observable
@@ -90,7 +89,7 @@ internal open class BaseSingleActivityWatcher(private val gliaActivityManager: G
     }
 
     @CallSuper
-    final override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         gliaActivityManager.onActivityCreated(activity)
     }
 
@@ -104,11 +103,11 @@ internal open class BaseSingleActivityWatcher(private val gliaActivityManager: G
     fun finishActivity(kClass: KClass<out Activity>) = gliaActivityManager.finishActivity(kClass)
 
 
-    private fun launchDialogHolderActivity(activity: Activity) {
+    protected fun launchDialogHolderActivity(activity: Activity) {
         DialogHolderActivity.start(activity)
     }
 
-    private fun ensureGliaActivity(activity: Activity, callback: Activity.() -> Unit) {
+    private fun enforceGliaActivity(activity: Activity, callback: Activity.() -> Unit) {
         if (activity.isGlia) {
             callback(activity)
         } else {
@@ -118,9 +117,11 @@ internal open class BaseSingleActivityWatcher(private val gliaActivityManager: G
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     fun showAlertDialogWithStyledContext(activity: Activity, callback: (Context, UiTheme) -> AlertDialog) {
-        ensureGliaActivity(activity) {
+        enforceGliaActivity(activity) {
             dismissAlertDialogSilently()
-            alertDialog = callback(wrapWithMaterialThemeOverlay(), runtimeTheme)
+            withRuntimeTheme { themedContext, uiTheme ->
+                alertDialog = callback(themedContext, uiTheme)
+            }
         }
     }
 

@@ -159,6 +159,7 @@ class EngagementRepositoryTest {
             assertNull(visitorCurrentMediaState)
             onHoldStateTest.assertNotComplete().assertValue(false).assertValueCount(1)
             operatorMediaStateTest.assertNotComplete().assertValue(Data.Empty).assertValueCount(1)
+            assertNull(currentOperatorValue)
             assertNull(operatorCurrentMediaState)
             screenSharingStateTest.assertNotComplete().assertNoValues()
             assertFalse(isQueueingOrEngagement)
@@ -312,6 +313,7 @@ class EngagementRepositoryTest {
             onHoldState.test().assertNotComplete().assertValue(false)
             operatorMediaState.test().assertNotComplete().assertValue(Data.Empty)
             assertNull(operatorCurrentMediaState)
+            assertNull(currentOperatorValue)
         }
 
         if (ongoingEngagement) {
@@ -369,7 +371,7 @@ class EngagementRepositoryTest {
 
         screenSharingRequestCallbackSlot.captured.accept(screenSharingRequest)
 
-        repository.screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.Requested(operatorName))
+        repository.screenSharingState.test().assertNotComplete().assertValue(ScreenSharingState.Requested)
         testBody(screenSharingRequest)
         confirmVerified(screenSharingRequest)
     }
@@ -590,9 +592,13 @@ class EngagementRepositoryTest {
 
         engagementStateCallbackSlot.captured.accept(state1)
         assertTrue(repository.isOperatorPresent)
+        assertEquals(operator1, repository.currentOperatorValue)
         engagementStateCallbackSlot.captured.accept(state2)
+        assertEquals(operator1, repository.currentOperatorValue)
         engagementStateCallbackSlot.captured.accept(state3)
+        assertEquals(operator2, repository.currentOperatorValue)
         engagementStateCallbackSlot.captured.accept(state4)
+        assertEquals(operator2, repository.currentOperatorValue)
 
         operatorTypingCallbackSlot.captured.apply {
             accept(OperatorTypingStatus { false })

@@ -28,9 +28,9 @@ internal class CallVisualizerManager(
         return buildVisitorCodeUseCase(context, false)
     }
 
-    override fun showVisitorCodeDialog(context: Context) {
+    override fun showVisitorCodeDialog() {
         checkForProperInit()
-        Dependencies.getControllerFactory().dialogController.showVisitorCodeDialog()
+        callVisualizerController.showVisitorCodeDialog()
     }
 
     override fun addVisitorContext(visitorContext: String) {

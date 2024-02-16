@@ -16,7 +16,6 @@ import com.glia.widgets.call.CallContract
 import com.glia.widgets.call.CallStateHelper
 import com.glia.widgets.call.CallStatus
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager
-import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.di.ControllerFactory
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.ResourceProvider
@@ -68,8 +67,6 @@ class CallActivityTest {
 
         every { controllerFactory.chatHeadController } answers { serviceChatHeadController }
         every { controllerFactory.floatingVisitorVideoController } answers { floatingVisitorVideoController }
-        val screenSharingController: ScreenSharingContract.Controller = mockk(relaxed = true)
-        every { controllerFactory.screenSharingController } returns screenSharingController
         Dependencies.setControllerFactory(controllerFactory)
 
         // set up SdkConfigurationManager

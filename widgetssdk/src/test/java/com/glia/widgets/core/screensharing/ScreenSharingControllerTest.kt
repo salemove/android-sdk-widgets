@@ -73,8 +73,8 @@ class ScreenSharingControllerTest {
 
         whenever(hasScreenSharingNotificationChannelEnabledUseCase()) doReturn true
         val operatorName = "Operator"
-        screenSharingState.onNext(ScreenSharingState.Requested(operatorName))
-        verify(dialogController).showStartScreenSharingDialog(eq(operatorName))
+        screenSharingState.onNext(ScreenSharingState.Requested)
+        verify(dialogController).showStartScreenSharingDialog()
 
         screenSharingState.onNext(ScreenSharingState.Started)
         verify(viewCallback).onScreenSharingStarted()
@@ -106,7 +106,7 @@ class ScreenSharingControllerTest {
         whenever(hasScreenSharingNotificationChannelEnabledUseCase()).thenReturn(true)
         subjectUnderTest.setViewCallback(mock())
         subjectUnderTest.onScreenSharingRequest(operatorName)
-        verify(dialogController).showStartScreenSharingDialog(eq(operatorName))
+        verify(dialogController).showStartScreenSharingDialog()
     }
 
     @Test

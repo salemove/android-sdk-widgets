@@ -446,7 +446,7 @@ class MainFragment : Fragment() {
         if (!visitorContext.isNullOrBlank()) {
             cv.addVisitorContext(visitorContext)
         }
-        cv.showVisitorCodeDialog(requireContext())
+        cv.showVisitorCodeDialog()
     }
 
     // For testing the integrated Visitor Code solution

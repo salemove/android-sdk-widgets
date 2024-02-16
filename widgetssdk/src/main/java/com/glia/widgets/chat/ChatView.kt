@@ -8,8 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.TypedArray
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
@@ -54,7 +52,6 @@ import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.fileupload.model.FileAttachment
 import com.glia.widgets.core.notification.openNotificationChannelScreen
-import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.databinding.ChatViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.filepreview.ui.FilePreviewActivity
@@ -112,14 +109,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
     private var controller: ChatContract.Controller? = null
     private var dialogCallback: DialogContract.Controller.Callback? = null
     private var dialogController: DialogContract.Controller? = null
-    private val screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
-        override fun onScreenSharingRequestError(message: String) = showToast(message)
 
-        override fun onScreenSharingRequestSuccess() {
-            Handler(Looper.getMainLooper()).post { binding.appBarView.showEndScreenSharingButton() }
-        }
-    }
-    private var screenSharingController: ScreenSharingContract.Controller? = null
     private var serviceChatHeadController: ChatHeadContract.Controller? = null
 
     private var uploadAttachmentAdapter by Delegates.notNull<UploadAttachmentAdapter>()
@@ -311,14 +301,11 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
      */
     fun onResume() {
         controller?.onResume()
-        screenSharingController?.setViewCallback(screenSharingViewCallback)
-        screenSharingController?.onResume(context.requireActivity())
         dialogCallback?.also { dialogController?.addCallback(it) }
     }
 
     fun onPause() {
         controller?.onPause()
-        screenSharingController?.removeViewCallback(screenSharingViewCallback)
         dialogCallback?.also { dialogController?.removeCallback(it) }
     }
 
@@ -348,7 +335,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         setController(Dependencies.getControllerFactory().chatController)
         setupDialogCallback()
         dialogController = Dependencies.getControllerFactory().dialogController
-        screenSharingController = Dependencies.getControllerFactory().screenSharingController
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
     }
 
@@ -531,12 +517,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
-                    is DialogState.StartScreenSharing -> post { showScreenSharingDialog(it.operatorName) }
                     DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
-                    DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
-                        showAllowScreenSharingNotificationsAndStartSharingDialog()
-                    }
-
                     DialogState.Confirmation -> post { controller?.onEngagementConfirmationDialogRequested() }
 
                     DialogState.VisitorCode -> {
@@ -583,7 +564,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         } else {
             binding.appBarView.hideLeaveButtons()
         }
-        if (screenSharingController?.isSharingScreen == true) {
+        if (chatState.isSharingScreen) {
             binding.appBarView.showEndScreenSharingButton()
         } else {
             binding.appBarView.hideEndScreenSharingButton()
@@ -598,17 +579,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         }
     }
 
-    private fun showAllowScreenSharingNotificationsAndStartSharingDialog() = showDialog {
-        Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
-            resetDialogStateAndDismiss()
-            this.context.openNotificationChannelScreen()
-        }, negativeButtonClickListener = {
-            resetDialogStateAndDismiss()
-            controller?.notificationDialogDismissed()
-            screenSharingController?.onScreenSharingDeclined()
-        })
-    }
-
     private fun showAllowNotificationsDialog() = showDialog {
         Dialogs.showAllowNotificationsDialog(context = context, uiTheme = theme, positiveButtonClickListener = {
             resetDialogStateAndDismiss()
@@ -617,14 +587,6 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         }, negativeButtonClickListener = {
             resetDialogStateAndDismiss()
             controller?.notificationDialogDismissed()
-        })
-    }
-
-    private fun showScreenSharingDialog(operatorName: String?) = showDialog {
-        Dialogs.showScreenSharingDialog(context = context, theme = theme, operatorName = operatorName, positiveButtonClickListener = {
-            screenSharingController?.onScreenSharingAccepted(context.requireActivity())
-        }, negativeButtonClickListener = {
-            screenSharingController?.onScreenSharingDeclined()
         })
     }
 
@@ -768,7 +730,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         binding.appBarView.setOnBackClickedListener { controller?.onBackArrowClicked() }
         binding.appBarView.setOnEndChatClickedListener { controller?.leaveChatClicked() }
         binding.appBarView.setOnEndCallButtonClickedListener {
-            screenSharingController?.onForceStopScreenSharing()
+            controller?.onForceStopScreenSharing()
             binding.appBarView.hideEndScreenSharingButton()
         }
         binding.appBarView.setOnXClickedListener { controller?.onXButtonClicked() }
@@ -996,7 +958,7 @@ internal class ChatView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         serviceChatHeadController?.setSdkConfiguration(configuration)
     }
 
-    private fun showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    override fun showToast(message: String, duration: Int) {
         Toast.makeText(context, message, duration).show()
     }
 

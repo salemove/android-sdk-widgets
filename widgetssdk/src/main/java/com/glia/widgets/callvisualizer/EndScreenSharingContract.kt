@@ -10,6 +10,7 @@ internal interface EndScreenSharingContract {
         fun onActivityCreate()
         fun onBackArrowClicked()
         fun onEndScreenSharingButtonClicked()
+        fun onForceStopScreenSharing()
     }
 
     interface View : BaseView<Controller> {

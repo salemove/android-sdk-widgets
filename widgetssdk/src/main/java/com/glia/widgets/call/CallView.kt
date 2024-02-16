@@ -36,7 +36,6 @@ import com.glia.widgets.core.configuration.GliaSdkConfiguration
 import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.core.dialog.model.DialogState
 import com.glia.widgets.core.notification.openNotificationChannelScreen
-import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.databinding.CallButtonsLayoutBinding
 import com.glia.widgets.databinding.CallViewBinding
 import com.glia.widgets.di.Dependencies
@@ -87,18 +86,6 @@ internal class CallView(
         Dependencies.getGliaThemeManager().theme?.callTheme
     }
 
-    private val screenSharingViewCallback = object : ScreenSharingContract.ViewCallback {
-        override fun onScreenSharingRequestError(message: String) = showToast(message)
-
-        override fun onScreenSharingRequestSuccess() {
-            post { appBar.showEndScreenSharingButton() }
-        }
-
-        override fun onScreenSharingEnded() {
-            post { appBar.hideEndScreenSharingButton() }
-        }
-    }
-
     private val binding: CallViewBinding by lazy {
         CallViewBinding.inflate(LayoutInflater.from(this.context), this)
     }
@@ -135,7 +122,6 @@ internal class CallView(
     private var theme: UiTheme by Delegates.notNull()
 
     private var callController: CallContract.Controller? = null
-    private var screenSharingController: ScreenSharingContract.Controller? = null
     private var serviceChatHeadController: ChatHeadContract.Controller? = null
     private var dialogCallback: DialogContract.Controller.Callback? = null
     private var dialogController: DialogContract.Controller? = null
@@ -173,7 +159,7 @@ internal class CallView(
             onBackClickedListener?.onBackClicked()
         }
         appBar.setOnEndChatClickedListener { callController?.leaveChatClicked() }
-        appBar.setOnEndCallButtonClickedListener { screenSharingController?.onForceStopScreenSharing() }
+        appBar.setOnEndCallButtonClickedListener { callController?.stopScreenSharingClicked() }
         appBar.setOnXClickedListener { callController?.leaveChatQueueClicked() }
         chatButton.setOnClickListener { callController?.chatButtonClicked() }
         speakerButton.setOnClickListener { callController?.onSpeakerButtonPressed() }
@@ -218,15 +204,12 @@ internal class CallView(
         callController?.onResume()
         operatorVideoView?.resumeRendering()
         dialogCallback?.also { dialogController?.addCallback(it) }
-        screenSharingController?.setViewCallback(screenSharingViewCallback)
-        screenSharingController?.onResume(context.requireActivity())
         serviceChatHeadController?.onResume(this)
     }
 
     fun onPause() {
         floatingVisitorVideoContainer.onPause()
         operatorVideoView?.pauseRendering()
-        screenSharingController?.removeViewCallback(screenSharingViewCallback)
         dialogCallback?.also { dialogController?.removeCallback(it) }
         serviceChatHeadController?.onPause(this)
         callController?.onPause()
@@ -234,7 +217,6 @@ internal class CallView(
 
     private fun destroyControllers() {
         callController = null
-        screenSharingController = null
         dialogController = null
     }
 
@@ -247,19 +229,13 @@ internal class CallView(
                     DialogState.ExitQueue -> post { showExitQueueDialog() }
                     DialogState.OverlayPermission -> post { showOverlayPermissionsDialog() }
                     DialogState.EndEngagement -> post { showEndEngagementDialog() }
-                    is DialogState.StartScreenSharing -> post { showScreenSharingDialog(it.operatorName) }
                     DialogState.EnableNotificationChannel -> post { showAllowNotificationsDialog() }
-                    DialogState.EnableScreenSharingNotificationsAndStartSharing -> post {
-                        showAllowScreenSharingNotificationsAndStartSharingDialog()
-                    }
-
                     DialogState.Confirmation -> post { callController?.onLiveObservationDialogRequested() }
                     else -> Logger.e(TAG, "DialogController callback in CallView with $it")
                 }
             }
         }
         dialogController = Dependencies.getControllerFactory().dialogController
-        screenSharingController = Dependencies.getControllerFactory().screenSharingController
         serviceChatHeadController = Dependencies.getControllerFactory().chatHeadController
     }
 
@@ -369,21 +345,6 @@ internal class CallView(
         )
     }
 
-    private fun showAllowScreenSharingNotificationsAndStartSharingDialog() = showDialog {
-        Dialogs.showAllowScreenSharingNotificationsAndStartSharingDialog(
-            context = context,
-            uiTheme = theme,
-            positiveButtonClickListener = {
-                callController?.notificationsDialogDismissed()
-                this.context.openNotificationChannelScreen()
-            },
-            negativeButtonClickListener = {
-                callController?.notificationsDialogDismissed()
-                screenSharingController?.onScreenSharingDeclined()
-            }
-        )
-    }
-
     private fun showAllowNotificationsDialog() = showDialog {
         Dialogs.showAllowNotificationsDialog(
             context = context,
@@ -396,20 +357,6 @@ internal class CallView(
             negativeButtonClickListener = {
                 resetDialogStateAndDismiss()
                 callController?.notificationsDialogDismissed()
-            }
-        )
-    }
-
-    private fun showScreenSharingDialog(operatorName: String?) = showDialog {
-        Dialogs.showScreenSharingDialog(
-            context = context,
-            theme = theme,
-            operatorName = operatorName,
-            positiveButtonClickListener = {
-                screenSharingController?.onScreenSharingAccepted(context.requireActivity())
-            },
-            negativeButtonClickListener = {
-                screenSharingController?.onScreenSharingDeclined()
             }
         )
     }
@@ -743,8 +690,8 @@ internal class CallView(
         serviceChatHeadController?.setSdkConfiguration(configuration)
     }
 
-    private fun showToast(message: String) {
-        context.showToast(message, Toast.LENGTH_SHORT)
+    override fun showToast(message: String) {
+        post { context.showToast(message, Toast.LENGTH_SHORT) }
     }
 
     fun interface OnBackClickedListener {
@@ -838,11 +785,12 @@ internal class CallView(
 
             setupEndButton(callState)
 
-            if (screenSharingController?.isSharingScreen == true) {
+            if (callState.isSharingScreen) {
                 appBar.showEndScreenSharingButton()
             } else {
                 appBar.hideEndScreenSharingButton()
             }
+
             if (callState.requestedMediaType == Engagement.MediaType.VIDEO) {
                 setTitle(stringProvider.getRemoteString(R.string.engagement_video_title))
             } else {

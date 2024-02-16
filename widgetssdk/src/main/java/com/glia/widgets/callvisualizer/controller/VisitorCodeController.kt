@@ -3,7 +3,6 @@ package com.glia.widgets.callvisualizer.controller
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
-import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
@@ -12,7 +11,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 internal class VisitorCodeController(
-    private val dialogController: DialogContract.Controller,
+    private val callVisualizerController: CallVisualizerContract.Controller,
     private val visitorCodeRepository: VisitorCodeRepository,
     private val engagementStateUseCase: EngagementStateUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
@@ -33,7 +32,7 @@ internal class VisitorCodeController(
     }
 
     override fun onCloseButtonClicked() {
-        dialogController.dismissCurrentDialog()
+        callVisualizerController.dismissVisitorCodeDialog()
         view.destroyTimer()
     }
 
@@ -72,7 +71,6 @@ internal class VisitorCodeController(
         engagementStateDisposable?.dispose()
         engagementStateDisposable = engagementStateUseCase().filter { it is State.StartedCallVisualizer }.subscribe {
             view.destroyTimer()
-            dialogController.dismissVisitorCodeDialog()
         }
     }
 

@@ -10,7 +10,6 @@ private const val TAG = "DialogController"
 internal interface DialogContract {
     interface Controller {
         val isShowingUnexpectedErrorDialog: Boolean
-        val isEnableScreenSharingNotificationsAndStartSharingDialogShown: Boolean
 
         fun dismissCurrentDialog()
         fun dismissDialogs()
@@ -20,14 +19,16 @@ internal interface DialogContract {
         fun dismissVisitorCodeDialog()
         fun showUnexpectedErrorDialog()
         fun showOverlayPermissionsDialog()
+        fun showCVOverlayPermissionDialog()
         fun dismissOverlayPermissionsDialog()
         fun dismissMessageCenterUnavailableDialog()
-        fun showStartScreenSharingDialog(operatorName: String?)
+        fun showStartScreenSharingDialog()
         fun showEnableCallNotificationChannelDialog()
         fun showEnableScreenSharingNotificationsAndStartSharingDialog()
         fun showMessageCenterUnavailableDialog()
         fun showUnauthenticatedDialog()
         fun showEngagementConfirmationDialog()
+        fun showCVEngagementConfirmationDialog()
         fun showUpgradeDialog(data: MediaUpgradeOfferData)
         fun addCallback(callback: Callback)
         fun removeCallback(callback: Callback)
@@ -45,8 +46,6 @@ internal class DialogController(
     override val isShowingUnexpectedErrorDialog: Boolean
         get() = dialogManager.currentDialogState is DialogState.UnexpectedError
 
-    override val isEnableScreenSharingNotificationsAndStartSharingDialogShown: Boolean
-        get() = DialogState.EnableScreenSharingNotificationsAndStartSharing == dialogManager.currentDialogState
     private val isOverlayDialogShown: Boolean
         get() = DialogState.OverlayPermission == dialogManager.currentDialogState
 
@@ -101,6 +100,11 @@ internal class DialogController(
         dialogManager.addAndEmit(DialogState.OverlayPermission)
     }
 
+    override fun showCVOverlayPermissionDialog() {
+        Logger.i(TAG, "Show CV Overlay permissions Dialog")
+        dialogManager.addAndEmit(DialogState.CVOverlayPermission)
+    }
+
     override fun dismissOverlayPermissionsDialog() {
         Logger.d(TAG, "Dismiss Overlay Permissions Dialog")
         dialogManager.remove(DialogState.OverlayPermission)
@@ -111,9 +115,9 @@ internal class DialogController(
         dialogManager.remove(DialogState.MessageCenterUnavailable)
     }
 
-    override fun showStartScreenSharingDialog(operatorName: String?) {
+    override fun showStartScreenSharingDialog() {
         Logger.i(TAG, "Show Start Screen Sharing Dialog")
-        dialogManager.addAndEmit(DialogState.StartScreenSharing(operatorName))
+        dialogManager.addAndEmit(DialogState.StartScreenSharing)
     }
 
     override fun showEnableCallNotificationChannelDialog() {
@@ -144,6 +148,11 @@ internal class DialogController(
         } else {
             dialogManager.addAndEmit(DialogState.Confirmation)
         }
+    }
+
+    override fun showCVEngagementConfirmationDialog() {
+        Logger.d(TAG, "Show CV Live Observation Opt In Dialog")
+        dialogManager.addAndEmit(DialogState.CVConfirmation)
     }
 
     override fun showUpgradeDialog(data: MediaUpgradeOfferData) {

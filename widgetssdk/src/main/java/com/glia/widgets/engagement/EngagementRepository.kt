@@ -26,6 +26,7 @@ internal interface EngagementRepository {
     val operatorCurrentMediaState: MediaState?
     val screenSharingState: Flowable<ScreenSharingState>
 
+    val currentOperatorValue: Operator?
     val isQueueingOrEngagement: Boolean
     val hasOngoingEngagement: Boolean
     val isQueueing: Boolean

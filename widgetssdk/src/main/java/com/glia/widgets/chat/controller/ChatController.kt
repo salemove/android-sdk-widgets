@@ -51,6 +51,7 @@ import com.glia.widgets.core.notification.domain.CallNotificationUseCase
 import com.glia.widgets.core.secureconversations.domain.IsSecureEngagementUseCase
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.engagement.EngagementUpdateState
+import com.glia.widgets.engagement.ScreenSharingState
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.AcceptMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.EndEngagementUseCase
@@ -60,6 +61,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.Logger
@@ -115,7 +117,8 @@ internal class ChatController(
     private val acceptMediaUpgradeOfferUseCase: AcceptMediaUpgradeOfferUseCase,
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase,
     private val enqueueForEngagementUseCase: EnqueueForEngagementUseCase,
-    private val decideOnQueueingUseCase: DecideOnQueueingUseCase
+    private val decideOnQueueingUseCase: DecideOnQueueingUseCase,
+    private val screenSharingUseCase: ScreenSharingUseCase
 ) : ChatContract.Controller {
     private var backClickedListener: ChatView.OnBackClickedListener? = null
     private var view: ChatContract.View? = null
@@ -176,6 +179,24 @@ internal class ChatController(
         chatState = ChatState()
         subscribeToEngagement()
         decideOnQueueingUseCase().unSafeSubscribe(::enqueueForEngagement)
+        screenSharingUseCase().unSafeSubscribe(::handleScreenSharingState)
+    }
+
+    private fun handleScreenSharingState(screenSharingState: ScreenSharingState) {
+        when (screenSharingState) {
+            ScreenSharingState.Ended -> emitViewState { chatState.endScreenSharing() }
+            ScreenSharingState.RequestAccepted -> emitViewState { chatState.startScreenSharing() }
+            ScreenSharingState.Started -> emitViewState { chatState.startScreenSharing() }
+            is ScreenSharingState.FailedToAcceptRequest -> view?.showToast(screenSharingState.message)
+            else -> {
+                //no-op
+            }
+        }
+    }
+
+    override fun onForceStopScreenSharing() {
+        emitViewState { chatState.endScreenSharing() }
+        screenSharingUseCase.end()
     }
 
     override fun initChat(companyName: String?, queueId: String?, visitorContextAssetId: String?, chatType: ChatType) {

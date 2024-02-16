@@ -27,23 +27,10 @@ class CallState {
     //    Need this to not update all views when only time is changed.
     public final boolean isOnlyTimeChanged;
     public final boolean isCallVisualizer;
-
     public final String queueId;
     public final String visitorContextAssetId;
 
-    public static CallState initial(Boolean isCallVisualizer) {
-        return new Builder()
-            .setIntegratorCallStarted(false)
-            .setVisible(false)
-            .setMessagesNotSeen(0)
-            .setCallStatus(new CallStatus.EngagementNotOngoing(null))
-            .setLandscapeLayoutControlsVisible(false)
-            .setIsSpeakerOn(false)
-            .setIsMuted(false)
-            .setHasVideo(false)
-            .setIsCallVisualizer(isCallVisualizer)
-            .createCallState();
-    }
+    public final boolean isSharingScreen;
 
     private CallState(Builder builder) {
         this.integratorCallStarted = builder.integratorCallStarted;
@@ -61,6 +48,21 @@ class CallState {
         this.isCallVisualizer = builder.isCallVisualizer;
         this.queueId = builder.queueId;
         this.visitorContextAssetId = builder.visitorContextAssetId;
+        this.isSharingScreen = builder.isSharingScreen;
+    }
+
+    public static CallState initial(Boolean isCallVisualizer) {
+        return new Builder()
+            .setIntegratorCallStarted(false)
+            .setVisible(false)
+            .setMessagesNotSeen(0)
+            .setCallStatus(new CallStatus.EngagementNotOngoing(null))
+            .setLandscapeLayoutControlsVisible(false)
+            .setIsSpeakerOn(false)
+            .setIsMuted(false)
+            .setHasVideo(false)
+            .setIsCallVisualizer(isCallVisualizer)
+            .createCallState();
     }
 
     @Override
@@ -71,23 +73,24 @@ class CallState {
         return integratorCallStarted == callState.integratorCallStarted &&
             isVisible == callState.isVisible &&
             messagesNotSeen == callState.messagesNotSeen &&
-                landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
-                isMuted == callState.isMuted &&
-                hasVideo == callState.hasVideo &&
-                Objects.equals(callStatus, callState.callStatus) &&
-                Objects.equals(companyName, callState.companyName) &&
-                Objects.equals(requestedMediaType, callState.requestedMediaType) &&
-                isSpeakerOn == callState.isSpeakerOn &&
-                isOnHold == callState.isOnHold &&
-                isOnlyTimeChanged == callState.isOnlyTimeChanged &&
-                isCallVisualizer == callState.isCallVisualizer;
+            landscapeLayoutControlsVisible == callState.landscapeLayoutControlsVisible &&
+            isMuted == callState.isMuted &&
+            hasVideo == callState.hasVideo &&
+            Objects.equals(callStatus, callState.callStatus) &&
+            Objects.equals(companyName, callState.companyName) &&
+            Objects.equals(requestedMediaType, callState.requestedMediaType) &&
+            isSpeakerOn == callState.isSpeakerOn &&
+            isOnHold == callState.isOnHold &&
+            isOnlyTimeChanged == callState.isOnlyTimeChanged &&
+            isCallVisualizer == callState.isCallVisualizer &&
+            isSharingScreen == callState.isSharingScreen;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(integratorCallStarted, isVisible, messagesNotSeen,
-                callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
-                companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged, isCallVisualizer);
+            callStatus, landscapeLayoutControlsVisible, isMuted, hasVideo,
+            companyName, requestedMediaType, isSpeakerOn, isOnHold, isOnlyTimeChanged, isCallVisualizer, isSharingScreen);
     }
 
     public boolean showOperatorStatusView() {
@@ -151,6 +154,7 @@ class CallState {
             ", isSpeakerOn: " + isSpeakerOn +
             ", isOnHold: " + isOnHold +
             ", isCallVisualizer: " + isCallVisualizer +
+            ", isSharingScreen: " + isSharingScreen +
             '}';
     }
 
@@ -160,148 +164,149 @@ class CallState {
             .setIntegratorCallStarted(false)
             .setVisible(false)
             .setIsOnHold(false)
+            .setIsSharingScreen(false)
             .setCallStatus(new CallStatus.EngagementNotOngoing(callStatus.getVisitorMediaState()))
             .createCallState();
     }
 
     public CallState changeNumberOfMessages(int numberOfMessages) {
         return new Builder()
-                .copyFrom(this)
-                .setMessagesNotSeen(numberOfMessages)
-                .createCallState();
+            .copyFrom(this)
+            .setMessagesNotSeen(numberOfMessages)
+            .createCallState();
     }
 
     public CallState changeRequestedMediaType(Engagement.MediaType requestedMediaType) {
         return new Builder()
-                .copyFrom(this)
-                .setRequestedMediaType(requestedMediaType)
-                .createCallState();
+            .copyFrom(this)
+            .setRequestedMediaType(requestedMediaType)
+            .createCallState();
     }
 
     public CallState operatorConnecting(String name, String url) {
         return new Builder()
-                .copyFrom(this)
-                .setCallStatus(
-                        new CallStatus.EngagementOngoingOperatorIsConnecting(
-                                name,
-                                "0",
-                                url,
-                                callStatus.getVisitorMediaState()
-                        )
-                ).createCallState();
+            .copyFrom(this)
+            .setCallStatus(
+                new CallStatus.EngagementOngoingOperatorIsConnecting(
+                    name,
+                    "0",
+                    url,
+                    callStatus.getVisitorMediaState()
+                )
+            ).createCallState();
     }
 
     public CallState engagementStarted() {
         Logger.i(TAG, "Engagement started");
         return new Builder()
-                .copyFrom(this)
-                .setIsOnHold(false)
-                .createCallState();
+            .copyFrom(this)
+            .setIsOnHold(false)
+            .createCallState();
     }
 
     public CallState backToOngoing() {
         return new Builder()
-                .copyFrom(this)
-                .setCallStatus(
-                        new CallStatus.EngagementOngoingOperatorIsConnecting(
-                                callStatus.getFormattedOperatorName(),
-                                "0",
-                                callStatus.getOperatorProfileImageUrl(),
-                                callStatus.getVisitorMediaState()
-                        )
+            .copyFrom(this)
+            .setCallStatus(
+                new CallStatus.EngagementOngoingOperatorIsConnecting(
+                    callStatus.getFormattedOperatorName(),
+                    "0",
+                    callStatus.getOperatorProfileImageUrl(),
+                    callStatus.getVisitorMediaState()
                 )
-                .createCallState();
+            )
+            .createCallState();
     }
 
     public CallState changeVisibility(boolean isVisible) {
         return new Builder()
-                .copyFrom(this)
-                .setVisible(isVisible)
-                .createCallState();
+            .copyFrom(this)
+            .setVisible(isVisible)
+            .createCallState();
     }
 
     public CallState videoCallOperatorVideoStarted(
-            MediaState operatorMediaState,
-            String formattedTime
+        MediaState operatorMediaState,
+        String formattedTime
     ) {
         return new Builder()
-                .copyFrom(this)
-                .setCallStatus(
-                        new CallStatus.EngagementOngoingVideoCallStarted(
-                                callStatus.getFormattedOperatorName(),
-                                formattedTime,
-                                callStatus.getOperatorProfileImageUrl(),
-                                operatorMediaState,
-                                callStatus.getVisitorMediaState()))
-                .setLandscapeLayoutControlsVisible(true)
-                .createCallState();
+            .copyFrom(this)
+            .setCallStatus(
+                new CallStatus.EngagementOngoingVideoCallStarted(
+                    callStatus.getFormattedOperatorName(),
+                    formattedTime,
+                    callStatus.getOperatorProfileImageUrl(),
+                    operatorMediaState,
+                    callStatus.getVisitorMediaState()))
+            .setLandscapeLayoutControlsVisible(true)
+            .createCallState();
     }
 
     public CallState visitorMediaStateChanged(MediaState visitorMediaState) {
         callStatus.setVisitorMediaState(visitorMediaState);
         return new Builder()
-                .copyFrom(this)
-                .setHasVideo(isVisitorVideoPlaying(visitorMediaState))
-                .setIsMuted(isMuted(visitorMediaState))
-                .createCallState();
+            .copyFrom(this)
+            .setHasVideo(isVisitorVideoPlaying(visitorMediaState))
+            .setIsMuted(isMuted(visitorMediaState))
+            .createCallState();
     }
 
     public CallState audioCallStarted(MediaState operatorMediaState, String formattedTime) {
         Logger.i(TAG, "Audio or video call started");
         return new Builder()
-                .copyFrom(this)
-                .setCallStatus(
-                        new CallStatus.EngagementOngoingAudioCallStarted(
-                                callStatus.getFormattedOperatorName(),
-                                formattedTime,
-                                callStatus.getOperatorProfileImageUrl(),
-                                operatorMediaState,
-                                callStatus.getVisitorMediaState())
-                )
-                .setLandscapeLayoutControlsVisible(true)
-                .createCallState();
+            .copyFrom(this)
+            .setCallStatus(
+                new CallStatus.EngagementOngoingAudioCallStarted(
+                    callStatus.getFormattedOperatorName(),
+                    formattedTime,
+                    callStatus.getOperatorProfileImageUrl(),
+                    operatorMediaState,
+                    callStatus.getVisitorMediaState())
+            )
+            .setLandscapeLayoutControlsVisible(true)
+            .createCallState();
     }
 
     public CallState newStartedCallTimerValue(String formattedTimeValue) {
         if (isAudioCall()) {
             return new Builder()
-                    .copyFrom(this)
-                    .setCallStatus(
-                            new CallStatus.EngagementOngoingAudioCallStarted(
-                                    callStatus.getFormattedOperatorName(),
-                                    formattedTimeValue,
-                                    callStatus.getOperatorProfileImageUrl(),
-                                    callStatus.getOperatorMediaState(),
-                                    callStatus.getVisitorMediaState()
-                            )
+                .copyFrom(this)
+                .setCallStatus(
+                    new CallStatus.EngagementOngoingAudioCallStarted(
+                        callStatus.getFormattedOperatorName(),
+                        formattedTimeValue,
+                        callStatus.getOperatorProfileImageUrl(),
+                        callStatus.getOperatorMediaState(),
+                        callStatus.getVisitorMediaState()
                     )
-                    .setOnlyTimeChanged(true)
-                    .createCallState();
+                )
+                .setOnlyTimeChanged(true)
+                .createCallState();
         } else if (isVideoCall()) {
             return new Builder()
-                    .copyFrom(this)
-                    .setCallStatus(
-                            new CallStatus.EngagementOngoingVideoCallStarted(
-                                    callStatus.getFormattedOperatorName(),
-                                    formattedTimeValue,
-                                    callStatus.getOperatorProfileImageUrl(),
-                                    callStatus.getOperatorMediaState(),
-                                    callStatus.getVisitorMediaState()
-                            )
+                .copyFrom(this)
+                .setCallStatus(
+                    new CallStatus.EngagementOngoingVideoCallStarted(
+                        callStatus.getFormattedOperatorName(),
+                        formattedTimeValue,
+                        callStatus.getOperatorProfileImageUrl(),
+                        callStatus.getOperatorMediaState(),
+                        callStatus.getVisitorMediaState()
                     )
-                    .setOnlyTimeChanged(true)
-                    .createCallState();
+                )
+                .setOnlyTimeChanged(true)
+                .createCallState();
         } else if (isTransferring()) {
             return new Builder()
-                    .copyFrom(this)
-                    .setCallStatus(
-                            new CallStatus.EngagementOngoingTransferring(
-                                    formattedTimeValue,
-                                    callStatus.getVisitorMediaState()
-                            )
+                .copyFrom(this)
+                .setCallStatus(
+                    new CallStatus.EngagementOngoingTransferring(
+                        formattedTimeValue,
+                        callStatus.getVisitorMediaState()
                     )
-                    .setOnlyTimeChanged(true)
-                    .createCallState();
+                )
+                .setOnlyTimeChanged(true)
+                .createCallState();
         } else {
             return this;
         }
@@ -310,17 +315,17 @@ class CallState {
     public CallState connectingTimerValueChanged(String timeValue) {
         if (isCallOngoingAndOperatorIsConnecting()) {
             return new Builder()
-                    .copyFrom(this)
-                    .setCallStatus(
-                            new CallStatus.EngagementOngoingOperatorIsConnecting(
-                                    callStatus.getFormattedOperatorName(),
-                                    timeValue,
-                                    callStatus.getOperatorProfileImageUrl(),
-                                    callStatus.getVisitorMediaState()
-                            )
+                .copyFrom(this)
+                .setCallStatus(
+                    new CallStatus.EngagementOngoingOperatorIsConnecting(
+                        callStatus.getFormattedOperatorName(),
+                        timeValue,
+                        callStatus.getOperatorProfileImageUrl(),
+                        callStatus.getVisitorMediaState()
                     )
-                    .setOnlyTimeChanged(true)
-                    .createCallState();
+                )
+                .setOnlyTimeChanged(true)
+                .createCallState();
         } else {
             return this;
         }
@@ -328,37 +333,45 @@ class CallState {
 
     public CallState landscapeControlsVisibleChanged(boolean visible) {
         return new Builder()
-                .copyFrom(this)
-                .setLandscapeLayoutControlsVisible(visible)
-                .createCallState();
+            .copyFrom(this)
+            .setLandscapeLayoutControlsVisible(visible)
+            .createCallState();
     }
 
     public CallState speakerValueChanged(boolean isSpeakerOn) {
         Logger.i(TAG, "Speaker value changed to " + isSpeakerOn);
         return new Builder()
-                .copyFrom(this)
-                .setIsSpeakerOn(isSpeakerOn)
-                .createCallState();
+            .copyFrom(this)
+            .setIsSpeakerOn(isSpeakerOn)
+            .createCallState();
     }
 
     public CallState setOnHold(boolean isOnHold) {
         return new Builder()
-                .copyFrom(this)
-                .setIsOnHold(isOnHold)
-                .createCallState();
+            .copyFrom(this)
+            .setIsOnHold(isOnHold)
+            .createCallState();
     }
 
     public CallState setTransferring() {
         Logger.i(TAG, "Transfer the call");
         return new Builder()
-                .copyFrom(this)
-                .setCallStatus(
-                        new CallStatus.EngagementOngoingTransferring(
-                                callStatus.getTime(),
-                                callStatus.getVisitorMediaState()
-                        )
+            .copyFrom(this)
+            .setCallStatus(
+                new CallStatus.EngagementOngoingTransferring(
+                    callStatus.getTime(),
+                    callStatus.getVisitorMediaState()
                 )
-                .createCallState();
+            )
+            .createCallState();
+    }
+
+    public CallState startScreenSharing() {
+        return new Builder().copyFrom(this).setIsSharingScreen(true).createCallState();
+    }
+
+    public CallState endScreenSharing() {
+        return new Builder().copyFrom(this).setIsSharingScreen(false).createCallState();
     }
 
     public ViewState getMuteButtonViewState() {
@@ -423,12 +436,12 @@ class CallState {
 
     private boolean isVisitorVideoAvailable() {
         return callStatus.getVisitorMediaState() != null &&
-                callStatus.getVisitorMediaState().getVideo() != null;
+            callStatus.getVisitorMediaState().getVideo() != null;
     }
 
     private boolean isOperatorVideoAvailable() {
         return callStatus.getOperatorMediaState() != null &&
-                callStatus.getOperatorMediaState().getVideo() != null;
+            callStatus.getOperatorMediaState().getVideo() != null;
     }
 
     private boolean isVisitorVideoPlaying(MediaState visitorMediaState) {
@@ -456,6 +469,10 @@ class CallState {
             .createCallState();
     }
 
+    public enum ViewState {
+        SHOW, DISABLE, HIDE
+    }
+
     public static class Builder {
         private boolean integratorCallStarted;
         private boolean isVisible;
@@ -473,6 +490,8 @@ class CallState {
         private boolean isCallVisualizer;
         private String queueId;
         private String visitorContextAssetId;
+
+        private boolean isSharingScreen;
 
         public Builder setIntegratorCallStarted(boolean integratorCallStarted) {
             this.integratorCallStarted = integratorCallStarted;
@@ -549,7 +568,12 @@ class CallState {
             return this;
         }
 
-        public Builder copyFrom(CallState callState) {
+        public Builder setIsSharingScreen(Boolean isSharingScreen) {
+            this.isSharingScreen = isSharingScreen;
+            return this;
+        }
+
+        Builder copyFrom(CallState callState) {
             integratorCallStarted = callState.integratorCallStarted;
             isVisible = callState.isVisible;
             messagesNotSeen = callState.messagesNotSeen;
@@ -566,15 +590,12 @@ class CallState {
             isCallVisualizer = callState.isCallVisualizer;
             queueId = callState.queueId;
             visitorContextAssetId = callState.visitorContextAssetId;
+            isSharingScreen = callState.isSharingScreen;
             return this;
         }
 
-        public CallState createCallState() {
+        CallState createCallState() {
             return new CallState(this);
         }
-    }
-
-    public enum ViewState {
-        SHOW, DISABLE, HIDE
     }
 }

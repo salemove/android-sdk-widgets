@@ -199,9 +199,9 @@ internal class OperatorStatusView @JvmOverloads constructor(
     }
 
     private fun updatePlaceholderView(size: Int, contentPadding: Int, visibility: Int) {
+        placeholderView.visibility = visibility
         placeholderView.layoutParams.width = size
         placeholderView.layoutParams.height = size
-        placeholderView.visibility = visibility
         setPlaceholderViewContentPadding(contentPadding)
     }
 

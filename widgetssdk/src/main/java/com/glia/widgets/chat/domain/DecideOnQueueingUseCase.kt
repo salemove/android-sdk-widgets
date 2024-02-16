@@ -27,7 +27,7 @@ internal class DecideOnQueueingUseCaseImpl(
     }
 
     private fun checkOverlayShown() {
-        if (!isShowOverlayPermissionRequestDialogUseCase.invoke()) {
+        if (!isShowOverlayPermissionRequestDialogUseCase()) {
             overlayShown.onComplete()
         }
     }
@@ -35,7 +35,7 @@ internal class DecideOnQueueingUseCaseImpl(
     override fun onOverlayDialogShown() {
         overlayShown.onComplete()
 
-        setOverlayPermissionRequestDialogShownUseCase.invoke()
+        setOverlayPermissionRequestDialogShownUseCase()
     }
 
     override fun onQueueingRequested() {

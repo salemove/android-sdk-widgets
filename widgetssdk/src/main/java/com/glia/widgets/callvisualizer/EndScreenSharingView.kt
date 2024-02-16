@@ -6,7 +6,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
 import com.glia.widgets.R
 import com.glia.widgets.UiTheme
-import com.glia.widgets.core.screensharing.ScreenSharingContract
 import com.glia.widgets.databinding.EndScreenSharingViewBinding
 import com.glia.widgets.di.Dependencies
 import com.glia.widgets.helper.Logger
@@ -43,7 +42,6 @@ internal class EndScreenSharingView(
     var onFinishListener: OnFinishListener? = null
     private var controller: EndScreenSharingContract.Controller? = null
     private var statusBarColor: Int by Delegates.notNull()
-    private var screenSharingController: ScreenSharingContract.Controller? = null
     private var defaultStatusBarColor: Int? = null
     private var stringProvider = Dependencies.getStringProvider()
 
@@ -95,13 +93,12 @@ internal class EndScreenSharingView(
     }
 
     override fun stopScreenSharing() {
-        screenSharingController?.onForceStopScreenSharing()
+        controller?.onForceStopScreenSharing()
     }
 
     override fun setController(controller: EndScreenSharingContract.Controller) {
         this.controller = controller
         controller.setView(this)
-        screenSharingController = Dependencies.getControllerFactory().screenSharingController
     }
 
     private fun applyRemoteTheme(unifiedTheme: UnifiedTheme?) {

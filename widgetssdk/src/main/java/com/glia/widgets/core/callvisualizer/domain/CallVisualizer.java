@@ -31,8 +31,22 @@ public interface CallVisualizer {
      * This dialog will overlay on top of any other dialogs without dismissing them.
      * <p>
      * Otherwise, it behaves the same way as {@link #createVisitorCodeView(Context)}.
+     *
+     * @deprecated Use {@link #showVisitorCodeDialog()}
      */
-    void showVisitorCodeDialog(@NonNull Context context);
+    @Deprecated(since = "2.3.2")
+    default void showVisitorCodeDialog(@NonNull Context context) {
+        showVisitorCodeDialog();
+    }
+
+    /**
+     * Shows the visitor code in a dialog box on top of the current activity within your application.
+     * <p>
+     * This dialog will overlay on top of any other dialogs without dismissing them.
+     * <p>
+     * Otherwise, it behaves the same way as {@link #createVisitorCodeView(Context)}.
+     */
+    void showVisitorCodeDialog();
 
     /**
      * Sets visitor context to the upcoming Call Visualizer engagement

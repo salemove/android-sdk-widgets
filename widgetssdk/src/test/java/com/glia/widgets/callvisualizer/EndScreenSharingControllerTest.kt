@@ -1,5 +1,6 @@
 package com.glia.widgets.callvisualizer
 
+import com.glia.widgets.engagement.domain.EndScreenSharingUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -9,7 +10,8 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 
 internal class EndScreenSharingControllerTest {
 
-    private val controller = EndScreenSharingController()
+    private val endScreenSharingUseCase: EndScreenSharingUseCase = mock()
+    private val controller = EndScreenSharingController(endScreenSharingUseCase)
     private val view = mock(EndScreenSharingContract.View::class.java)
 
     @Before
@@ -41,5 +43,12 @@ internal class EndScreenSharingControllerTest {
     fun onDestroy() {
         controller.onDestroy()
         verifyNoInteractions(view)
+    }
+
+    @Test
+    fun onForceStopScreenSharing() {
+        controller.onForceStopScreenSharing()
+        verify(endScreenSharingUseCase).invoke()
+        verifyNoMoreInteractions(endScreenSharingUseCase)
     }
 }

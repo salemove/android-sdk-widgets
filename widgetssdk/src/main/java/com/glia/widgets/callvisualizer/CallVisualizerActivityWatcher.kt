@@ -29,15 +29,15 @@ internal class CallVisualizerActivityWatcher(
         val activity = activityReference.get()
 
         when {
-            activity is WebBrowserActivity && state !is ControllerState.DisplayConfirmationDialog -> event.consume { controller.onWebBrowserOpened() }
             event.consumed -> Logger.d(TAG, "skipping.., event is already consumed")
             activity == null || activity.isFinishing -> Logger.d(TAG, "skipping.. activity is null or finishing")
-            activity is WebBrowserActivity -> Logger.d(TAG, "skipping.. WebBrowser is open")
-            state is ControllerState.DismissDialog -> dismissAlertDialogSilently()
+            activity is WebBrowserActivity && state is ControllerState.DisplayConfirmationDialog -> Logger.d(TAG, "skipping.. WebBrowser is open")
+            activity is WebBrowserActivity && state !is ControllerState.DisplayConfirmationDialog -> event.consume { controller.onWebBrowserOpened() }
+            state is ControllerState.DismissDialog -> event.consume { dismissAlertDialogSilently() }
             state is ControllerState.OpenWebBrowserScreen -> event.consume { openWebBrowser(activity, state.title, state.url) }
             state is ControllerState.CloseHolderActivity -> event.consume { closeHolderActivity(activity) }
             state is ControllerState.DisplayVisitorCodeDialog -> displayVisitorCodeDialog(activity)
-            state is ControllerState.DisplayConfirmationDialog && activity !is WebBrowserActivity -> displayConfirmationDialog(
+            state is ControllerState.DisplayConfirmationDialog -> displayConfirmationDialog(
                 activity,
                 state.links,
                 event::markConsumed

@@ -5,9 +5,15 @@ import android.CONTEXT_EXTENSIONS_CLASS_PATH
 import android.LOGGER_PATH
 import android.NOTIFICATION_EXTENSIONS_PATH
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.targetActivityName
 import android.view.View
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.comms.MediaUpgradeOffer
@@ -20,8 +26,10 @@ import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.IntentConfigurationHelper
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
+import com.glia.widgets.helper.showToast
 import com.glia.widgets.helper.withRuntimeTheme
 import com.glia.widgets.view.Dialogs
+import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.mockk.Runs
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -37,6 +45,7 @@ import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.processors.PublishProcessor
 import io.reactivex.schedulers.Schedulers
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
@@ -303,6 +312,84 @@ class OperatorRequestActivityWatcherTest {
     }
 
     @Test
+    fun `state DisplayToast will display toast message`() {
+        val message = "_message"
+        mockkStatic(CONTEXT_EXTENSIONS_CLASS_PATH)
+        every { any<ChatActivity>().showToast(any(), any()) } just Runs
+        fireState<ChatActivity>(controllerState, watcher, OperatorRequestContract.State.DisplayToast(message)) { _, activity ->
+            verify { activity.showToast(message, any()) }
+        }
+    }
+
+    @Test
+    fun `state AcquireMediaProjectionToken will launch DialogHolderActivity if activity is not a Component activity`() {
+        fireState<Activity>(controllerState, watcher, OperatorRequestContract.State.AcquireMediaProjectionToken) { _, activity ->
+            val intentSlot = slot<Intent>()
+            verify { activity.startActivity(capture(intentSlot)) }
+            Assert.assertEquals(DialogHolderActivity::class.qualifiedName, intentSlot.captured.targetActivityName)
+        }
+    }
+
+    @Test
+    fun `state AcquireMediaProjectionToken will request media projection if activity is a Component activity`() {
+        val resultLauncher: ActivityResultLauncher<Intent> = mockk(relaxUnitFun = true)
+
+        val mockkActivity: ChatActivity = mockk {
+            every { registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) } returns resultLauncher
+        }
+        watcher.onActivityCreated(mockkActivity, null)
+        verify { mockkActivity.registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), any()) }
+
+        fireState<ChatActivity>(controllerState, watcher, OperatorRequestContract.State.AcquireMediaProjectionToken) { event, activity ->
+            verify(exactly = 0) { activity.startActivity(any()) }
+            verify { event.markConsumed() }
+            verify { resultLauncher.launch(any()) }
+
+            confirmVerified(mockkActivity, resultLauncher)
+        }
+    }
+
+    @Test
+    fun `state OpenOverlayPermissionScreen will open overlay permissions screen when system can handle that intent`() {
+        val componentName: ComponentName = mockk()
+
+        val overlayIntent: Intent = mockk {
+            every { resolveActivity(any()) } returns componentName
+        }
+        every { intentConfigurationHelper.createForOverlayPermissionScreen(any()) } returns overlayIntent
+        fireState<ChatActivity>(
+            controllerState,
+            watcher,
+            OperatorRequestContract.State.OpenOverlayPermissionScreen
+        ) { _, activity ->
+            verify { intentConfigurationHelper.createForOverlayPermissionScreen(eq(activity)) }
+            verify { overlayIntent.resolveActivity(any()) }
+            verify { activity.startActivity(eq(overlayIntent)) }
+            verify { controller.overlayPermissionScreenOpened() }
+            confirmVerified(overlayIntent, componentName, intentConfigurationHelper)
+        }
+    }
+
+    @Test
+    fun `state OpenOverlayPermissionScreen will do nothing when system can't handle that intent`() {
+        val overlayIntent: Intent = mockk {
+            every { resolveActivity(any()) } returns null
+        }
+        every { intentConfigurationHelper.createForOverlayPermissionScreen(any()) } returns overlayIntent
+
+        fireState<ChatActivity>(
+            controllerState,
+            watcher,
+            OperatorRequestContract.State.OpenOverlayPermissionScreen
+        ) { _, activity ->
+            verify { intentConfigurationHelper.createForOverlayPermissionScreen(eq(activity)) }
+            verify { overlayIntent.resolveActivity(any()) }
+            verify { controller.failedToOpenOverlayPermissionScreen() }
+            confirmVerified(overlayIntent, intentConfigurationHelper)
+        }
+    }
+
+    @Test
     fun `showEnableScreenSharingNotifications will call onShowEnableScreenSharingNotificationsAccepted when dialog is accepted`() {
         mockkObject(Dialogs)
         fireState<ChatActivity>(
@@ -409,6 +496,58 @@ class OperatorRequestActivityWatcherTest {
     }
 
     @Test
+    fun `showOverlayDialog will call onOverlayPermissionRequestAccepted when dialog is accepted`() {
+        mockkObject(Dialogs)
+        fireState<ChatActivity>(
+            controllerState,
+            watcher,
+            OperatorRequestContract.State.ShowOverlayDialog
+        ) { state, activity ->
+            val onAcceptSlot = slot<View.OnClickListener>()
+            val onDeclineSlot = slot<View.OnClickListener>()
+            verify {
+                Dialogs.showOverlayPermissionsDialog(
+                    activity,
+                    any(),
+                    capture(onAcceptSlot),
+                    capture(onDeclineSlot)
+                )
+            }
+            onAcceptSlot.captured.onClick(mockk())
+
+            verify { state.markConsumed() }
+            verify { controller.onOverlayPermissionRequestAccepted() }
+        }
+        unmockkObject(Dialogs)
+    }
+
+    @Test
+    fun `showOverlayDialog will call onOverlayPermissionRequestDeclined when dialog is declined`() {
+        mockkObject(Dialogs)
+        fireState<ChatActivity>(
+            controllerState,
+            watcher,
+            OperatorRequestContract.State.ShowOverlayDialog
+        ) { state, activity ->
+            val onAcceptSlot = slot<View.OnClickListener>()
+            val onDeclineSlot = slot<View.OnClickListener>()
+            verify {
+                Dialogs.showOverlayPermissionsDialog(
+                    activity,
+                    any(),
+                    capture(onAcceptSlot),
+                    capture(onDeclineSlot)
+                )
+            }
+            onDeclineSlot.captured.onClick(mockk())
+
+            verify { state.markConsumed() }
+            verify { controller.onOverlayPermissionRequestDeclined() }
+        }
+        unmockkObject(Dialogs)
+    }
+
+    @Test
     fun `openNotificationsScreen will open notification screen`() {
         mockkStatic(NOTIFICATION_EXTENSIONS_PATH)
         every { any<Activity>().openNotificationChannelScreen() } just Runs
@@ -422,6 +561,23 @@ class OperatorRequestActivityWatcherTest {
             verify { controller.onNotificationScreenRequested() }
         }
         unmockkStatic(NOTIFICATION_EXTENSIONS_PATH)
+    }
+
+    @Test
+    fun `onActivityCreated will register for media projection result if activity is component activity`() {
+        val activity: ChatActivity = mockk(relaxed = true)
+        watcher.onActivityCreated(activity, null)
+
+        val activityResultSlot = slot<ActivityResultCallback<ActivityResult>>()
+
+        verify { activity.registerForActivityResult(any<ActivityResultContracts.StartActivityForResult>(), capture(activityResultSlot)) }
+
+        val activityResult = mockk<ActivityResult>()
+
+        activityResultSlot.captured.onActivityResult(activityResult)
+        verify { controller.onMediaProjectionResultReceived(activityResult, activity) }
+
+        confirmVerified(activity, controller)
     }
 
     private fun mockLogger() {

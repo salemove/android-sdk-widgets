@@ -39,6 +39,7 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
 import com.glia.widgets.engagement.domain.OperatorMediaUseCase
 import com.glia.widgets.engagement.domain.OperatorTypingUseCase
+import com.glia.widgets.engagement.domain.ScreenSharingUseCase
 import com.glia.widgets.filepreview.domain.usecase.DownloadFileUseCase
 import com.glia.widgets.filepreview.domain.usecase.IsFileReadyForPreviewUseCase
 import com.glia.widgets.helper.TimeCounter
@@ -96,6 +97,7 @@ class ChatControllerTest {
     private lateinit var isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase
     private lateinit var enqueueForEngagementUseCase: EnqueueForEngagementUseCase
     private lateinit var decideOnQueueingUseCase: DecideOnQueueingUseCase
+    private lateinit var screenSharingUseCase: ScreenSharingUseCase
 
     private lateinit var chatController: ChatController
     private lateinit var isAuthenticatedUseCase: IsAuthenticatedUseCase
@@ -154,6 +156,10 @@ class ChatControllerTest {
             on { invoke() } doReturn Completable.complete()
         }
 
+        screenSharingUseCase = mock {
+            on { invoke() } doReturn Flowable.empty()
+        }
+
         chatController = ChatController(
             callTimer = callTimer,
             minimizeHandler = minimizeHandler,
@@ -192,7 +198,8 @@ class ChatControllerTest {
             acceptMediaUpgradeOfferUseCase = acceptMediaUpgradeOfferUseCase,
             isQueueingOrEngagementUseCase = isQueueingOrEngagementUseCase,
             enqueueForEngagementUseCase = enqueueForEngagementUseCase,
-            decideOnQueueingUseCase = decideOnQueueingUseCase
+            decideOnQueueingUseCase = decideOnQueueingUseCase,
+            screenSharingUseCase = screenSharingUseCase
         )
         chatController.setView(chatView)
     }

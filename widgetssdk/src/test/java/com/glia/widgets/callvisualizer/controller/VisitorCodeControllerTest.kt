@@ -3,7 +3,6 @@ package com.glia.widgets.callvisualizer.controller
 import com.glia.androidsdk.omnibrowse.VisitorCode
 import com.glia.widgets.callvisualizer.VisitorCodeContract
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeRepository
-import com.glia.widgets.core.dialog.DialogContract
 import com.glia.widgets.engagement.State
 import com.glia.widgets.engagement.domain.EngagementStateUseCase
 import com.glia.widgets.engagement.domain.IsQueueingOrEngagementUseCase
@@ -29,9 +28,10 @@ internal class VisitorCodeControllerTest {
         on { invoke() } doReturn engagementState
     }
     private val isQueueingOrEngagementUseCase: IsQueueingOrEngagementUseCase = mock()
-    private val dialogController: DialogContract.Controller = mock()
+    private val callVisualizerController: CallVisualizerContract.Controller = mock()
     private val visitorCodeRepository: VisitorCodeRepository = mock()
-    private val controller = VisitorCodeController(dialogController, visitorCodeRepository, engagementStateUseCase, isQueueingOrEngagementUseCase)
+    private val controller =
+        VisitorCodeController(callVisualizerController, visitorCodeRepository, engagementStateUseCase, isQueueingOrEngagementUseCase)
     private val view: VisitorCodeContract.View = mock()
     private val refreshTime = 1000L
 
@@ -40,16 +40,16 @@ internal class VisitorCodeControllerTest {
         controller.setView(view)
         verify(view).notifySetupComplete()
         verifyNoMoreInteractions(view)
-        verifyNoInteractions(dialogController, visitorCodeRepository)
-        reset(view, dialogController, visitorCodeRepository)
+        verifyNoInteractions(callVisualizerController, visitorCodeRepository)
+        reset(view, callVisualizerController, visitorCodeRepository)
     }
 
     @Test
     fun onCloseButtonClicked() {
         controller.onCloseButtonClicked()
-        verify(dialogController).dismissCurrentDialog()
+        verify(callVisualizerController).dismissVisitorCodeDialog()
         verify(view).destroyTimer()
-        verifyNoMoreInteractions(dialogController, view)
+        verifyNoMoreInteractions(callVisualizerController, view)
         verifyNoInteractions(visitorCodeRepository)
     }
 
@@ -66,7 +66,7 @@ internal class VisitorCodeControllerTest {
         verify(view).showVisitorCode(vc)
         verify(view).setTimer(vc.duration)
         verifyNoMoreInteractions(view, visitorCodeRepository)
-        verifyNoInteractions(dialogController)
+        verifyNoInteractions(callVisualizerController)
 
         RxJavaPlugins.setComputationSchedulerHandler { null }
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { null }
@@ -83,7 +83,7 @@ internal class VisitorCodeControllerTest {
         verify(visitorCodeRepository).getVisitorCode()
         verify(view).showError(cause)
         verifyNoMoreInteractions(view, visitorCodeRepository)
-        verifyNoInteractions(dialogController)
+        verifyNoInteractions(callVisualizerController)
 
         RxJavaPlugins.setComputationSchedulerHandler { null }
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { null }
@@ -93,8 +93,8 @@ internal class VisitorCodeControllerTest {
     fun `auto close is triggered when engagement starts`() {
         engagementState.onNext(State.StartedCallVisualizer)
 
-        verify(dialogController).dismissVisitorCodeDialog()
         verify(view).destroyTimer()
+        verifyNoInteractions(callVisualizerController)
     }
 
     @Test
@@ -102,6 +102,6 @@ internal class VisitorCodeControllerTest {
         controller.onDestroy()
         verify(view).destroyTimer()
         verifyNoMoreInteractions(view)
-        verifyNoInteractions(dialogController, visitorCodeRepository)
+        verifyNoInteractions(callVisualizerController, visitorCodeRepository)
     }
 }

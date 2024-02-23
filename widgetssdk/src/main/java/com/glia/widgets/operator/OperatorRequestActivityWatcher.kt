@@ -4,12 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.getSystemService
-import androidx.core.net.toUri
 import com.glia.androidsdk.Engagement
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.call.CallActivity
@@ -85,8 +83,7 @@ internal class OperatorRequestActivityWatcher(
     }
 
     private fun openOverlayPermissionsScreen(activity: Activity) {
-        val overlayIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, "package:${activity.packageName}".toUri())
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val overlayIntent = intentConfigurationHelper.createForOverlayPermissionScreen(activity)
 
         if (overlayIntent.resolveActivity(activity.packageManager) != null) {
             activity.startActivity(overlayIntent)

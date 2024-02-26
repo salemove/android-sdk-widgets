@@ -66,7 +66,6 @@ internal class OperatorRequestController(
         when (state) {
             ScreenSharingState.Ended -> removeScreenSharingNotificationUseCase()
             is ScreenSharingState.FailedToAcceptRequest -> onScreenSharingFailedToAcceptRequest(state)
-            ScreenSharingState.RequestAccepted -> onScreenSharingAccepted()
             is ScreenSharingState.Requested -> onScreenSharingRequested()
             else -> {
                 //no-op
@@ -79,9 +78,11 @@ internal class OperatorRequestController(
         _state.onNext(State.DisplayToast(state.message))
     }
 
-    private fun onScreenSharingAccepted() {
+    private fun showCvDialogIfRequired(activity: Activity) {
         if (isCurrentEngagementCallVisualizerUseCase() && isShowOverlayPermissionRequestDialogUseCase()) {
             dialogController.showCVOverlayPermissionDialog()
+        } else {
+            finishIfDialogHolder(activity)
         }
     }
 
@@ -170,27 +171,29 @@ internal class OperatorRequestController(
     }
 
     override fun onMediaProjectionResultReceived(result: ActivityResult, activity: ComponentActivity) {
-        finishIfDialogHolder(activity)
-
         result.apply {
             if (resultCode == RESULT_OK && data != null) {
                 screenSharingUseCase.onActivityResultSkipPermissionRequest(resultCode, data)
+                showCvDialogIfRequired(activity)
             } else {
+                finishIfDialogHolder(activity)
                 screenSharingUseCase.declineRequest()
                 removeScreenSharingNotificationUseCase()
             }
         }
     }
 
-    override fun onOverlayPermissionRequestAccepted() {
+    override fun onOverlayPermissionRequestAccepted(activity: Activity) {
         dismissAlertDialog()
+        finishIfDialogHolder(activity)
         setOverlayPermissionRequestDialogShownUseCase()
         Logger.d(TAG, "Allowed to request overlay permission ✅")
         _state.onNext(State.OpenOverlayPermissionScreen)
     }
 
-    override fun onOverlayPermissionRequestDeclined() {
+    override fun onOverlayPermissionRequestDeclined(activity: Activity) {
         dismissAlertDialog()
+        finishIfDialogHolder(activity)
         setOverlayPermissionRequestDialogShownUseCase()
         Logger.d(TAG, "Declined to request overlay permission ❌")
     }

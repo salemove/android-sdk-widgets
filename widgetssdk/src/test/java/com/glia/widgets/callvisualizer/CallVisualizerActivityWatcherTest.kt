@@ -71,9 +71,9 @@ class CallVisualizerActivityWatcherTest {
     }
 
     @Test
-    fun `resuming WebBrowserActivity will notify web browser opened when current state is not DisplayConfirmationDialog`() {
+    fun `resuming WebBrowserActivity will notify web browser opened when current state is OpenWebBrowserScreen`() {
         emitActivity<WebBrowserActivity>()
-        val event = createMockEvent(CallVisualizerContract.State.DismissDialog)
+        val event = createMockEvent(CallVisualizerContract.State.OpenWebBrowserScreen("Title", "url"))
         emitState(event)
 
         verify { event.consume(any()) }
@@ -324,7 +324,8 @@ class CallVisualizerActivityWatcherTest {
         verify { activity.isFinishing }
         verify { event.consumed }
         verify { event.value }
-        verify { event.consume(any()) }
+        verify(exactly = 0) { event.consume(any()) }
+        verify(exactly = 0) { event.markConsumed() }
         verify { activity.startActivity(eq(intent)) }
 
         confirmVerified(activity, event)

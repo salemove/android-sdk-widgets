@@ -298,20 +298,6 @@ class OperatorRequestControllerTest {
     }
 
     @Test
-    fun `screen-sharing state RequestAccepted will show OverlayDialog when engagement is CV and overlay dialog needed`() {
-        every { isCurrentEngagementCallVisualizerUseCase() } returns true
-        every { isShowOverlayPermissionRequestDialogUseCase() } returns true
-
-        screenSharingProcessor.onNext(ScreenSharingState.RequestAccepted)
-
-        verify { isCurrentEngagementCallVisualizerUseCase() }
-        verify { isShowOverlayPermissionRequestDialogUseCase() }
-        verify { dialogController.showCVOverlayPermissionDialog() }
-
-        confirmVerified(isCurrentEngagementCallVisualizerUseCase, isShowOverlayPermissionRequestDialogUseCase)
-    }
-
-    @Test
     fun `screen-sharing state Ended will remove notification`() {
         screenSharingProcessor.onNext(ScreenSharingState.Ended)
 
@@ -475,12 +461,14 @@ class OperatorRequestControllerTest {
         Logger.setIsDebug(false)
         every { Logger.d(any(), any()) } just Runs
 
-        controller.onOverlayPermissionRequestDeclined()
+        val activity: Activity = mockk(relaxUnitFun = true)
+        controller.onOverlayPermissionRequestDeclined(activity)
         verify { dialogController.dismissCurrentDialog() }
         verify { setOverlayPermissionRequestDialogShownUseCase() }
         verify { Logger.d(any(), any()) }
+        verify(exactly = 0) { activity.finish() }
 
-        confirmVerified(dialogController, setOverlayPermissionRequestDialogShownUseCase)
+        confirmVerified(dialogController, setOverlayPermissionRequestDialogShownUseCase, activity)
         unmockkStatic(LOGGER_PATH)
     }
 
@@ -492,25 +480,54 @@ class OperatorRequestControllerTest {
 
         val state = controller.state.test()
 
-        controller.onOverlayPermissionRequestAccepted()
+        val activity: DialogHolderActivity = mockk(relaxUnitFun = true)
+        controller.onOverlayPermissionRequestAccepted(activity)
         verify { dialogController.dismissCurrentDialog() }
         verify { setOverlayPermissionRequestDialogShownUseCase() }
         verify { Logger.d(any(), any()) }
+        verify { activity.finish() }
 
         state.assertNotComplete().assertValue { it.value == OperatorRequestContract.State.OpenOverlayPermissionScreen }
 
-        confirmVerified(dialogController, setOverlayPermissionRequestDialogShownUseCase)
+        confirmVerified(dialogController, setOverlayPermissionRequestDialogShownUseCase, activity)
         unmockkStatic(LOGGER_PATH)
     }
 
     @Test
-    fun `onMediaProjectionResultReceived will skip permission request when result is successful`() {
+    fun `onMediaProjectionResultReceived will show CV dialog when it is required`() {
         val activity: DialogHolderActivity = mockk(relaxed = true)
         val intent: Intent = mockk(relaxUnitFun = true)
         val result: ActivityResult = mockk(relaxUnitFun = true) {
             every { resultCode } returns Activity.RESULT_OK
             every { data } returns intent
         }
+
+        every { isCurrentEngagementCallVisualizerUseCase() } returns true
+        every { isShowOverlayPermissionRequestDialogUseCase() } returns true
+
+        controller.onMediaProjectionResultReceived(result, activity)
+
+        verify { result.resultCode }
+        verify { result.data }
+        verify(exactly = 0) { activity.finish() }
+
+        verify { screenSharingUseCase.onActivityResultSkipPermissionRequest(Activity.RESULT_OK, intent) }
+        verify { dialogController.showCVOverlayPermissionDialog() }
+
+        confirmVerified(activity, intent, result, screenSharingUseCase)
+    }
+
+    @Test
+    fun `onMediaProjectionResultReceived will finish activity when CV confirmation is not required and activity is DialogHolderActivity`() {
+        val activity: DialogHolderActivity = mockk(relaxed = true)
+        val intent: Intent = mockk(relaxUnitFun = true)
+        val result: ActivityResult = mockk(relaxUnitFun = true) {
+            every { resultCode } returns Activity.RESULT_OK
+            every { data } returns intent
+        }
+
+        every { isCurrentEngagementCallVisualizerUseCase() } returns false
+        every { isShowOverlayPermissionRequestDialogUseCase() } returns true
 
         controller.onMediaProjectionResultReceived(result, activity)
 
@@ -520,13 +537,14 @@ class OperatorRequestControllerTest {
         verify { activity.finish() }
 
         verify { screenSharingUseCase.onActivityResultSkipPermissionRequest(Activity.RESULT_OK, intent) }
+        verify(exactly = 0) { dialogController.showCVOverlayPermissionDialog() }
 
         confirmVerified(activity, intent, result, screenSharingUseCase)
     }
 
     @Test
     fun `onMediaProjectionResultReceived will decline request when result is not successful`() {
-        val activity: ChatActivity = mockk(relaxed = true)
+        val activity: DialogHolderActivity = mockk(relaxed = true)
         val result: ActivityResult = mockk(relaxUnitFun = true) {
             every { resultCode } returns Activity.RESULT_OK
             every { data } returns null
@@ -537,7 +555,7 @@ class OperatorRequestControllerTest {
         verify { result.resultCode }
         verify { result.data }
 
-        verify(exactly = 0) { activity.finish() }
+        verify { activity.finish() }
 
         verify { screenSharingUseCase.declineRequest() }
         verify { removeScreenSharingNotificationUseCase() }

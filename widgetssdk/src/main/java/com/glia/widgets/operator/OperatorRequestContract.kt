@@ -37,8 +37,8 @@ internal interface OperatorRequestContract {
         fun onReturnedFromNotificationScreen()
         fun onNotificationScreenRequested()
         fun onMediaProjectionResultReceived(result: ActivityResult, activity: ComponentActivity)
-        fun onOverlayPermissionRequestAccepted()
-        fun onOverlayPermissionRequestDeclined()
+        fun onOverlayPermissionRequestAccepted(activity: Activity)
+        fun onOverlayPermissionRequestDeclined(activity: Activity)
         fun overlayPermissionScreenOpened()
         fun failedToOpenOverlayPermissionScreen()
     }

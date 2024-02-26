@@ -516,7 +516,7 @@ class OperatorRequestActivityWatcherTest {
             onAcceptSlot.captured.onClick(mockk())
 
             verify { state.markConsumed() }
-            verify { controller.onOverlayPermissionRequestAccepted() }
+            verify { controller.onOverlayPermissionRequestAccepted(activity) }
         }
         unmockkObject(Dialogs)
     }
@@ -542,7 +542,7 @@ class OperatorRequestActivityWatcherTest {
             onDeclineSlot.captured.onClick(mockk())
 
             verify { state.markConsumed() }
-            verify { controller.onOverlayPermissionRequestDeclined() }
+            verify { controller.onOverlayPermissionRequestDeclined(activity) }
         }
         unmockkObject(Dialogs)
     }

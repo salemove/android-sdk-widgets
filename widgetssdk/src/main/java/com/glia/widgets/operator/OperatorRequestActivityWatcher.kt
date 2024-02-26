@@ -116,10 +116,10 @@ internal class OperatorRequestActivityWatcher(
         showAlertDialogWithStyledContext(activity) { context, uiTheme ->
             Dialogs.showOverlayPermissionsDialog(context, uiTheme, {
                 consumeCallback()
-                controller.onOverlayPermissionRequestAccepted()
+                controller.onOverlayPermissionRequestAccepted(activity)
             }) {
                 consumeCallback()
-                controller.onOverlayPermissionRequestDeclined()
+                controller.onOverlayPermissionRequestDeclined(activity)
             }
         }
     }

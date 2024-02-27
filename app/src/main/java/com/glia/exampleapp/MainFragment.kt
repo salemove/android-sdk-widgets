@@ -8,6 +8,7 @@ import android.text.InputType
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -20,9 +21,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
+import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.Glia
 import com.glia.androidsdk.GliaException
 import com.glia.androidsdk.fcm.GliaPushMessage
+import com.glia.androidsdk.omnibrowse.Omnibrowse
 import com.glia.androidsdk.screensharing.ScreenSharing
 import com.glia.androidsdk.visitor.Authentication
 import com.glia.exampleapp.ExampleAppConfigManager.createDefaultConfig
@@ -34,10 +37,17 @@ import com.glia.widgets.chat.ChatType
 import com.glia.widgets.messagecenter.MessageCenterActivity
 import com.google.android.material.appbar.MaterialToolbar
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 class MainFragment : Fragment() {
     private var containerView: ConstraintLayout? = null
     private var authentication: Authentication? = null
+
+    private var pauseItem: MenuItem by Delegates.notNull()
+    private var resumeItem: MenuItem by Delegates.notNull()
+
+    private var engagementEndedItem: MenuItem by Delegates.notNull()
+    private var ongoingEngagementItem: MenuItem by Delegates.notNull()
 
     private val authToken: String
         get() {
@@ -91,24 +101,72 @@ class MainFragment : Fragment() {
         }
 
         view.findViewById<MaterialToolbar>(R.id.top_app_bar).menu.apply {
-            val pause = findItem(R.id.lo_pause)
-            val resume = findItem(R.id.lo_resume)
-
-            pause.setOnMenuItemClickListener {
+            pauseItem = findItem(R.id.lo_pause).setOnMenuItemClickListener {
                 it.isVisible = false
-                resume.isVisible = true
+                resumeItem.isVisible = true
                 Glia.getLiveObservation().pause()
                 true
             }
-            resume.setOnMenuItemClickListener {
+            resumeItem = findItem(R.id.lo_resume).setOnMenuItemClickListener {
                 it.isVisible = false
-                pause.isVisible = true
+                pauseItem.isVisible = true
                 Glia.getLiveObservation().resume()
                 true
             }
+            ongoingEngagementItem = findItem(R.id.menu_engagement_ongoing)
+            engagementEndedItem = findItem(R.id.menu_no_engagement)
         }
 
         handleOpensFromPushNotification()
+    }
+
+    private fun initMenu() {
+        if (Glia.getCurrentEngagement().isPresent) {
+            pauseItem.isVisible = true
+            resumeItem.isVisible = false
+            ongoingEngagementItem.isVisible = true
+            engagementEndedItem.isVisible = false
+        } else {
+            pauseItem.isVisible = false
+            resumeItem.isVisible = false
+            ongoingEngagementItem.isVisible = false
+            engagementEndedItem.isVisible = true
+        }
+
+
+        Glia.on(Glia.Events.ENGAGEMENT) {
+            onEngagementStarted()
+
+            it.on(Engagement.Events.END) {
+                onEngagementEnded()
+            }
+        }
+
+        Glia.omnibrowse.on(Omnibrowse.Events.ENGAGEMENT) {
+            onEngagementStarted()
+
+            it.on(Engagement.Events.END) {
+                onEngagementEnded()
+            }
+        }
+    }
+
+    private fun onEngagementStarted() {
+        requireView().post {
+            ongoingEngagementItem.isVisible = true
+            engagementEndedItem.isVisible = false
+            pauseItem.isVisible = true
+            resumeItem.isVisible = false
+        }
+    }
+
+    private fun onEngagementEnded() {
+        requireView().post {
+            ongoingEngagementItem.isVisible = false
+            engagementEndedItem.isVisible = true
+            pauseItem.isVisible = false
+            resumeItem.isVisible = false
+        }
     }
 
     private fun handleOpensFromPushNotification() {
@@ -140,8 +198,13 @@ class MainFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (Glia.isInitialized() && authentication == null) {
-            prepareAuthentication()
+
+        if (Glia.isInitialized()) {
+            initMenu()
+
+            if (authentication == null) {
+                prepareAuthentication()
+            }
         }
     }
 
@@ -379,7 +442,7 @@ class MainFragment : Fragment() {
 
         GliaWidgets.init(
             createDefaultConfig(
-                context = requireActivity().applicationContext
+                context = requireActivity().applicationContext,
 //                uiJsonRemoteConfig = UnifiedUiConfigurationLoader.fetchLocalGlobalColors(requireContext()),
 //                runtimeConfig = createSampleRuntimeConfig(),
 //                region = "us"
@@ -387,6 +450,10 @@ class MainFragment : Fragment() {
         )
         prepareAuthentication()
         listenForCallVisualizerEngagements()
+
+        requireView().post {
+            initMenu()
+        }
     }
 
     private fun createSampleRuntimeConfig(): UiTheme = UiTheme(

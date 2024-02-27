@@ -11,13 +11,27 @@
             android:id="@+id/lo_pause"
             android:icon="@android:drawable/ic_media_pause"
             android:title="Pause LO"
-            android:visible="true"
+            android:visible="false"
             app:showAsAction="always" />
 
         <item
             android:id="@+id/lo_resume"
             android:icon="@android:drawable/ic_media_play"
             android:title="Pause LO"
+            android:visible="false"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/menu_engagement_ongoing"
+            android:icon="@drawable/ic_ongoing_engagement"
+            android:title="Ongoing Engagement"
+            android:visible="false"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/menu_no_engagement"
+            android:icon="@drawable/ic_no_engagement"
+            android:title="Engagement Ended"
             android:visible="false"
             app:showAsAction="always" />
 

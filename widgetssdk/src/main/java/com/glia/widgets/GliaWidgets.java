@@ -16,6 +16,7 @@ import com.glia.androidsdk.visitor.Authentication;
 import com.glia.androidsdk.visitor.VisitorInfoUpdateRequest;
 import com.glia.widgets.chat.adapter.CustomCardAdapter;
 import com.glia.widgets.chat.adapter.WebViewCardAdapter;
+import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.CallVisualizer;
 import com.glia.widgets.core.visitor.GliaVisitorInfo;
 import com.glia.widgets.core.visitor.GliaWidgetException;
@@ -296,7 +297,9 @@ public class GliaWidgets {
      * {@link GliaException.Cause#INVALID_INPUT} - when SDK is not initialized
      */
     public static Authentication getAuthentication(@NonNull Authentication.Behavior behavior) {
-        return Dependencies.glia().getAuthentication(behavior);
+        AuthenticationManager authentication = Dependencies.glia().getAuthenticationManager(behavior);
+        Dependencies.setAuthenticationManager(authentication);
+        return authentication;
     }
 
     /**

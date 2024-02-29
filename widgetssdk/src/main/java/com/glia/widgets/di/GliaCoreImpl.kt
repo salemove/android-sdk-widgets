@@ -129,7 +129,7 @@ internal class GliaCoreImpl : GliaCore {
         Glia.getOperator(operatorId, callback)
     }
 
-    override fun getAuthentication(behavior: Authentication.Behavior): Authentication {
+    override fun getAuthenticationManager(behavior: Authentication.Behavior): AuthenticationManager {
         return AuthenticationManager(Glia.getAuthentication(behavior))
     }
 }

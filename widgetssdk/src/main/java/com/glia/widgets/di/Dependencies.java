@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
@@ -14,6 +15,7 @@ import com.glia.widgets.StringProviderImpl;
 import com.glia.widgets.callvisualizer.CallVisualizerActivityWatcher;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
+import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.CallVisualizerManager;
 import com.glia.widgets.core.chathead.ChatHeadManager;
 import com.glia.widgets.core.configuration.GliaSdkConfigurationManager;
@@ -44,6 +46,8 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static CallVisualizerManager callVisualizerManager;
+    @Nullable
+    private static AuthenticationManager authenticationManager;
     private static UseCaseFactory useCaseFactory;
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
@@ -76,6 +80,7 @@ public class Dependencies {
             sdkConfigurationManager,
             new ChatHeadManager(application),
             audioControlManager,
+            authenticationManager,
             schedulers,
             stringProvider,
             gliaCore
@@ -221,6 +226,10 @@ public class Dependencies {
     @VisibleForTesting
     public static void setRepositoryFactory(RepositoryFactory repositoryFactory) {
         Dependencies.repositoryFactory = repositoryFactory;
+    }
+
+    public static void setAuthenticationManager(@NonNull AuthenticationManager authenticationManager) {
+        Dependencies.authenticationManager = authenticationManager;
     }
 
     private static void initApplicationLifecycleObserver(

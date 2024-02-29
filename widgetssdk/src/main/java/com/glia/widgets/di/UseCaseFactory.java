@@ -2,7 +2,6 @@ package com.glia.widgets.di;
 
 import androidx.annotation.NonNull;
 
-import com.glia.androidsdk.visitor.Authentication;
 import com.glia.widgets.GliaWidgets;
 import com.glia.widgets.StringProvider;
 import com.glia.widgets.call.domain.HandleCallPermissionsUseCase;
@@ -55,6 +54,7 @@ import com.glia.widgets.chat.domain.gva.ParseGvaGalleryCardsUseCase;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
+import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
@@ -179,6 +179,7 @@ public class UseCaseFactory {
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final AudioControlManager audioControlManager;
+    private final AuthenticationManager authenticationManager;
     private final Schedulers schedulers;
     private final StringProvider stringProvider;
     private final GliaCore gliaCore;
@@ -192,6 +193,7 @@ public class UseCaseFactory {
                           GliaSdkConfigurationManager gliaSdkConfigurationManager,
                           ChatHeadManager chatHeadManager,
                           AudioControlManager audioControlManager,
+                          AuthenticationManager authenticationManager,
                           Schedulers schedulers,
                           StringProvider stringProvider,
                           GliaCore gliaCore) {
@@ -205,6 +207,7 @@ public class UseCaseFactory {
         this.schedulers = schedulers;
         this.stringProvider = stringProvider;
         this.gliaCore = gliaCore;
+        this.authenticationManager = authenticationManager;
     }
 
     @NonNull
@@ -590,7 +593,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
-        return new IsAuthenticatedUseCase(gliaCore.getAuthentication(Authentication.Behavior.FORBIDDEN_DURING_ENGAGEMENT));
+        return new IsAuthenticatedUseCase(authenticationManager);
     }
 
     @NonNull

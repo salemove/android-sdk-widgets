@@ -1,7 +1,9 @@
 package com.glia.widgets.core.screensharing;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -25,10 +27,10 @@ import java.util.function.Consumer;
 public class MediaProjectionService extends Service {
     private static final String TAG = "MediaProjectionService";
     private static final int SERVICE_ID = 123;
-
-    public interface Actions {
-        String START = "EngagementMonitoringService:Start";
-    }
+    private final Consumer<OmnicoreEngagement> omnicoreEngagementStartListener = (engagement) ->
+        engagement.on(Engagement.Events.END, (Runnable) this::stopSelf);
+    private final Consumer<OmnibrowseEngagement> omnibrowseEngagementStartListener = (engagement) ->
+        engagement.on(Engagement.Events.END, (Runnable) this::stopSelf);
 
     @Nullable
     @Override
@@ -44,7 +46,13 @@ public class MediaProjectionService extends Service {
 
     public void setupAsForegroundService() {
         // Register this service as a foreground service.
-        startForeground(SERVICE_ID, NotificationFactory.createScreenSharingNotification(this));
+        Notification screenSharingNotification = NotificationFactory.createScreenSharingNotification(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(SERVICE_ID, screenSharingNotification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
+        } else {
+            startForeground(SERVICE_ID, screenSharingNotification);
+        }
     }
 
     @Override
@@ -65,12 +73,6 @@ public class MediaProjectionService extends Service {
         return Service.START_STICKY;
     }
 
-    private final Consumer<OmnicoreEngagement> omnicoreEngagementStartListener = (engagement) ->
-            engagement.on(Engagement.Events.END, (Runnable) this::stopSelf);
-
-    private final Consumer<OmnibrowseEngagement> omnibrowseEngagementStartListener = (engagement) ->
-            engagement.on(Engagement.Events.END, (Runnable) this::stopSelf);
-
     public void setupListeners() {
         Glia.on(Glia.Events.ENGAGEMENT, omnicoreEngagementStartListener);
         Glia.omnibrowse.on(Omnibrowse.Events.ENGAGEMENT, omnibrowseEngagementStartListener);
@@ -86,5 +88,9 @@ public class MediaProjectionService extends Service {
     public void onDestroy() {
         removeListeners();
         super.onDestroy();
+    }
+
+    public interface Actions {
+        String START = "EngagementMonitoringService:Start";
     }
 }

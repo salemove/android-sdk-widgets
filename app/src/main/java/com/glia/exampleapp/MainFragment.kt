@@ -115,6 +115,11 @@ class MainFragment : Fragment() {
             }
             ongoingEngagementItem = findItem(R.id.menu_engagement_ongoing)
             engagementEndedItem = findItem(R.id.menu_no_engagement)
+
+            findItem(R.id.menu_open_legacy_activity).setOnMenuItemClickListener {
+                startActivity(Intent(requireContext(), LegacyActivity::class.java))
+                true
+            }
         }
 
         handleOpensFromPushNotification()

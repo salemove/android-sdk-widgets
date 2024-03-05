@@ -46,8 +46,7 @@ public class Dependencies {
     private static ControllerFactory controllerFactory;
     private static INotificationManager notificationManager;
     private static CallVisualizerManager callVisualizerManager;
-    @Nullable
-    private static AuthenticationManager authenticationManager;
+    private static final AuthenticationManagerProvider authenticationManagerProvider = new AuthenticationManagerProvider();
     private static UseCaseFactory useCaseFactory;
     private static ManagerFactory managerFactory;
     private static GliaCore gliaCore = new GliaCoreImpl();
@@ -80,7 +79,7 @@ public class Dependencies {
             sdkConfigurationManager,
             new ChatHeadManager(application),
             audioControlManager,
-            authenticationManager,
+            authenticationManagerProvider,
             schedulers,
             stringProvider,
             gliaCore
@@ -229,7 +228,7 @@ public class Dependencies {
     }
 
     public static void setAuthenticationManager(@NonNull AuthenticationManager authenticationManager) {
-        Dependencies.authenticationManager = authenticationManager;
+        authenticationManagerProvider.setAuthenticationManager(authenticationManager);
     }
 
     private static void initApplicationLifecycleObserver(
@@ -260,5 +259,19 @@ public class Dependencies {
     public static void destroyControllersAndResetEngagementData() {
         destroyControllers();
         getRepositoryFactory().getEngagementRepository().reset();
+    }
+
+    static class AuthenticationManagerProvider {
+        @Nullable
+        private AuthenticationManager authenticationManager;
+
+        @Nullable
+        public AuthenticationManager getAuthenticationManager() {
+            return authenticationManager;
+        }
+
+        public void setAuthenticationManager(@NonNull AuthenticationManager authenticationManager) {
+            this.authenticationManager = authenticationManager;
+        }
     }
 }

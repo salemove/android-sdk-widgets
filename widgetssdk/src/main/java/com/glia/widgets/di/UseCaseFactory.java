@@ -54,7 +54,6 @@ import com.glia.widgets.chat.domain.gva.ParseGvaGalleryCardsUseCase;
 import com.glia.widgets.core.audio.AudioControlManager;
 import com.glia.widgets.core.audio.domain.OnAudioStartedUseCase;
 import com.glia.widgets.core.audio.domain.TurnSpeakerphoneUseCase;
-import com.glia.widgets.core.authentication.AuthenticationManager;
 import com.glia.widgets.core.callvisualizer.domain.IsCallVisualizerScreenSharingUseCase;
 import com.glia.widgets.core.callvisualizer.domain.VisitorCodeViewBuilderUseCase;
 import com.glia.widgets.core.chathead.ChatHeadManager;
@@ -179,24 +178,24 @@ public class UseCaseFactory {
     private final INotificationManager notificationManager;
     private final ChatHeadManager chatHeadManager;
     private final AudioControlManager audioControlManager;
-    private final AuthenticationManager authenticationManager;
+    private final Dependencies.AuthenticationManagerProvider authenticationManagerProvider;
     private final Schedulers schedulers;
     private final StringProvider stringProvider;
     private final GliaCore gliaCore;
 
     private Gson gvaGson;
 
-    public UseCaseFactory(RepositoryFactory repositoryFactory,
-                          PermissionManager permissionManager,
-                          PermissionDialogManager permissionDialogManager,
-                          INotificationManager notificationManager,
-                          GliaSdkConfigurationManager gliaSdkConfigurationManager,
-                          ChatHeadManager chatHeadManager,
-                          AudioControlManager audioControlManager,
-                          AuthenticationManager authenticationManager,
-                          Schedulers schedulers,
-                          StringProvider stringProvider,
-                          GliaCore gliaCore) {
+    UseCaseFactory(RepositoryFactory repositoryFactory,
+                   PermissionManager permissionManager,
+                   PermissionDialogManager permissionDialogManager,
+                   INotificationManager notificationManager,
+                   GliaSdkConfigurationManager gliaSdkConfigurationManager,
+                   ChatHeadManager chatHeadManager,
+                   AudioControlManager audioControlManager,
+                   Dependencies.AuthenticationManagerProvider authenticationManagerProvider,
+                   Schedulers schedulers,
+                   StringProvider stringProvider,
+                   GliaCore gliaCore) {
         this.repositoryFactory = repositoryFactory;
         this.permissionManager = permissionManager;
         this.permissionDialogManager = permissionDialogManager;
@@ -207,7 +206,7 @@ public class UseCaseFactory {
         this.schedulers = schedulers;
         this.stringProvider = stringProvider;
         this.gliaCore = gliaCore;
-        this.authenticationManager = authenticationManager;
+        this.authenticationManagerProvider = authenticationManagerProvider;
     }
 
     @NonNull
@@ -593,7 +592,7 @@ public class UseCaseFactory {
 
     @NonNull
     public IsAuthenticatedUseCase createIsAuthenticatedUseCase() {
-        return new IsAuthenticatedUseCase(authenticationManager);
+        return new IsAuthenticatedUseCase(authenticationManagerProvider.getAuthenticationManager());
     }
 
     @NonNull

@@ -21,6 +21,13 @@
             android:visible="false"
             app:showAsAction="always" />
 
+    </group>
+
+    <group
+        android:id="@+id/engagement_state"
+        android:enabled="true"
+        android:visible="true">
+
         <item
             android:id="@+id/menu_engagement_ongoing"
             android:icon="@drawable/ic_ongoing_engagement"
@@ -36,5 +43,12 @@
             app:showAsAction="always" />
 
     </group>
+
+    <item
+        android:id="@+id/menu_open_legacy_activity"
+        android:enabled="true"
+        android:title="Open Legacy Activity"
+        android:visible="true"
+        app:showAsAction="never" />
 
 </menu>

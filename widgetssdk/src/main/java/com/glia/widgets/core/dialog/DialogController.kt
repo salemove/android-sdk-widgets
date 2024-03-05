@@ -163,9 +163,7 @@ internal class DialogController(
     override fun addCallback(callback: DialogContract.Controller.Callback) {
         Logger.d(TAG, "addCallback")
         viewCallbacks.add(callback)
-        if (viewCallbacks.size == 1) {
-            dialogManager.showNext()
-        }
+        dialogManager.showNext()
     }
 
     override fun removeCallback(callback: DialogContract.Controller.Callback) {

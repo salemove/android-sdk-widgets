@@ -8,11 +8,11 @@ import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import com.glia.widgets.UiTheme
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.asStateFlowable
 import com.glia.widgets.helper.isGlia
 import com.glia.widgets.helper.withRuntimeTheme
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.processors.PublishProcessor

@@ -157,7 +157,7 @@ class MainFragment : Fragment() {
     }
 
     private fun onEngagementStarted() {
-        requireView().post {
+        view?.post {
             ongoingEngagementItem.isVisible = true
             engagementEndedItem.isVisible = false
             pauseItem.isVisible = true
@@ -166,7 +166,7 @@ class MainFragment : Fragment() {
     }
 
     private fun onEngagementEnded() {
-        requireView().post {
+        view?.post {
             ongoingEngagementItem.isVisible = false
             engagementEndedItem.isVisible = true
             pauseItem.isVisible = false
@@ -456,7 +456,7 @@ class MainFragment : Fragment() {
         prepareAuthentication()
         listenForCallVisualizerEngagements()
 
-        requireView().post {
+        view?.post {
             initMenu()
         }
     }

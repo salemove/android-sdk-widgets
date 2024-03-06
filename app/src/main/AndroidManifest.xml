@@ -39,9 +39,7 @@
             </intent-filter>
         </activity-alias>
 
-        <activity
-            android:name=".LegacyActivity"
-            android:noHistory="true" />
+        <activity android:name=".LegacyActivity" />
 
         <service
             android:name="com.glia.androidsdk.fcm.GliaFcmService"

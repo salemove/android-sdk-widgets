@@ -4,12 +4,12 @@ import android.app.Activity
 import com.glia.widgets.base.BaseSingleActivityWatcher
 import com.glia.widgets.callvisualizer.controller.CallVisualizerContract
 import com.glia.widgets.core.dialog.model.ConfirmationDialogLinks
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.GliaActivityManager
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.TAG
 import com.glia.widgets.view.Dialogs
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import com.glia.widgets.webbrowser.WebBrowserActivity
 import io.reactivex.Flowable
 import java.lang.ref.WeakReference

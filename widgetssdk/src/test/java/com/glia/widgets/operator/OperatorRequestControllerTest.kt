@@ -25,10 +25,10 @@ import com.glia.widgets.engagement.domain.IsCurrentEngagementCallVisualizerUseCa
 import com.glia.widgets.engagement.domain.MediaUpgradeOfferData
 import com.glia.widgets.engagement.domain.OperatorMediaUpgradeOfferUseCase
 import com.glia.widgets.engagement.domain.ScreenSharingUseCase
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.OneTimeEvent
 import com.glia.widgets.helper.isAudio
-import com.glia.widgets.view.dialog.holder.DialogHolderActivity
 import io.mockk.CapturingSlot
 import io.mockk.Runs
 import io.mockk.confirmVerified

@@ -68,14 +68,9 @@
             android:name=".callvisualizer.EndScreenSharingActivity"
             android:launchMode="singleTask"
             android:theme="@style/Application.Glia.Call.Activity" />
-        <activity
-            android:name=".permissions.PermissionsSupportActivity"
-            android:launchMode="singleTask"
-            android:noHistory="true"
-            android:theme="@style/Application.Glia.Translucent.Activity" />
 
         <activity
-            android:name=".view.dialog.holder.DialogHolderActivity"
+            android:name=".helper.DialogHolderActivity"
             android:launchMode="singleTask"
             android:noHistory="true"
             android:theme="@style/Application.Glia.Translucent.Activity" />

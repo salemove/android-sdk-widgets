@@ -1,12 +1,12 @@
 package com.glia.widgets.permissions
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.glia.widgets.base.BaseActivityStackWatcher
+import com.glia.widgets.helper.DialogHolderActivity
 import com.glia.widgets.helper.WeakReferenceDelegate
 
 internal class ActivityWatcherForPermissionsRequest(
@@ -74,10 +74,7 @@ internal class ActivityWatcherForPermissionsRequest(
     }
 
     override fun openSupportActivity() {
-        currentActivity?.run {
-            val intent = Intent(this, PermissionsSupportActivity::class.java)
-            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
-        }
+        currentActivity?.run(DialogHolderActivity::start)
     }
 
     override fun destroySupportActivityIfExists() {
@@ -85,7 +82,7 @@ internal class ActivityWatcherForPermissionsRequest(
     }
 
     private fun destroySupportActivityIfExists(activity: Activity) {
-        if (activity is PermissionsSupportActivity) {
+        if (activity is DialogHolderActivity) {
             activity.finish()
         }
     }

@@ -14,7 +14,6 @@ import com.glia.widgets.core.notification.NotificationFactory
 import com.glia.widgets.core.notification.areNotificationsEnabledForChannel
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.helper.TAG
-import com.glia.widgets.helper.isAudio
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
 import com.glia.widgets.permissions.PermissionsRequestRepository
@@ -43,14 +42,18 @@ internal class PermissionManager(
     fun getPermissionsForMediaUpgradeOffer(offer: MediaUpgradeOffer): Permissions {
         Logger.i(TAG, "Request permissions for media upgrade offer")
         val requiredPermissions = buildList {
-            add(Manifest.permission.RECORD_AUDIO)
-            if (!offer.isAudio) {
+            if (offer.audio == MediaDirection.TWO_WAY) {
+                add(Manifest.permission.RECORD_AUDIO)
+            }
+            if (offer.video == MediaDirection.TWO_WAY) {
                 add(Manifest.permission.CAMERA)
             }
         }
-        val additionalPermissions = mutableListOf<String>()
-        if (sdkInt > Build.VERSION_CODES.R && offer.audio != null && offer.audio == MediaDirection.TWO_WAY) {
-            additionalPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+
+        val additionalPermissions = buildList {
+            if (sdkInt > Build.VERSION_CODES.R && offer.audio == MediaDirection.TWO_WAY) {
+                add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
         }
         return Permissions(requiredPermissions, additionalPermissions)
     }

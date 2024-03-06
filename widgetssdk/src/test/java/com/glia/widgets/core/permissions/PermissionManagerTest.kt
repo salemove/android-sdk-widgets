@@ -7,6 +7,8 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import com.glia.androidsdk.Engagement
 import com.glia.androidsdk.GliaException
+import com.glia.androidsdk.comms.MediaDirection
+import com.glia.androidsdk.comms.MediaUpgradeOffer
 import com.glia.widgets.helper.Logger
 import com.glia.widgets.permissions.Permissions
 import com.glia.widgets.permissions.PermissionsGrantedCallback
@@ -25,6 +27,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.function.Consumer
 
 class PermissionManagerTest {
     private lateinit var context: Context
@@ -515,4 +518,192 @@ class PermissionManagerTest {
 
         verify(permissionsRequestRepository).requestPermissions(permissions, callback)
     }
+
+    //Tests for .getPermissionsForMediaUpgradeOffer()
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns only Audio permission when MediaType audio is TWO_WAY and Build version is R or below`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.R
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(audio = MediaDirection.TWO_WAY))
+
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.RECORD_AUDIO),
+                emptyList()
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns Audio and Bluetooth permissions when MediaType audio is TWO_WAY and Build version is above R`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.S
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(audio = MediaDirection.TWO_WAY))
+
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.RECORD_AUDIO),
+                listOf(Manifest.permission.BLUETOOTH_CONNECT)
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns empty list when MediaType video is ONE_WAY, audio is not TWO_WAY and Build version is R or below`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.R
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(video = MediaDirection.ONE_WAY))
+
+        assertEquals(
+            Permissions(
+                emptyList(),
+                emptyList()
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns empty list when MediaType video is ONE_WAY, audio is not TWO_WAY and Build version is above R`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.S
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(video = MediaDirection.ONE_WAY))
+
+        assertEquals(
+            Permissions(
+                emptyList(),
+                emptyList()
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns only Camera permission when MediaType video is TWO_WAY and Build version is R or below`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.R
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(mockMediaUpgradeOffer(video = MediaDirection.TWO_WAY))
+
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.CAMERA),
+                emptyList()
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns only Camera permission when MediaType video is TWO_WAY and Build version is above R`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.S
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(
+            mockMediaUpgradeOffer(
+                audio = MediaDirection.ONE_WAY,
+                video = MediaDirection.TWO_WAY
+            )
+        )
+
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.CAMERA),
+                emptyList()
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns Camera and Audio permission when MediaType video is TWO_WAY, audio is TWO_WAY and Build version is R or below`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.R
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(
+            mockMediaUpgradeOffer(
+                audio = MediaDirection.TWO_WAY,
+                video = MediaDirection.TWO_WAY
+            )
+        )
+
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA),
+                emptyList()
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `getPermissionsForMediaUpgradeOffer returns Camera, Audio and Bluetooth permissions when MediaType video is TWO_WAY, audio is TWO_WAY and Build version is above R`() {
+        val permissionManager = PermissionManager(
+            context,
+            checkSelfPermission,
+            permissionsRequestRepository,
+            Build.VERSION_CODES.S
+        )
+
+        val result = permissionManager.getPermissionsForMediaUpgradeOffer(
+            mockMediaUpgradeOffer(
+                audio = MediaDirection.TWO_WAY,
+                video = MediaDirection.TWO_WAY
+            )
+        )
+
+        assertEquals(
+            Permissions(
+                listOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA),
+                listOf(Manifest.permission.BLUETOOTH_CONNECT)
+            ),
+            result
+        )
+    }
+
+    private fun mockMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null): MediaUpgradeOffer =
+        TestMediaUpgradeOffer(audio, video)
+
+    private class TestMediaUpgradeOffer(audio: MediaDirection? = null, video: MediaDirection? = null) : MediaUpgradeOffer(audio, video) {
+        override fun accept(callback: Consumer<GliaException>?) {}
+
+        override fun decline(callback: Consumer<GliaException>?) {}
+
+    }
+
 }
